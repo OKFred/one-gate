@@ -50,9 +50,9 @@ export type ResponseGeneric<U, M> = {
 
 export type AxiosConfig<U, M> = Omit<
   AxiosRequestConfig,
-  'url' | 'method' | 'headers' | 'path' | 'params' | 'data'
+  'url' | 'method' | 'headers' | 'path' | 'params' | 'data' | 'ignoreAbort'
 > &
-  RequestGeneric<U, M>;
+  RequestGeneric<U, M> & { ignoreAbort?: boolean };
 
 /** @description  axios 实例 */
 const service = axios.create({
@@ -65,13 +65,19 @@ function setupInterceptors(service: AxiosInstance) {
   /** @description 添加请求拦截器 */
   service.interceptors.request.use(
     (
-      config: InternalAxiosRequestConfig & { path?: Record<string, unknown>; requestId?: string },
+      config: InternalAxiosRequestConfig & {
+        path?: Record<string, unknown>;
+        requestId?: string;
+        ignoreAbort?: boolean;
+      },
     ) => {
-      // 创建 AbortController 并添加到队列
-      const controller = new AbortController();
-      const requestId = requestQueueManager.addRequest(controller);
-      config.requestId = requestId;
-      config.signal = controller.signal;
+      // 如果没有标记忽略 abort，才创建 AbortController 并添加到队列
+      if (!config.ignoreAbort) {
+        const controller = new AbortController();
+        const requestId = requestQueueManager.addRequest(controller);
+        config.requestId = requestId;
+        config.signal = controller.signal;
+      }
 
       // 自动添加认证token
       const token = authUtils.getUserInfo()?.token;
