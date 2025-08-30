@@ -1,10 +1,22 @@
-import './App.css';
-import Login from './pages/login';
+// import Login from './pages/login';
+
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
+import AppRoutes from './routes';
 
 function App() {
+  const navigate = useNavigate();
   return (
     <>
-      <Login />
+      <Button
+        variant="contained"
+        onClick={() => {
+          navigate('/login');
+        }}
+      >
+        Go to Login
+      </Button>
+      <AppRoutes />
     </>
   );
 }
