@@ -1,7 +1,13 @@
+import LoginFooter from './components/LoginFooter';
+import LoginForm from './components/LoginForm';
+import LoginHeader from './components/LoginHeader';
+
 export default function Login() {
   return (
-    <>
-      <h1>Login</h1>
-    </>
+    <div className='m-2'>
+      <LoginHeader />
+      <LoginForm />
+      <LoginFooter />
+    </div>
   );
 }
