@@ -1,0 +1,107 @@
+import db from "@/db/index";
+import { sql } from "drizzle-orm";
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { JSONSchema } from "json-schema-to-ts";
+
+export const mailTemplateIndex = {
+    id: {
+        type: "number",
+        description: "index id",
+        examples: [1],
+    },
+} as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
+
+export const mailTemplateUnique = {} as const satisfies Partial<
+    Record<keyof mailTemplateLike, JSONSchema>
+>;
+
+export const mailTemplateData = {
+    name: {
+        type: "string",
+        format: "email",
+        description: "邮件模板名称",
+        examples: ["welcome_email"],
+    },
+    title: {
+        type: "string",
+        description: "邮件标题",
+        examples: ["Welcome to our service!"],
+    },
+    langCode: {
+        type: "string",
+        description: "语言代码",
+        examples: ["en-US"],
+    },
+    content: {
+        type: "string",
+        description: "邮件内容",
+    },
+    creatorName: {
+        type: "string",
+        description: "创建者名称",
+    },
+    category: {
+        type: "string",
+        description: "邮件分类",
+    },
+} as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
+
+export const mailTemplateTimestamp = {
+    createTimeUtc: {
+        type: "number",
+    },
+    updateTimeUtc: {
+        type: "number",
+        nullable: true,
+    },
+} as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
+
+export type mailTemplateLike = InferSelectModel<typeof mailTemplateTable>;
+export type mailTemplateAddLike = InferInsertModel<typeof mailTemplateTable>;
+
+export const mailTemplateTable = sqliteTable("mail_template", {
+    id: integer("id").primaryKey().notNull(),
+    name: text("name").notNull().unique(),
+    title: text("title").notNull(),
+    langCode: text("lang_code").notNull(),
+    content: text("content").notNull(),
+    creatorName: text("creator_name").notNull(),
+    category: text("category"),
+    status: integer("status", {
+        mode: "boolean",
+    })
+        .notNull()
+        .default(true),
+    remark: text("remark"),
+    createTimeUtc: integer("create_time_utc")
+        .notNull()
+        .default(
+            sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
+        ),
+    updateTimeUtc: integer("update_time_utc"),
+});
+
+export async function tableInit() {
+    await db.run(`
+        CREATE TABLE IF NOT EXISTS mail_template (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL UNIQUE,
+            title TEXT NOT NULL,
+            lang_code TEXT NOT NULL,
+            content TEXT NOT NULL,
+            creator_name TEXT NOT NULL,
+            category TEXT,
+            status INTEGER NOT NULL DEFAULT 1,
+            remark TEXT,
+            create_time_utc INTEGER DEFAULT (
+              CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
+              CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
+            ),
+            update_time_utc INTEGER
+        )
+    `);
+    console.log("Table initialized");
+}
+
+export default mailTemplateTable;

@@ -1,0 +1,112 @@
+import db from "@/db/index";
+import { sql } from "drizzle-orm";
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { JSONSchema } from "json-schema-to-ts";
+
+export const mailLogIndex = {
+    id: {
+        type: "number",
+        description: "index id",
+        examples: [1],
+    },
+} as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
+
+export const mailLogUnique = {} as const satisfies Partial<
+    Record<keyof mailLogLike, JSONSchema>
+>;
+
+export const mailLogData = {
+    mailTo: {
+        type: "string",
+        format: "email",
+        description: "收件人邮箱地址",
+        examples: ["receiver@example.com"],
+    },
+    mailFrom: {
+        type: "string",
+        format: "email",
+        description: "发件人邮箱地址",
+        examples: ["sender@example.com"],
+    },
+    title: {
+        type: "string",
+        description: "邮件标题",
+        examples: ["Welcome to our service!"],
+    },
+    templateId: {
+        type: "string",
+        description: "邮件模板ID",
+    },
+    templateParams: {
+        type: "string",
+        description: "邮件模板参数",
+    },
+    sendStatus: {
+        type: "boolean",
+        description: "发送状态",
+    },
+    exceptionCode: {
+        type: "string",
+        description: "异常代码",
+    },
+    exceptionDetails: {
+        type: "string",
+        description: "异常详情",
+    },
+} as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
+
+export const mailLogTimestamp = {
+    createTimeUtc: {
+        type: "number",
+    },
+    updateTimeUtc: {
+        type: "number",
+        nullable: true,
+    },
+} as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
+
+export type mailLogLike = InferSelectModel<typeof mailLogTable>;
+export type mailLogAddLike = InferInsertModel<typeof mailLogTable>;
+
+export const mailLogTable = sqliteTable("mail_log", {
+    id: integer("id").primaryKey().notNull(),
+    mailTo: text("mail_to").notNull(),
+    mailFrom: text("mail_from").notNull(),
+    title: text("title").notNull(),
+    templateId: text("template_id"),
+    templateParams: text("template_params"),
+    sendStatus: integer("send_status", { mode: "boolean" }).notNull(),
+    exceptionCode: text("exception_code"),
+    exceptionDetails: text("exception_details"),
+    createTimeUtc: integer("create_time_utc")
+        .notNull()
+        .default(
+            sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
+        ),
+    updateTimeUtc: integer("update_time_utc"),
+});
+
+export async function tableInit() {
+    await db.run(`
+        CREATE TABLE IF NOT EXISTS mail_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            mail_to TEXT NOT NULL,
+            mail_from TEXT NOT NULL,
+            title TEXT NOT NULL,
+            template_id TEXT,
+            template_params TEXT,
+            send_status INTEGER NOT NULL,
+            exception_code TEXT,
+            exception_details TEXT,
+            create_time_utc INTEGER DEFAULT (
+              CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
+              CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
+            ),
+            update_time_utc INTEGER
+        )
+    `);
+    console.log("Table initialized");
+}
+
+export default mailLogTable;
