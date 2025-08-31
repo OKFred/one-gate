@@ -5,6 +5,8 @@ import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
 import Content from './components/Content';
 
+import BackToPrevButton from '../../components/BackToPrevButton';
+
 export default function ResponsiveLayout() {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
 
@@ -16,6 +18,8 @@ export default function ResponsiveLayout() {
         <Sidebar open={sidebarOpen} />
         <Content sidebarOpen={sidebarOpen} />
       </Box>
+  {/* 固定右下角返回按钮 */}
+  <BackToPrevButton />
     </Box>
   );
 }
