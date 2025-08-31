@@ -5,7 +5,8 @@ import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
 import Content from './components/Content';
 
-import BackToPrevButton from '../../components/BackToPrevButton';
+import GoBack from './components/GoBack';
+import ScrollTop from './components/ScrollTop';
 
 export default function ResponsiveLayout() {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
@@ -18,8 +19,9 @@ export default function ResponsiveLayout() {
         <Sidebar open={sidebarOpen} />
         <Content sidebarOpen={sidebarOpen} />
       </Box>
-  {/* 固定右下角返回按钮 */}
-  <BackToPrevButton />
+      {/* 固定右下角返回按钮和回到顶部按钮 */}
+      <GoBack />
+      <ScrollTop />
     </Box>
   );
 }
