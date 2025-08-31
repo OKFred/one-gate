@@ -1,6 +1,16 @@
 import type { AxiosConfig } from '../config';
 import axios from '../config';
 
+export const sendMailSingle = (
+  axiosConfig: Omit<AxiosConfig<'/api/mail/send/single', 'post'>, 'url' | 'method'>,
+) => {
+  return axios({
+    url: '/api/mail/send/single',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const listMailAccount = (
   axiosConfig: Omit<AxiosConfig<'/api/mail/account/list', 'post'>, 'url' | 'method'>,
 ) => {

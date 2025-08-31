@@ -1,28 +1,54 @@
 import { useRoutes } from 'react-router-dom';
+
+// 动态递归导入 pages 下除 error、layout、login 的页面
+const modules = import.meta.glob('./pages/!(error|layout|login)/**/index.tsx', { eager: true });
+import type { ReactElement, ComponentType } from 'react';
+
+type RouteItem = { path: string; element: ReactElement; children?: RouteItem[] };
+
+// 递归构建路由树
+function buildRouteTree(paths: [string, any][]): RouteItem[] {
+  const tree: Record<string, RouteItem> = {};
+  for (const [filePath, mod] of paths) {
+    // ./pages/mail/template/index.tsx => mail/template
+    const match = filePath.match(/\.\/pages\/(.*?)\/index\.tsx$/);
+    if (!match) continue;
+    const routePath = match[1];
+    const segments = routePath.split('/');
+    let cur = tree;
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i];
+      if (!cur[seg]) {
+        cur[seg] = {
+          path: seg,
+          element: null,
+          children: {},
+        };
+      }
+      if (i === segments.length - 1) {
+        const Comp = (mod as { default: ComponentType<Record<string, unknown>> }).default;
+        cur[seg].element = <Comp />;
+      }
+      cur = cur[seg].children;
+    }
+  }
+  // 转换为数组并递归 children
+  function toArray(obj: Record<string, RouteItem>): RouteItem[] {
+    return Object.values(obj).map(({ path, element, children }) => ({
+      path,
+      element,
+      children: children && Object.keys(children).length > 0 ? toArray(children) : undefined,
+    }));
+  }
+  return toArray(tree);
+}
+
+const childrenRoutes = buildRouteTree(Object.entries(modules));
+
 import Login from './pages/login';
 import Home from './pages/home';
 import NotFound from './pages/error/NotFound';
 import Layout from './pages/layout';
-
-// 动态导入 pages 下除 error、layout、login 的页面
-const modules = import.meta.glob('./pages/!(error|layout|login)/**/index.tsx', { eager: true });
-
-// 自动生成 children 路由
-import type { ReactElement, ComponentType } from 'react';
-
-type RouteItem = { path: string; element: ReactElement };
-
-const childrenRoutes: RouteItem[] = Object.entries(modules)
-  .map(([path, mod]) => {
-    // 取出页面名作为路由 path
-    // 例如 ./pages/mail/index.tsx => mail
-    const match = path.match(/\.\/pages\/(.*?)\/index\.tsx$/);
-    const routePath = match ? match[1] : '';
-    // 组件
-    const Comp = (mod as { default: ComponentType<Record<string, unknown>> }).default;
-    return routePath && Comp ? { path: routePath, element: <Comp /> } : null;
-  })
-  .filter((r): r is RouteItem => r !== null);
 
 export default function AppRoutes() {
   return useRoutes([
@@ -30,7 +56,7 @@ export default function AppRoutes() {
     { path: '/login', element: <Login /> },
     {
       path: '/',
-      element: <Layout />, // 需要布局的页面
+      element: <Layout />,
       children: childrenRoutes,
     },
     { path: '*', element: <NotFound /> },
