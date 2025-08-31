@@ -1,16 +1,19 @@
 import { defineConfig } from 'vite';
 import { loadEnv } from 'vite';
 import path from 'path';
-const pathSrc = path.resolve(__dirname, 'src');
 import react from '@vitejs/plugin-react-swc';
 import UnoCSS from 'unocss/vite';
 import childProcess from 'child_process';
+
+const pathSrc = path.resolve(__dirname, 'src');
+console.log('pathSrc', pathSrc);
+
 async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }) {
   //npx openapi-typescript SERVER_URL/doc.json -o ./types/openapi.d.ts
   const { SERVER_URL, VITE_SERVER_URL } = env;
   console.log('Generating API docs from', SERVER_URL);
   const child = childProcess.exec(
-    `npx openapi-typescript ${SERVER_URL || VITE_SERVER_URL}/doc.json -o ./types/openapi.d.ts`,
+    `npx openapi-typescript ${SERVER_URL || VITE_SERVER_URL}/doc.json -o ./src/types/openapi.d.ts`,
   );
   await new Promise((resolve, reject) => {
     child.on('close', (code) => {
@@ -40,7 +43,7 @@ export default defineConfig(({ command, mode }) => {
   const result = {
     resolve: {
       alias: {
-        '@': pathSrc,
+        '@/': pathSrc + '/',
       },
     },
     server: { proxy: {} },

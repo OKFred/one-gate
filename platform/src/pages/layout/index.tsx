@@ -23,15 +23,16 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 const drawerWidth = 240;
 
 const navItems = [
-  { text: '首页', icon: <HomeIcon /> },
-  { text: '账户', icon: <AccountCircleIcon /> },
-  { text: '邮件', icon: <MailIcon /> },
+  { text: '首页', icon: <HomeIcon />, path: '/home' },
+  { text: '账户', icon: <AccountCircleIcon />, path: '/account' },
+  { text: '邮件', icon: <MailIcon />, path: '/mail' },
 ];
 
 // 侧边栏收起/展开按钮组件
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import { useNavigate } from 'react-router';
 
 function SidebarToggle() {
   const [open, setOpen] = React.useContext(SidebarContext);
@@ -46,11 +47,14 @@ function SidebarToggle() {
 const SidebarContext = React.createContext<
   [boolean, React.Dispatch<React.SetStateAction<boolean>>]
 >([true, () => {}]);
-export default function ResponsiveLayout(props: { children?: React.ReactNode }) {
+import { Outlet } from 'react-router-dom';
+export default function ResponsiveLayout() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   // 桌面端侧边栏显示/隐藏
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
+
+  const navigate = useNavigate();
 
   const drawer = (
     <div>
@@ -62,7 +66,7 @@ export default function ResponsiveLayout(props: { children?: React.ReactNode }) 
         </div>
         <List className="pb-0! pt-0!">
           {navItems.map((item) => (
-            <ListItem component="button" key={item.text}>
+            <ListItem component="button" key={item.text} onClick={() => navigate(item.path)}>
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItem>
@@ -77,11 +81,24 @@ export default function ResponsiveLayout(props: { children?: React.ReactNode }) 
       <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: 'background.default' }}>
         <CssBaseline />
         {/* 顶部栏全宽 */}
-        <AppBar position="fixed" sx={{ width: '100vw', left: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}>
+        <AppBar
+          position="fixed"
+          sx={{ width: '100vw', left: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}
+        >
           <Toolbar sx={{ minHeight: '64px', pl: { sm: 0 } }}>
             {/* 桌面端侧边栏收起/展开按钮，绝对定位到左侧，避免被遮挡 */}
             {!isMobile && (
-              <Box sx={{ position: 'relative', width: 48, height: 48, display: 'flex', alignItems: 'center', justifyContent: 'center', mr: 2 }}>
+              <Box
+                sx={{
+                  position: 'relative',
+                  width: 48,
+                  height: 48,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 2,
+                }}
+              >
                 <SidebarToggle />
               </Box>
             )}
@@ -133,7 +150,7 @@ export default function ResponsiveLayout(props: { children?: React.ReactNode }) 
               transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
             }}
           >
-            {props.children}
+            <Outlet />
           </Box>
         </Box>
         {/* 移动端底部菜单 */}
