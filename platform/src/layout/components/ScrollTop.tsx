@@ -29,7 +29,7 @@ const ScrollTopButton: React.FC = () => {
         aria-label="回到顶部"
         sx={{
           position: 'fixed',
-          bottom: 96,
+          bottom: 128,
           right: 32,
           opacity: hover ? 1 : 0.3,
           transition: 'opacity 0.2s',

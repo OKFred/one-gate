@@ -19,7 +19,7 @@ const BackToPrevButton: React.FC = () => {
         aria-label="返回上一页"
         sx={{
           position: 'fixed',
-          bottom: 32,
+          bottom: 70,
           right: 32,
           opacity: hover ? 1 : 0.3,
           transition: 'opacity 0.2s',
