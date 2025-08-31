@@ -1,7 +1,7 @@
 import { useRoutes } from 'react-router-dom';
 
-// 动态递归导入 pages 下除 error、layout、login 的页面
-const modules = import.meta.glob('./pages/!(error|layout|login)/**/index.tsx', { eager: true });
+// 动态递归导入 pages 下除 error、login 的页面
+const modules = import.meta.glob('./pages/!(error|login)/**/index.tsx', { eager: true });
 import type { ReactElement, ComponentType } from 'react';
 
 type RouteItem = { path: string; element: ReactElement; children?: RouteItem[] };
@@ -45,10 +45,10 @@ function buildRouteTree(paths: [string, any][]): RouteItem[] {
 
 const childrenRoutes = buildRouteTree(Object.entries(modules));
 
+import Layout from './layout';
 import Login from './pages/login';
 import Home from './pages/home';
 import NotFound from './pages/error/NotFound';
-import Layout from './pages/layout';
 
 export default function AppRoutes() {
   return useRoutes([
