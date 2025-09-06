@@ -1,30 +1,16 @@
 import { useEffect, useState } from 'react';
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
   Container,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
   Typography,
-  Stack,
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
   listMailAccount,
   addMailAccount,
   updateMailAccount,
   deleteMailAccount,
 } from '@/api/mail';
+import AccountForm from './components/AccountForm';
+import AccountTable from './components/AccountTable';
 
 interface MailAccount {
   id?: number;
@@ -101,6 +87,11 @@ export default function MailAccount() {
     } else {
       await addMailAccount({ data: formData });
     }
+    handleCancel();
+    fetchAccounts();
+  };
+
+  const handleCancel = () => {
     setEditId(null);
     setForm({ 
       nickname: '', 
@@ -112,7 +103,6 @@ export default function MailAccount() {
       sslEnable: false,
       starttlsEnable: true,
     });
-    fetchAccounts();
   };
 
   return (
@@ -121,151 +111,20 @@ export default function MailAccount() {
         邮件账户管理
       </Typography>
       
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <form onSubmit={handleSubmit}>
-            <Stack spacing={3}>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
-                  label="昵称"
-                  value={form.nickname}
-                  onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
-                  required
-                  fullWidth
-                />
-                <TextField
-                  label="邮箱地址"
-                  type="email"
-                  value={form.mailAddress}
-                  onChange={(e) => setForm((f) => ({ ...f, mailAddress: e.target.value }))}
-                  required
-                  fullWidth
-                />
-              </Stack>
-              
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
-                  label="SMTP主机"
-                  value={form.host}
-                  onChange={(e) => setForm((f) => ({ ...f, host: e.target.value }))}
-                  required
-                  fullWidth
-                />
-                <TextField
-                  label="端口"
-                  type="number"
-                  value={form.port}
-                  onChange={(e) => setForm((f) => ({ ...f, port: e.target.value }))}
-                  required
-                  fullWidth
-                />
-              </Stack>
-              
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
-                  label="账户所有者"
-                  value={form.accountOwner}
-                  onChange={(e) => setForm((f) => ({ ...f, accountOwner: e.target.value }))}
-                  required
-                  fullWidth
-                />
-                <TextField
-                  label="密码"
-                  type="password"
-                  value={form.password}
-                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                  required
-                  fullWidth
-                />
-              </Stack>
-              
-              <Stack direction="row" spacing={2}>
-                <Button 
-                  type="submit" 
-                  variant="contained" 
-                  color="primary"
-                >
-                  {editId ? '更新' : '新增'}
-                </Button>
-                {editId && (
-                  <Button
-                    type="button"
-                    variant="outlined"
-                    onClick={() => {
-                      setEditId(null);
-                      setForm({ 
-                        nickname: '', 
-                        mailAddress: '', 
-                        host: '', 
-                        port: '587', 
-                        accountOwner: '', 
-                        password: '',
-                        sslEnable: false,
-                        starttlsEnable: true,
-                      });
-                    }}
-                  >
-                    取消
-                  </Button>
-                )}
-              </Stack>
-            </Stack>
-          </form>
-        </CardContent>
-      </Card>
+      <AccountForm
+        form={form}
+        editId={editId}
+        onFormChange={setForm}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+      />
 
-      {loading ? (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>昵称</TableCell>
-                <TableCell>邮箱</TableCell>
-                <TableCell>主机</TableCell>
-                <TableCell>端口</TableCell>
-                <TableCell>账户所有者</TableCell>
-                <TableCell align="center">操作</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {accounts.length > 0 &&
-                accounts.map((acc) => (
-                  <TableRow key={acc.id} hover>
-                    <TableCell>{acc.id}</TableCell>
-                    <TableCell>{acc.nickname}</TableCell>
-                    <TableCell>{acc.mailAddress}</TableCell>
-                    <TableCell>{acc.host}</TableCell>
-                    <TableCell>{acc.port}</TableCell>
-                    <TableCell>{acc.accountOwner}</TableCell>
-                    <TableCell align="center">
-                      <Stack direction="row" spacing={1} justifyContent="center">
-                        <IconButton 
-                          onClick={() => handleEdit(acc)}
-                          color="primary"
-                          size="small"
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton 
-                          onClick={() => acc.id && handleDelete(acc.id)}
-                          color="error"
-                          size="small"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+      <AccountTable
+        accounts={accounts}
+        loading={loading}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </Container>
   );
 }
