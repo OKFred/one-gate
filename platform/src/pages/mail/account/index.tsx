@@ -1,30 +1,66 @@
 import { useEffect, useState } from 'react';
 import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Container,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  Stack,
+} from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
   listMailAccount,
   addMailAccount,
   updateMailAccount,
   deleteMailAccount,
-  getMailAccount,
 } from '@/api/mail';
 
+interface MailAccount {
+  id?: number;
+  mailAddress?: string;
+  password?: string;
+  nickname?: string;
+  host?: string;
+  port: number;
+  sslEnable: boolean;
+  starttlsEnable: boolean;
+  accountOwner?: string;
+  createTimeUtc?: number;
+  updateTimeUtc?: number | null;
+}
+
 export default function MailAccount() {
-  const [accounts, setAccounts] = useState<any[]>([]);
+  const [accounts, setAccounts] = useState<MailAccount[]>([]);
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({
-    name: '',
+    nickname: '',
     mailAddress: '',
     host: '',
-    port: '',
-    user: '',
-    pass: '',
+    port: '587',
+    accountOwner: '',
+    password: '',
+    sslEnable: false,
+    starttlsEnable: true,
   });
 
   const fetchAccounts = async () => {
     setLoading(true);
     try {
       const res = await listMailAccount({ data: { pageNo: 1, pageSize: 100 } });
-      setAccounts(res.data?.data?.list || []);
+      const accountsList = (res.data as { data?: { list?: MailAccount[] } })?.data?.list || [];
+      setAccounts(accountsList);
     } finally {
       setLoading(false);
     }
@@ -34,15 +70,17 @@ export default function MailAccount() {
     fetchAccounts();
   }, []);
 
-  const handleEdit = (acc: any) => {
-    setEditId(acc.id);
+  const handleEdit = (acc: MailAccount) => {
+    setEditId(acc.id!);
     setForm({
-      name: acc.name,
-      mailAddress: acc.mailAddress,
-      host: acc.host,
-      port: acc.port,
-      user: acc.user,
-      pass: acc.pass,
+      nickname: acc.nickname || '',
+      mailAddress: acc.mailAddress || '',
+      host: acc.host || '',
+      port: acc.port?.toString() || '587',
+      accountOwner: acc.accountOwner || '',
+      password: acc.password || '',
+      sslEnable: acc.sslEnable || false,
+      starttlsEnable: acc.starttlsEnable || true,
     });
   };
 
@@ -53,103 +91,181 @@ export default function MailAccount() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = {
+      ...form,
+      port: parseInt(form.port, 10),
+    };
+    
     if (editId) {
-      await updateMailAccount({ data: { id: editId, ...form } });
+      await updateMailAccount({ data: { id: editId, ...formData } });
     } else {
-      await addMailAccount({ data: form });
+      await addMailAccount({ data: formData });
     }
     setEditId(null);
-    setForm({ name: '', mailAddress: '', host: '', port: '', user: '', pass: '' });
+    setForm({ 
+      nickname: '', 
+      mailAddress: '', 
+      host: '', 
+      port: '587', 
+      accountOwner: '', 
+      password: '',
+      sslEnable: false,
+      starttlsEnable: true,
+    });
     fetchAccounts();
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <h2>邮件账户管理</h2>
-      <form onSubmit={handleSubmit} style={{ marginBottom: 24 }}>
-        <input
-          placeholder="名称"
-          value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-          required
-        />
-        <input
-          placeholder="邮箱地址"
-          value={form.mailAddress}
-          onChange={(e) => setForm((f) => ({ ...f, mailAddress: e.target.value }))}
-          required
-        />
-        <input
-          placeholder="SMTP主机"
-          value={form.host}
-          onChange={(e) => setForm((f) => ({ ...f, host: e.target.value }))}
-          required
-        />
-        <input
-          placeholder="端口"
-          value={form.port}
-          onChange={(e) => setForm((f) => ({ ...f, port: e.target.value }))}
-          required
-        />
-        <input
-          placeholder="用户名"
-          value={form.user}
-          onChange={(e) => setForm((f) => ({ ...f, user: e.target.value }))}
-          required
-        />
-        <input
-          placeholder="密码"
-          value={form.pass}
-          onChange={(e) => setForm((f) => ({ ...f, pass: e.target.value }))}
-          required
-        />
-        <button type="submit">{editId ? '更新' : '新增'}</button>
-        {editId && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditId(null);
-              setForm({ name: '', mailAddress: '', host: '', port: '', user: '', pass: '' });
-            }}
-          >
-            取消
-          </button>
-        )}
-      </form>
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        邮件账户管理
+      </Typography>
+      
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <Stack spacing={3}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <TextField
+                  label="昵称"
+                  value={form.nickname}
+                  onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="邮箱地址"
+                  type="email"
+                  value={form.mailAddress}
+                  onChange={(e) => setForm((f) => ({ ...f, mailAddress: e.target.value }))}
+                  required
+                  fullWidth
+                />
+              </Stack>
+              
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <TextField
+                  label="SMTP主机"
+                  value={form.host}
+                  onChange={(e) => setForm((f) => ({ ...f, host: e.target.value }))}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="端口"
+                  type="number"
+                  value={form.port}
+                  onChange={(e) => setForm((f) => ({ ...f, port: e.target.value }))}
+                  required
+                  fullWidth
+                />
+              </Stack>
+              
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <TextField
+                  label="账户所有者"
+                  value={form.accountOwner}
+                  onChange={(e) => setForm((f) => ({ ...f, accountOwner: e.target.value }))}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="密码"
+                  type="password"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  required
+                  fullWidth
+                />
+              </Stack>
+              
+              <Stack direction="row" spacing={2}>
+                <Button 
+                  type="submit" 
+                  variant="contained" 
+                  color="primary"
+                >
+                  {editId ? '更新' : '新增'}
+                </Button>
+                {editId && (
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    onClick={() => {
+                      setEditId(null);
+                      setForm({ 
+                        nickname: '', 
+                        mailAddress: '', 
+                        host: '', 
+                        port: '587', 
+                        accountOwner: '', 
+                        password: '',
+                        sslEnable: false,
+                        starttlsEnable: true,
+                      });
+                    }}
+                  >
+                    取消
+                  </Button>
+                )}
+              </Stack>
+            </Stack>
+          </form>
+        </CardContent>
+      </Card>
+
       {loading ? (
-        <div>加载中...</div>
+        <Box display="flex" justifyContent="center" py={4}>
+          <CircularProgress />
+        </Box>
       ) : (
-        <table border={1} cellPadding={8} style={{ width: '100%' }}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>名称</th>
-              <th>邮箱</th>
-              <th>主机</th>
-              <th>端口</th>
-              <th>用户名</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {accounts.length > 0 &&
-              accounts.map((acc) => (
-                <tr key={acc.id}>
-                  <td>{acc.id}</td>
-                  <td>{acc.name}</td>
-                  <td>{acc.mailAddress}</td>
-                  <td>{acc.host}</td>
-                  <td>{acc.port}</td>
-                  <td>{acc.user}</td>
-                  <td>
-                    <button onClick={() => handleEdit(acc)}>编辑</button>
-                    <button onClick={() => handleDelete(acc.id)}>删除</button>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>昵称</TableCell>
+                <TableCell>邮箱</TableCell>
+                <TableCell>主机</TableCell>
+                <TableCell>端口</TableCell>
+                <TableCell>账户所有者</TableCell>
+                <TableCell align="center">操作</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {accounts.length > 0 &&
+                accounts.map((acc) => (
+                  <TableRow key={acc.id} hover>
+                    <TableCell>{acc.id}</TableCell>
+                    <TableCell>{acc.nickname}</TableCell>
+                    <TableCell>{acc.mailAddress}</TableCell>
+                    <TableCell>{acc.host}</TableCell>
+                    <TableCell>{acc.port}</TableCell>
+                    <TableCell>{acc.accountOwner}</TableCell>
+                    <TableCell align="center">
+                      <Stack direction="row" spacing={1} justifyContent="center">
+                        <IconButton 
+                          onClick={() => handleEdit(acc)}
+                          color="primary"
+                          size="small"
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton 
+                          onClick={() => acc.id && handleDelete(acc.id)}
+                          color="error"
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+    </Container>
   );
 }
