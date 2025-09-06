@@ -1,17 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import {
-  Container,
-  Typography,
-  Button,
-  Box,
-} from '@mui/material';
+import { Container, Typography, Button, Box, useTheme, useMediaQuery } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
-import {
-  listMailAccount,
-  addMailAccount,
-  updateMailAccount,
-  deleteMailAccount,
-} from '@/api/mail';
+import { listMailAccount, addMailAccount, updateMailAccount, deleteMailAccount } from '@/api/mail';
 import AccountForm from './components/AccountForm';
 import AccountTable from './components/AccountTable';
 import AccountFilter from './components/AccountFilter';
@@ -58,6 +48,9 @@ export default function MailAccount() {
     starttlsEnable: true,
   });
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const fetchAccounts = useCallback(async (searchParams: FilterState) => {
     setLoading(true);
     try {
@@ -68,12 +61,12 @@ export default function MailAccount() {
         orderBy: searchParams.orderBy,
         descend: searchParams.descend,
       };
-      
+
       const res = await listMailAccount({ data: requestData });
       const response = res.data as { data?: { list?: MailAccount[]; total?: number } };
       const accountsList = response?.data?.list || [];
       const total = response?.data?.total || 0;
-      
+
       setAccounts(accountsList);
       setTotalCount(total);
     } finally {
@@ -81,10 +74,13 @@ export default function MailAccount() {
     }
   }, []);
 
-  const handleFilterChange = useCallback((newFilters: FilterState) => {
-    setFilters(newFilters);
-    fetchAccounts(newFilters);
-  }, [fetchAccounts]);
+  const handleFilterChange = useCallback(
+    (newFilters: FilterState) => {
+      setFilters(newFilters);
+      fetchAccounts(newFilters);
+    },
+    [fetchAccounts],
+  );
 
   // 只在组件挂载时加载一次初始数据
   useEffect(() => {
@@ -112,12 +108,12 @@ export default function MailAccount() {
 
   const handleAdd = () => {
     setEditId(null);
-    setForm({ 
-      nickname: '', 
-      mailAddress: '', 
-      host: '', 
-      port: '587', 
-      accountOwner: '', 
+    setForm({
+      nickname: '',
+      mailAddress: '',
+      host: '',
+      port: '587',
+      accountOwner: '',
       password: '',
       sslEnable: false,
       starttlsEnable: true,
@@ -136,7 +132,7 @@ export default function MailAccount() {
       ...form,
       port: parseInt(form.port, 10),
     };
-    
+
     if (editId) {
       await updateMailAccount({ data: { id: editId, ...formData } });
     } else {
@@ -149,12 +145,12 @@ export default function MailAccount() {
   const handleCancel = () => {
     setEditId(null);
     setOpen(false);
-    setForm({ 
-      nickname: '', 
-      mailAddress: '', 
-      host: '', 
-      port: '587', 
-      accountOwner: '', 
+    setForm({
+      nickname: '',
+      mailAddress: '',
+      host: '',
+      port: '587',
+      accountOwner: '',
       password: '',
       sslEnable: false,
       starttlsEnable: true,
@@ -162,25 +158,38 @@ export default function MailAccount() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4" component="h1">
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 3 } }}>
+      <Box
+        display="flex"
+        flexDirection={{ xs: 'column', sm: 'row' }}
+        justifyContent="space-between"
+        alignItems={{ xs: 'stretch', sm: 'center' }}
+        mb={3}
+        gap={{ xs: 2, sm: 0 }}
+      >
+        <Typography
+          variant={isMobile ? 'h5' : 'h4'}
+          component="h1"
+          sx={{ textAlign: { xs: 'center', sm: 'left' } }}
+        >
           邮件账户管理
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleAdd}
+          fullWidth={isMobile}
+          sx={{
+            minWidth: { xs: 'auto', sm: 'fit-content' },
+            height: 'fit-content',
+          }}
         >
           新增账户
         </Button>
       </Box>
-      
-      <AccountFilter 
-        onFilterChange={handleFilterChange}
-        filterCount={totalCount}
-      />
-      
+
+      <AccountFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
+
       <AccountForm
         open={open}
         form={form}

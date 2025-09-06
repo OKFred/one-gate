@@ -25,7 +25,6 @@ interface SidebarProps {
   open: boolean;
 }
 
-
 const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -80,6 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   // 移动端底部菜单
   const mobileMenu = (
     <Box
+      className="mobile-bottom-nav"
       sx={{
         position: 'fixed',
         left: 0,
@@ -110,10 +110,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
               cursor: 'pointer',
               color: 'text.secondary',
               '&:active': { color: 'primary.main' },
+              transition: 'color 0.2s ease',
             }}
             onClick={() => navigate(item.path)}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>{item.icon}</Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5 }}>{item.icon}</Box>
             <Typography variant="caption">{item.text}</Typography>
           </Box>
         ))}

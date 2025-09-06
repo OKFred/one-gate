@@ -1,30 +1,57 @@
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import { TextField, Button, Box, Stack, useTheme, useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router';
+
 export default function LoginForm() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <>
-      <TextField label="Username" variant="outlined" fullWidth margin="normal" />
-      <TextField label="Password" type="password" variant="outlined" fullWidth margin="normal" />
-      {/* forgot password */}
-      <Button variant="text" color="primary">
-        Forgot Password?
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        sx={{ mt: 2 }}
-        onClick={() => {
-          navigate('/home');
-        }}
-      >
-        Login
-      </Button>
-      <Button variant="contained" color="success" fullWidth sx={{ mt: 2 }}>
-        Login with WeChat
-      </Button>
-    </>
+    <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
+      <Stack spacing={isMobile ? 2 : 3}>
+        <TextField
+          label="用户名"
+          variant="outlined"
+          fullWidth
+          size={isMobile ? 'medium' : 'medium'}
+        />
+        <TextField
+          label="密码"
+          type="password"
+          variant="outlined"
+          fullWidth
+          size={isMobile ? 'medium' : 'medium'}
+        />
+
+        <Box sx={{ textAlign: 'right' }}>
+          <Button variant="text" color="primary" size="small">
+            忘记密码？
+          </Button>
+        </Box>
+
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          size={isMobile ? 'large' : 'medium'}
+          sx={{ py: isMobile ? 1.5 : 1 }}
+          onClick={() => {
+            navigate('/home');
+          }}
+        >
+          登录
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="success"
+          fullWidth
+          size={isMobile ? 'large' : 'medium'}
+          sx={{ py: isMobile ? 1.5 : 1 }}
+        >
+          微信登录
+        </Button>
+      </Stack>
+    </Box>
   );
 }

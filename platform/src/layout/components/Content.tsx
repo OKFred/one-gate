@@ -16,12 +16,13 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
   return (
     <Box
       component="main"
+      className={isMobile ? 'content-mobile-padding' : ''}
       sx={{
         flexGrow: 1,
-        p: 3,
+        p: { xs: 2, md: 3 },
         width: { sm: sidebarOpen ? `calc(100vw - ${drawerWidth}px)` : `calc(100vw - 56px)` },
         minHeight: 'calc(100vh - 64px)',
-        pb: isMobile ? 8 : 0, // 给底部菜单留空间
+        pb: isMobile ? 'calc(72px + env(safe-area-inset-bottom, 16px))' : { xs: 2, md: 3 },
         transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
       }}
     >

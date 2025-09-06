@@ -7,7 +7,14 @@ import {
   DialogActions,
   TextField,
   Stack,
+  FormControlLabel,
+  Switch,
+  Box,
+  useTheme,
+  useMediaQuery,
+  IconButton,
 } from '@mui/material';
+import { Close as CloseIcon } from '@mui/icons-material';
 
 interface FormData {
   nickname: string;
@@ -29,20 +36,60 @@ interface AccountFormProps {
   onCancel: () => void;
 }
 
-export default function AccountForm({ open, form, editId, onFormChange, onSubmit, onCancel }: AccountFormProps) {
+export default function AccountForm({
+  open,
+  form,
+  editId,
+  onFormChange,
+  onSubmit,
+  onCancel,
+}: AccountFormProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(e);
   };
 
   return (
-    <Dialog open={open} onClose={onCancel} maxWidth="md" fullWidth>
-      <DialogTitle>
-        {editId ? '编辑邮件账户' : '新增邮件账户'}
+    <Dialog
+      open={open}
+      onClose={onCancel}
+      maxWidth="md"
+      fullWidth
+      fullScreen={isMobile}
+      sx={{
+        '& .MuiDialog-paper': {
+          margin: isMobile ? 0 : theme.spacing(4),
+          maxHeight: isMobile ? '100vh' : 'calc(100vh - 64px)',
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pb: isMobile ? 1 : 2,
+        }}
+      >
+        <Box>{editId ? '编辑邮件账户' : '新增邮件账户'}</Box>
+        {isMobile && (
+          <IconButton edge="end" color="inherit" onClick={onCancel} aria-label="close">
+            <CloseIcon />
+          </IconButton>
+        )}
       </DialogTitle>
-      <DialogContent>
+
+      <DialogContent
+        sx={{
+          pb: isMobile ? 1 : 2,
+          px: isMobile ? 2 : 3,
+        }}
+      >
         <form onSubmit={handleSubmit}>
-          <Stack spacing={3} sx={{ mt: 1 }}>
+          <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="昵称"
@@ -50,6 +97,7 @@ export default function AccountForm({ open, form, editId, onFormChange, onSubmit
                 onChange={(e) => onFormChange({ ...form, nickname: e.target.value })}
                 required
                 fullWidth
+                size={isMobile ? 'medium' : 'medium'}
               />
               <TextField
                 label="邮箱地址"
@@ -58,9 +106,10 @@ export default function AccountForm({ open, form, editId, onFormChange, onSubmit
                 onChange={(e) => onFormChange({ ...form, mailAddress: e.target.value })}
                 required
                 fullWidth
+                size={isMobile ? 'medium' : 'medium'}
               />
             </Stack>
-            
+
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="SMTP主机"
@@ -68,6 +117,7 @@ export default function AccountForm({ open, form, editId, onFormChange, onSubmit
                 onChange={(e) => onFormChange({ ...form, host: e.target.value })}
                 required
                 fullWidth
+                size={isMobile ? 'medium' : 'medium'}
               />
               <TextField
                 label="端口"
@@ -76,9 +126,10 @@ export default function AccountForm({ open, form, editId, onFormChange, onSubmit
                 onChange={(e) => onFormChange({ ...form, port: e.target.value })}
                 required
                 fullWidth
+                size={isMobile ? 'medium' : 'medium'}
               />
             </Stack>
-            
+
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="账户所有者"
@@ -86,6 +137,7 @@ export default function AccountForm({ open, form, editId, onFormChange, onSubmit
                 onChange={(e) => onFormChange({ ...form, accountOwner: e.target.value })}
                 required
                 fullWidth
+                size={isMobile ? 'medium' : 'medium'}
               />
               <TextField
                 label="密码"
@@ -94,16 +146,54 @@ export default function AccountForm({ open, form, editId, onFormChange, onSubmit
                 onChange={(e) => onFormChange({ ...form, password: e.target.value })}
                 required
                 fullWidth
+                size={isMobile ? 'medium' : 'medium'}
               />
             </Stack>
+
+            <Box>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.sslEnable}
+                      onChange={(e) => onFormChange({ ...form, sslEnable: e.target.checked })}
+                    />
+                  }
+                  label="启用SSL"
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.starttlsEnable}
+                      onChange={(e) => onFormChange({ ...form, starttlsEnable: e.target.checked })}
+                    />
+                  }
+                  label="启用STARTTLS"
+                />
+              </Stack>
+            </Box>
           </Stack>
         </form>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onCancel}>
+
+      <DialogActions
+        sx={{
+          px: isMobile ? 2 : 3,
+          py: isMobile ? 2 : 2,
+          flexDirection: isMobile ? 'column-reverse' : 'row',
+          gap: isMobile ? 1 : 0,
+        }}
+      >
+        <Button onClick={onCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
           取消
         </Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          fullWidth={isMobile}
+          size={isMobile ? 'large' : 'medium'}
+        >
           {editId ? '更新' : '新增'}
         </Button>
       </DialogActions>
