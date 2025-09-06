@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -14,6 +14,7 @@ import {
 } from '@/api/mail';
 import AccountForm from './components/AccountForm';
 import AccountTable from './components/AccountTable';
+import AccountFilter from './components/AccountFilter';
 
 interface MailAccount {
   id?: number;
@@ -29,11 +30,23 @@ interface MailAccount {
   updateTimeUtc?: number | null;
 }
 
+interface FilterState {
+  keyword: string;
+  orderBy: 'id' | 'accountOwner' | 'createTimeUtc';
+  descend: boolean;
+}
+
 export default function MailAccount() {
   const [accounts, setAccounts] = useState<MailAccount[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [filters, setFilters] = useState<FilterState>({
+    keyword: '',
+    orderBy: 'id',
+    descend: false,
+  });
   const [form, setForm] = useState({
     nickname: '',
     mailAddress: '',
@@ -45,20 +58,42 @@ export default function MailAccount() {
     starttlsEnable: true,
   });
 
-  const fetchAccounts = async () => {
+  const fetchAccounts = useCallback(async (searchParams: FilterState) => {
     setLoading(true);
     try {
-      const res = await listMailAccount({ data: { pageNo: 1, pageSize: 100 } });
-      const accountsList = (res.data as { data?: { list?: MailAccount[] } })?.data?.list || [];
+      const requestData = {
+        pageNo: 1,
+        pageSize: 100,
+        ...(searchParams.keyword && { keyword: searchParams.keyword }),
+        orderBy: searchParams.orderBy,
+        descend: searchParams.descend,
+      };
+      
+      const res = await listMailAccount({ data: requestData });
+      const response = res.data as { data?: { list?: MailAccount[]; total?: number } };
+      const accountsList = response?.data?.list || [];
+      const total = response?.data?.total || 0;
+      
       setAccounts(accountsList);
+      setTotalCount(total);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchAccounts();
   }, []);
+
+  const handleFilterChange = useCallback((newFilters: FilterState) => {
+    setFilters(newFilters);
+    fetchAccounts(newFilters);
+  }, [fetchAccounts]);
+
+  // 只在组件挂载时加载一次初始数据
+  useEffect(() => {
+    fetchAccounts({
+      keyword: '',
+      orderBy: 'id',
+      descend: false,
+    });
+  }, [fetchAccounts]);
 
   const handleEdit = (acc: MailAccount) => {
     setEditId(acc.id!);
@@ -92,7 +127,7 @@ export default function MailAccount() {
 
   const handleDelete = async (id: number) => {
     await deleteMailAccount({ data: { id } });
-    fetchAccounts();
+    fetchAccounts(filters);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -108,7 +143,7 @@ export default function MailAccount() {
       await addMailAccount({ data: formData });
     }
     handleCancel();
-    fetchAccounts();
+    fetchAccounts(filters);
   };
 
   const handleCancel = () => {
@@ -140,6 +175,11 @@ export default function MailAccount() {
           新增账户
         </Button>
       </Box>
+      
+      <AccountFilter 
+        onFilterChange={handleFilterChange}
+        filterCount={totalCount}
+      />
       
       <AccountForm
         open={open}
