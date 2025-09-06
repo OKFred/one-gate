@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react';
 import {
   Container,
   Typography,
+  Button,
+  Box,
 } from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
 import {
   listMailAccount,
   addMailAccount,
@@ -29,6 +32,7 @@ interface MailAccount {
 export default function MailAccount() {
   const [accounts, setAccounts] = useState<MailAccount[]>([]);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({
     nickname: '',
@@ -68,6 +72,22 @@ export default function MailAccount() {
       sslEnable: acc.sslEnable || false,
       starttlsEnable: acc.starttlsEnable || true,
     });
+    setOpen(true);
+  };
+
+  const handleAdd = () => {
+    setEditId(null);
+    setForm({ 
+      nickname: '', 
+      mailAddress: '', 
+      host: '', 
+      port: '587', 
+      accountOwner: '', 
+      password: '',
+      sslEnable: false,
+      starttlsEnable: true,
+    });
+    setOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -93,6 +113,7 @@ export default function MailAccount() {
 
   const handleCancel = () => {
     setEditId(null);
+    setOpen(false);
     setForm({ 
       nickname: '', 
       mailAddress: '', 
@@ -107,11 +128,21 @@ export default function MailAccount() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        邮件账户管理
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" component="h1">
+          邮件账户管理
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAdd}
+        >
+          新增账户
+        </Button>
+      </Box>
       
       <AccountForm
+        open={open}
         form={form}
         editId={editId}
         onFormChange={setForm}

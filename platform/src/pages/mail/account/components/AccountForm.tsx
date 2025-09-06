@@ -1,8 +1,10 @@
 import React from 'react';
 import {
   Button,
-  Card,
-  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   TextField,
   Stack,
 } from '@mui/material';
@@ -19,6 +21,7 @@ interface FormData {
 }
 
 interface AccountFormProps {
+  open: boolean;
   form: FormData;
   editId: number | null;
   onFormChange: (form: FormData) => void;
@@ -26,12 +29,20 @@ interface AccountFormProps {
   onCancel: () => void;
 }
 
-export default function AccountForm({ form, editId, onFormChange, onSubmit, onCancel }: AccountFormProps) {
+export default function AccountForm({ open, form, editId, onFormChange, onSubmit, onCancel }: AccountFormProps) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(e);
+  };
+
   return (
-    <Card sx={{ mb: 3 }}>
-      <CardContent>
-        <form onSubmit={onSubmit}>
-          <Stack spacing={3}>
+    <Dialog open={open} onClose={onCancel} maxWidth="md" fullWidth>
+      <DialogTitle>
+        {editId ? '编辑邮件账户' : '新增邮件账户'}
+      </DialogTitle>
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={3} sx={{ mt: 1 }}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="昵称"
@@ -85,28 +96,17 @@ export default function AccountForm({ form, editId, onFormChange, onSubmit, onCa
                 fullWidth
               />
             </Stack>
-            
-            <Stack direction="row" spacing={2}>
-              <Button 
-                type="submit" 
-                variant="contained" 
-                color="primary"
-              >
-                {editId ? '更新' : '新增'}
-              </Button>
-              {editId && (
-                <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={onCancel}
-                >
-                  取消
-                </Button>
-              )}
-            </Stack>
           </Stack>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onCancel}>
+          取消
+        </Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary">
+          {editId ? '更新' : '新增'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
