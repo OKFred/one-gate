@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "npx tsx watch ./src/index.ts",
+    "dev": "npx tsx --watch -r dotenv/config ./src/index.ts",
     "build": "npx tsgo && npx tsc-alias",
     "build:docker": "docker build -t registry.cn-hangzhou.aliyuncs.com/one-registry/base-mail-service:1.0.1 . && docker push registry.cn-hangzhou.aliyuncs.com/one-registry/base-mail-service:1.0.1",
     "start:ts": "node ./src/index.ts",
