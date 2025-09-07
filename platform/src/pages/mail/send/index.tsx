@@ -1,6 +1,5 @@
-
-import { useState } from 'react';
-import { sendMailSingle } from '@/api/mail';
+import { useState, useEffect } from 'react';
+import { sendMailSingle, listMailAccount } from '@/api/mail';
 import {
   Box,
   Button,
@@ -9,11 +8,27 @@ import {
   IconButton,
   Paper,
   Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  type SelectChangeEvent,
 } from '@mui/material';
 import NoticeTool from '@/components/NoticeTool';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+
+interface MailAccount {
+  id?: number;
+  mailAddress?: string;
+  nickname?: string;
+  accountOwner?: string;
+}
+
 export default function MailSend() {
+  // 邮箱账户列表
+  const [mailAccounts, setMailAccounts] = useState<MailAccount[]>([]);
+  const [accountsLoading, setAccountsLoading] = useState(false);
   // All hooks and handlers must be inside the component
   const [form, setForm] = useState({
     senderObj: { accountId: '', mailAddress: '' },
@@ -22,10 +37,54 @@ export default function MailSend() {
   });
   // 已移除 result, setResult
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error';
+  }>({ open: false, message: '', severity: 'success' });
 
-  const handleChange = (field: string, value: any) => {
+  // 获取邮箱账户列表
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      setAccountsLoading(true);
+      try {
+        const res = await listMailAccount({
+          data: {
+            pageNo: 1,
+            pageSize: 100,
+          },
+        });
+        const response = res.data as { data?: { list?: MailAccount[]; total?: number } };
+        if (res.data?.ok && response?.data?.list) {
+          setMailAccounts(response.data.list);
+        }
+      } catch (error) {
+        console.error('获取邮箱账户列表失败:', error);
+      } finally {
+        setAccountsLoading(false);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
+
+  const handleChange = (field: string, value: unknown) => {
     setForm((f) => ({ ...f, [field]: value }));
+  };
+
+  const handleAccountSelect = (event: SelectChangeEvent<string>) => {
+    const selectedAccountId = event.target.value;
+    const selectedAccount = mailAccounts.find((acc) => acc.id?.toString() === selectedAccountId);
+
+    if (selectedAccount) {
+      setForm((f) => ({
+        ...f,
+        senderObj: {
+          accountId: selectedAccountId,
+          mailAddress: '', // 清空邮箱地址，因为选择了账户ID
+        },
+      }));
+    }
   };
 
   const handleReceiverChange = (idx: number, key: string, value: string) => {
@@ -78,10 +137,20 @@ export default function MailSend() {
         }
         setSnackbar({ open: true, message: msg, severity: 'success' });
       } else {
-        setSnackbar({ open: true, message: (res.data?.message as string) || '邮件发送失败', severity: 'error' });
+        setSnackbar({
+          open: true,
+          message: (res.data?.message as string) || '邮件发送失败',
+          severity: 'error',
+        });
       }
     } catch (err) {
-      const msg = (err && typeof err === 'object' && 'message' in err && typeof (err as any).message === 'string') ? (err as any).message : '邮件发送失败';
+      const msg =
+        err &&
+        typeof err === 'object' &&
+        'message' in err &&
+        typeof (err as Error).message === 'string'
+          ? (err as Error).message
+          : '邮件发送失败';
       setSnackbar({ open: true, message: msg, severity: 'error' });
     } finally {
       setLoading(false);
@@ -96,27 +165,46 @@ export default function MailSend() {
         </Typography>
         <Box component="form" onSubmit={handleSubmit} autoComplete="off">
           <Stack spacing={2}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-              <TextField
-                label="发件账户ID"
+            <FormControl fullWidth size="small">
+              <InputLabel id="account-select-label">选择发件账户</InputLabel>
+              <Select
+                labelId="account-select-label"
+                id="account-select"
                 value={form.senderObj.accountId}
-                onChange={(e) =>
-                  handleChange('senderObj', { ...form.senderObj, accountId: e.target.value })
-                }
-                size="small"
-                fullWidth
-              />
-              <Typography color="text.secondary">或</Typography>
+                label="选择发件账户"
+                onChange={handleAccountSelect}
+                disabled={accountsLoading}
+              >
+                {mailAccounts.map((account) => (
+                  <MenuItem key={account.id} value={account.id?.toString() || ''}>
+                    <Box>
+                      <Typography variant="body2" fontWeight={500}>
+                        {account.nickname || account.mailAddress}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {account.mailAddress} ({account.accountOwner})
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {!form.senderObj.accountId && (
               <TextField
-                label="发件邮箱"
+                label="或直接输入发件邮箱"
                 value={form.senderObj.mailAddress}
                 onChange={(e) =>
-                  handleChange('senderObj', { ...form.senderObj, mailAddress: e.target.value })
+                  handleChange('senderObj', {
+                    ...form.senderObj,
+                    mailAddress: e.target.value,
+                    accountId: '',
+                  })
                 }
                 size="small"
                 fullWidth
+                helperText="如果没有配置的账户，可以直接输入邮箱地址"
               />
-            </Stack>
+            )}
             <Box>
               <Typography fontWeight={500} mb={1}>
                 收件人

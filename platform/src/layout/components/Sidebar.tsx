@@ -15,8 +15,8 @@ import { useResponsive } from '../responsive';
 
 const drawerWidth = 240;
 const navItems = [
-  { text: '首页', icon: <HomeIcon />, path: '/home' },
-  { text: '账户', icon: <AccountCircleIcon />, path: '/account' },
+  { text: '主页', icon: <HomeIcon />, path: '/home' },
+  { text: '用户中心', icon: <AccountCircleIcon />, path: '/account' },
   { text: '邮件', icon: <MailIcon />, path: '/mail' },
 ];
 
