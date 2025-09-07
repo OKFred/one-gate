@@ -14,6 +14,7 @@ import {
   Divider,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
+import dayjs from 'dayjs';
 
 interface MailTemplate {
   id?: number;
@@ -39,7 +40,7 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
-    return new Date(timestamp * 1000).toLocaleString('zh-CN');
+    return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
   };
 
   if (!template) return null;
