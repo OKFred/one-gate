@@ -1,8 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import { Outlet } from 'react-router-dom';
-import { useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { useResponsive } from '../responsive';
 
 interface ContentProps {
   sidebarOpen: boolean;
@@ -11,8 +10,8 @@ interface ContentProps {
 const drawerWidth = 240;
 
 const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMobile } = useResponsive();
+  
   return (
     <Box
       component="main"

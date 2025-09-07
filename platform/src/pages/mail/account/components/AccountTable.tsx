@@ -55,7 +55,7 @@ export default function AccountTable({ accounts, loading, onEdit, onDelete }: Ac
   // 移动端卡片布局
   if (isMobile) {
     return (
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 2, mb: 8 }}>
         {accounts.length > 0 ? (
           <Stack spacing={2}>
             {accounts.map((acc) => (

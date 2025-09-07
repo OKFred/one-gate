@@ -11,8 +11,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
+import { useResponsive } from '../responsive';
 
 const drawerWidth = 240;
 const navItems = [
@@ -27,8 +26,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMobile } = useResponsive();
 
   // 桌面端侧边栏
   const desktopSidebar = (
