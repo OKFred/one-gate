@@ -9,24 +9,51 @@ import Typography from '@mui/material/Typography';
 import HomeIcon from '@mui/icons-material/Home';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import MailIcon from '@mui/icons-material/Mail';
+import PeopleIcon from '@mui/icons-material/People';
 import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
 import { useResponsive } from '../responsive';
+import { authUtils } from '@/utils/auth';
 
 const drawerWidth = 240;
-const navItems = [
-  { text: '主页', icon: <HomeIcon />, path: '/home' },
-  { text: '用户中心', icon: <AccountCircleIcon />, path: '/account' },
-  { text: '邮件', icon: <MailIcon />, path: '/mail' },
-];
+
+// 获取基础菜单项
+const getNavItems = (): NavItem[] => {
+  const baseItems = [
+    { text: '主页', icon: <HomeIcon />, path: '/home' },
+    { text: '用户中心', icon: <AccountCircleIcon />, path: '/user' },
+    { text: '邮件', icon: <MailIcon />, path: '/mail' },
+  ];
+
+  // 检查用户是否为管理员，如果是则显示用户管理
+  const userInfo = authUtils.getUserInfo();
+  if (userInfo && userInfo.role === '管理员') {
+    baseItems.splice(2, 0, {
+      text: '用户管理',
+      icon: <PeopleIcon />,
+      path: '/user/management',
+    });
+  }
+
+  return baseItems;
+};
 
 interface SidebarProps {
   open: boolean;
 }
 
+interface NavItem {
+  text: string;
+  icon: React.ReactNode;
+  path: string;
+}
+
 const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
+  
+  // 动态获取菜单项
+  const navItems = getNavItems();
 
   // 桌面端侧边栏
   const desktopSidebar = (

@@ -16,6 +16,7 @@ import Logout from '@mui/icons-material/Logout';
 import { useResponsive } from '../responsive';
 import { authUtils, type UserInfo } from '@/utils/auth';
 import { loginAPI } from '@/api/auth';
+import { useNavigate } from 'react-router-dom';
 
 interface TopbarProps {
   sidebarOpen: boolean;
@@ -27,6 +28,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const navigate = useNavigate();
 
   // 加载用户信息
   useEffect(() => {
@@ -44,6 +46,9 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     setAnchorEl(null);
   };
 
+  const handleProfile = () => {
+    navigate('user');
+  };
   // 处理登出
   const handleLogout = () => {
     handleClose();
@@ -61,7 +66,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
     if (!userInfo) return '';
     return userInfo.username.charAt(0).toUpperCase();
   };
-  
+
   return (
     <AppBar
       position="fixed"
@@ -86,7 +91,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             </IconButton>
           </Box>
         )}
-        
+
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           OKFred平台
         </Typography>
@@ -105,9 +110,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
               aria-haspopup="true"
               aria-expanded={open ? 'true' : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {getUserAvatar()}
-              </Avatar>
+              <Avatar sx={{ width: 32, height: 32 }}>{getUserAvatar()}</Avatar>
             </IconButton>
           </Box>
         )}
@@ -158,7 +161,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             </Box>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleClose}>
+          <MenuItem onClick={handleProfile}>
             <ListItemIcon>
               <AccountCircle fontSize="small" />
             </ListItemIcon>
