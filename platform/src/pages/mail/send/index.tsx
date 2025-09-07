@@ -49,6 +49,11 @@ export default function MailSend() {
     receiverArr: [{ name: '', address: '' }],
     contentObj: { templateId: '', subject: '', html: '' },
   });
+  // 记录原始模板内容，用于检测用户是否修改了内容
+  const [originalTemplate, setOriginalTemplate] = useState<{
+    subject: string;
+    html: string;
+  } | null>(null);
   // 已移除 result, setResult
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState<{
@@ -111,6 +116,40 @@ export default function MailSend() {
     setForm((f) => ({ ...f, [field]: value }));
   };
 
+  // 处理主题变化，检测是否与原始模板不同
+  const handleSubjectChange = (newSubject: string) => {
+    const newContentObj = { ...form.contentObj, subject: newSubject };
+    
+    // 如果有模板ID且内容已被修改，则清除模板ID
+    if (form.contentObj.templateId && originalTemplate) {
+      const isSubjectChanged = newSubject !== originalTemplate.subject;
+      const isHtmlChanged = form.contentObj.html !== originalTemplate.html;
+      
+      if (isSubjectChanged || isHtmlChanged) {
+        newContentObj.templateId = '';
+      }
+    }
+    
+    setForm((f) => ({ ...f, contentObj: newContentObj }));
+  };
+
+  // 处理内容变化，检测是否与原始模板不同
+  const handleHtmlChange = (newHtml: string) => {
+    const newContentObj = { ...form.contentObj, html: newHtml };
+    
+    // 如果有模板ID且内容已被修改，则清除模板ID
+    if (form.contentObj.templateId && originalTemplate) {
+      const isSubjectChanged = form.contentObj.subject !== originalTemplate.subject;
+      const isHtmlChanged = newHtml !== originalTemplate.html;
+      
+      if (isSubjectChanged || isHtmlChanged) {
+        newContentObj.templateId = '';
+      }
+    }
+    
+    setForm((f) => ({ ...f, contentObj: newContentObj }));
+  };
+
   const handleAccountSelect = (event: SelectChangeEvent<string>) => {
     const selectedAccountId = event.target.value;
     const selectedAccount = mailAccounts.find((acc) => acc.id?.toString() === selectedAccountId);
@@ -133,16 +172,25 @@ export default function MailSend() {
     );
 
     if (selectedTemplate) {
+      const templateSubject = selectedTemplate.title || '';
+      const templateHtml = selectedTemplate.content || '';
+      
       setForm((f) => ({
         ...f,
         contentObj: {
           templateId: selectedTemplateId,
-          subject: selectedTemplate.title || f.contentObj.subject,
-          html: selectedTemplate.content || f.contentObj.html,
+          subject: templateSubject,
+          html: templateHtml,
         },
       }));
+      
+      // 记录原始模板内容
+      setOriginalTemplate({
+        subject: templateSubject,
+        html: templateHtml,
+      });
     } else {
-      // 清除模板选择时，保留当前的主题和内容
+      // 清除模板选择时，也清除原始模板记录
       setForm((f) => ({
         ...f,
         contentObj: {
@@ -150,6 +198,7 @@ export default function MailSend() {
           templateId: '',
         },
       }));
+      setOriginalTemplate(null);
     }
   };
 
@@ -350,9 +399,7 @@ export default function MailSend() {
               <TextField
                 label="主题"
                 value={form.contentObj.subject}
-                onChange={(e) =>
-                  handleChange('contentObj', { ...form.contentObj, subject: e.target.value })
-                }
+                onChange={(e) => handleSubjectChange(e.target.value)}
                 size="small"
                 fullWidth
               />
@@ -368,7 +415,7 @@ export default function MailSend() {
               )}
               <FroalaEditor
                 value={form.contentObj.html}
-                onChange={(html) => handleChange('contentObj', { ...form.contentObj, html })}
+                onChange={handleHtmlChange}
                 placeholder={
                   form.contentObj.templateId
                     ? '模板内容已加载，您可以在此基础上编辑...'
