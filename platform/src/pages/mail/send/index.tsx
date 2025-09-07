@@ -17,6 +17,7 @@ import {
 import NoticeTool from '@/components/NoticeTool';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import FroalaEditor from '@/components/FroalaEditor';
 
 interface MailAccount {
   id?: number;
@@ -270,17 +271,19 @@ export default function MailSend() {
                 fullWidth
               />
             </Stack>
-            <TextField
-              label="内容"
-              value={form.contentObj.html}
-              onChange={(e) =>
-                handleChange('contentObj', { ...form.contentObj, html: e.target.value })
-              }
-              size="small"
-              fullWidth
-              multiline
-              minRows={3}
-            />
+            <Box>
+              <Typography fontWeight={500} mb={1}>
+                邮件内容
+              </Typography>
+              <FroalaEditor
+                value={form.contentObj.html}
+                onChange={(html) =>
+                  handleChange('contentObj', { ...form.contentObj, html })
+                }
+                placeholder="请输入邮件内容..."
+                height={400}
+              />
+            </Box>
             <Button
               type="submit"
               variant="contained"
