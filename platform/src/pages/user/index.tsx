@@ -120,7 +120,7 @@ export default function UserCenter() {
   // 未找到用户信息
   if (!currentUser) {
     return (
-      <PageLayout title="用户中心">
+      <PageLayout title="我的">
         <Box textAlign="center" p={4}>
           <Alert severity="warning" sx={{ mb: 2 }}>
             无法获取用户信息
@@ -135,7 +135,7 @@ export default function UserCenter() {
 
   return (
     <PageLayout
-      title="用户中心"
+      title="我的"
       actions={
         <ResponsiveButton 
           variant="outlined" 

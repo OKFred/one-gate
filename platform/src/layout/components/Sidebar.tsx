@@ -21,7 +21,7 @@ const drawerWidth = 240;
 const getNavItems = (): NavItem[] => {
   const baseItems = [
     { text: '主页', icon: <HomeIcon />, path: '/home' },
-    { text: '用户中心', icon: <AccountCircleIcon />, path: '/user' },
+    { text: '我的', icon: <AccountCircleIcon />, path: '/user' },
     { text: '邮件', icon: <MailIcon />, path: '/mail' },
   ];
 
