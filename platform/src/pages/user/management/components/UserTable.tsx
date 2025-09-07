@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import type { User } from '@/api/user';
+import dayjs from 'dayjs';
 
 interface UserTableProps {
   users: User[];
@@ -87,23 +88,14 @@ export default function UserTable({
                   </TableCell>
                   <TableCell>
                     {user.createTimeUtc
-                      ? new Date(user.createTimeUtc).toLocaleDateString()
-                      : '暂无'
-                    }
+                      ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
+                      : '暂无'}
                   </TableCell>
                   <TableCell align="center">
-                    <IconButton
-                      size="small"
-                      onClick={() => onEdit(user)}
-                      color="primary"
-                    >
+                    <IconButton size="small" onClick={() => onEdit(user)} color="primary">
                       <EditIcon />
                     </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => onDelete(user)}
-                      color="error"
-                    >
+                    <IconButton size="small" onClick={() => onDelete(user)} color="error">
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>

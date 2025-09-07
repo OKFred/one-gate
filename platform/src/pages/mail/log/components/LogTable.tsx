@@ -18,11 +18,12 @@ import {
   useMediaQuery,
   Tooltip,
 } from '@mui/material';
-import { 
-  Visibility as ViewIcon, 
-  CheckCircle as SuccessIcon, 
-  Error as ErrorIcon 
+import {
+  Visibility as ViewIcon,
+  CheckCircle as SuccessIcon,
+  Error as ErrorIcon,
 } from '@mui/icons-material';
+import dayjs from 'dayjs';
 
 interface MailLog {
   id?: number;
@@ -50,7 +51,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
-    return new Date(timestamp * 1000).toLocaleString('zh-CN');
+    return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
   };
 
   const truncateText = (text?: string, maxLength = 30) => {
@@ -93,20 +94,10 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
                     </Box>
                     <Stack direction="row" spacing={1} alignItems="center">
                       {log.sendStatus ? (
-                        <Chip 
-                          icon={<SuccessIcon />} 
-                          label="成功" 
-                          color="success" 
-                          size="small" 
-                        />
+                        <Chip icon={<SuccessIcon />} label="成功" color="success" size="small" />
                       ) : (
                         <Tooltip title={log.exceptionDetails || '发送失败'}>
-                          <Chip 
-                            icon={<ErrorIcon />} 
-                            label="失败" 
-                            color="error" 
-                            size="small" 
-                          />
+                          <Chip icon={<ErrorIcon />} label="失败" color="error" size="small" />
                         </Tooltip>
                       )}
                       {onView && (
@@ -139,9 +130,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                       发送时间
                     </Typography>
-                    <Typography variant="body1">
-                      {formatDate(log.createTimeUtc)}
-                    </Typography>
+                    <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
                   </Box>
 
                   {log.templateId && (
@@ -204,20 +193,10 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
                 </TableCell>
                 <TableCell align="center">
                   {log.sendStatus ? (
-                    <Chip 
-                      icon={<SuccessIcon />} 
-                      label="成功" 
-                      color="success" 
-                      size="small" 
-                    />
+                    <Chip icon={<SuccessIcon />} label="成功" color="success" size="small" />
                   ) : (
                     <Tooltip title={log.exceptionDetails || '发送失败'}>
-                      <Chip 
-                        icon={<ErrorIcon />} 
-                        label="失败" 
-                        color="error" 
-                        size="small" 
-                      />
+                      <Chip icon={<ErrorIcon />} label="失败" color="error" size="small" />
                     </Tooltip>
                   )}
                 </TableCell>
