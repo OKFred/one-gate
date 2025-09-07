@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { sendMailSingle, listMailAccount } from '@/api/mail';
+import { sendMailSingle, listMailAccount, listMailTemplate } from '@/api/mail';
 import {
   Box,
   Button,
@@ -26,10 +26,23 @@ interface MailAccount {
   accountOwner?: string;
 }
 
+interface MailTemplate {
+  id?: number;
+  name?: string;
+  title?: string;
+  langCode?: string;
+  content?: string;
+  creatorName?: string;
+  category?: string;
+}
+
 export default function MailSend() {
   // 邮箱账户列表
   const [mailAccounts, setMailAccounts] = useState<MailAccount[]>([]);
   const [accountsLoading, setAccountsLoading] = useState(false);
+  // 邮件模板列表
+  const [mailTemplates, setMailTemplates] = useState<MailTemplate[]>([]);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
   // All hooks and handlers must be inside the component
   const [form, setForm] = useState({
     senderObj: { accountId: '', mailAddress: '' },
@@ -69,6 +82,31 @@ export default function MailSend() {
     fetchAccounts();
   }, []);
 
+  // 获取邮件模板列表
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      setTemplatesLoading(true);
+      try {
+        const res = await listMailTemplate({
+          data: {
+            pageNo: 1,
+            pageSize: 100,
+          },
+        });
+        const response = res.data as { data?: { list?: MailTemplate[]; total?: number } };
+        if (res.data?.ok && response?.data?.list) {
+          setMailTemplates(response.data.list);
+        }
+      } catch (error) {
+        console.error('获取邮件模板列表失败:', error);
+      } finally {
+        setTemplatesLoading(false);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
+
   const handleChange = (field: string, value: unknown) => {
     setForm((f) => ({ ...f, [field]: value }));
   };
@@ -83,6 +121,33 @@ export default function MailSend() {
         senderObj: {
           accountId: selectedAccountId,
           mailAddress: '', // 清空邮箱地址，因为选择了账户ID
+        },
+      }));
+    }
+  };
+
+  const handleTemplateSelect = (event: SelectChangeEvent<string>) => {
+    const selectedTemplateId = event.target.value;
+    const selectedTemplate = mailTemplates.find(
+      (template) => template.id?.toString() === selectedTemplateId,
+    );
+
+    if (selectedTemplate) {
+      setForm((f) => ({
+        ...f,
+        contentObj: {
+          templateId: selectedTemplateId,
+          subject: selectedTemplate.title || f.contentObj.subject,
+          html: selectedTemplate.content || f.contentObj.html,
+        },
+      }));
+    } else {
+      // 清除模板选择时，保留当前的主题和内容
+      setForm((f) => ({
+        ...f,
+        contentObj: {
+          ...f.contentObj,
+          templateId: '',
         },
       }));
     }
@@ -252,15 +317,36 @@ export default function MailSend() {
               </Stack>
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label="模板ID"
-                value={form.contentObj.templateId}
-                onChange={(e) =>
-                  handleChange('contentObj', { ...form.contentObj, templateId: e.target.value })
-                }
-                size="small"
-                fullWidth
-              />
+              <FormControl fullWidth size="small">
+                <InputLabel id="template-select-label">选择邮件模板</InputLabel>
+                <Select
+                  labelId="template-select-label"
+                  id="template-select"
+                  value={form.contentObj.templateId}
+                  label="选择邮件模板"
+                  onChange={handleTemplateSelect}
+                  disabled={templatesLoading}
+                >
+                  <MenuItem value="">
+                    <Typography variant="body2" color="text.secondary">
+                      不使用模板 - 手动编写内容
+                    </Typography>
+                  </MenuItem>
+                  {mailTemplates.map((template) => (
+                    <MenuItem key={template.id} value={template.id?.toString() || ''}>
+                      <Box>
+                        <Typography variant="body2" fontWeight={500}>
+                          {template.title || template.name}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          模板名: {template.name} | 创建者: {template.creatorName}
+                          {template.category && ` | 分类: ${template.category}`}
+                        </Typography>
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <TextField
                 label="主题"
                 value={form.contentObj.subject}
@@ -275,12 +361,19 @@ export default function MailSend() {
               <Typography fontWeight={500} mb={1}>
                 邮件内容
               </Typography>
+              {form.contentObj.templateId && (
+                <Typography variant="body2" color="info.main" mb={1}>
+                  已选择模板，内容已自动填充，您可以在此基础上继续编辑
+                </Typography>
+              )}
               <FroalaEditor
                 value={form.contentObj.html}
-                onChange={(html) =>
-                  handleChange('contentObj', { ...form.contentObj, html })
+                onChange={(html) => handleChange('contentObj', { ...form.contentObj, html })}
+                placeholder={
+                  form.contentObj.templateId
+                    ? '模板内容已加载，您可以在此基础上编辑...'
+                    : '请输入邮件内容或选择上方的邮件模板...'
                 }
-                placeholder="请输入邮件内容..."
                 height={400}
               />
             </Box>
