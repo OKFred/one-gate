@@ -43,20 +43,20 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // 响应拦截器
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && window.location.pathname !== '/login') {
       // token过期或无效，自动登出
       authUtils.logout();
       window.location.href = '/login';
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export const loginAPI = {
@@ -64,7 +64,7 @@ export const loginAPI = {
   async commonLogin(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const response = await apiClient.post('/api/login/common', credentials);
-      
+
       if (response.data.ok && response.data.data) {
         const { token, user } = response.data.data;
         // 自动保存token和用户信息
@@ -84,7 +84,7 @@ export const loginAPI = {
   async wechatLogin(loginData: WechatLoginData): Promise<LoginResponse> {
     try {
       const response = await apiClient.post('/api/login/wechat', loginData);
-      
+
       if (response.data.ok && response.data.data) {
         const { token, user } = response.data.data;
         // 自动保存token和用户信息
@@ -108,8 +108,8 @@ export const loginAPI = {
     }
 
     try {
-      const response = await apiClient.post('/api/login/verify', { 
-        token: tokenToVerify 
+      const response = await apiClient.post('/api/login/verify', {
+        token: tokenToVerify,
       });
       return response.data.data;
     } catch {
@@ -125,10 +125,10 @@ export const loginAPI = {
     }
 
     try {
-      const response = await apiClient.post('/api/login/refresh', { 
-        token: tokenToRefresh 
+      const response = await apiClient.post('/api/login/refresh', {
+        token: tokenToRefresh,
       });
-      
+
       if (response.data.ok && response.data.data) {
         const newToken = response.data.data.token;
         // 自动更新本地token

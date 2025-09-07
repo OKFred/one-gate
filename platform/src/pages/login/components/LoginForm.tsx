@@ -1,4 +1,13 @@
-import { TextField, Button, Box, Stack, useTheme, useMediaQuery, Alert, CircularProgress } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Box,
+  Stack,
+  useTheme,
+  useMediaQuery,
+  Alert,
+  CircularProgress,
+} from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { loginAPI, type LoginCredentials } from '@/api/auth';
@@ -17,16 +26,15 @@ export default function LoginForm() {
   const [error, setError] = useState<string>('');
 
   // 处理输入变化
-  const handleInputChange = (field: keyof LoginCredentials) => (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setCredentials(prev => ({
-      ...prev,
-      [field]: event.target.value
-    }));
-    // 清除错误信息
-    if (error) setError('');
-  };
+  const handleInputChange =
+    (field: keyof LoginCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCredentials((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+      // 清除错误信息
+      if (error) setError('');
+    };
 
   // 处理普通登录
   const handleLogin = async () => {
@@ -43,6 +51,7 @@ export default function LoginForm() {
       // 登录成功，跳转到首页
       navigate('/home');
     } catch (err) {
+      console.log(err);
       setError(err instanceof Error ? err.message : '登录失败');
     } finally {
       setLoading(false);
@@ -69,7 +78,7 @@ export default function LoginForm() {
             {error}
           </Alert>
         )}
-        
+
         <TextField
           label="用户名"
           variant="outlined"
@@ -77,10 +86,10 @@ export default function LoginForm() {
           size={isMobile ? 'medium' : 'medium'}
           value={credentials.username}
           onChange={handleInputChange('username')}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           disabled={loading}
         />
-        
+
         <TextField
           label="密码"
           type="password"
@@ -89,7 +98,7 @@ export default function LoginForm() {
           size={isMobile ? 'medium' : 'medium'}
           value={credentials.password}
           onChange={handleInputChange('password')}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
           disabled={loading}
         />
 
