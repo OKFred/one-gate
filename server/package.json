@@ -24,6 +24,8 @@
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.19.2",
     "@scalar/hono-api-reference": "^0.9.1",
+    "@types/bcrypt": "^6.0.0",
+    "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.9.1",
     "drizzle-orm": "^0.44.4",
     "hono": "^4.7.5",
@@ -61,6 +63,7 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
+      "bcrypt",
       "better-sqlite3",
       "bufferutil",
       "esbuild",
