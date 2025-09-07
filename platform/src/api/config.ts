@@ -51,6 +51,9 @@ const service = axios.create({
   timeout: 10_000,
 });
 
+// 导入认证工具
+import { authUtils } from '@/utils/auth';
+
 const axiosPlus: AxiosPlus = async (
   axiosConfig,
   /*  customOptions,
@@ -68,6 +71,12 @@ function interceptors(service: AxiosInstance) {
   /** @description 添加请求拦截器 */
   service.interceptors.request.use(
     (config: InternalAxiosRequestConfig & { path?: Record<string, unknown> }) => {
+      // 自动添加认证token
+      const token = authUtils.getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      
       let _url = config.url;
       if (!_url) {
         throw new Error('url is required');
@@ -100,6 +109,13 @@ function interceptors(service: AxiosInstance) {
     },
     function (error) {
       if (error.response) {
+        // 处理401未授权错误
+        if (error.response.status === 401) {
+          authUtils.logout();
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
+        
         if (error.response.data && error.response.data.message) {
           console.error(error.response.data.message);
         }

@@ -4,6 +4,241 @@
  */
 
 export interface paths {
+    "/api/login/common": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 普通登录
+         * @description 普通登录
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["commonLoginReq"];
+                };
+            };
+            responses: {
+                /** @description 登录成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["commonLoginRes"];
+                    };
+                };
+                /** @description 登录失败 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["commonLoginRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/login/wechat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 微信登录
+         * @description 微信登录
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["wechatLoginReq"];
+                };
+            };
+            responses: {
+                /** @description 登录成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["wechatLoginRes"];
+                    };
+                };
+                /** @description 登录失败 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["wechatLoginRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/login/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 验证token
+         * @description 验证token
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["verifyTokenReq"];
+                };
+            };
+            responses: {
+                /** @description 验证完成 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["verifyTokenRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/login/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 刷新token
+         * @description 刷新token
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["refreshTokenReq"];
+                };
+            };
+            responses: {
+                /** @description 刷新成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["refreshTokenRes"];
+                    };
+                };
+                /** @description 刷新失败 */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["refreshTokenRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/mail/account/add": {
         parameters: {
             query?: never;
@@ -895,6 +1130,266 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/user/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 添加用户
+         * @description 添加用户
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["userAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["userAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 获取用户详情
+         * @description 获取用户详情
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["userGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["userGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 查询用户列表
+         * @description 查询用户列表
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["userListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["userListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 更新用户
+         * @description 更新用户
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["userUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["userUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/user/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 删除用户
+         * @description 删除用户
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["userDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["userDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -908,6 +1403,107 @@ export interface components {
                 keywordLocation?: string;
                 error?: string;
             }[];
+        };
+        commonLoginReq: {
+            /**
+             * @description 用户名
+             * @example admin
+             */
+            username: string;
+            /**
+             * @description 密码
+             * @example password123
+             */
+            password: string;
+        };
+        commonLoginRes: {
+            ok: boolean;
+            data?: {
+                /** @description 用户token */
+                token: string;
+                user: {
+                    /** @description 用户ID */
+                    id: number;
+                    /** @description 用户名 */
+                    username: string;
+                    /** @description 角色 */
+                    role: string;
+                    /** @description 部门 */
+                    department: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                };
+            } | null;
+            message?: string;
+        };
+        wechatLoginReq: {
+            /**
+             * @description 微信授权码
+             * @example 061abc123
+             */
+            code: string;
+            /**
+             * @description 状态参数(可选)
+             * @example STATE
+             */
+            state?: string;
+        };
+        wechatLoginRes: {
+            ok: boolean;
+            data?: {
+                /** @description 用户token */
+                token: string;
+                user: {
+                    /** @description 用户ID */
+                    id: number;
+                    /** @description 用户名 */
+                    username: string;
+                    /** @description 角色 */
+                    role: string;
+                    /** @description 部门 */
+                    department: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                };
+            } | null;
+            message?: string;
+        };
+        verifyTokenReq: {
+            /**
+             * @description 需要验证的token
+             * @example example-session-token
+             */
+            token: string;
+        };
+        verifyTokenRes: {
+            ok: boolean;
+            data: {
+                /** @description token是否有效 */
+                valid: boolean;
+                payload?: {
+                    userId?: number;
+                    username?: string;
+                    role?: string;
+                    department?: string;
+                    exp?: number;
+                } | null;
+            };
+            message?: string;
+        };
+        refreshTokenReq: {
+            /**
+             * @description 需要刷新的token
+             * @example example-session-token
+             */
+            token: string;
+        };
+        refreshTokenRes: {
+            ok: boolean;
+            data?: {
+                /** @description 新的token */
+                token: string;
+            } | null;
+            message?: string;
         };
         mailAccountAddReq: {
             /**
@@ -1488,7 +2084,6 @@ export interface components {
         };
         mailTemplateAddReq: {
             /**
-             * Format: email
              * @description 邮件模板名称
              * @example welcome_email
              */
@@ -1535,7 +2130,6 @@ export interface components {
                  */
                 id?: number;
                 /**
-                 * Format: email
                  * @description 邮件模板名称
                  * @example welcome_email
                  */
@@ -1582,7 +2176,6 @@ export interface components {
                      */
                     id?: number;
                     /**
-                     * Format: email
                      * @description 邮件模板名称
                      * @example welcome_email
                      */
@@ -1621,7 +2214,6 @@ export interface components {
              */
             id: number;
             /**
-             * Format: email
              * @description 邮件模板名称
              * @example welcome_email
              */
@@ -1666,6 +2258,216 @@ export interface components {
              * @example 1
              */
             data: number;
+            message?: string;
+        };
+        userAddReq: {
+            /**
+             * @description 用户名
+             * @example admin
+             */
+            username: string;
+            /**
+             * @description 密码
+             * @example password123
+             */
+            password: string;
+            /**
+             * @description 部门
+             * @example 技术部
+             */
+            department: string;
+            /**
+             * @description 角色
+             * @example 管理员
+             */
+            role: string;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        userAddRes: {
+            ok: boolean;
+            /**
+             * @description 用户id
+             * @example 1
+             */
+            data: number;
+            message?: string;
+        };
+        userGetReq: {
+            /**
+             * @description 用户id
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description 用户名
+             * @example admin
+             */
+            username?: string;
+        };
+        userGetRes: {
+            ok: boolean;
+            data?: {
+                /**
+                 * @description 用户id
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * @description 用户名
+                 * @example admin
+                 */
+                username?: string;
+                /**
+                 * @description 部门
+                 * @example 技术部
+                 */
+                department?: string;
+                /**
+                 * @description 角色
+                 * @example 管理员
+                 */
+                role?: string;
+                /**
+                 * @description 是否启用
+                 * @default true
+                 */
+                isEnabled: boolean;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: number | null;
+            } | null;
+            message?: string;
+        };
+        userListReq: {
+            /** @enum {string} */
+            orderBy?: "id" | "username" | "department" | "role" | "createTimeUtc";
+            descend?: boolean;
+            /** @default 1 */
+            pageNo: number;
+            /** @default 10 */
+            pageSize: number;
+            /** @example  */
+            keyword?: string;
+        };
+        userListRes: {
+            ok: boolean;
+            data: {
+                list: {
+                    /**
+                     * @description 用户id
+                     * @example 1
+                     */
+                    id?: number;
+                    /**
+                     * @description 用户名
+                     * @example admin
+                     */
+                    username?: string;
+                    /**
+                     * @description 部门
+                     * @example 技术部
+                     */
+                    department?: string;
+                    /**
+                     * @description 角色
+                     * @example 管理员
+                     */
+                    role?: string;
+                    /**
+                     * @description 是否启用
+                     * @default true
+                     */
+                    isEnabled: boolean;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: number | null;
+                }[];
+                total?: number;
+                currentPage?: number;
+                totalPage?: number;
+                pageNo?: number;
+                pageSize?: number;
+            };
+            message?: string;
+        };
+        userUpdateReq: {
+            /**
+             * @description 用户id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 用户名
+             * @example admin
+             */
+            username?: string;
+            /**
+             * @description 密码
+             * @example password123
+             */
+            password?: string;
+            /**
+             * @description 部门
+             * @example 技术部
+             */
+            department?: string;
+            /**
+             * @description 角色
+             * @example 管理员
+             */
+            role?: string;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        userUpdateRes: {
+            ok: boolean;
+            /**
+             * @description 用户id
+             * @example 1
+             */
+            data?: number;
+            message?: string;
+        };
+        userDeleteReq: {
+            /**
+             * @description 用户id
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description 用户名
+             * @example admin
+             */
+            username?: string;
+        };
+        userDeleteRes: {
+            ok: boolean;
+            /**
+             * @description 用户id
+             * @example 1
+             */
+            data?: number;
             message?: string;
         };
     };
