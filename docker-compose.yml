@@ -1,0 +1,60 @@
+services:
+  # 后端API服务
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: mail-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./server/logs:/app/logs
+      - ./server/data:/app/data
+    networks:
+      - mail-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # 前端应用和Nginx代理
+  frontend:
+    build:
+      context: ./platform
+      dockerfile: Dockerfile
+    container_name: mail-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - nginx-logs:/var/log/nginx
+      - /data.db:/data.db
+    networks:
+      - mail-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  nginx-logs:
+    driver: local
+
+networks:
+  mail-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
