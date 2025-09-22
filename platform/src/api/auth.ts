@@ -27,7 +27,7 @@ export interface TokenVerifyResponse {
 
 // 创建axios实例
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_SERVER_URL || '', // API服务器地址
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

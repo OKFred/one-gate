@@ -17,10 +17,6 @@ RUN pnpm install
 # 复制源代码
 COPY . .
 
-# 设置构建环境变量
-ARG SERVER_URL=http://localhost:3000
-ENV SERVER_URL=${SERVER_URL}
-
 # 构建应用
 RUN pnpm run build
 
