@@ -9,7 +9,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DB_FILE_NAME=/data.db
+      - DB_FILE_NAME=file:/data.db
     volumes:
       - ./server/logs:/app/logs
       - ./server/data:/app/data
