@@ -9,9 +9,7 @@
     "build": "npx tsgo && npx tsc-alias",
     "build:docker": "docker build -t registry.cn-hangzhou.aliyuncs.com/one-registry/base-mail-service:1.0.1 . && docker push registry.cn-hangzhou.aliyuncs.com/one-registry/base-mail-service:1.0.1",
     "start:ts": "node ./src/index.ts",
-    "start": "node ./dist/index.js",
-    "test:generate": "pnpm exec openapi-generator-cli generate -i http://localhost:3000/doc.json -g javascript -o ./test/openapi-client",
-    "test:run": "cd ./test/openapi-client && npm install && pnpm run test"
+    "start": "node ./dist/index.js"
   },
   "keywords": [],
   "author": "FZ",
