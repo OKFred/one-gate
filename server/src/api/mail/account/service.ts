@@ -14,7 +14,7 @@ import type {
 } from "./update";
 
 const mailAccountService = {
-    async add(obj: mailAccountAddReqLike) {
+    async add(obj: any) {
         const {
             mailAddress,
             nickname,
@@ -38,7 +38,7 @@ const mailAccountService = {
                 accountOwner,
             } satisfies mailAccountAddLike)
             .returning({ id: mailAccountTable.id });
-        return result[0]?.id satisfies mailAccountAddResLike["data"];
+        return result[0]?.id;
     },
     async delete(uniqueKeyObj: mailAccountDeleteReqLike) {
         const { id, mailAddress } = uniqueKeyObj;

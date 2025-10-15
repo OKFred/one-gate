@@ -12,6 +12,8 @@ import { tableInit } from "./db.table";
 function createApp() {
     tableInit();
     const app = new OpenAPIHono<AppBindings>();
+    
+    // 暂时保持原有实现，后续再迁移到工厂函数
     const arr = [
         addMailAccount,
         getMailAccount,
@@ -20,6 +22,7 @@ function createApp() {
         deleteMailAccount,
         verifyMailAccount,
     ];
+    
     arr.forEach(({ pathObj, controller, componentArr }) => {
         pathRegister(app, pathObj, controller);
         if (componentArr) {
@@ -27,7 +30,7 @@ function createApp() {
                 app.openAPIRegistry.registerComponent(
                     "schemas",
                     component.name,
-                    component.component,
+                    component.component as any,
                 );
             });
         }
