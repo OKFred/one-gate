@@ -1,6 +1,6 @@
 import db from "@/db/index";
 import { sql } from "drizzle-orm";
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { JSONSchema } from "json-schema-to-ts";
 
@@ -85,7 +85,16 @@ export const mailLogTable = sqliteTable("mail_log", {
             sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
         ),
     updateTimeUtc: integer("update_time_utc"),
-});
+}, (table) => ({
+    // 复合索引：查询某个收件人的邮件历史（按时间排序）
+    mailToTimeIdx: index("idx_mail_to_time").on(table.mailTo, table.createTimeUtc),
+    // 单列索引：快速查询发送失败的邮件
+    sendStatusIdx: index("idx_send_status").on(table.sendStatus),
+    // 单列索引：按模板查询发送记录
+    templateIdIdx: index("idx_template_id").on(table.templateId),
+    // 单列索引：按时间范围查询日志
+    createTimeIdx: index("idx_create_time").on(table.createTimeUtc),
+}));
 
 export async function tableInit() {
     await db.run(`
@@ -106,7 +115,14 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-    console.log("Table initialized");
+    
+    // 创建索引以优化查询性能
+    await db.run(`CREATE INDEX IF NOT EXISTS idx_mail_to_time ON mail_log(mail_to, create_time_utc)`);
+    await db.run(`CREATE INDEX IF NOT EXISTS idx_send_status ON mail_log(send_status)`);
+    await db.run(`CREATE INDEX IF NOT EXISTS idx_template_id ON mail_log(template_id)`);
+    await db.run(`CREATE INDEX IF NOT EXISTS idx_create_time ON mail_log(create_time_utc)`);
+    
+    console.log("Mail log table and indexes initialized");
 }
 
 export default mailLogTable;
