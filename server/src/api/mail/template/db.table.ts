@@ -4,10 +4,18 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { JSONSchema } from "json-schema-to-ts";
 
+export const mailTemplateIndexAlias = {
+  templateId: {
+    type: "number",
+    description: "邮件模板id",
+    examples: [1],
+  },
+};
+
 export const mailTemplateIndex = {
   id: {
     type: "number",
-    description: "index id",
+    description: "邮件模板id",
     examples: [1],
   },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
@@ -49,10 +57,14 @@ export const mailTemplateData = {
 export const mailTemplateTimestamp = {
   createTimeUtc: {
     type: "number",
+    description: "创建时间",
+    examples: [1672531199000],
   },
   updateTimeUtc: {
     type: "number",
     nullable: true,
+    description: "更新时间",
+    examples: [1672531199000],
   },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
 
@@ -76,7 +88,7 @@ export const mailTemplateTable = sqliteTable("mail_template", {
   createTimeUtc: integer("create_time_utc")
     .notNull()
     .default(
-      sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
+      sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`
     ),
   updateTimeUtc: integer("update_time_utc"),
 });
@@ -100,7 +112,7 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-  console.log("Table initialized");
+  console.log("Mail template table initialized");
 }
 
 export default mailTemplateTable;
