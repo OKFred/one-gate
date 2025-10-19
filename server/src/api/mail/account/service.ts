@@ -1,161 +1,328 @@
 import db from "@/db/index";
-import { mailAccountAddLike, mailAccountTable } from "./db.table";
-import { asc, count, desc, eq, or } from "drizzle-orm";
-import type { mailAccountAddReqLike, mailAccountAddResLike } from "./add";
-import type {
-    mailAccountDeleteReqLike,
-    mailAccountDeleteResLike,
-} from "./delete";
-import type { mailAccountGetReqLike, mailAccountGetResLike } from "./get";
-import type { mailAccountListReqLike, mailAccountListResLike } from "./list";
-import type {
-    mailAccountUpdateReqLike,
-    mailAccountUpdateResLike,
-} from "./update";
+import {
+  mailAccountIndex,
+  mailAccountUnique,
+  mailAccountTimestamp,
+  mailAccountTable,
+  mailAccountData,
+  type mailAccountAddLike,
+  type mailAccountLike,
+} from "./db.table";
+import { asc, count, desc, eq } from "drizzle-orm";
+import { FromSchema, JSONSchema } from "json-schema-to-ts";
 
-const mailAccountService = {
-    async add(obj: any) {
-        const {
-            mailAddress,
-            nickname,
-            password,
-            host = "",
-            port = 465,
-            sslEnable = true,
-            starttlsEnable = false,
-            accountOwner = "",
-        } = obj;
-        const result = await db
-            .insert(mailAccountTable)
-            .values({
-                mailAddress,
-                nickname,
-                password,
-                host,
-                port,
-                sslEnable,
-                starttlsEnable,
-                accountOwner,
-            } satisfies mailAccountAddLike)
-            .returning({ id: mailAccountTable.id });
-        return result[0]?.id;
-    },
-    async delete(uniqueKeyObj: mailAccountDeleteReqLike) {
-        const { id, mailAddress } = uniqueKeyObj;
-        if (id === undefined && mailAddress === undefined) return null;
-        const result = await db
-            .delete(mailAccountTable)
-            .where(
-                or(
-                    id !== undefined ? eq(mailAccountTable.id, id) : undefined,
-                    mailAddress !== undefined
-                        ? eq(mailAccountTable.mailAddress, mailAddress)
-                        : undefined,
-                ),
-            )
-            .returning({
-                id: mailAccountTable.id,
-            });
-
-        if (!result || result.length === 0) return null;
-        return result[0].id satisfies mailAccountDeleteResLike["data"];
-    },
-    async list(listParamObj: mailAccountListReqLike) {
-        const {
-            orderBy = "id",
-            descend = true,
-            pageNo = 1,
-            pageSize = 10,
-            keyword = "",
-        } = listParamObj;
-        const offset = (pageNo - 1) * pageSize;
-        const orderField = mailAccountTable[orderBy] || mailAccountTable.id;
-        const maxPageSize = 1000;
-        const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
-        const queryDB = (getAll?: boolean) =>
-            db
-                .select(
-                    getAll
-                        ? { total: count(mailAccountTable.id).as("total") }
-                        : undefined,
-                )
-                .from(mailAccountTable)
-                .where(
-                    keyword
-                        ? eq(mailAccountTable.mailAddress, keyword)
-                        : undefined,
-                )
-                .orderBy(!descend ? asc(orderField) : desc(orderField))
-                .limit(getAll ? maxPageSize : finalPageSize)
-                .offset(getAll ? 0 : offset);
-        const getAllResult = await queryDB(true);
-        const total = getAllResult[0]?.total || 0;
-        if (total === 0) {
-            return {
-                total,
-                totalPage: 0,
-                currentPage: pageNo,
-                pageSize: finalPageSize,
-                list: [] as any[],
-            } satisfies mailAccountListResLike["data"];
-        }
-        const rows = await queryDB(false);
-        const totalPage = Math.ceil(total / finalPageSize);
-        return {
-            total,
-            totalPage,
-            currentPage: pageNo,
-            pageSize: finalPageSize,
-            list: rows,
-        };
-    },
-    async update(obj: mailAccountUpdateReqLike) {
-        const { id, ...rest } = obj;
-        const updateTimeUtc = new Date().valueOf();
-        const res = await db
-            .update(mailAccountTable)
-            .set({
-                ...rest,
-                updateTimeUtc,
-            })
-            .where(eq(mailAccountTable.id, id))
-            .returning({ id: mailAccountTable.id });
-        if (!res || res.length === 0) return null;
-        return res[0].id satisfies mailAccountUpdateResLike["data"];
-    },
-    async get(uniqueKeyObj: mailAccountGetReqLike) {
-        const { id, mailAddress } = uniqueKeyObj;
-        const rows = await db
-            .select()
-            .from(mailAccountTable)
-            .where(
-                or(
-                    id !== undefined ? eq(mailAccountTable.id, id) : undefined,
-                    mailAddress !== undefined
-                        ? eq(mailAccountTable.mailAddress, mailAddress)
-                        : undefined,
-                ),
-            )
-            .limit(1);
-        if (rows.length === 0) return null;
-        return rows[0] satisfies mailAccountGetResLike["data"];
-    },
-    async verify(uniqueKeyObj: mailAccountGetReqLike) {
-        const account = await mailAccountService.get(uniqueKeyObj);
-        if (!account?.id) throw new Error("未找到该 mailAccount");
-        const nodemailer = await import("nodemailer");
-        const transporter = nodemailer.default.createTransport({
-            host: account.host,
-            port: account.port,
-            secure: account.sslEnable,
-            auth: {
-                user: account.mailAddress,
-                pass: account.password,
-            },
-        });
-        await transporter.verify();
-        return true;
-    },
+const addReq = {
+  type: "object",
+  properties: {
+    ...mailAccountData,
+  } satisfies Partial<Record<keyof mailAccountAddLike, JSONSchema>>,
+  required: ["mailAddress", "nickname", "password", "accountOwner"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const addRes = {
+  ...mailAccountIndex["id"],
+} as const satisfies JSONSchema;
+async function onAdd(
+  obj: FromSchema<typeof addReq>
+): Promise<FromSchema<typeof addRes> | null> {
+  const {
+    mailAddress,
+    nickname,
+    password,
+    host = "",
+    port = 465,
+    sslEnable = true,
+    starttlsEnable = false,
+    accountOwner = "",
+  } = obj;
+  const result = await db
+    .insert(mailAccountTable)
+    .values({
+      mailAddress,
+      nickname,
+      password,
+      host,
+      port,
+      sslEnable,
+      starttlsEnable,
+      accountOwner,
+    } satisfies mailAccountAddLike)
+    .returning({ id: mailAccountTable.id });
+  return result[0]?.id;
+}
+const addApi = {
+  req: addReq,
+  res: addRes,
+  pathInfo: {
+    path: "/add",
+    method: "post",
+    summary: `添加邮件账户`,
+  },
+  service: onAdd,
 };
 
-export default mailAccountService;
+const deleteReq = {
+  type: "object",
+  properties: {
+    ...mailAccountIndex,
+  },
+  required: ["id"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const deleteRes = {
+  ...mailAccountIndex["id"],
+} as const satisfies JSONSchema;
+async function onDelete(
+  uniqueKeyObj: FromSchema<typeof deleteReq>
+): Promise<FromSchema<typeof deleteRes> | null> {
+  const { id } = uniqueKeyObj;
+  if (id === undefined) return null;
+  const result = await db
+    .delete(mailAccountTable)
+    .where(eq(mailAccountTable.id, id))
+    .returning({
+      id: mailAccountTable.id,
+    });
+  if (!result || result.length === 0) return null;
+  return result[0].id;
+}
+const deleteApi = {
+  req: deleteReq,
+  res: deleteRes,
+  pathInfo: {
+    path: "/delete",
+    method: "post",
+    summary: `删除邮件账户`,
+  },
+  service: onDelete,
+};
+
+const listReq = {
+  type: "object",
+  properties: {
+    orderBy: {
+      type: "string",
+      enum: [
+        "id",
+        "accountOwner",
+        "createTimeUtc",
+      ] satisfies (keyof mailAccountLike)[],
+    },
+    descend: { type: "boolean" },
+    pageNo: { type: "number", minimum: 1, default: 1 },
+    pageSize: { type: "number", maximum: 1000, default: 10 },
+    keyword: { type: "string", examples: [""] },
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listRes = {
+  type: "object",
+  properties: {
+    total: { type: "number", description: "总记录数" },
+    totalPage: { type: "number", description: "总页数" },
+    currentPage: { type: "number", description: "当前页码" },
+    pageSize: { type: "number", description: "每页记录数" },
+    list: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          ...mailAccountIndex,
+          ...mailAccountData,
+          ...mailAccountTimestamp,
+        } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>,
+      },
+    },
+  },
+} as const satisfies JSONSchema;
+async function onList(
+  listParamObj: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
+  const {
+    orderBy = "id",
+    descend = true,
+    pageNo = 1,
+    pageSize = 10,
+    keyword = "",
+  } = listParamObj;
+  const offset = (pageNo - 1) * pageSize;
+  const orderField = mailAccountTable[orderBy] || mailAccountTable.id;
+  const maxPageSize = 1000;
+  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+
+  // 函数重载：根据 getAll 参数提供不同的返回类型
+  function queryDB(getAll: true): Promise<{ total: number }[]>;
+  function queryDB(getAll: false): Promise<mailAccountLike[]>;
+  function queryDB(
+    getAll: boolean
+  ): Promise<{ total: number }[] | mailAccountLike[]> {
+    return db
+      .select(
+        getAll ? { total: count(mailAccountTable.id).as("total") } : undefined
+      )
+      .from(mailAccountTable)
+      .where(keyword ? eq(mailAccountTable.mailAddress, keyword) : undefined)
+      .orderBy(!descend ? asc(orderField) : desc(orderField))
+      .limit(getAll ? maxPageSize : finalPageSize)
+      .offset(getAll ? 0 : offset);
+  }
+  const getAllResult = await queryDB(true);
+  const total = getAllResult[0]?.total || 0;
+  if (total === 0) {
+    return {
+      total,
+      totalPage: 0,
+      currentPage: pageNo,
+      pageSize: finalPageSize,
+      list: [],
+    };
+  }
+  const rows = await queryDB(false);
+  const totalPage = Math.ceil(total / finalPageSize);
+  return {
+    total,
+    totalPage,
+    currentPage: pageNo,
+    pageSize: finalPageSize,
+    list: rows,
+  };
+}
+const listApi = {
+  req: listReq,
+  res: listRes,
+  pathInfo: {
+    path: "/list",
+    method: "post",
+    summary: `获取邮件账户列表`,
+  },
+  service: onList,
+};
+
+const updateReq = {
+  type: "object",
+  properties: {
+    ...mailAccountIndex,
+    ...mailAccountData,
+  },
+  required: ["id"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updateRes = {
+  ...mailAccountIndex["id"],
+} as const satisfies JSONSchema;
+async function onUpdate(
+  obj: FromSchema<typeof updateReq>
+): Promise<FromSchema<typeof updateRes> | null> {
+  const { id, ...rest } = obj;
+  const updateTimeUtc = new Date().valueOf();
+  const res = await db
+    .update(mailAccountTable)
+    .set({
+      ...rest,
+      updateTimeUtc,
+    })
+    .where(eq(mailAccountTable.id, id))
+    .returning({ id: mailAccountTable.id });
+  if (!res || res.length === 0) return null;
+  return res[0].id;
+}
+const updateApi = {
+  req: updateReq,
+  res: updateRes,
+  pathInfo: {
+    path: "/update",
+    method: "post",
+    summary: `更新邮件账户`,
+  },
+  service: onUpdate,
+};
+
+const getReq = {
+  type: "object",
+  properties: {
+    ...mailAccountIndex,
+  },
+  required: ["id"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const getRes = {
+  type: "object",
+  properties: {
+    ...mailAccountIndex,
+    ...mailAccountData,
+    ...mailAccountTimestamp,
+  } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>,
+} as const satisfies JSONSchema;
+async function onGet(
+  uniqueKeyObj: FromSchema<typeof getReq>
+): Promise<FromSchema<typeof getRes> | null> {
+  const { id } = uniqueKeyObj;
+  const rows = await db
+    .select()
+    .from(mailAccountTable)
+    .where(eq(mailAccountTable.id, id))
+    .limit(1);
+  if (rows.length === 0) return null;
+  return rows[0];
+}
+const getApi = {
+  req: getReq,
+  res: getRes,
+  pathInfo: {
+    path: "/get",
+    method: "post",
+    summary: `获取邮件账户`,
+  },
+  service: onGet,
+};
+
+const verifyReq = {
+  type: "object",
+  properties: {
+    ...mailAccountIndex,
+  },
+  required: ["id"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const verifyRes = {
+  type: "boolean",
+  description: "验证结果，true 表示验证成功",
+} as const satisfies JSONSchema;
+async function onVerify(
+  uniqueKeyObj: FromSchema<typeof verifyReq>
+): Promise<FromSchema<typeof verifyRes>> {
+  const account = await onGet(uniqueKeyObj);
+  if (!account?.id) throw new Error("未找到该 mailAccount");
+  const nodemailer = await import("nodemailer");
+  const transporter = nodemailer.default.createTransport({
+    host: account.host,
+    port: account.port,
+    secure: account.sslEnable,
+    auth: {
+      user: account.mailAddress,
+      pass: account.password,
+    },
+  });
+  await transporter.verify();
+  return true;
+}
+const verifyApi = {
+  req: verifyReq,
+  res: verifyRes,
+  pathInfo: {
+    path: "/verify",
+    method: "post",
+    summary: `验证邮件账户`,
+  },
+  service: onVerify,
+};
+
+export default {
+  add: addApi,
+  delete: deleteApi,
+  list: listApi,
+  update: updateApi,
+  get: getApi,
+  verify: verifyApi,
+};
