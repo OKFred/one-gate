@@ -16,7 +16,7 @@ const addReq = {
   properties: {
     ...mailAccountData,
   } satisfies Partial<Record<keyof mailAccountAddLike, JSONSchema>>,
-  required: ["mailAddress", "nickname", "password", "accountOwner"],
+  required: ["mailAddress", "nickname", "password"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -33,7 +33,6 @@ async function onAdd(
     port = 465,
     sslEnable = true,
     starttlsEnable = false,
-    accountOwner = "",
   } = obj;
   const result = await db
     .insert(mailAccountTable)
@@ -45,7 +44,7 @@ async function onAdd(
       port,
       sslEnable,
       starttlsEnable,
-      accountOwner,
+      creatorId: 1,
     } satisfies mailAccountAddLike)
     .returning({ id: mailAccountTable.id });
   return result[0]?.id;
@@ -102,11 +101,7 @@ const listReq = {
   properties: {
     orderBy: {
       type: "string",
-      enum: [
-        "id",
-        "accountOwner",
-        "createTimeUtc",
-      ] satisfies (keyof mailAccountLike)[],
+      enum: ["id", "createTimeUtc"] satisfies (keyof mailAccountLike)[],
     },
     descend: { type: "boolean" },
     pageNo: { type: "number", minimum: 1, default: 1 },
@@ -221,6 +216,7 @@ async function onUpdate(
     .set({
       ...rest,
       updateTimeUtc,
+      updaterId: 1,
     })
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });

@@ -66,10 +66,6 @@ export const mailAccountData = {
     description: "是否启用STARTTLS",
     default: false,
   },
-  accountOwner: {
-    type: "string",
-    description: "邮箱账号拥有者",
-  },
 } as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
 
 export const mailAccountTimestamp = {
@@ -86,8 +82,19 @@ export const mailAccountTimestamp = {
   },
 } as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
 
-export type mailAccountLike = InferSelectModel<typeof mailAccountTable>;
-export type mailAccountAddLike = InferInsertModel<typeof mailAccountTable>;
+export const mailAccountUser = {
+  creatorId: {
+    type: "number",
+    description: "创建者ID",
+    examples: [1],
+  },
+  updaterId: {
+    type: "number",
+    nullable: true,
+    description: "更新者ID",
+    examples: [1],
+  },
+} as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
 
 export const mailAccountTable = sqliteTable("mail_account", {
   id: integer("id").primaryKey().notNull(),
@@ -98,14 +105,18 @@ export const mailAccountTable = sqliteTable("mail_account", {
   port: integer("port").notNull(),
   sslEnable: integer("ssl_enable", { mode: "boolean" }).notNull(),
   starttlsEnable: integer("starttls_enable", { mode: "boolean" }).notNull(),
-  accountOwner: text("account_owner").notNull(),
   createTimeUtc: integer("create_time_utc")
     .notNull()
     .default(
       sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`
     ),
   updateTimeUtc: integer("update_time_utc"),
+  creatorId: integer("creator_id"),
+  updaterId: integer("updater_id"),
 });
+
+export type mailAccountLike = InferSelectModel<typeof mailAccountTable>;
+export type mailAccountAddLike = InferInsertModel<typeof mailAccountTable>;
 
 export async function tableInit() {
   await db.run(`
@@ -118,12 +129,13 @@ export async function tableInit() {
             port INTEGER NOT NULL DEFAULT 465,
             ssl_enable INTEGER NOT NULL DEFAULT 1,
             starttls_enable INTEGER NOT NULL DEFAULT 0,
-            account_owner TEXT NOT NULL,
             create_time_utc INTEGER DEFAULT (
               CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
               CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
             ),
-            update_time_utc INTEGER
+            update_time_utc INTEGER,
+            creator_id INTEGER,
+            updater_id INTEGER
         )
     `);
   console.log("Mail account table initialized");
