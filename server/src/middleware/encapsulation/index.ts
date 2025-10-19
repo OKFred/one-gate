@@ -1,12 +1,14 @@
-import { NodeHonoContext, RawRouteConfig } from "@/types/app";
+import { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
 import { validate } from "@cfworker/json-schema";
 import { HTTPException } from "hono/http-exception";
 import { errorSchema } from "@/middleware/errorHandler/schema";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { JSONSchema } from "json-schema-to-ts";
+import { OpenAPIHono } from "@hono/zod-openapi";
+import pathRegister from "@/api/pathRegister";
 
-export function componentMaker(
+function componentMaker(
   dataType: "request" | "response",
   { name, component }: { name: string; component: JSONSchema }
 ) {
@@ -34,13 +36,7 @@ export function componentMaker(
   }
 }
 
-export function routeMaker({
-  pathInfo,
-  nameSpace,
-  service,
-  reqSchema,
-  componentArr,
-}) {
+function routeMaker({ pathInfo, nameSpace, service, reqSchema, componentArr }) {
   const controller = async (c: NodeHonoContext) => {
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
@@ -50,15 +46,15 @@ export function routeMaker({
         { cause: errors }
       );
     }
-    const res = await service(bodyObj);
-    if (!res) {
+    const result = await service(bodyObj);
+    if (!result) {
       return c.json(
         { ok: false, message: "操作失败", data: null },
         httpStatusCode.OK as ContentfulStatusCode
       );
     }
     return c.json(
-      { ok: true, data: res },
+      { ok: true, data: result },
       httpStatusCode.OK as ContentfulStatusCode
     );
   };
@@ -91,4 +87,54 @@ export function routeMaker({
     },
   } satisfies RawRouteConfig;
   return { pathObj: newPathObj, controller };
+}
+
+export interface ServiceItem {
+  req: JSONSchema;
+  res: JSONSchema;
+  pathInfo: Partial<RawRouteConfig>;
+  service: (body: any) => Promise<any>;
+}
+
+export default function main(
+  service: Record<string, ServiceItem>,
+  nameSpace: string,
+  prerequisites: Function
+) {
+  if (prerequisites) {
+    prerequisites();
+  }
+  const app = new OpenAPIHono<AppBindings>();
+  Array.from(Object.values(service)).forEach((obj) => {
+    const { req, res, pathInfo } = obj;
+    const subNameSpace = pathInfo.path
+      .replace(/\//g, "_")
+      .slice(1)
+      .replace(/^\w/, (c) => c.toUpperCase());
+    const componentArr = [
+      componentMaker("request", {
+        name: `${nameSpace}${subNameSpace}Req`,
+        component: req,
+      }),
+      componentMaker("response", {
+        name: `${nameSpace}${subNameSpace}Res`,
+        component: res,
+      }),
+    ];
+    const { pathObj, controller } = routeMaker({
+      ...obj,
+      nameSpace,
+      reqSchema: req,
+      componentArr,
+    });
+    pathRegister(app, pathObj, controller);
+    componentArr.forEach((component) => {
+      app.openAPIRegistry.registerComponent(
+        "schemas",
+        component.name,
+        component.component as any
+      );
+    });
+  });
+  return app;
 }

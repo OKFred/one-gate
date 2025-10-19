@@ -3,73 +3,82 @@ import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { JSONSchema } from "json-schema-to-ts";
+export const mailLogIndexAlias = {
+  logId: {
+    type: "number",
+    description: "邮件日志id",
+    examples: [1],
+  },
+};
 
 export const mailLogIndex = {
-    id: {
-        type: "number",
-        description: "index id",
-        examples: [1],
-    },
+  id: {
+    type: "number",
+    description: "邮件日志id",
+    examples: [1],
+  },
 } as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
 
 export const mailLogUnique = {} as const satisfies Partial<
-    Record<keyof mailLogLike, JSONSchema>
+  Record<keyof mailLogLike, JSONSchema>
 >;
 
 export const mailLogData = {
-    mailTo: {
-        type: "string",
-        format: "email",
-        description: "收件人邮箱地址",
-        examples: ["receiver@example.com"],
-    },
-    mailFrom: {
-        type: "string",
-        format: "email",
-        description: "发件人邮箱地址",
-        examples: ["sender@example.com"],
-    },
-    title: {
-        type: "string",
-        description: "邮件标题",
-        examples: ["Welcome to our service!"],
-    },
-    templateId: {
-        type: "string",
-        description: "邮件模板ID",
-    },
-    templateParams: {
-        type: "string",
-        description: "邮件模板参数",
-    },
-    sendStatus: {
-        type: "boolean",
-        description: "发送状态",
-    },
-    exceptionCode: {
-        type: "string",
-        description: "异常代码",
-    },
-    exceptionDetails: {
-        type: "string",
-        description: "异常详情",
-    },
+  mailTo: {
+    type: "string",
+    format: "email",
+    description: "收件人邮箱地址",
+    examples: ["receiver@example.com"],
+  },
+  mailFrom: {
+    type: "string",
+    format: "email",
+    description: "发件人邮箱地址",
+    examples: ["sender@example.com"],
+  },
+  title: {
+    type: "string",
+    description: "邮件标题",
+    examples: ["Welcome to register on our platform!"],
+  },
+  templateId: {
+    type: "string",
+    description: "邮件模板ID",
+  },
+  templateParams: {
+    type: "string",
+    description: "邮件模板参数",
+  },
+  sendStatus: {
+    type: "boolean",
+    description: "发送状态",
+  },
+  exceptionCode: {
+    type: "string",
+    description: "异常代码",
+  },
+  exceptionDetails: {
+    type: "string",
+    description: "异常详情",
+  },
 } as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
 
 export const mailLogTimestamp = {
-    createTimeUtc: {
-        type: "number",
-    },
-    updateTimeUtc: {
-        type: "number",
-        nullable: true,
-    },
+  createTimeUtc: {
+    type: "number",
+  },
+  updateTimeUtc: {
+    type: "number",
+    nullable: true,
+  },
 } as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
 
 export type mailLogLike = InferSelectModel<typeof mailLogTable>;
 export type mailLogAddLike = InferInsertModel<typeof mailLogTable>;
 
-export const mailLogTable = sqliteTable("mail_log", {
+export const mailLogTable = sqliteTable(
+  "mail_log",
+  {
     id: integer("id").primaryKey().notNull(),
     mailTo: text("mail_to").notNull(),
     mailFrom: text("mail_from").notNull(),
@@ -80,24 +89,26 @@ export const mailLogTable = sqliteTable("mail_log", {
     exceptionCode: text("exception_code"),
     exceptionDetails: text("exception_details"),
     createTimeUtc: integer("create_time_utc")
-        .notNull()
-        .default(
-            sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
-        ),
+      .notNull()
+      .default(
+        sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`
+      ),
     updateTimeUtc: integer("update_time_utc"),
-}, (table) => ({
+  },
+  (table) => [
     // 复合索引：查询某个收件人的邮件历史（按时间排序）
-    mailToTimeIdx: index("idx_mail_to_time").on(table.mailTo, table.createTimeUtc),
+    index("idx_mail_to_time").on(table.mailTo, table.createTimeUtc),
     // 单列索引：快速查询发送失败的邮件
-    sendStatusIdx: index("idx_send_status").on(table.sendStatus),
+    index("idx_send_status").on(table.sendStatus),
     // 单列索引：按模板查询发送记录
-    templateIdIdx: index("idx_template_id").on(table.templateId),
+    index("idx_template_id").on(table.templateId),
     // 单列索引：按时间范围查询日志
-    createTimeIdx: index("idx_create_time").on(table.createTimeUtc),
-}));
+    index("idx_create_time").on(table.createTimeUtc),
+  ]
+);
 
 export async function tableInit() {
-    await db.run(`
+  await db.run(`
         CREATE TABLE IF NOT EXISTS mail_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             mail_to TEXT NOT NULL,
@@ -115,14 +126,22 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-    
-    // 创建索引以优化查询性能
-    await db.run(`CREATE INDEX IF NOT EXISTS idx_mail_to_time ON mail_log(mail_to, create_time_utc)`);
-    await db.run(`CREATE INDEX IF NOT EXISTS idx_send_status ON mail_log(send_status)`);
-    await db.run(`CREATE INDEX IF NOT EXISTS idx_template_id ON mail_log(template_id)`);
-    await db.run(`CREATE INDEX IF NOT EXISTS idx_create_time ON mail_log(create_time_utc)`);
-    
-    console.log("Mail log table and indexes initialized");
+
+  // 创建索引以优化查询性能
+  await db.run(
+    `CREATE INDEX IF NOT EXISTS idx_mail_to_time ON mail_log(mail_to, create_time_utc)`
+  );
+  await db.run(
+    `CREATE INDEX IF NOT EXISTS idx_send_status ON mail_log(send_status)`
+  );
+  await db.run(
+    `CREATE INDEX IF NOT EXISTS idx_template_id ON mail_log(template_id)`
+  );
+  await db.run(
+    `CREATE INDEX IF NOT EXISTS idx_create_time ON mail_log(create_time_utc)`
+  );
+
+  console.log("Mail log table and indexes initialized");
 }
 
 export default mailLogTable;
