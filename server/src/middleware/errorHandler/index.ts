@@ -1,4 +1,4 @@
-import type { App } from "@/types/app.ts";
+import type { App, NodeHonoContext } from "@/types/app.ts";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
 
@@ -10,8 +10,8 @@ type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // 提�
 export default function errorHandler(app: App) {
   app.notFound((c) => {
     return c.json(
-      { ok: false, message: "Not Found", errors: [] },
-      { status: 404 },
+      { ok: false, message: "接口不存在", data: null },
+      { status: 404 }
     );
   });
 
@@ -20,23 +20,13 @@ export default function errorHandler(app: App) {
     properties: {
       ok: { type: "boolean" },
       message: { type: "string" },
-      errors: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            instanceLocation: { type: "string" },
-            keyword: { type: "string" },
-            keywordLocation: { type: "string" },
-            error: { type: "string" },
-          },
-        },
-      },
+      data: { type: "object" },
     },
-    required: ["ok", "message"],
+    required: ["ok", "message", "data"],
+    additionalProperties: false,
   });
 
-  app.onError((e, c) => {
+  app.onError((e, c: NodeHonoContext) => {
     if (e instanceof HTTPException) {
       const message =
         e.status === 404
@@ -48,12 +38,12 @@ export default function errorHandler(app: App) {
         {
           ok: false,
           message,
-          errors: e.cause as HTTPExceptionOptions["cause"],
+          data: e.cause as HTTPExceptionOptions["cause"],
         },
         {
           status: e.status,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
     let message = "未知异常";
@@ -64,17 +54,17 @@ export default function errorHandler(app: App) {
           ok: false,
           message,
         },
-        { status: 409 },
+        { status: 409 }
       );
     }
-    console.log(e);
+    c.var.logger.error(`接口异常：` + e.stack);
     return c.json(
       {
         ok: false,
         message,
-        errors: process.env.NODE_ENV !== "production" && e.message,
+        data: process.env.NODE_ENV !== "production" ? e.message : null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   });
 }

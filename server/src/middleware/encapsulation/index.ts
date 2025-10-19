@@ -47,14 +47,8 @@ function routeMaker({ pathInfo, nameSpace, service, reqSchema, componentArr }) {
       );
     }
     const result = await service(bodyObj);
-    if (!result) {
-      return c.json(
-        { ok: false, message: "操作失败", data: null },
-        httpStatusCode.OK as ContentfulStatusCode
-      );
-    }
     return c.json(
-      { ok: true, data: result },
+      { ok: true, message: "操作成功", data: result },
       httpStatusCode.OK as ContentfulStatusCode
     );
   };
