@@ -15,12 +15,7 @@ import {
 } from '@mui/material';
 import { FilterList as FilterIcon, ExpandLess, ExpandMore, Search as SearchIcon } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
-
-interface FilterState {
-  keyword: string;
-  orderBy: 'id' | 'accountOwner' | 'createTimeUtc';
-  descend: boolean;
-}
+import type { FilterState } from '../type';
 
 interface AccountFilterProps {
   onFilterChange: (filters: FilterState) => void;
@@ -129,7 +124,7 @@ export default function AccountFilter({ onFilterChange, filterCount = 0 }: Accou
           <Stack spacing={2}>
             <TextField
               label="关键字搜索"
-              placeholder="搜索昵称、邮箱地址、主机地址、账户所有者..."
+              placeholder="搜索昵称、邮箱地址、主机地址..."
               value={keywordInput}
               onChange={(e) => handleFilterChange('keyword', e.target.value)}
               size="small"
@@ -152,7 +147,6 @@ export default function AccountFilter({ onFilterChange, filterCount = 0 }: Accou
                   onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                 >
                   <MenuItem value="id">ID</MenuItem>
-                  <MenuItem value="accountOwner">账户所有者</MenuItem>
                   <MenuItem value="createTimeUtc">创建时间</MenuItem>
                 </Select>
               </FormControl>

@@ -10,25 +10,7 @@ import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import AccountForm from './components/AccountForm';
 import AccountTable from './components/AccountTable';
 import AccountFilter from './components/AccountFilter';
-
-interface MailAccount {
-  id?: number;
-  mailAddress?: string;
-  password?: string;
-  nickname?: string;
-  host?: string;
-  port: number;
-  sslEnable: boolean;
-  starttlsEnable: boolean;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
-
-interface FilterState {
-  keyword: string;
-  orderBy: 'id' | 'createTimeUtc';
-  descend: boolean;
-}
+import type { MailAccount, FilterState, MailAccountFormData } from './type';
 
 export default function MailAccountRefactored() {
   const [accounts, setAccounts] = useState<MailAccount[]>([]);
@@ -41,7 +23,7 @@ export default function MailAccountRefactored() {
     orderBy: 'id',
     descend: false,
   });
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<MailAccountFormData>({
     nickname: '',
     mailAddress: '',
     host: '',
@@ -50,10 +32,6 @@ export default function MailAccountRefactored() {
     sslEnable: true,
     starttlsEnable: false,
   });
-
-  // 不再需要手动检测移动端，响应式组件会自动处理
-  // const theme = useTheme();
-  // const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const fetchAccounts = useCallback(async (searchParams: FilterState) => {
     setLoading(true);
@@ -189,19 +167,3 @@ export default function MailAccountRefactored() {
     </PageLayout>
   );
 }
-
-/**
- * 重构前后对比：
- *
- * 重构前需要的代码：
- * - 68行手动响应式检测和布局代码
- * - 重复的Container和Typography配置
- * - 手动的按钮适配逻辑
- *
- * 重构后：
- * - 只需要5行PageLayout和ResponsiveButton
- * - 自动处理所有响应式适配
- * - 代码更简洁，维护性更好
- *
- * 减少了约85%的布局相关代码！
- */

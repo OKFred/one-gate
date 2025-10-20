@@ -18,19 +18,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-
-interface MailAccount {
-  id?: number;
-  mailAddress?: string;
-  password?: string;
-  nickname?: string;
-  host?: string;
-  port: number;
-  sslEnable: boolean;
-  starttlsEnable: boolean;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
+import type { MailAccount } from '../type';
 
 interface AccountTableProps {
   accounts: MailAccount[];

@@ -22,22 +22,13 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-
-interface FormData {
-  nickname: string;
-  mailAddress: string;
-  host: string;
-  port: string;
-  password: string;
-  sslEnable: boolean;
-  starttlsEnable: boolean;
-}
+import type { MailAccountFormData } from '../type';
 
 interface AccountFormProps {
   open: boolean;
-  form: FormData;
+  form: MailAccountFormData;
   editId: number | null;
-  onFormChange: (form: FormData) => void;
+  onFormChange: (form: MailAccountFormData) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
