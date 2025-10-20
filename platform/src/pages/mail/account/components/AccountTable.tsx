@@ -139,7 +139,6 @@ export default function AccountTable({ accounts, loading, onEdit, onDelete }: Ac
             <TableCell>邮箱</TableCell>
             <TableCell>主机</TableCell>
             <TableCell>端口</TableCell>
-            <TableCell>账户所有者</TableCell>
             <TableCell align="center">操作</TableCell>
           </TableRow>
         </TableHead>
