@@ -7,7 +7,12 @@ import {
   useMediaQuery,
   Alert,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
+import {
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { commonLogin } from '@/api/system/auth';
@@ -26,6 +31,7 @@ export default function LoginForm() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // 处理输入变化
   const handleInputChange =
@@ -104,7 +110,7 @@ export default function LoginForm() {
 
         <TextField
           label="密码"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           variant="outlined"
           fullWidth
           size={isMobile ? 'medium' : 'medium'}
@@ -112,6 +118,21 @@ export default function LoginForm() {
           onChange={handleInputChange('password')}
           onKeyDown={handleKeyPress}
           disabled={loading}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={() => setShowPassword(!showPassword)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  edge="end"
+                  disabled={loading}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              ),
+            },
+          }}
         />
 
         <Box sx={{ textAlign: 'right' }}>

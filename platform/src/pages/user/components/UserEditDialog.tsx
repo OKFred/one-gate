@@ -13,8 +13,13 @@ import {
   InputLabel,
   Box,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
-import { Settings as SettingsIcon } from '@mui/icons-material';
+import {
+  Settings as SettingsIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
 import type { User } from '@/api/system/user';
 
@@ -48,6 +53,7 @@ export default function UserEditDialog({
     role: '',
     isEnabled: true,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // 当用户数据改变时更新表单
   useEffect(() => {
@@ -105,11 +111,25 @@ export default function UserEditDialog({
           <TextField
             fullWidth
             label="新密码"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => handleFormChange('password', e.target.value)}
             margin="normal"
             helperText="留空则不修改密码"
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowPassword(!showPassword)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                ),
+              },
+            }}
           />
           
           <TextField

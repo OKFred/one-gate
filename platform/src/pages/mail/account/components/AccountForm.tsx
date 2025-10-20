@@ -17,7 +17,11 @@ import {
   useMediaQuery,
   IconButton,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 
 interface FormData {
   nickname: string;
@@ -48,6 +52,7 @@ export default function AccountForm({
 }: AccountFormProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,12 +140,26 @@ export default function AccountForm({
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="密码"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={form.password}
                 onChange={(e) => onFormChange({ ...form, password: e.target.value })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    ),
+                  },
+                }}
               />
             </Stack>
 

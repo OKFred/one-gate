@@ -13,7 +13,12 @@ import {
   InputLabel,
   Box,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
+import {
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
 import type { User, UserAddRequest, UserUpdateRequest } from '@/api/system/user';
 
@@ -47,6 +52,7 @@ export default function UserFormDialog({
     role: '普通用户',
     isEnabled: true,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const isEditing = !!user;
 
@@ -133,12 +139,26 @@ export default function UserFormDialog({
           <TextField
             fullWidth
             label={isEditing ? "新密码" : "密码"}
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => handleFormChange('password', e.target.value)}
             margin="normal"
             required={!isEditing}
             helperText={isEditing ? "留空则不修改密码" : ""}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowPassword(!showPassword)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                ),
+              },
+            }}
           />
           
           <TextField
