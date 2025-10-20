@@ -11,6 +11,7 @@ import {
 import { asc, count, desc, eq, or, like } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
+import { HTTPException } from "hono/http-exception";
 
 const SALT_ROUNDS = 12; // bcrypt盐轮数
 
@@ -28,17 +29,11 @@ const addRes = {
 async function onAdd(
   obj: FromSchema<typeof addReq>
 ): Promise<FromSchema<typeof addRes> | null> {
-  const {
-    username,
-    password,
-    department,
-    role,
-    isEnabled = true,
-  } = obj;
-  
+  const { username, password, department, role, isEnabled = true } = obj;
+
   // 密码加盐处理
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-  
+
   const result = await db
     .insert(userTable)
     .values({
@@ -114,7 +109,11 @@ const listReq = {
     descend: { type: "boolean" },
     pageNo: { type: "number", minimum: 1, default: 1 },
     pageSize: { type: "number", maximum: 1000, default: 10 },
-    keyword: { type: "string", examples: [""], description: "搜索用户名、部门或角色" },
+    keyword: {
+      type: "string",
+      examples: [""],
+      description: "搜索用户名、部门或角色",
+    },
     isEnabled: { type: "boolean", description: "是否启用状态过滤" },
   },
   required: [],
@@ -146,7 +145,7 @@ const listRes = {
 } as const satisfies JSONSchema;
 
 // 用于内部查询的类型（包含密码）
-type userLikeWithoutPassword = Omit<userLike, 'password'>;
+type userLikeWithoutPassword = Omit<userLike, "password">;
 
 async function onList(
   listParamObj: FromSchema<typeof listReq>
@@ -179,7 +178,11 @@ async function onList(
     if (isEnabled !== undefined) {
       conditions.push(eq(userTable.isEnabled, isEnabled));
     }
-    return conditions.length > 0 ? (conditions.length === 1 ? conditions[0] : or(...conditions)) : undefined;
+    return conditions.length > 0
+      ? conditions.length === 1
+        ? conditions[0]
+        : or(...conditions)
+      : undefined;
   };
 
   // 函数重载：根据 getAll 参数提供不同的返回类型
@@ -208,7 +211,7 @@ async function onList(
       .orderBy(!descend ? asc(orderField) : desc(orderField))
       .limit(getAll ? maxPageSize : finalPageSize)
       .offset(getAll ? 0 : offset);
-    
+
     return baseQuery as any;
   }
   const getAllResult = await queryDB(true);
@@ -260,18 +263,18 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { id, password, ...rest } = obj;
   const updateTimeUtc = new Date().valueOf();
-  
+
   // 如果更新密码，需要重新加盐
   let updateData: any = {
     ...rest,
     updateTimeUtc,
   };
-  
+
   if (password) {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     updateData.password = hashedPassword;
   }
-  
+
   const res = await db
     .update(userTable)
     .set(updateData)
@@ -329,7 +332,9 @@ async function onGet(
     .from(userTable)
     .where(eq(userTable.id, id))
     .limit(1);
-  if (rows.length === 0) return null;
+  if (rows.length === 0) {
+    throw new HTTPException(404, { message: "用户不存在或已被禁用" });
+  }
   return rows[0];
 }
 const getApi = {
@@ -383,16 +388,15 @@ async function onVerify(
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-    
   if (user.length === 0) {
     return { valid: false, userId: null };
   }
-  
+
   const userData = user[0];
   if (!userData.isEnabled) {
     return { valid: false, userId: null };
   }
-  
+
   const isValid = await bcrypt.compare(password, userData.password);
   return {
     valid: isValid,

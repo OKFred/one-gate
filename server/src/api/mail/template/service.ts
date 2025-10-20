@@ -10,6 +10,7 @@ import {
 } from "./db.table";
 import { asc, count, desc, eq, like, or } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import { HTTPException } from "hono/http-exception";
 
 const addReq = {
   type: "object",
@@ -25,14 +26,7 @@ const addRes = {
 async function onAdd(
   obj: FromSchema<typeof addReq>
 ): Promise<FromSchema<typeof addRes> | null> {
-  const {
-    name,
-    title,
-    langCode,
-    content,
-    creatorName,
-    category = "",
-  } = obj;
+  const { name, title, langCode, content, creatorName, category = "" } = obj;
   const result = await db
     .insert(mailTemplateTable)
     .values({
@@ -294,7 +288,9 @@ async function onGet(
     .from(mailTemplateTable)
     .where(eq(mailTemplateTable.id, id))
     .limit(1);
-  if (rows.length === 0) return null;
+  if (rows.length === 0) {
+    throw new HTTPException(404, { message: "邮件模板不存在或已被删除" });
+  }
   return rows[0];
 }
 const getApi = {

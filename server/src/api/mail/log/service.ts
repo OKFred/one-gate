@@ -10,6 +10,7 @@ import {
 } from "./db.table";
 import { asc, count, desc, eq, and, gte, lte, like, or } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import { HTTPException } from "hono/http-exception";
 
 const addReq = {
   type: "object",
@@ -297,7 +298,9 @@ async function onGet(
     .from(mailLogTable)
     .where(eq(mailLogTable.id, id))
     .limit(1);
-  if (rows.length === 0) return null;
+  if (rows.length === 0) {
+    throw new HTTPException(404, { message: "邮件日志不存在或已被删除" });
+  }
   return rows[0];
 }
 const getApi = {

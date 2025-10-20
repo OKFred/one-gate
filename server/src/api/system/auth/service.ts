@@ -1,5 +1,8 @@
 import userService from "@/api/system/user/service";
 import { tokenUtils } from "@/utils/token";
+import { HTTPException } from "hono/http-exception";
+import httpStatusCode from "http-status-codes";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 
 // 普通登录
@@ -67,16 +70,23 @@ async function onLogin(
 
   // 验证用户名和密码
   const verifyResult = await userService.verify.service({ username, password });
-  if (!verifyResult || !verifyResult.valid || !verifyResult.userId) {
-    return null;
-  }
+  if (!verifyResult || !verifyResult.valid || !verifyResult.userId)
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "token无效或已过期",
+      }
+    );
 
   // 获取用户信息
   const user = await userService.get.service({ id: verifyResult.userId });
-  if (!user || !user.isEnabled) {
-    return null;
-  }
-
+  if (!user || !user.isEnabled)
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "用户不存在或已被禁用",
+      }
+    );
   // 生成token
   const token = tokenUtils.generateToken({
     userId: user.id,
@@ -145,8 +155,12 @@ async function onWechatLogin(
   // 暂时返回null，需要配置微信开发者信息
   console.log("微信登录暂未实现，需要配置微信AppID和AppSecret");
   console.log("收到的参数:", { code, state });
-
-  throw new Error("微信登录功能暂未实现，请使用普通登录");
+  throw new HTTPException(
+    httpStatusCode.NOT_IMPLEMENTED as ContentfulStatusCode,
+    {
+      message: "微信登录暂未实现，需要配置微信开发者信息",
+    }
+  );
 }
 
 const wechatLoginApi = {
