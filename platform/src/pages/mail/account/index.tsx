@@ -45,10 +45,10 @@ export default function MailAccountRefactored() {
     nickname: '',
     mailAddress: '',
     host: '',
-    port: '587',
+    port: '465',
     password: '',
-    sslEnable: false,
-    starttlsEnable: true,
+    sslEnable: true,
+    starttlsEnable: false,
   });
 
   // 不再需要手动检测移动端，响应式组件会自动处理
@@ -100,10 +100,10 @@ export default function MailAccountRefactored() {
       nickname: acc.nickname || '',
       mailAddress: acc.mailAddress || '',
       host: acc.host || '',
-      port: acc.port?.toString() || '587',
+      port: String(acc.port) || '',
       password: acc.password || '',
-      sslEnable: acc.sslEnable || false,
-      starttlsEnable: acc.starttlsEnable || true,
+      sslEnable: acc.sslEnable,
+      starttlsEnable: acc.starttlsEnable,
     });
     setOpen(true);
   };
@@ -114,10 +114,10 @@ export default function MailAccountRefactored() {
       nickname: '',
       mailAddress: '',
       host: '',
-      port: '587',
+      port: '465',
       password: '',
-      sslEnable: false,
-      starttlsEnable: true,
+      sslEnable: true,
+      starttlsEnable: false,
     });
     setOpen(true);
   };
@@ -150,10 +150,10 @@ export default function MailAccountRefactored() {
       nickname: '',
       mailAddress: '',
       host: '',
-      port: '587',
+      port: '465',
       password: '',
-      sslEnable: false,
-      starttlsEnable: true,
+      sslEnable: true,
+      starttlsEnable: false,
     });
   };
 

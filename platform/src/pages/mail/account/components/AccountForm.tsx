@@ -8,7 +8,10 @@ import {
   TextField,
   Stack,
   FormControlLabel,
-  Switch,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  Radio,
   Box,
   useTheme,
   useMediaQuery,
@@ -141,28 +144,24 @@ export default function AccountForm({
               />
             </Stack>
 
-            <Box>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={form.sslEnable}
-                      onChange={(e) => onFormChange({ ...form, sslEnable: e.target.checked })}
-                    />
-                  }
-                  label="启用SSL"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={form.starttlsEnable}
-                      onChange={(e) => onFormChange({ ...form, starttlsEnable: e.target.checked })}
-                    />
-                  }
-                  label="启用STARTTLS"
-                />
-              </Stack>
-            </Box>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">加密方式</FormLabel>
+              <RadioGroup
+                row
+                value={form.sslEnable ? 'ssl' : form.starttlsEnable ? 'starttls' : ''}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  onFormChange({
+                    ...form,
+                    sslEnable: value === 'ssl',
+                    starttlsEnable: value === 'starttls',
+                  });
+                }}
+              >
+                <FormControlLabel value="ssl" control={<Radio />} label="SSL/TLS" />
+                <FormControlLabel value="starttls" control={<Radio />} label="STARTTLS" />
+              </RadioGroup>
+            </FormControl>
           </Stack>
         </form>
       </DialogContent>

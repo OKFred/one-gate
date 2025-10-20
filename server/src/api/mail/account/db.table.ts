@@ -54,7 +54,7 @@ export const mailAccountData = {
   port: {
     type: "number",
     description: "邮箱服务器端口",
-    default: 587,
+    examples: [587, 465],
   },
   sslEnable: {
     type: "boolean",
