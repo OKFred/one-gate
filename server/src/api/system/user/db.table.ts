@@ -73,7 +73,7 @@ export const userTimestamp = {
 export type userLike = InferSelectModel<typeof userTable>;
 export type userAddLike = InferInsertModel<typeof userTable>;
 
-export const userTable = sqliteTable("user", {
+export const userTable = sqliteTable("system_user", {
     id: integer("id").primaryKey().notNull(),
     username: text("username").notNull().unique(),
     password: text("password").notNull(),
@@ -90,7 +90,7 @@ export const userTable = sqliteTable("user", {
 
 export async function tableInit() {
     await db.run(`
-        CREATE TABLE IF NOT EXISTS user (
+        CREATE TABLE IF NOT EXISTS system_user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
@@ -104,7 +104,7 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-    console.log("User table initialized");
+    console.log("System user table initialized");
 }
 
 export default userTable;
