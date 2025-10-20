@@ -10,7 +10,9 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginAPI, type LoginCredentials } from '@/api/auth';
+import { commonLogin } from '@/api/system/auth';
+import { authUtils } from '@/utils/auth';
+import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -18,7 +20,7 @@ export default function LoginForm() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // 状态管理
-  const [credentials, setCredentials] = useState<LoginCredentials>({
+  const [credentials, setCredentials] = useState<CommonLoginReq>({
     username: '',
     password: '',
   });
@@ -27,8 +29,8 @@ export default function LoginForm() {
 
   // 处理输入变化
   const handleInputChange =
-    (field: keyof LoginCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCredentials((prev) => ({
+    (field: keyof CommonLoginReq) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCredentials((prev: CommonLoginReq) => ({
         ...prev,
         [field]: event.target.value,
       }));
@@ -47,9 +49,19 @@ export default function LoginForm() {
     setError('');
 
     try {
-      await loginAPI.commonLogin(credentials);
-      // 登录成功，跳转到首页
-      navigate('/home');
+      const response = await commonLogin({ data: credentials });
+      
+      if (response.data.ok && response.data.data) {
+        const loginData = response.data.data as CommonLoginData;
+        const { token, user } = loginData;
+        // 保存token和用户信息
+        authUtils.setToken(token);
+        authUtils.setUserInfo(user);
+        // 登录成功，跳转到首页
+        navigate('/home');
+      } else {
+        setError(response.data.message || '登录失败');
+      }
     } catch (err) {
       console.log(err);
       setError(err instanceof Error ? err.message : '登录失败');

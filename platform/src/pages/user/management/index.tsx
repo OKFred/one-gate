@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Alert } from '@mui/material';
 import { Add as AddIcon, Refresh as RefreshIcon } from '@mui/icons-material';
-import { UserApiService, type User, type UserAddRequest, type UserUpdateRequest, type UserListRequest } from '@/api/user';
+import { UserApiService, type User, type UserAddRequest, type UserUpdateRequest, type UserListRequest } from '@/api/system/user';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserFilter from './components/UserFilter';
 import UserTable from './components/UserTable';

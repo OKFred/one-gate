@@ -15,7 +15,6 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
 import { useResponsive } from '../responsive';
 import { authUtils, type UserInfo } from '@/utils/auth';
-import { loginAPI } from '@/api/auth';
 import { useNavigate } from 'react-router-dom';
 
 interface TopbarProps {
@@ -52,7 +51,8 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   // 处理登出
   const handleLogout = () => {
     handleClose();
-    loginAPI.logout();
+    authUtils.logout();
+    navigate('/login');
   };
 
   // 获取用户名显示

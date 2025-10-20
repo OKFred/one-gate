@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CircularProgress, Alert, Box } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
-import { UserApiService, type User, type UserUpdateRequest } from '@/api/user';
+import { UserApiService, type User, type UserUpdateRequest } from '@/api/system/user';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserProfile from './components/UserProfile';
 import UserDetails from './components/UserDetails';

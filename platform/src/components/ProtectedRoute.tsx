@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { authUtils } from '@/utils/auth';
-import { loginAPI } from '@/api/auth';
+import { verifyToken } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
+import type { VerifyTokenData } from '@/pages/login/type';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,8 +26,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       try {
         // 验证token是否有效
-        const result = await loginAPI.verifyToken(token);
-        if (result.valid) {
+        const result = await verifyToken({ data: { token } });
+        const verifyData = result.data.data as VerifyTokenData;
+        
+        if (result.data.ok && verifyData?.valid) {
           setIsAuthenticated(true);
         } else {
           // token无效，清理本地存储

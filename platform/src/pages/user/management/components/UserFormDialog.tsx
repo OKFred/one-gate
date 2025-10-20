@@ -15,7 +15,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User, UserAddRequest, UserUpdateRequest } from '@/api/user';
+import type { User, UserAddRequest, UserUpdateRequest } from '@/api/system/user';
 
 interface FormData {
   username: string;

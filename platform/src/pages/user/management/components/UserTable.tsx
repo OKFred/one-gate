@@ -14,7 +14,7 @@ import {
   Box,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import type { User } from '@/api/user';
+import type { User } from '@/api/system/user';
 import dayjs from 'dayjs';
 
 interface UserTableProps {

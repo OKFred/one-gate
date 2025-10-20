@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { sendMailSingle, listMailAccount, listMailTemplate } from '@/api/mail';
+import { sendMail, listMailAccount, listMailTemplate } from '@/api/mail';
 import {
   Box,
   Button,
@@ -242,7 +242,7 @@ export default function MailSend() {
               : undefined,
         },
       };
-      const res = await sendMailSingle({ data: payload });
+      const res = await sendMail({ data: payload });
       if (res.data && res.data.ok) {
         let msg = '邮件发送成功';
         if (typeof res.data.data === 'string') {

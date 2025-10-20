@@ -99,7 +99,7 @@ export class UserApiService {
   // 添加用户
   static async addUser(userData: UserAddRequest): Promise<ApiResponse<number>> {
     try {
-      const response = await userApiClient.post('/api/user/add', userData);
+      const response = await userApiClient.post('/api/v1/system/user/add', userData);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } }; message?: string };
@@ -110,7 +110,7 @@ export class UserApiService {
   // 获取用户详情
   static async getUser(params: UserGetRequest): Promise<ApiResponse<User>> {
     try {
-      const response = await userApiClient.post('/api/user/get', params);
+      const response = await userApiClient.post('/api/v1/system/user/get', params);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } }; message?: string };
@@ -121,7 +121,7 @@ export class UserApiService {
   // 获取用户列表
   static async getUserList(params: UserListRequest = {}): Promise<ApiResponse<UserListResponse>> {
     try {
-      const response = await userApiClient.post('/api/user/list', {
+      const response = await userApiClient.post('/api/v1/system/user/list', {
         orderBy: 'id',
         descend: true,
         pageNo: 1,
@@ -138,7 +138,7 @@ export class UserApiService {
   // 更新用户
   static async updateUser(userData: UserUpdateRequest): Promise<ApiResponse<number>> {
     try {
-      const response = await userApiClient.post('/api/user/update', userData);
+      const response = await userApiClient.post('/api/v1/system/user/update', userData);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } }; message?: string };
@@ -149,7 +149,7 @@ export class UserApiService {
   // 删除用户
   static async deleteUser(params: UserDeleteRequest): Promise<ApiResponse<number>> {
     try {
-      const response = await userApiClient.post('/api/user/delete', params);
+      const response = await userApiClient.post('/api/v1/system/user/delete', params);
       return response.data;
     } catch (error: unknown) {
       const err = error as { response?: { data?: { message?: string } }; message?: string };

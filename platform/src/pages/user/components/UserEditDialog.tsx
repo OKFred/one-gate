@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User } from '@/api/user';
+import type { User } from '@/api/system/user';
 
 interface FormData {
   username: string;
