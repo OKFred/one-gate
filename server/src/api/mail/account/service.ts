@@ -12,6 +12,18 @@ import { asc, count, desc, eq } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 
+const common = {
+  onBeforeAddOrUpdate: (obj: Partial<mailAccountLike>): void => {
+    const { sslEnable, starttlsEnable } = obj;
+    if (sslEnable && starttlsEnable) {
+      throw new HTTPException(400, {
+        message: "SSL 和 STARTTLS 不能同时启用",
+      });
+    }
+    return;
+  },
+};
+
 const addReq = {
   type: "object",
   properties: {
@@ -35,6 +47,7 @@ async function onAdd(
     sslEnable = true,
     starttlsEnable = false,
   } = obj;
+  common.onBeforeAddOrUpdate(obj);
   const result = await db
     .insert(mailAccountTable)
     .values({
@@ -211,6 +224,7 @@ async function onUpdate(
   obj: FromSchema<typeof updateReq>
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { id, ...rest } = obj;
+  common.onBeforeAddOrUpdate(rest);
   const updateTimeUtc = new Date().valueOf();
   const res = await db
     .update(mailAccountTable)
