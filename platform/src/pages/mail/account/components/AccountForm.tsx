@@ -21,7 +21,6 @@ interface FormData {
   mailAddress: string;
   host: string;
   port: string;
-  accountOwner: string;
   password: string;
   sslEnable: boolean;
   starttlsEnable: boolean;
@@ -131,14 +130,6 @@ export default function AccountForm({
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label="账户所有者"
-                value={form.accountOwner}
-                onChange={(e) => onFormChange({ ...form, accountOwner: e.target.value })}
-                required
-                fullWidth
-                size={isMobile ? 'medium' : 'medium'}
-              />
               <TextField
                 label="密码"
                 type="password"

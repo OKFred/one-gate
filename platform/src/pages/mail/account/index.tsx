@@ -20,14 +20,13 @@ interface MailAccount {
   port: number;
   sslEnable: boolean;
   starttlsEnable: boolean;
-  accountOwner?: string;
   createTimeUtc?: number;
   updateTimeUtc?: number | null;
 }
 
 interface FilterState {
   keyword: string;
-  orderBy: 'id' | 'accountOwner' | 'createTimeUtc';
+  orderBy: 'id' | 'createTimeUtc';
   descend: boolean;
 }
 
@@ -47,7 +46,6 @@ export default function MailAccountRefactored() {
     mailAddress: '',
     host: '',
     port: '587',
-    accountOwner: '',
     password: '',
     sslEnable: false,
     starttlsEnable: true,
@@ -103,7 +101,6 @@ export default function MailAccountRefactored() {
       mailAddress: acc.mailAddress || '',
       host: acc.host || '',
       port: acc.port?.toString() || '587',
-      accountOwner: acc.accountOwner || '',
       password: acc.password || '',
       sslEnable: acc.sslEnable || false,
       starttlsEnable: acc.starttlsEnable || true,
@@ -118,7 +115,6 @@ export default function MailAccountRefactored() {
       mailAddress: '',
       host: '',
       port: '587',
-      accountOwner: '',
       password: '',
       sslEnable: false,
       starttlsEnable: true,
@@ -155,7 +151,6 @@ export default function MailAccountRefactored() {
       mailAddress: '',
       host: '',
       port: '587',
-      accountOwner: '',
       password: '',
       sslEnable: false,
       starttlsEnable: true,

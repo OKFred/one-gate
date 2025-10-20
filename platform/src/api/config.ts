@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { Method, AxiosRequestConfig, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import type { paths } from '@/types/openapi'; //由openapi-typescript自动生成的类型
+import { showGlobalNotification } from '@/utils/notificationHelper';
 
 type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
 
@@ -54,20 +55,8 @@ const service = axios.create({
 // 导入认证工具
 import { authUtils } from '@/utils/auth';
 
-const axiosPlus: AxiosPlus = async (
-  axiosConfig,
-  /*  customOptions,
-  loadingOptions, */
-) => {
-  const { method, ...rest } = axiosConfig;
-  const applyInterceptors = interceptors(service);
-  return await applyInterceptors({
-    method: method as Lowercase<Method>,
-    ...rest,
-  });
-};
-
-function interceptors(service: AxiosInstance) {
+// 初始化拦截器（只执行一次）
+function setupInterceptors(service: AxiosInstance) {
   /** @description 添加请求拦截器 */
   service.interceptors.request.use(
     (config: InternalAxiosRequestConfig & { path?: Record<string, unknown> }) => {
@@ -99,11 +88,18 @@ function interceptors(service: AxiosInstance) {
   service.interceptors.response.use(
     function (response) {
       if (response.status === 200) {
+        // 检查响应数据中的 ok 字段
+        if (response.data && response.data.ok === false) {
+          const errorMessage = response.data.message || '请求失败';
+          showGlobalNotification(errorMessage, 'error');
+          console.error(errorMessage);
+          return Promise.reject(response);
+        }
         return response;
       } else {
-        if (response.data && response.data.message) {
-          console.error(response.data.message);
-        }
+        const errorMessage = response.data?.message || '请求失败';
+        showGlobalNotification(errorMessage, 'error');
+        console.error(errorMessage);
         return Promise.reject(response);
       }
     },
@@ -111,18 +107,42 @@ function interceptors(service: AxiosInstance) {
       if (error.response) {
         // 处理401未授权错误
         if (error.response.status === 401) {
+          showGlobalNotification('登录已过期，请重新登录', 'warning');
           authUtils.logout();
           window.location.href = '/login';
           return Promise.reject(error);
         }
         
-        if (error.response.data && error.response.data.message) {
-          console.error(error.response.data.message);
-        }
+        // 显示错误消息
+        const errorMessage = error.response.data?.message || '请求失败';
+        showGlobalNotification(errorMessage, 'error');
+        console.error(errorMessage);
+      } else {
+        // 网络错误或其他错误
+        const errorMessage = error.message || '网络错误';
+        showGlobalNotification(errorMessage, 'error');
+        console.error(errorMessage);
       }
       return Promise.reject(error);
     },
   );
   return service;
 }
+
+// 初始化拦截器
+setupInterceptors(service);
+
+// axiosPlus 函数，直接使用已配置好拦截器的 service
+const axiosPlus: AxiosPlus = async (
+  axiosConfig,
+  /*  customOptions,
+  loadingOptions, */
+) => {
+  const { method, ...rest } = axiosConfig;
+  return await service({
+    method: method as Lowercase<Method>,
+    ...rest,
+  });
+};
+
 export default axiosPlus;

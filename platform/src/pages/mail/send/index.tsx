@@ -23,7 +23,6 @@ interface MailAccount {
   id?: number;
   mailAddress?: string;
   nickname?: string;
-  accountOwner?: string;
 }
 
 interface MailTemplate {
@@ -119,34 +118,34 @@ export default function MailSend() {
   // 处理主题变化，检测是否与原始模板不同
   const handleSubjectChange = (newSubject: string) => {
     const newContentObj = { ...form.contentObj, subject: newSubject };
-    
+
     // 如果有模板ID且内容已被修改，则清除模板ID
     if (form.contentObj.templateId && originalTemplate) {
       const isSubjectChanged = newSubject !== originalTemplate.subject;
       const isHtmlChanged = form.contentObj.html !== originalTemplate.html;
-      
+
       if (isSubjectChanged || isHtmlChanged) {
         newContentObj.templateId = '';
       }
     }
-    
+
     setForm((f) => ({ ...f, contentObj: newContentObj }));
   };
 
   // 处理内容变化，检测是否与原始模板不同
   const handleHtmlChange = (newHtml: string) => {
     const newContentObj = { ...form.contentObj, html: newHtml };
-    
+
     // 如果有模板ID且内容已被修改，则清除模板ID
     if (form.contentObj.templateId && originalTemplate) {
       const isSubjectChanged = form.contentObj.subject !== originalTemplate.subject;
       const isHtmlChanged = newHtml !== originalTemplate.html;
-      
+
       if (isSubjectChanged || isHtmlChanged) {
         newContentObj.templateId = '';
       }
     }
-    
+
     setForm((f) => ({ ...f, contentObj: newContentObj }));
   };
 
@@ -174,7 +173,7 @@ export default function MailSend() {
     if (selectedTemplate) {
       const templateSubject = selectedTemplate.title || '';
       const templateHtml = selectedTemplate.content || '';
-      
+
       setForm((f) => ({
         ...f,
         contentObj: {
@@ -183,7 +182,7 @@ export default function MailSend() {
           html: templateHtml,
         },
       }));
-      
+
       // 记录原始模板内容
       setOriginalTemplate({
         subject: templateSubject,
@@ -297,7 +296,7 @@ export default function MailSend() {
                         {account.nickname || account.mailAddress}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {account.mailAddress} ({account.accountOwner})
+                        {account.mailAddress}
                       </Typography>
                     </Box>
                   </MenuItem>

@@ -28,7 +28,6 @@ interface MailAccount {
   port: number;
   sslEnable: boolean;
   starttlsEnable: boolean;
-  accountOwner?: string;
   createTimeUtc?: number;
   updateTimeUtc?: number | null;
 }
@@ -108,14 +107,6 @@ export default function AccountTable({ accounts, loading, onEdit, onDelete }: Ac
                       {acc.host}:{acc.port}
                     </Typography>
                   </Box>
-
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      账户所有者
-                    </Typography>
-                    <Typography variant="body1">{acc.accountOwner}</Typography>
-                  </Box>
-
                   <Box>
                     <Stack direction="row" spacing={1} flexWrap="wrap">
                       {acc.sslEnable && <Chip label="SSL" color="success" size="small" />}
@@ -161,7 +152,6 @@ export default function AccountTable({ accounts, loading, onEdit, onDelete }: Ac
                 <TableCell>{acc.mailAddress}</TableCell>
                 <TableCell>{acc.host}</TableCell>
                 <TableCell>{acc.port}</TableCell>
-                <TableCell>{acc.accountOwner}</TableCell>
                 <TableCell align="center">
                   <Stack direction="row" spacing={1} justifyContent="center">
                     <IconButton onClick={() => onEdit(acc)} color="primary" size="small">
