@@ -1,5 +1,8 @@
+// @ts-ignore
 import process from "process";
+// @ts-ignore
 import fs from "fs";
+// @ts-ignore
 import path from "path";
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
