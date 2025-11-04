@@ -216,7 +216,7 @@ const sendApi = {
   pathInfo: {
     path: "/send",
     method: "post",
-    summary: `发送邮件`,
+    summary: "发送邮件",
   } as const,
   service: onSend,
 };

@@ -52,7 +52,7 @@ const addApi = {
   pathInfo: {
     path: "/add",
     method: "post",
-    summary: `添加用户`,
+    summary: "添加用户",
   } as const,
   service: onAdd,
 };
@@ -88,7 +88,7 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: `删除用户`,
+    summary: "删除用户",
   } as const,
   service: onDelete,
 };
@@ -241,7 +241,7 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: `获取用户列表`,
+    summary: "获取用户列表",
   } as const,
   service: onList,
 };
@@ -289,7 +289,7 @@ const updateApi = {
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: `更新用户`,
+    summary: "更新用户",
   } as const,
   service: onUpdate,
 };
@@ -343,7 +343,7 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: `获取用户`,
+    summary: "获取用户",
   } as const,
   service: onGet,
 };
@@ -409,7 +409,7 @@ const verifyApi = {
   pathInfo: {
     path: "/verify",
     method: "post",
-    summary: `验证用户密码`,
+    summary: "验证用户密码",
   } as const,
   service: onVerify,
 };

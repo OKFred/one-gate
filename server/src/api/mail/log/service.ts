@@ -57,7 +57,7 @@ const addApi = {
   pathInfo: {
     path: "/add",
     method: "post",
-    summary: `添加邮件日志`,
+    summary: "添加邮件日志",
   } as const,
   service: onAdd,
 };
@@ -93,7 +93,7 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: `删除邮件日志`,
+    summary: "删除邮件日志",
   } as const,
   service: onDelete,
 };
@@ -229,7 +229,7 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: `获取邮件日志列表`,
+    summary: "获取邮件日志列表",
   } as const,
   service: onList,
 };
@@ -268,7 +268,7 @@ const updateApi = {
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: `更新邮件日志`,
+    summary: "更新邮件日志",
   } as const,
   service: onUpdate,
 };
@@ -309,7 +309,7 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: `获取邮件日志`,
+    summary: "获取邮件日志",
   } as const,
   service: onGet,
 };

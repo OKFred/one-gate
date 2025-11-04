@@ -113,7 +113,7 @@ const loginApi = {
   pathInfo: {
     path: "/login",
     method: "post",
-    summary: `用户登录`,
+    summary: "用户登录",
   } as const,
   service: onLogin,
 };
@@ -169,7 +169,7 @@ const wechatLoginApi = {
   pathInfo: {
     path: "/wechat",
     method: "post",
-    summary: `微信登录`,
+    summary: "微信登录",
   } as const,
   service: onWechatLogin,
 };
@@ -231,7 +231,7 @@ const verifyTokenApi = {
   pathInfo: {
     path: "/verify",
     method: "post",
-    summary: `验证token`,
+    summary: "验证token",
   } as const,
   service: onVerifyToken,
 };
@@ -282,7 +282,7 @@ const refreshTokenApi = {
   pathInfo: {
     path: "/refresh",
     method: "post",
-    summary: `刷新token`,
+    summary: "刷新token",
   } as const,
   service: onRefreshToken,
 };
