@@ -11,15 +11,14 @@ import {
 import { asc, count, desc, eq } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
-import { LanguageKey } from "@/middleware/i18n";
+import type { LanguageKey } from "@/types/locales";
 
 const common = {
   onBeforeAddOrUpdate: (obj: Partial<mailAccountLike>): void => {
     const { sslEnable, starttlsEnable } = obj;
     if (sslEnable && starttlsEnable) {
       throw new HTTPException(400, {
-        message:
-          "i18n.api.mail.sslAndStarttlsConflict" satisfies LanguageKey,
+        message: "i18n.api.mail.sslAndStarttlsConflict" satisfies LanguageKey,
       });
     }
     return;

@@ -1,11 +1,7 @@
-import { Next } from "hono";
-import { NodeHonoContext } from "@/types/app";
-import type { Context } from "hono";
-import zhCN from "../../locales/zh-CN";
-import enUS from "../../locales/en-US";
-
-export type LanguageKey = keyof typeof zhCN;
-export type LangugeValue = (typeof zhCN)[LanguageKey];
+import zhCN from "@/locales/zh-CN";
+import enUS from "@/locales/en-US";
+import type { LanguageKey, LanguageValue } from "@/types/locales";
+import type { NodeHonoContext } from "@/types/app";
 
 const languageObj = {
   "en-US": enUS,
@@ -19,13 +15,13 @@ const languageObj = {
  */
 export const createTranslator = (
   langCode?: string
-): ((key: LanguageKey) => string) => {
+): ((key: LanguageKey) => LanguageValue) => {
   const supportedLanguages = ["en-US", "zh-CN"];
   const language = supportedLanguages.includes(langCode || "")
     ? langCode!
     : "zh-CN";
 
-  return (key: LanguageKey): string => {
+  return (key: LanguageKey): LanguageValue => {
     const translations = languageObj[language];
     return translations[key as LanguageKey] || key;
   };
@@ -36,13 +32,8 @@ export const createTranslator = (
  * @param c - Hono 上下文对象
  * @returns 翻译函数
  */
-export const getTranslator = (c: Context) => {
+export const getTranslator = (c: NodeHonoContext) => {
   return createTranslator(
     c.req.header("locale") || c.req.header("Accept-Language")
   );
-};
-
-export const i18nHandler = async (c: NodeHonoContext, next: Next) => {
-  // i18n handler 保留用于将来可能需要的全局设置
-  await next();
 };

@@ -3,8 +3,8 @@ import fs from "fs";
 import path from "path";
 import { swaggerUI } from "@hono/swagger-ui";
 import { Scalar } from "@scalar/hono-api-reference";
-import { App } from "@/types/app";
-import { LanguageKey } from "@/middleware/i18n";
+import type { App } from "@/types/app";
+import type { LanguageKey } from "@/types/locales";
 import { HTTPException } from "hono/http-exception";
 
 const apiDocBase = path.join(process.cwd(), "src", "middleware", "doc");

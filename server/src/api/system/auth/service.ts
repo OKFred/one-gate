@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { LanguageKey } from "@/middleware/i18n";
+import type { LanguageKey } from "@/types/locales";
 
 // 普通登录
 const loginReq = {

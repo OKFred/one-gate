@@ -11,7 +11,7 @@ import {
 import { asc, count, desc, eq, like, or } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
-import { LanguageKey } from "@/middleware/i18n";
+import type { LanguageKey } from "@/types/locales";
 
 const addReq = {
   type: "object",

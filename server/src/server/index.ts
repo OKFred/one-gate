@@ -5,7 +5,7 @@ import docRegister from "@/middleware/doc/docRegister";
 import corsHandler from "@/middleware/cors";
 import nodeServer from "@/middleware/nodeServer/index";
 import routeRegister from "@/api/index";
-import { AppBindings, NodeHonoContext } from "@/types/app";
+import type { AppBindings, NodeHonoContext } from "@/types/app";
 
 async function createApp() {
   const app = new OpenAPIHono<AppBindings>();

@@ -1,4 +1,4 @@
-import { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
+import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
 import { validate } from "@cfworker/json-schema";
 import { HTTPException } from "hono/http-exception";
 import { errorSchema } from "@/middleware/errorHandler/schema";
