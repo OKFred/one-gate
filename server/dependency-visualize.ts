@@ -1,3 +1,4 @@
+import process from "process";
 import fs from "fs";
 import path from "path";
 import { parse } from "@babel/parser";
@@ -31,7 +32,11 @@ function analyzeImports(code: string, filePath: string) {
 
     traverseFunc(ast, {
       // 静态 import
-      ImportDeclaration(path) {
+      ImportDeclaration(path: {
+        node: {
+          source: { value: string };
+        };
+      }) {
         result.static.push(path.node.source.value);
         // 检测是否导入了 subFolderBatchRegister
         if (path.node.source.value.includes("subFolderBatchRegister")) {
@@ -40,7 +45,7 @@ function analyzeImports(code: string, filePath: string) {
       },
 
       // require() 和 import()
-      CallExpression(nodePath) {
+      CallExpression(nodePath: { node: { callee: any; arguments: any } }) {
         const { callee, arguments: args } = nodePath.node;
 
         // 检测调用 subFolderBatchRegister(app, "/api", __dirname)
@@ -243,7 +248,7 @@ function discoverSubFolderApis(dir: string): string[] {
 
   if (!fs.existsSync(dir)) return subApis;
 
-  const folders = fs.readdirSync(dir).filter((item) => {
+  const folders = fs.readdirSync(dir).filter((item: any) => {
     const fullPath = path.join(dir, item);
     try {
       return fs.statSync(fullPath).isDirectory();
