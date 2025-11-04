@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { errorSchema } from "@/middleware/errorHandler/schema";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import { JSONSchema } from "json-schema-to-ts";
+import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
 
