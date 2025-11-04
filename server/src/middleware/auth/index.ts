@@ -3,7 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { tokenUtils } from "@/utils/token";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import { LanguageKey } from "../i18n";
+import type { LanguageKey } from "@/types/locales";
 
 export interface AuthenticatedContext extends Context {
     user?: {
