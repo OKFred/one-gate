@@ -1,0 +1,48 @@
+import { Next } from "hono";
+import { NodeHonoContext } from "@/types/app";
+import type { Context } from "hono";
+import zhCN from "../../locales/zh-CN";
+import enUS from "../../locales/en-US";
+
+export type LanguageKey = keyof typeof zhCN;
+export type LangugeValue = (typeof zhCN)[LanguageKey];
+
+const languageObj = {
+  "en-US": enUS,
+  "zh-CN": zhCN,
+};
+
+/**
+ * 创建翻译函数，用于处理消息的多语言替换
+ * @param langCode - Accept-Language 请求头
+ * @returns 翻译函数，如果找不到文案则原样返回
+ */
+export const createTranslator = (
+  langCode?: string
+): ((key: string) => string) => {
+  const supportedLanguages = ["en-US", "zh-CN"];
+  const language = supportedLanguages.includes(langCode || "")
+    ? langCode!
+    : "zh-CN";
+
+  return (key: string): string => {
+    const translations = languageObj[language];
+    return translations[key as LanguageKey] || key;
+  };
+};
+
+/**
+ * 从上下文中获取翻译函数
+ * @param c - Hono 上下文对象
+ * @returns 翻译函数
+ */
+export const getTranslator = (c: Context) => {
+  return createTranslator(
+    c.req.header("locale") || c.req.header("Accept-Language")
+  );
+};
+
+export const i18nHandler = async (c: NodeHonoContext, next: Next) => {
+  // i18n handler 保留用于将来可能需要的全局设置
+  await next();
+};

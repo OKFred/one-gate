@@ -1,4 +1,5 @@
 import type { App, NodeHonoContext } from "@/types/app.ts";
+import { createTranslator, getTranslator } from "@/middleware/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
 
@@ -9,8 +10,13 @@ type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // 提�
 
 export default function errorHandler(app: App) {
   app.notFound((c) => {
+    const t = getTranslator(c);
     return c.json(
-      { ok: false, message: "接口不存在", data: null },
+      {
+        ok: false,
+        message: t("i18n.middleware.errorHandler.notFound"),
+        data: null,
+      },
       { status: 404 }
     );
   });
@@ -27,14 +33,18 @@ export default function errorHandler(app: App) {
   });
 
   app.onError((e, c: NodeHonoContext) => {
+    const t = getTranslator(c);
+
     if (e instanceof HTTPException) {
       const message = e.message
-        ? e.message
+        ? e.message.startsWith("i18n.")
+          ? t(e.message)
+          : e.message
         : e.status === 404
-          ? "目标不存在"
+          ? t("i18n.middleware.errorHandler.targetNotExist")
           : e.status === 422
-            ? "请求体校验失败"
-            : "服务器异常";
+            ? t("i18n.middleware.errorHandler.validationFailed")
+            : t("i18n.middleware.errorHandler.serverError");
       return c.json(
         {
           ok: false,
@@ -47,9 +57,9 @@ export default function errorHandler(app: App) {
         }
       );
     }
-    let message = "未知异常";
+    let message = t("i18n.middleware.errorHandler.unknownError");
     if (e.message?.includes("SQLITE_CONSTRAINT_UNIQUE")) {
-      message = "数据重复";
+      message = t("i18n.middleware.errorHandler.duplicateData");
       return c.json(
         {
           ok: false,
@@ -58,7 +68,7 @@ export default function errorHandler(app: App) {
         { status: 409 }
       );
     }
-    c.var.logger.error(`接口异常：` + e.stack);
+    c.var.logger.error(t("i18n.middleware.errorHandler.apiError") + e.stack);
     return c.json(
       {
         ok: false,
@@ -78,4 +88,9 @@ process.on("uncaughtException", function (err) {
   console.log("uncaughtException:" + err);
 });
 
-process.env.NODE_ENV === "production" && console.log("服务器已启动");
+process.env.NODE_ENV === "production" &&
+  console.log(
+    createTranslator(process.env.LOCALE)(
+      "i18n.middleware.errorHandler.serverStarted"
+    )
+  );

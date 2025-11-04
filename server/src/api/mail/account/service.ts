@@ -275,7 +275,9 @@ async function onGet(
     .where(eq(mailAccountTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, { message: "邮件账户不存在或已被删除" });
+    throw new HTTPException(404, {
+      message: "i18n.api.mailLog.notExistOrDeleted",
+    });
   }
   return rows[0];
 }

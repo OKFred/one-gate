@@ -1603,9 +1603,10 @@ export interface components {
             host?: string;
             /**
              * @description 邮箱服务器端口
-             * @default 587
+             * @example 587
+             * @example 465
              */
-            port: number;
+            port?: number;
             /**
              * @description 是否启用SSL
              * @default true
@@ -1693,9 +1694,10 @@ export interface components {
                     host?: string;
                     /**
                      * @description 邮箱服务器端口
-                     * @default 587
+                     * @example 587
+                     * @example 465
                      */
-                    port: number;
+                    port?: number;
                     /**
                      * @description 是否启用SSL
                      * @default true
@@ -1749,9 +1751,10 @@ export interface components {
             host?: string;
             /**
              * @description 邮箱服务器端口
-             * @default 587
+             * @example 587
+             * @example 465
              */
-            port: number;
+            port?: number;
             /**
              * @description 是否启用SSL
              * @default true
@@ -1810,9 +1813,10 @@ export interface components {
                 host?: string;
                 /**
                  * @description 邮箱服务器端口
-                 * @default 587
+                 * @example 587
+                 * @example 465
                  */
-                port: number;
+                port?: number;
                 /**
                  * @description 是否启用SSL
                  * @default true
