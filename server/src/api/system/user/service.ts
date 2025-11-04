@@ -12,6 +12,7 @@ import { asc, count, desc, eq, or, like } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
+import { LanguageKey } from "@/middleware/i18n";
 
 const SALT_ROUNDS = 12; // bcrypt盐轮数
 
@@ -333,7 +334,7 @@ async function onGet(
     .where(eq(userTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, { message: "用户不存在或已被禁用" });
+    throw new HTTPException(404, { message: "i18n.api.notExistOrDisabled" satisfies LanguageKey });
   }
   return rows[0];
 }

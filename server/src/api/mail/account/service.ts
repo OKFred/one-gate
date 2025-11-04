@@ -11,13 +11,15 @@ import {
 import { asc, count, desc, eq } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
+import { LanguageKey } from "@/middleware/i18n";
 
 const common = {
   onBeforeAddOrUpdate: (obj: Partial<mailAccountLike>): void => {
     const { sslEnable, starttlsEnable } = obj;
     if (sslEnable && starttlsEnable) {
       throw new HTTPException(400, {
-        message: "SSL 和 STARTTLS 不能同时启用",
+        message:
+          "i18n.api.mail.sslAndStarttlsConflict" satisfies LanguageKey,
       });
     }
     return;
@@ -276,7 +278,7 @@ async function onGet(
     .limit(1);
   if (rows.length === 0) {
     throw new HTTPException(404, {
-      message: "i18n.api.mailLog.notExistOrDeleted",
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
     });
   }
   return rows[0];
@@ -308,7 +310,10 @@ async function onVerify(
   uniqueKeyObj: FromSchema<typeof verifyReq>
 ): Promise<FromSchema<typeof verifyRes>> {
   const account = await onGet(uniqueKeyObj);
-  if (!account?.id) throw new Error("未找到该 mailAccount");
+  if (!account?.id)
+    throw new HTTPException(404, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
   const nodemailer = await import("nodemailer");
   const transporter = nodemailer.default.createTransport({
     host: account.host,

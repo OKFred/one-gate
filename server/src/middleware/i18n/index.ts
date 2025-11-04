@@ -19,13 +19,13 @@ const languageObj = {
  */
 export const createTranslator = (
   langCode?: string
-): ((key: string) => string) => {
+): ((key: LanguageKey) => string) => {
   const supportedLanguages = ["en-US", "zh-CN"];
   const language = supportedLanguages.includes(langCode || "")
     ? langCode!
     : "zh-CN";
 
-  return (key: string): string => {
+  return (key: LanguageKey): string => {
     const translations = languageObj[language];
     return translations[key as LanguageKey] || key;
   };

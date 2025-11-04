@@ -22,7 +22,11 @@ async function createApp() {
   app.get("/", (c: NodeHonoContext) => {
     const { logger } = c.var;
     logger.info("gotcha");
-    return c.json({ ok: true, message: new Date().toLocaleString() });
+    return c.json({
+      ok: true,
+      data: new Date().toLocaleString(),
+      message: "OK",
+    });
   });
   return app;
 }

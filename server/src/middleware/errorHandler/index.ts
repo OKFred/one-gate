@@ -1,5 +1,9 @@
 import type { App, NodeHonoContext } from "@/types/app.ts";
-import { createTranslator, getTranslator } from "@/middleware/i18n";
+import {
+  createTranslator,
+  getTranslator,
+  LanguageKey,
+} from "@/middleware/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
 
@@ -38,13 +42,18 @@ export default function errorHandler(app: App) {
     if (e instanceof HTTPException) {
       const message = e.message
         ? e.message.startsWith("i18n.")
-          ? t(e.message)
+          ? t(e.message as LanguageKey)
           : e.message
         : e.status === 404
           ? t("i18n.middleware.errorHandler.targetNotExist")
           : e.status === 422
             ? t("i18n.middleware.errorHandler.validationFailed")
-            : t("i18n.middleware.errorHandler.serverError");
+            : t("i18n.middleware.errorHandler.undefinedError");
+      if (message === t("i18n.middleware.errorHandler.undefinedError")) {
+        c.var.logger.error(
+          t("i18n.middleware.errorHandler.undefinedError") + ": " + e.stack
+        );
+      }
       return c.json(
         {
           ok: false,
@@ -59,7 +68,7 @@ export default function errorHandler(app: App) {
     }
     let message = t("i18n.middleware.errorHandler.unknownError");
     if (e.message?.includes("SQLITE_CONSTRAINT_UNIQUE")) {
-      message = t("i18n.middleware.errorHandler.duplicateData");
+      message = t("i18n.middleware.errorHandler.duplicatedData");
       return c.json(
         {
           ok: false,
@@ -68,7 +77,9 @@ export default function errorHandler(app: App) {
         { status: 409 }
       );
     }
-    c.var.logger.error(t("i18n.middleware.errorHandler.apiError") + e.stack);
+    c.var.logger.error(
+      t("i18n.middleware.errorHandler.serverError") + ": " + e.stack
+    );
     return c.json(
       {
         ok: false,

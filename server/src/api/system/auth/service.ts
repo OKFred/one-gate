@@ -4,6 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import { LanguageKey } from "@/middleware/i18n";
 
 // 普通登录
 const loginReq = {
@@ -74,7 +75,7 @@ async function onLogin(
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
       {
-        message: "token无效或已过期",
+        message: "i18n.api.system.authFailed" satisfies LanguageKey,
       }
     );
 
@@ -84,7 +85,7 @@ async function onLogin(
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
       {
-        message: "用户不存在或已被禁用",
+        message: "i18n.api.system.notAuthenticated" satisfies LanguageKey,
       }
     );
   // 生成token
@@ -158,7 +159,7 @@ async function onWechatLogin(
   throw new HTTPException(
     httpStatusCode.NOT_IMPLEMENTED as ContentfulStatusCode,
     {
-      message: "微信登录暂未实现，需要配置微信开发者信息",
+      message: "i18n.api.system.wechatNotImplemented" satisfies LanguageKey,
     }
   );
 }

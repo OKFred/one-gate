@@ -48,7 +48,7 @@ function routeMaker({ pathInfo, nameSpace, service, reqSchema, componentArr }) {
     }
     const result = await service(bodyObj);
     return c.json(
-      { ok: true, message: "操作成功", data: result },
+      { ok: true, message: "OK", data: result },
       httpStatusCode.OK as ContentfulStatusCode
     );
   };

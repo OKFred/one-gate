@@ -11,6 +11,7 @@ import {
 import { asc, count, desc, eq, and, gte, lte, like, or } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
+import { LanguageKey } from "@/middleware/i18n";
 
 const addReq = {
   type: "object",
@@ -299,7 +300,7 @@ async function onGet(
     .where(eq(mailLogTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, { message: "邮件日志不存在或已被删除" });
+    throw new HTTPException(404, { message: "i18n.api.notExistOrDisabled" satisfies LanguageKey });
   }
   return rows[0];
 }

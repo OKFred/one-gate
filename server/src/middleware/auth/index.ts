@@ -3,6 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { tokenUtils } from "@/utils/token";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import { LanguageKey } from "../i18n";
 
 export interface AuthenticatedContext extends Context {
     user?: {
@@ -19,7 +20,7 @@ export const authMiddleware = async (c: AuthenticatedContext, next: Next) => {
         const authHeader = c.req.header("Authorization");
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             throw new HTTPException(httpStatusCode.UNAUTHORIZED as ContentfulStatusCode, {
-                message: "未提供有效的认证token",
+                message: "i18n.api.system.noToken" satisfies LanguageKey,
             });
         }
         
@@ -28,7 +29,7 @@ export const authMiddleware = async (c: AuthenticatedContext, next: Next) => {
         
         if (!payload) {
             throw new HTTPException(httpStatusCode.UNAUTHORIZED as ContentfulStatusCode, {
-                message: "token无效或已过期",
+                message: "i18n.api.system.invalidToken" satisfies LanguageKey,
             });
         }
         
@@ -46,7 +47,7 @@ export const authMiddleware = async (c: AuthenticatedContext, next: Next) => {
             throw error;
         }
         throw new HTTPException(httpStatusCode.UNAUTHORIZED as ContentfulStatusCode, {
-            message: "认证失败",
+            message: "i18n.api.system.authFailed" satisfies LanguageKey,
         });
     }
 };
@@ -56,13 +57,13 @@ export const roleMiddleware = (allowedRoles: string[]) => {
     return async (c: AuthenticatedContext, next: Next) => {
         if (!c.user) {
             throw new HTTPException(httpStatusCode.UNAUTHORIZED as ContentfulStatusCode, {
-                message: "未认证用户",
+                message: "i18n.api.system.notAuthenticated" satisfies LanguageKey,
             });
         }
         
         if (!allowedRoles.includes(c.user.role)) {
             throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode, {
-                message: "权限不足",
+                message: "i18n.api.system.insufficientPermission" satisfies LanguageKey,
             });
         }
         
