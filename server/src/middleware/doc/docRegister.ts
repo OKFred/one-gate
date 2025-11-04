@@ -7,9 +7,10 @@ import { App } from "@/types/app";
 import { LanguageKey } from "@/middleware/i18n";
 import { HTTPException } from "hono/http-exception";
 
+const apiDocBase = path.join(process.cwd(), "src", "middleware", "doc");
 export default function docRegister(app: App) {
   app.get("/doc", async (c) => {
-    const docHtmlPath = path.join(process.cwd(), "src", "doc", "index.html");
+    const docHtmlPath = path.join(apiDocBase, "index.html");
     try {
       const htmlContent = fs.readFileSync(docHtmlPath, "utf-8");
       return c.body(htmlContent, 200, { "Content-Type": "text/html" });
@@ -32,22 +33,12 @@ export default function docRegister(app: App) {
     ],
   });
   app.get("/doc/swagger-ui.css", async (c) => {
-    const docHtmlPath = path.join(
-      process.cwd(),
-      "src",
-      "doc",
-      "swagger-ui.css"
-    );
+    const docHtmlPath = path.join(apiDocBase, "swagger-ui.css");
     const htmlContent = fs.readFileSync(docHtmlPath, "utf-8");
     return c.body(htmlContent, 200, { "Content-Type": "text/css" });
   });
   app.get("/doc/swagger-ui-bundle.js", async (c) => {
-    const docHtmlPath = path.join(
-      process.cwd(),
-      "src",
-      "doc",
-      "swagger-ui-bundle.js"
-    );
+    const docHtmlPath = path.join(apiDocBase, "swagger-ui-bundle.js");
     const htmlContent = fs.readFileSync(docHtmlPath, "utf-8");
     return c.body(htmlContent, 200, { "Content-Type": "text/javascript" });
   });

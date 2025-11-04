@@ -1,7 +1,7 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import logHandler from "@/middleware/logger";
 import errorHandler from "@/middleware/errorHandler";
-import docRegister from "@/doc/docRegister";
+import docRegister from "@/middleware/doc/docRegister";
 import corsHandler from "@/middleware/cors";
 import nodeServer from "@/middleware/nodeServer/index";
 import routeRegister from "@/api/index";
