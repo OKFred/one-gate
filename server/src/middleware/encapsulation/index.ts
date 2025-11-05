@@ -36,7 +36,14 @@ function componentMaker(
   }
 }
 
-function routeMaker({ pathInfo, nameSpace, service, reqSchema, componentArr }) {
+function routeMaker({
+  pathInfo,
+  nameSpace,
+  service,
+  reqSchema,
+  resSchema,
+  componentArr,
+}) {
   const controller = async (c: NodeHonoContext) => {
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
@@ -47,6 +54,18 @@ function routeMaker({ pathInfo, nameSpace, service, reqSchema, componentArr }) {
       );
     }
     const result = await service(bodyObj);
+    if (process.env.NODE_ENV !== "production") {
+      const { valid: resValid, errors: resErrors } = validate(
+        result,
+        resSchema as object,
+        "2020-12"
+      );
+      if (!resValid) {
+        c.var.logger.error(
+          "Response schema validation failed:\n" + JSON.stringify(resErrors)
+        );
+      }
+    }
     return c.json(
       { ok: true, message: "OK", data: result },
       httpStatusCode.OK as ContentfulStatusCode
@@ -119,6 +138,7 @@ export default function main(
       ...obj,
       nameSpace,
       reqSchema: req,
+      resSchema: res,
       componentArr,
     });
     pathRegister(app, pathObj, controller);
