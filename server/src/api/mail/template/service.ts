@@ -9,7 +9,7 @@ import {
   type mailTemplateLike,
 } from "./db.table";
 import { asc, count, desc, eq, like, or } from "drizzle-orm";
-import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import * as commonSchema from "../common.schema";

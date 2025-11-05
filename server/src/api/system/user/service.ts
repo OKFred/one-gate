@@ -9,7 +9,7 @@ import {
   type userLike,
 } from "./db.table";
 import { asc, count, desc, eq, or, like } from "drizzle-orm";
-import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";

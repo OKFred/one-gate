@@ -3,7 +3,7 @@ import { tokenUtils } from "@/utils/token";
 import { HTTPException } from "hono/http-exception";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { LanguageKey } from "@/types/locales";
 
 // 普通登录

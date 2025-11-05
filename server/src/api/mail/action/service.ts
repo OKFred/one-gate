@@ -1,4 +1,4 @@
-import { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import mailAccountService from "../account/service";
 import mailTemplateService from "../template/service";
 import mailLogService from "../log/service";
