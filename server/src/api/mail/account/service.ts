@@ -168,15 +168,6 @@ async function onList(
   }
   const getAllResult = await queryDB(true);
   const total = getAllResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
   const rows = await queryDB(false);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
