@@ -4,14 +4,6 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 
-export const userIndexAlias = {
-    userId: {
-        type: "number",
-        description: "用户id",
-        examples: [1],
-    },
-};
-
 export const userIndex = {
     id: {
         type: "number",

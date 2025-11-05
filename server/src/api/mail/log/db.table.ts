@@ -3,13 +3,6 @@ import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
-export const mailLogIndexAlias = {
-  logId: {
-    type: "number",
-    description: "邮件日志id",
-    examples: [1],
-  },
-};
 
 export const mailLogIndex = {
   id: {

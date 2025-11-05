@@ -4,14 +4,6 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 
-export const mailTemplateIndexAlias = {
-  templateId: {
-    type: "number",
-    description: "邮件模板id",
-    examples: [1],
-  },
-};
-
 export const mailTemplateIndex = {
   id: {
     type: "number",
