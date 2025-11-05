@@ -12,6 +12,7 @@ import { asc, count, desc, eq, like, or } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
+import * as commonSchema from "../common.schema";
 
 const addReq = {
   type: "object",
@@ -91,19 +92,13 @@ const deleteApi = {
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: [
-        "id",
-        "name",
-        "creatorName",
-        "createTimeUtc",
-      ] satisfies (keyof mailTemplateLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", maximum: 1000, default: 10 },
-    keyword: { type: "string", examples: [""] },
+    orderBy: commonSchema.orderByWrapper([
+      "id",
+      "name",
+      "creatorName",
+      "createTimeUtc",
+    ] satisfies (keyof mailTemplateLike)[]),
+    ...commonSchema.listReqBase,
   },
   required: [],
   additionalProperties: false,
@@ -111,30 +106,21 @@ const listReq = {
 const listRes = {
   type: "object",
   properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          ...mailTemplateIndex,
-          ...mailTemplateData,
-          ...mailTemplateTimestamp,
-          status: {
-            type: "boolean",
-            description: "状态",
-          },
-          remark: {
-            type: "string",
-            nullable: true,
-            description: "备注",
-          },
-        } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>,
+    ...commonSchema.listResBase,
+    list: commonSchema.listWrapper({
+      ...mailTemplateIndex,
+      ...mailTemplateData,
+      ...mailTemplateTimestamp,
+      status: {
+        type: "boolean",
+        description: "状态",
       },
-    },
+      remark: {
+        type: "string",
+        nullable: true,
+        description: "备注",
+      },
+    } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
 async function onList(
@@ -290,7 +276,9 @@ async function onGet(
     .where(eq(mailTemplateTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, { message: "i18n.api.notExistOrDisabled" satisfies LanguageKey });
+    throw new HTTPException(404, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
   }
   return rows[0];
 }

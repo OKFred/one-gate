@@ -12,6 +12,7 @@ import { asc, count, desc, eq } from "drizzle-orm";
 import { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
+import * as commonSchema from "../common.schema";
 
 const common = {
   onBeforeAddOrUpdate: (obj: Partial<mailAccountLike>): void => {
@@ -114,14 +115,11 @@ const deleteApi = {
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: ["id", "createTimeUtc"] satisfies (keyof mailAccountLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", maximum: 1000, default: 10 },
-    keyword: { type: "string", examples: [""] },
+    orderBy: commonSchema.orderByWrapper([
+      "id",
+      "createTimeUtc",
+    ] satisfies (keyof mailAccountLike)[]),
+    ...commonSchema.listReqBase,
   },
   required: [],
   additionalProperties: false,
@@ -129,21 +127,12 @@ const listReq = {
 const listRes = {
   type: "object",
   properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          ...mailAccountIndex,
-          ...mailAccountData,
-          ...mailAccountTimestamp,
-        } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>,
-      },
-    },
+    ...commonSchema.listResBase,
+    list: commonSchema.listWrapper({
+      ...mailAccountIndex,
+      ...mailAccountData,
+      ...mailAccountTimestamp,
+    } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
 async function onList(
