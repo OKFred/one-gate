@@ -19,7 +19,7 @@ const addReq = {
   properties: {
     ...mailTemplateData,
   } satisfies Partial<Record<keyof mailTemplateAddLike, JSONSchema>>,
-  required: ["name", "title", "langCode", "content", "creatorName"],
+  required: ["name", "title", "langCode", "content", "creatorId"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -28,7 +28,7 @@ const addRes = {
 async function onAdd(
   obj: FromSchema<typeof addReq>
 ): Promise<FromSchema<typeof addRes> | null> {
-  const { name, title, langCode, content, creatorName, category = "" } = obj;
+  const { name, title, langCode, content, creatorId, category = "" } = obj;
   const result = await db
     .insert(mailTemplateTable)
     .values({
@@ -36,7 +36,7 @@ async function onAdd(
       title,
       langCode,
       content,
-      creatorName,
+      creatorId,
       category,
     } satisfies mailTemplateAddLike)
     .returning({ id: mailTemplateTable.id });
@@ -95,7 +95,7 @@ const listReq = {
     orderBy: commonSchema.orderByWrapper([
       "id",
       "name",
-      "creatorName",
+      "creatorId",
       "createTimeUtc",
     ] satisfies (keyof mailTemplateLike)[]),
     ...commonSchema.listReqBase,

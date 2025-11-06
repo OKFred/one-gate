@@ -36,9 +36,9 @@ export const mailTemplateData = {
     type: "string",
     description: "邮件内容",
   },
-  creatorName: {
+  creatorId: {
     type: "string",
-    description: "创建者名称",
+    description: "创建者ID",
   },
   category: {
     type: "string",
@@ -69,7 +69,7 @@ export const mailTemplateTable = sqliteTable("mail_template", {
   title: text("title").notNull(),
   langCode: text("lang_code").notNull(),
   content: text("content").notNull(),
-  creatorName: text("creator_name").notNull(),
+  creatorId: text("creator_id").notNull(),
   category: text("category"),
   status: integer("status", {
     mode: "boolean",
@@ -93,7 +93,7 @@ export async function tableInit() {
             title TEXT NOT NULL,
             lang_code TEXT NOT NULL,
             content TEXT NOT NULL,
-            creator_name TEXT NOT NULL,
+            creator_id TEXT NOT NULL,
             category TEXT,
             status INTEGER NOT NULL DEFAULT 1,
             remark TEXT,
