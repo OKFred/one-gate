@@ -36,17 +36,22 @@ export const mailTemplateData = {
     type: "string",
     description: "邮件内容",
   },
-  creatorId: {
-    type: "string",
-    description: "创建者ID",
-  },
   category: {
     type: "string",
     description: "邮件分类",
   },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
 
-export const mailTemplateTimestamp = {
+export const mailTemplateAudit = {
+  creatorId: {
+    type: "number",
+    description: "创建者ID",
+  },
+  updaterId: {
+    type: "number",
+    description: "更新者ID",
+    nullable: true,
+  },
   createTimeUtc: {
     type: "number",
     description: "创建时间",
@@ -69,7 +74,6 @@ export const mailTemplateTable = sqliteTable("mail_template", {
   title: text("title").notNull(),
   langCode: text("lang_code").notNull(),
   content: text("content").notNull(),
-  creatorId: text("creator_id").notNull(),
   category: text("category"),
   status: integer("status", {
     mode: "boolean",
@@ -77,6 +81,8 @@ export const mailTemplateTable = sqliteTable("mail_template", {
     .notNull()
     .default(true),
   remark: text("remark"),
+  creatorId: integer("creator_id").notNull(),
+  updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
     .notNull()
     .default(
@@ -93,10 +99,11 @@ export async function tableInit() {
             title TEXT NOT NULL,
             lang_code TEXT NOT NULL,
             content TEXT NOT NULL,
-            creator_id TEXT NOT NULL,
             category TEXT,
             status INTEGER NOT NULL DEFAULT 1,
             remark TEXT,
+            creator_id INTEGER NOT NULL,
+            updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
               CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
               CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)

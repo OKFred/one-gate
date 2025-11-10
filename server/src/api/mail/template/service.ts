@@ -2,7 +2,7 @@ import db from "@/db/index";
 import {
   mailTemplateIndex,
   mailTemplateUnique,
-  mailTemplateTimestamp,
+  mailTemplateAudit,
   mailTemplateTable,
   mailTemplateData,
   type mailTemplateAddLike,
@@ -20,7 +20,7 @@ const addReq = {
   properties: {
     ...mailTemplateData,
   } satisfies Partial<Record<keyof mailTemplateAddLike, JSONSchema>>,
-  required: ["name", "title", "langCode", "content", "creatorId"],
+  required: ["name", "title", "langCode", "content"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -30,7 +30,9 @@ async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const { name, title, langCode, content, creatorId, category = "" } = obj;
+  const userObj = c.get("userObj");
+  const { userId: creatorId } = userObj;
+  const { name, title, langCode, content, category = "" } = obj;
   const result = await db
     .insert(mailTemplateTable)
     .values({
@@ -70,14 +72,17 @@ async function onDelete(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
+  // 软删除：设置 status=false 并记录 updaterId，而不是物理删除
+  const updateTimeUtc = new Date().valueOf();
   const result = await db
-    .delete(mailTemplateTable)
+    .update(mailTemplateTable)
+    .set({ status: false, updaterId, updateTimeUtc })
     .where(eq(mailTemplateTable.id, id))
-    .returning({
-      id: mailTemplateTable.id,
-    });
+    .returning({ id: mailTemplateTable.id });
   if (!result || result.length === 0) return null;
   return result[0].id;
 }
@@ -113,7 +118,7 @@ const listRes = {
     list: commonSchema.listWrapper({
       ...mailTemplateIndex,
       ...mailTemplateData,
-      ...mailTemplateTimestamp,
+      ...mailTemplateAudit,
       status: {
         type: "boolean",
         description: "状态",
@@ -211,12 +216,15 @@ async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
+  const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
   const updateTimeUtc = new Date().valueOf();
   const res = await db
     .update(mailTemplateTable)
     .set({
       ...rest,
+      updaterId,
       updateTimeUtc,
     })
     .where(eq(mailTemplateTable.id, id))
@@ -248,7 +256,7 @@ const getRes = {
   properties: {
     ...mailTemplateIndex,
     ...mailTemplateData,
-    ...mailTemplateTimestamp,
+    ...mailTemplateAudit,
     status: {
       type: "boolean",
       description: "状态",

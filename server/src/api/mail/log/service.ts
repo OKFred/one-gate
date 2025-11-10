@@ -2,7 +2,7 @@ import db from "@/db/index";
 import {
   mailLogIndex,
   mailLogUnique,
-  mailLogTimestamp,
+  mailLogAudit,
   mailLogTable,
   mailLogData,
   type mailLogAddLike,
@@ -30,6 +30,8 @@ async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
+  const userObj = c.get("userObj");
+  const { userId: creatorId } = userObj;
   const {
     mailTo,
     mailFrom,
@@ -51,6 +53,7 @@ async function onAdd(
       sendStatus,
       exceptionCode,
       exceptionDetails,
+      creatorId,
     } satisfies mailLogAddLike)
     .returning({ id: mailLogTable.id });
   return result[0]?.id;
@@ -81,6 +84,8 @@ async function onDelete(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
   const result = await db
@@ -129,7 +134,7 @@ const listRes = {
     list: commonSchema.listWrapper({
       ...mailLogIndex,
       ...mailLogData,
-      ...mailLogTimestamp,
+      ...mailLogAudit,
     } satisfies Partial<Record<keyof mailLogLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
@@ -230,12 +235,15 @@ async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
+  const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
   const updateTimeUtc = new Date().valueOf();
   const res = await db
     .update(mailLogTable)
     .set({
       ...rest,
+      updaterId,
       updateTimeUtc,
     })
     .where(eq(mailLogTable.id, id))
@@ -267,7 +275,7 @@ const getRes = {
   properties: {
     ...mailLogIndex,
     ...mailLogData,
-    ...mailLogTimestamp,
+    ...mailLogAudit,
   } satisfies Partial<Record<keyof mailLogLike, JSONSchema>>,
 } as const satisfies JSONSchema;
 async function onGet(

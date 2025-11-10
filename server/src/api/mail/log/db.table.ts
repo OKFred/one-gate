@@ -56,13 +56,26 @@ export const mailLogData = {
   },
 } as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
 
-export const mailLogTimestamp = {
+export const mailLogAudit = {
+  creatorId: {
+    type: "number",
+    description: "创建者ID",
+  },
+  updaterId: {
+    type: "number",
+    description: "更新者ID",
+    nullable: true,
+  },
   createTimeUtc: {
     type: "number",
+    description: "创建时间",
+    examples: [1672531199000],
   },
   updateTimeUtc: {
     type: "number",
     nullable: true,
+    description: "更新时间",
+    examples: [1672531199000],
   },
 } as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
 
@@ -81,6 +94,8 @@ export const mailLogTable = sqliteTable(
     sendStatus: integer("send_status", { mode: "boolean" }).notNull(),
     exceptionCode: text("exception_code"),
     exceptionDetails: text("exception_details"),
+    creatorId: integer("creator_id").notNull(),
+    updaterId: integer("updater_id"),
     createTimeUtc: integer("create_time_utc")
       .notNull()
       .default(
@@ -112,6 +127,8 @@ export async function tableInit() {
             send_status INTEGER NOT NULL,
             exception_code TEXT,
             exception_details TEXT,
+            creator_id INTEGER NOT NULL,
+            updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
               CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
               CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)

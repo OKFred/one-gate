@@ -2,7 +2,7 @@ import db from "@/db/index";
 import {
   mailAccountIndex,
   mailAccountUnique,
-  mailAccountTimestamp,
+  mailAccountAudit,
   mailAccountTable,
   mailAccountData,
   type mailAccountAddLike,
@@ -42,6 +42,8 @@ async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
+  const userObj = c.get("userObj");
+  const { userId: creatorId } = userObj;
   const {
     mailAddress,
     nickname,
@@ -62,7 +64,7 @@ async function onAdd(
       port,
       sslEnable,
       starttlsEnable,
-      creatorId: 1,
+      creatorId,
     } satisfies mailAccountAddLike)
     .returning({ id: mailAccountTable.id });
   return result[0]?.id;
@@ -93,14 +95,19 @@ async function onDelete(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const userObj = c.get("userObj");
+  if (!userObj?.userId) {
+    throw new HTTPException(401, {
+      message: "i18n.api.system.notAuthenticated" as any,
+    });
+  }
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
+  // 物理删除保持不变，这里仅演示可选：若需要软删除可扩展 status 字段
   const result = await db
     .delete(mailAccountTable)
     .where(eq(mailAccountTable.id, id))
-    .returning({
-      id: mailAccountTable.id,
-    });
+    .returning({ id: mailAccountTable.id });
   if (!result || result.length === 0) return null;
   return result[0].id;
 }
@@ -134,7 +141,7 @@ const listRes = {
     list: commonSchema.listWrapper({
       ...mailAccountIndex,
       ...mailAccountData,
-      ...mailAccountTimestamp,
+      ...mailAccountAudit,
     } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
@@ -207,6 +214,12 @@ async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
+  const userObj = c.get("userObj");
+  if (!userObj?.userId) {
+    throw new HTTPException(401, {
+      message: "i18n.api.system.notAuthenticated" as any,
+    });
+  }
   const { id, ...rest } = obj;
   common.onBeforeAddOrUpdate(rest);
   const updateTimeUtc = new Date().valueOf();
@@ -215,7 +228,7 @@ async function onUpdate(
     .set({
       ...rest,
       updateTimeUtc,
-      updaterId: 1,
+      updaterId: userObj.userId,
     })
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });
@@ -246,7 +259,7 @@ const getRes = {
   properties: {
     ...mailAccountIndex,
     ...mailAccountData,
-    ...mailAccountTimestamp,
+    ...mailAccountAudit,
   } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>,
 } as const satisfies JSONSchema;
 async function onGet(

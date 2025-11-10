@@ -2,7 +2,7 @@ import db from "@/db/index";
 import {
   userIndex,
   userUnique,
-  userTimestamp,
+  userAudit,
   userTable,
   userData,
   type userAddLike,
@@ -140,7 +140,7 @@ const listRes = {
           department: userData.department,
           role: userData.role,
           isEnabled: userData.isEnabled,
-          ...userTimestamp,
+          ...userAudit,
           // 注意：不返回密码字段
         },
       },
@@ -314,7 +314,7 @@ const getRes = {
     department: userData.department,
     role: userData.role,
     isEnabled: userData.isEnabled,
-    ...userTimestamp,
+    ...userAudit,
     // 注意：不返回密码字段
   },
 } as const satisfies JSONSchema;

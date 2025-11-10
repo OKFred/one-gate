@@ -48,7 +48,7 @@ export const userData = {
     },
 } as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
 
-export const userTimestamp = {
+export const userAudit = {
     createTimeUtc: {
         type: "number",
         description: "创建时间",
