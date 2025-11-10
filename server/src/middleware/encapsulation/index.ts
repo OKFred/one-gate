@@ -7,6 +7,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
+import { authMiddleware } from "../auth";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -36,6 +37,8 @@ function componentMaker(
   }
 }
 
+const routeWhitelist = ["/api/system/auth/login"];
+
 function routeMaker({
   pathInfo,
   nameSpace,
@@ -53,6 +56,10 @@ function routeMaker({
         httpStatusCode.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
         { cause: ["Content-Type must be application/json"] }
       );
+    }
+    const token = c.req.header("authorization");
+    if (token && !routeWhitelist.includes(pathInfo.path)) {
+      await authMiddleware(c);
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");

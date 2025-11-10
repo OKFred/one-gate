@@ -21,6 +21,7 @@ export type routeLike = {
 export type AppBindings = {
   Variables: {
     bodyObj?: any;
+    userObj?: any;
   };
   Bindings: Env;
 };
