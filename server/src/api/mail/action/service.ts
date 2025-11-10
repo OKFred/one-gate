@@ -1,4 +1,5 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
+import type { NodeHonoContext } from "@/types/app";
 import mailAccountService from "../account/service";
 import mailTemplateService from "../template/service";
 import mailLogService from "../log/service";
@@ -91,14 +92,13 @@ const sendRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-async function onSend(
-  obj: FromSchema<typeof sendReq>
-): Promise<FromSchema<typeof sendRes>> {
+async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
+  const obj = c.get("bodyObj") as FromSchema<typeof sendReq>;
   const { accountId, templateId, receiverArr, subject, html, templateParams } =
     obj;
 
   // 1. 获取邮件账户信息
-  const accountObj = await mailAccountService.get.service({ id: accountId });
+  const accountObj = await mailAccountService.get.service(c);
   if (!accountObj) {
     throw new Error("未找到该邮件账户");
   }
@@ -110,7 +110,7 @@ async function onSend(
   let finalTemplateParams: string | undefined = undefined;
 
   if (templateId) {
-    const template = await mailTemplateService.get.service({ id: templateId });
+    const template = await mailTemplateService.get.service(c);
     if (!template) {
       throw new Error("未找到该邮件模板");
     }
@@ -132,7 +132,9 @@ async function onSend(
 
   // 3. 验证必填字段
   if (!finalSubject || !finalHtml) {
-    throw new Error("邮件主题和内容不能为空，请提供 subject 和 html 或 templateId");
+    throw new Error(
+      "邮件主题和内容不能为空，请提供 subject 和 html 或 templateId"
+    );
   }
 
   // 4. 发送邮件
@@ -187,16 +189,7 @@ async function onSend(
   }
 
   // 5. 记录日志
-  const logId = await mailLogService.add.service({
-    title: finalSubject,
-    mailTo: receiverArr.map((item) => item.address).join(";"),
-    mailFrom: accountObj.mailAddress,
-    sendStatus,
-    templateId: finalTemplateId,
-    templateParams: finalTemplateParams,
-    exceptionCode,
-    exceptionDetails,
-  });
+  const logId = await mailLogService.add.service(c);
 
   // 6. 如果发送失败，抛出错误
   if (!sendStatus) {

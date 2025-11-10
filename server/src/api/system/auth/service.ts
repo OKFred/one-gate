@@ -5,6 +5,7 @@ import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { LanguageKey } from "@/types/locales";
+import type { NodeHonoContext } from "@/types/app";
 
 // 普通登录
 const loginReq = {
@@ -65,12 +66,27 @@ const loginRes = {
 } as const satisfies JSONSchema;
 
 async function onLogin(
-  obj: FromSchema<typeof loginReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof loginRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
   const { username, password } = obj;
 
+  // 创建一个新的 Request 对象用于调用 verify service
+  const verifyReq = new Request("http://localhost/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+  const verifyContext = {
+    ...c,
+    req: {
+      ...c.req,
+      json: async () => ({ username, password }),
+    },
+  } as NodeHonoContext;
+
   // 验证用户名和密码
-  const verifyResult = await userService.verify.service({ username, password });
+  const verifyResult = await userService.verify.service(verifyContext);
   if (!verifyResult || !verifyResult.valid || !verifyResult.userId)
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
@@ -79,8 +95,17 @@ async function onLogin(
       }
     );
 
+  // 创建一个新的 context 用于调用 get service
+  const getContext = {
+    ...c,
+    req: {
+      ...c.req,
+      json: async () => ({ id: verifyResult.userId }),
+    },
+  } as NodeHonoContext;
+
   // 获取用户信息
-  const user = await userService.get.service({ id: verifyResult.userId });
+  const user = await userService.get.service(getContext);
   if (!user || !user.isEnabled)
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
@@ -143,8 +168,9 @@ const wechatLoginRes = {
 } as const satisfies JSONSchema;
 
 async function onWechatLogin(
-  obj: FromSchema<typeof wechatLoginReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof wechatLoginRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof wechatLoginReq>;
   const { code, state } = obj;
 
   // TODO: 实现微信登录逻辑
@@ -214,8 +240,9 @@ const verifyTokenRes = {
 } as const satisfies JSONSchema;
 
 async function onVerifyToken(
-  obj: FromSchema<typeof verifyTokenReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof verifyTokenRes>> {
+  const obj = c.get("bodyObj") as FromSchema<typeof verifyTokenReq>;
   const { token } = obj;
   const payload = tokenUtils.verifyToken(token);
   const isValid = payload !== null;
@@ -264,8 +291,9 @@ const refreshTokenRes = {
 } as const satisfies JSONSchema;
 
 async function onRefreshToken(
-  obj: FromSchema<typeof refreshTokenReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof refreshTokenReq>;
   const { token } = obj;
   const newToken = tokenUtils.refreshToken(token);
   if (!newToken) {

@@ -45,6 +45,15 @@ function routeMaker({
   componentArr,
 }) {
   const controller = async (c: NodeHonoContext) => {
+    //获取request header content type
+    //如果不是 application/json 则报错
+    const contentType = c.req.header("content-type");
+    if (contentType !== "application/json") {
+      throw new HTTPException(
+        httpStatusCode.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
+        { cause: ["Content-Type must be application/json"] }
+      );
+    }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
     if (!valid) {
@@ -53,7 +62,8 @@ function routeMaker({
         { cause: errors }
       );
     }
-    const result = await service(bodyObj);
+    c.set("bodyObj", bodyObj);
+    const result = await service(c);
     if (process.env.NODE_ENV !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
@@ -106,7 +116,7 @@ export interface ServiceItem {
   req: JSONSchema;
   res: JSONSchema;
   pathInfo: Partial<RawRouteConfig>;
-  service: (body: any) => Promise<any>;
+  service: (c: NodeHonoContext) => Promise<any>;
 }
 
 export default function main(

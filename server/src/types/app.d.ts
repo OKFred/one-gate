@@ -19,7 +19,9 @@ export type routeLike = {
 };
 
 export type AppBindings = {
-  Variables: {};
+  Variables: {
+    bodyObj?: any;
+  };
   Bindings: Env;
 };
 

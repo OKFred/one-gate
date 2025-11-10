@@ -13,6 +13,7 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
+import type { NodeHonoContext } from "@/types/app";
 
 const SALT_ROUNDS = 12; // bcrypt盐轮数
 
@@ -28,8 +29,9 @@ const addRes = {
   ...userIndex["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  obj: FromSchema<typeof addReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const { username, password, department, role, isEnabled = true } = obj;
 
   // 密码加盐处理
@@ -70,8 +72,9 @@ const deleteRes = {
   ...userIndex["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  uniqueKeyObj: FromSchema<typeof deleteReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
   const result = await db
@@ -148,9 +151,8 @@ const listRes = {
 // 用于内部查询的类型（包含密码）
 type userLikeWithoutPassword = Omit<userLike, "password">;
 
-async function onList(
-  listParamObj: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
+  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
   const {
     orderBy = "id",
     descend = true,
@@ -260,8 +262,9 @@ const updateRes = {
   ...userIndex["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  obj: FromSchema<typeof updateReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const { id, password, ...rest } = obj;
   const updateTimeUtc = new Date().valueOf();
 
@@ -316,8 +319,9 @@ const getRes = {
   },
 } as const satisfies JSONSchema;
 async function onGet(
-  uniqueKeyObj: FromSchema<typeof getReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof getRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
   const { id } = uniqueKeyObj;
   const rows = await db
     .select({
@@ -334,7 +338,9 @@ async function onGet(
     .where(eq(userTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, { message: "i18n.api.notExistOrDisabled" satisfies LanguageKey });
+    throw new HTTPException(404, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
   }
   return rows[0];
 }
@@ -381,8 +387,9 @@ const verifyRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onVerify(
-  obj: FromSchema<typeof verifyReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof verifyRes>> {
+  const obj = c.get("bodyObj") as FromSchema<typeof verifyReq>;
   const { username, password } = obj;
   const user = await db
     .select()

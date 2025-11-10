@@ -12,6 +12,7 @@ import { asc, count, desc, eq } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
+import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "../common.schema";
 
 const common = {
@@ -38,8 +39,9 @@ const addRes = {
   ...mailAccountIndex["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  obj: FromSchema<typeof addReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const {
     mailAddress,
     nickname,
@@ -88,8 +90,9 @@ const deleteRes = {
   ...mailAccountIndex["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  uniqueKeyObj: FromSchema<typeof deleteReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
   const result = await db
@@ -135,9 +138,8 @@ const listRes = {
     } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
-async function onList(
-  listParamObj: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
+  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
   const {
     orderBy = "id",
     descend = true,
@@ -202,8 +204,9 @@ const updateRes = {
   ...mailAccountIndex["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  obj: FromSchema<typeof updateReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const { id, ...rest } = obj;
   common.onBeforeAddOrUpdate(rest);
   const updateTimeUtc = new Date().valueOf();
@@ -247,8 +250,9 @@ const getRes = {
   } satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>,
 } as const satisfies JSONSchema;
 async function onGet(
-  uniqueKeyObj: FromSchema<typeof getReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof getRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
   const { id } = uniqueKeyObj;
   const rows = await db
     .select()
@@ -286,9 +290,17 @@ const verifyRes = {
   description: "验证结果，true 表示验证成功",
 } as const satisfies JSONSchema;
 async function onVerify(
-  uniqueKeyObj: FromSchema<typeof verifyReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof verifyRes>> {
-  const account = await onGet(uniqueKeyObj);
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof verifyReq>;
+  const getContext = {
+    ...c,
+    req: {
+      ...c.req,
+      json: async () => uniqueKeyObj,
+    },
+  } as NodeHonoContext;
+  const account = await onGet(getContext);
   if (!account?.id)
     throw new HTTPException(404, {
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,

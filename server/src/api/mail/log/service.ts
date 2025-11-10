@@ -12,6 +12,7 @@ import { asc, count, desc, eq, and, gte, lte, like, or } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
+import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "../common.schema";
 
 const addReq = {
@@ -26,8 +27,9 @@ const addRes = {
   ...mailLogIndex["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  obj: FromSchema<typeof addReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const {
     mailTo,
     mailFrom,
@@ -76,8 +78,9 @@ const deleteRes = {
   ...mailLogIndex["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  uniqueKeyObj: FromSchema<typeof deleteReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
   const result = await db
@@ -130,9 +133,8 @@ const listRes = {
     } satisfies Partial<Record<keyof mailLogLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
-async function onList(
-  listParamObj: FromSchema<typeof listReq>
-): Promise<FromSchema<typeof listRes>> {
+async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
+  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
   const {
     orderBy = "id",
     descend = true,
@@ -225,8 +227,9 @@ const updateRes = {
   ...mailLogIndex["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  obj: FromSchema<typeof updateReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const { id, ...rest } = obj;
   const updateTimeUtc = new Date().valueOf();
   const res = await db
@@ -268,8 +271,9 @@ const getRes = {
   } satisfies Partial<Record<keyof mailLogLike, JSONSchema>>,
 } as const satisfies JSONSchema;
 async function onGet(
-  uniqueKeyObj: FromSchema<typeof getReq>
+  c: NodeHonoContext
 ): Promise<FromSchema<typeof getRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
   const { id } = uniqueKeyObj;
   const rows = await db
     .select()
