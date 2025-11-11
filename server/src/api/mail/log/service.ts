@@ -14,6 +14,7 @@ import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "../common.schema";
+import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 const addReq = {
   type: "object",
@@ -238,13 +239,12 @@ async function onUpdate(
   const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
-  const updateTimeUtc = new Date().valueOf();
   const res = await db
     .update(mailLogTable)
     .set({
       ...rest,
       updaterId,
-      updateTimeUtc,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
     })
     .where(eq(mailLogTable.id, id))
     .returning({ id: mailLogTable.id });

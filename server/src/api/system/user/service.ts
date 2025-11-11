@@ -14,6 +14,7 @@ import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
+import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 const SALT_ROUNDS = 12; // bcrypt盐轮数
 
@@ -266,12 +267,11 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const { id, password, ...rest } = obj;
-  const updateTimeUtc = new Date().valueOf();
 
   // 如果更新密码，需要重新加盐
   let updateData: any = {
     ...rest,
-    updateTimeUtc,
+    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
   if (password) {

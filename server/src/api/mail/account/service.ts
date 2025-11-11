@@ -14,6 +14,7 @@ import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "../common.schema";
+import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 const common = {
   onBeforeAddOrUpdate: (obj: Partial<mailAccountLike>): void => {
@@ -222,12 +223,11 @@ async function onUpdate(
   }
   const { id, ...rest } = obj;
   common.onBeforeAddOrUpdate(rest);
-  const updateTimeUtc = new Date().valueOf();
   const res = await db
     .update(mailAccountTable)
     .set({
       ...rest,
-      updateTimeUtc,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
       updaterId: userObj.userId,
     })
     .where(eq(mailAccountTable.id, id))

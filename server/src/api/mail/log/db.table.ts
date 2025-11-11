@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
+import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 export const mailLogIndex = {
   id: {
@@ -98,9 +99,7 @@ export const mailLogTable = sqliteTable(
     updaterId: integer("updater_id"),
     createTimeUtc: integer("create_time_utc")
       .notNull()
-      .default(
-        sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`
-      ),
+      .default(getCurrentTimestampUtcSql()),
     updateTimeUtc: integer("update_time_utc"),
   },
   (table) => [

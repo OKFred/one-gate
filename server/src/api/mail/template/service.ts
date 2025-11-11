@@ -14,6 +14,7 @@ import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "../common.schema";
+import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 const addReq = {
   type: "object",
@@ -77,10 +78,9 @@ async function onDelete(
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
   // 软删除：设置 status=false 并记录 updaterId，而不是物理删除
-  const updateTimeUtc = new Date().valueOf();
   const result = await db
     .update(mailTemplateTable)
-    .set({ status: false, updaterId, updateTimeUtc })
+    .set({ status: false, updaterId, updateTimeUtc: getCurrentTimestampUtcSql() })
     .where(eq(mailTemplateTable.id, id))
     .returning({ id: mailTemplateTable.id });
   if (!result || result.length === 0) return null;
@@ -219,13 +219,12 @@ async function onUpdate(
   const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
-  const updateTimeUtc = new Date().valueOf();
   const res = await db
     .update(mailTemplateTable)
     .set({
       ...rest,
       updaterId,
-      updateTimeUtc,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
     })
     .where(eq(mailTemplateTable.id, id))
     .returning({ id: mailTemplateTable.id });
