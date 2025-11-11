@@ -32,8 +32,7 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-  const { userId: creatorId } = userObj;
-  const {
+   const {
     mailTo,
     mailFrom,
     title,
@@ -54,7 +53,7 @@ async function onAdd(
       sendStatus,
       exceptionCode,
       exceptionDetails,
-      creatorId,
+      creatorId: userObj.userId,
     } satisfies mailLogAddLike)
     .returning({ id: mailLogTable.id });
   return result[0]?.id;
@@ -237,13 +236,12 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
-  const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
   const res = await db
     .update(mailLogTable)
     .set({
       ...rest,
-      updaterId,
+      updaterId: userObj.userId,
       updateTimeUtc: getCurrentTimestampUtcSql(),
     })
     .where(eq(mailLogTable.id, id))

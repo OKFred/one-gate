@@ -15,6 +15,8 @@ import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "../common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import httpStatusCode from "http-status-codes";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const common = {
   onBeforeAddOrUpdate: (obj: Partial<mailAccountLike>): void => {
@@ -44,8 +46,7 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-  const { userId: creatorId } = userObj;
-  const {
+   const {
     mailAddress,
     nickname,
     password,
@@ -65,7 +66,7 @@ async function onAdd(
       port,
       sslEnable,
       starttlsEnable,
-      creatorId,
+      creatorId: userObj.userId,
     } satisfies mailAccountAddLike)
     .returning({ id: mailAccountTable.id });
   return result[0]?.id;
@@ -98,9 +99,12 @@ async function onDelete(
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const userObj = c.get("userObj");
   if (!userObj?.userId) {
-    throw new HTTPException(401, {
-      message: "i18n.api.system.notAuthenticated" as any,
-    });
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.notAuthenticated" as any,
+      }
+    );
   }
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
@@ -216,19 +220,14 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
-  if (!userObj?.userId) {
-    throw new HTTPException(401, {
-      message: "i18n.api.system.notAuthenticated" as any,
-    });
-  }
   const { id, ...rest } = obj;
   common.onBeforeAddOrUpdate(rest);
   const res = await db
     .update(mailAccountTable)
     .set({
       ...rest,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
       updaterId: userObj.userId,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
     })
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });

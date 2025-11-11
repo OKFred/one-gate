@@ -1,49 +1,67 @@
 import db from "@/db/index";
 import {
-  mailTemplateIndex,
-  mailTemplateUnique,
-  mailTemplateAudit,
-  mailTemplateTable,
-  mailTemplateData,
-  type mailTemplateAddLike,
-  type mailTemplateLike,
+  departmentIndex,
+  departmentData,
+  departmentAudit,
+  departmentTable,
+  type departmentAddLike,
+  type departmentLike,
 } from "./db.table";
-import { asc, count, desc, eq, like, or } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
-import * as commonSchema from "../common.schema";
+import * as commonSchema from "@/api/mail/common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import httpStatusCode from "http-status-codes";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const addReq = {
   type: "object",
   properties: {
-    ...mailTemplateData,
-  } satisfies Partial<Record<keyof mailTemplateAddLike, JSONSchema>>,
-  required: ["name", "title", "langCode", "content"],
+    ...departmentData,
+  } satisfies Partial<Record<keyof departmentAddLike, JSONSchema>>,
+  required: ["name"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
-  ...mailTemplateIndex["id"],
+  ...departmentIndex["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-   const { name, title, langCode, content, category = "" } = obj;
+  const { name, description, parentId, isEnabled = true } = obj;
+  // 如果有父部门，检查父部门是否存在
+  if (parentId) {
+    const parent = await db
+      .select()
+      .from(departmentTable)
+      .where(eq(departmentTable.id, parentId))
+      .limit(1);
+
+    if (parent.length === 0) {
+      throw new HTTPException(
+        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+        {
+          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+        }
+      );
+    }
+  }
   const result = await db
-    .insert(mailTemplateTable)
+    .insert(departmentTable)
     .values({
       name,
-      title,
-      langCode,
-      content,
+      description,
+      parentId,
+      isEnabled,
       creatorId: userObj.userId,
-      category,
-    } satisfies mailTemplateAddLike)
-    .returning({ id: mailTemplateTable.id });
+    } satisfies departmentAddLike)
+    .returning({ id: departmentTable.id });
+
   return result[0]?.id;
 }
 const addApi = {
@@ -52,7 +70,7 @@ const addApi = {
   pathInfo: {
     path: "/add",
     method: "post",
-    summary: "添加邮件模板",
+    summary: "添加部门",
   } as const,
   service: onAdd,
 };
@@ -60,31 +78,53 @@ const addApi = {
 const deleteReq = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
+    ...departmentIndex,
   },
   required: ["id"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const deleteRes = {
-  ...mailTemplateIndex["id"],
+  ...departmentIndex["id"],
 } as const satisfies JSONSchema;
+
 async function onDelete(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const userObj = c.get("userObj");
+  if (!userObj?.userId) {
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.notAuthenticated" as any,
+      }
+    );
+  }
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
-  // 软删除：设置 status=false 并记录 updaterId，而不是物理删除
+
+  // 检查是否有子部门
+  const children = await db
+    .select()
+    .from(departmentTable)
+    .where(eq(departmentTable.parentId, id))
+    .limit(1);
+
+  if (children.length > 0) {
+    throw new HTTPException(
+      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.department.hasChildren" satisfies LanguageKey,
+      }
+    );
+  }
+
   const result = await db
-    .update(mailTemplateTable)
-    .set({
-      status: false,
-      updaterId: userObj.userId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(mailTemplateTable.id, id))
-    .returning({ id: mailTemplateTable.id });
+    .delete(departmentTable)
+    .where(eq(departmentTable.id, id))
+    .returning({ id: departmentTable.id });
+
   if (!result || result.length === 0) return null;
   return result[0].id;
 }
@@ -94,7 +134,7 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: "删除邮件模板",
+    summary: "删除部门",
   } as const,
   service: onDelete,
 };
@@ -105,10 +145,11 @@ const listReq = {
     orderBy: commonSchema.orderByWrapper([
       "id",
       "name",
-      "creatorId",
       "createTimeUtc",
-    ] satisfies (keyof mailTemplateLike)[]),
+    ] satisfies (keyof departmentLike)[]),
     ...commonSchema.listReqBase,
+    isEnabled: departmentData.isEnabled,
+    parentId: departmentData.parentId,
   },
   required: [],
   additionalProperties: false,
@@ -118,21 +159,13 @@ const listRes = {
   properties: {
     ...commonSchema.listResBase,
     list: commonSchema.listWrapper({
-      ...mailTemplateIndex,
-      ...mailTemplateData,
-      ...mailTemplateAudit,
-      status: {
-        type: "boolean",
-        description: "状态",
-      },
-      remark: {
-        type: "string",
-        nullable: true,
-        description: "备注",
-      },
-    } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>),
+      ...departmentIndex,
+      ...departmentData,
+      ...departmentAudit,
+    } satisfies Partial<Record<keyof departmentLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
+
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
   const {
@@ -141,29 +174,36 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     pageNo = 1,
     pageSize = 10,
     keyword = "",
+    isEnabled,
+    parentId,
   } = listParamObj;
+
   const offset = (pageNo - 1) * pageSize;
-  const orderField = mailTemplateTable[orderBy] || mailTemplateTable.id;
+  const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   // 函数重载：根据 getAll 参数提供不同的返回类型
   function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<mailTemplateLike[]>;
+  function queryDB(getAll: false): Promise<departmentLike[]>;
   function queryDB(
     getAll: boolean
-  ): Promise<{ total: number }[] | mailTemplateLike[]> {
+  ): Promise<{ total: number }[] | departmentLike[]> {
     return db
       .select(
-        getAll ? { total: count(mailTemplateTable.id).as("total") } : undefined
+        getAll ? { total: count(departmentTable.id).as("total") } : undefined
       )
-      .from(mailTemplateTable)
+      .from(departmentTable)
       .where(
         keyword
-          ? or(
-              like(mailTemplateTable.name, `%${keyword}%`),
-              like(mailTemplateTable.title, `%${keyword}%`),
-              like(mailTemplateTable.category, `%${keyword}%`)
+          ? and(
+              like(departmentTable.name, `%${keyword}%`),
+              isEnabled !== undefined
+                ? eq(departmentTable.isEnabled, isEnabled)
+                : undefined,
+              parentId !== undefined
+                ? eq(departmentTable.parentId, parentId)
+                : undefined
             )
           : undefined
       )
@@ -189,7 +229,7 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: "获取邮件模板列表",
+    summary: "获取部门列表",
   } as const,
   service: onList,
 };
@@ -197,48 +237,73 @@ const listApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
-    ...mailTemplateData,
-    status: {
-      type: "boolean",
-      description: "状态",
-    },
-    remark: {
-      type: "string",
-      description: "备注",
-    },
+    ...departmentIndex,
+    ...departmentData,
   },
   required: ["id"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const updateRes = {
-  ...mailTemplateIndex["id"],
+  ...departmentIndex["id"],
 } as const satisfies JSONSchema;
+
 async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
   const { id, ...rest } = obj;
+
+  // 如果更新父部门，检查是否会造成循环引用
+  if (rest.parentId) {
+    // 不能将自己设为父部门
+    if (rest.parentId === id) {
+      throw new HTTPException(
+        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
+      );
+    }
+
+    // 检查父部门是否存在
+    const parent = await db
+      .select()
+      .from(departmentTable)
+      .where(eq(departmentTable.id, rest.parentId))
+      .limit(1);
+
+    if (parent.length === 0) {
+      throw new HTTPException(
+        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+        {
+          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+        }
+      );
+    }
+  }
+
+  const updateData = {
+    ...rest,
+    updaterId: userObj.userId,
+    updateTimeUtc: getCurrentTimestampUtcSql(),
+  };
+
   const res = await db
-    .update(mailTemplateTable)
-    .set({
-      ...rest,
-      updaterId: userObj.userId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(mailTemplateTable.id, id))
-    .returning({ id: mailTemplateTable.id });
+    .update(departmentTable)
+    .set(updateData)
+    .where(eq(departmentTable.id, id))
+    .returning({ id: departmentTable.id });
+
   if (!res || res.length === 0) return null;
   return res[0].id;
 }
+
 const updateApi = {
   req: updateReq,
   res: updateRes,
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: "更新邮件模板",
+    summary: "更新部门",
   } as const,
   service: onUpdate,
 };
@@ -246,28 +311,21 @@ const updateApi = {
 const getReq = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
+    ...departmentIndex,
   },
   required: ["id"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const getRes = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
-    ...mailTemplateData,
-    ...mailTemplateAudit,
-    status: {
-      type: "boolean",
-      description: "状态",
-    },
-    remark: {
-      type: "string",
-      nullable: true,
-      description: "备注",
-    },
-  } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>,
+    ...departmentIndex,
+    ...departmentData,
+    ...departmentAudit,
+  },
 } as const satisfies JSONSchema;
+
 async function onGet(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof getRes> | null> {
@@ -275,14 +333,16 @@ async function onGet(
   const { id } = uniqueKeyObj;
   const rows = await db
     .select()
-    .from(mailTemplateTable)
-    .where(eq(mailTemplateTable.id, id))
+    .from(departmentTable)
+    .where(eq(departmentTable.id, id))
     .limit(1);
+
   if (rows.length === 0) {
-    throw new HTTPException(404, {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
     });
   }
+
   return rows[0];
 }
 const getApi = {
@@ -291,7 +351,7 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: "获取邮件模板",
+    summary: "获取部门信息",
   } as const,
   service: onGet,
 };

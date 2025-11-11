@@ -44,20 +44,26 @@ const loginRes = {
           type: "string",
           description: "用户名",
         },
-        role: {
+        roleIds: {
           type: "string",
-          description: "角色",
+          description: "角色ID列表，逗号分隔",
         },
-        department: {
-          type: "string",
-          description: "部门",
+        departmentId: {
+          type: "number",
+          description: "部门ID",
         },
         isEnabled: {
           type: "boolean",
           description: "是否启用",
         },
       },
-      required: ["id", "username", "role", "department", "isEnabled"] as const,
+      required: [
+        "id",
+        "username",
+        "roleIds",
+        "departmentId",
+        "isEnabled",
+      ] as const,
       additionalProperties: false,
     },
   },
@@ -117,8 +123,8 @@ async function onLogin(
   const token = tokenUtils.generateToken({
     userId: user.id,
     username: user.username,
-    role: user.role,
-    department: user.department,
+    roleIds: user.roleIds,
+    departmentId: user.departmentId,
   });
 
   return {
@@ -126,8 +132,8 @@ async function onLogin(
     user: {
       id: user.id,
       username: user.username,
-      role: user.role,
-      department: user.department,
+      roleIds: user.roleIds,
+      departmentId: user.departmentId,
       isEnabled: user.isEnabled,
     },
   };
@@ -227,8 +233,8 @@ const verifyTokenRes = {
       properties: {
         userId: { type: "number" },
         username: { type: "string" },
-        role: { type: "string" },
-        department: { type: "string" },
+        roleIds: { type: "string" },
+        departmentId: { type: "number" },
         exp: { type: "number" },
       },
       nullable: true,

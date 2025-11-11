@@ -8,7 +8,7 @@ import {
   type userAddLike,
   type userLike,
 } from "./db.table";
-import { asc, count, desc, eq, or, like } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
@@ -23,7 +23,7 @@ const addReq = {
   properties: {
     ...userData,
   } satisfies Partial<Record<keyof userAddLike, JSONSchema>>,
-  required: ["username", "password", "department", "role"],
+  required: ["username", "password", "departmentId", "roleIds"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -33,7 +33,7 @@ async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const { username, password, department, role, isEnabled = true } = obj;
+  const { username, password, departmentId, roleIds, isEnabled = true } = obj;
 
   // 密码加盐处理
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -43,8 +43,8 @@ async function onAdd(
     .values({
       username,
       password: hashedPassword,
-      department,
-      role,
+      departmentId,
+      roleIds,
       isEnabled,
     } satisfies userAddLike)
     .returning({ id: userTable.id });
@@ -106,8 +106,8 @@ const listReq = {
       enum: [
         "id",
         "username",
-        "department",
-        "role",
+        "departmentId",
+        "roleIds",
         "createTimeUtc",
       ] satisfies (keyof userLike)[],
     },
@@ -138,8 +138,8 @@ const listRes = {
         properties: {
           ...userIndex,
           username: userData.username,
-          department: userData.department,
-          role: userData.role,
+          departmentId: userData.departmentId,
+          roleIds: userData.roleIds,
           isEnabled: userData.isEnabled,
           ...userAudit,
           // 注意：不返回密码字段
@@ -167,28 +167,6 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (keyword) {
-      conditions.push(
-        or(
-          like(userTable.username, `%${keyword}%`),
-          like(userTable.department, `%${keyword}%`),
-          like(userTable.role, `%${keyword}%`)
-        )
-      );
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(userTable.isEnabled, isEnabled));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : or(...conditions)
-      : undefined;
-  };
-
   // 函数重载：根据 getAll 参数提供不同的返回类型
   function queryDB(getAll: true): Promise<{ total: number }[]>;
   function queryDB(getAll: false): Promise<userLikeWithoutPassword[]>;
@@ -202,8 +180,8 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
           : {
               id: userTable.id,
               username: userTable.username,
-              department: userTable.department,
-              role: userTable.role,
+              departmentId: userTable.departmentId,
+              roleIds: userTable.roleIds,
               isEnabled: userTable.isEnabled,
               createTimeUtc: userTable.createTimeUtc,
               updateTimeUtc: userTable.updateTimeUtc,
@@ -211,7 +189,20 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
             }
       )
       .from(userTable)
-      .where(buildWhereCondition())
+      .where(
+        and(
+          keyword
+            ? or(
+                like(userTable.username, `%${keyword}%`),
+                like(userTable.departmentId, `%${keyword}%`),
+                like(userTable.roleIds, `%${keyword}%`)
+              )
+            : undefined,
+          isEnabled !== undefined
+            ? eq(userTable.isEnabled, isEnabled)
+            : undefined
+        )
+      )
       .orderBy(!descend ? asc(orderField) : desc(orderField))
       .limit(getAll ? maxPageSize : finalPageSize)
       .offset(getAll ? 0 : offset);
@@ -266,11 +257,12 @@ async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
+  const userObj = c.get("userObj");
   const { id, password, ...rest } = obj;
-
   // 如果更新密码，需要重新加盐
   let updateData: any = {
     ...rest,
+    updaterId: userObj.userId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
@@ -311,8 +303,8 @@ const getRes = {
   properties: {
     ...userIndex,
     username: userData.username,
-    department: userData.department,
-    role: userData.role,
+    departmentId: userData.departmentId,
+    roleIds: userData.roleIds,
     isEnabled: userData.isEnabled,
     ...userAudit,
     // 注意：不返回密码字段
@@ -327,8 +319,8 @@ async function onGet(
     .select({
       id: userTable.id,
       username: userTable.username,
-      department: userTable.department,
-      role: userTable.role,
+      departmentId: userTable.departmentId,
+      roleIds: userTable.roleIds,
       isEnabled: userTable.isEnabled,
       createTimeUtc: userTable.createTimeUtc,
       updateTimeUtc: userTable.updateTimeUtc,
