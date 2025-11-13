@@ -33,7 +33,7 @@ const loginRes = {
       type: "string",
       description: "用户token",
     },
-    user: {
+    userObj: {
       type: "object",
       properties: {
         id: {
@@ -49,7 +49,7 @@ const loginRes = {
           description: "角色ID列表，逗号分隔",
         },
         departmentId: {
-          type: "number",
+          type: ["number", "null"],
           description: "部门ID",
         },
         isEnabled: {
@@ -57,84 +57,43 @@ const loginRes = {
           description: "是否启用",
         },
       },
-      required: [
-        "id",
-        "username",
-        "roleIds",
-        "departmentId",
-        "isEnabled",
-      ] as const,
+      required: ["id", "username", "roleIds", "isEnabled"] as const,
       additionalProperties: false,
     },
   },
-  required: ["token", "user"] as const,
+  required: ["token", "userObj"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 async function onLogin(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof loginRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
-  const { username, password } = obj;
-
-  // 创建一个新的 Request 对象用于调用 verify service
-  const verifyReq = new Request("http://localhost/verify", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
-  const verifyContext = {
-    ...c,
-    req: {
-      ...c.req,
-      json: async () => ({ username, password }),
-    },
-  } as NodeHonoContext;
-
-  // 验证用户名和密码
-  const verifyResult = await userService.verify.service(verifyContext);
-  if (!verifyResult || !verifyResult.valid || !verifyResult.userId)
+  const verifyResult = await userService.verify.service(c);
+  if (!verifyResult || !verifyResult.valid || !verifyResult.userObj)
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
       {
         message: "i18n.api.system.authFailed" satisfies LanguageKey,
       }
     );
-
-  // 创建一个新的 context 用于调用 get service
-  const getContext = {
-    ...c,
-    req: {
-      ...c.req,
-      json: async () => ({ id: verifyResult.userId }),
-    },
-  } as NodeHonoContext;
-
-  // 获取用户信息
-  const user = await userService.get.service(getContext);
-  if (!user || !user.isEnabled)
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" satisfies LanguageKey,
-      }
-    );
+  const userObj = verifyResult.userObj;
+  const { id, username, roleIds, departmentId, isEnabled } = userObj;
   // 生成token
   const token = tokenUtils.generateToken({
-    userId: user.id,
-    username: user.username,
-    roleIds: user.roleIds,
-    departmentId: user.departmentId,
+    userId: id,
+    username,
+    roleIds,
+    departmentId: departmentId ?? null,
   });
 
   return {
     token,
-    user: {
-      id: user.id,
-      username: user.username,
-      roleIds: user.roleIds,
-      departmentId: user.departmentId,
-      isEnabled: user.isEnabled,
+    userObj: {
+      id,
+      username,
+      roleIds,
+      departmentId: departmentId ?? null,
+      isEnabled,
     },
   };
 }

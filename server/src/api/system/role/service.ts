@@ -16,6 +16,8 @@ import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 
+const superAdminRoleId = 1; // 超级管理员角色ID
+
 // 添加角色
 const addReq = {
   type: "object",
@@ -41,10 +43,7 @@ async function onAdd(
     const parsed = JSON.parse(permissions);
     if (!Array.isArray(parsed)) {
       throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "Invalid permissions format, must be a JSON array",
-        }
+        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
       );
     }
   }
@@ -95,7 +94,9 @@ async function onDelete(
   const { id } = uniqueKeyObj;
 
   if (!id) return null;
-
+  if (id === superAdminRoleId) {
+    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
+  }
   const result = await db
     .delete(roleTable)
     .where(eq(roleTable.id, id))
@@ -263,7 +264,7 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
-  const { id, permissions, ...rest } = obj;
+  const { id, permissions, isEnabled, ...rest } = obj;
 
   // 如果更新permissions，验证是否为有效JSON数组
   if (permissions) {
@@ -277,6 +278,7 @@ async function onUpdate(
 
   const updateData = {
     ...rest,
+    isEnabled: id === superAdminRoleId ? true : isEnabled, // 禁止禁用超级管理员角色
     permissions,
     updaterId: userObj.userId,
     updateTimeUtc: getCurrentTimestampUtcSql(),

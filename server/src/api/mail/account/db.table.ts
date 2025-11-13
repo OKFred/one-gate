@@ -8,7 +8,7 @@ import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 export const mailAccountIndex = {
   id: {
     type: "number",
-    description: "邮箱账号id",
+    description: "邮箱账号ID",
     examples: [1],
   },
 } as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
@@ -124,7 +124,7 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-  console.log("Mail account table initialized");
+  console.log("💾 表 mail_account 已初始化");
 }
 
 export default mailAccountTable;

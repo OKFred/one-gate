@@ -24,8 +24,8 @@ export type AppBindings = {
     userObj?: {
       userId: number;
       username: string;
-      role: string;
-      department: string;
+      roleIds: string;
+      departmentId: number | null;
     };
   };
   Bindings: Env;

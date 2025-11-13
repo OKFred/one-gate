@@ -59,7 +59,7 @@ function routeMaker({
     }
     const token = c.req.header("authorization");
     if (token && !routeWhitelist.includes(pathInfo.path)) {
-      await authMiddleware(c);
+      await authMiddleware(c); // 拿到userObj
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");

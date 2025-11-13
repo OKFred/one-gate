@@ -9,6 +9,6 @@ export default function nodeServer(app: App) {
             port: PORT,
             fetch: app.fetch,
         });
-        console.log(`Server listening on http://localhost:${PORT}`);
+        console.log(`🚀 服务器已启动： http://localhost:${PORT}`);
     }, 0);
 }

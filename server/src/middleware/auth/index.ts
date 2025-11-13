@@ -34,8 +34,8 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     c.set("userObj", {
       userId: payload.userId,
       username: payload.username,
-      role: payload.role,
-      department: payload.department,
+      roleIds: payload.roleIds,
+      departmentId: payload.departmentId,
     });
   } catch (error) {
     if (error instanceof HTTPException) {
@@ -62,7 +62,7 @@ export const roleMiddleware = (allowedRoles: string[]) => {
       );
     }
 
-    if (!allowedRoles.includes(c.get("userObj").role)) {
+    if (!allowedRoles.includes(c.get("userObj").roleIds)) {
       throw new HTTPException(
         httpStatusCode.FORBIDDEN as ContentfulStatusCode,
         {

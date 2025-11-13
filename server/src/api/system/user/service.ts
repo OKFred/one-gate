@@ -15,15 +15,18 @@ import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import httpStatusCode from "http-status-codes";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const SALT_ROUNDS = 12; // bcrypt盐轮数
+const superAdminId = 1; // 超级管理员用户ID
 
 const addReq = {
   type: "object",
   properties: {
     ...userData,
   } satisfies Partial<Record<keyof userAddLike, JSONSchema>>,
-  required: ["username", "password", "departmentId", "roleIds"],
+  required: ["username", "password", "roleIds"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -78,6 +81,9 @@ async function onDelete(
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
+  if (id === superAdminId) {
+    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
+  }
   const result = await db
     .delete(userTable)
     .where(eq(userTable.id, id))
@@ -258,10 +264,11 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
-  const { id, password, ...rest } = obj;
+  const { id, password, isEnabled, ...rest } = obj;
   // 如果更新密码，需要重新加盐
   let updateData: any = {
     ...rest,
+    isEnabled: id === superAdminId ? true : isEnabled, // 禁止禁用超级管理员
     updaterId: userObj.userId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
@@ -369,10 +376,17 @@ const verifyRes = {
       type: "boolean",
       description: "验证结果，true 表示验证成功",
     },
-    userId: {
-      type: "number",
+    userObj: {
+      type: "object",
       nullable: true,
-      description: "用户ID（验证成功时返回）",
+      description: "用户对象，验证成功时返回用户信息，验证失败时为 null",
+      properties: {
+        ...userIndex,
+        username: userData.username,
+        departmentId: userData.departmentId,
+        roleIds: userData.roleIds,
+        isEnabled: userData.isEnabled,
+      },
     },
   },
   required: ["valid"] as const,
@@ -383,24 +397,22 @@ async function onVerify(
 ): Promise<FromSchema<typeof verifyRes>> {
   const obj = c.get("bodyObj") as FromSchema<typeof verifyReq>;
   const { username, password } = obj;
-  const user = await db
+  const userArr = await db
     .select()
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-  if (user.length === 0) {
-    return { valid: false, userId: null };
+  if (userArr.length === 0) {
+    return { valid: false };
   }
-
-  const userData = user[0];
-  if (!userData.isEnabled) {
-    return { valid: false, userId: null };
+  const userObj = userArr[0];
+  if (!userObj.isEnabled) {
+    return { valid: false };
   }
-
-  const isValid = await bcrypt.compare(password, userData.password);
+  const isValid = await bcrypt.compare(password, userObj.password);
   return {
     valid: isValid,
-    userId: isValid ? userData.id : null,
+    userObj: isValid ? userObj : null,
   };
 }
 const verifyApi = {

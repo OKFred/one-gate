@@ -70,7 +70,7 @@ export const userTable = sqliteTable("system_user", {
   id: integer("id").primaryKey().notNull(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  departmentId: integer("department_id").notNull(),
+  departmentId: integer("department_id"),
   roleIds: text("role_ids").notNull(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
   createTimeUtc: integer("create_time_utc")
@@ -85,7 +85,7 @@ export async function tableInit() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            department_id INTEGER NOT NULL,
+            department_id INTEGER,
             role_ids TEXT NOT NULL,
             is_enabled INTEGER NOT NULL DEFAULT 1,
             create_time_utc INTEGER DEFAULT (
@@ -95,7 +95,7 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-  console.log("System user table initialized");
+  console.log("💾 表 system_user 已初始化");
 }
 
 export default userTable;

@@ -150,7 +150,7 @@ export async function tableInit() {
     `CREATE INDEX IF NOT EXISTS idx_create_time ON mail_log(create_time_utc)`
   );
 
-  console.log("Mail log table and indexes initialized");
+  console.log("💾 表 mail_log 已初始化");
 }
 
 export default mailLogTable;

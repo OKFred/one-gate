@@ -7,17 +7,17 @@ export interface TokenPayload {
   userId: number;
   username: string;
   roleIds: string;
-  departmentId: number;
+  departmentId: number | null;
   exp: number; // 过期时间戳
 }
 
 export interface UserTokenData {
   token: string;
-  user: {
+  userObj: {
     id: number;
     username: string;
     roleIds: string;
-    departmentId: number;
+    departmentId: number | null;
     isEnabled: boolean;
   };
 }

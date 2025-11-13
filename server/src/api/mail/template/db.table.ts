@@ -110,7 +110,7 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-  console.log("Mail template table initialized");
+  console.log("💾 表 mail_template 已初始化");
 }
 
 export default mailTemplateTable;

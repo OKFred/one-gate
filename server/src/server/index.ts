@@ -6,6 +6,7 @@ import corsHandler from "@/middleware/cors";
 import nodeServer from "@/middleware/nodeServer/index";
 import routeRegister from "@/api/index";
 import type { AppBindings, NodeHonoContext } from "@/types/app";
+import initDatabase from "@/db/init";
 
 async function createApp() {
   const app = new OpenAPIHono<AppBindings>();
@@ -17,6 +18,10 @@ async function createApp() {
   //   pathHandler(app);
   docRegister(app);
   await routeRegister(app);
+
+  // 初始化数据库数据（超级管理员角色和账号）
+  setTimeout(initDatabase, 0);
+
   nodeServer(app);
   //   normalRouter(app);
   app.get("/", (c: NodeHonoContext) => {
