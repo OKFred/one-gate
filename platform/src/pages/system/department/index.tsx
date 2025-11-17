@@ -52,6 +52,9 @@ export default function DepartmentManagement() {
     isEnabled: true,
   });
   const [error, setError] = useState<string>('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
@@ -137,19 +140,37 @@ export default function DepartmentManagement() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('确定要删除该部门吗？')) return;
+  const handleDelete = (department: Department) => {
+    setDepartmentToDelete(department);
+    setDeleteDialogOpen(true);
+  };
+
+  const showNotification = (type: 'success' | 'error', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const confirmDeleteDepartment = async () => {
+    if (!departmentToDelete) return;
 
     setLoading(true);
     try {
-      await deleteFn({ data: { id } });
+      await deleteFn({ data: { id: departmentToDelete.id } });
       fetchDepartments();
+      setDeleteDialogOpen(false);
+      setDepartmentToDelete(null);
+      showNotification('success', '部门删除成功');
     } catch (err) {
       console.error(err);
-      alert('删除失败，请重试');
+      showNotification('error', '删除失败，请重试');
     } finally {
       setLoading(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setDepartmentToDelete(null);
   };
 
   const renderTree = (nodes: Department[]) =>
@@ -163,7 +184,7 @@ export default function DepartmentManagement() {
             <IconButton onClick={() => handleOpenDialog(node)}>
               <EditIcon />
             </IconButton>
-            <IconButton onClick={() => handleDelete(node.id)}>
+            <IconButton onClick={() => handleDelete(node)}>
               <DeleteIcon />
             </IconButton>
           </Box>
@@ -231,6 +252,27 @@ export default function DepartmentManagement() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
+        <DialogTitle>确认删除</DialogTitle>
+        <DialogContent>
+          确定要删除部门 "{departmentToDelete?.name}" 吗？此操作不可恢复。
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={cancelDelete} disabled={loading}>
+            取消
+          </Button>
+          <Button onClick={confirmDeleteDepartment} color="error" variant="contained" disabled={loading}>
+            删除
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {notification && (
+        <Alert severity={notification.type} onClose={() => setNotification(null)}>
+          {notification.message}
+        </Alert>
+      )}
     </Box>
   );
 }
