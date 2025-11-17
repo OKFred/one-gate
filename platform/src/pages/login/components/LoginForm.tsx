@@ -17,8 +17,17 @@ import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { commonLogin } from '@/api/system/auth';
 import { authUtils } from '@/utils/auth';
-import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
-
+import type { CommonLoginReq } from '@/pages/login/type';
+export type CommonLoginData = {
+  token: string;
+  userObj: {
+    id: number;
+    username: string;
+    roleIds: string;
+    departmentId: number | null;
+    isEnabled: boolean;
+  };
+};
 export default function LoginForm() {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -56,13 +65,17 @@ export default function LoginForm() {
 
     try {
       const response = await commonLogin({ data: credentials });
-      
+
       if (response.data.ok && response.data.data) {
         const loginData = response.data.data as CommonLoginData;
-        const { token, user } = loginData;
+        const { token, userObj } = loginData;
+        if (!userObj || !userObj.isEnabled) {
+          setError('用户未启用，请联系管理员');
+          return;
+        }
         // 保存token和用户信息
         authUtils.setToken(token);
-        authUtils.setUserInfo(user);
+        authUtils.setUserInfo(userObj);
         // 登录成功，跳转到首页
         navigate('/home');
       } else {
@@ -118,20 +131,18 @@ export default function LoginForm() {
           onChange={handleInputChange('password')}
           onKeyDown={handleKeyPress}
           disabled={loading}
-          slotProps={{
-            input: {
-              endAdornment: (
-                <IconButton
-                  aria-label="toggle password visibility"
-                  onClick={() => setShowPassword(!showPassword)}
-                  onMouseDown={(e) => e.preventDefault()}
-                  edge="end"
-                  disabled={loading}
-                >
-                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                </IconButton>
-              ),
-            },
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPassword(!showPassword)}
+                onMouseDown={(e) => e.preventDefault()}
+                edge="end"
+                disabled={loading}
+              >
+                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ),
           }}
         />
 
