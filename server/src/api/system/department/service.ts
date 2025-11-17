@@ -16,6 +16,7 @@ import * as commonSchema from "@/api/mail/common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import hasValue from "@/utils/hasValue";
 
 const addReq = {
   type: "object",
@@ -35,7 +36,7 @@ async function onAdd(
   const userObj = c.get("userObj");
   const { name, description, parentId, isEnabled = true } = obj;
   // 如果有父部门，检查父部门是否存在
-  if (parentId) {
+  if (hasValue(parentId)) {
     const parent = await db
       .select()
       .from(departmentTable)

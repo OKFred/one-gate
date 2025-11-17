@@ -24,7 +24,7 @@ export const departmentData = {
     examples: ["负责技术研发工作"],
   },
   parentId: {
-    type: "number",
+    type: ["number", "null"],
     nullable: true,
     description: "父部门ID，支持部门层级",
   },
