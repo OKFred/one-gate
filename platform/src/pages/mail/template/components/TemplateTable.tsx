@@ -31,7 +31,6 @@ interface MailTemplate {
   title?: string;
   langCode?: string;
   content?: string;
-  creatorName?: string;
   category?: string;
   createTimeUtc?: number;
   updateTimeUtc?: number | null;
@@ -134,13 +133,6 @@ export default function TemplateTable({
 
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      创建者
-                    </Typography>
-                    <Typography variant="body1">{template.creatorName}</Typography>
-                  </Box>
-
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
                       创建时间
                     </Typography>
                     <Typography variant="body1">{formatDate(template.createTimeUtc)}</Typography>
@@ -181,7 +173,6 @@ export default function TemplateTable({
             <TableCell>模板名称</TableCell>
             <TableCell>邮件标题</TableCell>
             <TableCell>内容预览</TableCell>
-            <TableCell>创建者</TableCell>
             <TableCell>语言/分类</TableCell>
             <TableCell>创建时间</TableCell>
             <TableCell align="center">操作</TableCell>
@@ -213,7 +204,6 @@ export default function TemplateTable({
                     </Typography>
                   </Tooltip>
                 </TableCell>
-                <TableCell>{template.creatorName}</TableCell>
                 <TableCell>
                   <Stack spacing={0.5}>
                     {template.langCode && (
