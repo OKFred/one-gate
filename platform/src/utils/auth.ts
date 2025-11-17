@@ -6,14 +6,14 @@ const USER_KEY = 'userInfo';
 export interface UserInfo {
   id: number;
   username: string;
-  role: string;
-  department: string;
+  roleIds: string;
+  departmentId: number | null;
   isEnabled: boolean;
 }
 
 export interface LoginResponse {
   token: string;
-  user: UserInfo;
+  userObj: UserInfo;
 }
 
 // Token管理
@@ -69,5 +69,5 @@ export const authUtils = {
   getAuthHeader(): { Authorization: string } | Record<string, never> {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
-  }
+  },
 };
