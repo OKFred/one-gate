@@ -3051,7 +3051,7 @@ export interface components {
              */
             description?: string;
             /** @description 父部门ID，支持部门层级 */
-            parentId?: number | null;
+            parentId?: ((number | null) | null) | null;
             /**
              * @description 是否启用
              * @default true
@@ -3099,7 +3099,7 @@ export interface components {
              */
             isEnabled: boolean;
             /** @description 父部门ID，支持部门层级 */
-            parentId?: number | null;
+            parentId?: ((number | null) | null) | null;
         };
         SystemDepartmentListRes: {
             ok: boolean;
@@ -3129,7 +3129,7 @@ export interface components {
                      */
                     description?: string;
                     /** @description 父部门ID，支持部门层级 */
-                    parentId?: number | null;
+                    parentId?: ((number | null) | null) | null;
                     /**
                      * @description 是否启用
                      * @default true
@@ -3170,7 +3170,7 @@ export interface components {
              */
             description?: string;
             /** @description 父部门ID，支持部门层级 */
-            parentId?: number | null;
+            parentId?: ((number | null) | null) | null;
             /**
              * @description 是否启用
              * @default true
@@ -3212,7 +3212,7 @@ export interface components {
                  */
                 description?: string;
                 /** @description 父部门ID，支持部门层级 */
-                parentId?: number | null;
+                parentId?: ((number | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @default true

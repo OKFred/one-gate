@@ -22,12 +22,13 @@ const getNavItems = (): NavItem[] => {
   const baseItems = [
     { text: '主页', icon: <HomeIcon />, path: '/home' },
     { text: '我的', icon: <AccountCircleIcon />, path: '/user' },
+    { text: '部门', icon: <PeopleIcon />, path: '/system/department' },
     { text: '邮件', icon: <MailIcon />, path: '/mail' },
   ];
 
   // 检查用户是否为管理员，如果是则显示用户管理
   const userInfo = authUtils.getUserInfo();
-  if (userInfo && userInfo.role === '管理员') {
+  if (userInfo && userInfo.roleIds.includes('1')) {
     baseItems.splice(2, 0, {
       text: '用户管理',
       icon: <PeopleIcon />,
@@ -51,7 +52,7 @@ interface NavItem {
 const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
-  
+
   // 动态获取菜单项
   const navItems = getNavItems();
 

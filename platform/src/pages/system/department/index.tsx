@@ -12,9 +12,14 @@ import {
   Typography,
   Alert,
 } from '@mui/material';
-import { Add as AddIcon, Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material';
-import type { GridColDef } from '@mui/x-data-grid';
-import { DataGrid } from '@mui/x-data-grid';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  Edit as EditIcon,
+  ExpandMore as ExpandMoreIcon,
+  ChevronRight as ChevronRightIcon,
+} from '@mui/icons-material';
+import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { listFn, addFn, updateFn, deleteFn } from '@/api/system/department';
 
 interface Department {
@@ -23,6 +28,16 @@ interface Department {
   description?: string;
   parentId?: number | null;
   isEnabled: boolean;
+  children?: Department[]; // Added children property to fix the type error
+}
+
+function buildTree(data: Department[], parentId: number | null = null): Department[] {
+  return data
+    .filter((item) => item.parentId === parentId)
+    .map((item) => ({
+      ...item,
+      children: buildTree(data, item.id),
+    }));
 }
 
 export default function DepartmentManagement() {
@@ -48,7 +63,9 @@ export default function DepartmentManagement() {
           isEnabled: true, // 默认启用状态
         },
       });
-      setDepartments(res.data.data.list || []);
+      const flatData = res.data.data.list || [];
+      const treeData = buildTree(flatData);
+      setDepartments(treeData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -135,33 +152,26 @@ export default function DepartmentManagement() {
     }
   };
 
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'name', headerName: '名称', flex: 1 },
-    { field: 'description', headerName: '描述', flex: 1 },
-    { field: 'parentId', headerName: '父部门ID', width: 120 },
-    {
-      field: 'isEnabled',
-      headerName: '启用状态',
-      width: 120,
-      renderCell: (params) => (params.value ? '启用' : '禁用'),
-    },
-    {
-      field: 'actions',
-      headerName: '操作',
-      width: 150,
-      renderCell: (params) => (
-        <>
-          <IconButton onClick={() => handleOpenDialog(params.row)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </>
-      ),
-    },
-  ];
+  const renderTree = (nodes: Department[]) =>
+    nodes.map((node) => (
+      <TreeItem
+        key={node.id}
+        itemId={node.id.toString()}
+        label={
+          <Box display="flex" alignItems="center">
+            <Typography>{node.name}</Typography>
+            <IconButton onClick={() => handleOpenDialog(node)}>
+              <EditIcon />
+            </IconButton>
+            <IconButton onClick={() => handleDelete(node.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        }
+      >
+        {node.children && renderTree(node.children)}
+      </TreeItem>
+    ));
 
   return (
     <Box>
@@ -177,19 +187,13 @@ export default function DepartmentManagement() {
         添加部门
       </Button>
       <Box mt={2}>
-        <DataGrid
-          rows={departments}
-          columns={columns}
-          autoHeight
-          loading={loading}
-          disableRowSelectionOnClick
-          initialState={{
-            pagination: {
-              paginationModel: { pageSize: 10, page: 0 },
-            },
-          }}
-          pageSizeOptions={[10, 20, 50]}
-        />
+        {loading ? (
+          <CircularProgress />
+        ) : (
+          <SimpleTreeView slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}>
+            {renderTree(departments)}
+          </SimpleTreeView>
+        )}
       </Box>
 
       <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
