@@ -1222,6 +1222,586 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/department/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加部门 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/department/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除部门 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/department/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取部门列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/department/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新部门 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/department/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取部门信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加角色 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRoleAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRoleAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除角色 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRoleDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRoleDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取角色列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRoleListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRoleListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新角色 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRoleUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRoleUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取角色信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRoleGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRoleGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/user/add": {
         parameters: {
             query?: never;
@@ -1621,7 +2201,7 @@ export interface components {
         MailAccountAddRes: {
             ok: boolean;
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             data: number;
@@ -1629,7 +2209,7 @@ export interface components {
         };
         MailAccountDeleteReq: {
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             id: number;
@@ -1637,7 +2217,7 @@ export interface components {
         MailAccountDeleteRes: {
             ok: boolean;
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             data: number;
@@ -1667,7 +2247,7 @@ export interface components {
                 pageSize?: number;
                 list?: {
                     /**
-                     * @description 邮箱账号id
+                     * @description 邮箱账号ID
                      * @example 1
                      */
                     id?: number;
@@ -1708,6 +2288,10 @@ export interface components {
                      * @default false
                      */
                     starttlsEnable: boolean;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /** @description 更新者ID */
+                    updaterId?: number | null;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
@@ -1724,7 +2308,7 @@ export interface components {
         };
         MailAccountUpdateReq: {
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             id: number;
@@ -1769,7 +2353,7 @@ export interface components {
         MailAccountUpdateRes: {
             ok: boolean;
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             data: number;
@@ -1777,7 +2361,7 @@ export interface components {
         };
         MailAccountGetReq: {
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             id: number;
@@ -1786,7 +2370,7 @@ export interface components {
             ok: boolean;
             data: {
                 /**
-                 * @description 邮箱账号id
+                 * @description 邮箱账号ID
                  * @example 1
                  */
                 id?: number;
@@ -1827,6 +2411,10 @@ export interface components {
                  * @default false
                  */
                 starttlsEnable: boolean;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /** @description 更新者ID */
+                updaterId?: number | null;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
@@ -1842,7 +2430,7 @@ export interface components {
         };
         MailAccountVerifyReq: {
             /**
-             * @description 邮箱账号id
+             * @description 邮箱账号ID
              * @example 1
              */
             id: number;
@@ -1966,10 +2554,7 @@ export interface components {
             pageNo: number;
             /** @default 10 */
             pageSize: number;
-            /**
-             * @description 搜索邮箱地址
-             * @example
-             */
+            /** @example  */
             keyword?: string;
             /** @description 发送状态过滤 */
             sendStatus?: boolean;
@@ -2024,7 +2609,19 @@ export interface components {
                     exceptionCode?: string;
                     /** @description 异常详情 */
                     exceptionDetails?: string;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /** @description 更新者ID */
+                    updaterId?: number | null;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
                     createTimeUtc?: number;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
                     updateTimeUtc?: number | null;
                 }[];
             };
@@ -2115,7 +2712,19 @@ export interface components {
                 exceptionCode?: string;
                 /** @description 异常详情 */
                 exceptionDetails?: string;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /** @description 更新者ID */
+                updaterId?: number | null;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
                 createTimeUtc?: number;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
                 updateTimeUtc?: number | null;
             };
             message: string;
@@ -2138,8 +2747,6 @@ export interface components {
             langCode: string;
             /** @description 邮件内容 */
             content: string;
-            /** @description 创建者名称 */
-            creatorName: string;
             /** @description 邮件分类 */
             category?: string;
         };
@@ -2170,7 +2777,7 @@ export interface components {
         };
         MailTemplateListReq: {
             /** @enum {string} */
-            orderBy?: "id" | "name" | "creatorName" | "createTimeUtc";
+            orderBy?: "id" | "name" | "creatorId" | "createTimeUtc";
             descend?: boolean;
             /** @default 1 */
             pageNo: number;
@@ -2213,10 +2820,12 @@ export interface components {
                     langCode?: string;
                     /** @description 邮件内容 */
                     content?: string;
-                    /** @description 创建者名称 */
-                    creatorName?: string;
                     /** @description 邮件分类 */
                     category?: string;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /** @description 更新者ID */
+                    updaterId?: number | null;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
@@ -2258,8 +2867,6 @@ export interface components {
             langCode?: string;
             /** @description 邮件内容 */
             content?: string;
-            /** @description 创建者名称 */
-            creatorName?: string;
             /** @description 邮件分类 */
             category?: string;
             /** @description 状态 */
@@ -2308,10 +2915,12 @@ export interface components {
                 langCode?: string;
                 /** @description 邮件内容 */
                 content?: string;
-                /** @description 创建者名称 */
-                creatorName?: string;
                 /** @description 邮件分类 */
                 category?: string;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /** @description 更新者ID */
+                updaterId?: number | null;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
@@ -2346,15 +2955,15 @@ export interface components {
             data: {
                 /** @description 用户token */
                 token: string;
-                user: {
+                userObj: {
                     /** @description 用户ID */
                     id: number;
                     /** @description 用户名 */
                     username: string;
-                    /** @description 角色 */
-                    role: string;
-                    /** @description 部门 */
-                    department: string;
+                    /** @description 角色ID列表，逗号分隔 */
+                    roleIds: string;
+                    /** @description 部门ID */
+                    departmentId?: number | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                 };
@@ -2378,15 +2987,15 @@ export interface components {
             data: {
                 /** @description 用户token */
                 token: string;
-                user: {
+                userObj: {
                     /** @description 用户ID */
                     id: number;
                     /** @description 用户名 */
                     username: string;
-                    /** @description 角色 */
-                    role: string;
-                    /** @description 部门 */
-                    department: string;
+                    /** @description 角色ID列表，逗号分隔 */
+                    roleIds: string;
+                    /** @description 部门ID */
+                    departmentId?: number | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                 };
@@ -2408,8 +3017,8 @@ export interface components {
                 payload?: {
                     userId?: number;
                     username?: string;
-                    role?: string;
-                    department?: string;
+                    roleIds?: string;
+                    departmentId?: number;
                     exp?: number;
                 } | null;
             };
@@ -2430,6 +3039,408 @@ export interface components {
             };
             message: string;
         };
+        SystemDepartmentAddReq: {
+            /**
+             * @description 部门名称
+             * @example 技术部
+             */
+            name: string;
+            /**
+             * @description 部门描述
+             * @example 负责技术研发工作
+             */
+            description?: string;
+            /** @description 父部门ID，支持部门层级 */
+            parentId?: number | null;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        SystemDepartmentAddRes: {
+            ok: boolean;
+            /**
+             * @description 部门ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemDepartmentDeleteReq: {
+            /**
+             * @description 部门ID
+             * @example 1
+             */
+            id: number;
+        };
+        SystemDepartmentDeleteRes: {
+            ok: boolean;
+            /**
+             * @description 部门ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemDepartmentListReq: {
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "createTimeUtc";
+            descend?: boolean;
+            /** @default 1 */
+            pageNo: number;
+            /** @default 10 */
+            pageSize: number;
+            /** @example  */
+            keyword?: string;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+            /** @description 父部门ID，支持部门层级 */
+            parentId?: number | null;
+        };
+        SystemDepartmentListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total?: number;
+                /** @description 总页数 */
+                totalPage?: number;
+                /** @description 当前页码 */
+                currentPage?: number;
+                /** @description 每页记录数 */
+                pageSize?: number;
+                list?: {
+                    /**
+                     * @description 部门ID
+                     * @example 1
+                     */
+                    id?: number;
+                    /**
+                     * @description 部门名称
+                     * @example 技术部
+                     */
+                    name?: string;
+                    /**
+                     * @description 部门描述
+                     * @example 负责技术研发工作
+                     */
+                    description?: string;
+                    /** @description 父部门ID，支持部门层级 */
+                    parentId?: number | null;
+                    /**
+                     * @description 是否启用
+                     * @default true
+                     */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /** @description 更新者ID */
+                    updaterId?: number | null;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: number | null;
+                }[];
+            };
+            message: string;
+        };
+        SystemDepartmentUpdateReq: {
+            /**
+             * @description 部门ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 部门名称
+             * @example 技术部
+             */
+            name?: string;
+            /**
+             * @description 部门描述
+             * @example 负责技术研发工作
+             */
+            description?: string;
+            /** @description 父部门ID，支持部门层级 */
+            parentId?: number | null;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        SystemDepartmentUpdateRes: {
+            ok: boolean;
+            /**
+             * @description 部门ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemDepartmentGetReq: {
+            /**
+             * @description 部门ID
+             * @example 1
+             */
+            id: number;
+        };
+        SystemDepartmentGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 部门ID
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * @description 部门名称
+                 * @example 技术部
+                 */
+                name?: string;
+                /**
+                 * @description 部门描述
+                 * @example 负责技术研发工作
+                 */
+                description?: string;
+                /** @description 父部门ID，支持部门层级 */
+                parentId?: number | null;
+                /**
+                 * @description 是否启用
+                 * @default true
+                 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /** @description 更新者ID */
+                updaterId?: number | null;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: number | null;
+            };
+            message: string;
+        };
+        SystemRoleAddReq: {
+            /**
+             * @description 角色名称
+             * @example 管理员
+             */
+            name: string;
+            /**
+             * @description 角色描述
+             * @example 系统管理员，拥有所有权限
+             */
+            description?: string;
+            /**
+             * @description 权限列表，JSON数组格式
+             * @example ["user:read","user:write","system:admin"]
+             */
+            permissions?: string;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        SystemRoleAddRes: {
+            ok: boolean;
+            /**
+             * @description 角色ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemRoleDeleteReq: {
+            /**
+             * @description 角色ID
+             * @example 1
+             */
+            id: number;
+        };
+        SystemRoleDeleteRes: {
+            ok: boolean;
+            /**
+             * @description 角色ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemRoleListReq: {
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "createTimeUtc";
+            descend?: boolean;
+            /** @default 1 */
+            pageNo: number;
+            /** @default 10 */
+            pageSize: number;
+            /**
+             * @description 搜索角色ID或名称
+             * @example
+             */
+            keyword?: string;
+            /** @description 是否启用状态过滤 */
+            isEnabled?: boolean;
+        };
+        SystemRoleListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total?: number;
+                /** @description 总页数 */
+                totalPage?: number;
+                /** @description 当前页码 */
+                currentPage?: number;
+                /** @description 每页记录数 */
+                pageSize?: number;
+                list?: {
+                    /**
+                     * @description 角色ID
+                     * @example 1
+                     */
+                    id?: number;
+                    /**
+                     * @description 角色名称
+                     * @example 管理员
+                     */
+                    name?: string;
+                    /**
+                     * @description 角色描述
+                     * @example 系统管理员，拥有所有权限
+                     */
+                    description?: string;
+                    /**
+                     * @description 权限列表，JSON数组格式
+                     * @example ["user:read","user:write","system:admin"]
+                     */
+                    permissions?: string;
+                    /**
+                     * @description 是否启用
+                     * @default true
+                     */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /** @description 更新者ID */
+                    updaterId?: number | null;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: number | null;
+                }[];
+            };
+            message: string;
+        };
+        SystemRoleUpdateReq: {
+            /**
+             * @description 角色ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 角色名称
+             * @example 管理员
+             */
+            name?: string;
+            /**
+             * @description 角色描述
+             * @example 系统管理员，拥有所有权限
+             */
+            description?: string;
+            /**
+             * @description 权限列表，JSON数组格式
+             * @example ["user:read","user:write","system:admin"]
+             */
+            permissions?: string;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        SystemRoleUpdateRes: {
+            ok: boolean;
+            /**
+             * @description 角色ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemRoleGetReq: {
+            /**
+             * @description 角色ID
+             * @example 1
+             */
+            id: number;
+        };
+        SystemRoleGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 角色ID
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * @description 角色名称
+                 * @example 管理员
+                 */
+                name?: string;
+                /**
+                 * @description 角色描述
+                 * @example 系统管理员，拥有所有权限
+                 */
+                description?: string;
+                /**
+                 * @description 权限列表，JSON数组格式
+                 * @example ["user:read","user:write","system:admin"]
+                 */
+                permissions?: string;
+                /**
+                 * @description 是否启用
+                 * @default true
+                 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /** @description 更新者ID */
+                updaterId?: number | null;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: number | null;
+            };
+            message: string;
+        };
         SystemUserAddReq: {
             /**
              * @description 用户名
@@ -2442,15 +3453,15 @@ export interface components {
              */
             password: string;
             /**
-             * @description 部门
-             * @example 技术部
+             * @description 部门ID
+             * @example 1
              */
-            department: string;
+            departmentId?: number;
             /**
-             * @description 角色
-             * @example 管理员
+             * @description 角色ID列表，逗号分隔
+             * @example 1,2,3
              */
-            role: string;
+            roleIds: string;
             /**
              * @description 是否启用
              * @default true
@@ -2484,7 +3495,7 @@ export interface components {
         };
         SystemUserListReq: {
             /** @enum {string} */
-            orderBy?: "id" | "username" | "department" | "role" | "createTimeUtc";
+            orderBy?: "id" | "username" | "departmentId" | "roleIds" | "createTimeUtc";
             descend?: boolean;
             /** @default 1 */
             pageNo: number;
@@ -2521,15 +3532,15 @@ export interface components {
                      */
                     username?: string;
                     /**
-                     * @description 部门
-                     * @example 技术部
+                     * @description 部门ID
+                     * @example 1
                      */
-                    department?: string;
+                    departmentId?: number;
                     /**
-                     * @description 角色
-                     * @example 管理员
+                     * @description 角色ID列表，逗号分隔
+                     * @example 1,2,3
                      */
-                    role?: string;
+                    roleIds?: string;
                     /**
                      * @description 是否启用
                      * @default true
@@ -2566,15 +3577,15 @@ export interface components {
              */
             password?: string;
             /**
-             * @description 部门
-             * @example 技术部
+             * @description 部门ID
+             * @example 1
              */
-            department?: string;
+            departmentId?: number;
             /**
-             * @description 角色
-             * @example 管理员
+             * @description 角色ID列表，逗号分隔
+             * @example 1,2,3
              */
-            role?: string;
+            roleIds?: string;
             /**
              * @description 是否启用
              * @default true
@@ -2611,15 +3622,15 @@ export interface components {
                  */
                 username?: string;
                 /**
-                 * @description 部门
-                 * @example 技术部
+                 * @description 部门ID
+                 * @example 1
                  */
-                department?: string;
+                departmentId?: number;
                 /**
-                 * @description 角色
-                 * @example 管理员
+                 * @description 角色ID列表，逗号分隔
+                 * @example 1,2,3
                  */
-                role?: string;
+                roleIds?: string;
                 /**
                  * @description 是否启用
                  * @default true
@@ -2649,8 +3660,34 @@ export interface components {
             data: {
                 /** @description 验证结果，true 表示验证成功 */
                 valid: boolean;
-                /** @description 用户ID（验证成功时返回） */
-                userId?: number | null;
+                /** @description 用户对象，验证成功时返回用户信息，验证失败时为 null */
+                userObj?: {
+                    /**
+                     * @description 用户id
+                     * @example 1
+                     */
+                    id?: number;
+                    /**
+                     * @description 用户名
+                     * @example admin
+                     */
+                    username?: string;
+                    /**
+                     * @description 部门ID
+                     * @example 1
+                     */
+                    departmentId?: number;
+                    /**
+                     * @description 角色ID列表，逗号分隔
+                     * @example 1,2,3
+                     */
+                    roleIds?: string;
+                    /**
+                     * @description 是否启用
+                     * @default true
+                     */
+                    isEnabled: boolean;
+                } | null;
             };
             message: string;
         };
