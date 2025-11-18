@@ -193,7 +193,7 @@ const verifyTokenRes = {
         userId: { type: "number" },
         username: { type: "string" },
         roleIds: { type: "string" },
-        departmentId: { type: "number" },
+        departmentId: { type: ["number", "null"] },
         exp: { type: "number" },
       },
       nullable: true,

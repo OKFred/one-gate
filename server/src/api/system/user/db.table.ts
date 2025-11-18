@@ -33,7 +33,7 @@ export const userData = {
     examples: ["password123"],
   },
   departmentId: {
-    type: "number",
+    type: ["number", "null"],
     description: "部门ID",
     examples: [1],
   },
