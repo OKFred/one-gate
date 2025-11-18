@@ -3018,7 +3018,7 @@ export interface components {
                     userId?: number;
                     username?: string;
                     roleIds?: string;
-                    departmentId?: number;
+                    departmentId?: number | null;
                     exp?: number;
                 } | null;
             };
@@ -3456,7 +3456,7 @@ export interface components {
              * @description 部门ID
              * @example 1
              */
-            departmentId?: number;
+            departmentId?: number | null;
             /**
              * @description 角色ID列表，逗号分隔
              * @example 1,2,3
@@ -3535,7 +3535,7 @@ export interface components {
                      * @description 部门ID
                      * @example 1
                      */
-                    departmentId?: number;
+                    departmentId?: number | null;
                     /**
                      * @description 角色ID列表，逗号分隔
                      * @example 1,2,3
@@ -3580,7 +3580,7 @@ export interface components {
              * @description 部门ID
              * @example 1
              */
-            departmentId?: number;
+            departmentId?: number | null;
             /**
              * @description 角色ID列表，逗号分隔
              * @example 1,2,3
@@ -3625,7 +3625,7 @@ export interface components {
                  * @description 部门ID
                  * @example 1
                  */
-                departmentId?: number;
+                departmentId?: number | null;
                 /**
                  * @description 角色ID列表，逗号分隔
                  * @example 1,2,3
@@ -3676,7 +3676,7 @@ export interface components {
                      * @description 部门ID
                      * @example 1
                      */
-                    departmentId?: number;
+                    departmentId?: number | null;
                     /**
                      * @description 角色ID列表，逗号分隔
                      * @example 1,2,3
