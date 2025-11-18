@@ -41,11 +41,13 @@ export default function errorHandler(app: App) {
         ? e.message.startsWith("i18n.")
           ? t(e.message as LanguageKey)
           : e.message
-        : e.status === 404
-          ? t("i18n.middleware.errorHandler.targetNotExist")
-          : e.status === 422
-            ? t("i18n.middleware.errorHandler.validationFailed")
-            : t("i18n.middleware.errorHandler.undefinedError");
+        : e.status === 403
+          ? t("i18n.middleware.errorHandler.forbidden")
+          : e.status === 404
+            ? t("i18n.middleware.errorHandler.targetNotExist")
+            : e.status === 422
+              ? t("i18n.middleware.errorHandler.validationFailed")
+              : t("i18n.middleware.errorHandler.undefinedError");
       if (message === t("i18n.middleware.errorHandler.undefinedError")) {
         c.var.logger.error(
           t("i18n.middleware.errorHandler.undefinedError") + ": " + e.stack

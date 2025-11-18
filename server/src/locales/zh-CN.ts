@@ -1,6 +1,7 @@
 export default {
   "i18n.middleware.errorHandler.notFound": "未找到请求的资源",
   "i18n.middleware.errorHandler.targetNotExist": "目标不存在",
+  "i18n.middleware.errorHandler.forbidden": "禁止访问",
   "i18n.middleware.errorHandler.validationFailed": "请求校验失败",
   "i18n.middleware.errorHandler.serverError": "服务器异常",
   "i18n.middleware.errorHandler.unknownError": "未知异常",
