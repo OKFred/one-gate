@@ -17,7 +17,7 @@ import {
 import NoticeTool from '@/components/NoticeTool';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import FroalaEditor from '@/components/FroalaEditor';
+import JoditEditor from '@/components/JoditEditor/index';
 
 interface MailAccount {
   id?: number;
@@ -412,7 +412,7 @@ export default function MailSend() {
                   已选择模板，内容已自动填充，您可以在此基础上继续编辑
                 </Typography>
               )}
-              <FroalaEditor
+              <JoditEditor
                 value={form.contentObj.html}
                 onChange={handleHtmlChange}
                 placeholder={

@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import FroalaEditor from '@/components/FroalaEditor';
+import JoditEditor from '@/components/JoditEditor/index';
 
 interface FormData {
   name: string;
@@ -149,7 +149,7 @@ export default function TemplateForm({
               <Typography variant="body2" color="text.secondary" mb={2}>
                 使用富文本编辑器编写邮件模板内容，支持HTML格式
               </Typography>
-              <FroalaEditor
+              <JoditEditor
                 value={form.content}
                 onChange={(html) => onFormChange({ ...form, content: html })}
                 placeholder="请输入邮件模板内容..."
