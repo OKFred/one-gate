@@ -14,7 +14,6 @@ import {
   MenuItem,
   type SelectChangeEvent,
 } from '@mui/material';
-import NoticeTool from '@/components/NoticeTool';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import JoditEditor from '@/components/JoditEditor/index';
@@ -435,12 +434,6 @@ export default function MailSend() {
             </Button>
           </Stack>
         </Box>
-        <NoticeTool
-          open={snackbar.open}
-          message={snackbar.message}
-          severity={snackbar.severity}
-          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
-        />
       </Paper>
     </Box>
   );

@@ -13,7 +13,6 @@ import {
   deleteMailTemplate,
 } from '@/api/mail';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
-import NoticeTool from '@/components/NoticeTool';
 import TemplateForm from './components/TemplateForm';
 import TemplateTable from './components/TemplateTable';
 import TemplateFilter from './components/TemplateFilter';
@@ -285,14 +284,6 @@ export default function MailTemplate() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onPreview={handlePreview}
-      />
-
-      {/* 通知组件 */}
-      <NoticeTool
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
       />
     </PageLayout>
   );
