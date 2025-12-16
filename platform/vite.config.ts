@@ -6,12 +6,11 @@ import UnoCSS from 'unocss/vite';
 import childProcess from 'child_process';
 
 const pathSrc = path.resolve(__dirname, 'src');
-console.log('pathSrc', pathSrc);
 
 async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }) {
   //npx openapi-typescript SERVER_URL/doc.json -o ./types/openapi.d.ts
   const { SERVER_URL, VITE_SERVER_URL } = env;
-  console.log('Generating API docs from', SERVER_URL);
+  console.log('Generating API docs from', SERVER_URL || VITE_SERVER_URL);
   const child = childProcess.exec(
     `npx openapi-typescript ${SERVER_URL || VITE_SERVER_URL}/doc.json -o ./src/types/openapi.d.ts`,
   );
