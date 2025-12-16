@@ -19,7 +19,7 @@ async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }
       if (code === 0) {
         resolve(null);
       } else {
-        reject(new Error(`getAPIDocs failed with code ${code}`));
+        reject(new Error(code?.toString()));
       }
     });
   });
@@ -59,7 +59,11 @@ export default defineConfig(({ command, mode }) => {
         },
       };
     }
-    getAPIDocs(env);
+    try {
+      getAPIDocs(env);
+    } catch (e) {
+      console.error('getAPIDocs error', e);
+    }
   }
   return result;
 });
