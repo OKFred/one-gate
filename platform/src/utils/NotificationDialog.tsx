@@ -91,7 +91,6 @@ export const NotificationDialog = ({
             pt: 2,
             pl: 10,
             pr: 10,
-            textAlign: 'left',
           }}
         >
           {getTitle()}

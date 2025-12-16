@@ -21,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { listFn, addFn, updateFn, deleteFn } from '@/api/system/department';
+import { showGlobalNotification } from '@/utils/notification';
 
 interface Department {
   id: number;
@@ -54,7 +55,6 @@ export default function DepartmentManagement() {
   const [error, setError] = useState<string>('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [departmentToDelete, setDepartmentToDelete] = useState<Department | null>(null);
-  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
@@ -80,7 +80,7 @@ export default function DepartmentManagement() {
     fetchDepartments();
   }, [fetchDepartments]);
 
-  const handleOpenDialog = (department?: Department) => {
+  const handleOpenDialog = (department?: Department, parentId?: number) => {
     if (department) {
       setEditingDepartment(department);
       setFormValues({
@@ -91,7 +91,12 @@ export default function DepartmentManagement() {
       });
     } else {
       setEditingDepartment(null);
-      setFormValues({ name: '', description: '', parentId: '', isEnabled: true });
+      setFormValues({
+        name: '',
+        description: '',
+        parentId: parentId ? parentId.toString() : '',
+        isEnabled: true,
+      });
     }
     setDialogOpen(true);
   };
@@ -145,11 +150,6 @@ export default function DepartmentManagement() {
     setDeleteDialogOpen(true);
   };
 
-  const showNotification = (type: 'success' | 'error', message: string) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification(null), 3000);
-  };
-
   const confirmDeleteDepartment = async () => {
     if (!departmentToDelete) return;
 
@@ -159,10 +159,10 @@ export default function DepartmentManagement() {
       fetchDepartments();
       setDeleteDialogOpen(false);
       setDepartmentToDelete(null);
-      showNotification('success', '部门删除成功');
+      showGlobalNotification({ message: '部门删除成功', type: 'success' });
     } catch (err) {
       console.error(err);
-      showNotification('error', '删除失败，请重试');
+      showGlobalNotification({ message: '删除失败，请重试', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -181,10 +181,29 @@ export default function DepartmentManagement() {
         label={
           <Box display="flex" alignItems="center">
             <Typography>{node.name}</Typography>
-            <IconButton onClick={() => handleOpenDialog(node)}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenDialog(undefined, node.id);
+              }}
+            >
+              <AddIcon />
+            </IconButton>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenDialog(node);
+              }}
+            >
               <EditIcon />
             </IconButton>
-            <IconButton onClick={() => handleDelete(node)}>
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(node);
+              }}
+              disabled={node.id === 1}
+            >
               <DeleteIcon />
             </IconButton>
           </Box>
@@ -211,7 +230,10 @@ export default function DepartmentManagement() {
         {loading ? (
           <CircularProgress />
         ) : (
-          <SimpleTreeView slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}>
+          <SimpleTreeView
+            slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
+            defaultExpandedItems={departments.map((d) => d.id.toString())}
+          >
             {renderTree(departments)}
           </SimpleTreeView>
         )}
@@ -235,13 +257,15 @@ export default function DepartmentManagement() {
             fullWidth
             margin="normal"
           />
-          <TextField
-            label="父部门ID"
-            value={formValues.parentId}
-            onChange={(e) => handleFormChange('parentId', e.target.value)}
-            fullWidth
-            margin="normal"
-          />
+          {/* {
+            <TextField
+              label="父部门ID"
+              value={formValues.parentId}
+              onChange={(e) => handleFormChange('parentId', e.target.value)}
+              fullWidth
+              margin="normal"
+            />
+          } */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} disabled={loading}>
@@ -262,17 +286,16 @@ export default function DepartmentManagement() {
           <Button onClick={cancelDelete} disabled={loading}>
             取消
           </Button>
-          <Button onClick={confirmDeleteDepartment} color="error" variant="contained" disabled={loading}>
+          <Button
+            onClick={confirmDeleteDepartment}
+            color="error"
+            variant="contained"
+            disabled={loading}
+          >
             删除
           </Button>
         </DialogActions>
       </Dialog>
-
-      {notification && (
-        <Alert severity={notification.type} onClose={() => setNotification(null)}>
-          {notification.message}
-        </Alert>
-      )}
     </Box>
   );
 }
