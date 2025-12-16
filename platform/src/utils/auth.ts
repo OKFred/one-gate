@@ -1,20 +1,10 @@
 // 认证相关的工具函数
+import type { components } from '@/types/openapi';
 
 const TOKEN_KEY = 'userToken';
 const USER_KEY = 'userInfo';
-
-export interface UserInfo {
-  id: number;
-  username: string;
-  roleIds: string;
-  departmentId: number | null;
-  isEnabled: boolean;
-}
-
-export interface LoginResponse {
-  token: string;
-  userObj: UserInfo;
-}
+export type LoginResponse = components['schemas']['SystemAuthLoginRes']['data'];
+export type UserInfo = LoginResponse['userObj'];
 
 // Token管理
 export const authUtils = {

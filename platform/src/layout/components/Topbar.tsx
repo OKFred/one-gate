@@ -156,7 +156,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             <Box>
               <Typography variant="subtitle2">{userInfo?.username}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {userInfo?.department} · {userInfo?.role}
+                {userInfo?.departmentId} · {userInfo?.roleIds}
               </Typography>
             </Box>
           </MenuItem>
