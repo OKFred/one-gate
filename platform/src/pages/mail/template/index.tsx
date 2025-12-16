@@ -12,6 +12,7 @@ import {
   updateMailTemplate,
   deleteMailTemplate,
 } from '@/api/mail';
+import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import TemplateForm from './components/TemplateForm';
 import TemplateTable from './components/TemplateTable';
@@ -58,11 +59,6 @@ export default function MailTemplate() {
     creatorName: '',
     category: '',
   });
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({ open: false, message: '', severity: 'success' });
 
   // 获取模板列表
   const fetchTemplates = useCallback(async (searchParams: FilterState) => {
@@ -85,10 +81,9 @@ export default function MailTemplate() {
       setTotalCount(total);
     } catch (error) {
       console.error('获取模板列表失败:', error);
-      setSnackbar({
-        open: true,
+      showGlobalNotification({
         message: '获取模板列表失败',
-        severity: 'error',
+        type: 'error',
       });
     } finally {
       setLoading(false);
@@ -152,25 +147,22 @@ export default function MailTemplate() {
     try {
       const res = await deleteMailTemplate({ data: { id } });
       if (res.data?.ok) {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: '删除成功',
-          severity: 'success',
+          type: 'success',
         });
         fetchTemplates(filters);
       } else {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: res.data?.message || '删除失败',
-          severity: 'error',
+          type: 'error',
         });
       }
     } catch (error) {
       console.error('删除模板失败:', error);
-      setSnackbar({
-        open: true,
+      showGlobalNotification({
         message: '删除失败',
-        severity: 'error',
+        type: 'error',
       });
     }
   };
@@ -204,26 +196,23 @@ export default function MailTemplate() {
       }
 
       if (res.data?.ok) {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: editId ? '更新成功' : '新增成功',
-          severity: 'success',
+          type: 'success',
         });
         handleCancel();
         fetchTemplates(filters);
       } else {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: res.data?.message || (editId ? '更新失败' : '新增失败'),
-          severity: 'error',
+          type: 'error',
         });
       }
     } catch (error) {
       console.error('保存模板失败:', error);
-      setSnackbar({
-        open: true,
+      showGlobalNotification({
         message: editId ? '更新失败' : '新增失败',
-        severity: 'error',
+        type: 'error',
       });
     } finally {
       setFormLoading(false);

@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { CircularProgress, Alert, Box } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { UserApiService, type User, type UserUpdateRequest } from '@/api/system/user';
+import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserProfile from './components/UserProfile';
 import UserDetails from './components/UserDetails';
@@ -24,13 +25,6 @@ export default function UserCenter() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-  // 显示消息
-  const showAlert = useCallback((type: 'success' | 'error', message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  }, []);
 
   // 获取当前用户信息
   const fetchCurrentUser = useCallback(async () => {
@@ -49,11 +43,11 @@ export default function UserCenter() {
         }
       }
     } catch (error) {
-      showAlert('error', error instanceof Error ? error.message : '获取用户信息失败');
+      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '获取用户信息失败' });
     } finally {
       setLoading(false);
     }
-  }, [showAlert]);
+  }, []);
 
   // 打开编辑对话框
   const handleEdit = useCallback(() => {
@@ -86,18 +80,18 @@ export default function UserCenter() {
 
       const response = await UserApiService.updateUser(updateData);
       if (response.ok) {
-        showAlert('success', '用户信息更新成功');
+        showGlobalNotification({ type: 'success', message: '用户信息更新成功' });
         setEditDialogOpen(false);
         await fetchCurrentUser(); // 重新获取用户信息
       } else {
-        showAlert('error', response.message || '更新失败');
+        showGlobalNotification({ type: 'error', message: response.message || '更新失败' });
       }
     } catch (error) {
-      showAlert('error', error instanceof Error ? error.message : '更新用户信息失败');
+      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '更新用户信息失败' });
     } finally {
       setLoading(false);
     }
-  }, [currentUser, fetchCurrentUser, showAlert]);
+  }, [currentUser, fetchCurrentUser]);
 
   // 刷新用户信息
   const handleRefresh = useCallback(() => {
@@ -147,17 +141,6 @@ export default function UserCenter() {
         </ResponsiveButton>
       }
     >
-      {/* 警告提示 */}
-      {alert && (
-        <Alert 
-          severity={alert.type} 
-          sx={{ mb: 2 }}
-          onClose={() => setAlert(null)}
-        >
-          {alert.message}
-        </Alert>
-      )}
-
       {/* 用户信息展示 */}
       <Box 
         display="grid" 

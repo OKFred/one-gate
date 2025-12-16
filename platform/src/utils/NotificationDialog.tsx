@@ -77,14 +77,23 @@ export const NotificationDialog = ({
         open={open}
         onClose={(_, reason) => {
           if (reason === 'backdropClick' || reason === 'escapeKeyDown') {
-             handleAction('close');
+            handleAction('close');
           }
         }}
         TransitionProps={{
           onExited: onExited,
         }}
       >
-        <DialogTitle sx={{ color: type === 'error' ? 'error.main' : 'inherit', m: 0, p: 2 }}>
+        <DialogTitle
+          sx={{
+            color: type === 'error' ? 'error.main' : 'inherit',
+            pb: 2,
+            pt: 2,
+            pl: 10,
+            pr: 10,
+            textAlign: 'left',
+          }}
+        >
           {getTitle()}
           {showClose ? (
             <IconButton

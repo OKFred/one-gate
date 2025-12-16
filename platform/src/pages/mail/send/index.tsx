@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { sendMail, listMailAccount, listMailTemplate } from '@/api/mail';
+import { showGlobalNotification } from '@/utils/notification';
 import {
   Box,
   Button,
@@ -54,11 +55,6 @@ export default function MailSend() {
   } | null>(null);
   // 已移除 result, setResult
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({ open: false, message: '', severity: 'success' });
 
   // 获取邮箱账户列表
   useEffect(() => {
@@ -248,12 +244,11 @@ export default function MailSend() {
         } else if (typeof res.data.data === 'object' && res.data.data !== null) {
           msg = JSON.stringify(res.data.data);
         }
-        setSnackbar({ open: true, message: msg, severity: 'success' });
+        showGlobalNotification({ message: msg, type: 'success' });
       } else {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: (res.data?.message as string) || '邮件发送失败',
-          severity: 'error',
+          type: 'error',
         });
       }
     } catch (err) {
@@ -264,7 +259,7 @@ export default function MailSend() {
         typeof (err as Error).message === 'string'
           ? (err as Error).message
           : '邮件发送失败';
-      setSnackbar({ open: true, message: msg, severity: 'error' });
+      showGlobalNotification({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }

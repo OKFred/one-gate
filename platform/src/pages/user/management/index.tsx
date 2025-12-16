@@ -4,9 +4,10 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Alert } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Add as AddIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import { UserApiService, type User, type UserAddRequest, type UserUpdateRequest, type UserListRequest } from '@/api/system/user';
+import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserFilter from './components/UserFilter';
 import UserTable from './components/UserTable';
@@ -26,14 +27,6 @@ export default function UserManagement() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   
-  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
-  // 显示消息
-  const showAlert = useCallback((type: 'success' | 'error', message: string) => {
-    setAlert({ type, message });
-    setTimeout(() => setAlert(null), 3000);
-  }, []);
-
   // 获取用户列表
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -52,11 +45,11 @@ export default function UserManagement() {
         setTotal(response.data.total);
       }
     } catch (error) {
-      showAlert('error', error instanceof Error ? error.message : '获取用户列表失败');
+      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '获取用户列表失败' });
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage, searchKeyword, showAlert]);
+  }, [page, rowsPerPage, searchKeyword]);
 
   // 处理搜索
   const handleSearch = useCallback((keyword: string) => {
@@ -91,13 +84,13 @@ export default function UserManagement() {
         // 编辑用户
         response = await UserApiService.updateUser(userData);
         if (response.ok) {
-          showAlert('success', '用户更新成功');
+          showGlobalNotification({ type: 'success', message: '用户更新成功' });
         }
       } else {
         // 添加用户
         response = await UserApiService.addUser(userData);
         if (response.ok) {
-          showAlert('success', '用户添加成功');
+          showGlobalNotification({ type: 'success', message: '用户添加成功' });
         }
       }
 
@@ -106,14 +99,14 @@ export default function UserManagement() {
         setEditingUser(null);
         await fetchUsers();
       } else {
-        showAlert('error', response.message || '操作失败');
+        showGlobalNotification({ type: 'error', message: response.message || '操作失败' });
       }
     } catch (error) {
-      showAlert('error', error instanceof Error ? error.message : '操作失败');
+      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '操作失败' });
     } finally {
       setLoading(false);
     }
-  }, [fetchUsers, showAlert]);
+  }, [fetchUsers]);
 
   // 打开删除确认对话框
   const handleDeleteUser = useCallback((user: User) => {
@@ -129,19 +122,19 @@ export default function UserManagement() {
     try {
       const response = await UserApiService.deleteUser({ id: userToDelete.id });
       if (response.ok) {
-        showAlert('success', '用户删除成功');
+        showGlobalNotification({ type: 'success', message: '用户删除成功' });
         setDeleteDialogOpen(false);
         setUserToDelete(null);
         await fetchUsers();
       } else {
-        showAlert('error', response.message || '删除失败');
+        showGlobalNotification({ type: 'error', message: response.message || '删除失败' });
       }
     } catch (error) {
-      showAlert('error', error instanceof Error ? error.message : '删除用户失败');
+      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '删除用户失败' });
     } finally {
       setLoading(false);
     }
-  }, [userToDelete, fetchUsers, showAlert]);
+  }, [userToDelete, fetchUsers]);
 
   // 取消删除
   const cancelDelete = useCallback(() => {
@@ -191,17 +184,6 @@ export default function UserManagement() {
         </>
       }
     >
-      {/* 警告提示 */}
-      {alert && (
-        <Alert 
-          severity={alert.type} 
-          sx={{ mb: 2 }}
-          onClose={() => setAlert(null)}
-        >
-          {alert.message}
-        </Alert>
-      )}
-
       {/* 搜索过滤器 */}
       <UserFilter onSearch={handleSearch} userCount={total} />
 
