@@ -6,20 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-here";
 export interface TokenPayload {
   userId: number;
   username: string;
-  roleIds: string;
-  departmentId: number | null;
   exp: number; // 过期时间戳
-}
-
-export interface UserTokenData {
-  token: string;
-  userObj: {
-    id: number;
-    username: string;
-    roleIds: string;
-    departmentId: number | null;
-    isEnabled: boolean;
-  };
 }
 
 export const tokenUtils = {
@@ -75,8 +62,6 @@ export const tokenUtils = {
     return this.generateToken({
       userId: payload.userId,
       username: payload.username,
-      roleIds: payload.roleIds,
-      departmentId: payload.departmentId,
     });
   },
 };

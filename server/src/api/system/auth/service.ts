@@ -82,8 +82,6 @@ async function onLogin(
   const token = tokenUtils.generateToken({
     userId: id,
     username,
-    roleIds,
-    departmentId: departmentId ?? null,
   });
 
   return {
@@ -181,27 +179,7 @@ const verifyTokenReq = {
 } as const satisfies JSONSchema;
 
 const verifyTokenRes = {
-  type: "object",
-  properties: {
-    valid: {
-      type: "boolean",
-      description: "token是否有效",
-    },
-    payload: {
-      type: "object",
-      properties: {
-        userId: { type: "number" },
-        username: { type: "string" },
-        roleIds: { type: "string" },
-        departmentId: { type: ["number", "null"] },
-        exp: { type: "number" },
-      },
-      nullable: true,
-      additionalProperties: false,
-    },
-  },
-  required: ["valid"] as const,
-  additionalProperties: false,
+  type: "boolean",
 } as const satisfies JSONSchema;
 
 async function onVerifyToken(
@@ -209,13 +187,8 @@ async function onVerifyToken(
 ): Promise<FromSchema<typeof verifyTokenRes>> {
   const obj = c.get("bodyObj") as FromSchema<typeof verifyTokenReq>;
   const { token } = obj;
-  const payload = tokenUtils.verifyToken(token);
-  const isValid = payload !== null;
-
-  return {
-    valid: isValid,
-    payload: payload,
-  };
+  const isValid = tokenUtils.verifyToken(token) !== null;
+  return isValid;
 }
 
 const verifyTokenApi = {

@@ -8,7 +8,9 @@ import {
   type userAddLike,
   type userLike,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { departmentTable } from "../department/db.table";
+import { roleTable } from "../role/db.table";
+import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
@@ -386,6 +388,18 @@ const verifyRes = {
         departmentId: userData.departmentId,
         roleIds: userData.roleIds,
         isEnabled: userData.isEnabled,
+        departmentName: { type: "string", nullable: true },
+        roleArr: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              label: { type: "string" },
+              value: { type: "string" },
+            },
+            required: ["label", "value"],
+          },
+        },
       },
     },
   },
@@ -410,9 +424,48 @@ async function onVerify(
     return { valid: false };
   }
   const isValid = await bcrypt.compare(password, userObj.password);
+
+  if (!isValid) {
+    return { valid: false, userObj: null };
+  }
+
+  // Fetch department name
+  let departmentName = null;
+  if (userObj.departmentId) {
+    const dept = await db
+      .select({ name: departmentTable.name })
+      .from(departmentTable)
+      .where(eq(departmentTable.id, userObj.departmentId))
+      .limit(1);
+    if (dept.length > 0) {
+      departmentName = dept[0].name;
+    }
+  }
+
+  // Fetch roles
+  let roleArr: { label: string; value: string }[] = [];
+  if (userObj.roleIds) {
+    const ids = userObj.roleIds
+      .split(",")
+      .map((id) => Number(id.trim()))
+      .filter((id) => !isNaN(id));
+    if (ids.length > 0) {
+      const roles = await db
+        .select({ id: roleTable.id, name: roleTable.name })
+        .from(roleTable)
+        .where(inArray(roleTable.id, ids));
+
+      roleArr = roles.map((r) => ({ label: r.name, value: String(r.id) }));
+    }
+  }
+
   return {
-    valid: isValid,
-    userObj: isValid ? userObj : null,
+    valid: true,
+    userObj: {
+      ...userObj,
+      departmentName,
+      roleArr,
+    },
   };
 }
 const verifyApi = {
