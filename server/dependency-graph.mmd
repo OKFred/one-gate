@@ -1,3 +1,8 @@
+---
+config:
+  theme: neo-dark
+  layout: elk
+---
 graph LR
   src_index_ts["src/index.ts"] --> src_server_index_ts["src/server/index.ts"]
   src_server_index_ts["src/server/index.ts"] --> src_middleware_logger_index_ts["src/middleware/logger/index.ts"]
@@ -36,7 +41,7 @@ graph LR
   src_api_mail_account_db_table_ts["src/api/mail/account/db.table.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
   src_api_mail_account_service_ts["src/api/mail/account/service.ts"] --> src_db_index_ts["src/db/index.ts"]
   src_api_mail_account_service_ts["src/api/mail/account/service.ts"] --> src_api_mail_account_db_table_ts["src/api/mail/account/db.table.ts"]
-  src_api_mail_account_service_ts["src/api/mail/account/service.ts"] --> src_api_mail_common_schema_ts["src/api/mail/common.schema.ts"]
+  src_api_mail_account_service_ts["src/api/mail/account/service.ts"] --> src_middleware_encapsulation_common_schema_ts["src/middleware/encapsulation/common.schema.ts"]
   src_api_mail_account_service_ts["src/api/mail/account/service.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
   src_api_mail_action_index_ts["src/api/mail/action/index.ts"] --> src_middleware_encapsulation_index_ts["src/middleware/encapsulation/index.ts"]
   src_api_mail_action_index_ts["src/api/mail/action/index.ts"] --> src_api_mail_action_service_ts["src/api/mail/action/service.ts"]
@@ -45,13 +50,13 @@ graph LR
   src_api_mail_action_service_ts["src/api/mail/action/service.ts"] --> src_api_mail_log_service_ts["src/api/mail/log/service.ts"]
   src_api_mail_template_service_ts["src/api/mail/template/service.ts"] --> src_db_index_ts["src/db/index.ts"]
   src_api_mail_template_service_ts["src/api/mail/template/service.ts"] --> src_api_mail_template_db_table_ts["src/api/mail/template/db.table.ts"]
-  src_api_mail_template_service_ts["src/api/mail/template/service.ts"] --> src_api_mail_common_schema_ts["src/api/mail/common.schema.ts"]
+  src_api_mail_template_service_ts["src/api/mail/template/service.ts"] --> src_middleware_encapsulation_common_schema_ts["src/middleware/encapsulation/common.schema.ts"]
   src_api_mail_template_service_ts["src/api/mail/template/service.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
   src_api_mail_template_db_table_ts["src/api/mail/template/db.table.ts"] --> src_db_index_ts["src/db/index.ts"]
   src_api_mail_template_db_table_ts["src/api/mail/template/db.table.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
   src_api_mail_log_service_ts["src/api/mail/log/service.ts"] --> src_db_index_ts["src/db/index.ts"]
   src_api_mail_log_service_ts["src/api/mail/log/service.ts"] --> src_api_mail_log_db_table_ts["src/api/mail/log/db.table.ts"]
-  src_api_mail_log_service_ts["src/api/mail/log/service.ts"] --> src_api_mail_common_schema_ts["src/api/mail/common.schema.ts"]
+  src_api_mail_log_service_ts["src/api/mail/log/service.ts"] --> src_middleware_encapsulation_common_schema_ts["src/middleware/encapsulation/common.schema.ts"]
   src_api_mail_log_service_ts["src/api/mail/log/service.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
   src_api_mail_log_db_table_ts["src/api/mail/log/db.table.ts"] --> src_db_index_ts["src/db/index.ts"]
   src_api_mail_log_db_table_ts["src/api/mail/log/db.table.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
@@ -89,7 +94,7 @@ graph LR
   src_api_system_department_index_ts["src/api/system/department/index.ts"] --> src_api_system_department_service_ts["src/api/system/department/service.ts"]
   src_api_system_department_service_ts["src/api/system/department/service.ts"] --> src_db_index_ts["src/db/index.ts"]
   src_api_system_department_service_ts["src/api/system/department/service.ts"] --> src_api_system_department_db_table_ts["src/api/system/department/db.table.ts"]
-  src_api_system_department_service_ts["src/api/system/department/service.ts"] --> src_api_mail_common_schema_ts["src/api/mail/common.schema.ts"]
+  src_api_system_department_service_ts["src/api/system/department/service.ts"] --> src_middleware_encapsulation_common_schema_ts["src/middleware/encapsulation/common.schema.ts"]
   src_api_system_department_service_ts["src/api/system/department/service.ts"] --> src_utils_timestamp_ts["src/utils/timestamp.ts"]
   src_api_system_department_service_ts["src/api/system/department/service.ts"] --> src_utils_hasValue_ts["src/utils/hasValue.ts"]
   src_api_system_role_index_ts["src/api/system/role/index.ts"] --> src_middleware_encapsulation_index_ts["src/middleware/encapsulation/index.ts"]

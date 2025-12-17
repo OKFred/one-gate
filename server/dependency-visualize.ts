@@ -326,7 +326,12 @@ export default function main() {
     return str.replace(/[\/\\\.@\-:]/g, "_");
   }
 
-  let mermaidContent = "graph LR\n";
+  let mermaidContent = `---
+config:
+  theme: neo-dark
+  layout: elk
+---
+graph LR\n`;
   for (const [file, deps] of Object.entries(graph)) {
     const fileId = sanitizeId(file);
 
