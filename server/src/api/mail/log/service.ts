@@ -13,7 +13,7 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
-import * as commonSchema from "../common.schema";
+import * as commonSchema from "@/middleware/encapsulation/common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 const addReq = {
