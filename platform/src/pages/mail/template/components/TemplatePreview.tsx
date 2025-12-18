@@ -15,22 +15,11 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
-
-interface MailTemplate {
-  id?: number;
-  name?: string;
-  title?: string;
-  langCode?: string;
-  content?: string;
-  creatorName?: string;
-  category?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
+import type { ListMailTemplate } from '../type';
 
 interface TemplatePreviewProps {
   open: boolean;
-  template: MailTemplate | null;
+  template: ListMailTemplate | null;
   onClose: () => void;
 }
 
@@ -101,12 +90,6 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
                     模板名称
                   </Typography>
                   <Typography variant="body1">{template.name || '-'}</Typography>
-                </Box>
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    创建者
-                  </Typography>
-                  <Typography variant="body1">{template.creatorName || '-'}</Typography>
                 </Box>
               </Stack>
 

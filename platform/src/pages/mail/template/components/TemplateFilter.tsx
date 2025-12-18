@@ -20,12 +20,7 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
-
-interface FilterState {
-  keyword: string;
-  orderBy: 'id' | 'langCode' | 'creatorName' | 'category' | 'createTimeUtc';
-  descend: boolean;
-}
+import type { FilterState } from '../type';
 
 interface TemplateFilterProps {
   onFilterChange: (filters: FilterState) => void;

@@ -24,24 +24,14 @@ import {
   Visibility as ViewIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
-
-interface MailTemplate {
-  id?: number;
-  name?: string;
-  title?: string;
-  langCode?: string;
-  content?: string;
-  category?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
+import type { ListMailTemplate } from '../type';
 
 interface TemplateTableProps {
-  templates: MailTemplate[];
+  templates: ListMailTemplate[];
   loading: boolean;
-  onEdit: (template: MailTemplate) => void;
+  onEdit: (template: ListMailTemplate) => void;
   onDelete: (id: number) => void;
-  onPreview?: (template: MailTemplate) => void;
+  onPreview?: (template: ListMailTemplate) => void;
 }
 
 export default function TemplateTable({

@@ -15,14 +15,10 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import JoditEditor from '@/components/JoditEditor/index';
+import type { AddMailTemplateRequest } from '../type';
 
-interface FormData {
-  name: string;
-  title: string;
-  langCode: string;
-  content: string;
-  creatorName: string;
-  category: string;
+interface FormData extends AddMailTemplateRequest {
+  creatorName?: string;
 }
 
 interface TemplateFormProps {

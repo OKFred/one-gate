@@ -22,13 +22,13 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import type { MailAccountForm } from '../type';
+import type { AddMailAccountRequest } from '../type';
 
 interface AccountFormProps {
   open: boolean;
-  form: MailAccountForm;
+  form: AddMailAccountRequest;
   editId: number | null;
-  onFormChange: (form: MailAccountForm) => void;
+  onFormChange: (form: AddMailAccountRequest) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
@@ -121,7 +121,7 @@ export default function AccountForm({
                 label="端口"
                 type="number"
                 value={form.port}
-                onChange={(e) => onFormChange({ ...form, port: e.target.value })}
+                onChange={(e) => onFormChange({ ...form, port: Number(e.target.value) })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}

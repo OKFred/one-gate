@@ -23,27 +23,11 @@ export type GetMailAccount = NonNullable<GetMailAccountResponse['data']>;
 // 添加邮件账户
 export type AddMailAccountRequest = NonNullable<Parameters<typeof MailAPI.addFn>[0]['data']>;
 export type AddMailAccountResponse = Awaited<ReturnType<typeof MailAPI.addFn>>;
-export type AddMailAccount = NonNullable<AddMailAccountResponse['data']>;
 
 // 更新邮件账户
 export type UpdateMailAccountRequest = NonNullable<Parameters<typeof MailAPI.updateFn>[0]['data']>;
 export type UpdateMailAccountResponse = Awaited<ReturnType<typeof MailAPI.updateFn>>;
-export type UpdateMailAccount = NonNullable<UpdateMailAccountResponse['data']>;
 
 // 删除邮件账户
 export type DeleteMailAccountRequest = NonNullable<Parameters<typeof MailAPI.deleteFn>[0]['data']>;
 export type DeleteMailAccountResponse = Awaited<ReturnType<typeof MailAPI.deleteFn>>;
-export type DeleteMailAccount = NonNullable<DeleteMailAccountResponse['data']>;
-
-// ==================== 表单相关类型 ====================
-
-// 邮件账户表单数据（用于前端表单，port 为字符串）
-export interface MailAccountForm {
-  nickname: string;
-  mailAddress: string;
-  host: string;
-  port: string; // 前端表单中 port 是字符串
-  password: string;
-  sslEnable: boolean;
-  starttlsEnable: boolean;
-}

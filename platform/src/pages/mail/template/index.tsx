@@ -13,33 +13,16 @@ import TemplateForm from './components/TemplateForm';
 import TemplateTable from './components/TemplateTable';
 import TemplateFilter from './components/TemplateFilter';
 import TemplatePreview from './components/TemplatePreview';
-
-interface MailTemplate {
-  id?: number;
-  name?: string;
-  title?: string;
-  langCode?: string;
-  content?: string;
-  creatorName?: string;
-  category?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
-
-interface FilterState {
-  keyword: string;
-  orderBy: 'id' | 'langCode' | 'creatorName' | 'category' | 'createTimeUtc';
-  descend: boolean;
-}
+import type { ListMailTemplate, FilterState } from './type';
 
 export default function MailTemplate() {
-  const [templates, setTemplates] = useState<MailTemplate[]>([]);
+  const [templates, setTemplates] = useState<ListMailTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
-  const [previewTemplate, setPreviewTemplate] = useState<MailTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<ListMailTemplate | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState<FilterState>({
     keyword: '',
@@ -51,7 +34,6 @@ export default function MailTemplate() {
     title: '',
     langCode: '',
     content: '',
-    creatorName: '',
     category: '',
   });
 
@@ -68,7 +50,7 @@ export default function MailTemplate() {
       };
 
       const res = await mailTemplateAPI.listFn({ data: requestData });
-      const response = res.data as { data?: { list?: MailTemplate[]; total?: number } };
+      const response = res.data;
       const templatesList = response?.data?.list || [];
       const total = response?.data?.total || 0;
 
@@ -104,14 +86,13 @@ export default function MailTemplate() {
   }, [fetchTemplates]);
 
   // 编辑模板
-  const handleEdit = (template: MailTemplate) => {
+  const handleEdit = (template: ListMailTemplate) => {
     setEditId(template.id!);
     setForm({
       name: template.name || '',
       title: template.title || '',
       langCode: template.langCode || '',
       content: template.content || '',
-      creatorName: template.creatorName || '',
       category: template.category || '',
     });
     setOpen(true);
@@ -125,14 +106,13 @@ export default function MailTemplate() {
       title: '',
       langCode: '',
       content: '',
-      creatorName: '',
       category: '',
     });
     setOpen(true);
   };
 
   // 预览模板
-  const handlePreview = (template: MailTemplate) => {
+  const handlePreview = (template: ListMailTemplate) => {
     setPreviewTemplate(template);
     setPreviewOpen(true);
   };
@@ -176,7 +156,7 @@ export default function MailTemplate() {
             ...form,
             // 过滤空字符串，使可选字段正确传递
             langCode: form.langCode || undefined,
-            category: form.category || undefined,
+            category: form.category,
           },
         });
       } else {
@@ -185,7 +165,7 @@ export default function MailTemplate() {
             ...form,
             // 过滤空字符串，使可选字段正确传递
             langCode: form.langCode,
-            category: form.category || undefined,
+            category: form.category,
           },
         });
       }
@@ -223,7 +203,6 @@ export default function MailTemplate() {
       title: '',
       langCode: '',
       content: '',
-      creatorName: '',
       category: '',
     });
   };

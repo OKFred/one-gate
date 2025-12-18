@@ -1,8 +1,3 @@
-/**
- * 邮件账户管理页面 - 重构示例
- * 展示如何使用新的响应式组件系统来简化移动端适配
- */
-
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
 import * as mailAccountAPI from '@/api/mail/account';
@@ -10,7 +5,7 @@ import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import AccountForm from './components/AccountForm';
 import AccountTable from './components/AccountTable';
 import AccountFilter from './components/AccountFilter';
-import type { ListMailAccount, FilterState, MailAccountForm } from './type';
+import type { FilterState, ListMailAccount, AddMailAccountRequest } from './type';
 
 export default function MailAccountRefactored() {
   const [accounts, setAccounts] = useState<ListMailAccount[]>([]);
@@ -23,11 +18,11 @@ export default function MailAccountRefactored() {
     orderBy: 'id',
     descend: false,
   });
-  const [form, setForm] = useState<MailAccountForm>({
+  const [form, setForm] = useState<AddMailAccountRequest>({
     nickname: '',
     mailAddress: '',
     host: '',
-    port: '465',
+    port: 465,
     password: '',
     sslEnable: true,
     starttlsEnable: false,
@@ -78,7 +73,7 @@ export default function MailAccountRefactored() {
       nickname: acc.nickname || '',
       mailAddress: acc.mailAddress || '',
       host: acc.host || '',
-      port: String(acc.port) || '',
+      port: acc.port,
       password: acc.password || '',
       sslEnable: acc.sslEnable,
       starttlsEnable: acc.starttlsEnable,
@@ -92,7 +87,7 @@ export default function MailAccountRefactored() {
       nickname: '',
       mailAddress: '',
       host: '',
-      port: '465',
+      port: 465,
       password: '',
       sslEnable: true,
       starttlsEnable: false,
@@ -109,7 +104,7 @@ export default function MailAccountRefactored() {
     e.preventDefault();
     const formData = {
       ...form,
-      port: parseInt(form.port, 10),
+      port: form.port,
     };
 
     if (editId) {
@@ -128,7 +123,7 @@ export default function MailAccountRefactored() {
       nickname: '',
       mailAddress: '',
       host: '',
-      port: '465',
+      port: 465,
       password: '',
       sslEnable: true,
       starttlsEnable: false,
