@@ -3680,7 +3680,7 @@ export interface components {
                     departmentName?: string | null;
                     roleArr?: {
                         label: string;
-                        value: string;
+                        value: number;
                     }[];
                 } | null;
             };

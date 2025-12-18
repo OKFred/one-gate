@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -7,60 +7,13 @@ import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import HomeIcon from '@mui/icons-material/Home';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import PeopleIcon from '@mui/icons-material/People';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import DescriptionIcon from '@mui/icons-material/Description';
-import HistoryIcon from '@mui/icons-material/History';
-import SendIcon from '@mui/icons-material/Send';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
 import { useResponsive } from '../responsive';
-import { authUtils } from '@/utils/auth';
+import Icon from '@/components/Icon';
+import { getMenuList, type MenuItem } from '@/api/system/menu';
 
 const drawerWidth = 240;
-
-interface NavItem {
-  text: string;
-  icon: React.ReactNode;
-  path?: string;
-  children?: NavItem[];
-}
-
-// 获取基础菜单项
-const getNavItems = (): NavItem[] => {
-  const baseItems: NavItem[] = [
-    { text: '主页', icon: <HomeIcon />, path: '/home' },
-    { text: '我的', icon: <AccountCircleIcon />, path: '/user' },
-    { text: '部门', icon: <PeopleIcon />, path: '/system/department' },
-    {
-      text: '邮件',
-      icon: <MailIcon />,
-      children: [
-        { text: '邮件模板', icon: <DescriptionIcon />, path: '/mail/template' },
-        { text: '邮件日志', icon: <HistoryIcon />, path: '/mail/log' },
-        { text: '邮件发送', icon: <SendIcon />, path: '/mail/send' },
-        { text: '邮件账户', icon: <ManageAccountsIcon />, path: '/mail/account' },
-      ],
-    },
-  ];
-
-  // 检查用户是否为管理员，如果是则显示用户管理
-  const userInfo = authUtils.getUserInfo();
-  if (userInfo && userInfo.roleIds.includes('1')) {
-    baseItems.splice(2, 0, {
-      text: '用户管理',
-      icon: <PeopleIcon />,
-      path: '/user/management',
-    });
-  }
-
-  return baseItems;
-};
 
 interface SidebarProps {
   open: boolean;
@@ -70,15 +23,22 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
+  const [navItems, setNavItems] = useState<MenuItem[]>([]);
 
-  // 动态获取菜单项
-  const navItems = getNavItems();
+  // 异步加载菜单数据
+  useEffect(() => {
+    const loadMenus = async () => {
+      const menus = await getMenuList();
+      setNavItems(menus);
+    };
+    loadMenus();
+  }, []);
 
-  const handleMenuClick = (item: NavItem) => {
-    if (item.children) {
+  const handleMenuClick = (item: MenuItem) => {
+    if (item.children && item.children.length > 0) {
       setExpandedMenus((prev) => ({
         ...prev,
-        [item.text]: !prev[item.text],
+        [item.id]: !prev[item.id],
       }));
     } else if (item.path) {
       navigate(item.path);
@@ -86,19 +46,18 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   };
 
   // 渲染菜单项
-  const renderMenuItem = (item: NavItem, level = 0) => {
+  const renderMenuItem = (item: MenuItem, level = 0) => {
     const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedMenus[item.text];
+    const isExpanded = expandedMenus[item.id];
 
     return (
-      <React.Fragment key={item.text}>
-        <ListItemButton
-          onClick={() => handleMenuClick(item)}
-          sx={{ pl: level > 0 ? 4 : 2 }}
-        >
-          <ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+      <React.Fragment key={item.id}>
+        <ListItemButton onClick={() => handleMenuClick(item)} sx={{ pl: level > 0 ? 4 : 2 }}>
+          <ListItemIcon sx={{ minWidth: 40 }}>
+            <Icon name={item.icon} size={24} />
+          </ListItemIcon>
           <ListItemText primary={item.text} />
-          {hasChildren && (isExpanded ? <ExpandLess /> : <ExpandMore />)}
+          {hasChildren && <Icon name={isExpanded ? 'expand-less' : 'expand-more'} size={24} />}
         </ListItemButton>
         {hasChildren && (
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
@@ -143,9 +102,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
                 OKFred平台
               </Typography>
             </div>
-            <List className="pb-0! pt-0!">
-              {navItems.map((item) => renderMenuItem(item))}
-            </List>
+            <List className="pb-0! pt-0!">{navItems.map((item) => renderMenuItem(item))}</List>
           </div>
         </div>
       </Drawer>
@@ -176,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
       >
         {navItems.map((item) => (
           <Box
-            key={item.text}
+            key={item.id}
             sx={{
               flex: '0 0 auto',
               minWidth: 120,
@@ -188,9 +145,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
               '&:active': { color: 'primary.main' },
               transition: 'color 0.2s ease',
             }}
-            onClick={() => item.path ? navigate(item.path) : navigate('/mail')}
+            onClick={() => (item.path ? navigate(item.path) : navigate('/mail'))}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5 }}>{item.icon}</Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5 }}>
+              <Icon name={item.icon} size={24} />
+            </Box>
             <Typography variant="caption">{item.text}</Typography>
           </Box>
         ))}
