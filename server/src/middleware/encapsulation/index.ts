@@ -37,7 +37,7 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = ["/api/system/auth/login"];
+const routeWhitelist = ["/system/auth/login"];
 
 function routeMaker({
   pathInfo,
@@ -57,9 +57,8 @@ function routeMaker({
         { cause: ["Content-Type must be application/json"] }
       );
     }
-    const token = c.req.header("authorization");
-    if (token && !routeWhitelist.includes(pathInfo.path)) {
-      await authMiddleware(c); // 拿到userObj
+    if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
+      await authMiddleware(c);
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");

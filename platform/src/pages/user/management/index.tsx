@@ -6,12 +6,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Add as AddIcon, Refresh as RefreshIcon } from '@mui/icons-material';
-import { UserApiService, type User, type UserAddRequest, type UserUpdateRequest, type UserListRequest } from '@/api/system/user';
+import * as UserApiService from '@/api/system/user';
 import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserFilter from './components/UserFilter';
 import UserTable from './components/UserTable';
 import UserFormDialog from './components/UserFormDialog';
+import type { AddUserParams, User } from '../type';
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
@@ -20,18 +21,18 @@ export default function UserManagement() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchKeyword, setSearchKeyword] = useState('');
-  
+
   // 对话框状态
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  
+
   // 获取用户列表
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const params: UserListRequest = {
+      const data = {
         pageNo: page + 1,
         pageSize: rowsPerPage,
         orderBy: 'id',
@@ -39,13 +40,14 @@ export default function UserManagement() {
         keyword: searchKeyword || undefined,
       };
 
-      const response = await UserApiService.getUserList(params);
-      if (response.ok && response.data) {
-        setUsers(response.data.list);
-        setTotal(response.data.total);
-      }
+      const resData = await UserApiService.listFn({ data });
+      setUsers(resData.data.data.list);
+      setTotal(resData.data.data.total);
     } catch (error) {
-      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '获取用户列表失败' });
+      showGlobalNotification({
+        type: 'error',
+        message: error instanceof Error ? error.message : '获取用户列表失败',
+      });
     } finally {
       setLoading(false);
     }
@@ -76,37 +78,40 @@ export default function UserManagement() {
   }, []);
 
   // 保存用户（添加或编辑）
-  const handleSaveUser = useCallback(async (userData: UserAddRequest | UserUpdateRequest) => {
-    setLoading(true);
-    try {
-      let response;
-      if ('id' in userData) {
-        // 编辑用户
-        response = await UserApiService.updateUser(userData);
-        if (response.ok) {
+  const handleSaveUser = useCallback(
+    async (userData: AddUserParams) => {
+      setLoading(true);
+      try {
+        let response;
+        if (!userData) return;
+        if ('id' in userData) {
+          // 编辑用户
+          response = await UserApiService.updateFn({ data: userData });
           showGlobalNotification({ type: 'success', message: '用户更新成功' });
+        } else {
+          // 添加用户
+          response = await UserApiService.addFn(userData);
+          if (response.ok) {
+            showGlobalNotification({ type: 'success', message: '用户添加成功' });
+          }
         }
-      } else {
-        // 添加用户
-        response = await UserApiService.addUser(userData);
-        if (response.ok) {
-          showGlobalNotification({ type: 'success', message: '用户添加成功' });
-        }
-      }
 
-      if (response.ok) {
-        setFormDialogOpen(false);
-        setEditingUser(null);
-        await fetchUsers();
-      } else {
-        showGlobalNotification({ type: 'error', message: response.message || '操作失败' });
+        if (response.ok) {
+          setFormDialogOpen(false);
+          setEditingUser(null);
+          await fetchUsers();
+        }
+      } catch (error) {
+        showGlobalNotification({
+          type: 'error',
+          message: error instanceof Error ? error.message : '操作失败',
+        });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '操作失败' });
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchUsers]);
+    },
+    [fetchUsers],
+  );
 
   // 打开删除确认对话框
   const handleDeleteUser = useCallback((user: User) => {
@@ -120,7 +125,7 @@ export default function UserManagement() {
 
     setLoading(true);
     try {
-      const response = await UserApiService.deleteUser({ id: userToDelete.id });
+      const response = await UserApiService.deleteFn({ id: userToDelete.id });
       if (response.ok) {
         showGlobalNotification({ type: 'success', message: '用户删除成功' });
         setDeleteDialogOpen(false);
@@ -130,7 +135,10 @@ export default function UserManagement() {
         showGlobalNotification({ type: 'error', message: response.message || '删除失败' });
       }
     } catch (error) {
-      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '删除用户失败' });
+      showGlobalNotification({
+        type: 'error',
+        message: error instanceof Error ? error.message : '删除用户失败',
+      });
     } finally {
       setLoading(false);
     }
@@ -174,11 +182,7 @@ export default function UserManagement() {
           >
             刷新
           </ResponsiveButton>
-          <ResponsiveButton
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddUser}
-          >
+          <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAddUser}>
             添加用户
           </ResponsiveButton>
         </>
@@ -216,12 +220,10 @@ export default function UserManagement() {
           确定要删除用户 "{userToDelete?.username}" 吗？此操作不可恢复。
         </DialogContent>
         <DialogActions>
-          <ResponsiveButton onClick={cancelDelete}>
-            取消
-          </ResponsiveButton>
-          <ResponsiveButton 
-            onClick={confirmDeleteUser} 
-            color="error" 
+          <ResponsiveButton onClick={cancelDelete}>取消</ResponsiveButton>
+          <ResponsiveButton
+            onClick={confirmDeleteUser}
+            color="error"
             variant="contained"
             disabled={loading}
           >
@@ -235,21 +237,21 @@ export default function UserManagement() {
 
 /**
  * 重构说明：
- * 
+ *
  * 1. 响应式设计：
  *    - 使用 PageLayout 提供统一的布局结构
  *    - 使用 ResponsiveButton 等响应式组件
  *    - 表格自动适配移动端显示
- * 
+ *
  * 2. 组件解耦：
  *    - UserFilter: 搜索过滤器组件
- *    - UserTable: 用户列表表格组件  
+ *    - UserTable: 用户列表表格组件
  *    - UserFormDialog: 用户添加/编辑对话框组件
- * 
+ *
  * 3. 性能优化：
  *    - 使用 useCallback 避免不必要的重渲染
  *    - 统一的数据获取和状态管理
- * 
+ *
  * 4. 用户体验：
  *    - 统一的错误处理和消息提示
  *    - 加载状态显示

@@ -1,14 +1,22 @@
 import axios from 'axios';
-import type { Method, AxiosRequestConfig, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { showGlobalNotification } from '@/utils/notification';
+import type {
+  AxiosRequestConfig,
+  AxiosInstance,
+  InternalAxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import type { paths } from '@/types/openapi'; //由openapi-typescript自动生成的类型
+import { showGlobalNotification } from '@/utils/notification';
 
-type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
+// 导入认证工具
+import { authUtils } from '@/utils/auth';
+
+export type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
 
 type SchemaGeneric<U, M> = M extends keyof UrlGeneric<U> ? UrlGeneric<U>[M] : never;
 
 export type RequestGeneric<U, M> = {
-  url: string;
+  url: U;
   method: M;
   headers?: SchemaGeneric<U, M> extends { parameters: { header?: infer H } } ? Partial<H> : never;
   path?: SchemaGeneric<U, M> extends { parameters: { path?: infer P } } ? P : never;
@@ -40,20 +48,11 @@ export type AxiosConfig<U, M> = Omit<
 > &
   RequestGeneric<U, M>;
 
-export type AxiosPlus = <U extends keyof paths, M extends keyof UrlGeneric<U>>(
-  axiosConfig: RequestGeneric<U, M>,
-  // customOptions?: Record<string, unknown>,
-  // loadingOptions?: Record<string, unknown>,
-) => Promise<ResponseGeneric<U, M>>;
-
 /** @description  axios 实例 */
 const service = axios.create({
   /*   baseURL: "http://localhost:3000", */
   timeout: 10_000,
 });
-
-// 导入认证工具
-import { authUtils } from '@/utils/auth';
 
 // 初始化拦截器（只执行一次）
 function setupInterceptors(service: AxiosInstance) {
@@ -61,7 +60,7 @@ function setupInterceptors(service: AxiosInstance) {
   service.interceptors.request.use(
     (config: InternalAxiosRequestConfig & { path?: Record<string, unknown> }) => {
       // 自动添加认证token
-      const token = authUtils.getToken();
+      const token = authUtils.getUserInfo()?.token;
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -147,16 +146,12 @@ function setupInterceptors(service: AxiosInstance) {
 setupInterceptors(service);
 
 // axiosPlus 函数，直接使用已配置好拦截器的 service
-const axiosPlus: AxiosPlus = async (
-  axiosConfig,
+const axiosPlus = async <U extends keyof paths, M extends keyof UrlGeneric<U>>(
+  axiosConfig: AxiosConfig<U, M>,
   /*  customOptions,
   loadingOptions, */
-) => {
-  const { method, ...rest } = axiosConfig;
-  return await service({
-    method: method as Lowercase<Method>,
-    ...rest,
-  });
+): Promise<Omit<AxiosResponse, 'data' | 'headers'> & ResponseGeneric<U, M>> => {
+  return await service(axiosConfig as AxiosRequestConfig);
 };
 
-export default axiosPlus;
+export { axiosPlus };

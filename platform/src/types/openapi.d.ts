@@ -2953,9 +2953,9 @@ export interface components {
         SystemAuthLoginRes: {
             ok: boolean;
             data: {
-                /** @description 用户token */
-                token: string;
                 userObj: {
+                    /** @description 用户token */
+                    token: string;
                     /** @description 用户ID */
                     id: number;
                     /** @description 用户名 */
@@ -2985,9 +2985,9 @@ export interface components {
         SystemAuthWechatRes: {
             ok: boolean;
             data: {
-                /** @description 用户token */
-                token: string;
                 userObj: {
+                    /** @description 用户token */
+                    token: string;
                     /** @description 用户ID */
                     id: number;
                     /** @description 用户名 */
@@ -3011,17 +3011,7 @@ export interface components {
         };
         SystemAuthVerifyRes: {
             ok: boolean;
-            data: {
-                /** @description token是否有效 */
-                valid: boolean;
-                payload?: {
-                    userId?: number;
-                    username?: string;
-                    roleIds?: string;
-                    departmentId?: number | null;
-                    exp?: number;
-                } | null;
-            };
+            data: boolean;
             message: string;
         };
         SystemAuthRefreshReq: {
@@ -3687,6 +3677,11 @@ export interface components {
                      * @default true
                      */
                     isEnabled: boolean;
+                    departmentName?: string | null;
+                    roleArr?: {
+                        label: string;
+                        value: string;
+                    }[];
                 } | null;
             };
             message: string;

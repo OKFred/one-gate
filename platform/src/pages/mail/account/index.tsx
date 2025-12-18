@@ -45,7 +45,7 @@ export default function MailAccountRefactored() {
       };
 
       const res = await listMailAccount({ data: requestData });
-      const response = res.data as { data?: { list?: MailAccount[]; total?: number } };
+      const response = res.data;
       const accountsList = response?.data?.list || [];
       const total = response?.data?.total || 0;
 

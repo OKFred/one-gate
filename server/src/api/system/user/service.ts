@@ -8,8 +8,8 @@ import {
   type userAddLike,
   type userLike,
 } from "./db.table";
-import { departmentTable } from "../department/db.table";
-import { roleTable } from "../role/db.table";
+import { getDepartmentNameById } from "@/api/system/department/service";
+import { getRolesByIds } from "@/api/system/role/service";
 import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
@@ -395,7 +395,7 @@ const verifyRes = {
             type: "object",
             properties: {
               label: { type: "string" },
-              value: { type: "string" },
+              value: { type: "number" },
             },
             required: ["label", "value"],
           },
@@ -432,30 +432,19 @@ async function onVerify(
   // Fetch department name
   let departmentName = null;
   if (userObj.departmentId) {
-    const dept = await db
-      .select({ name: departmentTable.name })
-      .from(departmentTable)
-      .where(eq(departmentTable.id, userObj.departmentId))
-      .limit(1);
-    if (dept.length > 0) {
-      departmentName = dept[0].name;
-    }
+    departmentName = await getDepartmentNameById(userObj.departmentId);
   }
 
   // Fetch roles
-  let roleArr: { label: string; value: string }[] = [];
+  let roleArr: { label: string; value: number }[] = [];
   if (userObj.roleIds) {
     const ids = userObj.roleIds
       .split(",")
       .map((id) => Number(id.trim()))
       .filter((id) => !isNaN(id));
     if (ids.length > 0) {
-      const roles = await db
-        .select({ id: roleTable.id, name: roleTable.name })
-        .from(roleTable)
-        .where(inArray(roleTable.id, ids));
-
-      roleArr = roles.map((r) => ({ label: r.name, value: String(r.id) }));
+      const roles = await getRolesByIds(ids);
+      roleArr = roles.map((o) => ({ label: o.name, value: o.id }));
     }
   }
 

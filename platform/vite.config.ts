@@ -10,10 +10,9 @@ const pathSrc = path.resolve(__dirname, 'src');
 async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }) {
   //npx openapi-typescript SERVER_URL/doc.json -o ./types/openapi.d.ts
   const { SERVER_URL, VITE_SERVER_URL } = env;
-  console.log('Generating API docs from', SERVER_URL || VITE_SERVER_URL);
-  const child = childProcess.exec(
-    `npx openapi-typescript ${SERVER_URL || VITE_SERVER_URL}/doc.json -o ./src/types/openapi.d.ts`,
-  );
+  const command = `npx openapi-typescript ${SERVER_URL || VITE_SERVER_URL}/doc.json -o ./src/types/openapi.d.ts`;
+  console.log('Executing command:', command);
+  const child = childProcess.exec(command);
   await new Promise((resolve, reject) => {
     child.on('close', (code) => {
       if (code === 0) {
@@ -59,11 +58,9 @@ export default defineConfig(({ command, mode }) => {
         },
       };
     }
-    try {
-      getAPIDocs(env);
-    } catch (e) {
-      console.error('getAPIDocs error', e);
-    }
+    getAPIDocs(env).catch((err) => {
+      console.error('Error generating API docs:', err);
+    });
   }
   return result;
 });

@@ -12,7 +12,7 @@ export type ListMailAccountParams = Parameters<typeof MailAPI.listMailAccount>[0
 export type ListMailAccountResponse = Awaited<ReturnType<typeof MailAPI.listMailAccount>>;
 export type ListMailAccountReq = NonNullable<ListMailAccountParams['data']>;
 export type ListMailAccountData = NonNullable<ListMailAccountResponse['data']>;
-export type MailAccountList = NonNullable<ListMailAccountData['list']>;
+export type MailAccountList = NonNullable<ListMailAccountData['data']['list']>;
 export type MailAccount = MailAccountList[number];
 
 // 筛选状态类型

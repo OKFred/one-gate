@@ -357,6 +357,20 @@ const getApi = {
   service: onGet,
 };
 
+/**
+ * 内部服务调用：根据ID获取部门名称
+ */
+export async function getDepartmentNameById(
+  id: number
+): Promise<string | null> {
+  const rows = await db
+    .select({ name: departmentTable.name })
+    .from(departmentTable)
+    .where(eq(departmentTable.id, id))
+    .limit(1);
+  return rows.length > 0 ? rows[0].name : null;
+}
+
 export default {
   add: addApi,
   delete: deleteApi,

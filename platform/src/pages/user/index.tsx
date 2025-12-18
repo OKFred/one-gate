@@ -6,12 +6,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CircularProgress, Alert, Box } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
-import { UserApiService, type User, type UserUpdateRequest } from '@/api/system/user';
+import * as UserApiService from '@/api/system/user';
 import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserProfile from './components/UserProfile';
 import UserDetails from './components/UserDetails';
 import UserEditDialog from './components/UserEditDialog';
+import type { UpdateUserParams, User } from './type';
 
 interface FormData {
   username: string;
@@ -31,19 +32,20 @@ export default function UserCenter() {
     setLoading(true);
     try {
       // 先从本地存储获取用户基本信息
-      const localUser = UserApiService.getCurrentUser();
+      const localUser = localStorage.getItem('userInfo');
       if (localUser) {
-        setCurrentUser(localUser);
-        
+        const parsedUser = JSON.parse(localUser);
         // 然后从服务器获取最新的用户信息
-        const response = await UserApiService.getUser({ id: localUser.id });
-        if (response.ok && response.data) {
-          setCurrentUser(response.data);
-          UserApiService.updateCurrentUser(response.data);
+        const response = await UserApiService.getFn({ data: { id: parsedUser.id } });
+        if (response.data) {
+          setCurrentUser(response.data.data);
         }
       }
     } catch (error) {
-      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '获取用户信息失败' });
+      showGlobalNotification({
+        type: 'error',
+        message: error instanceof Error ? error.message : '获取用户信息失败',
+      });
     } finally {
       setLoading(false);
     }
@@ -60,38 +62,40 @@ export default function UserCenter() {
   }, []);
 
   // 保存用户信息
-  const handleSave = useCallback(async (formData: FormData) => {
-    if (!currentUser) return;
+  const handleSave = useCallback(
+    async (formData: UpdateUserParams) => {
+      if (!currentUser) return;
 
-    setLoading(true);
-    try {
-      const updateData: UserUpdateRequest = {
-        id: currentUser.id,
-        username: formData.username,
-        department: formData.department,
-        role: formData.role,
-        isEnabled: formData.isEnabled,
-      };
+      setLoading(true);
+      if (!currentUser.id || !formData?.departmentId) return;
+      try {
+        const updateData: UpdateUserParams = {
+          id: currentUser.id,
+          username: formData?.username,
+          departmentId: formData?.departmentId,
+          roleIds: formData?.roleIds,
+          isEnabled: formData?.isEnabled || false,
+        };
 
-      // 只有输入了新密码才更新密码
-      if (formData.password.trim()) {
-        updateData.password = formData.password;
-      }
-
-      const response = await UserApiService.updateUser(updateData);
-      if (response.ok) {
+        // 只有输入了新密码才更新密码
+        if (formData.password && formData.password.trim()) {
+          updateData.password = formData.password;
+        }
+        await UserApiService.updateFn(updateData);
         showGlobalNotification({ type: 'success', message: '用户信息更新成功' });
         setEditDialogOpen(false);
-        await fetchCurrentUser(); // 重新获取用户信息
-      } else {
-        showGlobalNotification({ type: 'error', message: response.message || '更新失败' });
+        await fetchCurrentUser();
+      } catch (error) {
+        showGlobalNotification({
+          type: 'error',
+          message: error instanceof Error ? error.message : '更新用户信息失败',
+        });
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      showGlobalNotification({ type: 'error', message: error instanceof Error ? error.message : '更新用户信息失败' });
-    } finally {
-      setLoading(false);
-    }
-  }, [currentUser, fetchCurrentUser]);
+    },
+    [currentUser, fetchCurrentUser],
+  );
 
   // 刷新用户信息
   const handleRefresh = useCallback(() => {
@@ -131,9 +135,9 @@ export default function UserCenter() {
     <PageLayout
       title="我的"
       actions={
-        <ResponsiveButton 
-          variant="outlined" 
-          startIcon={<RefreshIcon />} 
+        <ResponsiveButton
+          variant="outlined"
+          startIcon={<RefreshIcon />}
           onClick={handleRefresh}
           disabled={loading}
         >
@@ -142,11 +146,7 @@ export default function UserCenter() {
       }
     >
       {/* 用户信息展示 */}
-      <Box 
-        display="grid" 
-        gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} 
-        gap={3}
-      >
+      <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3}>
         {/* 用户资料卡片 */}
         <Box>
           <UserProfile user={currentUser} onEdit={handleEdit} />
@@ -172,21 +172,21 @@ export default function UserCenter() {
 
 /**
  * 重构说明：
- * 
+ *
  * 1. 响应式设计：
  *    - 使用 PageLayout 提供统一的布局结构
  *    - 使用 ResponsiveButton 等响应式组件
  *    - Grid 布局自动适配移动端
- * 
+ *
  * 2. 组件解耦：
  *    - UserProfile: 用户资料卡片组件
  *    - UserDetails: 详细信息展示组件
  *    - UserEditDialog: 编辑对话框组件
- * 
+ *
  * 3. 性能优化：
  *    - 使用 useCallback 避免不必要的重渲染
  *    - 清晰的状态管理和数据流
- * 
+ *
  * 4. 用户体验：
  *    - 统一的错误处理和消息提示
  *    - 加载状态显示

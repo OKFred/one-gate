@@ -225,7 +225,7 @@ export default function MailSend() {
           return { accountId: undefined, mailAddress: undefined };
         }
       })();
-      const payload = {
+      const data = {
         ...form,
         senderObj,
         contentObj: {
@@ -236,7 +236,7 @@ export default function MailSend() {
               : undefined,
         },
       };
-      const res = await sendMail({ data: payload });
+      const res = await sendMail({ data });
       if (res.data && res.data.ok) {
         let msg = '邮件发送成功';
         if (typeof res.data.data === 'string') {

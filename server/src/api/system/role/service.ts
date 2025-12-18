@@ -7,7 +7,7 @@ import {
   type roleAddLike,
   type roleLike,
 } from "./db.table";
-import { asc, count, desc, eq, or, like } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
@@ -355,6 +355,20 @@ const getApi = {
   } as const,
   service: onGet,
 };
+
+/**
+ * 内部服务调用：根据ID数组获取角色列表
+ */
+export async function getRolesByIds(
+  ids: number[]
+): Promise<{ id: number; name: string }[]> {
+  if (ids.length === 0) return [];
+  const rows = await db
+    .select({ id: roleTable.id, name: roleTable.name })
+    .from(roleTable)
+    .where(inArray(roleTable.id, ids));
+  return rows;
+}
 
 export default {
   add: addApi,

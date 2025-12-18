@@ -29,13 +29,13 @@ const loginReq = {
 const loginRes = {
   type: "object",
   properties: {
-    token: {
-      type: "string",
-      description: "用户token",
-    },
     userObj: {
       type: "object",
       properties: {
+        token: {
+          type: "string",
+          description: "用户token",
+        },
         id: {
           type: "number",
           description: "用户ID",
@@ -57,11 +57,11 @@ const loginRes = {
           description: "是否启用",
         },
       },
-      required: ["id", "username", "roleIds", "isEnabled"] as const,
+      required: ["token", "id", "username", "roleIds", "isEnabled"] as const,
       additionalProperties: false,
     },
   },
-  required: ["token", "userObj"] as const,
+  required: ["userObj"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -85,8 +85,8 @@ async function onLogin(
   });
 
   return {
-    token,
     userObj: {
+      token,
       id,
       username,
       roleIds,
