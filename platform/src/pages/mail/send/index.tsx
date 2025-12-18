@@ -20,29 +20,16 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import JoditEditor from '@/components/JoditEditor/index';
-
-interface MailAccount {
-  id?: number;
-  mailAddress?: string;
-  nickname?: string;
-}
-
-interface MailTemplate {
-  id?: number;
-  name?: string;
-  title?: string;
-  langCode?: string;
-  content?: string;
-  creatorName?: string;
-  category?: string;
-}
+import type { ListMailAccount } from '../account/type';
+import type { ListMailTemplate } from '../template/type';
+import type { SendMailRequest } from './type';
 
 export default function MailSend() {
   // 邮箱账户列表
-  const [mailAccounts, setMailAccounts] = useState<MailAccount[]>([]);
+  const [mailAccounts, setMailAccounts] = useState<ListMailAccount[]>([]);
   const [accountsLoading, setAccountsLoading] = useState(false);
   // 邮件模板列表
-  const [mailTemplates, setMailTemplates] = useState<MailTemplate[]>([]);
+  const [mailTemplates, setMailTemplates] = useState<ListMailTemplate[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
   // All hooks and handlers must be inside the component
   const [form, setForm] = useState({
@@ -69,7 +56,7 @@ export default function MailSend() {
             pageSize: 100,
           },
         });
-        const response = res.data as { data?: { list?: MailAccount[]; total?: number } };
+        const response = res.data;
         if (res.data?.ok && response?.data?.list) {
           setMailAccounts(response.data.list);
         }
@@ -94,7 +81,7 @@ export default function MailSend() {
             pageSize: 100,
           },
         });
-        const response = res.data as { data?: { list?: MailTemplate[]; total?: number } };
+        const response = res.data;
         if (res.data?.ok && response?.data?.list) {
           setMailTemplates(response.data.list);
         }
@@ -217,27 +204,17 @@ export default function MailSend() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Only one of accountId or mailAddress should be set, the other must be undefined
-      const senderObj = (() => {
-        if (form.senderObj.accountId && form.senderObj.accountId !== '') {
-          return { accountId: Number(form.senderObj.accountId), mailAddress: undefined };
-        } else if (form.senderObj.mailAddress && form.senderObj.mailAddress !== '') {
-          return { accountId: undefined, mailAddress: form.senderObj.mailAddress };
-        } else {
-          return { accountId: undefined, mailAddress: undefined };
-        }
-      })();
-      const data = {
-        ...form,
-        senderObj,
-        contentObj: {
-          ...form.contentObj,
-          templateId:
-            form.contentObj.templateId && form.contentObj.templateId !== ''
-              ? Number(form.contentObj.templateId)
-              : undefined,
-        },
+      const data: SendMailRequest = {
+        accountId: Number(form.senderObj.accountId),
+        receiverArr: form.receiverArr,
+        templateId:
+          form.contentObj.templateId && form.contentObj.templateId !== ''
+            ? Number(form.contentObj.templateId)
+            : undefined,
+        subject: form.contentObj.subject,
+        html: form.contentObj.html,
       };
+
       const res = await mailActionAPI.sendFn({ data });
       if (res.data && res.data.ok) {
         let msg = '邮件发送成功';

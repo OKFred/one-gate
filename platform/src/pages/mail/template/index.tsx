@@ -1,9 +1,3 @@
-/**
- * 邮件模板管理页面
- * 使用响应式组件系统和FroalaEditor富文本编辑器
- * 参考邮件账户管理的架构和OpenAPI文档
- */
-
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
 import * as mailTemplateAPI from '@/api/mail/template';
