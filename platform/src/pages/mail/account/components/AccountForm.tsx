@@ -22,13 +22,13 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import type { MailAccountFormData } from '../type';
+import type { MailAccountForm } from '../type';
 
 interface AccountFormProps {
   open: boolean;
-  form: MailAccountFormData;
+  form: MailAccountForm;
   editId: number | null;
-  onFormChange: (form: MailAccountFormData) => void;
+  onFormChange: (form: MailAccountForm) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }

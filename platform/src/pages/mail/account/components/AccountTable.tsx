@@ -18,12 +18,12 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import type { MailAccount } from '../type';
+import type { ListMailAccount } from '../type';
 
 interface AccountTableProps {
-  accounts: MailAccount[];
+  accounts: ListMailAccount[];
   loading: boolean;
-  onEdit: (account: MailAccount) => void;
+  onEdit: (account: ListMailAccount) => void;
   onDelete: (id: number) => void;
 }
 

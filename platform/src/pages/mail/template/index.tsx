@@ -6,12 +6,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
-import {
-  listMailTemplate,
-  addMailTemplate,
-  updateMailTemplate,
-  deleteMailTemplate,
-} from '@/api/mail';
+import * as mailTemplateAPI from '@/api/mail/template';
 import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import TemplateForm from './components/TemplateForm';
@@ -72,7 +67,7 @@ export default function MailTemplate() {
         descend: searchParams.descend,
       };
 
-      const res = await listMailTemplate({ data: requestData });
+      const res = await mailTemplateAPI.listFn({ data: requestData });
       const response = res.data as { data?: { list?: MailTemplate[]; total?: number } };
       const templatesList = response?.data?.list || [];
       const total = response?.data?.total || 0;
@@ -145,7 +140,7 @@ export default function MailTemplate() {
   // 删除模板
   const handleDelete = async (id: number) => {
     try {
-      const res = await deleteMailTemplate({ data: { id } });
+      const res = await mailTemplateAPI.deleteFn({ data: { id } });
       if (res.data?.ok) {
         showGlobalNotification({
           message: '删除成功',
@@ -175,7 +170,7 @@ export default function MailTemplate() {
     try {
       let res;
       if (editId) {
-        res = await updateMailTemplate({
+        res = await mailTemplateAPI.updateFn({
           data: {
             id: editId,
             ...form,
@@ -185,11 +180,11 @@ export default function MailTemplate() {
           },
         });
       } else {
-        res = await addMailTemplate({
+        res = await mailTemplateAPI.addFn({
           data: {
             ...form,
             // 过滤空字符串，使可选字段正确传递
-            langCode: form.langCode || undefined,
+            langCode: form.langCode,
             category: form.category || undefined,
           },
         });

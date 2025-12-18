@@ -5,15 +5,15 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
-import { listMailAccount, addMailAccount, updateMailAccount, deleteMailAccount } from '@/api/mail';
+import * as mailAccountAPI from '@/api/mail/account';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import AccountForm from './components/AccountForm';
 import AccountTable from './components/AccountTable';
 import AccountFilter from './components/AccountFilter';
-import type { MailAccount, FilterState, MailAccountFormData } from './type';
+import type { ListMailAccount, FilterState, MailAccountForm } from './type';
 
 export default function MailAccountRefactored() {
-  const [accounts, setAccounts] = useState<MailAccount[]>([]);
+  const [accounts, setAccounts] = useState<ListMailAccount[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -23,7 +23,7 @@ export default function MailAccountRefactored() {
     orderBy: 'id',
     descend: false,
   });
-  const [form, setForm] = useState<MailAccountFormData>({
+  const [form, setForm] = useState<MailAccountForm>({
     nickname: '',
     mailAddress: '',
     host: '',
@@ -44,7 +44,7 @@ export default function MailAccountRefactored() {
         descend: searchParams.descend,
       };
 
-      const res = await listMailAccount({ data: requestData });
+      const res = await mailAccountAPI.listFn({ data: requestData });
       const response = res.data;
       const accountsList = response?.data?.list || [];
       const total = response?.data?.total || 0;
@@ -72,7 +72,7 @@ export default function MailAccountRefactored() {
     });
   }, [fetchAccounts]);
 
-  const handleEdit = (acc: MailAccount) => {
+  const handleEdit = (acc: ListMailAccount) => {
     setEditId(acc.id!);
     setForm({
       nickname: acc.nickname || '',
@@ -101,7 +101,7 @@ export default function MailAccountRefactored() {
   };
 
   const handleDelete = async (id: number) => {
-    await deleteMailAccount({ data: { id } });
+    await mailAccountAPI.deleteFn({ data: { id } });
     fetchAccounts(filters);
   };
 
@@ -113,9 +113,9 @@ export default function MailAccountRefactored() {
     };
 
     if (editId) {
-      await updateMailAccount({ data: { id: editId, ...formData } });
+      await mailAccountAPI.updateFn({ data: { id: editId, ...formData } });
     } else {
-      await addMailAccount({ data: formData });
+      await mailAccountAPI.addFn({ data: formData });
     }
     handleCancel();
     fetchAccounts(filters);

@@ -5,7 +5,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
-import { listMailLog } from '@/api/mail';
+import * as mailLogAPI from '@/api/mail/log';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import LogFilter from './components/LogFilter';
 import LogTable from './components/LogTable';
@@ -54,7 +54,7 @@ export default function MailLogRefactored() {
         descend: searchParams.descend,
       };
 
-      const res = await listMailLog({ data: requestData });
+      const res = await mailLogAPI.listFn({ data: requestData });
       const response = res.data as { data?: { list?: MailLog[]; total?: number } };
       const logsList = response?.data?.list || [];
       const total = response?.data?.total || 0;
@@ -109,18 +109,10 @@ export default function MailLogRefactored() {
       <LogFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
 
       {/* 数据表格 */}
-      <LogTable
-        logs={logs}
-        loading={loading}
-        onView={handleViewLog}
-      />
+      <LogTable logs={logs} loading={loading} onView={handleViewLog} />
 
       {/* 详情对话框 */}
-      <LogDetail
-        open={detailOpen}
-        log={selectedLog}
-        onClose={handleCloseDetail}
-      />
+      <LogDetail open={detailOpen} log={selectedLog} onClose={handleCloseDetail} />
     </PageLayout>
   );
 }

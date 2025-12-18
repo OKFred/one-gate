@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { sendMail, listMailAccount, listMailTemplate } from '@/api/mail';
+import * as mailAccountAPI from '@/api/mail/account';
+import * as mailTemplateAPI from '@/api/mail/template';
+import * as mailActionAPI from '@/api/mail/action';
 import { showGlobalNotification } from '@/utils/notification';
 import {
   Box,
@@ -61,7 +63,7 @@ export default function MailSend() {
     const fetchAccounts = async () => {
       setAccountsLoading(true);
       try {
-        const res = await listMailAccount({
+        const res = await mailAccountAPI.listFn({
           data: {
             pageNo: 1,
             pageSize: 100,
@@ -86,7 +88,7 @@ export default function MailSend() {
     const fetchTemplates = async () => {
       setTemplatesLoading(true);
       try {
-        const res = await listMailTemplate({
+        const res = await mailTemplateAPI.listFn({
           data: {
             pageNo: 1,
             pageSize: 100,
@@ -236,7 +238,7 @@ export default function MailSend() {
               : undefined,
         },
       };
-      const res = await sendMail({ data });
+      const res = await mailActionAPI.sendFn({ data });
       if (res.data && res.data.ok) {
         let msg = '邮件发送成功';
         if (typeof res.data.data === 'string') {
