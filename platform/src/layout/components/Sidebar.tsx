@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 import Drawer from '@mui/material/Drawer';
+import SwipeableDrawer from '@mui/material/SwipeableDrawer';
 import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -24,6 +25,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const { isMobile } = useResponsive();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const [navItems, setNavItems] = useState<MenuItem[]>([]);
+  // 移动端：底部抽屉状态
+  const [bottomDrawerOpen, setBottomDrawerOpen] = useState(false);
+  const [activeParentMenu, setActiveParentMenu] = useState<MenuItem | null>(null);
 
   // 异步加载菜单数据
   useEffect(() => {
@@ -42,6 +46,25 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
       }));
     } else if (item.path) {
       navigate(item.path);
+    }
+  };
+
+  // 移动端：处理底部菜单点击
+  const handleMobileMenuClick = (item: MenuItem) => {
+    if (item.children && item.children.length > 0) {
+      setActiveParentMenu(item);
+      setBottomDrawerOpen(true);
+    } else if (item.path) {
+      navigate(item.path);
+    }
+  };
+
+  // 移动端：处理子菜单点击
+  const handleSubMenuClick = (item: MenuItem) => {
+    if (item.path) {
+      navigate(item.path);
+      setBottomDrawerOpen(false);
+      setActiveParentMenu(null);
     }
   };
 
@@ -139,30 +162,103 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
             px: 1,
           }}
         >
-          {navItems.map((item) => (
-            <Box
-              key={item.id}
-              sx={{
-                flex: '0 0 auto',
-                minWidth: 120,
-                textAlign: 'center',
-                py: 1,
-                px: 1.5,
-                cursor: 'pointer',
-                color: 'text.secondary',
-                '&:active': { color: 'primary.main' },
-                transition: 'color 0.2s ease',
-              }}
-              onClick={() => (item.path ? navigate(item.path) : navigate('/mail'))}
-            >
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5 }}>
-                <Icon name={item.icon} size={24} />
+          {navItems.map((item) => {
+            const hasChildren = item.children && item.children.length > 0;
+            return (
+              <Box
+                key={item.id}
+                sx={{
+                  flex: '0 0 auto',
+                  minWidth: 72,
+                  textAlign: 'center',
+                  py: 1,
+                  px: 1,
+                  cursor: 'pointer',
+                  color: 'text.secondary',
+                  '&:active': { color: 'primary.main' },
+                  transition: 'color 0.2s ease',
+                }}
+                onClick={() => handleMobileMenuClick(item)}
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5, position: 'relative' }}>
+                  <Icon name={item.icon} size={24} />
+                  {hasChildren && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: -2,
+                        right: 8,
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        bgcolor: 'primary.main',
+                      }}
+                    />
+                  )}
+                </Box>
+                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>{item.text}</Typography>
               </Box>
-              <Typography variant="caption">{item.text}</Typography>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
       ) : null}
+
+      {/* 子菜单上拉抽屉 */}
+      <SwipeableDrawer
+        anchor="bottom"
+        open={bottomDrawerOpen}
+        onClose={() => {
+          setBottomDrawerOpen(false);
+          setActiveParentMenu(null);
+        }}
+        onOpen={() => {}}
+        disableSwipeToOpen
+        sx={{
+          '& .MuiDrawer-paper': {
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            maxHeight: '60vh',
+          },
+        }}
+      >
+        {/* 拖拽指示条 */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 1.5 }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 4,
+              borderRadius: 2,
+              bgcolor: 'grey.300',
+            }}
+          />
+        </Box>
+
+        {/* 标题 */}
+        {activeParentMenu && (
+          <Box sx={{ px: 2, pb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Icon name={activeParentMenu.icon} size={20} />
+            <Typography variant="subtitle1" fontWeight={600}>
+              {activeParentMenu.text}
+            </Typography>
+          </Box>
+        )}
+
+        {/* 子菜单列表 */}
+        <List sx={{ pb: 2 }}>
+          {activeParentMenu?.children?.map((child) => (
+            <ListItemButton
+              key={child.id}
+              onClick={() => handleSubMenuClick(child)}
+              sx={{ py: 1.5 }}
+            >
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                {child.icon && <Icon name={child.icon} size={22} />}
+              </ListItemIcon>
+              <ListItemText primary={child.text} />
+            </ListItemButton>
+          ))}
+        </List>
+      </SwipeableDrawer>
     </Box>
   );
 
