@@ -12,7 +12,8 @@ import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router';
 import { useResponsive } from '../responsive';
 import Icon from '@/components/Icon';
-import { getMenuList, type MenuItem } from '@/api/system/menu';
+import { treeFn } from '@/api/system/menu';
+import type { SystemMenuTree } from './type';
 
 const drawerWidth = 240;
 
@@ -24,21 +25,21 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
-  const [navItems, setNavItems] = useState<MenuItem[]>([]);
+  const [navItems, setNavItems] = useState<SystemMenuTree[]>([]);
   // 移动端：底部抽屉状态
   const [bottomDrawerOpen, setBottomDrawerOpen] = useState(false);
-  const [activeParentMenu, setActiveParentMenu] = useState<MenuItem | null>(null);
+  const [activeParentMenu, setActiveParentMenu] = useState<SystemMenuTree | null>(null);
 
   // 异步加载菜单数据
   useEffect(() => {
     const loadMenus = async () => {
-      const resData = await getMenuList();
+      const resData = await treeFn();
       setNavItems(resData.data.data);
     };
     loadMenus();
   }, []);
 
-  const handleMenuClick = (item: MenuItem) => {
+  const handleMenuClick = (item: SystemMenuTree) => {
     if (item.children && item.children.length > 0) {
       setExpandedMenus((prev) => ({
         ...prev,
@@ -50,7 +51,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   };
 
   // 移动端：处理底部菜单点击
-  const handleMobileMenuClick = (item: MenuItem) => {
+  const handleMobileMenuClick = (item: SystemMenuTree) => {
     if (item.children && item.children.length > 0) {
       setActiveParentMenu(item);
       setBottomDrawerOpen(true);
@@ -60,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   };
 
   // 移动端：处理子菜单点击
-  const handleSubMenuClick = (item: MenuItem) => {
+  const handleSubMenuClick = (item: SystemMenuTree) => {
     if (item.path) {
       navigate(item.path);
       setBottomDrawerOpen(false);
@@ -69,7 +70,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   };
 
   // 渲染菜单项
-  const renderMenuItem = (item: MenuItem, level = 0) => {
+  const renderSystemMenuTree = (item: SystemMenuTree, level = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedMenus[String(item.id)];
 
@@ -90,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
         {hasChildren && (
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {item.children!.map((child) => renderMenuItem(child, level + 1))}
+              {item.children!.map((child) => renderSystemMenuTree(child, level + 1))}
             </List>
           </Collapse>
         )}
@@ -131,7 +132,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
               </Typography>
             </div>
             {navItems && navItems.length > 0 ? (
-              <List className="pb-0! pt-0!">{navItems.map((item) => renderMenuItem(item))}</List>
+              <List className="pb-0! pt-0!">
+                {navItems.map((item) => renderSystemMenuTree(item))}
+              </List>
             ) : null}
           </div>
         </div>
@@ -180,7 +183,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
                 }}
                 onClick={() => handleMobileMenuClick(item)}
               >
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5, position: 'relative' }}>
+                <Box
+                  sx={{ display: 'flex', justifyContent: 'center', mb: 0.5, position: 'relative' }}
+                >
                   <Icon name={item.icon} size={24} />
                   {hasChildren && (
                     <Box
@@ -196,7 +201,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
                     />
                   )}
                 </Box>
-                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>{item.text}</Typography>
+                <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                  {item.text}
+                </Typography>
               </Box>
             );
           })}
