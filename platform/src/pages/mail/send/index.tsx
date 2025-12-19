@@ -178,6 +178,8 @@ export default function MailSend() {
         ...f,
         contentObj: {
           ...f.contentObj,
+          subject: '',
+          html: '',
           templateId: '',
         },
       }));
@@ -245,7 +247,7 @@ export default function MailSend() {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
+    <Box sx={{ mx: 'auto', p: 3 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" gutterBottom fontWeight={600}>
           发送邮件
