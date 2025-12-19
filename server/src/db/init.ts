@@ -86,7 +86,7 @@ async function initSuperAdminUser(roleId: number) {
       .values({
         username: SUPER_ADMIN.username,
         password: hashedPassword,
-        roleIds: String(roleId), // 关联超级管理员角色
+        roleIdArr: [roleId], // 关联超级管理员角色
         isEnabled: true,
       })
       .returning({ id: userTable.id });

@@ -11,7 +11,7 @@ import {
   Edit as EditIcon 
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User } from '@/api/system/user';
+import type { User } from '@/pages/user/type.d';
 
 interface UserDetailsProps {
   user: User;
@@ -58,19 +58,19 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
             
             <Box>
               <Typography variant="body2" color="text.secondary">
-                部门
+                部门ID
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.department}
+                {user.departmentId || '未分配'}
               </Typography>
             </Box>
             
             <Box>
               <Typography variant="body2" color="text.secondary">
-                角色
+                角色ID
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.role}
+                {user.roleIdArr?.join(', ') || '未分配'}
               </Typography>
             </Box>
             

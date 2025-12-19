@@ -28,7 +28,7 @@ const addReq = {
   properties: {
     ...userData,
   } satisfies Partial<Record<keyof userAddLike, JSONSchema>>,
-  required: ["username", "password", "roleIds"],
+  required: ["username", "password", "roleIdArr"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -38,7 +38,7 @@ async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const { username, password, departmentId, roleIds, isEnabled = true } = obj;
+  const { username, password, departmentId, roleIdArr, isEnabled = true } = obj;
 
   // 密码加盐处理
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -49,7 +49,7 @@ async function onAdd(
       username,
       password: hashedPassword,
       departmentId,
-      roleIds,
+      roleIdArr,
       isEnabled,
     } satisfies userAddLike)
     .returning({ id: userTable.id });
@@ -115,7 +115,7 @@ const listReq = {
         "id",
         "username",
         "departmentId",
-        "roleIds",
+        "roleIdArr",
         "createTimeUtc",
       ] satisfies (keyof userLike)[],
     },
@@ -147,7 +147,7 @@ const listRes = {
           ...userIndex,
           username: userData.username,
           departmentId: userData.departmentId,
-          roleIds: userData.roleIds,
+          roleIdArr: userData.roleIdArr,
           isEnabled: userData.isEnabled,
           ...userAudit,
           // 注意：不返回密码字段
@@ -189,7 +189,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
               id: userTable.id,
               username: userTable.username,
               departmentId: userTable.departmentId,
-              roleIds: userTable.roleIds,
+              roleIdArr: userTable.roleIdArr,
               isEnabled: userTable.isEnabled,
               createTimeUtc: userTable.createTimeUtc,
               updateTimeUtc: userTable.updateTimeUtc,
@@ -199,13 +199,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
       .from(userTable)
       .where(
         and(
-          keyword
-            ? or(
-                like(userTable.username, `%${keyword}%`),
-                like(userTable.departmentId, `%${keyword}%`),
-                like(userTable.roleIds, `%${keyword}%`)
-              )
-            : undefined,
+          keyword ? or(like(userTable.username, `%${keyword}%`)) : undefined,
           isEnabled !== undefined
             ? eq(userTable.isEnabled, isEnabled)
             : undefined
@@ -266,7 +260,7 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
-  const { id, password, isEnabled, ...rest } = obj;
+  const { id, password, isEnabled, roleIdArr, ...rest } = obj;
   // 如果更新密码，需要重新加盐
   let updateData: any = {
     ...rest,
@@ -313,7 +307,7 @@ const getRes = {
     ...userIndex,
     username: userData.username,
     departmentId: userData.departmentId,
-    roleIds: userData.roleIds,
+    roleIdArr: userData.roleIdArr,
     isEnabled: userData.isEnabled,
     ...userAudit,
     // 注意：不返回密码字段
@@ -329,7 +323,7 @@ async function onGet(
       id: userTable.id,
       username: userTable.username,
       departmentId: userTable.departmentId,
-      roleIds: userTable.roleIds,
+      roleIdArr: userTable.roleIdArr,
       isEnabled: userTable.isEnabled,
       createTimeUtc: userTable.createTimeUtc,
       updateTimeUtc: userTable.updateTimeUtc,
@@ -386,7 +380,6 @@ const verifyRes = {
         ...userIndex,
         username: userData.username,
         departmentId: userData.departmentId,
-        roleIds: userData.roleIds,
         isEnabled: userData.isEnabled,
         departmentName: { type: "string", nullable: true },
         roleArr: {
@@ -435,17 +428,11 @@ async function onVerify(
     departmentName = await getDepartmentNameById(userObj.departmentId);
   }
 
-  // Fetch roles
   let roleArr: { label: string; value: number }[] = [];
-  if (userObj.roleIds) {
-    const ids = userObj.roleIds
-      .split(",")
-      .map((id) => Number(id.trim()))
-      .filter((id) => !isNaN(id));
-    if (ids.length > 0) {
-      const roles = await getRolesByIds(ids);
-      roleArr = roles.map((o) => ({ label: o.name, value: o.id }));
-    }
+  const roleIdArr = userObj.roleIdArr;
+  if (roleIdArr.length > 0) {
+    const roles = await getRolesByIds(roleIdArr);
+    roleArr = roles.map((o) => ({ label: o.name, value: o.id }));
   }
 
   return {

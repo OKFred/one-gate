@@ -14,20 +14,23 @@ import {
   Box,
   CircularProgress,
   IconButton,
+  Chip,
+  OutlinedInput,
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Settings as SettingsIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User } from '@/api/system/user';
+import type { User } from '@/pages/user/type.d';
 
 interface FormData {
   username: string;
   password: string;
-  department: string;
-  role: string;
+  departmentId: number | null;
+  roleIdArr: number[];
   isEnabled: boolean;
 }
 
@@ -39,6 +42,13 @@ interface UserEditDialogProps {
   onSave: (formData: FormData) => void;
 }
 
+// 预定义的角色选项
+const roleOptions = [
+  { value: 1, label: '超级管理员' },
+  { value: 2, label: '管理员' },
+  { value: 3, label: '普通用户' },
+];
+
 export default function UserEditDialog({ 
   open, 
   user, 
@@ -49,8 +59,8 @@ export default function UserEditDialog({
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
-    department: '',
-    role: '',
+    departmentId: null,
+    roleIdArr: [],
     isEnabled: true,
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -59,18 +69,24 @@ export default function UserEditDialog({
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username,
+        username: user.username || '',
         password: '',
-        department: user.department,
-        role: user.role,
+        departmentId: user.departmentId || null,
+        roleIdArr: user.roleIdArr || [],
         isEnabled: user.isEnabled,
       });
     }
   }, [user]);
 
   // 处理表单数据变化
-  const handleFormChange = (field: keyof FormData, value: string | boolean) => {
+  const handleFormChange = (field: keyof FormData, value: string | boolean | number | null | number[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // 处理角色多选变化
+  const handleRoleChange = (event: SelectChangeEvent<number[]>) => {
+    const value = event.target.value;
+    handleFormChange('roleIdArr', typeof value === 'string' ? value.split(',').map(Number) : value);
   };
 
   // 处理保存
@@ -134,23 +150,34 @@ export default function UserEditDialog({
           
           <TextField
             fullWidth
-            label="部门"
-            value={formData.department}
-            onChange={(e) => handleFormChange('department', e.target.value)}
+            label="部门ID"
+            type="number"
+            value={formData.departmentId || ''}
+            onChange={(e) => handleFormChange('departmentId', e.target.value ? Number(e.target.value) : null)}
             margin="normal"
-            required
           />
           
           <FormControl fullWidth margin="normal" required>
             <InputLabel>角色</InputLabel>
             <Select
-              value={formData.role}
-              label="角色"
-              onChange={(e) => handleFormChange('role', e.target.value)}
+              multiple
+              value={formData.roleIdArr}
+              onChange={handleRoleChange}
+              input={<OutlinedInput label="角色" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => {
+                    const role = roleOptions.find(r => r.value === value);
+                    return <Chip key={value} label={role?.label || value} size="small" />;
+                  })}
+                </Box>
+              )}
             >
-              <MenuItem value="管理员">管理员</MenuItem>
-              <MenuItem value="普通用户">普通用户</MenuItem>
-              <MenuItem value="操作员">操作员</MenuItem>
+              {roleOptions.map((role) => (
+                <MenuItem key={role.value} value={role.value}>
+                  {role.label}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
           

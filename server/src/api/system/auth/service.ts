@@ -44,9 +44,10 @@ const loginRes = {
           type: "string",
           description: "用户名",
         },
-        roleIds: {
-          type: "string",
-          description: "角色ID列表，逗号分隔",
+        roleIdArr: {
+          type: "array",
+          description: "角色ID列表",
+          items: { type: "number", description: "角色ID" },
         },
         departmentId: {
           type: ["number", "null"],
@@ -57,7 +58,7 @@ const loginRes = {
           description: "是否启用",
         },
       },
-      required: ["token", "id", "username", "roleIds", "isEnabled"] as const,
+      required: ["token", "id", "username", "roleIdArr", "isEnabled"] as const,
       additionalProperties: false,
     },
   },
@@ -77,7 +78,7 @@ async function onLogin(
       }
     );
   const userObj = verifyResult.userObj;
-  const { id, username, roleIds, departmentId, isEnabled } = userObj;
+  const { id, username, roleIdArr, departmentId, isEnabled } = userObj;
   // 生成token
   const token = tokenUtils.generateToken({
     userId: id,
@@ -89,7 +90,7 @@ async function onLogin(
       token,
       id,
       username,
-      roleIds,
+      roleIdArr,
       departmentId: departmentId ?? null,
       isEnabled,
     },

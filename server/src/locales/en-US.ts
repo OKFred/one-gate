@@ -18,6 +18,8 @@ export default {
   "i18n.api.notExistOrDisabled": "Data does not exist or has been disabled",
   "i18n.api.system.department.hasChildren":
     "The department has child departments and cannot be deleted",
+  "i18n.api.system.menu.hasChildren":
+    "The menu has child menus and cannot be deleted",
   "i18n.api.system.wechatNotImplemented":
     "WeChat login is not yet implemented, WeChat developer credentials need to be configured",
   "i18n.api.mail.sslAndStarttlsConflict":

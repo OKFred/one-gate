@@ -37,10 +37,11 @@ export const userData = {
     description: "部门ID",
     examples: [1],
   },
-  roleIds: {
-    type: "string",
-    description: "角色ID列表，逗号分隔",
-    examples: ["1,2,3"],
+  roleIdArr: {
+    type: "array",
+    items: { type: "number" },
+    description: "角色ID数组",
+    examples: [[1, 2, 3]],
   },
   isEnabled: {
     type: "boolean",
@@ -71,7 +72,7 @@ export const userTable = sqliteTable("system_user", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   departmentId: integer("department_id"),
-  roleIds: text("role_ids").notNull(),
+  roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
   createTimeUtc: integer("create_time_utc")
     .notNull()
@@ -86,7 +87,7 @@ export async function tableInit() {
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             department_id INTEGER,
-            role_ids TEXT NOT NULL,
+            role_id_arr TEXT NOT NULL,
             is_enabled INTEGER NOT NULL DEFAULT 1,
             create_time_utc INTEGER DEFAULT (
               CAST(strftime('%s', 'now') AS INTEGER) * 1000 +

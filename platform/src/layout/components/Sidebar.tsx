@@ -28,8 +28,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   // 异步加载菜单数据
   useEffect(() => {
     const loadMenus = async () => {
-      const menus = await getMenuList();
-      setNavItems(menus);
+      const resData = await getMenuList();
+      setNavItems(resData.data.data);
     };
     loadMenus();
   }, []);
@@ -38,7 +38,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
     if (item.children && item.children.length > 0) {
       setExpandedMenus((prev) => ({
         ...prev,
-        [item.id]: !prev[item.id],
+        [String(item.id)]: !prev[String(item.id)],
       }));
     } else if (item.path) {
       navigate(item.path);
@@ -48,16 +48,21 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
   // 渲染菜单项
   const renderMenuItem = (item: MenuItem, level = 0) => {
     const hasChildren = item.children && item.children.length > 0;
-    const isExpanded = expandedMenus[item.id];
+    const isExpanded = expandedMenus[String(item.id)];
 
     return (
       <React.Fragment key={item.id}>
         <ListItemButton onClick={() => handleMenuClick(item)} sx={{ pl: level > 0 ? 4 : 2 }}>
           <ListItemIcon sx={{ minWidth: 40 }}>
-            <Icon name={item.icon} size={24} />
+            {item.icon && <Icon name={item.icon} size={24} />}
           </ListItemIcon>
           <ListItemText primary={item.text} />
-          {hasChildren && <Icon name={isExpanded ? 'expand-less' : 'expand-more'} size={24} />}
+          {hasChildren && (
+            <Icon
+              name={isExpanded ? 'material-symbols:expand-less' : 'material-symbols:expand-more'}
+              size={20}
+            />
+          )}
         </ListItemButton>
         {hasChildren && (
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
@@ -102,7 +107,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
                 OKFred平台
               </Typography>
             </div>
-            <List className="pb-0! pt-0!">{navItems.map((item) => renderMenuItem(item))}</List>
+            {navItems && navItems.length > 0 ? (
+              <List className="pb-0! pt-0!">{navItems.map((item) => renderMenuItem(item))}</List>
+            ) : null}
           </div>
         </div>
       </Drawer>
@@ -124,36 +131,38 @@ const Sidebar: React.FC<SidebarProps> = ({ open }) => {
         boxShadow: '0 -2px 8px rgba(0,0,0,0.04)',
       }}
     >
-      <Box
-        sx={{
-          overflowX: 'auto',
-          display: 'flex',
-          px: 1,
-        }}
-      >
-        {navItems.map((item) => (
-          <Box
-            key={item.id}
-            sx={{
-              flex: '0 0 auto',
-              minWidth: 120,
-              textAlign: 'center',
-              py: 1,
-              px: 1.5,
-              cursor: 'pointer',
-              color: 'text.secondary',
-              '&:active': { color: 'primary.main' },
-              transition: 'color 0.2s ease',
-            }}
-            onClick={() => (item.path ? navigate(item.path) : navigate('/mail'))}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5 }}>
-              <Icon name={item.icon} size={24} />
+      {navItems && navItems.length > 0 ? (
+        <Box
+          sx={{
+            overflowX: 'auto',
+            display: 'flex',
+            px: 1,
+          }}
+        >
+          {navItems.map((item) => (
+            <Box
+              key={item.id}
+              sx={{
+                flex: '0 0 auto',
+                minWidth: 120,
+                textAlign: 'center',
+                py: 1,
+                px: 1.5,
+                cursor: 'pointer',
+                color: 'text.secondary',
+                '&:active': { color: 'primary.main' },
+                transition: 'color 0.2s ease',
+              }}
+              onClick={() => (item.path ? navigate(item.path) : navigate('/mail'))}
+            >
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 0.5 }}>
+                <Icon name={item.icon} size={24} />
+              </Box>
+              <Typography variant="caption">{item.text}</Typography>
             </Box>
-            <Typography variant="caption">{item.text}</Typography>
-          </Box>
-        ))}
-      </Box>
+          ))}
+        </Box>
+      ) : null}
     </Box>
   );
 

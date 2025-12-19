@@ -38,7 +38,7 @@ export const authMiddleware = async (c: NodeHonoContext) => {
       .select({
         id: userTable.id,
         username: userTable.username,
-        roleIds: userTable.roleIds,
+        roleIdArr: userTable.roleIdArr,
         departmentId: userTable.departmentId,
         isEnabled: userTable.isEnabled,
       })
@@ -70,7 +70,7 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     c.set("userObj", {
       userId: user.id,
       username: user.username,
-      roleIds: user.roleIds || "",
+      roleIdArr: user.roleIdArr ? user.roleIdArr : [],
       departmentId: user.departmentId || null,
     });
   } catch (error) {
@@ -87,7 +87,7 @@ export const authMiddleware = async (c: NodeHonoContext) => {
 };
 
 // 角色权限检查中间件
-export const roleMiddleware = (allowedRoles: string[]) => {
+export const roleMiddleware = (allowedRoles: number[]) => {
   return async (c: NodeHonoContext) => {
     if (!c.get("userObj")) {
       throw new HTTPException(
@@ -98,7 +98,9 @@ export const roleMiddleware = (allowedRoles: string[]) => {
       );
     }
 
-    if (!allowedRoles.includes(c.get("userObj").roleIds)) {
+    if (
+      !allowedRoles.some((role) => c.get("userObj").roleIdArr.includes(role))
+    ) {
       throw new HTTPException(
         httpStatusCode.FORBIDDEN as ContentfulStatusCode,
         {

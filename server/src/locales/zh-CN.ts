@@ -17,6 +17,7 @@ export default {
   "i18n.api.system.insufficientPermission": "权限不足",
   "i18n.api.notExistOrDisabled": "数据不存在或已被禁用",
   "i18n.api.system.department.hasChildren": "该部门存在子部门，无法删除",
+  "i18n.api.system.menu.hasChildren": "该菜单存在子菜单，无法删除",
   "i18n.api.system.wechatNotImplemented":
     "微信登录暂未实现，需要配置微信开发者信息",
   "i18n.api.mail.sslAndStarttlsConflict": "SSL 和 STARTTLS 不能同时启用",

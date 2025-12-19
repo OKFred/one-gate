@@ -1512,6 +1512,354 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/menu/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加菜单 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/menu/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除菜单 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/menu/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取菜单列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/menu/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新菜单 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/menu/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取菜单信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/menu/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取树形菜单（根据用户角色过滤） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuTreeReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuTreeRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/role/add": {
         parameters: {
             query?: never;
@@ -2960,8 +3308,8 @@ export interface components {
                     id: number;
                     /** @description 用户名 */
                     username: string;
-                    /** @description 角色ID列表，逗号分隔 */
-                    roleIds: string;
+                    /** @description 角色ID列表 */
+                    roleIdArr: number[];
                     /** @description 部门ID */
                     departmentId?: number | null;
                     /** @description 是否启用 */
@@ -2992,8 +3340,8 @@ export interface components {
                     id: number;
                     /** @description 用户名 */
                     username: string;
-                    /** @description 角色ID列表，逗号分隔 */
-                    roleIds: string;
+                    /** @description 角色ID列表 */
+                    roleIdArr: number[];
                     /** @description 部门ID */
                     departmentId?: number | null;
                     /** @description 是否启用 */
@@ -3225,6 +3573,293 @@ export interface components {
             };
             message: string;
         };
+        SystemMenuAddReq: {
+            /**
+             * @description 菜单名称
+             * @example 主页
+             */
+            text: string;
+            /**
+             * @description 图标名称，使用 Iconify material-symbols 图标
+             * @example material-symbols:home
+             */
+            icon: string;
+            /**
+             * @description 路由路径
+             * @example /home
+             */
+            path?: ((string | null) | null) | null;
+            /** @description 父菜单ID，支持菜单层级 */
+            parentId?: ((number | null) | null) | null;
+            /**
+             * @description 排序
+             * @default 0
+             */
+            sort: number;
+            /**
+             * @description 需要的角色ID列表
+             * @example [
+             *       1,
+             *       2
+             *     ]
+             */
+            roleIdArr?: number[];
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        SystemMenuAddRes: {
+            ok: boolean;
+            /**
+             * @description 菜单ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemMenuDeleteReq: {
+            /**
+             * @description 菜单ID
+             * @example 1
+             */
+            id: number;
+        };
+        SystemMenuDeleteRes: {
+            ok: boolean;
+            /**
+             * @description 菜单ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemMenuListReq: {
+            /** @enum {string} */
+            orderBy?: "id" | "text" | "sort" | "createTimeUtc";
+            descend?: boolean;
+            /** @default 1 */
+            pageNo: number;
+            /** @default 10 */
+            pageSize: number;
+            /** @example  */
+            keyword?: string;
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+            /** @description 父菜单ID，支持菜单层级 */
+            parentId?: ((number | null) | null) | null;
+        };
+        SystemMenuListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total?: number;
+                /** @description 总页数 */
+                totalPage?: number;
+                /** @description 当前页码 */
+                currentPage?: number;
+                /** @description 每页记录数 */
+                pageSize?: number;
+                list?: {
+                    /**
+                     * @description 菜单ID
+                     * @example 1
+                     */
+                    id?: number;
+                    /**
+                     * @description 菜单名称
+                     * @example 主页
+                     */
+                    text?: string;
+                    /**
+                     * @description 图标名称，使用 Iconify material-symbols 图标
+                     * @example material-symbols:home
+                     */
+                    icon?: string;
+                    /**
+                     * @description 路由路径
+                     * @example /home
+                     */
+                    path?: ((string | null) | null) | null;
+                    /** @description 父菜单ID，支持菜单层级 */
+                    parentId?: ((number | null) | null) | null;
+                    /**
+                     * @description 排序
+                     * @default 0
+                     */
+                    sort: number;
+                    /**
+                     * @description 需要的角色ID列表
+                     * @example [
+                     *       1,
+                     *       2
+                     *     ]
+                     */
+                    roleIdArr?: number[];
+                    /**
+                     * @description 是否启用
+                     * @default true
+                     */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /** @description 更新者ID */
+                    updaterId?: number | null;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: number | null;
+                }[];
+            };
+            message: string;
+        };
+        SystemMenuUpdateReq: {
+            /**
+             * @description 菜单ID
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 菜单名称
+             * @example 主页
+             */
+            text?: string;
+            /**
+             * @description 图标名称，使用 Iconify material-symbols 图标
+             * @example material-symbols:home
+             */
+            icon?: string;
+            /**
+             * @description 路由路径
+             * @example /home
+             */
+            path?: ((string | null) | null) | null;
+            /** @description 父菜单ID，支持菜单层级 */
+            parentId?: ((number | null) | null) | null;
+            /**
+             * @description 排序
+             * @default 0
+             */
+            sort: number;
+            /**
+             * @description 需要的角色ID列表
+             * @example [
+             *       1,
+             *       2
+             *     ]
+             */
+            roleIdArr?: number[];
+            /**
+             * @description 是否启用
+             * @default true
+             */
+            isEnabled: boolean;
+        };
+        SystemMenuUpdateRes: {
+            ok: boolean;
+            /**
+             * @description 菜单ID
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemMenuGetReq: {
+            /**
+             * @description 菜单ID
+             * @example 1
+             */
+            id: number;
+        };
+        SystemMenuGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 菜单ID
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * @description 菜单名称
+                 * @example 主页
+                 */
+                text?: string;
+                /**
+                 * @description 图标名称，使用 Iconify material-symbols 图标
+                 * @example material-symbols:home
+                 */
+                icon?: string;
+                /**
+                 * @description 路由路径
+                 * @example /home
+                 */
+                path?: ((string | null) | null) | null;
+                /** @description 父菜单ID，支持菜单层级 */
+                parentId?: ((number | null) | null) | null;
+                /**
+                 * @description 排序
+                 * @default 0
+                 */
+                sort: number;
+                /**
+                 * @description 需要的角色ID列表
+                 * @example [
+                 *       1,
+                 *       2
+                 *     ]
+                 */
+                roleIdArr?: number[];
+                /**
+                 * @description 是否启用
+                 * @default true
+                 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /** @description 更新者ID */
+                updaterId?: number | null;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: number | null;
+            };
+            message: string;
+        };
+        SystemMenuTreeReq: Record<string, never>;
+        SystemMenuTreeRes: {
+            ok: boolean;
+            data: {
+                id?: number;
+                text?: string;
+                icon?: string;
+                path?: ((string | null) | null) | null;
+                sort?: number;
+                children?: {
+                    id?: number;
+                    text?: string;
+                    icon?: string;
+                    path?: ((string | null) | null) | null;
+                    sort?: number;
+                }[];
+            }[];
+            message: string;
+        };
         SystemRoleAddReq: {
             /**
              * @description 角色名称
@@ -3448,10 +4083,14 @@ export interface components {
              */
             departmentId?: number | null;
             /**
-             * @description 角色ID列表，逗号分隔
-             * @example 1,2,3
+             * @description 角色ID数组
+             * @example [
+             *       1,
+             *       2,
+             *       3
+             *     ]
              */
-            roleIds: string;
+            roleIdArr: number[];
             /**
              * @description 是否启用
              * @default true
@@ -3485,7 +4124,7 @@ export interface components {
         };
         SystemUserListReq: {
             /** @enum {string} */
-            orderBy?: "id" | "username" | "departmentId" | "roleIds" | "createTimeUtc";
+            orderBy?: "id" | "username" | "departmentId" | "roleIdArr" | "createTimeUtc";
             descend?: boolean;
             /** @default 1 */
             pageNo: number;
@@ -3527,10 +4166,14 @@ export interface components {
                      */
                     departmentId?: number | null;
                     /**
-                     * @description 角色ID列表，逗号分隔
-                     * @example 1,2,3
+                     * @description 角色ID数组
+                     * @example [
+                     *       1,
+                     *       2,
+                     *       3
+                     *     ]
                      */
-                    roleIds?: string;
+                    roleIdArr?: number[];
                     /**
                      * @description 是否启用
                      * @default true
@@ -3572,10 +4215,14 @@ export interface components {
              */
             departmentId?: number | null;
             /**
-             * @description 角色ID列表，逗号分隔
-             * @example 1,2,3
+             * @description 角色ID数组
+             * @example [
+             *       1,
+             *       2,
+             *       3
+             *     ]
              */
-            roleIds?: string;
+            roleIdArr?: number[];
             /**
              * @description 是否启用
              * @default true
@@ -3617,10 +4264,14 @@ export interface components {
                  */
                 departmentId?: number | null;
                 /**
-                 * @description 角色ID列表，逗号分隔
-                 * @example 1,2,3
+                 * @description 角色ID数组
+                 * @example [
+                 *       1,
+                 *       2,
+                 *       3
+                 *     ]
                  */
-                roleIds?: string;
+                roleIdArr?: number[];
                 /**
                  * @description 是否启用
                  * @default true
@@ -3667,11 +4318,6 @@ export interface components {
                      * @example 1
                      */
                     departmentId?: number | null;
-                    /**
-                     * @description 角色ID列表，逗号分隔
-                     * @example 1,2,3
-                     */
-                    roleIds?: string;
                     /**
                      * @description 是否启用
                      * @default true

@@ -14,19 +14,22 @@ import {
   Box,
   CircularProgress,
   IconButton,
+  Chip,
+  OutlinedInput,
 } from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User, UserAddRequest, UserUpdateRequest } from '@/api/system/user';
+import type { User } from '@/pages/user/type.d';
 
 interface FormData {
   username: string;
   password: string;
-  department: string;
-  role: string;
+  departmentId: number | null;
+  roleIdArr: number[];
   isEnabled: boolean;
 }
 
@@ -35,21 +38,28 @@ interface UserFormDialogProps {
   user: User | null; // null表示添加用户，有值表示编辑用户
   loading: boolean;
   onClose: () => void;
-  onSave: (data: UserAddRequest | UserUpdateRequest) => void;
+  onSave: (data: FormData) => void;
 }
 
-export default function UserFormDialog({ 
-  open, 
-  user, 
-  loading, 
-  onClose, 
-  onSave 
+// 预定义的角色选项
+const roleOptions = [
+  { value: 1, label: '超级管理员' },
+  { value: 2, label: '管理员' },
+  { value: 3, label: '普通用户' },
+];
+
+export default function UserFormDialog({
+  open,
+  user,
+  loading,
+  onClose,
+  onSave,
 }: UserFormDialogProps) {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
-    department: '',
-    role: '普通用户',
+    departmentId: null,
+    roleIdArr: [3], // 默认普通用户
     isEnabled: true,
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -60,71 +70,62 @@ export default function UserFormDialog({
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username,
+        username: String(user.username),
         password: '',
-        department: user.department,
-        role: user.role,
+        departmentId: user.departmentId || null,
+        roleIdArr: user.roleIdArr || [],
         isEnabled: user.isEnabled,
       });
     } else {
       setFormData({
         username: '',
         password: '',
-        department: '',
-        role: '普通用户',
+        departmentId: null,
+        roleIdArr: [3], // 默认普通用户
         isEnabled: true,
       });
     }
   }, [user]);
 
   // 处理表单数据变化
-  const handleFormChange = (field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleFormChange = (
+    field: keyof FormData,
+    value: string | boolean | number | null | number[],
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // 处理角色多选变化
+  const handleRoleChange = (event: SelectChangeEvent<number[]>) => {
+    const value = event.target.value;
+    handleFormChange('roleIdArr', typeof value === 'string' ? value.split(',').map(Number) : value);
   };
 
   // 处理保存
   const handleSave = () => {
     if (isEditing && user) {
       // 编辑用户
-      const updateData: UserUpdateRequest = {
+      const updateData: FormData & { id: number } = {
+        ...formData,
         id: user.id,
-        username: formData.username,
-        department: formData.department,
-        role: formData.role,
-        isEnabled: formData.isEnabled,
       };
 
       // 只有输入了新密码才更新密码
-      if (formData.password.trim()) {
-        updateData.password = formData.password;
+      if (!formData.password.trim()) {
+        delete updateData.password;
       }
 
       onSave(updateData);
     } else {
       // 添加用户
-      const addData: UserAddRequest = {
-        username: formData.username,
-        password: formData.password,
-        department: formData.department,
-        role: formData.role,
-        isEnabled: formData.isEnabled,
-      };
-
-      onSave(addData);
+      onSave(formData);
     }
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-    >
-      <DialogTitle>
-        {isEditing ? '编辑用户' : '添加新用户'}
-      </DialogTitle>
-      
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{isEditing ? '编辑用户' : '添加新用户'}</DialogTitle>
+
       <DialogContent>
         <Box pt={1}>
           <TextField
@@ -135,16 +136,16 @@ export default function UserFormDialog({
             margin="normal"
             required
           />
-          
+
           <TextField
             fullWidth
-            label={isEditing ? "新密码" : "密码"}
+            label={isEditing ? '新密码' : '密码'}
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => handleFormChange('password', e.target.value)}
             margin="normal"
             required={!isEditing}
-            helperText={isEditing ? "留空则不修改密码" : ""}
+            helperText={isEditing ? '留空则不修改密码' : ''}
             slotProps={{
               input: {
                 endAdornment: (
@@ -160,29 +161,42 @@ export default function UserFormDialog({
               },
             }}
           />
-          
+
           <TextField
             fullWidth
-            label="部门"
-            value={formData.department}
-            onChange={(e) => handleFormChange('department', e.target.value)}
+            label="部门ID"
+            type="number"
+            value={formData.departmentId || ''}
+            onChange={(e) =>
+              handleFormChange('departmentId', e.target.value ? Number(e.target.value) : null)
+            }
             margin="normal"
-            required
           />
-          
+
           <FormControl fullWidth margin="normal" required>
             <InputLabel>角色</InputLabel>
             <Select
-              value={formData.role}
-              label="角色"
-              onChange={(e) => handleFormChange('role', e.target.value)}
+              multiple
+              value={formData.roleIdArr}
+              onChange={handleRoleChange}
+              input={<OutlinedInput label="角色" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {selected.map((value) => {
+                    const role = roleOptions.find((r) => r.value === value);
+                    return <Chip key={value} label={role?.label || value} size="small" />;
+                  })}
+                </Box>
+              )}
             >
-              <MenuItem value="管理员">管理员</MenuItem>
-              <MenuItem value="普通用户">普通用户</MenuItem>
-              <MenuItem value="操作员">操作员</MenuItem>
+              {roleOptions.map((role) => (
+                <MenuItem key={role.value} value={role.value}>
+                  {role.label}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
-          
+
           <FormControlLabel
             control={
               <Switch
@@ -195,17 +209,11 @@ export default function UserFormDialog({
           />
         </Box>
       </DialogContent>
-      
+
       <DialogActions>
-        <ResponsiveButton onClick={onClose}>
-          取消
-        </ResponsiveButton>
-        <ResponsiveButton 
-          onClick={handleSave} 
-          variant="contained"
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={20} /> : (isEditing ? '保存' : '添加')}
+        <ResponsiveButton onClick={onClose}>取消</ResponsiveButton>
+        <ResponsiveButton onClick={handleSave} variant="contained" disabled={loading}>
+          {loading ? <CircularProgress size={20} /> : isEditing ? '保存' : '添加'}
         </ResponsiveButton>
       </DialogActions>
     </Dialog>

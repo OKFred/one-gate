@@ -5,7 +5,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import httpStatusCode from "http-status-codes";
 import type { LanguageKey } from "@/types/locales";
 
-export const roleMiddleware = (allowedRoles: string[]) => {
+export const roleMiddleware = (allowedRoles: number[]) => {
   return async (c: NodeHonoContext, next: Next) => {
     const user = c.var.userObj;
 
@@ -17,18 +17,15 @@ export const roleMiddleware = (allowedRoles: string[]) => {
         }
       );
     }
-
-    // roleIds is a string, possibly comma separated
-    const userRoles = user.roleIds ? user.roleIds.split(",") : [];
-    
-    // Check if user has at least one of the allowed roles
+    const userRoles = user.roleIdArr || [];
     const hasRole = userRoles.some((role) => allowedRoles.includes(role));
 
     if (!hasRole) {
       throw new HTTPException(
         httpStatusCode.FORBIDDEN as ContentfulStatusCode,
         {
-          message: "i18n.api.system.insufficientPermission" satisfies LanguageKey,
+          message:
+            "i18n.api.system.insufficientPermission" satisfies LanguageKey,
         }
       );
     }

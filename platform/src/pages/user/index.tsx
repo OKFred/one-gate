@@ -14,14 +14,6 @@ import UserDetails from './components/UserDetails';
 import UserEditDialog from './components/UserEditDialog';
 import type { UpdateUserParams, User } from './type';
 
-interface FormData {
-  username: string;
-  password: string;
-  department: string;
-  role: string;
-  isEnabled: boolean;
-}
-
 export default function UserCenter() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
@@ -73,7 +65,7 @@ export default function UserCenter() {
           id: currentUser.id,
           username: formData?.username,
           departmentId: formData?.departmentId,
-          roleIds: formData?.roleIds,
+          roleIdArr: formData?.roleIdArr,
           isEnabled: formData?.isEnabled || false,
         };
 

@@ -14,7 +14,7 @@ import {
   Box,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import type { User } from '@/api/system/user';
+import type { User } from '@/pages/user/type.d';
 import dayjs from 'dayjs';
 
 interface UserTableProps {
@@ -48,8 +48,8 @@ export default function UserTable({
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>用户名</TableCell>
-              <TableCell>部门</TableCell>
-              <TableCell>角色</TableCell>
+              <TableCell>部门ID</TableCell>
+              <TableCell>角色ID</TableCell>
               <TableCell>状态</TableCell>
               <TableCell>创建时间</TableCell>
               <TableCell align="center">操作</TableCell>
@@ -77,8 +77,8 @@ export default function UserTable({
                 <TableRow key={user.id} hover>
                   <TableCell>{user.id}</TableCell>
                   <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.department}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell>{user.departmentId || '-'}</TableCell>
+                  <TableCell>{user.roleIdArr?.join(', ') || '-'}</TableCell>
                   <TableCell>
                     <Chip
                       label={user.isEnabled ? '启用' : '禁用'}
