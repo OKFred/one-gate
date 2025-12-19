@@ -1,7 +1,5 @@
 import * as MailTemplateAPI from '@/api/mail/template';
 
-// ==================== 邮件模板相关类型 ====================
-
 // 筛选状态类型
 export interface FilterState {
   keyword: string;

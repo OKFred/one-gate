@@ -1,7 +1,5 @@
 import * as MailAPI from '@/api/mail/account';
 
-// ==================== 邮件账户相关类型 ====================
-
 // 筛选状态类型
 export interface FilterState {
   keyword: string;

@@ -7,7 +7,7 @@ import {
   type menuAddLike,
   type menuLike,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, and, isNull } from "drizzle-orm";
+import { asc, count, desc, eq, like, and, isNull } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
@@ -159,102 +159,6 @@ const deleteApi = {
   service: onDelete,
 };
 
-// ============ 菜单列表 ============
-const listReq = {
-  type: "object",
-  properties: {
-    orderBy: commonSchema.orderByWrapper([
-      "id",
-      "text",
-      "sort",
-      "createTimeUtc",
-    ] satisfies (keyof menuLike)[]),
-    ...commonSchema.listReqBase,
-    isEnabled: menuData.isEnabled,
-    parentId: menuData.parentId,
-  },
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listRes = {
-  type: "object",
-  properties: {
-    ...commonSchema.listResBase,
-    list: commonSchema.listWrapper({
-      ...menuIndex,
-      ...menuData,
-      ...menuAudit,
-    } satisfies Partial<Record<keyof menuLike, JSONSchema>>),
-  },
-} as const satisfies JSONSchema;
-
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
-  const {
-    orderBy = "sort",
-    descend = false,
-    pageNo = 1,
-    pageSize = 100,
-    keyword = "",
-    isEnabled,
-    parentId,
-  } = listParamObj;
-
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = menuTable[orderBy] || menuTable.sort;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
-
-  function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<menuLike[]>;
-  function queryDB(getAll: boolean): Promise<{ total: number }[] | menuLike[]> {
-    return db
-      .select(getAll ? { total: count(menuTable.id).as("total") } : undefined)
-      .from(menuTable)
-      .where(
-        and(
-          keyword ? like(menuTable.text, `%${keyword}%`) : undefined,
-          isEnabled !== undefined
-            ? eq(menuTable.isEnabled, isEnabled)
-            : undefined,
-          parentId !== undefined
-            ? parentId === null
-              ? isNull(menuTable.parentId)
-              : eq(menuTable.parentId, parentId)
-            : undefined
-        )
-      )
-      .orderBy(!descend ? asc(orderField) : desc(orderField))
-      .limit(getAll ? maxPageSize : finalPageSize)
-      .offset(getAll ? 0 : offset);
-  }
-
-  const getAllResult = await queryDB(true);
-  const total = getAllResult[0]?.total || 0;
-  const rows = await queryDB(false);
-  const totalPage = Math.ceil(total / finalPageSize);
-
-  return {
-    total,
-    totalPage,
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: rows,
-  };
-}
-
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: {
-    path: "/list",
-    method: "post",
-    summary: "获取菜单列表",
-  } as const,
-  service: onList,
-};
-
 // ============ 更新菜单 ============
 const updateReq = {
   type: "object",
@@ -330,7 +234,6 @@ const updateApi = {
   service: onUpdate,
 };
 
-// ============ 获取单个菜单 ============
 const getReq = {
   type: "object",
   properties: {
@@ -380,16 +283,6 @@ const getApi = {
   service: onGet,
 };
 
-// ============ 获取树形菜单（前端使用） ============
-export interface MenuTreeItem {
-  id: number;
-  text: string;
-  icon: string;
-  path?: string | null;
-  sort: number;
-  children?: MenuTreeItem[];
-}
-
 const treeReq = {
   type: "object",
   properties: {},
@@ -397,34 +290,28 @@ const treeReq = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
+const menuTreeItem = {
+  type: "object",
+  properties: {
+    id: { type: "number" },
+    text: { type: "string" },
+    icon: { type: "string" },
+    path: { type: "string" },
+    sort: { type: "number" },
+  },
+  required: ["id", "text", "icon", "path"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
 const treeRes = {
   type: "array",
   items: {
-    type: "object",
-    properties: {
-      id: { type: "number" },
-      text: { type: "string" },
-      icon: { type: "string" },
-      path: { type: ["string", "null"], nullable: true },
-      sort: { type: "number" },
-      children: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            id: { type: "number" },
-            text: { type: "string" },
-            icon: { type: "string" },
-            path: { type: ["string", "null"], nullable: true },
-            sort: { type: "number" },
-          },
-        },
-      },
-    },
+    ...menuTreeItem,
   },
 } as const satisfies JSONSchema;
 
-async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[]> {
+type MenuTreeItem = FromSchema<typeof menuTreeItem> & { children?: MenuTreeItem[] };
+async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
   const userObj = c.get("userObj");
   const { roleIdArr } = userObj;
   // 获取所有启用的菜单
@@ -444,50 +331,20 @@ async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[]> {
       return true;
     }
   });
-
-  // 构建树形结构
-  const menuMap = new Map<number, MenuTreeItem>();
-  const rootMenus: MenuTreeItem[] = [];
-
-  // 先创建所有菜单项
-  for (const menu of filteredMenus) {
-    menuMap.set(menu.id, {
-      id: menu.id,
-      text: menu.text,
-      icon: menu.icon,
-      path: menu.path,
-      sort: menu.sort,
-      children: [],
-    });
+  function buildMenuTree(
+    data: typeof filteredMenus,
+    parentId: number | null = null
+  ): MenuTreeItem[] {
+    return data
+      .filter((item) => item.parentId === parentId)
+      .map((item) => ({
+        ...item,
+        roleIdArr: undefined, // 不返回角色信息到前端
+        children: buildMenuTree(data, item.id),
+      }));
   }
-
-  // 然后建立父子关系
-  for (const menu of filteredMenus) {
-    const menuItem = menuMap.get(menu.id)!;
-    if (menu.parentId && menuMap.has(menu.parentId)) {
-      const parent = menuMap.get(menu.parentId)!;
-      parent.children = parent.children || [];
-      parent.children.push(menuItem);
-    } else {
-      rootMenus.push(menuItem);
-    }
-  }
-
-  // 清理空的 children 数组
-  const cleanEmptyChildren = (items: MenuTreeItem[]): MenuTreeItem[] => {
-    return items.map((item) => {
-      if (item.children && item.children.length === 0) {
-        const { children, ...rest } = item;
-        return rest;
-      }
-      if (item.children && item.children.length > 0) {
-        return { ...item, children: cleanEmptyChildren(item.children) };
-      }
-      return item;
-    });
-  };
-
-  return cleanEmptyChildren(rootMenus);
+  const menuTree = buildMenuTree(filteredMenus);
+  return menuTree;
 }
 
 const treeApi = {
@@ -504,7 +361,6 @@ const treeApi = {
 export default {
   add: addApi,
   delete: deleteApi,
-  list: listApi,
   update: updateApi,
   get: getApi,
   tree: treeApi,

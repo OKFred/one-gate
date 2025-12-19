@@ -5,8 +5,6 @@
 
 import type * as AuthAPI from '../../api/system/auth';
 
-// ==================== 登录相关类型 ====================
-
 // 普通登录
 export type CommonLoginParams = Parameters<typeof AuthAPI.commonLogin>[0];
 export type CommonLoginResponse = Awaited<ReturnType<typeof AuthAPI.commonLogin>>;

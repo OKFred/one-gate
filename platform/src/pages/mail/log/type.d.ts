@@ -1,7 +1,5 @@
 import * as MailLogAPI from '@/api/mail/log';
 
-// ==================== 邮件日志相关类型 ====================
-
 // 筛选状态类型
 export interface FilterState {
   keyword: string;

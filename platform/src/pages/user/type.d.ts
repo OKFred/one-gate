@@ -1,6 +1,11 @@
 import type * as UserAPI from '@/api/system/user';
 
-// ==================== 用户相关类型 ====================
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListUserReq['orderBy']>;
+  descend: boolean;
+}
 
 // 获取用户列表
 export type ListUserParams = Parameters<typeof UserAPI.listFn>[0];
@@ -9,13 +14,6 @@ export type ListUserReq = NonNullable<ListUserParams['data']>;
 export type ListUserData = NonNullable<ListUserResponse['data']>;
 export type UserList = NonNullable<ListUserData['data']['list']>;
 export type User = UserList[number];
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListUserReq['orderBy']>;
-  descend: boolean;
-}
 
 // 获取单个用户
 export type GetUserParams = Parameters<typeof UserAPI.getFn>[0];
