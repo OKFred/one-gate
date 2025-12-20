@@ -14,6 +14,7 @@ import {
   CardContent,
   Typography,
   Chip,
+  Pagination,
   useTheme,
   useMediaQuery,
 } from '@mui/material';
@@ -25,11 +26,25 @@ interface AccountTableProps {
   loading: boolean;
   onEdit: (account: ListMailAccount) => void;
   onDelete: (id: number) => void;
+  page: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
 }
 
-export default function AccountTable({ accounts, loading, onEdit, onDelete }: AccountTableProps) {
+export default function AccountTable({
+  accounts,
+  loading,
+  onEdit,
+  onDelete,
+  page,
+  pageSize,
+  total,
+  onPageChange,
+}: AccountTableProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const totalPages = Math.ceil(total / pageSize);
 
   if (loading) {
     return (
@@ -112,6 +127,17 @@ export default function AccountTable({ accounts, loading, onEdit, onDelete }: Ac
             </Typography>
           </Box>
         )}
+        {totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(_, value) => onPageChange(value)}
+              color="primary"
+              size="medium"
+            />
+          </Box>
+        )}
       </Box>
     );
   }
@@ -157,6 +183,16 @@ export default function AccountTable({ accounts, loading, onEdit, onDelete }: Ac
             ))}
         </TableBody>
       </Table>
+      {totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(_, value) => onPageChange(value)}
+            color="primary"
+          />
+        </Box>
+      )}
     </TableContainer>
   );
 }

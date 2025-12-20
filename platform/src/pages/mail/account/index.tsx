@@ -7,12 +7,14 @@ import AccountTable from './components/AccountTable';
 import AccountFilter from './components/AccountFilter';
 import type { FilterState, ListMailAccount, AddMailAccountRequest } from './type';
 
-export default function MailAccountRefactored() {
+export default function MailAccountPage() {
   const [accounts, setAccounts] = useState<ListMailAccount[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
   const [filters, setFilters] = useState<FilterState>({
     keyword: '',
     orderBy: 'id',
@@ -28,12 +30,12 @@ export default function MailAccountRefactored() {
     starttlsEnable: false,
   });
 
-  const fetchAccounts = useCallback(async (searchParams: FilterState) => {
+  const fetchAccounts = useCallback(async (searchParams: FilterState, currentPage: number = 1) => {
     setLoading(true);
     try {
       const requestData = {
-        pageNo: 1,
-        pageSize: 100,
+        pageNo: currentPage,
+        pageSize,
         ...(searchParams.keyword && { keyword: searchParams.keyword }),
         orderBy: searchParams.orderBy,
         descend: searchParams.descend,
@@ -54,9 +56,18 @@ export default function MailAccountRefactored() {
   const handleFilterChange = useCallback(
     (newFilters: FilterState) => {
       setFilters(newFilters);
-      fetchAccounts(newFilters);
+      setPage(1);
+      fetchAccounts(newFilters, 1);
     },
     [fetchAccounts],
+  );
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      setPage(newPage);
+      fetchAccounts(filters, newPage);
+    },
+    [fetchAccounts, filters],
   );
 
   useEffect(() => {
@@ -158,6 +169,10 @@ export default function MailAccountRefactored() {
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        page={page}
+        pageSize={pageSize}
+        total={totalCount}
+        onPageChange={handlePageChange}
       />
     </PageLayout>
   );
