@@ -10,7 +10,6 @@ import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
 import { useResponsive } from '../responsive';
@@ -87,7 +86,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             }}
           >
             <IconButton color="inherit" onClick={() => setSidebarOpen((v) => !v)}>
-              {sidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+              <MenuIcon />
             </IconButton>
           </Box>
         )}

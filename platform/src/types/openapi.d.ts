@@ -1628,64 +1628,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取菜单列表 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["SystemMenuListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SystemMenuListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/system/menu/update": {
         parameters: {
             query?: never;
@@ -3635,94 +3577,6 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemMenuListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "text" | "sort" | "createTimeUtc";
-            descend?: boolean;
-            /** @default 1 */
-            pageNo: number;
-            /** @default 10 */
-            pageSize: number;
-            /** @example  */
-            keyword?: string;
-            /**
-             * @description 是否启用
-             * @default true
-             */
-            isEnabled: boolean;
-            /** @description 父菜单ID，支持菜单层级 */
-            parentId?: ((number | null) | null) | null;
-        };
-        SystemMenuListRes: {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total?: number;
-                /** @description 总页数 */
-                totalPage?: number;
-                /** @description 当前页码 */
-                currentPage?: number;
-                /** @description 每页记录数 */
-                pageSize?: number;
-                list?: {
-                    /**
-                     * @description 菜单ID
-                     * @example 1
-                     */
-                    id?: number;
-                    /**
-                     * @description 菜单名称
-                     * @example 主页
-                     */
-                    text?: string;
-                    /**
-                     * @description 图标名称，使用 Iconify material-symbols 图标
-                     * @example material-symbols:home
-                     */
-                    icon?: string;
-                    /**
-                     * @description 路由路径
-                     * @example /home
-                     */
-                    path?: ((string | null) | null) | null;
-                    /** @description 父菜单ID，支持菜单层级 */
-                    parentId?: ((number | null) | null) | null;
-                    /**
-                     * @description 排序
-                     * @default 0
-                     */
-                    sort: number;
-                    /**
-                     * @description 需要的角色ID列表
-                     * @example [
-                     *       1,
-                     *       2
-                     *     ]
-                     */
-                    roleIdArr?: number[];
-                    /**
-                     * @description 是否启用
-                     * @default true
-                     */
-                    isEnabled: boolean;
-                    /** @description 创建者ID */
-                    creatorId?: number;
-                    /** @description 更新者ID */
-                    updaterId?: number | null;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc?: number;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc?: number | null;
-                }[];
-            };
-            message: string;
-        };
         SystemMenuUpdateReq: {
             /**
              * @description 菜单ID
@@ -3845,18 +3699,11 @@ export interface components {
         SystemMenuTreeRes: {
             ok: boolean;
             data: {
-                id?: number;
-                text?: string;
-                icon?: string;
-                path?: ((string | null) | null) | null;
+                id: number;
+                text: string;
+                icon: string;
+                path: string;
                 sort?: number;
-                children?: {
-                    id?: number;
-                    text?: string;
-                    icon?: string;
-                    path?: ((string | null) | null) | null;
-                    sort?: number;
-                }[];
             }[];
             message: string;
         };
