@@ -75,6 +75,14 @@ export const initialMenuData = [
     parentId: 8,
     sort: 2,
   },
+  {
+    id: 11,
+    text: "菜单",
+    icon: "material-symbols:menu",
+    path: "/system/menu",
+    parentId: 8,
+    sort: 3,
+  }
 ] as menuLike[];
 
 type menuLike = {

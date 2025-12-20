@@ -17,19 +17,6 @@ export const treeFn = async () => {
 };
 
 /**
- * 获取菜单列表（管理用）
- */
-export const listFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/menu/list', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/system/menu/list',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-/**
  * 获取单个菜单
  */
 export const getFn = (
