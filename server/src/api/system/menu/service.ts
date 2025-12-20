@@ -5,14 +5,12 @@ import {
   menuAudit,
   menuTable,
   type menuAddLike,
-  type menuLike,
 } from "./db.table";
-import { asc, count, desc, eq, like, and, isNull } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
-import * as commonSchema from "@/middleware/encapsulation/common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
@@ -310,7 +308,9 @@ const treeRes = {
   },
 } as const satisfies JSONSchema;
 
-type MenuTreeItem = FromSchema<typeof menuTreeItem> & { children?: MenuTreeItem[] };
+type MenuTreeItem = FromSchema<typeof menuTreeItem> & {
+  children?: MenuTreeItem[];
+};
 async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
   const userObj = c.get("userObj");
   const { roleIdArr } = userObj;
@@ -322,14 +322,16 @@ async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
     .orderBy(asc(menuTable.sort));
 
   // 根据用户角色过滤菜单
-  const filteredMenus = allMenus.filter((menu) => {
+  let filteredMenus = allMenus.filter((menu) => {
     if (!menu.roleIdArr) return true;
-    try {
-      if (menu.roleIdArr.length === 0) return true;
-      return menu.roleIdArr.some((roleId) => roleIdArr.includes(roleId));
-    } catch {
-      return true;
-    }
+    if (menu.roleIdArr.length === 0) return true;
+    return menu.roleIdArr.some((roleId) => roleIdArr.includes(roleId));
+  });
+  // 父菜单没有权限时，所有子菜单也不显示
+  filteredMenus = filteredMenus.filter((menu) => {
+    if (!menu.parentId) return true;
+    const parentMenu = filteredMenus.find((m) => m.id === menu.parentId);
+    return !!parentMenu;
   });
   function buildMenuTree(
     data: typeof filteredMenus,

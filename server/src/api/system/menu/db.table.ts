@@ -4,6 +4,7 @@ import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import { count, sql } from "drizzle-orm";
+import { initialMenuData } from "./initialMenu";
 
 export const menuIndex = {
   id: {
@@ -96,87 +97,6 @@ export const menuTable = sqliteTable("system_menu", {
   updateTimeUtc: integer("update_time_utc"),
 });
 
-// 初始菜单数据
-const initialMenuData = [
-  {
-    id: 1,
-    text: "主页",
-    icon: "material-symbols:home",
-    path: "/home",
-    sort: 1,
-  },
-  {
-    id: 2,
-    text: "我的",
-    icon: "material-symbols:account-circle",
-    path: "/me",
-    sort: 2,
-  },
-  {
-    id: 3,
-    text: "邮件管理",
-    icon: "material-symbols:mail",
-    sort: 3,
-  },
-  {
-    id: 4,
-    text: "模板",
-    icon: "material-symbols:description",
-    path: "/mail/template",
-    parentId: 3,
-    sort: 1,
-  },
-  {
-    id: 5,
-    text: "日志",
-    icon: "material-symbols:history",
-    path: "/mail/log",
-    parentId: 3,
-    sort: 2,
-  },
-  {
-    id: 6,
-    text: "发送",
-    icon: "material-symbols:send",
-    path: "/mail/send",
-    parentId: 3,
-    sort: 3,
-  },
-  {
-    id: 7,
-    text: "账户",
-    icon: "material-symbols:manage-accounts",
-    path: "/mail/account",
-    parentId: 3,
-    sort: 4,
-  },
-  {
-    id: 8,
-    text: "系统管理",
-    icon: "material-symbols:settings",
-    sort: 4,
-    roleIdArr: [1], // 仅管理员可见
-  },
-  {
-    id: 9,
-    text: "人员",
-    icon: "material-symbols:group",
-    path: "/system/user",
-    parentId: 8,
-    sort: 1,
-    roleIdArr: [1], // 仅管理员可见
-  },
-  {
-    id: 10,
-    text: "部门",
-    icon: "material-symbols:groups",
-    path: "/system/department",
-    parentId: 8,
-    sort: 2,
-    roleIdArr: [1], // 仅管理员可见
-  },
-];
-
 export async function tableInit() {
   await db.run(sql`
     CREATE TABLE IF NOT EXISTS system_menu (
@@ -210,9 +130,9 @@ export async function tableInit() {
         id: menu.id,
         text: menu.text,
         icon: menu.icon,
+        sort: menu.sort,
         path: menu.path || null,
         parentId: menu.parentId || null,
-        sort: menu.sort,
         roleIdArr: menu.roleIdArr || null,
         isEnabled: true,
         creatorId: 1, // 系统初始化用户
