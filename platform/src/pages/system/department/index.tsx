@@ -11,6 +11,8 @@ import {
   IconButton,
   Typography,
   Alert,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -18,10 +20,13 @@ import {
   Edit as EditIcon,
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
+  Close as CloseIcon,
+  Apartment as ApartmentIcon,
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { listFn, addFn, updateFn, deleteFn } from '@/api/system/department';
 import { showGlobalNotification } from '@/utils/notification';
+import { PageLayout } from '@/layout/responsive';
 
 interface Department {
   id: number;
@@ -42,7 +47,11 @@ function buildTree(data: Department[], parentId: number | null = null): Departme
 }
 
 export default function DepartmentManagement() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [flatDepartments, setFlatDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
@@ -69,8 +78,10 @@ export default function DepartmentManagement() {
       const flatData = res.data.data.list || [];
       const treeData = buildTree(flatData);
       setDepartments(treeData);
+      setFlatDepartments(flatData);
     } catch (err) {
       console.error(err);
+      showGlobalNotification({ message: '获取部门列表失败', type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -179,76 +190,134 @@ export default function DepartmentManagement() {
         key={node.id}
         itemId={node.id.toString()}
         label={
-          <Box display="flex" alignItems="center">
-            <Typography>{node.name}</Typography>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDialog(undefined, node.id);
-              }}
-            >
-              <AddIcon />
-            </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleOpenDialog(node);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(node);
-              }}
-              disabled={node.id === 1}
-            >
-              <DeleteIcon />
-            </IconButton>
+          <Box display="flex" alignItems="center" py={0.5}>
+            <ApartmentIcon sx={{ mr: 1, fontSize: 20, color: 'text.secondary' }} />
+            <Typography sx={{ flexGrow: 1 }}>
+              {node.name}
+              {node.description && (
+                <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+                  ({node.description})
+                </Typography>
+              )}
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDialog(undefined, node.id);
+                }}
+                title="添加子部门"
+              >
+                <AddIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleOpenDialog(node);
+                }}
+                title="编辑"
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(node);
+                }}
+                title="删除"
+                disabled={node.id === 1 || (node.children && node.children.length > 0)}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Box>
           </Box>
         }
       >
-        {node.children && renderTree(node.children)}
+        {node.children && node.children.length > 0 && renderTree(node.children)}
       </TreeItem>
     ));
 
+  // 获取所有展开项的ID
+  const getAllExpandedIds = useCallback((deptList: Department[]): string[] => {
+    const ids: string[] = [];
+    const traverse = (items: Department[]) => {
+      items.forEach((item) => {
+        if (item.children && item.children.length > 0) {
+          ids.push(item.id.toString());
+          traverse(item.children);
+        }
+      });
+    };
+    traverse(deptList);
+    return ids;
+  }, []);
+
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        部门管理
-      </Typography>
-      <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => handleOpenDialog()}
-        disabled={loading}
-      >
-        添加部门
-      </Button>
-      <Box mt={2}>
+    <PageLayout
+      title="部门管理"
+      actions={
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
+          disabled={loading}
+        >
+          添加部门
+        </Button>
+      }
+    >
+      {/* 部门树 */}
+      <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
         {loading ? (
-          <CircularProgress />
-        ) : (
+          <Box display="flex" justifyContent="center" py={4}>
+            <CircularProgress />
+          </Box>
+        ) : departments.length > 0 ? (
           <SimpleTreeView
             slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-            defaultExpandedItems={departments.map((d) => d.id.toString())}
+            defaultExpandedItems={getAllExpandedIds(departments)}
           >
             {renderTree(departments)}
           </SimpleTreeView>
+        ) : (
+          <Typography color="text.secondary" textAlign="center" py={4}>
+            暂无部门数据，点击上方按钮添加
+          </Typography>
         )}
       </Box>
 
-      <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>{editingDepartment ? '编辑部门' : '添加部门'}</DialogTitle>
+      {/* 添加/编辑对话框 */}
+      <Dialog
+        open={dialogOpen}
+        onClose={handleCloseDialog}
+        fullWidth
+        maxWidth="sm"
+        fullScreen={isMobile}
+      >
+        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{editingDepartment ? '编辑部门' : '添加部门'}</span>
+          {isMobile && (
+            <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogTitle>
         <DialogContent>
-          {error && <Alert severity="error">{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
           <TextField
             label="名称"
             value={formValues.name}
             onChange={(e) => handleFormChange('name', e.target.value)}
             fullWidth
             margin="normal"
+            required
           />
           <TextField
             label="描述"
@@ -257,17 +326,8 @@ export default function DepartmentManagement() {
             fullWidth
             margin="normal"
           />
-          {/* {
-            <TextField
-              label="父部门ID"
-              value={formValues.parentId}
-              onChange={(e) => handleFormChange('parentId', e.target.value)}
-              fullWidth
-              margin="normal"
-            />
-          } */}
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleCloseDialog} disabled={loading}>
             取消
           </Button>
@@ -277,10 +337,18 @@ export default function DepartmentManagement() {
         </DialogActions>
       </Dialog>
 
+      {/* 删除确认对话框 */}
       <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
         <DialogTitle>确认删除</DialogTitle>
         <DialogContent>
-          确定要删除部门 "{departmentToDelete?.name}" 吗？此操作不可恢复。
+          <Typography>
+            确定要删除部门 "<strong>{departmentToDelete?.name}</strong>" 吗？此操作不可恢复。
+          </Typography>
+          {departmentToDelete?.children && departmentToDelete.children.length > 0 && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              该部门存在子部门，请先删除子部门后再删除该部门。
+            </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={cancelDelete} disabled={loading}>
@@ -290,12 +358,12 @@ export default function DepartmentManagement() {
             onClick={confirmDeleteDepartment}
             color="error"
             variant="contained"
-            disabled={loading}
+            disabled={loading || (departmentToDelete?.children && departmentToDelete.children.length > 0)}
           >
-            删除
+            {loading ? <CircularProgress size={20} /> : '删除'}
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </PageLayout>
   );
 }
