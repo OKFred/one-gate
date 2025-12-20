@@ -1,121 +1,221 @@
 import {
-  Card,
+  Box,
+  CircularProgress,
+  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
-  IconButton,
-  Chip,
-  CircularProgress,
+  Stack,
+  Card,
+  CardContent,
   Typography,
-  Box,
+  Chip,
+  Pagination,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import type { User } from '@/pages/me/type';
+import type { User } from '../type';
 import dayjs from 'dayjs';
 
 interface UserTableProps {
   users: User[];
   loading: boolean;
-  total: number;
-  page: number;
-  rowsPerPage: number;
   onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
+  onDelete: (id: number) => void;
+  page: number;
+  pageSize: number;
+  total: number;
   onPageChange: (page: number) => void;
-  onRowsPerPageChange: (rowsPerPage: number) => void;
 }
 
 export default function UserTable({
   users,
   loading,
-  total,
-  page,
-  rowsPerPage,
   onEdit,
   onDelete,
+  page,
+  pageSize,
+  total,
   onPageChange,
-  onRowsPerPageChange,
 }: UserTableProps) {
-  return (
-    <Card>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>用户名</TableCell>
-              <TableCell>部门ID</TableCell>
-              <TableCell>角色ID</TableCell>
-              <TableCell>状态</TableCell>
-              <TableCell>创建时间</TableCell>
-              <TableCell align="center">操作</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Box py={4}>
-                    <CircularProgress />
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const totalPages = Math.ceil(total / pageSize);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" py={4}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // 移动端卡片布局
+  if (isMobile) {
+    return (
+      <Box sx={{ mt: 2, mb: 8 }}>
+        {users.length > 0 ? (
+          <Stack spacing={2}>
+            {users.map((user) => (
+              <Card key={user.id} variant="outlined">
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      mb: 2,
+                    }}
+                  >
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6" component="div" gutterBottom>
+                        {user.username}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        ID: {user.id}
+                      </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={1}>
+                      <IconButton onClick={() => onEdit(user)} color="primary" size="small">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => user.id && onDelete(user.id)}
+                        disabled={user.id === 1}
+                        color="error"
+                        size="small"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Stack>
                   </Box>
-                </TableCell>
-              </TableRow>
-            ) : users.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Box py={4}>
-                    <Typography color="text.secondary">暂无数据</Typography>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      部门ID
+                    </Typography>
+                    <Typography variant="body1">{user.departmentId || '-'}</Typography>
                   </Box>
-                </TableCell>
-              </TableRow>
-            ) : (
-              users.map((user) => (
-                <TableRow key={user.id} hover>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.username}</TableCell>
-                  <TableCell>{user.departmentId || '-'}</TableCell>
-                  <TableCell>{user.roleIdArr?.join(', ') || '-'}</TableCell>
-                  <TableCell>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      角色ID
+                    </Typography>
+                    <Typography variant="body1">{user.roleIdArr?.join(', ') || '-'}</Typography>
+                  </Box>
+
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      创建时间
+                    </Typography>
+                    <Typography variant="body1">
+                      {user.createTimeUtc
+                        ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
+                        : '暂无'}
+                    </Typography>
+                  </Box>
+
+                  <Box>
                     <Chip
                       label={user.isEnabled ? '启用' : '禁用'}
                       color={user.isEnabled ? 'success' : 'error'}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
-                    {user.createTimeUtc
-                      ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                      : '暂无'}
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton size="small" onClick={() => onEdit(user)} color="primary">
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Stack>
+        ) : (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="body1" color="text.secondary">
+              暂无用户
+            </Typography>
+          </Box>
+        )}
+        {totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(_, value) => onPageChange(value)}
+              color="primary"
+              size="medium"
+            />
+          </Box>
+        )}
+      </Box>
+    );
+  }
+
+  // 桌面端表格布局
+  return (
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>用户名</TableCell>
+            <TableCell>部门ID</TableCell>
+            <TableCell>角色ID</TableCell>
+            <TableCell>状态</TableCell>
+            <TableCell>创建时间</TableCell>
+            <TableCell align="center">操作</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {users.length > 0 &&
+            users.map((user) => (
+              <TableRow key={user.id} hover>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.departmentId || '-'}</TableCell>
+                <TableCell>{user.roleIdArr?.join(', ') || '-'}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={user.isEnabled ? '启用' : '禁用'}
+                    color={user.isEnabled ? 'success' : 'error'}
+                    size="small"
+                  />
+                </TableCell>
+                <TableCell>
+                  {user.createTimeUtc
+                    ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
+                    : '暂无'}
+                </TableCell>
+                <TableCell align="center">
+                  <Stack direction="row" spacing={1} justifyContent="center">
+                    <IconButton onClick={() => onEdit(user)} color="primary" size="small">
                       <EditIcon />
                     </IconButton>
-                    <IconButton size="small" onClick={() => onDelete(user)} color="error">
+                    <IconButton
+                      onClick={() => user.id && onDelete(user.id)}
+                      color="error"
+                      size="small"
+                    >
                       <DeleteIcon />
                     </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <TablePagination
-        component="div"
-        count={total}
-        page={page}
-        onPageChange={(_, newPage) => onPageChange(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(parseInt(e.target.value, 10))}
-        rowsPerPageOptions={[5, 10, 25, 50]}
-        labelRowsPerPage="每页显示："
-      />
-    </Card>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+      {totalPages > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+          <Pagination
+            count={totalPages}
+            page={page}
+            onChange={(_, value) => onPageChange(value)}
+            color="primary"
+          />
+        </Box>
+      )}
+    </TableContainer>
   );
 }
