@@ -159,9 +159,9 @@ const initialMenuData = [
   },
   {
     id: 9,
-    text: "用户",
+    text: "人员",
     icon: "material-symbols:group",
-    path: "/system/management",
+    path: "/system/person",
     parentId: 8,
     sort: 1,
     roleIdArr: [1], // 仅管理员可见
