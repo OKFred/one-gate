@@ -11,7 +11,7 @@ import {
   Edit as EditIcon 
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User } from '@/pages/user/type.d';
+import type { User } from '@/pages/me/type';
 
 interface UserDetailsProps {
   user: User;

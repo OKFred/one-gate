@@ -19,12 +19,11 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
-  Settings as SettingsIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User } from '@/pages/user/type.d';
+import type { User } from '@/pages/me/type';
 
 interface FormData {
   username: string;
@@ -34,12 +33,12 @@ interface FormData {
   isEnabled: boolean;
 }
 
-interface UserEditDialogProps {
+interface UserFormDialogProps {
   open: boolean;
-  user: User | null;
+  user: User | null; // null表示添加用户，有值表示编辑用户
   loading: boolean;
   onClose: () => void;
-  onSave: (formData: FormData) => void;
+  onSave: (data: FormData) => void;
 }
 
 // 预定义的角色选项
@@ -49,38 +48,51 @@ const roleOptions = [
   { value: 3, label: '普通用户' },
 ];
 
-export default function UserEditDialog({ 
-  open, 
-  user, 
-  loading, 
-  onClose, 
-  onSave 
-}: UserEditDialogProps) {
+export default function UserFormDialog({
+  open,
+  user,
+  loading,
+  onClose,
+  onSave,
+}: UserFormDialogProps) {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
     departmentId: null,
-    roleIdArr: [],
+    roleIdArr: [3], // 默认普通用户
     isEnabled: true,
   });
   const [showPassword, setShowPassword] = useState(false);
+
+  const isEditing = !!user;
 
   // 当用户数据改变时更新表单
   useEffect(() => {
     if (user) {
       setFormData({
-        username: user.username || '',
+        username: String(user.username),
         password: '',
         departmentId: user.departmentId || null,
         roleIdArr: user.roleIdArr || [],
         isEnabled: user.isEnabled,
       });
+    } else {
+      setFormData({
+        username: '',
+        password: '',
+        departmentId: null,
+        roleIdArr: [3], // 默认普通用户
+        isEnabled: true,
+      });
     }
   }, [user]);
 
   // 处理表单数据变化
-  const handleFormChange = (field: keyof FormData, value: string | boolean | number | null | number[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleFormChange = (
+    field: keyof FormData,
+    value: string | boolean | number | null | number[],
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   // 处理角色多选变化
@@ -91,28 +103,29 @@ export default function UserEditDialog({
 
   // 处理保存
   const handleSave = () => {
-    onSave(formData);
-  };
+    if (isEditing && user) {
+      // 编辑用户
+      const updateData: FormData & { id: number } = {
+        ...formData,
+        id: user.id,
+      };
 
-  // 处理关闭
-  const handleClose = () => {
-    onClose();
+      // 只有输入了新密码才更新密码
+      if (!formData.password.trim()) {
+        delete updateData.password;
+      }
+
+      onSave(updateData);
+    } else {
+      // 添加用户
+      onSave(formData);
+    }
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose}
-      maxWidth="sm"
-      fullWidth
-    >
-      <DialogTitle>
-        <Box display="flex" alignItems="center">
-          <SettingsIcon sx={{ mr: 1 }} />
-          编辑个人信息
-        </Box>
-      </DialogTitle>
-      
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{isEditing ? '编辑用户' : '添加新用户'}</DialogTitle>
+
       <DialogContent>
         <Box pt={1}>
           <TextField
@@ -123,15 +136,16 @@ export default function UserEditDialog({
             margin="normal"
             required
           />
-          
+
           <TextField
             fullWidth
-            label="新密码"
+            label={isEditing ? '新密码' : '密码'}
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => handleFormChange('password', e.target.value)}
             margin="normal"
-            helperText="留空则不修改密码"
+            required={!isEditing}
+            helperText={isEditing ? '留空则不修改密码' : ''}
             slotProps={{
               input: {
                 endAdornment: (
@@ -147,16 +161,18 @@ export default function UserEditDialog({
               },
             }}
           />
-          
+
           <TextField
             fullWidth
             label="部门ID"
             type="number"
             value={formData.departmentId || ''}
-            onChange={(e) => handleFormChange('departmentId', e.target.value ? Number(e.target.value) : null)}
+            onChange={(e) =>
+              handleFormChange('departmentId', e.target.value ? Number(e.target.value) : null)
+            }
             margin="normal"
           />
-          
+
           <FormControl fullWidth margin="normal" required>
             <InputLabel>角色</InputLabel>
             <Select
@@ -167,7 +183,7 @@ export default function UserEditDialog({
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => {
-                    const role = roleOptions.find(r => r.value === value);
+                    const role = roleOptions.find((r) => r.value === value);
                     return <Chip key={value} label={role?.label || value} size="small" />;
                   })}
                 </Box>
@@ -180,7 +196,7 @@ export default function UserEditDialog({
               ))}
             </Select>
           </FormControl>
-          
+
           <FormControlLabel
             control={
               <Switch
@@ -193,17 +209,11 @@ export default function UserEditDialog({
           />
         </Box>
       </DialogContent>
-      
+
       <DialogActions>
-        <ResponsiveButton onClick={handleClose}>
-          取消
-        </ResponsiveButton>
-        <ResponsiveButton 
-          onClick={handleSave} 
-          variant="contained"
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={20} /> : '保存'}
+        <ResponsiveButton onClick={onClose}>取消</ResponsiveButton>
+        <ResponsiveButton onClick={handleSave} variant="contained" disabled={loading}>
+          {loading ? <CircularProgress size={20} /> : isEditing ? '保存' : '添加'}
         </ResponsiveButton>
       </DialogActions>
     </Dialog>

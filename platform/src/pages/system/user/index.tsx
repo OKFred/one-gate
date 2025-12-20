@@ -12,7 +12,7 @@ import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import UserFilter from './components/UserFilter';
 import UserTable from './components/UserTable';
 import UserFormDialog from './components/UserFormDialog';
-import type { AddUserParams, User } from '../../user/type';
+import type { AddUserParams, User } from '../../me/type';
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);

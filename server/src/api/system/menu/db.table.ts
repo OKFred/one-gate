@@ -109,7 +109,7 @@ const initialMenuData = [
     id: 2,
     text: "我的",
     icon: "material-symbols:account-circle",
-    path: "/user",
+    path: "/me",
     sort: 2,
   },
   {
@@ -161,7 +161,7 @@ const initialMenuData = [
     id: 9,
     text: "人员",
     icon: "material-symbols:group",
-    path: "/system/person",
+    path: "/system/user",
     parentId: 8,
     sort: 1,
     roleIdArr: [1], // 仅管理员可见

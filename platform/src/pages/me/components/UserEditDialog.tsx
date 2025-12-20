@@ -19,11 +19,12 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
+  Settings as SettingsIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/layout/responsive';
-import type { User } from '@/pages/user/type.d';
+import type { User } from '@/pages/me/type';
 
 interface FormData {
   username: string;
@@ -33,12 +34,12 @@ interface FormData {
   isEnabled: boolean;
 }
 
-interface UserFormDialogProps {
+interface UserEditDialogProps {
   open: boolean;
-  user: User | null; // null表示添加用户，有值表示编辑用户
+  user: User | null;
   loading: boolean;
   onClose: () => void;
-  onSave: (data: FormData) => void;
+  onSave: (formData: FormData) => void;
 }
 
 // 预定义的角色选项
@@ -48,51 +49,38 @@ const roleOptions = [
   { value: 3, label: '普通用户' },
 ];
 
-export default function UserFormDialog({
-  open,
-  user,
-  loading,
-  onClose,
-  onSave,
-}: UserFormDialogProps) {
+export default function UserEditDialog({ 
+  open, 
+  user, 
+  loading, 
+  onClose, 
+  onSave 
+}: UserEditDialogProps) {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
     departmentId: null,
-    roleIdArr: [3], // 默认普通用户
+    roleIdArr: [],
     isEnabled: true,
   });
   const [showPassword, setShowPassword] = useState(false);
-
-  const isEditing = !!user;
 
   // 当用户数据改变时更新表单
   useEffect(() => {
     if (user) {
       setFormData({
-        username: String(user.username),
+        username: user.username || '',
         password: '',
         departmentId: user.departmentId || null,
         roleIdArr: user.roleIdArr || [],
         isEnabled: user.isEnabled,
       });
-    } else {
-      setFormData({
-        username: '',
-        password: '',
-        departmentId: null,
-        roleIdArr: [3], // 默认普通用户
-        isEnabled: true,
-      });
     }
   }, [user]);
 
   // 处理表单数据变化
-  const handleFormChange = (
-    field: keyof FormData,
-    value: string | boolean | number | null | number[],
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleFormChange = (field: keyof FormData, value: string | boolean | number | null | number[]) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   // 处理角色多选变化
@@ -103,29 +91,28 @@ export default function UserFormDialog({
 
   // 处理保存
   const handleSave = () => {
-    if (isEditing && user) {
-      // 编辑用户
-      const updateData: FormData & { id: number } = {
-        ...formData,
-        id: user.id,
-      };
+    onSave(formData);
+  };
 
-      // 只有输入了新密码才更新密码
-      if (!formData.password.trim()) {
-        delete updateData.password;
-      }
-
-      onSave(updateData);
-    } else {
-      // 添加用户
-      onSave(formData);
-    }
+  // 处理关闭
+  const handleClose = () => {
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{isEditing ? '编辑用户' : '添加新用户'}</DialogTitle>
-
+    <Dialog 
+      open={open} 
+      onClose={handleClose}
+      maxWidth="sm"
+      fullWidth
+    >
+      <DialogTitle>
+        <Box display="flex" alignItems="center">
+          <SettingsIcon sx={{ mr: 1 }} />
+          编辑个人信息
+        </Box>
+      </DialogTitle>
+      
       <DialogContent>
         <Box pt={1}>
           <TextField
@@ -136,16 +123,15 @@ export default function UserFormDialog({
             margin="normal"
             required
           />
-
+          
           <TextField
             fullWidth
-            label={isEditing ? '新密码' : '密码'}
+            label="新密码"
             type={showPassword ? 'text' : 'password'}
             value={formData.password}
             onChange={(e) => handleFormChange('password', e.target.value)}
             margin="normal"
-            required={!isEditing}
-            helperText={isEditing ? '留空则不修改密码' : ''}
+            helperText="留空则不修改密码"
             slotProps={{
               input: {
                 endAdornment: (
@@ -161,18 +147,16 @@ export default function UserFormDialog({
               },
             }}
           />
-
+          
           <TextField
             fullWidth
             label="部门ID"
             type="number"
             value={formData.departmentId || ''}
-            onChange={(e) =>
-              handleFormChange('departmentId', e.target.value ? Number(e.target.value) : null)
-            }
+            onChange={(e) => handleFormChange('departmentId', e.target.value ? Number(e.target.value) : null)}
             margin="normal"
           />
-
+          
           <FormControl fullWidth margin="normal" required>
             <InputLabel>角色</InputLabel>
             <Select
@@ -183,7 +167,7 @@ export default function UserFormDialog({
               renderValue={(selected) => (
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                   {selected.map((value) => {
-                    const role = roleOptions.find((r) => r.value === value);
+                    const role = roleOptions.find(r => r.value === value);
                     return <Chip key={value} label={role?.label || value} size="small" />;
                   })}
                 </Box>
@@ -196,7 +180,7 @@ export default function UserFormDialog({
               ))}
             </Select>
           </FormControl>
-
+          
           <FormControlLabel
             control={
               <Switch
@@ -209,11 +193,17 @@ export default function UserFormDialog({
           />
         </Box>
       </DialogContent>
-
+      
       <DialogActions>
-        <ResponsiveButton onClick={onClose}>取消</ResponsiveButton>
-        <ResponsiveButton onClick={handleSave} variant="contained" disabled={loading}>
-          {loading ? <CircularProgress size={20} /> : isEditing ? '保存' : '添加'}
+        <ResponsiveButton onClick={handleClose}>
+          取消
+        </ResponsiveButton>
+        <ResponsiveButton 
+          onClick={handleSave} 
+          variant="contained"
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={20} /> : '保存'}
         </ResponsiveButton>
       </DialogActions>
     </Dialog>
