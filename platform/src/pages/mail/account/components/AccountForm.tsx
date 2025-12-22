@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle, useRef, memo } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, memo } from 'react';
 import {
   Button,
   Dialog,
@@ -51,10 +51,6 @@ const AccountForm = memo(
     const { tableRef } = localObj;
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-    // 渲染计数
-    const renderCount = useRef(0);
-    renderCount.current += 1;
 
     // 内部状态管理
     const [open, setOpen] = useState(false);

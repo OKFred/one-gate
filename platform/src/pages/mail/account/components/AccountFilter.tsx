@@ -23,7 +23,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   memo,
   forwardRef,
   useImperativeHandle,
@@ -49,10 +48,6 @@ const AccountFilter = memo(
       orderBy: 'id',
       descend: false,
     });
-
-    // 渲染计数
-    const renderCount = useRef(0);
-    renderCount.current += 1;
 
     // 暴露给父组件的方法
     useImperativeHandle(

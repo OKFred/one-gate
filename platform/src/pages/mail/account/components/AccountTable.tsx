@@ -4,7 +4,6 @@ import {
   useState,
   useCallback,
   useEffect,
-  useRef,
   memo,
 } from 'react';
 import {
@@ -69,10 +68,6 @@ const AccountTable = memo(
     const { formRef, filterRef } = localObj;
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-    // 渲染计数
-    const renderCount = useRef(0);
-    renderCount.current += 1;
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
