@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { sendMailSingle, listMailAccount, listMailTemplate } from '@/api/mail';
+import * as mailAccountAPI from '@/api/mail/account';
+import * as mailTemplateAPI from '@/api/mail/template';
+import * as mailActionAPI from '@/api/mail/action';
+import { showGlobalNotification } from '@/utils/notification';
 import {
   Box,
   Button,
@@ -14,34 +17,19 @@ import {
   MenuItem,
   type SelectChangeEvent,
 } from '@mui/material';
-import NoticeTool from '@/components/NoticeTool';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import FroalaEditor from '@/components/FroalaEditor';
-
-interface MailAccount {
-  id?: number;
-  mailAddress?: string;
-  nickname?: string;
-  accountOwner?: string;
-}
-
-interface MailTemplate {
-  id?: number;
-  name?: string;
-  title?: string;
-  langCode?: string;
-  content?: string;
-  creatorName?: string;
-  category?: string;
-}
+import JoditEditor from '@/components/JoditEditor/index';
+import type { ListMailAccount } from '../account/type';
+import type { ListMailTemplate } from '../template/type';
+import type { SendMailRequest } from './type';
 
 export default function MailSend() {
   // 邮箱账户列表
-  const [mailAccounts, setMailAccounts] = useState<MailAccount[]>([]);
+  const [mailAccounts, setMailAccounts] = useState<ListMailAccount[]>([]);
   const [accountsLoading, setAccountsLoading] = useState(false);
   // 邮件模板列表
-  const [mailTemplates, setMailTemplates] = useState<MailTemplate[]>([]);
+  const [mailTemplates, setMailTemplates] = useState<ListMailTemplate[]>([]);
   const [templatesLoading, setTemplatesLoading] = useState(false);
   // All hooks and handlers must be inside the component
   const [form, setForm] = useState({
@@ -56,24 +44,19 @@ export default function MailSend() {
   } | null>(null);
   // 已移除 result, setResult
   const [loading, setLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({ open: false, message: '', severity: 'success' });
 
   // 获取邮箱账户列表
   useEffect(() => {
     const fetchAccounts = async () => {
       setAccountsLoading(true);
       try {
-        const res = await listMailAccount({
+        const res = await mailAccountAPI.listFn({
           data: {
             pageNo: 1,
             pageSize: 100,
           },
         });
-        const response = res.data as { data?: { list?: MailAccount[]; total?: number } };
+        const response = res.data;
         if (res.data?.ok && response?.data?.list) {
           setMailAccounts(response.data.list);
         }
@@ -92,13 +75,13 @@ export default function MailSend() {
     const fetchTemplates = async () => {
       setTemplatesLoading(true);
       try {
-        const res = await listMailTemplate({
+        const res = await mailTemplateAPI.listFn({
           data: {
             pageNo: 1,
             pageSize: 100,
           },
         });
-        const response = res.data as { data?: { list?: MailTemplate[]; total?: number } };
+        const response = res.data;
         if (res.data?.ok && response?.data?.list) {
           setMailTemplates(response.data.list);
         }
@@ -119,34 +102,34 @@ export default function MailSend() {
   // 处理主题变化，检测是否与原始模板不同
   const handleSubjectChange = (newSubject: string) => {
     const newContentObj = { ...form.contentObj, subject: newSubject };
-    
+
     // 如果有模板ID且内容已被修改，则清除模板ID
     if (form.contentObj.templateId && originalTemplate) {
       const isSubjectChanged = newSubject !== originalTemplate.subject;
       const isHtmlChanged = form.contentObj.html !== originalTemplate.html;
-      
+
       if (isSubjectChanged || isHtmlChanged) {
         newContentObj.templateId = '';
       }
     }
-    
+
     setForm((f) => ({ ...f, contentObj: newContentObj }));
   };
 
   // 处理内容变化，检测是否与原始模板不同
   const handleHtmlChange = (newHtml: string) => {
     const newContentObj = { ...form.contentObj, html: newHtml };
-    
+
     // 如果有模板ID且内容已被修改，则清除模板ID
     if (form.contentObj.templateId && originalTemplate) {
       const isSubjectChanged = form.contentObj.subject !== originalTemplate.subject;
       const isHtmlChanged = newHtml !== originalTemplate.html;
-      
+
       if (isSubjectChanged || isHtmlChanged) {
         newContentObj.templateId = '';
       }
     }
-    
+
     setForm((f) => ({ ...f, contentObj: newContentObj }));
   };
 
@@ -174,7 +157,7 @@ export default function MailSend() {
     if (selectedTemplate) {
       const templateSubject = selectedTemplate.title || '';
       const templateHtml = selectedTemplate.content || '';
-      
+
       setForm((f) => ({
         ...f,
         contentObj: {
@@ -183,7 +166,7 @@ export default function MailSend() {
           html: templateHtml,
         },
       }));
-      
+
       // 记录原始模板内容
       setOriginalTemplate({
         subject: templateSubject,
@@ -195,6 +178,8 @@ export default function MailSend() {
         ...f,
         contentObj: {
           ...f.contentObj,
+          subject: '',
+          html: '',
           templateId: '',
         },
       }));
@@ -221,28 +206,18 @@ export default function MailSend() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Only one of accountId or mailAddress should be set, the other must be undefined
-      const senderObj = (() => {
-        if (form.senderObj.accountId && form.senderObj.accountId !== '') {
-          return { accountId: Number(form.senderObj.accountId), mailAddress: undefined };
-        } else if (form.senderObj.mailAddress && form.senderObj.mailAddress !== '') {
-          return { accountId: undefined, mailAddress: form.senderObj.mailAddress };
-        } else {
-          return { accountId: undefined, mailAddress: undefined };
-        }
-      })();
-      const payload = {
-        ...form,
-        senderObj,
-        contentObj: {
-          ...form.contentObj,
-          templateId:
-            form.contentObj.templateId && form.contentObj.templateId !== ''
-              ? Number(form.contentObj.templateId)
-              : undefined,
-        },
+      const data: SendMailRequest = {
+        accountId: Number(form.senderObj.accountId),
+        receiverArr: form.receiverArr,
+        templateId:
+          form.contentObj.templateId && form.contentObj.templateId !== ''
+            ? Number(form.contentObj.templateId)
+            : undefined,
+        subject: form.contentObj.subject,
+        html: form.contentObj.html,
       };
-      const res = await sendMailSingle({ data: payload });
+
+      const res = await mailActionAPI.sendFn({ data });
       if (res.data && res.data.ok) {
         let msg = '邮件发送成功';
         if (typeof res.data.data === 'string') {
@@ -250,12 +225,11 @@ export default function MailSend() {
         } else if (typeof res.data.data === 'object' && res.data.data !== null) {
           msg = JSON.stringify(res.data.data);
         }
-        setSnackbar({ open: true, message: msg, severity: 'success' });
+        showGlobalNotification({ message: msg, type: 'success' });
       } else {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: (res.data?.message as string) || '邮件发送失败',
-          severity: 'error',
+          type: 'error',
         });
       }
     } catch (err) {
@@ -266,14 +240,14 @@ export default function MailSend() {
         typeof (err as Error).message === 'string'
           ? (err as Error).message
           : '邮件发送失败';
-      setSnackbar({ open: true, message: msg, severity: 'error' });
+      showGlobalNotification({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
+    <Box sx={{ mx: 'auto', p: 3 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" gutterBottom fontWeight={600}>
           发送邮件
@@ -297,7 +271,7 @@ export default function MailSend() {
                         {account.nickname || account.mailAddress}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {account.mailAddress} ({account.accountOwner})
+                        {account.mailAddress}
                       </Typography>
                     </Box>
                   </MenuItem>
@@ -413,7 +387,7 @@ export default function MailSend() {
                   已选择模板，内容已自动填充，您可以在此基础上继续编辑
                 </Typography>
               )}
-              <FroalaEditor
+              <JoditEditor
                 value={form.contentObj.html}
                 onChange={handleHtmlChange}
                 placeholder={
@@ -436,12 +410,6 @@ export default function MailSend() {
             </Button>
           </Stack>
         </Box>
-        <NoticeTool
-          open={snackbar.open}
-          message={snackbar.message}
-          severity={snackbar.severity}
-          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
-        />
       </Paper>
     </Box>
   );

@@ -2,12 +2,13 @@ import db from "@/db/index";
 import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import { JSONSchema } from "json-schema-to-ts";
+import type { JSONSchema } from "json-schema-to-ts";
+import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 
 export const mailTemplateIndex = {
   id: {
     type: "number",
-    description: "index id",
+    description: "邮件模板id",
     examples: [1],
   },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
@@ -36,23 +37,32 @@ export const mailTemplateData = {
     type: "string",
     description: "邮件内容",
   },
-  creatorName: {
-    type: "string",
-    description: "创建者名称",
-  },
   category: {
     type: "string",
     description: "邮件分类",
   },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
 
-export const mailTemplateTimestamp = {
+export const mailTemplateAudit = {
+  creatorId: {
+    type: "number",
+    description: "创建者ID",
+  },
+  updaterId: {
+    type: "number",
+    description: "更新者ID",
+    nullable: true,
+  },
   createTimeUtc: {
     type: "number",
+    description: "创建时间",
+    examples: [1672531199000],
   },
   updateTimeUtc: {
     type: "number",
     nullable: true,
+    description: "更新时间",
+    examples: [1672531199000],
   },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
 
@@ -65,7 +75,6 @@ export const mailTemplateTable = sqliteTable("mail_template", {
   title: text("title").notNull(),
   langCode: text("lang_code").notNull(),
   content: text("content").notNull(),
-  creatorName: text("creator_name").notNull(),
   category: text("category"),
   status: integer("status", {
     mode: "boolean",
@@ -73,11 +82,11 @@ export const mailTemplateTable = sqliteTable("mail_template", {
     .notNull()
     .default(true),
   remark: text("remark"),
+  creatorId: integer("creator_id").notNull(),
+  updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
     .notNull()
-    .default(
-      sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
-    ),
+    .default(getCurrentTimestampUtcSql()),
   updateTimeUtc: integer("update_time_utc"),
 });
 
@@ -89,10 +98,11 @@ export async function tableInit() {
             title TEXT NOT NULL,
             lang_code TEXT NOT NULL,
             content TEXT NOT NULL,
-            creator_name TEXT NOT NULL,
             category TEXT,
             status INTEGER NOT NULL DEFAULT 1,
             remark TEXT,
+            creator_id INTEGER NOT NULL,
+            updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
               CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
               CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
@@ -100,7 +110,7 @@ export async function tableInit() {
             update_time_utc INTEGER
         )
     `);
-  console.log("Table initialized");
+  console.log("💾 表 mail_template 已初始化");
 }
 
 export default mailTemplateTable;

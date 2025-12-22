@@ -7,28 +7,35 @@ import {
   useMediaQuery,
   Alert,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
+import {
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginAPI, type LoginCredentials } from '@/api/auth';
-
+import { commonLogin } from '@/api/system/auth';
+import { authUtils } from '@/utils/auth';
+import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
 export default function LoginForm() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // 状态管理
-  const [credentials, setCredentials] = useState<LoginCredentials>({
+  const [credentials, setCredentials] = useState<CommonLoginReq>({
     username: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // 处理输入变化
   const handleInputChange =
-    (field: keyof LoginCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCredentials((prev) => ({
+    (field: keyof CommonLoginReq) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCredentials((prev: CommonLoginReq) => ({
         ...prev,
         [field]: event.target.value,
       }));
@@ -47,9 +54,21 @@ export default function LoginForm() {
     setError('');
 
     try {
-      await loginAPI.commonLogin(credentials);
-      // 登录成功，跳转到首页
-      navigate('/home');
+      const response = await commonLogin({ data: credentials });
+
+      if (response.data.ok && response.data.data) {
+        const loginData = response.data.data as CommonLoginData['data'];
+        const { userObj } = loginData;
+        if (!userObj || !userObj.isEnabled) {
+          setError('用户未启用，请联系管理员');
+          return;
+        }
+        authUtils.setUserInfo(userObj);
+        // 登录成功，跳转到首页
+        navigate('/home');
+      } else {
+        setError(response.data.message || '登录失败');
+      }
     } catch (err) {
       console.log(err);
       setError(err instanceof Error ? err.message : '登录失败');
@@ -92,7 +111,7 @@ export default function LoginForm() {
 
         <TextField
           label="密码"
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           variant="outlined"
           fullWidth
           size={isMobile ? 'medium' : 'medium'}
@@ -100,6 +119,19 @@ export default function LoginForm() {
           onChange={handleInputChange('password')}
           onKeyDown={handleKeyPress}
           disabled={loading}
+          InputProps={{
+            endAdornment: (
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={() => setShowPassword(!showPassword)}
+                onMouseDown={(e) => e.preventDefault()}
+                edge="end"
+                disabled={loading}
+              >
+                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ),
+          }}
         />
 
         <Box sx={{ textAlign: 'right' }}>

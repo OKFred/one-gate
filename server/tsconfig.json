@@ -1,33 +1,25 @@
 {
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "module": "ESNext",
-        "target": "ESNext",
-        "moduleResolution": "bundler",
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "strict": false,
-        "skipLibCheck": true,
-        "noUncheckedSideEffectImports": true,
-        "resolveJsonModule": true,
-        "lib": ["ESNext", "DOM"],
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["./src/*"]
-        }
-    },
-    "include": ["src/**/*", "*.ts"],
-    "exclude": [
-        "node_modules",
-        "dist",
-        "build",
-        "coverage",
-        "tests/**/**",
-        "tests/**/*.spec.ts",
-        "tests/**/*.d.ts"
-    ],
-    "tsc-alias": {
-        "verbose": true,
-        "resolveFullPaths": true
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": false,
+    "skipLibCheck": true,
+    "noUncheckedSideEffectImports": true,
+    "resolveJsonModule": true,
+    "lib": ["ESNext", "DOM"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
     }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "tests/**/**"],
+  "tsc-alias": {
+    "verbose": true,
+    "resolveFullPaths": true
+  }
 }

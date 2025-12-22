@@ -24,25 +24,12 @@ import {
   Error as ErrorIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
-
-interface MailLog {
-  id?: number;
-  mailTo?: string;
-  mailFrom?: string;
-  title?: string;
-  templateId?: string;
-  templateParams?: string;
-  sendStatus?: boolean;
-  exceptionCode?: string;
-  exceptionDetails?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
+import type { ListMailLog } from '../type';
 
 interface LogTableProps {
-  logs: MailLog[];
+  logs: ListMailLog[];
   loading: boolean;
-  onView?: (log: MailLog) => void;
+  onView?: (log: ListMailLog) => void;
 }
 
 export default function LogTable({ logs, loading, onView }: LogTableProps) {

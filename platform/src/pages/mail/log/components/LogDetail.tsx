@@ -20,24 +20,11 @@ import {
   Schedule as TimeIcon,
   Description as TemplateIcon,
 } from '@mui/icons-material';
-
-interface MailLog {
-  id?: number;
-  mailTo?: string;
-  mailFrom?: string;
-  title?: string;
-  templateId?: string;
-  templateParams?: string;
-  sendStatus?: boolean;
-  exceptionCode?: string;
-  exceptionDetails?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
+import type { ListMailLog } from '../type';
 
 interface LogDetailProps {
   open: boolean;
-  log: MailLog | null;
+  log: ListMailLog | null;
   onClose: () => void;
 }
 

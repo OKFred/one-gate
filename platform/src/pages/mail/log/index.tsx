@@ -5,37 +5,18 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
-import { listMailLog } from '@/api/mail';
+import * as mailLogAPI from '@/api/mail/log';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
 import LogFilter from './components/LogFilter';
 import LogTable from './components/LogTable';
 import LogDetail from './components/LogDetail';
-
-interface MailLog {
-  id?: number;
-  mailTo?: string;
-  mailFrom?: string;
-  title?: string;
-  templateId?: string;
-  templateParams?: string;
-  sendStatus?: boolean;
-  exceptionCode?: string;
-  exceptionDetails?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
-
-interface FilterState {
-  keyword: string;
-  orderBy: 'id' | 'mailTo' | 'mailFrom' | 'createTimeUtc';
-  descend: boolean;
-}
+import type { ListMailLog, FilterState } from './type';
 
 export default function MailLogRefactored() {
-  const [logs, setLogs] = useState<MailLog[]>([]);
+  const [logs, setLogs] = useState<ListMailLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [selectedLog, setSelectedLog] = useState<MailLog | null>(null);
+  const [selectedLog, setSelectedLog] = useState<ListMailLog | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
     keyword: '',
@@ -54,8 +35,8 @@ export default function MailLogRefactored() {
         descend: searchParams.descend,
       };
 
-      const res = await listMailLog({ data: requestData });
-      const response = res.data as { data?: { list?: MailLog[]; total?: number } };
+      const res = await mailLogAPI.listFn({ data: requestData });
+      const response = res.data;
       const logsList = response?.data?.list || [];
       const total = response?.data?.total || 0;
 
@@ -78,7 +59,7 @@ export default function MailLogRefactored() {
     fetchLogs(filters);
   };
 
-  const handleViewLog = (log: MailLog) => {
+  const handleViewLog = (log: ListMailLog) => {
     setSelectedLog(log);
     setDetailOpen(true);
   };
@@ -109,18 +90,10 @@ export default function MailLogRefactored() {
       <LogFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
 
       {/* 数据表格 */}
-      <LogTable
-        logs={logs}
-        loading={loading}
-        onView={handleViewLog}
-      />
+      <LogTable logs={logs} loading={loading} onView={handleViewLog} />
 
       {/* 详情对话框 */}
-      <LogDetail
-        open={detailOpen}
-        log={selectedLog}
-        onClose={handleCloseDetail}
-      />
+      <LogDetail open={detailOpen} log={selectedLog} onClose={handleCloseDetail} />
     </PageLayout>
   );
 }

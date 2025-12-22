@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { authUtils } from '@/utils/auth';
-import { loginAPI } from '@/api/auth';
+import { verifyToken } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 
 interface ProtectedRouteProps {
@@ -15,8 +15,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = authUtils.getToken();
-      
+      const token = authUtils.getUserInfo()?.token;
+
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
@@ -25,8 +25,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       try {
         // 验证token是否有效
-        const result = await loginAPI.verifyToken(token);
-        if (result.valid) {
+        const result = await verifyToken({ data: { token } });
+        const verified = result.data;
+
+        if (result.data.ok && verified) {
           setIsAuthenticated(true);
         } else {
           // token无效，清理本地存储
@@ -63,13 +65,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // 未认证，重定向到登录页
   if (!isAuthenticated) {
-    return (
-      <Navigate 
-        to="/login" 
-        state={{ from: location }} 
-        replace 
-      />
-    );
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   // 已认证，渲染子组件

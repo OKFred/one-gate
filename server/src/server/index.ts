@@ -1,11 +1,12 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import logHandler from "@/middleware/logger";
 import errorHandler from "@/middleware/errorHandler";
-import docRegister from "@/doc/docRegister";
+import docRegister from "@/middleware/doc/docRegister";
 import corsHandler from "@/middleware/cors";
 import nodeServer from "@/middleware/nodeServer/index";
 import routeRegister from "@/api/index";
-import { AppBindings, NodeHonoContext } from "@/types/app";
+import type { AppBindings, NodeHonoContext } from "@/types/app";
+import initDatabase from "@/db/init";
 
 async function createApp() {
   const app = new OpenAPIHono<AppBindings>();
@@ -17,12 +18,20 @@ async function createApp() {
   //   pathHandler(app);
   docRegister(app);
   await routeRegister(app);
+
+  // 初始化数据库数据（超级管理员角色和账号）
+  setTimeout(initDatabase, 0);
+
   nodeServer(app);
   //   normalRouter(app);
   app.get("/", (c: NodeHonoContext) => {
     const { logger } = c.var;
     logger.info("gotcha");
-    return c.json({ ok: true, message: new Date().toLocaleString() });
+    return c.json({
+      ok: true,
+      data: new Date().toLocaleString(),
+      message: "OK",
+    });
   });
   return app;
 }

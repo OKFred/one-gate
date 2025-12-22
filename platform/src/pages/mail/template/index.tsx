@@ -1,50 +1,22 @@
-/**
- * 邮件模板管理页面
- * 使用响应式组件系统和FroalaEditor富文本编辑器
- * 参考邮件账户管理的架构和OpenAPI文档
- */
-
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
-import {
-  listMailTemplate,
-  addMailTemplate,
-  updateMailTemplate,
-  deleteMailTemplate,
-} from '@/api/mail';
+import * as mailTemplateAPI from '@/api/mail/template';
+import { showGlobalNotification } from '@/utils/notification';
 import { PageLayout, ResponsiveButton } from '@/layout/responsive';
-import NoticeTool from '@/components/NoticeTool';
 import TemplateForm from './components/TemplateForm';
 import TemplateTable from './components/TemplateTable';
 import TemplateFilter from './components/TemplateFilter';
 import TemplatePreview from './components/TemplatePreview';
-
-interface MailTemplate {
-  id?: number;
-  name?: string;
-  title?: string;
-  langCode?: string;
-  content?: string;
-  creatorName?: string;
-  category?: string;
-  createTimeUtc?: number;
-  updateTimeUtc?: number | null;
-}
-
-interface FilterState {
-  keyword: string;
-  orderBy: 'id' | 'langCode' | 'creatorName' | 'category' | 'createTimeUtc';
-  descend: boolean;
-}
+import type { ListMailTemplate, FilterState } from './type';
 
 export default function MailTemplate() {
-  const [templates, setTemplates] = useState<MailTemplate[]>([]);
+  const [templates, setTemplates] = useState<ListMailTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
-  const [previewTemplate, setPreviewTemplate] = useState<MailTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] = useState<ListMailTemplate | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [filters, setFilters] = useState<FilterState>({
     keyword: '',
@@ -56,14 +28,8 @@ export default function MailTemplate() {
     title: '',
     langCode: '',
     content: '',
-    creatorName: '',
     category: '',
   });
-  const [snackbar, setSnackbar] = useState<{
-    open: boolean;
-    message: string;
-    severity: 'success' | 'error';
-  }>({ open: false, message: '', severity: 'success' });
 
   // 获取模板列表
   const fetchTemplates = useCallback(async (searchParams: FilterState) => {
@@ -77,8 +43,8 @@ export default function MailTemplate() {
         descend: searchParams.descend,
       };
 
-      const res = await listMailTemplate({ data: requestData });
-      const response = res.data as { data?: { list?: MailTemplate[]; total?: number } };
+      const res = await mailTemplateAPI.listFn({ data: requestData });
+      const response = res.data;
       const templatesList = response?.data?.list || [];
       const total = response?.data?.total || 0;
 
@@ -86,10 +52,9 @@ export default function MailTemplate() {
       setTotalCount(total);
     } catch (error) {
       console.error('获取模板列表失败:', error);
-      setSnackbar({
-        open: true,
+      showGlobalNotification({
         message: '获取模板列表失败',
-        severity: 'error',
+        type: 'error',
       });
     } finally {
       setLoading(false);
@@ -115,14 +80,13 @@ export default function MailTemplate() {
   }, [fetchTemplates]);
 
   // 编辑模板
-  const handleEdit = (template: MailTemplate) => {
+  const handleEdit = (template: ListMailTemplate) => {
     setEditId(template.id!);
     setForm({
       name: template.name || '',
       title: template.title || '',
       langCode: template.langCode || '',
       content: template.content || '',
-      creatorName: template.creatorName || '',
       category: template.category || '',
     });
     setOpen(true);
@@ -136,14 +100,13 @@ export default function MailTemplate() {
       title: '',
       langCode: '',
       content: '',
-      creatorName: '',
       category: '',
     });
     setOpen(true);
   };
 
   // 预览模板
-  const handlePreview = (template: MailTemplate) => {
+  const handlePreview = (template: ListMailTemplate) => {
     setPreviewTemplate(template);
     setPreviewOpen(true);
   };
@@ -151,27 +114,24 @@ export default function MailTemplate() {
   // 删除模板
   const handleDelete = async (id: number) => {
     try {
-      const res = await deleteMailTemplate({ data: { id } });
+      const res = await mailTemplateAPI.deleteFn({ data: { id } });
       if (res.data?.ok) {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: '删除成功',
-          severity: 'success',
+          type: 'success',
         });
         fetchTemplates(filters);
       } else {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: res.data?.message || '删除失败',
-          severity: 'error',
+          type: 'error',
         });
       }
     } catch (error) {
       console.error('删除模板失败:', error);
-      setSnackbar({
-        open: true,
+      showGlobalNotification({
         message: '删除失败',
-        severity: 'error',
+        type: 'error',
       });
     }
   };
@@ -184,47 +144,44 @@ export default function MailTemplate() {
     try {
       let res;
       if (editId) {
-        res = await updateMailTemplate({
+        res = await mailTemplateAPI.updateFn({
           data: {
             id: editId,
             ...form,
             // 过滤空字符串，使可选字段正确传递
             langCode: form.langCode || undefined,
-            category: form.category || undefined,
+            category: form.category,
           },
         });
       } else {
-        res = await addMailTemplate({
+        res = await mailTemplateAPI.addFn({
           data: {
             ...form,
             // 过滤空字符串，使可选字段正确传递
-            langCode: form.langCode || undefined,
-            category: form.category || undefined,
+            langCode: form.langCode,
+            category: form.category,
           },
         });
       }
 
       if (res.data?.ok) {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: editId ? '更新成功' : '新增成功',
-          severity: 'success',
+          type: 'success',
         });
         handleCancel();
         fetchTemplates(filters);
       } else {
-        setSnackbar({
-          open: true,
+        showGlobalNotification({
           message: res.data?.message || (editId ? '更新失败' : '新增失败'),
-          severity: 'error',
+          type: 'error',
         });
       }
     } catch (error) {
       console.error('保存模板失败:', error);
-      setSnackbar({
-        open: true,
+      showGlobalNotification({
         message: editId ? '更新失败' : '新增失败',
-        severity: 'error',
+        type: 'error',
       });
     } finally {
       setFormLoading(false);
@@ -240,7 +197,6 @@ export default function MailTemplate() {
       title: '',
       langCode: '',
       content: '',
-      creatorName: '',
       category: '',
     });
   };
@@ -285,14 +241,6 @@ export default function MailTemplate() {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onPreview={handlePreview}
-      />
-
-      {/* 通知组件 */}
-      <NoticeTool
-        open={snackbar.open}
-        message={snackbar.message}
-        severity={snackbar.severity}
-        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
       />
     </PageLayout>
   );

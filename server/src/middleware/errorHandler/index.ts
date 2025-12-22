@@ -1,6 +1,8 @@
-import type { App } from "@/types/app.ts";
+import type { App, NodeHonoContext } from "@/types/app.ts";
+import { createTranslator, getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
+import type { LanguageKey } from "@/types/locales.ts";
 
 type HTTPExceptionConstructorParams = Required<
   ConstructorParameters<typeof HTTPException>
@@ -8,10 +10,15 @@ type HTTPExceptionConstructorParams = Required<
 type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // 提取第二个参数的类型
 
 export default function errorHandler(app: App) {
-  app.notFound((c) => {
+  app.notFound((c: NodeHonoContext) => {
+    const t = getTranslator(c);
     return c.json(
-      { ok: false, message: "Not Found", errors: [] },
-      { status: 404 },
+      {
+        ok: false,
+        message: t("i18n.middleware.errorHandler.notFound"),
+        data: null,
+      },
+      { status: 404 }
     );
   });
 
@@ -20,61 +27,65 @@ export default function errorHandler(app: App) {
     properties: {
       ok: { type: "boolean" },
       message: { type: "string" },
-      errors: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            instanceLocation: { type: "string" },
-            keyword: { type: "string" },
-            keywordLocation: { type: "string" },
-            error: { type: "string" },
-          },
-        },
-      },
+      data: { type: "object" },
     },
-    required: ["ok", "message"],
+    required: ["ok", "message", "data"],
+    additionalProperties: false,
   });
 
-  app.onError((e, c) => {
+  app.onError((e, c: NodeHonoContext) => {
+    const t = getTranslator(c);
+
     if (e instanceof HTTPException) {
-      const message =
-        e.status === 404
-          ? "目标不存在"
-          : e.status === 422
-            ? "请求体校验失败"
-            : "服务器异常";
+      const message = e.message
+        ? e.message.startsWith("i18n.")
+          ? t(e.message as LanguageKey)
+          : e.message
+        : e.status === 403
+          ? t("i18n.middleware.errorHandler.forbidden")
+          : e.status === 404
+            ? t("i18n.middleware.errorHandler.targetNotExist")
+            : e.status === 422
+              ? t("i18n.middleware.errorHandler.validationFailed")
+              : t("i18n.middleware.errorHandler.undefinedError");
+      if (message === t("i18n.middleware.errorHandler.undefinedError")) {
+        c.var.logger.error(
+          t("i18n.middleware.errorHandler.undefinedError") + ": " + e.stack
+        );
+      }
       return c.json(
         {
           ok: false,
           message,
-          errors: e.cause as HTTPExceptionOptions["cause"],
+          data: e.cause as HTTPExceptionOptions["cause"],
         },
         {
           status: e.status,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
-    let message = "未知异常";
+    let message = t("i18n.middleware.errorHandler.unknownError");
     if (e.message?.includes("SQLITE_CONSTRAINT_UNIQUE")) {
-      message = "数据重复";
+      message = t("i18n.middleware.errorHandler.duplicatedData");
       return c.json(
         {
           ok: false,
           message,
         },
-        { status: 409 },
+        { status: 409 }
       );
     }
-    console.log(e);
+    c.var.logger.error(
+      t("i18n.middleware.errorHandler.serverError") + ": " + e.stack
+    );
     return c.json(
       {
         ok: false,
         message,
-        errors: process.env.NODE_ENV !== "production" && e.message,
+        data: process.env.NODE_ENV !== "production" ? e.message : null,
       },
-      { status: 500 },
+      { status: 500 }
     );
   });
 }
@@ -87,4 +98,9 @@ process.on("uncaughtException", function (err) {
   console.log("uncaughtException:" + err);
 });
 
-process.env.NODE_ENV === "production" && console.log("服务器已启动");
+process.env.NODE_ENV === "production" &&
+  console.log(
+    createTranslator(process.env.LOCALE)(
+      "i18n.middleware.errorHandler.serverStarted"
+    )
+  );

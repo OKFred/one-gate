@@ -10,12 +10,10 @@ import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
 import { useResponsive } from '../responsive';
 import { authUtils, type UserInfo } from '@/utils/auth';
-import { loginAPI } from '@/api/auth';
 import { useNavigate } from 'react-router-dom';
 
 interface TopbarProps {
@@ -52,7 +50,8 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   // 处理登出
   const handleLogout = () => {
     handleClose();
-    loginAPI.logout();
+    authUtils.logout();
+    navigate('/login');
   };
 
   // 获取用户名显示
@@ -87,7 +86,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             }}
           >
             <IconButton color="inherit" onClick={() => setSidebarOpen((v) => !v)}>
-              {sidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+              <MenuIcon />
             </IconButton>
           </Box>
         )}
@@ -156,7 +155,7 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
             <Box>
               <Typography variant="subtitle2">{userInfo?.username}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {userInfo?.department} · {userInfo?.role}
+                {userInfo?.departmentId} · {userInfo?.roleIdArr?.join(',')}
               </Typography>
             </Box>
           </MenuItem>

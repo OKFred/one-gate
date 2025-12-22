@@ -10,9 +10,9 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - DB_FILE_NAME=file:/data.db
+      - LOCALE=zh-CN
     volumes:
       - ./server/logs:/app/logs
-      - ./server/data:/app/data
       - ./data.db:/data.db
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
@@ -28,7 +28,6 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       backend:
         condition: service_healthy

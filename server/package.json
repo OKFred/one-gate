@@ -7,11 +7,9 @@
   "scripts": {
     "dev": "npx tsx --watch -r dotenv/config ./src/index.ts",
     "build": "npx tsgo && npx tsc-alias",
-    "build:docker": "docker build -t registry.cn-hangzhou.aliyuncs.com/one-registry/base-mail-service:1.0.1 . && docker push registry.cn-hangzhou.aliyuncs.com/one-registry/base-mail-service:1.0.1",
+    "visualize": "node dependency-visualize.ts",
     "start:ts": "node ./src/index.ts",
-    "start": "node ./dist/index.js",
-    "test:generate": "pnpm exec openapi-generator-cli generate -i http://localhost:3000/doc.json -g javascript -o ./test/openapi-client",
-    "test:run": "cd ./test/openapi-client && npm install && pnpm run test"
+    "start": "node ./dist/index.js"
   },
   "keywords": [],
   "author": "FZ",
@@ -42,8 +40,11 @@
     "xpath": "^0.0.32"
   },
   "devDependencies": {
+    "@babel/parser": "^7.28.4",
+    "@babel/traverse": "^7.28.4",
     "@eslint/js": "^9.22.0",
     "@libsql/client": "^0.15.12",
+    "@types/babel__traverse": "^7.28.0",
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.13.10",
     "@types/nodemailer": "^6.4.17",
