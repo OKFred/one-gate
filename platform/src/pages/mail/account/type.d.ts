@@ -1,5 +1,9 @@
 import * as MailAPI from '@/api/mail/account';
 
+export interface Props {
+  localObj: LocalObj;
+}
+
 // 筛选状态类型
 export interface FilterState {
   keyword: string;

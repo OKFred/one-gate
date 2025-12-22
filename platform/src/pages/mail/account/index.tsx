@@ -1,179 +1,26 @@
-import { useEffect, useState, useCallback } from 'react';
-import { Add as AddIcon } from '@mui/icons-material';
-import * as mailAccountAPI from '@/api/mail/account';
-import { PageLayout, ResponsiveButton } from '@/layout/responsive';
-import AccountForm from './components/AccountForm';
-import AccountTable from './components/AccountTable';
-import AccountFilter from './components/AccountFilter';
-import type { FilterState, ListMailAccount, AddMailAccountRequest } from './type';
+import { useRef, useMemo } from 'react';
+import { PageLayout } from '@/layout/responsive';
+import AccountForm, { type AccountFormRef } from './components/AccountForm';
+import AccountTable, { type AccountTableRef } from './components/AccountTable';
+import AccountFilter, { type AccountFilterRef } from './components/AccountFilter';
+
+export interface LocalObj {
+  tableRef: React.RefObject<AccountTableRef | null>;
+  formRef: React.RefObject<AccountFormRef | null>;
+  filterRef: React.RefObject<AccountFilterRef | null>;
+}
 
 export default function MailAccountPage() {
-  const [accounts, setAccounts] = useState<ListMailAccount[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
-  const [filters, setFilters] = useState<FilterState>({
-    keyword: '',
-    orderBy: 'id',
-    descend: false,
-  });
-  const [form, setForm] = useState<AddMailAccountRequest>({
-    nickname: '',
-    mailAddress: '',
-    host: '',
-    port: 465,
-    password: '',
-    sslEnable: true,
-    starttlsEnable: false,
-  });
-
-  const fetchAccounts = useCallback(async (searchParams: FilterState, currentPage: number = 1) => {
-    setLoading(true);
-    try {
-      const requestData = {
-        pageNo: currentPage,
-        pageSize,
-        ...(searchParams.keyword && { keyword: searchParams.keyword }),
-        orderBy: searchParams.orderBy,
-        descend: searchParams.descend,
-      };
-
-      const res = await mailAccountAPI.listFn({ data: requestData });
-      const response = res.data;
-      const accountsList = response?.data?.list || [];
-      const total = response?.data?.total || 0;
-
-      setAccounts(accountsList);
-      setTotalCount(total);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const handleFilterChange = useCallback(
-    (newFilters: FilterState) => {
-      setFilters(newFilters);
-      setPage(1);
-      fetchAccounts(newFilters, 1);
-    },
-    [fetchAccounts],
-  );
-
-  const handlePageChange = useCallback(
-    (newPage: number) => {
-      setPage(newPage);
-      fetchAccounts(filters, newPage);
-    },
-    [fetchAccounts, filters],
-  );
-
-  useEffect(() => {
-    fetchAccounts({
-      keyword: '',
-      orderBy: 'id',
-      descend: false,
-    });
-  }, [fetchAccounts]);
-
-  const handleEdit = (acc: ListMailAccount) => {
-    setEditId(acc.id!);
-    setForm({
-      nickname: acc.nickname || '',
-      mailAddress: acc.mailAddress || '',
-      host: acc.host || '',
-      port: acc.port,
-      password: acc.password || '',
-      sslEnable: acc.sslEnable,
-      starttlsEnable: acc.starttlsEnable,
-    });
-    setOpen(true);
-  };
-
-  const handleAdd = () => {
-    setEditId(null);
-    setForm({
-      nickname: '',
-      mailAddress: '',
-      host: '',
-      port: 465,
-      password: '',
-      sslEnable: true,
-      starttlsEnable: false,
-    });
-    setOpen(true);
-  };
-
-  const handleDelete = async (id: number) => {
-    await mailAccountAPI.deleteFn({ data: { id } });
-    fetchAccounts(filters);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = {
-      ...form,
-      port: form.port,
-    };
-
-    if (editId) {
-      await mailAccountAPI.updateFn({ data: { id: editId, ...formData } });
-    } else {
-      await mailAccountAPI.addFn({ data: formData });
-    }
-    handleCancel();
-    fetchAccounts(filters);
-  };
-
-  const handleCancel = () => {
-    setEditId(null);
-    setOpen(false);
-    setForm({
-      nickname: '',
-      mailAddress: '',
-      host: '',
-      port: 465,
-      password: '',
-      sslEnable: true,
-      starttlsEnable: false,
-    });
-  };
+  const tableRef = useRef<AccountTableRef>(null);
+  const formRef = useRef<AccountFormRef>(null);
+  const filterRef = useRef<AccountFilterRef>(null);
+  const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout
-      title="邮件账户管理"
-      actions={
-        <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-          新增账户
-        </ResponsiveButton>
-      }
-    >
-      {/* 筛选组件 */}
-      <AccountFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
-
-      {/* 表单对话框 */}
-      <AccountForm
-        open={open}
-        form={form}
-        editId={editId}
-        onFormChange={setForm}
-        onSubmit={handleSubmit}
-        onCancel={handleCancel}
-      />
-
-      {/* 数据表格 */}
-      <AccountTable
-        accounts={accounts}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        page={page}
-        pageSize={pageSize}
-        total={totalCount}
-        onPageChange={handlePageChange}
-      />
+    <PageLayout title="邮件账户管理">
+      <AccountFilter ref={localObj.filterRef} localObj={localObj} />
+      <AccountForm ref={localObj.formRef} localObj={localObj} />
+      <AccountTable ref={localObj.tableRef} localObj={localObj} />
     </PageLayout>
   );
 }
