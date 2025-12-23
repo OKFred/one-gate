@@ -1,8 +1,7 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import type { ContainerProps, BoxProps } from '@mui/material';
-import { ResponsiveContainer } from './ResponsiveContainer';
-import { ResponsiveButtonGroup } from './ResponsiveButton';
+import { ResponsiveButtonGroup } from '@/components/Responsive/ResponsiveButton';
 
 interface PageLayoutProps {
   title: string;
@@ -12,15 +11,9 @@ interface PageLayoutProps {
   className?: string;
 }
 
-export const PageLayout: React.FC<PageLayoutProps> = ({
-  title,
-  actions,
-  children,
-  maxWidth = 'lg',
-  className,
-}) => {
+export const PageLayout: React.FC<PageLayoutProps> = ({ title, actions, children, className }) => {
   return (
-    <ResponsiveContainer maxWidth={maxWidth} className={className}>
+    <div className={className}>
       {/* 页面标题区域 */}
       <Box
         sx={{
@@ -41,7 +34,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
 
       {/* 页面内容 */}
       {children}
-    </ResponsiveContainer>
+    </div>
   );
 };
 

@@ -16,8 +16,6 @@ import {
   Typography,
   Chip,
   Pagination,
-  useTheme,
-  useMediaQuery,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -31,6 +29,7 @@ import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/ico
 import * as roleAPI from '@/api/system/role';
 import type { ListRole, FilterState } from '../type.d';
 import type { Props } from '../type.d';
+import { useResponsive } from '@/hooks/useResponsive';
 
 // 暴露给父组件的方法
 export interface RoleTableRef {
@@ -61,8 +60,7 @@ const DEFAULT_FILTERS: FilterState = {
 const RoleTable = memo(
   forwardRef<RoleTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const { isMobile } = useResponsive();
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({

@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router';
 import Icon from '@/components/Icon';
 import { treeFn } from '@/api/system/menu';
 import type { SystemMenuTree } from './type';
-import { useResponsive } from '../responsive';
+import { useResponsive } from '@/hooks/useResponsive';
 
 const drawerWidth = 240;
 

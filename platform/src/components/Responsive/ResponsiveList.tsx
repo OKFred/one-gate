@@ -14,9 +14,8 @@ import {
   CardContent,
   Typography,
   Pagination,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
+import { useResponsive } from '@/hooks/useResponsive';
 
 /** 表格列配置 */
 export interface TableColumn<T> {
@@ -83,8 +82,8 @@ function ResponsiveListInner<T>({
   emptyText = '暂无数据',
   extraContent,
 }: ResponsiveListProps<T>) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
+
   const totalPages = Math.ceil(total / pageSize);
 
   // 加载状态
@@ -159,7 +158,11 @@ function ResponsiveListInner<T>({
                         </Typography>
                       )}
                     </Box>
-                    {cardActions && <Stack direction="row" spacing={1}>{cardActions(item)}</Stack>}
+                    {cardActions && (
+                      <Stack direction="row" spacing={1}>
+                        {cardActions(item)}
+                      </Stack>
+                    )}
                   </Box>
 
                   {/* 内容字段 */}

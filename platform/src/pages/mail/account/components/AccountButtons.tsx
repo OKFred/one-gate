@@ -10,7 +10,7 @@ import {
   Button,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { ResponsiveButton } from '@/layout/responsive';
+import { ResponsiveButton } from '@/components/Responsive/index';
 import * as mailAccountAPI from '@/api/mail/account';
 import type { ListMailAccount } from '../type.d';
 import type { AccountFormRef } from './AccountForm';

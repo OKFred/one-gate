@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Box } from '@mui/material';
 import type { ButtonProps, BoxProps } from '@mui/material';
-import { useResponsive } from '../hooks/useResponsive';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface ResponsiveButtonProps extends ButtonProps {
   mobileFullWidth?: boolean;
@@ -19,18 +19,16 @@ export const ResponsiveButton: React.FC<ResponsiveButtonProps> = ({
 }) => {
   const { isMobile } = useResponsive();
 
-  const finalVariant = isMobile && mobileVariant ? mobileVariant : 
-                      !isMobile && desktopVariant ? desktopVariant : variant;
-  
+  const finalVariant =
+    isMobile && mobileVariant
+      ? mobileVariant
+      : !isMobile && desktopVariant
+        ? desktopVariant
+        : variant;
+
   const finalFullWidth = isMobile ? mobileFullWidth : fullWidth;
 
-  return (
-    <Button
-      variant={finalVariant}
-      fullWidth={finalFullWidth}
-      {...props}
-    />
-  );
+  return <Button variant={finalVariant} fullWidth={finalFullWidth} {...props} />;
 };
 
 interface ResponsiveButtonGroupProps extends BoxProps {

@@ -66,7 +66,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   return (
     <AppBar
       position="fixed"
-      sx={{ width: '100vw', left: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}
+      sx={{ left: 0, right: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}
     >
       <Toolbar sx={{ minHeight: '64px', pl: { sm: 0 } }}>
         <Box

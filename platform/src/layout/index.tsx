@@ -1,17 +1,14 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme } from '@mui/material/styles';
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
 import Content from './components/Content';
 import ScrollTop from './components/ScrollTop';
-import { ResponsiveProvider } from './responsive';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function ResponsiveLayout() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMobile } = useResponsive();
   const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile);
 
   // 监听屏幕尺寸变化，移动端时关闭侧边栏，桌面端时打开侧边栏
@@ -24,7 +21,7 @@ export default function ResponsiveLayout() {
   };
 
   return (
-    <ResponsiveProvider>
+    <div>
       <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: 'background.default' }}>
         <CssBaseline />
         <Topbar setSidebarOpen={setSidebarOpen} />
@@ -34,6 +31,6 @@ export default function ResponsiveLayout() {
         </Box>
         <ScrollTop />
       </Box>
-    </ResponsiveProvider>
+    </div>
   );
 }

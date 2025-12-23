@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { PageLayout } from '@/layout/responsive';
+import { PageLayout } from '@/components/Responsive/index';
 import AccountForm, { type AccountFormRef } from './components/AccountForm';
 import AccountTable, { type AccountTableRef } from './components/AccountTable';
 import AccountFilter, { type AccountFilterRef } from './components/AccountFilter';

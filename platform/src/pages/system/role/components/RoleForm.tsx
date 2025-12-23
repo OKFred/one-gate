@@ -11,13 +11,13 @@ import {
   Switch,
   Box,
   useTheme,
-  useMediaQuery,
   IconButton,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as roleAPI from '@/api/system/role';
 import type { AddRoleRequest, ListRole } from '../type';
 import type { Props } from '../type.d';
+import { useResponsive } from '@/hooks/useResponsive';
 
 // 暴露给父组件的方法
 export interface RoleFormRef {
@@ -40,7 +40,7 @@ const RoleForm = memo(
   forwardRef<RoleFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const { isMobile } = useResponsive();
 
     // 内部状态管理
     const [open, setOpen] = useState(false);

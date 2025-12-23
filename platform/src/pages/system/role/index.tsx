@@ -1,5 +1,5 @@
 import { useRef, useMemo } from 'react';
-import { PageLayout } from '@/layout/responsive';
+import { PageLayout } from '@/components/Responsive/index';
 import RoleForm, { type RoleFormRef } from './components/RoleForm';
 import RoleTable, { type RoleTableRef } from './components/RoleTable';
 import RoleFilter, { type RoleFilterRef } from './components/RoleFilter';

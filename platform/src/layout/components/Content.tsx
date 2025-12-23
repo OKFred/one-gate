@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import { Outlet } from 'react-router-dom';
-import { useResponsive } from '../responsive';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface ContentProps {
   sidebarOpen: boolean;
@@ -11,7 +11,7 @@ const drawerWidth = 240;
 
 const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
   const { isMobile } = useResponsive();
-  
+
   return (
     <Box
       component="main"

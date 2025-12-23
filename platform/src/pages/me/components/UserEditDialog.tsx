@@ -23,7 +23,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import { ResponsiveButton } from '@/layout/responsive';
+import { ResponsiveButton } from '@/components/Responsive/index';
 import type { User } from '@/pages/me/type';
 
 interface FormData {

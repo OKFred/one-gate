@@ -10,8 +10,6 @@ import {
   Chip,
   Stack,
   Alert,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   CheckCircle as SuccessIcon,
@@ -21,6 +19,7 @@ import {
   Description as TemplateIcon,
 } from '@mui/icons-material';
 import type { ListMailLog } from '../type';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface LogDetailProps {
   open: boolean;
@@ -29,8 +28,7 @@ interface LogDetailProps {
 }
 
 export default function LogDetail({ open, log, onClose }: LogDetailProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
@@ -50,13 +48,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
   if (!log) return null;
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="md" 
-      fullWidth
-      fullScreen={isMobile}
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth fullScreen={isMobile}>
       <DialogTitle>
         <Box display="flex" alignItems="center" gap={2}>
           <EmailIcon color="primary" />
@@ -65,7 +57,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
           </Typography>
         </Box>
       </DialogTitle>
-      
+
       <DialogContent>
         <Stack spacing={3}>
           {/* 发送状态 */}
@@ -74,19 +66,9 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
               发送状态
             </Typography>
             {log.sendStatus ? (
-              <Chip 
-                icon={<SuccessIcon />} 
-                label="发送成功" 
-                color="success" 
-                variant="outlined"
-              />
+              <Chip icon={<SuccessIcon />} label="发送成功" color="success" variant="outlined" />
             ) : (
-              <Chip 
-                icon={<ErrorIcon />} 
-                label="发送失败" 
-                color="error" 
-                variant="outlined"
-              />
+              <Chip icon={<ErrorIcon />} label="发送失败" color="error" variant="outlined" />
             )}
           </Box>
 
@@ -102,11 +84,9 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
                 <Typography variant="subtitle2" color="text.secondary">
                   邮件标题
                 </Typography>
-                <Typography variant="body1">
-                  {log.title || '-'}
-                </Typography>
+                <Typography variant="body1">{log.title || '-'}</Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
                   收件人
@@ -115,7 +95,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
                   {log.mailTo || '-'}
                 </Typography>
               </Box>
-              
+
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
                   发件人
@@ -140,19 +120,15 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
                 <Typography variant="subtitle2" color="text.secondary">
                   创建时间
                 </Typography>
-                <Typography variant="body1">
-                  {formatDate(log.createTimeUtc)}
-                </Typography>
+                <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
               </Box>
-              
+
               {log.updateTimeUtc && (
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
                     更新时间
                   </Typography>
-                  <Typography variant="body1">
-                    {formatDate(log.updateTimeUtc)}
-                  </Typography>
+                  <Typography variant="body1">{formatDate(log.updateTimeUtc)}</Typography>
                 </Box>
               )}
             </Stack>
@@ -173,20 +149,18 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
                       <Typography variant="subtitle2" color="text.secondary">
                         模板ID
                       </Typography>
-                      <Typography variant="body1">
-                        {log.templateId}
-                      </Typography>
+                      <Typography variant="body1">{log.templateId}</Typography>
                     </Box>
                   )}
-                  
+
                   {log.templateParams && (
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary">
                         模板参数
                       </Typography>
-                      <Box 
-                        component="pre" 
-                        sx={{ 
+                      <Box
+                        component="pre"
+                        sx={{
                           backgroundColor: 'grey.100',
                           p: 2,
                           borderRadius: 1,
@@ -218,7 +192,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
                     <Typography variant="body2">{log.exceptionCode}</Typography>
                   </Alert>
                 )}
-                
+
                 {log.exceptionDetails && (
                   <Alert severity="error">
                     <Typography variant="subtitle2">错误详情</Typography>
@@ -230,7 +204,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
           )}
         </Stack>
       </DialogContent>
-      
+
       <DialogActions>
         <Button onClick={onClose} color="primary" variant="contained">
           关闭

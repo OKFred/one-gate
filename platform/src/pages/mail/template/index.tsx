@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
 import * as mailTemplateAPI from '@/api/mail/template';
-import { showGlobalNotification } from '@/utils/notification';
-import { PageLayout, ResponsiveButton } from '@/layout/responsive';
+import { showGlobalNotification } from '@/components/Notification';
+import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import TemplateForm from './components/TemplateForm';
 import TemplateTable from './components/TemplateTable';
 import TemplateFilter from './components/TemplateFilter';

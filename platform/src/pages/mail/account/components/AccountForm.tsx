@@ -14,7 +14,6 @@ import {
   Radio,
   Box,
   useTheme,
-  useMediaQuery,
   IconButton,
 } from '@mui/material';
 import {
@@ -25,6 +24,7 @@ import {
 import * as mailAccountAPI from '@/api/mail/account';
 import type { AddMailAccountRequest, ListMailAccount } from '../type';
 import type { Props } from '../type.d';
+import { useResponsive } from '@/hooks/useResponsive';
 
 // 暴露给父组件的方法
 export interface AccountFormRef {
@@ -50,7 +50,7 @@ const AccountForm = memo(
   forwardRef<AccountFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const { isMobile } = useResponsive();
 
     // 内部状态管理
     const [open, setOpen] = useState(false);

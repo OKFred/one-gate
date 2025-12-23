@@ -6,7 +6,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import * as mailLogAPI from '@/api/mail/log';
-import { PageLayout, ResponsiveButton } from '@/layout/responsive';
+import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import LogFilter from './components/LogFilter';
 import LogTable from './components/LogTable';
 import LogDetail from './components/LogDetail';

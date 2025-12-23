@@ -14,8 +14,6 @@ import {
   CardContent,
   Typography,
   Chip,
-  useTheme,
-  useMediaQuery,
   Tooltip,
 } from '@mui/material';
 import {
@@ -25,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { ListMailTemplate } from '../type';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface TemplateTableProps {
   templates: ListMailTemplate[];
@@ -41,8 +40,7 @@ export default function TemplateTable({
   onDelete,
   onPreview,
 }: TemplateTableProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';

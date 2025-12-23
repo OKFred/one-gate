@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
 import * as UserApiService from '@/api/system/user';
-import { PageLayout, ResponsiveButton } from '@/layout/responsive';
+import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import UserFilter from './components/UserFilter';
 import UserTable from './components/UserTable';
 import UserForm from './components/UserForm';

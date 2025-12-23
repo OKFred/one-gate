@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import { Chip } from '@mui/material';
-import ResponsiveList, { type TableColumn, type CardField } from '@/components/ResponsiveList';
+import ResponsiveList, { type TableColumn, type CardField } from '@/components/Responsive/ResponsiveList';
 import * as mailAccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './AccountButtons';
 import type { ListMailAccount, FilterState } from '../type.d';

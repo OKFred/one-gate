@@ -19,8 +19,6 @@ import {
   MenuItem,
   OutlinedInput,
   Chip,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
@@ -33,8 +31,9 @@ import {
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as MenuAPI from '@/api/system/menu';
-import { showGlobalNotification } from '@/utils/notification';
-import { PageLayout } from '@/layout/responsive';
+import { showGlobalNotification } from '@/components/Notification';
+import { PageLayout } from '@/components/Responsive/index';
+import { useResponsive } from '@/hooks/useResponsive';
 
 // 菜单接口 (从tree接口返回的数据，部分字段可选)
 interface Menu {
@@ -98,8 +97,7 @@ const iconOptions = [
 ];
 
 export default function MenuManagement() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const [menus, setMenus] = useState<Menu[]>([]);
   const [flatMenus, setFlatMenus] = useState<Menu[]>([]);
