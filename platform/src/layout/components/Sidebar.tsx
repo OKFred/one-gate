@@ -44,8 +44,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       }));
     } else if (item.path) {
       navigate(item.path);
-      // 移动端点击菜单后关闭侧边栏
-      isMobile && onClose?.();
+      if (isMobile) {
+        onClose?.();
+      } // 移动端点击菜单后关闭侧边栏
     }
   };
 

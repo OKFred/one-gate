@@ -3703,9 +3703,16 @@ export interface components {
             data: {
                 id: number;
                 text: string;
-                icon: string;
+                icon?: string;
                 path: string;
                 sort?: number;
+                children?: {
+                    id: number;
+                    text: string;
+                    icon?: string;
+                    path: string;
+                    sort?: number;
+                }[];
             }[];
             message: string;
         };

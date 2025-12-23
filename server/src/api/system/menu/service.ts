@@ -298,8 +298,22 @@ const menuTreeItem = {
     icon: { type: "string" },
     path: { type: "string" },
     sort: { type: "number" },
+    children: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          text: { type: "string" },
+          icon: { type: "string" },
+          path: { type: "string" },
+          sort: { type: "number" },
+        },
+        required: ["id", "text", "path"],
+      },
+    },
   },
-  required: ["id", "text", "icon", "path"],
+  required: ["id", "text", "path"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -310,10 +324,9 @@ const treeRes = {
   },
 } as const satisfies JSONSchema;
 
-type MenuTreeItem = FromSchema<typeof menuTreeItem> & {
-  children?: MenuTreeItem[];
-};
-async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
+async function onTree(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof treeRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
   const { roleIdArr } = userObj;
@@ -352,7 +365,7 @@ async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
   function buildMenuTree(
     data: typeof filteredMenus,
     parentId: number | null = null
-  ): MenuTreeItem[] {
+  ): FromSchema<typeof treeRes> {
     return data
       .filter((item) => item.parentId === parentId)
       .map((item) => ({
