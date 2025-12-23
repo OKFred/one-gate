@@ -197,6 +197,7 @@ export default function UserTable({
                       onClick={() => user.id && onDelete(user.id)}
                       color="error"
                       size="small"
+                      disabled={user.id === 1}
                     >
                       <DeleteIcon />
                     </IconButton>

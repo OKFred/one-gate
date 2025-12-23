@@ -171,6 +171,7 @@ const RoleForm = memo(
                   <Switch
                     checked={form.isEnabled}
                     onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
+                    disabled={editId === 1}
                   />
                 }
                 label="启用状态"

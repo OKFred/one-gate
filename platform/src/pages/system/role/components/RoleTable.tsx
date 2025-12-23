@@ -1,11 +1,4 @@
-import {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  useCallback,
-  useEffect,
-  memo,
-} from 'react';
+import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import {
   Box,
   CircularProgress,
@@ -34,11 +27,7 @@ import {
   Fab,
   Tooltip,
 } from '@mui/material';
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import * as roleAPI from '@/api/system/role';
 import type { ListRole, FilterState } from '../type.d';
 import type { Props } from '../type.d';
@@ -249,6 +238,7 @@ const RoleTable = memo(
                         size="small"
                         color="error"
                         onClick={() => openDeleteDialog(role.id!, role.name || '')}
+                        disabled={role.id === 1}
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -380,6 +370,7 @@ const RoleTable = memo(
                           size="small"
                           color="error"
                           onClick={() => openDeleteDialog(role.id!, role.name || '')}
+                          disabled={role.id === 1}
                         >
                           <DeleteIcon />
                         </IconButton>

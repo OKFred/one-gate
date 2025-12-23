@@ -185,6 +185,7 @@ export default function UserFormDialog({
                 <Switch
                   checked={form.isEnabled}
                   onChange={(e) => onFormChange({ ...form, isEnabled: e.target.checked })}
+                  disabled={editId === 1}
                 />
               }
               label="启用账户"
