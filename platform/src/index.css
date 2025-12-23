@@ -79,10 +79,3 @@ body {
     padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 }
-
-/* 移动端内容区域底部安全距离 */
-@media (max-width: 600px) {
-  .content-mobile-padding {
-    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
-  }
-}
