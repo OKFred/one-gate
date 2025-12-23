@@ -3696,20 +3696,21 @@ export interface components {
             message: string;
         };
         SystemMenuTreeReq: {
-            isEnabled?: boolean;
+            /** @description 是否显示所有菜单（包括未启用的） */
+            showAll?: boolean;
         };
         SystemMenuTreeRes: {
             ok: boolean;
             data: {
                 id: number;
                 text: string;
-                icon?: string;
+                icon: string;
                 path: string;
                 sort?: number;
                 children?: {
                     id: number;
                     text: string;
-                    icon?: string;
+                    icon: string;
                     path: string;
                     sort?: number;
                 }[];

@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   // 异步加载菜单数据
   useEffect(() => {
     const loadMenus = async () => {
-      const resData = await treeFn();
+      const resData = await treeFn({ data: {} });
       setNavItems(resData.data.data);
     };
     loadMenus();

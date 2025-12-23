@@ -105,7 +105,7 @@ export default function MenuManagement() {
   const [flatMenus, setFlatMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [filterEnabled, setFilterEnabled] = useState<boolean | undefined>(undefined);
+  const [showAll, setShowAll] = useState<boolean>(true);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
   const [formValues, setFormValues] = useState<MenuFormData>(defaultFormData);
   const [error, setError] = useState<string>('');
@@ -131,8 +131,8 @@ export default function MenuManagement() {
   const fetchMenus = useCallback(async () => {
     setLoading(true);
     try {
-      const params = filterEnabled !== undefined ? { isEnabled: filterEnabled } : undefined;
-      const res = await MenuAPI.treeFn(params);
+      const params = { showAll };
+      const res = await MenuAPI.treeFn({ data: params });
       const treeData = res.data.data || [];
       setMenus(treeData);
       setFlatMenus(flattenMenus(treeData));
@@ -142,7 +142,7 @@ export default function MenuManagement() {
     } finally {
       setLoading(false);
     }
-  }, [flattenMenus, filterEnabled]);
+  }, [flattenMenus, showAll]);
 
   useEffect(() => {
     fetchMenus();
@@ -202,8 +202,7 @@ export default function MenuManagement() {
       return;
     }
     if (!formValues.icon) {
-      setError('菜单图标不能为空');
-      return;
+      formValues.icon = 'material-symbols:folder';
     }
 
     setLoading(true);
@@ -357,11 +356,11 @@ export default function MenuManagement() {
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>启用状态</InputLabel>
             <Select<string>
-              value={filterEnabled ? 'enabled' : 'all'}
+              value={showAll === true ? 'all' : 'enabled'}
               label="启用状态"
               onChange={(e) => {
                 const val = e.target.value;
-                setFilterEnabled(val === 'all' ? undefined : val === 'enabled');
+                setShowAll(val === 'all' ? true : false);
               }}
             >
               <MenuItem value="all">全部</MenuItem>

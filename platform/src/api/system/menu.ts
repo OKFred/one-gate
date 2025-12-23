@@ -8,11 +8,13 @@ import type { AxiosConfig } from '../config';
 /**
  * 获取树形菜单列表（根据用户角色自动过滤）
  */
-export const treeFn = async (params?: { isEnabled?: boolean }) => {
+export const treeFn = async (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/menu/tree', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
     url: '/api/v1/system/menu/tree',
     method: 'post',
-    data: params ?? {},
+    ...axiosConfig,
   });
 };
 

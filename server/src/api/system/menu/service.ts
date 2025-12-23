@@ -284,7 +284,10 @@ const getApi = {
 const treeReq = {
   type: "object",
   properties: {
-    isEnabled: { type: "boolean" },
+    showAll: {
+      description: "是否显示所有菜单（包括未启用的）",
+      type: "boolean",
+    },
   },
   required: [],
   additionalProperties: false,
@@ -309,11 +312,11 @@ const menuTreeItem = {
           path: { type: "string" },
           sort: { type: "number" },
         },
-        required: ["id", "text", "path"],
+        required: ["id", "text", "icon", "path"],
       },
     },
   },
-  required: ["id", "text", "path"],
+  required: ["id", "text", "icon", "path"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -327,16 +330,16 @@ const treeRes = {
 async function onTree(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof treeRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
+  const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
   const userObj = c.get("userObj");
   const { roleIdArr } = userObj;
   // 获取所有菜单
-  const { isEnabled } = obj;
+  const { showAll } = obj;
   // 构建查询条件
   const buildWhereCondition = () => {
     const conditions = [];
-    if (isEnabled !== undefined) {
-      conditions.push(eq(menuTable.isEnabled, isEnabled));
+    if (showAll !== true) {
+      conditions.push(eq(menuTable.isEnabled, true)); // 默认只查询启用的菜单
     }
     return conditions.length > 0
       ? conditions.length === 1
