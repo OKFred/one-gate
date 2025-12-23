@@ -3,6 +3,7 @@ import { PageLayout } from '@/layout/responsive';
 import AccountForm, { type AccountFormRef } from './components/AccountForm';
 import AccountTable, { type AccountTableRef } from './components/AccountTable';
 import AccountFilter, { type AccountFilterRef } from './components/AccountFilter';
+import { AddAccountButton } from './components/AccountButtons';
 
 export interface LocalObj {
   tableRef: React.RefObject<AccountTableRef | null>;
@@ -17,7 +18,10 @@ export default function MailAccountPage() {
   const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title="邮件账户管理">
+    <PageLayout
+      title="邮件账户管理"
+      actions={<AddAccountButton formRef={formRef} />}
+    >
       <AccountFilter ref={localObj.filterRef} localObj={localObj} />
       <AccountForm ref={localObj.formRef} localObj={localObj} />
       <AccountTable ref={localObj.tableRef} localObj={localObj} />

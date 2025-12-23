@@ -9,7 +9,6 @@ import {
 import {
   Box,
   CircularProgress,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -25,15 +24,9 @@ import {
   Pagination,
   useTheme,
   useMediaQuery,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import * as mailAccountAPI from '@/api/mail/account';
+import { AccountActionButtons } from './AccountButtons';
 import type { ListMailAccount, FilterState } from '../type.d';
 import type { Props } from '../type.d';
 
@@ -82,13 +75,6 @@ const AccountTable = memo(
     const { accounts, loading, page, pageSize, total, filters } = state;
     const totalPages = Math.ceil(total / pageSize);
 
-    // 删除确认对话框状态
-    const [deleteDialog, setDeleteDialog] = useState<{
-      open: boolean;
-      id: number | null;
-      nickname: string;
-    }>({ open: false, id: null, nickname: '' });
-
     // 获取数据的核心函数
     const fetchAccounts = useCallback(
       async (searchFilters: FilterState, currentPage: number = 1) => {
@@ -125,6 +111,11 @@ const AccountTable = memo(
       [state.pageSize, filterRef],
     );
 
+    // 删除成功后的回调
+    const handleDeleteSuccess = useCallback(() => {
+      fetchAccounts(filters, page);
+    }, [fetchAccounts, filters, page]);
+
     // 初始加载
     useEffect(() => {
       fetchAccounts(DEFAULT_FILTERS, 1);
@@ -144,30 +135,6 @@ const AccountTable = memo(
       }),
       [fetchAccounts, filters, page, total],
     );
-
-    // 处理编辑
-    const handleEdit = (account: ListMailAccount) => {
-      formRef.current?.openEdit(account);
-    };
-
-    // 打开删除确认对话框
-    const openDeleteDialog = (id: number, nickname: string) => {
-      setDeleteDialog({ open: true, id, nickname });
-    };
-
-    // 关闭删除确认对话框
-    const closeDeleteDialog = () => {
-      setDeleteDialog({ open: false, id: null, nickname: '' });
-    };
-
-    // 确认删除
-    const handleConfirmDelete = async () => {
-      if (deleteDialog.id) {
-        await mailAccountAPI.deleteFn({ data: { id: deleteDialog.id } });
-        fetchAccounts(filters, page);
-      }
-      closeDeleteDialog();
-    };
 
     // 处理分页
     const handlePageChange = (newPage: number) => {
@@ -207,18 +174,11 @@ const AccountTable = memo(
                           ID: {acc.id}
                         </Typography>
                       </Box>
-                      <Stack direction="row" spacing={1}>
-                        <IconButton onClick={() => handleEdit(acc)} color="primary" size="small">
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          onClick={() => acc.id && openDeleteDialog(acc.id, acc.nickname || '')}
-                          color="error"
-                          size="small"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Stack>
+                      <AccountActionButtons
+                        account={acc}
+                        formRef={formRef}
+                        onDeleteSuccess={handleDeleteSuccess}
+                      />
                     </Box>
 
                     <Box sx={{ mb: 2 }}>
@@ -294,39 +254,17 @@ const AccountTable = memo(
                   <TableCell>{acc.host}</TableCell>
                   <TableCell>{acc.port}</TableCell>
                   <TableCell align="center">
-                    <Stack direction="row" spacing={1} justifyContent="center">
-                      <IconButton onClick={() => handleEdit(acc)} color="primary" size="small">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => acc.id && openDeleteDialog(acc.id, acc.nickname || '')}
-                        color="error"
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Stack>
+                    <AccountActionButtons
+                      account={acc}
+                      formRef={formRef}
+                      onDeleteSuccess={handleDeleteSuccess}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
 
-        {/* 删除确认对话框 */}
-        <Dialog open={deleteDialog.open} onClose={closeDeleteDialog}>
-          <DialogTitle>确认删除</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              确定要删除邮件账户 "{deleteDialog.nickname}" 吗？此操作不可撤销。
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDeleteDialog}>取消</Button>
-            <Button onClick={handleConfirmDelete} color="error" autoFocus>
-              删除
-            </Button>
-          </DialogActions>
-        </Dialog>
         {totalPages > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
             <Pagination
