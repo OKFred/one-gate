@@ -1,30 +1,6 @@
-import {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  useCallback,
-  useEffect,
-  memo,
-} from 'react';
-import {
-  Box,
-  CircularProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Stack,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Pagination,
-  useTheme,
-  useMediaQuery,
-} from '@mui/material';
+import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
+import { Chip } from '@mui/material';
+import ResponsiveList, { type TableColumn, type CardField } from '@/components/ResponsiveList';
 import * as mailAccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './AccountButtons';
 import type { ListMailAccount, FilterState } from '../type.d';
@@ -59,8 +35,6 @@ const DEFAULT_FILTERS: FilterState = {
 const AccountTable = memo(
   forwardRef<AccountTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
@@ -73,7 +47,6 @@ const AccountTable = memo(
     });
 
     const { accounts, loading, page, pageSize, total, filters } = state;
-    const totalPages = Math.ceil(total / pageSize);
 
     // 获取数据的核心函数
     const fetchAccounts = useCallback(
@@ -141,141 +114,63 @@ const AccountTable = memo(
       fetchAccounts(filters, newPage);
     };
 
-    if (loading) {
-      return (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
-        </Box>
-      );
-    }
+    // 表格列配置（PC端）
+    const columns: TableColumn<ListMailAccount>[] = [
+      { title: 'ID', render: (acc) => acc.id },
+      { title: '昵称', render: (acc) => acc.nickname },
+      { title: '邮箱', render: (acc) => acc.mailAddress },
+      { title: '主机', render: (acc) => acc.host },
+      { title: '端口', render: (acc) => acc.port },
+      {
+        title: '操作',
+        align: 'center',
+        render: (acc) => (
+          <AccountActionButtons
+            account={acc}
+            formRef={formRef}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        ),
+      },
+    ];
 
-    // 移动端卡片布局
-    if (isMobile) {
-      return (
-        <Box sx={{ mt: 2, mb: 8, position: 'relative' }}>
-          {accounts.length > 0 ? (
-            <Stack spacing={2}>
-              {accounts.map((acc) => (
-                <Card key={acc.id} variant="outlined">
-                  <CardContent>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        mb: 2,
-                      }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" component="div" gutterBottom>
-                          {acc.nickname}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          ID: {acc.id}
-                        </Typography>
-                      </Box>
-                      <AccountActionButtons
-                        account={acc}
-                        formRef={formRef}
-                        onDeleteSuccess={handleDeleteSuccess}
-                      />
-                    </Box>
+    // 卡片字段配置（移动端）
+    const cardFields: CardField<ListMailAccount>[] = [
+      { type: 'title', render: (acc) => acc.nickname },
+      { type: 'subtitle', label: 'ID', render: (acc) => acc.id },
+      { type: 'content', label: '邮箱地址', render: (acc) => acc.mailAddress },
+      { type: 'content', label: 'SMTP服务器', render: (acc) => `${acc.host}:${acc.port}` },
+      {
+        type: 'tags',
+        render: (acc) => (
+          <>
+            {acc.sslEnable && <Chip label="SSL" color="success" size="small" />}
+            {acc.starttlsEnable && <Chip label="STARTTLS" color="info" size="small" />}
+          </>
+        ),
+      },
+    ];
 
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        邮箱地址
-                      </Typography>
-                      <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                        {acc.mailAddress}
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        SMTP服务器
-                      </Typography>
-                      <Typography variant="body1">
-                        {acc.host}:{acc.port}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Stack direction="row" spacing={1} flexWrap="wrap">
-                        {acc.sslEnable && <Chip label="SSL" color="success" size="small" />}
-                        {acc.starttlsEnable && <Chip label="STARTTLS" color="info" size="small" />}
-                      </Stack>
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
-          ) : (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Typography variant="body1" color="text.secondary">
-                暂无邮件账户
-              </Typography>
-            </Box>
-          )}
-          {totalPages > 1 && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-              <Pagination
-                count={totalPages}
-                page={page}
-                onChange={(_, value) => handlePageChange(value)}
-                color="primary"
-                size="medium"
-              />
-            </Box>
-          )}
-        </Box>
-      );
-    }
-
-    // 桌面端表格布局
     return (
-      <TableContainer component={Paper} sx={{ position: 'relative' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>昵称</TableCell>
-              <TableCell>邮箱</TableCell>
-              <TableCell>主机</TableCell>
-              <TableCell>端口</TableCell>
-              <TableCell align="center">操作</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {accounts.length > 0 &&
-              accounts.map((acc) => (
-                <TableRow key={acc.id} hover>
-                  <TableCell>{acc.id}</TableCell>
-                  <TableCell>{acc.nickname}</TableCell>
-                  <TableCell>{acc.mailAddress}</TableCell>
-                  <TableCell>{acc.host}</TableCell>
-                  <TableCell>{acc.port}</TableCell>
-                  <TableCell align="center">
-                    <AccountActionButtons
-                      account={acc}
-                      formRef={formRef}
-                      onDeleteSuccess={handleDeleteSuccess}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-
-        {totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={(_, value) => handlePageChange(value)}
-              color="primary"
-            />
-          </Box>
+      <ResponsiveList
+        data={accounts}
+        loading={loading}
+        page={page}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        keyExtractor={(acc) => acc.id!}
+        columns={columns}
+        cardFields={cardFields}
+        cardActions={(acc) => (
+          <AccountActionButtons
+            account={acc}
+            formRef={formRef}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
         )}
-      </TableContainer>
+        emptyText="暂无邮件账户"
+      />
     );
   }),
 );
