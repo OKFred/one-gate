@@ -105,6 +105,7 @@ export default function MenuManagement() {
   const [flatMenus, setFlatMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [filterEnabled, setFilterEnabled] = useState<boolean | undefined>(undefined);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
   const [formValues, setFormValues] = useState<MenuFormData>(defaultFormData);
   const [error, setError] = useState<string>('');
@@ -130,7 +131,8 @@ export default function MenuManagement() {
   const fetchMenus = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await MenuAPI.treeFn();
+      const params = filterEnabled !== undefined ? { isEnabled: filterEnabled } : undefined;
+      const res = await MenuAPI.treeFn(params);
       const treeData = res.data.data || [];
       setMenus(treeData);
       setFlatMenus(flattenMenus(treeData));
@@ -140,7 +142,7 @@ export default function MenuManagement() {
     } finally {
       setLoading(false);
     }
-  }, [flattenMenus]);
+  }, [flattenMenus, filterEnabled]);
 
   useEffect(() => {
     fetchMenus();
@@ -180,7 +182,10 @@ export default function MenuManagement() {
   };
 
   // 处理表单变化
-  const handleFormChange = (field: keyof MenuFormData, value: string | number | number[] | boolean | null) => {
+  const handleFormChange = (
+    field: keyof MenuFormData,
+    value: string | number | number[] | boolean | null,
+  ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -348,14 +353,30 @@ export default function MenuManagement() {
     <PageLayout
       title="菜单管理"
       actions={
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-          disabled={loading}
-        >
-          添加菜单
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>启用状态</InputLabel>
+            <Select<string>
+              value={filterEnabled ? 'enabled' : 'all'}
+              label="启用状态"
+              onChange={(e) => {
+                const val = e.target.value;
+                setFilterEnabled(val === 'all' ? undefined : val === 'enabled');
+              }}
+            >
+              <MenuItem value="all">全部</MenuItem>
+              <MenuItem value="enabled">仅启用</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            disabled={loading}
+          >
+            添加菜单
+          </Button>
+        </Box>
       }
     >
       {/* 菜单树 */}
@@ -386,7 +407,9 @@ export default function MenuManagement() {
         maxWidth="sm"
         fullScreen={isMobile}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
           <span>{editingMenu ? '编辑菜单' : '添加菜单'}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>

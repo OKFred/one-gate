@@ -3695,7 +3695,9 @@ export interface components {
             };
             message: string;
         };
-        SystemMenuTreeReq: Record<string, never>;
+        SystemMenuTreeReq: {
+            isEnabled?: boolean;
+        };
         SystemMenuTreeRes: {
             ok: boolean;
             data: {

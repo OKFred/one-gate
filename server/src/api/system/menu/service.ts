@@ -6,7 +6,7 @@ import {
   menuTable,
   type menuAddLike,
 } from "./db.table";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, or } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
@@ -283,7 +283,9 @@ const getApi = {
 
 const treeReq = {
   type: "object",
-  properties: {},
+  properties: {
+    isEnabled: { type: "boolean" },
+  },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
@@ -312,13 +314,27 @@ type MenuTreeItem = FromSchema<typeof menuTreeItem> & {
   children?: MenuTreeItem[];
 };
 async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
   const { roleIdArr } = userObj;
-  // 获取所有启用的菜单
+  // 获取所有菜单
+  const { isEnabled } = obj;
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    const conditions = [];
+    if (isEnabled !== undefined) {
+      conditions.push(eq(menuTable.isEnabled, isEnabled));
+    }
+    return conditions.length > 0
+      ? conditions.length === 1
+        ? conditions[0]
+        : or(...conditions)
+      : undefined;
+  };
   const allMenus = await db
     .select()
     .from(menuTable)
-    .where(eq(menuTable.isEnabled, true))
+    .where(buildWhereCondition())
     .orderBy(asc(menuTable.sort));
 
   // 根据用户角色过滤菜单
