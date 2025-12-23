@@ -1,8 +1,7 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { ContainerProps, BoxProps } from '@mui/material';
 import { ResponsiveContainer } from './ResponsiveContainer';
-import { ResponsiveTitle } from './ResponsiveTypography';
 import { ResponsiveButtonGroup } from './ResponsiveButton';
 
 interface PageLayoutProps {
@@ -33,15 +32,11 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
           gap: { xs: 2, sm: 0 },
         }}
       >
-        <ResponsiveTitle component="h1">
+        <Typography variant="h4" fontWeight="bold">
           {title}
-        </ResponsiveTitle>
-        
-        {actions && (
-          <ResponsiveButtonGroup>
-            {actions}
-          </ResponsiveButtonGroup>
-        )}
+        </Typography>
+
+        {actions && <ResponsiveButtonGroup>{actions}</ResponsiveButtonGroup>}
       </Box>
 
       {/* 页面内容 */}
@@ -55,23 +50,13 @@ interface SectionLayoutProps extends BoxProps {
   children: React.ReactNode;
 }
 
-export const SectionLayout: React.FC<SectionLayoutProps> = ({
-  title,
-  children,
-  sx,
-  ...props
-}) => {
+export const SectionLayout: React.FC<SectionLayoutProps> = ({ title, children, sx, ...props }) => {
   return (
     <Box sx={{ mb: { xs: 3, md: 4 }, ...sx }} {...props}>
       {title && (
-        <ResponsiveTitle 
-          variant="h5" 
-          gutterBottom 
-          fontWeight="bold"
-          sx={{ mb: 2 }}
-        >
+        <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ mb: 2 }}>
           {title}
-        </ResponsiveTitle>
+        </Typography>
       )}
       {children}
     </Box>

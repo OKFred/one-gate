@@ -1,20 +1,15 @@
-import {
-  Card,
-  CardContent,
-  Stack,
-} from '@mui/material';
+import { Card, CardContent, Stack, Typography } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Email as EmailIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
-import { 
-  PageLayout, 
-  CardGrid, 
-  ResponsiveTitle, 
+import {
+  PageLayout,
+  CardGrid,
+  ResponsiveTitle,
   ResponsiveSubtitle,
-  ResponsiveTypography,
-  SectionLayout 
+  SectionLayout,
 } from '@/layout/responsive';
 
 export default function HomeRefactored() {
@@ -42,9 +37,7 @@ export default function HomeRefactored() {
   return (
     <PageLayout title="欢迎使用 OKFred 平台">
       {/* 副标题 */}
-      <ResponsiveSubtitle sx={{ mb: { xs: 3, md: 4 } }}>
-        一站式邮件管理解决方案
-      </ResponsiveSubtitle>
+      <ResponsiveSubtitle sx={{ mb: { xs: 3, md: 4 } }}>一站式邮件管理解决方案</ResponsiveSubtitle>
 
       {/* 统计卡片网格 */}
       <SectionLayout>
@@ -62,15 +55,15 @@ export default function HomeRefactored() {
             >
               <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 3 } }}>
                 <div style={{ marginBottom: 16 }}>{stat.icon}</div>
-                <ResponsiveTypography
-                  variants={{ xs: 'h4', md: 'h3' }}
+                <Typography
+                  variant="h4"
                   component="div"
                   fontWeight="bold"
                   color={stat.color}
                   gutterBottom
                 >
                   {stat.value}
-                </ResponsiveTypography>
+                </Typography>
                 <ResponsiveTitle variant="h6" color="text.secondary">
                   {stat.title}
                 </ResponsiveTitle>
