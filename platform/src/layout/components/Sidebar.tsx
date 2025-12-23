@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router';
 import Icon from '@/components/Icon';
 import { treeFn } from '@/api/system/menu';
 import type { SystemMenuTree } from './type';
+import { useResponsive } from '../responsive';
 
 const drawerWidth = 240;
 
@@ -24,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const [navItems, setNavItems] = useState<SystemMenuTree[]>([]);
+  const { isMobile } = useResponsive();
 
   // 异步加载菜单数据
   useEffect(() => {
@@ -43,7 +45,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     } else if (item.path) {
       navigate(item.path);
       // 移动端点击菜单后关闭侧边栏
-      onClose?.();
+      isMobile && onClose?.();
     }
   };
 
