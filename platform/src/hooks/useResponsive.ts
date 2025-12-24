@@ -1,16 +1,26 @@
-import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ResponsiveContext } from '../hooks/useResponsive';
-import type { ResponsiveState, BreakpointKey } from '../hooks/useResponsive';
+import { createContext, useContext } from 'react';
 
-interface ResponsiveProviderProps {
-  children: React.ReactNode;
+// 定义响应式断点类型
+export type BreakpointKey = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+
+// 响应式状态接口
+export interface ResponsiveState {
+  isMobile: boolean;
+  isTablet: boolean;
+  isDesktop: boolean;
+  isSmallMobile: boolean;
+  breakpoint: BreakpointKey;
 }
 
-export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children }) => {
+// 创建响应式上下文
+export const ResponsiveContext = createContext<ResponsiveState | undefined>(undefined);
+
+// 自定义Hook：获取响应式状态
+export const useResponsive = (): ResponsiveState => {
   const theme = useTheme();
-  
+
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
@@ -23,7 +33,7 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
   else if (isTablet) breakpoint = 'md';
   else if (isDesktop) breakpoint = 'lg';
 
-  const value: ResponsiveState = {
+  const state = {
     isMobile,
     isTablet,
     isDesktop,
@@ -31,9 +41,6 @@ export const ResponsiveProvider: React.FC<ResponsiveProviderProps> = ({ children
     breakpoint,
   };
 
-  return (
-    <ResponsiveContext.Provider value={value}>
-      {children}
-    </ResponsiveContext.Provider>
-  );
+  const context = useContext(ResponsiveContext);
+  return context || state;
 };

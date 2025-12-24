@@ -14,8 +14,6 @@ import {
   CardContent,
   Typography,
   Chip,
-  useTheme,
-  useMediaQuery,
   Tooltip,
 } from '@mui/material';
 import {
@@ -25,6 +23,7 @@ import {
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { ListMailLog } from '../type';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface LogTableProps {
   logs: ListMailLog[];
@@ -33,8 +32,7 @@ interface LogTableProps {
 }
 
 export default function LogTable({ logs, loading, onView }: LogTableProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';

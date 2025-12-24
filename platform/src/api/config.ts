@@ -6,7 +6,7 @@ import type {
   AxiosResponse,
 } from 'axios';
 import type { paths } from '@/types/openapi'; //由openapi-typescript自动生成的类型
-import { showGlobalNotification } from '@/utils/notification';
+import { showGlobalNotification } from '@/components/Notification';
 
 // 导入认证工具
 import { authUtils } from '@/utils/auth';

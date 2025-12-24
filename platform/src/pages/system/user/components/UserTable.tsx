@@ -15,12 +15,11 @@ import {
   Typography,
   Chip,
   Pagination,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import type { User } from '../type';
 import dayjs from 'dayjs';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface UserTableProps {
   users: User[];
@@ -43,8 +42,8 @@ export default function UserTable({
   total,
   onPageChange,
 }: UserTableProps) {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
+
   const totalPages = Math.ceil(total / pageSize);
 
   if (loading) {
@@ -197,6 +196,7 @@ export default function UserTable({
                       onClick={() => user.id && onDelete(user.id)}
                       color="error"
                       size="small"
+                      disabled={user.id === 1}
                     >
                       <DeleteIcon />
                     </IconButton>

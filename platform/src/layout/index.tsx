@@ -5,22 +5,32 @@ import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
 import Content from './components/Content';
 import ScrollTop from './components/ScrollTop';
-import { ResponsiveProvider } from './responsive';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function ResponsiveLayout() {
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const { isMobile } = useResponsive();
+  const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile);
+
+  // 监听屏幕尺寸变化，移动端时关闭侧边栏，桌面端时打开侧边栏
+  React.useEffect(() => {
+    setSidebarOpen(!isMobile);
+  }, [isMobile]);
+
+  const handleSidebarClose = () => {
+    setSidebarOpen(false);
+  };
 
   return (
-    <ResponsiveProvider>
+    <div>
       <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: 'background.default' }}>
         <CssBaseline />
-        <Topbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <Topbar setSidebarOpen={setSidebarOpen} />
         <Box sx={{ display: 'flex', pt: { xs: 7, sm: 8 } }}>
-          <Sidebar open={sidebarOpen} />
+          <Sidebar open={sidebarOpen} onClose={handleSidebarClose} />
           <Content sidebarOpen={sidebarOpen} />
         </Box>
         <ScrollTop />
       </Box>
-    </ResponsiveProvider>
+    </div>
   );
 }

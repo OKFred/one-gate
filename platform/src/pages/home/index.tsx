@@ -1,21 +1,10 @@
-import {
-  Card,
-  CardContent,
-  Stack,
-} from '@mui/material';
+import { Card, CardContent, Stack, Typography } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Email as EmailIcon,
   Person as PersonIcon,
 } from '@mui/icons-material';
-import { 
-  PageLayout, 
-  CardGrid, 
-  ResponsiveTitle, 
-  ResponsiveSubtitle,
-  ResponsiveTypography,
-  SectionLayout 
-} from '@/layout/responsive';
+import { PageLayout, CardGrid, SectionLayout } from '@/components/Responsive/index';
 
 export default function HomeRefactored() {
   const stats = [
@@ -42,9 +31,7 @@ export default function HomeRefactored() {
   return (
     <PageLayout title="欢迎使用 OKFred 平台">
       {/* 副标题 */}
-      <ResponsiveSubtitle sx={{ mb: { xs: 3, md: 4 } }}>
-        一站式邮件管理解决方案
-      </ResponsiveSubtitle>
+      <Typography sx={{ mb: { xs: 3, md: 4 } }}>一站式邮件管理解决方案</Typography>
 
       {/* 统计卡片网格 */}
       <SectionLayout>
@@ -62,18 +49,18 @@ export default function HomeRefactored() {
             >
               <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 3 } }}>
                 <div style={{ marginBottom: 16 }}>{stat.icon}</div>
-                <ResponsiveTypography
-                  variants={{ xs: 'h4', md: 'h3' }}
+                <Typography
+                  variant="h4"
                   component="div"
                   fontWeight="bold"
                   color={stat.color}
                   gutterBottom
                 >
                   {stat.value}
-                </ResponsiveTypography>
-                <ResponsiveTitle variant="h6" color="text.secondary">
+                </Typography>
+                <Typography variant="h6" color="text.secondary">
                   {stat.title}
-                </ResponsiveTitle>
+                </Typography>
               </CardContent>
             </Card>
           ))}
@@ -85,18 +72,18 @@ export default function HomeRefactored() {
         <Card>
           <CardContent sx={{ p: { xs: 2, md: 3 } }}>
             <Stack spacing={2}>
-              <ResponsiveSubtitle variant="body1">
+              <Typography variant="body1">
                 🔧 <strong>配置邮件账户：</strong> 在邮件账户管理中添加您的SMTP配置
-              </ResponsiveSubtitle>
-              <ResponsiveSubtitle variant="body1">
+              </Typography>
+              <Typography variant="body1">
                 📝 <strong>创建邮件模板：</strong> 设计可重复使用的邮件模板
-              </ResponsiveSubtitle>
-              <ResponsiveSubtitle variant="body1">
+              </Typography>
+              <Typography variant="body1">
                 📧 <strong>发送邮件：</strong> 使用模板快速发送邮件
-              </ResponsiveSubtitle>
-              <ResponsiveSubtitle variant="body1">
+              </Typography>
+              <Typography variant="body1">
                 📊 <strong>查看日志：</strong> 监控邮件发送状态和历史记录
-              </ResponsiveSubtitle>
+              </Typography>
             </Stack>
           </CardContent>
         </Card>

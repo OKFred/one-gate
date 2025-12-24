@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import * as mailAccountAPI from '@/api/mail/account';
 import * as mailTemplateAPI from '@/api/mail/template';
 import * as mailActionAPI from '@/api/mail/action';
-import { showGlobalNotification } from '@/utils/notification';
+import { showGlobalNotification } from '@/components/Notification';
 import {
   Box,
   Button,

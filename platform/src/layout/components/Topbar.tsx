@@ -12,17 +12,14 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
-import { useResponsive } from '../responsive';
 import { authUtils, type UserInfo } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 
 interface TopbarProps {
-  sidebarOpen: boolean;
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
-  const { isMobile } = useResponsive();
+const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -69,27 +66,24 @@ const Topbar: React.FC<TopbarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   return (
     <AppBar
       position="fixed"
-      sx={{ width: '100vw', left: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}
+      sx={{ left: 0, right: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}
     >
       <Toolbar sx={{ minHeight: '64px', pl: { sm: 0 } }}>
-        {/* 桌面端侧边栏收起/展开按钮，绝对定位到左侧，避免被遮挡 */}
-        {!isMobile && (
-          <Box
-            sx={{
-              position: 'relative',
-              width: 48,
-              height: 48,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              mr: 2,
-            }}
-          >
-            <IconButton color="inherit" onClick={() => setSidebarOpen((v) => !v)}>
-              <MenuIcon />
-            </IconButton>
-          </Box>
-        )}
+        <Box
+          sx={{
+            position: 'relative',
+            width: 48,
+            height: 48,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mr: 2,
+          }}
+        >
+          <IconButton color="inherit" onClick={() => setSidebarOpen((v) => !v)}>
+            <MenuIcon />
+          </IconButton>
+        </Box>
 
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           OKFred平台

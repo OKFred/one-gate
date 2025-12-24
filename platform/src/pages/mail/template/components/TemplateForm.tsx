@@ -9,13 +9,13 @@ import {
   Stack,
   Box,
   useTheme,
-  useMediaQuery,
   IconButton,
   Typography,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import JoditEditor from '@/components/JoditEditor/index';
 import type { AddMailTemplateRequest } from '../type';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface FormData extends AddMailTemplateRequest {
   creatorName?: string;
@@ -41,7 +41,7 @@ export default function TemplateForm({
   loading = false,
 }: TemplateFormProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

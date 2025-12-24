@@ -10,7 +10,7 @@ import {
   AccountBox as AccountBoxIcon, 
   Edit as EditIcon 
 } from '@mui/icons-material';
-import { ResponsiveButton } from '@/layout/responsive';
+import { ResponsiveButton } from '@/components/Responsive/index';
 import type { User } from '@/pages/me/type';
 
 interface UserDetailsProps {

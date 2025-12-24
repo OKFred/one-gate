@@ -6,7 +6,7 @@ import {
   menuTable,
   type menuAddLike,
 } from "./db.table";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, or } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
@@ -283,7 +283,12 @@ const getApi = {
 
 const treeReq = {
   type: "object",
-  properties: {},
+  properties: {
+    showAll: {
+      description: "是否显示所有菜单（包括未启用的）",
+      type: "boolean",
+    },
+  },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
@@ -296,6 +301,20 @@ const menuTreeItem = {
     icon: { type: "string" },
     path: { type: "string" },
     sort: { type: "number" },
+    children: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          text: { type: "string" },
+          icon: { type: "string" },
+          path: { type: "string" },
+          sort: { type: "number" },
+        },
+        required: ["id", "text", "icon", "path"],
+      },
+    },
   },
   required: ["id", "text", "icon", "path"],
   additionalProperties: false,
@@ -308,17 +327,30 @@ const treeRes = {
   },
 } as const satisfies JSONSchema;
 
-type MenuTreeItem = FromSchema<typeof menuTreeItem> & {
-  children?: MenuTreeItem[];
-};
-async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
+async function onTree(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof treeRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
   const userObj = c.get("userObj");
   const { roleIdArr } = userObj;
-  // 获取所有启用的菜单
+  // 获取所有菜单
+  const { showAll } = obj;
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    const conditions = [];
+    if (showAll !== true) {
+      conditions.push(eq(menuTable.isEnabled, true)); // 默认只查询启用的菜单
+    }
+    return conditions.length > 0
+      ? conditions.length === 1
+        ? conditions[0]
+        : or(...conditions)
+      : undefined;
+  };
   const allMenus = await db
     .select()
     .from(menuTable)
-    .where(eq(menuTable.isEnabled, true))
+    .where(buildWhereCondition())
     .orderBy(asc(menuTable.sort));
 
   // 根据用户角色过滤菜单
@@ -336,7 +368,7 @@ async function onTree(c: NodeHonoContext): Promise<MenuTreeItem[] | null> {
   function buildMenuTree(
     data: typeof filteredMenus,
     parentId: number | null = null
-  ): MenuTreeItem[] {
+  ): FromSchema<typeof treeRes> {
     return data
       .filter((item) => item.parentId === parentId)
       .map((item) => ({

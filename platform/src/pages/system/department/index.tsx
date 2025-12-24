@@ -11,8 +11,6 @@ import {
   IconButton,
   Typography,
   Alert,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -25,8 +23,9 @@ import {
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { listFn, addFn, updateFn, deleteFn } from '@/api/system/department';
-import { showGlobalNotification } from '@/utils/notification';
-import { PageLayout } from '@/layout/responsive';
+import { showGlobalNotification } from '@/components/Notification';
+import { PageLayout } from '@/components/Responsive/index';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface Department {
   id: number;
@@ -47,8 +46,7 @@ function buildTree(data: Department[], parentId: number | null = null): Departme
 }
 
 export default function DepartmentManagement() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [flatDepartments, setFlatDepartments] = useState<Department[]>([]);
@@ -297,7 +295,9 @@ export default function DepartmentManagement() {
         maxWidth="sm"
         fullScreen={isMobile}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
           <span>{editingDepartment ? '编辑部门' : '添加部门'}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>
@@ -358,7 +358,9 @@ export default function DepartmentManagement() {
             onClick={confirmDeleteDepartment}
             color="error"
             variant="contained"
-            disabled={loading || (departmentToDelete?.children && departmentToDelete.children.length > 0)}
+            disabled={
+              loading || (departmentToDelete?.children && departmentToDelete.children.length > 0)
+            }
           >
             {loading ? <CircularProgress size={20} /> : '删除'}
           </Button>

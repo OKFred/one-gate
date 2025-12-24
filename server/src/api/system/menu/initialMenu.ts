@@ -61,28 +61,36 @@ export const initialMenuData = [
   },
   {
     id: 9,
-    text: "人员",
-    icon: "material-symbols:group",
-    path: "/system/user",
+    text: "角色",
+    icon: "material-symbols:supervisor-account",
+    path: "/system/role",
     parentId: 8,
     sort: 1,
   },
   {
     id: 10,
-    text: "部门",
-    icon: "material-symbols:groups",
-    path: "/system/department",
+    text: "人员",
+    icon: "material-symbols:group",
+    path: "/system/user",
     parentId: 8,
     sort: 2,
   },
   {
     id: 11,
+    text: "部门",
+    icon: "material-symbols:groups",
+    path: "/system/department",
+    parentId: 8,
+    sort: 3,
+  },
+  {
+    id: 12,
     text: "菜单",
     icon: "material-symbols:menu",
     path: "/system/menu",
     parentId: 8,
-    sort: 3,
-  }
+    sort: 4,
+  },
 ] as menuLike[];
 
 type menuLike = {

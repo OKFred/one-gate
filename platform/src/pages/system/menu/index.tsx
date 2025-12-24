@@ -19,8 +19,6 @@ import {
   MenuItem,
   OutlinedInput,
   Chip,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
 import {
@@ -33,8 +31,9 @@ import {
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as MenuAPI from '@/api/system/menu';
-import { showGlobalNotification } from '@/utils/notification';
-import { PageLayout } from '@/layout/responsive';
+import { showGlobalNotification } from '@/components/Notification';
+import { PageLayout } from '@/components/Responsive/index';
+import { useResponsive } from '@/hooks/useResponsive';
 
 // 菜单接口 (从tree接口返回的数据，部分字段可选)
 interface Menu {
@@ -98,13 +97,13 @@ const iconOptions = [
 ];
 
 export default function MenuManagement() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const [menus, setMenus] = useState<Menu[]>([]);
   const [flatMenus, setFlatMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [showAll, setShowAll] = useState<boolean>(true);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
   const [formValues, setFormValues] = useState<MenuFormData>(defaultFormData);
   const [error, setError] = useState<string>('');
@@ -130,7 +129,8 @@ export default function MenuManagement() {
   const fetchMenus = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await MenuAPI.treeFn();
+      const params = { showAll };
+      const res = await MenuAPI.treeFn({ data: params });
       const treeData = res.data.data || [];
       setMenus(treeData);
       setFlatMenus(flattenMenus(treeData));
@@ -140,7 +140,7 @@ export default function MenuManagement() {
     } finally {
       setLoading(false);
     }
-  }, [flattenMenus]);
+  }, [flattenMenus, showAll]);
 
   useEffect(() => {
     fetchMenus();
@@ -180,7 +180,10 @@ export default function MenuManagement() {
   };
 
   // 处理表单变化
-  const handleFormChange = (field: keyof MenuFormData, value: string | number | number[] | boolean | null) => {
+  const handleFormChange = (
+    field: keyof MenuFormData,
+    value: string | number | number[] | boolean | null,
+  ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -197,8 +200,7 @@ export default function MenuManagement() {
       return;
     }
     if (!formValues.icon) {
-      setError('菜单图标不能为空');
-      return;
+      formValues.icon = 'material-symbols:folder';
     }
 
     setLoading(true);
@@ -348,14 +350,30 @@ export default function MenuManagement() {
     <PageLayout
       title="菜单管理"
       actions={
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-          disabled={loading}
-        >
-          添加菜单
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>启用状态</InputLabel>
+            <Select<string>
+              value={showAll === true ? 'all' : 'enabled'}
+              label="启用状态"
+              onChange={(e) => {
+                const val = e.target.value;
+                setShowAll(val === 'all' ? true : false);
+              }}
+            >
+              <MenuItem value="all">全部</MenuItem>
+              <MenuItem value="enabled">仅启用</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            disabled={loading}
+          >
+            添加菜单
+          </Button>
+        </Box>
       }
     >
       {/* 菜单树 */}
@@ -386,7 +404,9 @@ export default function MenuManagement() {
         maxWidth="sm"
         fullScreen={isMobile}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <DialogTitle
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
           <span>{editingMenu ? '编辑菜单' : '添加菜单'}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>

@@ -1,14 +1,4 @@
-import {
-  TextField,
-  Button,
-  Box,
-  Stack,
-  useTheme,
-  useMediaQuery,
-  Alert,
-  CircularProgress,
-  IconButton,
-} from '@mui/material';
+import { TextField, Button, Box, Stack, Alert, CircularProgress, IconButton } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
@@ -18,10 +8,10 @@ import { useState } from 'react';
 import { commonLogin } from '@/api/system/auth';
 import { authUtils } from '@/utils/auth';
 import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
+import { useResponsive } from '@/hooks/useResponsive';
 export default function LoginForm() {
   const navigate = useNavigate();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { isMobile } = useResponsive();
 
   // 状态管理
   const [credentials, setCredentials] = useState<CommonLoginReq>({

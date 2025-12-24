@@ -3695,7 +3695,10 @@ export interface components {
             };
             message: string;
         };
-        SystemMenuTreeReq: Record<string, never>;
+        SystemMenuTreeReq: {
+            /** @description 是否显示所有菜单（包括未启用的） */
+            showAll?: boolean;
+        };
         SystemMenuTreeRes: {
             ok: boolean;
             data: {
@@ -3704,6 +3707,13 @@ export interface components {
                 icon: string;
                 path: string;
                 sort?: number;
+                children?: {
+                    id: number;
+                    text: string;
+                    icon: string;
+                    path: string;
+                    sort?: number;
+                }[];
             }[];
             message: string;
         };

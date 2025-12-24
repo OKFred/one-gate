@@ -17,7 +17,6 @@ import {
   Chip,
   OutlinedInput,
   useTheme,
-  useMediaQuery,
   IconButton,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
@@ -27,6 +26,7 @@ import {
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import type { AddUserParams } from '../type';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface UserFormDialogProps {
   open: boolean;
@@ -53,7 +53,8 @@ export default function UserFormDialog({
   onCancel,
 }: UserFormDialogProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
+
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -185,6 +186,7 @@ export default function UserFormDialog({
                 <Switch
                   checked={form.isEnabled}
                   onChange={(e) => onFormChange({ ...form, isEnabled: e.target.checked })}
+                  disabled={editId === 1}
                 />
               }
               label="启用账户"

@@ -9,13 +9,13 @@ import {
   Chip,
   Stack,
   useTheme,
-  useMediaQuery,
   IconButton,
   Divider,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { ListMailTemplate } from '../type';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface TemplatePreviewProps {
   open: boolean;
@@ -25,7 +25,7 @@ interface TemplatePreviewProps {
 
 export default function TemplatePreview({ open, template, onClose }: TemplatePreviewProps) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useResponsive();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
