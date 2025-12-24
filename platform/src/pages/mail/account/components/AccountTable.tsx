@@ -1,10 +1,14 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import { Chip } from '@mui/material';
-import ResponsiveList, { type TableColumn, type CardField } from '@/components/Responsive/ResponsiveList';
+import ResponsiveList, {
+  type TableColumn,
+  type CardField,
+} from '@/components/Responsive/ResponsiveList';
 import * as mailAccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './AccountButtons';
 import type { ListMailAccount, FilterState } from '../type.d';
 import type { Props } from '../type.d';
+import dayjs from 'dayjs';
 
 // 暴露给父组件的方法
 export interface AccountTableRef {
@@ -128,6 +132,10 @@ const AccountTable = memo(
       { title: '邮箱', render: (acc) => acc.mailAddress },
       { title: '主机', render: (acc) => acc.host },
       { title: '端口', render: (acc) => acc.port },
+      {
+        title: '创建时间',
+        render: (acc) => dayjs(acc.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
+      },
       {
         title: '操作',
         align: 'center',
