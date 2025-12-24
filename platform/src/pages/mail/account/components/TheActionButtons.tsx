@@ -12,38 +12,36 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import * as mailAccountAPI from '@/api/mail/account';
-import type { ListMailAccount } from '../type.d';
-import type { AccountFormRef } from './AccountForm';
+import type { ListMailAccount } from '../type';
+import type { TheFormRef } from './TheForm';
 
 // ==================== 新增账户按钮 ====================
 
-export interface AddAccountButtonProps {
-  formRef: React.RefObject<AccountFormRef | null>;
+export interface AddButtonProps {
+  formRef: React.RefObject<TheFormRef | null>;
 }
 
 /**
  * 新增账户按钮组件
  * 用于页面顶部的新增操作
  */
-export const AddAccountButton = memo(({ formRef }: AddAccountButtonProps) => {
+export const AddTheButton = memo(({ formRef }: AddButtonProps) => {
   const handleAdd = useCallback(() => {
-    formRef.current?.openAdd();
+    formRef.current?.onOpen();
   }, [formRef]);
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      新增账户
+      新增
     </ResponsiveButton>
   );
 });
 
-AddAccountButton.displayName = 'AddAccountButton';
-
 // ==================== 编辑删除操作按钮 ====================
 
-export interface AccountActionButtonsProps {
+export interface RowButtonProps {
   account: ListMailAccount;
-  formRef: React.RefObject<AccountFormRef | null>;
+  formRef: React.RefObject<TheFormRef | null>;
   /** 删除成功后的回调 */
   onDeleteSuccess?: () => void;
 }
@@ -53,13 +51,13 @@ export interface AccountActionButtonsProps {
  * 用于表格/卡片中的行操作
  */
 export const AccountActionButtons = memo(
-  ({ account, formRef, onDeleteSuccess }: AccountActionButtonsProps) => {
+  ({ account, formRef, onDeleteSuccess }: RowButtonProps) => {
     // 删除确认对话框状态
     const [deleteDialog, setDeleteDialog] = useState(false);
 
     // 处理编辑
     const handleEdit = useCallback(() => {
-      formRef.current?.openEdit(account);
+      formRef.current?.onOpen(account);
     }, [formRef, account]);
 
     // 打开删除确认对话框
@@ -111,5 +109,3 @@ export const AccountActionButtons = memo(
     );
   },
 );
-
-AccountActionButtons.displayName = 'AccountActionButtons';

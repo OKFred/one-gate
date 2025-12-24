@@ -5,29 +5,15 @@ import ResponsiveList, {
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
 import * as mailAccountAPI from '@/api/mail/account';
-import { AccountActionButtons } from './AccountButtons';
-import type { ListMailAccount, FilterState } from '../type.d';
-import type { Props } from '../type.d';
+import { AccountActionButtons } from './TheActionButtons';
+import type { ListMailAccount, FilterState, TableState } from '../type';
+import type { Props } from '../type';
 import dayjs from 'dayjs';
 
 // 暴露给父组件的方法
-export interface AccountTableRef {
+export interface TheTableRef {
   /** 刷新表格数据 */
   refresh: (filters?: FilterState) => void;
-  /** 获取当前筛选条件 */
-  getFilters: () => FilterState;
-  /** 获取当前总数 */
-  getTotal: () => number;
-}
-
-// 表格内部状态
-interface TableState {
-  accounts: ListMailAccount[];
-  loading: boolean;
-  page: number;
-  pageSize: number;
-  total: number;
-  filters: FilterState;
 }
 
 const DEFAULT_FILTERS: FilterState = {
@@ -36,8 +22,8 @@ const DEFAULT_FILTERS: FilterState = {
   descend: false,
 };
 
-const AccountTable = memo(
-  forwardRef<AccountTableRef, Props>(({ localObj }, ref) => {
+const TheTable = memo(
+  forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
 
     // 整合所有表格相关状态
@@ -107,10 +93,8 @@ const AccountTable = memo(
           const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
           fetchAccounts(filtersToUse, pageToUse);
         },
-        getFilters: () => filters,
-        getTotal: () => total,
       }),
-      [fetchAccounts, filters, page, total],
+      [fetchAccounts, filters, page],
     );
 
     // 处理分页
@@ -185,12 +169,10 @@ const AccountTable = memo(
             onDeleteSuccess={handleDeleteSuccess}
           />
         )}
-        emptyText="暂无邮件账户"
+        emptyText="暂无数据"
       />
     );
   }),
 );
 
-AccountTable.displayName = 'AccountTable';
-
-export default AccountTable;
+export default TheTable;

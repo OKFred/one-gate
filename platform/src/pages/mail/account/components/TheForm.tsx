@@ -23,17 +23,13 @@ import {
 } from '@mui/icons-material';
 import * as mailAccountAPI from '@/api/mail/account';
 import type { AddMailAccountRequest, ListMailAccount } from '../type';
-import type { Props } from '../type.d';
+import type { Props } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
 
 // 暴露给父组件的方法
-export interface AccountFormRef {
-  /** 打开新增表单 */
-  openAdd: () => void;
+export interface TheFormRef {
   /** 打开编辑表单 */
-  openEdit: (account: ListMailAccount) => void;
-  /** 关闭表单 */
-  close: () => void;
+  onOpen: (account?: ListMailAccount) => void;
 }
 
 const DEFAULT_FORM: AddMailAccountRequest = {
@@ -46,8 +42,8 @@ const DEFAULT_FORM: AddMailAccountRequest = {
   starttlsEnable: false,
 };
 
-const AccountForm = memo(
-  forwardRef<AccountFormRef, Props>(({ localObj }, ref) => {
+const TheForm = memo(
+  forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -62,28 +58,24 @@ const AccountForm = memo(
     useImperativeHandle(
       ref,
       () => ({
-        openAdd: () => {
-          setEditId(null);
-          setForm(DEFAULT_FORM);
+        onOpen: (account?: ListMailAccount) => {
+          if (account) {
+            setEditId(account.id!);
+            setForm({
+              nickname: account.nickname || '',
+              mailAddress: account.mailAddress || '',
+              host: account.host || '',
+              port: account.port,
+              password: account.password || '',
+              sslEnable: account.sslEnable,
+              starttlsEnable: account.starttlsEnable,
+            });
+          } else {
+            setEditId(null);
+            setForm(DEFAULT_FORM);
+          }
           setShowPassword(false);
           setOpen(true);
-        },
-        openEdit: (account: ListMailAccount) => {
-          setEditId(account.id!);
-          setForm({
-            nickname: account.nickname || '',
-            mailAddress: account.mailAddress || '',
-            host: account.host || '',
-            port: account.port,
-            password: account.password || '',
-            sslEnable: account.sslEnable,
-            starttlsEnable: account.starttlsEnable,
-          });
-          setShowPassword(false);
-          setOpen(true);
-        },
-        close: () => {
-          handleCancel();
         },
       }),
       [],
@@ -267,6 +259,4 @@ const AccountForm = memo(
   }),
 );
 
-AccountForm.displayName = 'AccountForm';
-
-export default AccountForm;
+export default TheForm;

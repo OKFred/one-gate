@@ -19,25 +19,18 @@ import {
   ExpandMore,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import {
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { FilterState } from '../type';
-import type { Props } from '../type.d';
+import type { Props } from '../type';
 
 // 暴露给父组件的方法
-export interface AccountFilterRef {
+export interface TheFilterRef {
   /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
 }
 
-const AccountFilter = memo(
-  forwardRef<AccountFilterRef, Props>(({ localObj }, ref) => {
+const TheFilter = memo(
+  forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
@@ -201,4 +194,4 @@ const AccountFilter = memo(
   }),
 );
 
-export default AccountFilter;
+export default TheFilter;
