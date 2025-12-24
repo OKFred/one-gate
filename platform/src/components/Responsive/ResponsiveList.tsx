@@ -14,6 +14,9 @@ import {
   CardContent,
   Typography,
   Pagination,
+  Select,
+  MenuItem,
+  FormControl,
 } from '@mui/material';
 import { useResponsive } from '@/hooks/useResponsive';
 
@@ -53,6 +56,8 @@ export interface ResponsiveListProps<T> {
   pageSize: number;
   /** 页码改变回调 */
   onPageChange: (page: number) => void;
+  /** 每页数量改变回调 */
+  onPageSizeChange?: (pageSize: number) => void;
   /** 获取每行的唯一 key */
   keyExtractor: (item: T) => string | number;
   /** 表格列配置（PC端） */
@@ -75,6 +80,7 @@ function ResponsiveListInner<T>({
   total,
   pageSize,
   onPageChange,
+  onPageSizeChange,
   keyExtractor,
   columns,
   cardFields,
@@ -107,9 +113,39 @@ function ResponsiveListInner<T>({
   }
 
   // 分页组件
+  const pageSizeOptions = [5, 10, 20, 50, 100];
   const PaginationComponent =
-    totalPages > 1 ? (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 2, mt: isMobile ? 0 : undefined }}>
+    totalPages > 1 || (onPageSizeChange && pageSizeOptions.length > 0) ? (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          py: 2,
+          mt: isMobile ? 0 : undefined,
+          gap: 2,
+        }}
+      >
+        {onPageSizeChange && (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              每页条数：
+            </Typography>
+            <FormControl size="small" sx={{ minWidth: 80 }}>
+              <Select
+                value={pageSize}
+                onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                displayEmpty
+              >
+                {pageSizeOptions.map((opt) => (
+                  <MenuItem key={opt} value={opt}>
+                    {opt}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
+        )}
         <Pagination
           count={totalPages}
           page={page}

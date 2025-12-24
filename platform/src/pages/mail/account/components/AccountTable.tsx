@@ -114,6 +114,13 @@ const AccountTable = memo(
       fetchAccounts(filters, newPage);
     };
 
+    // 处理每页条数变化
+    const handlePageSizeChange = (newPageSize: number) => {
+      setState((prev) => ({ ...prev, pageSize: newPageSize }));
+      // 重置到第一页并刷新数据
+      fetchAccounts(filters, 1);
+    };
+
     // 表格列配置（PC端）
     const columns: TableColumn<ListMailAccount>[] = [
       { title: 'ID', render: (acc) => acc.id },
@@ -159,6 +166,7 @@ const AccountTable = memo(
         total={total}
         pageSize={pageSize}
         onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
         keyExtractor={(acc) => acc.id!}
         columns={columns}
         cardFields={cardFields}
