@@ -25,6 +25,7 @@ import * as mailAccountAPI from '@/api/mail/account';
 import type { AddMailAccountRequest, ListMailAccount } from '../type';
 import type { Props } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -47,6 +48,7 @@ const TheForm = memo(
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
+    const t = useTranslation();
 
     // 内部状态管理
     const [open, setOpen] = useState(false);
@@ -128,7 +130,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? '编辑邮件账户' : '新增邮件账户'}
+            {editId ? t('i18n.pages.mail.account.form.title.edit') : t('i18n.pages.mail.account.form.title.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -147,7 +149,7 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="昵称"
+                  label={t('i18n.pages.mail.account.form.nickname')}
                   value={form.nickname}
                   onChange={(e) => setForm({ ...form, nickname: e.target.value })}
                   required
@@ -155,7 +157,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label="邮箱地址"
+                  label={t('i18n.pages.mail.account.form.email')}
                   type="email"
                   value={form.mailAddress}
                   onChange={(e) => setForm({ ...form, mailAddress: e.target.value })}
@@ -167,7 +169,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="SMTP主机"
+                  label={t('i18n.pages.mail.account.form.host')}
                   value={form.host}
                   onChange={(e) => setForm({ ...form, host: e.target.value })}
                   required
@@ -175,7 +177,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label="端口"
+                  label={t('i18n.pages.mail.account.form.port')}
                   type="number"
                   value={form.port}
                   onChange={(e) => setForm({ ...form, port: Number(e.target.value) })}
@@ -187,7 +189,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="密码"
+                  label={t('i18n.pages.mail.account.form.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -225,8 +227,8 @@ const TheForm = memo(
                     });
                   }}
                 >
-                  <FormControlLabel value="ssl" control={<Radio />} label="SSL/TLS" />
-                  <FormControlLabel value="starttls" control={<Radio />} label="STARTTLS" />
+                  <FormControlLabel value="ssl" control={<Radio />} label={t('i18n.pages.mail.account.form.ssl')} />
+                  <FormControlLabel value="starttls" control={<Radio />} label={t('i18n.pages.mail.account.form.starttls')} />
                 </RadioGroup>
               </FormControl>
             </Stack>
@@ -242,7 +244,7 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
-            取消
+            {t('i18n.pages.mail.account.form.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -251,7 +253,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {editId ? '更新' : '新增'}
+            {t('i18n.pages.mail.account.form.save')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -14,6 +14,7 @@ import { ResponsiveButton } from '@/components/Responsive/index';
 import * as mailAccountAPI from '@/api/mail/account';
 import type { ListMailAccount } from '../type';
 import type { TheFormRef } from './TheForm';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // ==================== 新增账户按钮 ====================
 
@@ -26,13 +27,14 @@ export interface AddButtonProps {
  * 用于页面顶部的新增操作
  */
 export const AddTheButton = memo(({ formRef }: AddButtonProps) => {
+  const t = useTranslation();
   const handleAdd = useCallback(() => {
     formRef.current?.onOpen();
   }, [formRef]);
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      新增
+      {t('i18n.pages.mail.account.actions.add')}
     </ResponsiveButton>
   );
 });
@@ -52,6 +54,7 @@ export interface RowButtonProps {
  */
 export const AccountActionButtons = memo(
   ({ account, formRef, onDeleteSuccess }: RowButtonProps) => {
+    const t = useTranslation();
     // 删除确认对话框状态
     const [deleteDialog, setDeleteDialog] = useState(false);
 
@@ -92,16 +95,16 @@ export const AccountActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>确认删除</DialogTitle>
+          <DialogTitle>{t('i18n.pages.mail.account.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              确定要删除邮件账户 "{account.nickname}" 吗？此操作不可撤销。
+              {t('i18n.pages.mail.account.actions.deleteConfirmMessage').replace('{nickname}', account.nickname || '')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>取消</Button>
+            <Button onClick={closeDeleteDialog}>{t('i18n.pages.mail.account.form.cancel')}</Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus>
-              删除
+              {t('i18n.pages.mail.account.actions.delete')}
             </Button>
           </DialogActions>
         </Dialog>

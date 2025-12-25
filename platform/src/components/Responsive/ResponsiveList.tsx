@@ -58,6 +58,8 @@ export interface ResponsiveListProps<T> {
   onPageChange: (page: number) => void;
   /** 每页数量改变回调 */
   onPageSizeChange?: (pageSize: number) => void;
+  /** 每页数量标签 */
+  pageSizeLabel?: string;
   /** 获取每行的唯一 key */
   keyExtractor: (item: T) => string | number;
   /** 表格列配置（PC端） */
@@ -81,6 +83,7 @@ function ResponsiveListInner<T>({
   pageSize,
   onPageChange,
   onPageSizeChange,
+  pageSizeLabel = '每页条数：',
   keyExtractor,
   columns,
   cardFields,
@@ -129,7 +132,7 @@ function ResponsiveListInner<T>({
         {onPageSizeChange && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              每页条数：
+              {pageSizeLabel}
             </Typography>
             <FormControl size="small" sx={{ minWidth: 80 }}>
               <Select

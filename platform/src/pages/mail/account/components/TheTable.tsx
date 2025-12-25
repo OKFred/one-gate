@@ -9,6 +9,7 @@ import { AccountActionButtons } from './TheActionButtons';
 import type { ListMailAccount, FilterState, TableState } from '../type';
 import type { Props } from '../type';
 import dayjs from 'dayjs';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheTableRef {
@@ -25,6 +26,7 @@ const DEFAULT_FILTERS: FilterState = {
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
+    const t = useTranslation();
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
@@ -111,17 +113,17 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<ListMailAccount>[] = [
-      { title: 'ID', render: (acc) => acc.id },
-      { title: '昵称', render: (acc) => acc.nickname },
-      { title: '邮箱', render: (acc) => acc.mailAddress },
-      { title: '主机', render: (acc) => acc.host },
-      { title: '端口', render: (acc) => acc.port },
+      { title: t('i18n.pages.mail.account.columns.id'), render: (acc) => acc.id },
+      { title: t('i18n.pages.mail.account.columns.nickname'), render: (acc) => acc.nickname },
+      { title: t('i18n.pages.mail.account.columns.email'), render: (acc) => acc.mailAddress },
+      { title: t('i18n.pages.mail.account.columns.host'), render: (acc) => acc.host },
+      { title: t('i18n.pages.mail.account.columns.port'), render: (acc) => acc.port },
       {
-        title: '创建时间',
+        title: t('i18n.pages.mail.account.columns.createTime'),
         render: (acc) => dayjs(acc.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: '操作',
+        title: t('i18n.pages.mail.account.columns.actions'),
         align: 'center',
         render: (acc) => (
           <AccountActionButtons
@@ -136,15 +138,15 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<ListMailAccount>[] = [
       { type: 'title', render: (acc) => acc.nickname },
-      { type: 'subtitle', label: 'ID', render: (acc) => acc.id },
-      { type: 'content', label: '邮箱地址', render: (acc) => acc.mailAddress },
-      { type: 'content', label: 'SMTP服务器', render: (acc) => `${acc.host}:${acc.port}` },
+      { type: 'subtitle', label: t('i18n.pages.mail.account.columns.id'), render: (acc) => acc.id },
+      { type: 'content', label: t('i18n.pages.mail.account.columns.email'), render: (acc) => acc.mailAddress },
+      { type: 'content', label: t('i18n.pages.mail.account.columns.host') + ':' + t('i18n.pages.mail.account.columns.port'), render: (acc) => `${acc.host}:${acc.port}` },
       {
         type: 'tags',
         render: (acc) => (
           <>
-            {acc.sslEnable && <Chip label="SSL" color="success" size="small" />}
-            {acc.starttlsEnable && <Chip label="STARTTLS" color="info" size="small" />}
+            {acc.sslEnable && <Chip label={t('i18n.pages.mail.account.tags.ssl')} color="success" size="small" />}
+            {acc.starttlsEnable && <Chip label={t('i18n.pages.mail.account.tags.starttls')} color="info" size="small" />}
           </>
         ),
       },
@@ -169,7 +171,7 @@ const TheTable = memo(
             onDeleteSuccess={handleDeleteSuccess}
           />
         )}
-        emptyText="暂无数据"
+        emptyText={t('i18n.pages.mail.account.empty')}
       />
     );
   }),
