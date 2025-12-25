@@ -5,8 +5,13 @@ import {
   userAudit,
   userTable,
   userData,
+  userVOData,
+  userOmitPasswordData,
+  userOmitPasswordVOData,
   type userAddLike,
   type userLike,
+  type userVOLike,
+  type userAddVOLike,
 } from "./db.table";
 import { getDepartmentNameById } from "@/api/system/department/service";
 import { getRolesByIds } from "@/api/system/role/service";
@@ -26,9 +31,10 @@ const superAdminId = 1; // 超级管理员用户ID
 const addReq = {
   type: "object",
   properties: {
-    ...userData,
-  } satisfies Partial<Record<keyof userAddLike, JSONSchema>>,
-  required: ["username", "password", "roleIdArr"],
+    ...userUnique,
+    ...userVOData,
+  } satisfies Partial<Record<keyof userAddVOLike, JSONSchema>>,
+  required: ["username", "password", "langCode", "roleArr"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -42,10 +48,12 @@ async function onAdd(
     username,
     password,
     langCode,
-    departmentId,
-    roleIdArr,
+    roleArr,
+    departmentObj,
     isEnabled = true,
   } = obj;
+  const departmentId = departmentObj ? departmentObj.value : null;
+  const roleIdArr = roleArr.map((o) => o.value);
 
   // 密码加盐处理
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -124,7 +132,7 @@ const listReq = {
         "username",
         "langCode",
         "departmentId",
-        "roleIdArr",
+        "isEnabled",
         "createTimeUtc",
       ] satisfies (keyof userLike)[],
     },
@@ -154,21 +162,18 @@ const listRes = {
         type: "object",
         properties: {
           ...userIndex,
-          username: userData.username,
-          langCode: userData.langCode,
-          departmentId: userData.departmentId,
-          roleIdArr: userData.roleIdArr,
-          isEnabled: userData.isEnabled,
+          ...userUnique,
+          ...userOmitPasswordData,
           ...userAudit,
-          // 注意：不返回密码字段
         },
+        required: ["id", "username", "langCode", "isEnabled", "createTimeUtc"],
+        additionalProperties: false,
       },
     },
   },
+  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
-
-// 用于内部查询的类型（包含密码）
-type userLikeWithoutPassword = Omit<userLike, "password">;
 
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
@@ -187,26 +192,10 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
 
   // 函数重载：根据 getAll 参数提供不同的返回类型
   function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<userLikeWithoutPassword[]>;
-  function queryDB(
-    getAll: boolean
-  ): Promise<{ total: number }[] | userLikeWithoutPassword[]> {
+  function queryDB(getAll: false): Promise<userLike[]>;
+  function queryDB(getAll: boolean): Promise<{ total: number }[] | userLike[]> {
     const baseQuery = db
-      .select(
-        getAll
-          ? { total: count(userTable.id).as("total") }
-          : {
-              id: userTable.id,
-              username: userTable.username,
-              langCode: userTable.langCode,
-              departmentId: userTable.departmentId,
-              roleIdArr: userTable.roleIdArr,
-              isEnabled: userTable.isEnabled,
-              createTimeUtc: userTable.createTimeUtc,
-              updateTimeUtc: userTable.updateTimeUtc,
-              // 注意：不返回密码字段
-            }
-      )
+      .select(getAll ? { total: count(userTable.id).as("total") } : undefined)
       .from(userTable)
       .where(
         and(
@@ -219,8 +208,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
       .orderBy(!descend ? asc(orderField) : desc(orderField))
       .limit(getAll ? maxPageSize : finalPageSize)
       .offset(getAll ? 0 : offset);
-
-    return baseQuery as any;
+    return baseQuery;
   }
   const getAllResult = await queryDB(true);
   const total = getAllResult[0]?.total || 0;
@@ -234,13 +222,17 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     };
   }
   const rows = await queryDB(false);
+  const rowsFiltered: Omit<userLike, "password">[] = rows.map((row) => {
+    const { password, ...rest } = row; // 注意：不返回密码字段
+    return rest;
+  });
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list: rowsFiltered,
   };
 }
 const listApi = {
@@ -258,7 +250,8 @@ const updateReq = {
   type: "object",
   properties: {
     ...userIndex,
-    ...userData,
+    ...userUnique,
+    ...userVOData,
   },
   required: ["id"],
   additionalProperties: false,
@@ -271,15 +264,22 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
-  const { id, password, isEnabled, roleIdArr, ...rest } = obj;
-  // 如果更新密码，需要重新加盐
-  let updateData: any = {
+  const { id, password, departmentObj, roleArr, ...rest } = obj;
+  const departmentId = departmentObj ? departmentObj.value : null;
+  const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
+  const isEnabled = id === superAdminId ? true : obj.isEnabled; // 禁止禁用超级管理员
+  let updateData = {
     ...rest,
-    isEnabled: id === superAdminId ? true : isEnabled, // 禁止禁用超级管理员
+    id,
+    password: undefined,
+    departmentId,
+    roleIdArr,
+    isEnabled, // 禁止禁用超级管理员
     updaterId: userObj.userId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
+  // 如果更新密码，需要重新加盐
   if (password) {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     updateData.password = hashedPassword;
@@ -316,14 +316,19 @@ const getRes = {
   type: "object",
   properties: {
     ...userIndex,
-    username: userData.username,
-    langCode: userData.langCode,
-    departmentId: userData.departmentId,
-    roleIdArr: userData.roleIdArr,
-    isEnabled: userData.isEnabled,
+    ...userUnique,
+    ...userOmitPasswordVOData,
     ...userAudit,
-    // 注意：不返回密码字段
   },
+  required: [
+    "id",
+    "username",
+    "langCode",
+    "isEnabled",
+    "roleArr",
+    "createTimeUtc",
+  ],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
   c: NodeHonoContext
@@ -331,17 +336,7 @@ async function onGet(
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
   const { id } = uniqueKeyObj;
   const rows = await db
-    .select({
-      id: userTable.id,
-      username: userTable.username,
-      langCode: userTable.langCode,
-      departmentId: userTable.departmentId,
-      roleIdArr: userTable.roleIdArr,
-      isEnabled: userTable.isEnabled,
-      createTimeUtc: userTable.createTimeUtc,
-      updateTimeUtc: userTable.updateTimeUtc,
-      // 注意：不返回密码字段
-    })
+    .select()
     .from(userTable)
     .where(eq(userTable.id, id))
     .limit(1);
@@ -350,7 +345,22 @@ async function onGet(
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
     });
   }
-  return rows[0];
+  const row = rows[0];
+  const departmentObj = row.departmentId
+    ? {
+        label: (await getDepartmentNameById(row.departmentId)) || "",
+        value: row.departmentId,
+      }
+    : null;
+  const roleArr =
+    row.roleIdArr.length > 0 ? await getRolesByIds(row.roleIdArr) : [];
+  const newRow = {
+    ...row,
+    departmentObj,
+    roleArr,
+    password: undefined, // 注意：不返回密码字段
+  };
+  return newRow;
 }
 const getApi = {
   req: getReq,
@@ -363,111 +373,88 @@ const getApi = {
   service: onGet,
 };
 
-const verifyReq = {
-  type: "object",
-  properties: {
-    username: {
-      type: "string",
-      description: "用户名",
-    },
-    password: {
-      type: "string",
-      description: "密码",
-    },
-  },
-  required: ["username", "password"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const verifyRes = {
-  type: "object",
-  properties: {
-    valid: {
-      type: "boolean",
-      description: "验证结果，true 表示验证成功",
-    },
+async function verifyUsernameAndPassword({ username, password }): Promise<{
+  userObj?: Omit<userVOLike, "password">;
+  valid: boolean;
+}> {
+  const _userObj = await getUserObjByName(username);
+  if (!_userObj) return { valid: false };
+  const isValid = await bcrypt.compare(password, _userObj.password);
+  if (!isValid) return { valid: false };
+  const { password: _, ...rest } = _userObj; // 注意：不返回密码字段
+  return {
+    valid: true,
     userObj: {
-      type: "object",
-      nullable: true,
-      description: "用户对象，验证成功时返回用户信息，验证失败时为 null",
-      properties: {
-        ...userIndex,
-        username: userData.username,
-        langCode: userData.langCode,
-        departmentId: userData.departmentId,
-        roleIdArr: userData.roleIdArr,
-        isEnabled: userData.isEnabled,
-        departmentName: { type: "string", nullable: true },
-        roleArr: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              label: { type: "string" },
-              value: { type: "number" },
-            },
-            required: ["label", "value"],
-          },
-        },
-      },
+      ...rest,
     },
-  },
-  required: ["valid"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-async function onVerify(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof verifyRes>> {
-  const obj = c.get("bodyObj") as FromSchema<typeof verifyReq>;
-  const { username, password } = obj;
+  };
+}
+
+async function getUserObjByName(username: string): Promise<userVOLike | null> {
   const userArr = await db
     .select()
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-  if (userArr.length === 0) {
-    return { valid: false };
-  }
+  if (userArr.length === 0) return null;
   const userObj = userArr[0];
-  if (!userObj.isEnabled) {
-    return { valid: false };
-  }
-  const isValid = await bcrypt.compare(password, userObj.password);
-
-  if (!isValid) {
-    return { valid: false, userObj: null };
-  }
-
-  // Fetch department name
-  let departmentName = null;
-  if (userObj.departmentId) {
-    departmentName = await getDepartmentNameById(userObj.departmentId);
-  }
-
-  let roleArr: { label: string; value: number }[] = [];
-  const roleIdArr = userObj.roleIdArr;
-  if (roleIdArr.length > 0) {
-    const roles = await getRolesByIds(roleIdArr);
-    roleArr = roles.map((o) => ({ label: o.name, value: o.id }));
-  }
-
+  if (!userObj.isEnabled) return null;
+  const row = { ...userObj };
+  const departmentObj = row.departmentId
+    ? {
+        label: (await getDepartmentNameById(row.departmentId)) || "",
+        value: row.departmentId,
+      }
+    : null;
+  const roleArr =
+    row.roleIdArr.length > 0 ? await getRolesByIds(row.roleIdArr) : [];
   return {
-    valid: true,
-    userObj: {
-      ...userObj,
-      departmentName,
-      roleArr,
-    },
+    ...row,
+    departmentObj,
+    roleArr,
   };
 }
-const verifyApi = {
-  req: verifyReq,
-  res: verifyRes,
+
+const updateLangCodeReq = {
+  type: "object",
+  properties: {
+    id: userIndex.id,
+    langCode: userData.langCode,
+  },
+  required: ["id", "langCode"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updateLangCodeRes = {
+  ...userIndex["id"],
+} as const satisfies JSONSchema;
+async function onUpdateLangCode(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof updateLangCodeRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof updateLangCodeReq>;
+  const userObj = c.get("userObj");
+  const { id, langCode } = obj;
+
+  const res = await db
+    .update(userTable)
+    .set({
+      langCode,
+      // updaterId: userObj.userId,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
+    })
+    .where(eq(userTable.id, id))
+    .returning({ id: userTable.id });
+  if (!res || res.length === 0) return null;
+  return res[0].id;
+}
+const updateLangCodeApi = {
+  req: updateLangCodeReq,
+  res: updateLangCodeRes,
   pathInfo: {
-    path: "/verify",
+    path: "/updateLangCode",
     method: "post",
-    summary: "验证用户密码",
+    summary: "更新用户语言",
   } as const,
-  service: onVerify,
+  service: onUpdateLangCode,
 };
 
 export default {
@@ -476,5 +463,7 @@ export default {
   list: listApi,
   update: updateApi,
   get: getApi,
-  verify: verifyApi,
+  updateLangCode: updateLangCodeApi,
+  verifyUsernameAndPassword,
+  getUserObjByName,
 };

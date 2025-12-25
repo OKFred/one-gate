@@ -361,10 +361,10 @@ const getApi = {
  */
 export async function getRolesByIds(
   ids: number[]
-): Promise<{ id: number; name: string }[]> {
+): Promise<{ value: number; label: string }[]> {
   if (ids.length === 0) return [];
   const rows = await db
-    .select({ id: roleTable.id, name: roleTable.name })
+    .select({ value: roleTable.id, label: roleTable.name })
     .from(roleTable)
     .where(inArray(roleTable.id, ids));
   return rows;

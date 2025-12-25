@@ -1,5 +1,4 @@
 import db from "@/db/index";
-import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -17,43 +16,125 @@ export const userUnique = {
   username: {
     type: "string",
     description: "用户名",
-    examples: ["admin"],
+    examples: ["user"],
   },
 } as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
-
-export const userData = {
-  username: {
-    type: "string",
-    description: "用户名",
-    examples: ["admin"],
-  },
-  password: {
-    type: "string",
-    description: "密码",
-    examples: ["password123"],
-  },
+export const userOmitPasswordData = {
   langCode: {
     type: "string",
     description: "语言代码",
     examples: ["en-US", "zh-CN"],
-  },
-  departmentId: {
-    type: ["number", "null"],
-    description: "部门ID",
-    examples: [1],
-  },
-  roleIdArr: {
-    type: "array",
-    items: { type: "number" },
-    description: "角色ID数组",
-    examples: [[1, 2, 3]],
   },
   isEnabled: {
     type: "boolean",
     description: "是否启用",
     default: true,
   },
+  departmentId: {
+    type: "number",
+    description: "部门ID",
+    examples: [1],
+  },
+  roleIdArr: {
+    type: "array",
+    description: "角色ID数组",
+    items: {
+      type: "number",
+      examples: [1],
+    },
+  },
 } as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
+export const userOmitPasswordVOData = {
+  langCode: {
+    type: "string",
+    description: "语言代码",
+    examples: ["en-US", "zh-CN"],
+  },
+  isEnabled: {
+    type: "boolean",
+    description: "是否启用",
+    default: true,
+  },
+  departmentObj: {
+    type: "object",
+    description: "部门对象",
+    properties: {
+      value: { type: "number", description: "部门ID", examples: [1] },
+      label: { type: "string", description: "部门名称", examples: ["研发部"] },
+    },
+    required: ["value", "label"],
+    additionalProperties: false,
+  },
+  roleArr: {
+    type: "array",
+    description: "角色数组",
+    items: {
+      type: "object",
+      properties: {
+        value: { type: "number", description: "角色ID", examples: [1] },
+        label: {
+          type: "string",
+          description: "角色名称",
+          examples: ["管理员"],
+        },
+      },
+      required: ["value", "label"],
+      additionalProperties: false,
+    },
+  },
+} as const satisfies Partial<Record<keyof userVOLike, JSONSchema>>;
+export const userData = {
+  password: {
+    type: "string",
+    description: "密码",
+    examples: ["pass"],
+  },
+  ...userOmitPasswordData,
+} as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
+export const userVOData = {
+  password: {
+    type: "string",
+    description: "密码",
+    examples: ["pass"],
+  },
+  langCode: {
+    type: "string",
+    description: "语言代码",
+    examples: ["en-US", "zh-CN"],
+  },
+  departmentObj: {
+    type: "object",
+    description: "部门对象",
+    properties: {
+      value: { type: "number", description: "部门ID", examples: [1] },
+      label: { type: "string", description: "部门名称", examples: ["研发部"] },
+    },
+    required: ["value", "label"],
+    additionalProperties: false,
+  },
+  roleArr: {
+    type: "array",
+    description: "角色数组",
+    items: {
+      type: "object",
+      properties: {
+        value: { type: "number", description: "角色ID", examples: [1] },
+        label: {
+          type: "string",
+          description: "角色名称",
+          examples: ["管理员"],
+        },
+      },
+      required: ["value", "label"],
+      additionalProperties: false,
+    },
+  },
+  isEnabled: {
+    type: "boolean",
+    description: "是否启用",
+    default: true,
+  },
+} as const satisfies Partial<Record<keyof userVOLike, JSONSchema>>;
 
 export const userAudit = {
   createTimeUtc: {
@@ -69,8 +150,28 @@ export const userAudit = {
   },
 } as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
 
+type userDataDerived = {
+  departmentObj?: {
+    value: number;
+    label: string;
+  };
+  roleArr: {
+    value: number;
+    label: string;
+  }[];
+};
 export type userLike = InferSelectModel<typeof userTable>;
 export type userAddLike = InferInsertModel<typeof userTable>;
+export type userVOLike = Omit<
+  InferSelectModel<typeof userTable>,
+  "roleIdArr" | "departmentId"
+> &
+  userDataDerived;
+export type userAddVOLike = Omit<
+  InferInsertModel<typeof userTable>,
+  "roleIdArr" | "departmentId"
+> &
+  userDataDerived;
 
 export const userTable = sqliteTable("system_user", {
   id: integer("id").primaryKey().notNull(),
