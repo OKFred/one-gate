@@ -49,9 +49,36 @@ const loginRes = {
           description: "角色ID列表",
           items: { type: "number", description: "角色ID" },
         },
+        roleArr: {
+          type: "array",
+          description: "角色列表",
+          items: {
+            type: "object",
+            properties: {
+              label: {
+                type: "string",
+                description: "角色名称",
+              },
+              value: {
+                type: "number",
+                description: "角色ID",
+              },
+            },
+            required: ["label", "value"] as const,
+             additionalProperties: false,
+          },
+        },
         departmentId: {
           type: ["number", "null"],
           description: "部门ID",
+        },
+        departmentName: {
+          type: ["string", "null"],
+          description: "部门名称",
+        },
+        langCode: {
+          type: "string",
+          description: "用户语言代码",
         },
         isEnabled: {
           type: "boolean",
@@ -78,7 +105,7 @@ async function onLogin(
       }
     );
   const userObj = verifyResult.userObj;
-  const { id, username, roleIdArr, departmentId, isEnabled } = userObj;
+  const { id, username, roleIdArr, departmentId, isEnabled, roleArr, departmentName, langCode } = userObj;
   // 生成token
   const token = tokenUtils.generateToken({
     userId: id,
@@ -91,7 +118,10 @@ async function onLogin(
       id,
       username,
       roleIdArr,
-      departmentId: departmentId ?? null,
+      roleArr,
+      departmentId,
+      departmentName,
+      langCode,
       isEnabled,
     },
   };

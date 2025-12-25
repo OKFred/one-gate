@@ -394,6 +394,7 @@ const verifyRes = {
         username: userData.username,
         langCode: userData.langCode,
         departmentId: userData.departmentId,
+        roleIdArr: userData.roleIdArr,
         isEnabled: userData.isEnabled,
         departmentName: { type: "string", nullable: true },
         roleArr: {
