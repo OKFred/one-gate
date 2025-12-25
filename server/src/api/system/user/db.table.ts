@@ -32,6 +32,11 @@ export const userData = {
     description: "密码",
     examples: ["password123"],
   },
+  langCode: {
+    type: "string",
+    description: "语言代码",
+    examples: ["en-US", "zh-CN"],
+  },
   departmentId: {
     type: ["number", "null"],
     description: "部门ID",
@@ -71,6 +76,7 @@ export const userTable = sqliteTable("system_user", {
   id: integer("id").primaryKey().notNull(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  langCode: text("lang_code").notNull(),
   departmentId: integer("department_id"),
   roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
@@ -86,6 +92,7 @@ export async function tableInit() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
+            lang_code TEXT NOT NULL,
             department_id INTEGER,
             role_id_arr TEXT NOT NULL,
             is_enabled INTEGER NOT NULL DEFAULT 1,

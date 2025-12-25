@@ -10,6 +10,7 @@ const SALT_ROUNDS = 12;
 const SUPER_ADMIN = {
   username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
   password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
+  langCode: "zh-CN",
   roleId: 1, // 超级管理员角色ID
 };
 
@@ -86,6 +87,7 @@ async function initSuperAdminUser(roleId: number) {
       .values({
         username: SUPER_ADMIN.username,
         password: hashedPassword,
+        langCode: SUPER_ADMIN.langCode,
         roleIdArr: [roleId], // 关联超级管理员角色
         isEnabled: true,
       })

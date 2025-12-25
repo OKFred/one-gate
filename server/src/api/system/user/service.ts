@@ -38,7 +38,14 @@ async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const { username, password, departmentId, roleIdArr, isEnabled = true } = obj;
+  const {
+    username,
+    password,
+    langCode,
+    departmentId,
+    roleIdArr,
+    isEnabled = true,
+  } = obj;
 
   // 密码加盐处理
   const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
@@ -48,6 +55,7 @@ async function onAdd(
     .values({
       username,
       password: hashedPassword,
+      langCode,
       departmentId,
       roleIdArr,
       isEnabled,
@@ -114,6 +122,7 @@ const listReq = {
       enum: [
         "id",
         "username",
+        "langCode",
         "departmentId",
         "roleIdArr",
         "createTimeUtc",
@@ -146,6 +155,7 @@ const listRes = {
         properties: {
           ...userIndex,
           username: userData.username,
+          langCode: userData.langCode,
           departmentId: userData.departmentId,
           roleIdArr: userData.roleIdArr,
           isEnabled: userData.isEnabled,
@@ -188,6 +198,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
           : {
               id: userTable.id,
               username: userTable.username,
+              langCode: userTable.langCode,
               departmentId: userTable.departmentId,
               roleIdArr: userTable.roleIdArr,
               isEnabled: userTable.isEnabled,
@@ -306,6 +317,7 @@ const getRes = {
   properties: {
     ...userIndex,
     username: userData.username,
+    langCode: userData.langCode,
     departmentId: userData.departmentId,
     roleIdArr: userData.roleIdArr,
     isEnabled: userData.isEnabled,
@@ -322,6 +334,7 @@ async function onGet(
     .select({
       id: userTable.id,
       username: userTable.username,
+      langCode: userTable.langCode,
       departmentId: userTable.departmentId,
       roleIdArr: userTable.roleIdArr,
       isEnabled: userTable.isEnabled,
@@ -379,6 +392,7 @@ const verifyRes = {
       properties: {
         ...userIndex,
         username: userData.username,
+        langCode: userData.langCode,
         departmentId: userData.departmentId,
         isEnabled: userData.isEnabled,
         departmentName: { type: "string", nullable: true },

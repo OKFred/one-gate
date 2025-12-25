@@ -3935,6 +3935,12 @@ export interface components {
              */
             password: string;
             /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /**
              * @description 部门ID
              * @example 1
              */
@@ -3981,7 +3987,7 @@ export interface components {
         };
         SystemUserListReq: {
             /** @enum {string} */
-            orderBy?: "id" | "username" | "departmentId" | "roleIdArr" | "createTimeUtc";
+            orderBy?: "id" | "username" | "langCode" | "departmentId" | "roleIdArr" | "createTimeUtc";
             descend?: boolean;
             /** @default 1 */
             pageNo: number;
@@ -4017,6 +4023,12 @@ export interface components {
                      * @example admin
                      */
                     username?: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode?: string;
                     /**
                      * @description 部门ID
                      * @example 1
@@ -4067,6 +4079,12 @@ export interface components {
              */
             password?: string;
             /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /**
              * @description 部门ID
              * @example 1
              */
@@ -4115,6 +4133,12 @@ export interface components {
                  * @example admin
                  */
                 username?: string;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode?: string;
                 /**
                  * @description 部门ID
                  * @example 1
@@ -4170,6 +4194,12 @@ export interface components {
                      * @example admin
                      */
                     username?: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode?: string;
                     /**
                      * @description 部门ID
                      * @example 1
