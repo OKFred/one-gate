@@ -56,7 +56,8 @@ export const userOmitPasswordVOData = {
     default: true,
   },
   departmentObj: {
-    type: "object",
+    type: ["object", "null"],
+    nullable: true,
     description: "部门对象",
     properties: {
       value: { type: "number", description: "部门ID", examples: [1] },
@@ -103,7 +104,8 @@ export const userVOData = {
     examples: ["en-US", "zh-CN"],
   },
   departmentObj: {
-    type: "object",
+    type: ["object", "null"],
+    nullable: true,
     description: "部门对象",
     properties: {
       value: { type: "number", description: "部门ID", examples: [1] },

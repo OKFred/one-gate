@@ -299,7 +299,7 @@ const menuTreeItem = {
     id: { type: "number" },
     text: { type: "string" },
     icon: { type: "string" },
-    path: { type: "string" },
+    path: { type: ["string", "null"], nullable: true },
     sort: { type: "number" },
     children: {
       type: "array",
@@ -309,14 +309,14 @@ const menuTreeItem = {
           id: { type: "number" },
           text: { type: "string" },
           icon: { type: "string" },
-          path: { type: "string" },
+          path: { type: ["string", "null"], nullable: true },
           sort: { type: "number" },
         },
-        required: ["id", "text", "icon", "path"],
+        required: ["id", "text", "icon"],
       },
     },
   },
-  required: ["id", "text", "icon", "path"],
+  required: ["id", "text", "icon"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -372,8 +372,11 @@ async function onTree(
     return data
       .filter((item) => item.parentId === parentId)
       .map((item) => ({
-        ...item,
-        roleIdArr: undefined, // 不返回角色信息到前端
+        id: item.id,
+        text: item.text,
+        icon: item.icon,
+        path: item.path,
+        sort: item.sort,
         children: buildMenuTree(data, item.id),
       }));
   }

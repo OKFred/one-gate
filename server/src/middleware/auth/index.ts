@@ -35,13 +35,7 @@ export const authMiddleware = async (c: NodeHonoContext) => {
 
     // 从数据库获取最新的用户信息
     const userArr = await db
-      .select({
-        id: userTable.id,
-        username: userTable.username,
-        roleIdArr: userTable.roleIdArr,
-        departmentId: userTable.departmentId,
-        isEnabled: userTable.isEnabled,
-      })
+      .select()
       .from(userTable)
       .where(eq(userTable.id, payload.userId))
       .limit(1);
@@ -69,9 +63,8 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     // 将用户信息添加到context中
     c.set("userObj", {
       userId: user.id,
-      username: user.username,
-      roleIdArr: user.roleIdArr ? user.roleIdArr : [],
-      departmentId: user.departmentId || null,
+      ...user,
+      password: undefined, // 不暴露密码
     });
   } catch (error) {
     if (error instanceof HTTPException) {
@@ -99,7 +92,9 @@ export const roleMiddleware = (allowedRoles: number[]) => {
     }
 
     if (
-      !allowedRoles.some((role) => c.get("userObj").roleIdArr.includes(role))
+      !allowedRoles.some((role) =>
+        c.get("userObj").roleArr.find((r) => r.value === role)
+      )
     ) {
       throw new HTTPException(
         httpStatusCode.FORBIDDEN as ContentfulStatusCode,

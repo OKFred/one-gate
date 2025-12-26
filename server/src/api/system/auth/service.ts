@@ -1,4 +1,6 @@
-import userService from "@/api/system/user/service";
+import userService, {
+  verifyUsernameAndPassword,
+} from "@/api/system/user/service";
 import { tokenUtils } from "@/utils/token";
 import { HTTPException } from "hono/http-exception";
 import httpStatusCode from "http-status-codes";
@@ -104,7 +106,7 @@ async function onLogin(
 ): Promise<FromSchema<typeof loginRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
   const { username, password } = obj;
-  const verifyResult = await userService.verifyUsernameAndPassword({
+  const verifyResult = await verifyUsernameAndPassword({
     username,
     password,
   });
@@ -351,13 +353,7 @@ const profileRes = {
           },
         },
       },
-      required: [
-        "id",
-        "username",
-        "langCode",
-        "roleArr",
-        "isEnabled",
-      ] as const,
+      required: ["id", "username", "langCode", "roleArr", "isEnabled"] as const,
       additionalProperties: false,
     },
   },

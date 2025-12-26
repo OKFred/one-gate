@@ -345,22 +345,19 @@ async function onGet(
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
     });
   }
-  const row = rows[0];
-  const departmentObj = row.departmentId
+  const { password, departmentId, roleIdArr, ...rest } = rows[0];
+  const departmentObj = departmentId
     ? {
-        label: (await getDepartmentNameById(row.departmentId)) || "",
-        value: row.departmentId,
+        label: (await getDepartmentNameById(departmentId)) || "",
+        value: departmentId,
       }
     : null;
-  const roleArr =
-    row.roleIdArr.length > 0 ? await getRolesByIds(row.roleIdArr) : [];
-  const newRow = {
-    ...row,
+  const roleArr = roleIdArr.length > 0 ? await getRolesByIds(roleIdArr) : [];
+  return {
+    ...rest,
     departmentObj,
     roleArr,
-    password: undefined, // 注意：不返回密码字段
   };
-  return newRow;
 }
 const getApi = {
   req: getReq,
@@ -373,7 +370,10 @@ const getApi = {
   service: onGet,
 };
 
-async function verifyUsernameAndPassword({ username, password }): Promise<{
+export async function verifyUsernameAndPassword({
+  username,
+  password,
+}): Promise<{
   userObj?: Omit<userVOLike, "password">;
   valid: boolean;
 }> {
@@ -390,7 +390,9 @@ async function verifyUsernameAndPassword({ username, password }): Promise<{
   };
 }
 
-async function getUserObjByName(username: string): Promise<userVOLike | null> {
+export async function getUserObjByName(
+  username: string
+): Promise<userVOLike | null> {
   const userArr = await db
     .select()
     .from(userTable)
@@ -399,17 +401,16 @@ async function getUserObjByName(username: string): Promise<userVOLike | null> {
   if (userArr.length === 0) return null;
   const userObj = userArr[0];
   if (!userObj.isEnabled) return null;
-  const row = { ...userObj };
-  const departmentObj = row.departmentId
+  const { departmentId, roleIdArr, ...rest } = userObj;
+  const departmentObj = departmentId
     ? {
-        label: (await getDepartmentNameById(row.departmentId)) || "",
-        value: row.departmentId,
+        label: (await getDepartmentNameById(departmentId)) || "",
+        value: departmentId,
       }
     : null;
-  const roleArr =
-    row.roleIdArr.length > 0 ? await getRolesByIds(row.roleIdArr) : [];
+  const roleArr = roleIdArr.length > 0 ? await getRolesByIds(roleIdArr) : [];
   return {
-    ...row,
+    ...rest,
     departmentObj,
     roleArr,
   };
@@ -464,6 +465,4 @@ export default {
   update: updateApi,
   get: getApi,
   updateLangCode: updateLangCodeApi,
-  verifyUsernameAndPassword,
-  getUserObjByName,
 };
