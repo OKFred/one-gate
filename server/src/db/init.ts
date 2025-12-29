@@ -90,6 +90,7 @@ async function initSuperAdminUser(roleId: number) {
         langCode: SUPER_ADMIN.langCode,
         roleIdArr: [roleId], // 关联超级管理员角色
         isEnabled: true,
+        creatorId: 1, // 系统初始化
       })
       .returning({ id: userTable.id });
 

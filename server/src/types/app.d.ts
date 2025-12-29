@@ -55,3 +55,8 @@ export type App = OpenAPIHono<AppBindings>;
 export type Mutable<T> = {
   -readonly [K in keyof T]: T[K];
 };
+
+// 定义类型工具：提取 T 中必填的键（检查可选性）
+export type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
+}[keyof T];

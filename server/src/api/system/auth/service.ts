@@ -105,7 +105,9 @@ async function onLogin(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof loginRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
-  const { username, password } = obj;
+  const { username, password: base64Password } = obj;
+  const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
+  const password = plainPassword;
   const verifyResult = await verifyUsernameAndPassword({
     username,
     password,

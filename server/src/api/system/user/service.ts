@@ -1,26 +1,25 @@
 import db from "@/db/index";
 import {
-  userIndex,
-  userUnique,
-  userAudit,
   userTable,
-  userData,
-  userVOData,
-  userOmitPasswordData,
-  userOmitPasswordVOData,
-  type userAddLike,
-  type userLike,
-  type userVOLike,
-  type userAddVOLike,
+  IndexVO,
+  UserVO,
+  UserAddVO,
+  UserUpdateVO,
+  type UserPOLike,
+  type UserVOLike,
+  type UserAddVOLike,
+  type UserUpdateVOLike,
+  type UserDeleteVOLike,
+  type UserGetVOLike,
 } from "./db.table";
 import { getDepartmentNameById } from "@/api/system/department/service";
 import { getRolesByIds } from "@/api/system/role/service";
-import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { NodeHonoContext, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
@@ -31,22 +30,29 @@ const superAdminId = 1; // 超级管理员用户ID
 const addReq = {
   type: "object",
   properties: {
-    ...userUnique,
-    ...userVOData,
-  } satisfies Partial<Record<keyof userAddVOLike, JSONSchema>>,
-  required: ["username", "password", "langCode", "roleArr"],
+    ...UserAddVO,
+  } satisfies Partial<Record<keyof UserAddVOLike, JSONSchema>>,
+  required: [
+    "username",
+    "password",
+    "langCode",
+    "isEnabled",
+    "roleArr",
+  ] as const satisfies RequiredKeys<UserAddVOLike>[], // 如果无必填字段，设为空；否则填充
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
-  ...userIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
+  const userObj = c.get("userObj");
+  const { userId: creatorId } = userObj;
   const {
     username,
-    password,
+    password: base64Password,
     langCode,
     roleArr,
     departmentObj,
@@ -54,20 +60,20 @@ async function onAdd(
   } = obj;
   const departmentId = departmentObj ? departmentObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
-
-  // 密码加盐处理
-  const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+  const plainPassword = globalThis.atob(base64Password); // 防小白
+  const password = await bcrypt.hash(plainPassword, SALT_ROUNDS); // 密码加盐处理
 
   const result = await db
     .insert(userTable)
     .values({
       username,
-      password: hashedPassword,
+      password,
       langCode,
       departmentId,
       roleIdArr,
       isEnabled,
-    } satisfies userAddLike)
+      creatorId,
+    })
     .returning({ id: userTable.id });
   return result[0]?.id;
 }
@@ -85,13 +91,13 @@ const addApi = {
 const deleteReq = {
   type: "object",
   properties: {
-    ...userIndex,
+    ...IndexVO,
   },
-  required: ["id"] as const,
+  required: ["id"] as const satisfies RequiredKeys<UserDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const deleteRes = {
-  ...userIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
   c: NodeHonoContext
@@ -134,11 +140,11 @@ const listReq = {
         "departmentId",
         "isEnabled",
         "createTimeUtc",
-      ] satisfies (keyof userLike)[],
+      ] satisfies (keyof UserPOLike)[],
     },
     descend: { type: "boolean" },
     pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", maximum: 1000, default: 10 },
+    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
     keyword: {
       type: "string",
       examples: [""],
@@ -158,17 +164,34 @@ const listRes = {
     pageSize: { type: "number", description: "每页记录数" },
     list: {
       type: "array",
-      items: {
-        type: "object",
-        properties: {
-          ...userIndex,
-          ...userUnique,
-          ...userOmitPasswordData,
-          ...userAudit,
+      oneOf: [
+        {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              ...UserVO,
+            },
+            required: [
+              "id",
+              "username",
+              "langCode",
+              "departmentId",
+              "roleIdArr",
+              "isEnabled",
+              "creatorId",
+              "createTimeUtc",
+              "updaterId",
+              "updateTimeUtc",
+            ] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[],
+            additionalProperties: false,
+          },
         },
-        required: ["id", "username", "langCode", "isEnabled", "createTimeUtc"],
-        additionalProperties: false,
-      },
+        {
+          type: "array",
+          maxItems: 0,
+        },
+      ],
     },
   },
   required: ["total", "totalPage", "currentPage", "pageSize", "list"],
@@ -192,8 +215,10 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
 
   // 函数重载：根据 getAll 参数提供不同的返回类型
   function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<userLike[]>;
-  function queryDB(getAll: boolean): Promise<{ total: number }[] | userLike[]> {
+  function queryDB(getAll: false): Promise<UserPOLike[]>;
+  function queryDB(
+    getAll: boolean
+  ): Promise<{ total: number }[] | UserPOLike[]> {
     const baseQuery = db
       .select(getAll ? { total: count(userTable.id).as("total") } : undefined)
       .from(userTable)
@@ -222,7 +247,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     };
   }
   const rows = await queryDB(false);
-  const rowsFiltered: Omit<userLike, "password">[] = rows.map((row) => {
+  const rowsFiltered = rows.map((row) => {
     const { password, ...rest } = row; // 注意：不返回密码字段
     return rest;
   });
@@ -249,21 +274,20 @@ const listApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...userIndex,
-    ...userUnique,
-    ...userVOData,
+    ...UserUpdateVO,
   },
-  required: ["id"],
+  required: ["id"] as const satisfies RequiredKeys<UserUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
-  ...userIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id, password, departmentObj, roleArr, ...rest } = obj;
   const departmentId = departmentObj ? departmentObj.value : null;
   const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
@@ -275,7 +299,7 @@ async function onUpdate(
     departmentId,
     roleIdArr,
     isEnabled, // 禁止禁用超级管理员
-    updaterId: userObj.userId,
+    updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
@@ -307,18 +331,15 @@ const updateApi = {
 const getReq = {
   type: "object",
   properties: {
-    ...userIndex,
+    ...IndexVO,
   },
-  required: ["id"],
+  required: ["id"] as const satisfies RequiredKeys<UserGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
   type: "object",
   properties: {
-    ...userIndex,
-    ...userUnique,
-    ...userOmitPasswordVOData,
-    ...userAudit,
+    ...UserVO,
   },
   required: [
     "id",
@@ -374,7 +395,7 @@ export async function verifyUsernameAndPassword({
   username,
   password,
 }): Promise<{
-  userObj?: Omit<userVOLike, "password">;
+  userObj?: Omit<UserVOLike, "password">;
   valid: boolean;
 }> {
   const _userObj = await getUserObjByName(username);
@@ -392,7 +413,7 @@ export async function verifyUsernameAndPassword({
 
 export async function getUserObjByName(
   username: string
-): Promise<userVOLike | null> {
+): Promise<UserVOLike | null> {
   const userArr = await db
     .select()
     .from(userTable)
@@ -419,14 +440,14 @@ export async function getUserObjByName(
 const updateLangCodeReq = {
   type: "object",
   properties: {
-    id: userIndex.id,
-    langCode: userData.langCode,
+    id: IndexVO.id,
+    langCode: UserVO.langCode,
   },
-  required: ["id", "langCode"],
+  required: ["id", "langCode"] as const satisfies ("id" | "langCode")[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateLangCodeRes = {
-  ...userIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdateLangCode(
   c: NodeHonoContext
@@ -434,12 +455,12 @@ async function onUpdateLangCode(
   const obj = c.get("bodyObj") as FromSchema<typeof updateLangCodeReq>;
   const userObj = c.get("userObj");
   const { id, langCode } = obj;
-
+  const { userId: updaterId } = userObj;
   const res = await db
     .update(userTable)
     .set({
       langCode,
-      // updaterId: userObj.userId,
+      updaterId,
       updateTimeUtc: getCurrentTimestampUtcSql(),
     })
     .where(eq(userTable.id, id))
