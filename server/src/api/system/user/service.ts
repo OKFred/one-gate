@@ -6,6 +6,12 @@ import {
   UserListVO,
   UserAddVO,
   UserUpdateVO,
+  UserListKeys,
+  UserDetailKeys,
+  UserGetKeys,
+  UserDeleteKeys,
+  UserAddKeys,
+  UserUpdateKeys,
   type UserPOLike,
   type UserVOLike,
   type UserAddVOLike,
@@ -72,18 +78,9 @@ const listRes = {
             properties: {
               ...UserListVO,
             },
-            required: [
-              "id",
-              "username",
-              "langCode",
-              "departmentId",
-              "roleIdArr",
-              "isEnabled",
-              "creatorId",
-              "createTimeUtc",
-              "updaterId",
-              "updateTimeUtc",
-            ] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[],
+            required: [...UserListKeys] as const satisfies RequiredKeys<
+              Omit<UserPOLike, "password">
+            >[],
             additionalProperties: false,
           },
         },
@@ -176,13 +173,7 @@ const addReq = {
   properties: {
     ...UserAddVO,
   } satisfies Partial<Record<keyof UserAddVOLike, JSONSchema>>,
-  required: [
-    "username",
-    "password",
-    "langCode",
-    "isEnabled",
-    "roleArr",
-  ] as const satisfies RequiredKeys<UserAddVOLike>[], // 如果无必填字段，设为空；否则填充
+  required: [...UserAddKeys] as const satisfies RequiredKeys<UserAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -237,7 +228,9 @@ const updateReq = {
   properties: {
     ...UserUpdateVO,
   },
-  required: ["id"] as const satisfies RequiredKeys<UserUpdateVOLike>[],
+  required: [
+    ...UserUpdateKeys,
+  ] as const satisfies RequiredKeys<UserUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
@@ -294,7 +287,9 @@ const deleteReq = {
   properties: {
     ...IndexVO,
   },
-  required: ["id"] as const satisfies RequiredKeys<UserDeleteVOLike>[],
+  required: [
+    ...UserDeleteKeys,
+  ] as const satisfies RequiredKeys<UserDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const deleteRes = {
@@ -334,7 +329,7 @@ const getReq = {
   properties: {
     ...IndexVO,
   },
-  required: ["id"] as const satisfies RequiredKeys<UserGetVOLike>[],
+  required: [...UserGetKeys] as const satisfies RequiredKeys<UserGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
@@ -342,14 +337,7 @@ const getRes = {
   properties: {
     ...UserVO,
   },
-  required: [
-    "id",
-    "username",
-    "langCode",
-    "isEnabled",
-    "roleArr",
-    "createTimeUtc",
-  ],
+  required: [...UserDetailKeys] as const satisfies RequiredKeys<UserVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(

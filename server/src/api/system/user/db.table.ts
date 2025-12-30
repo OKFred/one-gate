@@ -12,6 +12,7 @@ import {
   AuditAddOmitKeyLike,
   AuditUpdateOmitKeyLike,
 } from "@/db/common/schema";
+import { RequiredKeys } from "@/types/app";
 
 //----------------- PO ----------------//
 const UserUniquePO = {
@@ -67,7 +68,7 @@ type UserUpdatePOLike = Partial<
   Omit<UserSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
   Pick<UserPOLike, IndexKeyLike>;
-type UserDeletePOLike = Pick<UserPOLike, IndexKeyLike>;
+// type UserDeletePOLike = Pick<UserPOLike, IndexKeyLike>;
 
 //----------------- DTO ----------------//
 const UserDepartmentDTO = {
@@ -165,6 +166,47 @@ export type UserUpdateVOLike = Omit<
   Partial<UserDTOLike>;
 export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
 export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
+
+//----------------- Required Keys ----------------//
+export const UserListKeys = [
+  "id",
+  "username",
+  "langCode",
+  "departmentId",
+  "roleIdArr",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
+export const UserDetailKeys = [
+  "id",
+  "username",
+  "langCode",
+  "roleArr",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<UserVOLike>[];
+export const UserAddKeys = [
+  "username",
+  "password",
+  "langCode",
+  "isEnabled",
+  "roleArr",
+] as const satisfies RequiredKeys<UserAddVOLike>[];
+export const UserUpdateKeys = [
+  "id",
+] as const satisfies RequiredKeys<UserUpdateVOLike>[];
+export const UserDeleteKeys = [
+  "id",
+] as const satisfies RequiredKeys<UserDeleteVOLike>[];
+export const UserGetKeys = [
+  "id",
+] as const satisfies RequiredKeys<UserGetVOLike>[];
 
 //----------------- Table ----------------//
 export const userTable = sqliteTable("system_user", {
