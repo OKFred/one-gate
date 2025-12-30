@@ -149,7 +149,6 @@ export const UserAddVO = {
 export const UserUpdateVO = {
   ...IndexVO,
   ...UserUniqueVO,
-  ...UserPasswordPO,
   ...UserBaseVO,
 } as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 更新
 export type UserVOLike = Omit<UserPOLike, "roleIdArr" | "departmentId"> &

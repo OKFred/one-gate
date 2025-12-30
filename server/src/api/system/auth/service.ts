@@ -1,6 +1,4 @@
-import userService, {
-  verifyUsernameAndPassword,
-} from "@/api/system/user/service";
+import userService, { utils as userUtils } from "@/api/system/user/service";
 import { tokenUtils } from "@/utils/token";
 import { HTTPException } from "hono/http-exception";
 import httpStatusCode from "http-status-codes";
@@ -108,11 +106,16 @@ async function onLogin(
   const { username, password: base64Password } = obj;
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
   const password = plainPassword;
-  const verifyResult = await verifyUsernameAndPassword({
+  const verifyResult = await userUtils.verifyUsernameAndPassword({
     username,
     password,
   });
-  if (!verifyResult || !verifyResult.valid || !verifyResult.userObj)
+  if (
+    !verifyResult ||
+    !verifyResult.valid ||
+    !verifyResult.userObj ||
+    !verifyResult.userObj.isEnabled
+  )
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
       {

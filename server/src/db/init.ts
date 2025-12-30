@@ -4,7 +4,8 @@ import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
 import { eq } from "drizzle-orm";
 
-const SALT_ROUNDS = 12;
+export const SALT_ROUNDS = 12;
+export const SUPER_ADMIN_ID = 1;
 
 // 超级管理员配置
 const SUPER_ADMIN = {
