@@ -3,6 +3,7 @@ import {
   userTable,
   IndexVO,
   UserVO,
+  UserListVO,
   UserAddVO,
   UserUpdateVO,
   type UserPOLike,
@@ -26,107 +27,6 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const SALT_ROUNDS = 12; // bcrypt盐轮数
 const superAdminId = 1; // 超级管理员用户ID
-
-const addReq = {
-  type: "object",
-  properties: {
-    ...UserAddVO,
-  } satisfies Partial<Record<keyof UserAddVOLike, JSONSchema>>,
-  required: [
-    "username",
-    "password",
-    "langCode",
-    "isEnabled",
-    "roleArr",
-  ] as const satisfies RequiredKeys<UserAddVOLike>[], // 如果无必填字段，设为空；否则填充
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-async function onAdd(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
-  const { userId: creatorId } = userObj;
-  const {
-    username,
-    password: base64Password,
-    langCode,
-    roleArr,
-    departmentObj,
-    isEnabled = true,
-  } = obj;
-  const departmentId = departmentObj ? departmentObj.value : null;
-  const roleIdArr = roleArr.map((o) => o.value);
-  const plainPassword = globalThis.atob(base64Password); // 防小白
-  const password = await bcrypt.hash(plainPassword, SALT_ROUNDS); // 密码加盐处理
-
-  const result = await db
-    .insert(userTable)
-    .values({
-      username,
-      password,
-      langCode,
-      departmentId,
-      roleIdArr,
-      isEnabled,
-      creatorId,
-    })
-    .returning({ id: userTable.id });
-  return result[0]?.id;
-}
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加用户",
-  } as const,
-  service: onAdd,
-};
-
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: ["id"] as const satisfies RequiredKeys<UserDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-async function onDelete(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const { id } = uniqueKeyObj;
-  if (id === undefined) return null;
-  if (id === superAdminId) {
-    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
-  }
-  const result = await db
-    .delete(userTable)
-    .where(eq(userTable.id, id))
-    .returning({
-      id: userTable.id,
-    });
-  if (!result || result.length === 0) return null;
-  return result[0].id;
-}
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除用户",
-  } as const,
-  service: onDelete,
-};
 
 const listReq = {
   type: "object",
@@ -170,7 +70,7 @@ const listRes = {
           items: {
             type: "object",
             properties: {
-              ...UserVO,
+              ...UserListVO,
             },
             required: [
               "id",
@@ -271,6 +171,67 @@ const listApi = {
   service: onList,
 };
 
+const addReq = {
+  type: "object",
+  properties: {
+    ...UserAddVO,
+  } satisfies Partial<Record<keyof UserAddVOLike, JSONSchema>>,
+  required: [
+    "username",
+    "password",
+    "langCode",
+    "isEnabled",
+    "roleArr",
+  ] as const satisfies RequiredKeys<UserAddVOLike>[], // 如果无必填字段，设为空；否则填充
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const addRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onAdd(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof addRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
+  const userObj = c.get("userObj");
+  const { userId: creatorId } = userObj;
+  const {
+    username,
+    password: base64Password,
+    langCode,
+    roleArr,
+    departmentObj,
+    isEnabled = true,
+  } = obj;
+  const departmentId = departmentObj ? departmentObj.value : null;
+  const roleIdArr = roleArr.map((o) => o.value);
+  const plainPassword = globalThis.atob(base64Password); // 防小白
+  const password = await bcrypt.hash(plainPassword, SALT_ROUNDS); // 密码加盐处理
+
+  const result = await db
+    .insert(userTable)
+    .values({
+      username,
+      password,
+      langCode,
+      departmentId,
+      roleIdArr,
+      isEnabled,
+      creatorId,
+    })
+    .returning({ id: userTable.id });
+  return result[0]?.id;
+}
+const addApi = {
+  req: addReq,
+  res: addRes,
+  pathInfo: {
+    path: "/add",
+    method: "post",
+    summary: "添加用户",
+  } as const,
+  service: onAdd,
+};
+
 const updateReq = {
   type: "object",
   properties: {
@@ -326,6 +287,46 @@ const updateApi = {
     summary: "更新用户",
   } as const,
   service: onUpdate,
+};
+
+const deleteReq = {
+  type: "object",
+  properties: {
+    ...IndexVO,
+  },
+  required: ["id"] as const satisfies RequiredKeys<UserDeleteVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const deleteRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onDelete(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const { id } = uniqueKeyObj;
+  if (id === undefined) return null;
+  if (id === superAdminId) {
+    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
+  }
+  const result = await db
+    .delete(userTable)
+    .where(eq(userTable.id, id))
+    .returning({
+      id: userTable.id,
+    });
+  if (!result || result.length === 0) return null;
+  return result[0].id;
+}
+const deleteApi = {
+  req: deleteReq,
+  res: deleteRes,
+  pathInfo: {
+    path: "/delete",
+    method: "post",
+    summary: "删除用户",
+  } as const,
+  service: onDelete,
 };
 
 const getReq = {

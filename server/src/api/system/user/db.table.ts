@@ -14,21 +14,21 @@ import {
 } from "@/db/common/schema";
 
 //----------------- PO ----------------//
-export const UserUniquePO = {
+const UserUniquePO = {
   username: {
     type: "string",
     description: "用户名",
     examples: ["user"],
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
-export const UserPasswordPO = {
+const UserPasswordPO = {
   password: {
     type: "string",
     description: "密码",
     examples: ["pass"],
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
-export const UserBasePO = {
+const UserBasePO = {
   langCode: {
     type: "string",
     description: "语言代码",
@@ -53,24 +53,24 @@ export const UserBasePO = {
     },
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
-export const UserPO = {
+const UserPO = {
   ...IndexPO,
   ...UserUniquePO,
   ...UserPasswordPO,
   ...UserBasePO,
   ...AuditPO,
-} as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
-export type UserPOLike = InferSelectModel<typeof userTable>;
-type UserSelectLike = InferInsertModel<typeof userTable>;
-type UserAddPOLike = Omit<UserSelectLike, IndexKeyLike | AuditAddOmitKeyLike>;
+} as const satisfies Record<keyof UserPOLike, JSONSchema>;
+export type UserPOLike = InferSelectModel<typeof userTable>; // 列表
+type UserSelectPOLike = InferInsertModel<typeof userTable>;
+type UserAddPOLike = Omit<UserSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type UserUpdatePOLike = Partial<
-  Omit<UserSelectLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+  Omit<UserSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
   Pick<UserPOLike, IndexKeyLike>;
 type UserDeletePOLike = Pick<UserPOLike, IndexKeyLike>;
 
 //----------------- DTO ----------------//
-export const UserDepartmentDTO = {
+const UserDepartmentDTO = {
   departmentObj: {
     type: ["object", "null"],
     nullable: true,
@@ -87,7 +87,7 @@ export const UserDepartmentDTO = {
     additionalProperties: false,
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
-export const UserRoleDTO = {
+const UserRoleDTO = {
   roleArr: {
     type: "array",
     description: "角色数组",
@@ -106,15 +106,15 @@ export const UserRoleDTO = {
     },
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
-export type UserDTOLike = {
+type UserDTOLike = {
   departmentObj?: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]>;
   roleArr: FromSchema<(typeof UserRoleDTO)["roleArr"]>;
 };
 
 //----------------- VO ----------------//
-export { IndexVO };
-export const UserUniqueVO = UserUniquePO;
-export const UserBaseVO = {
+export { IndexVO }; // 删改查
+const UserUniqueVO = UserUniquePO;
+const UserBaseVO = {
   langCode: {
     type: "string",
     description: "语言代码",
@@ -133,18 +133,24 @@ export const UserVO = {
   ...UserUniqueVO,
   ...UserBaseVO,
   ...AuditVO,
-} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 详情
+export const UserListVO = {
+  ...IndexVO,
+  ...UserUniqueVO,
+  ...UserBasePO,
+  ...AuditVO,
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 列表
 export const UserAddVO = {
   ...UserUniqueVO,
   ...UserPasswordPO,
   ...UserBaseVO,
-} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 新增
 export const UserUpdateVO = {
   ...IndexVO,
   ...UserUniqueVO,
   ...UserPasswordPO,
   ...UserBaseVO,
-} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 更新
 export type UserVOLike = Omit<UserPOLike, "roleIdArr" | "departmentId"> &
   UserDTOLike;
 export type UserAddVOLike = Omit<
@@ -158,7 +164,6 @@ export type UserUpdateVOLike = Omit<
 > &
   Partial<UserDTOLike>;
 export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
-export type UserEditResultVOLike = Pick<UserVOLike, IndexKeyLike>;
 export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
 
 //----------------- Table ----------------//
