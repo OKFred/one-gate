@@ -47,9 +47,3 @@ export type DeleteUserParams = Parameters<typeof UserAPI.deleteFn>[0];
 export type DeleteUserResponse = Awaited<ReturnType<typeof UserAPI.deleteFn>>;
 export type DeleteUserReq = NonNullable<DeleteUserParams['data']>;
 export type DeleteUserData = NonNullable<DeleteUserResponse['data']>;
-
-// 验证用户
-export type VerifyUserParams = Parameters<typeof UserAPI.verifyFn>[0];
-export type VerifyUserResponse = Awaited<ReturnType<typeof UserAPI.verifyFn>>;
-export type VerifyUserReq = NonNullable<VerifyUserParams['data']>;
-export type VerifyUserData = NonNullable<VerifyUserResponse['data']>;

@@ -98,7 +98,10 @@ export const AccountActionButtons = memo(
           <DialogTitle>{t('i18n.pages.mail.account.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('i18n.pages.mail.account.actions.deleteConfirmMessage').replace('{nickname}', account.nickname || '')}
+              {t('i18n.pages.mail.account.actions.deleteConfirmMessage').replace(
+                '{nickname}',
+                account.nickname || '',
+              )}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

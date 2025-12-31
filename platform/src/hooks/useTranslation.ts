@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import zhCN from '@/locales/zh-CN';
 import enUS from '@/locales/en-US';
+import { authUtils } from '@/utils/auth';
 
 const languageObj = {
   'en-US': enUS,
@@ -27,7 +28,8 @@ export const createTranslator = (langCode?: string) => {
  * @returns 翻译函数
  */
 export const useTranslation = () => {
-  const langCode = navigator.language.startsWith('zh') ? 'zh-CN' : 'en-US';
+  const userInfo = authUtils.getUserInfo();
+  const langCode = userInfo?.langCode || 'zh-CN';
 
   const t = useMemo(() => createTranslator(langCode), [langCode]);
 

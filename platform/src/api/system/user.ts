@@ -51,11 +51,11 @@ export const deleteFn = (
   });
 };
 
-export const verifyFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/user/verify', 'post'>, 'url' | 'method'>,
+export const updateLangCodeFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/user/updateLangCode', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
-    url: '/api/v1/system/user/verify',
+    url: '/api/v1/system/user/updateLangCode',
     method: 'post',
     ...axiosConfig,
   });
