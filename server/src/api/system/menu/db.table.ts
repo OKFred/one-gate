@@ -3,8 +3,7 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { count, sql } from "drizzle-orm";
-import { initialMenuData } from "./initialMenu";
+import { sql } from "drizzle-orm";
 
 export const menuIndex = {
   id: {
@@ -116,28 +115,6 @@ export async function tableInit() {
     )
   `);
   console.log("💾 表 system_menu 已初始化");
-
-  // 检查是否已有数据，没有则插入初始数据
-  const countResult = await db
-    .select({ total: count(menuTable.id).as("total") })
-    .from(menuTable);
-
-  if (countResult[0]?.total === 0) {
-    for (const menu of initialMenuData) {
-      await db.insert(menuTable).values({
-        id: menu.id,
-        text: menu.text,
-        icon: menu.icon,
-        sort: menu.sort,
-        path: menu.path || null,
-        parentId: menu.parentId || null,
-        roleIdArr: menu.roleIdArr || null,
-        isEnabled: true,
-        creatorId: 1, // 系统初始化用户
-      });
-    }
-    console.log("💾 表 system_menu 初始数据已插入");
-  }
 }
 
 export default menuTable;

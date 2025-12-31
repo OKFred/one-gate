@@ -1,8 +1,10 @@
 import db from "@/db/index";
 import bcrypt from "bcrypt";
+import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
-import { eq } from "drizzle-orm";
+import { menuTable } from "@/api/system/menu/db.table";
+import { initialMenuData } from "@/api/system/menu/initialMenu";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -108,6 +110,32 @@ async function initSuperAdminUser(roleId: number) {
 }
 
 /**
+ * 初始化菜单
+ */
+async function initMenu() {
+  // 检查是否已有数据，没有则插入初始数据
+  const countResult = await db
+    .select({ total: count(menuTable.id).as("total") })
+    .from(menuTable);
+  if (countResult[0]?.total === 0) {
+    for (const menu of initialMenuData) {
+      await db.insert(menuTable).values({
+        id: menu.id,
+        text: menu.text,
+        icon: menu.icon,
+        sort: menu.sort,
+        path: menu.path || null,
+        parentId: menu.parentId || null,
+        roleIdArr: menu.roleIdArr || null,
+        isEnabled: true,
+        creatorId: 1, // 系统初始化
+      });
+    }
+    console.log("💾 表 system_menu 初始数据已插入");
+  }
+}
+
+/**
  * 初始化数据库数据
  */
 export async function initDatabase() {
@@ -119,6 +147,8 @@ export async function initDatabase() {
 
     // 2. 初始化超级管理员账号
     await initSuperAdminUser(roleId);
+    // 3. 初始化菜单
+    await initMenu();
 
     console.log("✅ 数据库初始化完成");
   } catch (error) {
