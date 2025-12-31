@@ -1,33 +1,47 @@
 import db from "@/db/index";
 import {
-  departmentIndex,
-  departmentData,
-  departmentAudit,
   departmentTable,
-  type departmentAddLike,
-  type departmentLike,
+  IndexVO,
+  DepartmentVO,
+  DepartmentListVO,
+  DepartmentAddVO,
+  DepartmentUpdateVO,
+  DepartmentListKeys,
+  DepartmentDetailKeys,
+  DepartmentGetKeys,
+  DepartmentDeleteKeys,
+  DepartmentAddKeys,
+  DepartmentUpdateKeys,
+  type DepartmentPOLike,
+  type DepartmentVOLike,
+  type DepartmentAddVOLike,
+  type DepartmentUpdateVOLike,
+  type DepartmentDeleteVOLike,
+  type DepartmentGetVOLike,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
-import * as commonSchema from "@/middleware/encapsulation/common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 
 const addReq = {
   type: "object",
   properties: {
-    ...departmentData,
-  } satisfies Partial<Record<keyof departmentAddLike, JSONSchema>>,
-  required: ["name"],
+    ...DepartmentAddVO,
+  } satisfies Partial<Record<keyof DepartmentAddVOLike, JSONSchema>>,
+  required: [
+    ...DepartmentAddKeys,
+  ] as const satisfies RequiredKeys<DepartmentAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
-  ...departmentIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
   c: NodeHonoContext
@@ -60,7 +74,7 @@ async function onAdd(
       parentId,
       isEnabled,
       creatorId: userObj.userId,
-    } satisfies departmentAddLike)
+    })
     .returning({ id: departmentTable.id });
 
   return result[0]?.id;
@@ -79,14 +93,16 @@ const addApi = {
 const deleteReq = {
   type: "object",
   properties: {
-    ...departmentIndex,
+    ...IndexVO,
   },
-  required: ["id"] as const,
+  required: [
+    ...DepartmentDeleteKeys,
+  ] as const satisfies RequiredKeys<DepartmentDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const deleteRes = {
-  ...departmentIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 
 async function onDelete(
@@ -143,14 +159,24 @@ const deleteApi = {
 const listReq = {
   type: "object",
   properties: {
-    orderBy: commonSchema.orderByWrapper([
-      "id",
-      "name",
-      "createTimeUtc",
-    ] satisfies (keyof departmentLike)[]),
-    ...commonSchema.listReqBase,
-    isEnabled: departmentData.isEnabled,
-    parentId: departmentData.parentId,
+    orderBy: {
+      type: "string",
+      enum: [
+        "id",
+        "name",
+        "createTimeUtc",
+      ] satisfies (keyof DepartmentPOLike)[],
+    },
+    descend: { type: "boolean" },
+    pageNo: { type: "number", minimum: 1, default: 1 },
+    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
+    keyword: { type: "string", examples: [""] },
+    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
+    parentId: {
+      type: ["number", "null"],
+      nullable: true,
+      description: "父部门ID过滤",
+    },
   },
   required: [],
   additionalProperties: false,
@@ -158,13 +184,35 @@ const listReq = {
 const listRes = {
   type: "object",
   properties: {
-    ...commonSchema.listResBase,
-    list: commonSchema.listWrapper({
-      ...departmentIndex,
-      ...departmentData,
-      ...departmentAudit,
-    } satisfies Partial<Record<keyof departmentLike, JSONSchema>>),
+    total: { type: "number", description: "总记录数" },
+    totalPage: { type: "number", description: "总页数" },
+    currentPage: { type: "number", description: "当前页码" },
+    pageSize: { type: "number", description: "每页记录数" },
+    list: {
+      type: "array",
+      oneOf: [
+        {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              ...DepartmentListVO,
+            },
+            required: [
+              ...DepartmentListKeys,
+            ] as const satisfies RequiredKeys<DepartmentPOLike>[],
+            additionalProperties: false,
+          },
+        },
+        {
+          type: "array",
+          maxItems: 0,
+        },
+      ],
+    },
   },
+  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
 
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
@@ -186,10 +234,10 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
 
   // 函数重载：根据 getAll 参数提供不同的返回类型
   function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<departmentLike[]>;
+  function queryDB(getAll: false): Promise<DepartmentPOLike[]>;
   function queryDB(
     getAll: boolean
-  ): Promise<{ total: number }[] | departmentLike[]> {
+  ): Promise<{ total: number }[] | DepartmentPOLike[]> {
     return db
       .select(
         getAll ? { total: count(departmentTable.id).as("total") } : undefined
@@ -238,15 +286,16 @@ const listApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...departmentIndex,
-    ...departmentData,
+    ...DepartmentUpdateVO,
   },
-  required: ["id"],
+  required: [
+    ...DepartmentUpdateKeys,
+  ] as const satisfies RequiredKeys<DepartmentUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const updateRes = {
-  ...departmentIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 
 async function onUpdate(
@@ -312,19 +361,23 @@ const updateApi = {
 const getReq = {
   type: "object",
   properties: {
-    ...departmentIndex,
+    ...IndexVO,
   },
-  required: ["id"],
+  required: [
+    ...DepartmentGetKeys,
+  ] as const satisfies RequiredKeys<DepartmentGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const getRes = {
   type: "object",
   properties: {
-    ...departmentIndex,
-    ...departmentData,
-    ...departmentAudit,
+    ...DepartmentVO,
   },
+  required: [
+    ...DepartmentDetailKeys,
+  ] as const satisfies RequiredKeys<DepartmentVOLike>[],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
 
 async function onGet(

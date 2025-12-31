@@ -3,23 +3,27 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import {
+  IndexPO,
+  IndexVO,
+  AuditPO,
+  AuditVO,
+  type IndexKeyLike,
+  type AuditAddOmitKeyLike,
+  type AuditUpdateOmitKeyLike,
+} from "@/db/common/schema";
+import { type RequiredKeys } from "@/types/app";
 
-export const departmentIndex = {
-  id: {
-    type: "number",
-    description: "部门ID",
-    examples: [1],
-  },
-} as const satisfies Partial<Record<keyof departmentLike, JSONSchema>>;
-
-export const departmentData = {
+//----------------- PO ----------------//
+const DepartmentBasePO = {
   name: {
     type: "string",
     description: "部门名称",
     examples: ["技术部"],
   },
   description: {
-    type: "string",
+    type: ["string", "null"],
+    nullable: true,
     description: "部门描述",
     examples: ["负责技术研发工作"],
   },
@@ -32,33 +36,78 @@ export const departmentData = {
     type: "boolean",
     description: "是否启用",
   },
-} as const satisfies Partial<Record<keyof departmentLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof DepartmentPOLike, JSONSchema>>;
+const DepartmentPO = {
+  ...IndexPO,
+  ...DepartmentBasePO,
+  ...AuditPO,
+} as const satisfies Record<keyof DepartmentPOLike, JSONSchema>;
+export type DepartmentPOLike = InferSelectModel<typeof departmentTable>; // 列表
+type DepartmentSelectPOLike = InferInsertModel<typeof departmentTable>;
+type DepartmentAddPOLike = Omit<DepartmentSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type DepartmentUpdatePOLike = Partial<
+  Omit<DepartmentSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+> &
+  Pick<DepartmentPOLike, IndexKeyLike>;
 
-export const departmentAudit = {
-  creatorId: {
-    type: "number",
-    description: "创建者ID",
-  },
-  updaterId: {
-    type: "number",
-    description: "更新者ID",
-    nullable: true,
-  },
-  createTimeUtc: {
-    type: "number",
-    description: "创建时间",
-    examples: [1672531199000],
-  },
-  updateTimeUtc: {
-    type: "number",
-    nullable: true,
-    description: "更新时间",
-    examples: [1672531199000],
-  },
-} as const satisfies Partial<Record<keyof departmentLike, JSONSchema>>;
+//----------------- VO ----------------//
+export { IndexVO }; // 删改查
+const DepartmentBaseVO = DepartmentBasePO;
+export const DepartmentVO = {
+  ...IndexVO,
+  ...DepartmentBaseVO,
+  ...AuditVO,
+} as const satisfies Partial<Record<keyof DepartmentVOLike, JSONSchema>>; // 详情
+export const DepartmentListVO = DepartmentVO; // 列表
+export const DepartmentAddVO = {
+  ...DepartmentBaseVO,
+} as const satisfies Partial<Record<keyof DepartmentVOLike, JSONSchema>>; // 新增
+export const DepartmentUpdateVO = {
+  ...IndexVO,
+  ...DepartmentBaseVO,
+} as const satisfies Partial<Record<keyof DepartmentVOLike, JSONSchema>>; // 更新
+export type DepartmentVOLike = DepartmentPOLike;
+export type DepartmentAddVOLike = Omit<DepartmentAddPOLike, "creatorId">;
+export type DepartmentUpdateVOLike = DepartmentUpdatePOLike;
+export type DepartmentDeleteVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
+export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 
-export type departmentLike = InferSelectModel<typeof departmentTable>;
-export type departmentAddLike = InferInsertModel<typeof departmentTable>;
+//----------------- Required Keys ----------------//
+export const DepartmentListKeys = [
+  "id",
+  "name",
+  "description",
+  "parentId",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<DepartmentPOLike>[];
+export const DepartmentDetailKeys = [
+  "id",
+  "name",
+  "description",
+  "parentId",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<DepartmentVOLike>[];
+export const DepartmentAddKeys = [
+  "name",
+  "isEnabled",
+] as const satisfies RequiredKeys<DepartmentAddVOLike>[];
+export const DepartmentUpdateKeys = [
+  "id",
+] as const satisfies RequiredKeys<DepartmentUpdateVOLike>[];
+export const DepartmentDeleteKeys = [
+  "id",
+] as const satisfies RequiredKeys<DepartmentDeleteVOLike>[];
+export const DepartmentGetKeys = [
+  "id",
+] as const satisfies RequiredKeys<DepartmentGetVOLike>[];
 
 export const departmentTable = sqliteTable("system_department", {
   id: integer("id").primaryKey().notNull(),
