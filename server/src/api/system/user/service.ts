@@ -525,6 +525,7 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
 }
 
 export const utils = {
+  getUserObjByName,
   convertPassword,
   verifyUsernameAndPassword,
 };

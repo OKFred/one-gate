@@ -6,6 +6,7 @@ import type { LanguageKey } from "@/types/locales";
 import { NodeHonoContext } from "@/types/app";
 import db from "@/db/index";
 import { userTable } from "@/api/system/user/db.table";
+import { utils as userUtils } from "@/api/system/user/service";
 import { eq } from "drizzle-orm";
 
 export const authMiddleware = async (c: NodeHonoContext) => {
@@ -33,25 +34,9 @@ export const authMiddleware = async (c: NodeHonoContext) => {
       );
     }
 
-    // 从数据库获取最新的用户信息
-    const userArr = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.id, payload.userId))
-      .limit(1);
+    const user = await userUtils.getUserObjByName(payload.username);
 
-    if (userArr.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-        {
-          message: "i18n.api.system.authFailed" satisfies LanguageKey,
-        }
-      );
-    }
-
-    const user = userArr[0];
-
-    if (!user.isEnabled) {
+    if (!user?.isEnabled) {
       throw new HTTPException(
         httpStatusCode.FORBIDDEN as ContentfulStatusCode,
         {
@@ -59,12 +44,11 @@ export const authMiddleware = async (c: NodeHonoContext) => {
         }
       );
     }
-
+    const { password, id: userId, ...rest } = user;
     // 将用户信息添加到context中
     c.set("userObj", {
-      userId: user.id,
-      ...user,
-      password: undefined, // 不暴露密码
+      userId,
+      ...rest,
     });
   } catch (error) {
     if (error instanceof HTTPException) {
