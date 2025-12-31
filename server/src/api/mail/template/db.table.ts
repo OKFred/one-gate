@@ -76,11 +76,7 @@ export const mailTemplateTable = sqliteTable("mail_template", {
   langCode: text("lang_code").notNull(),
   content: text("content").notNull(),
   category: text("category"),
-  status: integer("status", {
-    mode: "boolean",
-  })
-    .notNull()
-    .default(true),
+  status: integer("status", { mode: "boolean" }).notNull(),
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -99,7 +95,7 @@ export async function tableInit() {
             lang_code TEXT NOT NULL,
             content TEXT NOT NULL,
             category TEXT,
-            status INTEGER NOT NULL DEFAULT 1,
+            status INTEGER NOT NULL,
             remark TEXT,
             creator_id INTEGER NOT NULL,
             updater_id INTEGER,

@@ -196,7 +196,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
       )
       .from(departmentTable)
       .where(
-        keyword
+        hasValue(keyword)
           ? and(
               like(departmentTable.name, `%${keyword}%`),
               isEnabled !== undefined

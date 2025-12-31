@@ -39,7 +39,6 @@ export const menuData = {
   sort: {
     type: "number",
     description: "排序",
-    default: 0,
   },
   roleIdArr: {
     type: "array",
@@ -50,7 +49,6 @@ export const menuData = {
   isEnabled: {
     type: "boolean",
     description: "是否启用",
-    default: true,
   },
 } as const satisfies Partial<Record<keyof menuLike, JSONSchema>>;
 
@@ -86,9 +84,9 @@ export const menuTable = sqliteTable("system_menu", {
   icon: text("icon").notNull(),
   path: text("path"),
   parentId: integer("parent_id"),
-  sort: integer("sort").notNull().default(0),
+  sort: integer("sort").notNull(),
   roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
@@ -105,9 +103,9 @@ export async function tableInit() {
       icon TEXT NOT NULL,
       path TEXT,
       parent_id INTEGER,
-      sort INTEGER NOT NULL DEFAULT 0,
+      sort INTEGER NOT NULL,
       role_id_arr TEXT,
-      is_enabled INTEGER NOT NULL DEFAULT 1,
+      is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

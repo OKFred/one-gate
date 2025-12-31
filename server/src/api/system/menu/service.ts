@@ -332,7 +332,7 @@ async function onTree(
 ): Promise<FromSchema<typeof treeRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
   const userObj = c.get("userObj");
-  const { roleIdArr } = userObj;
+  const { roleArr } = userObj;
   // 获取所有菜单
   const { showAll } = obj;
   // 构建查询条件
@@ -357,7 +357,9 @@ async function onTree(
   let filteredMenus = allMenus.filter((menu) => {
     if (!menu.roleIdArr) return true;
     if (menu.roleIdArr.length === 0) return true;
-    return menu.roleIdArr.some((roleId) => roleIdArr.includes(roleId));
+    return menu.roleIdArr.some((roleId) =>
+      roleArr.find((r) => r.value === roleId)
+    );
   });
   // 父菜单没有权限时，所有子菜单也不显示
   filteredMenus = filteredMenus.filter((menu) => {

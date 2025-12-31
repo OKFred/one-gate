@@ -31,7 +31,6 @@ export const departmentData = {
   isEnabled: {
     type: "boolean",
     description: "是否启用",
-    default: true,
   },
 } as const satisfies Partial<Record<keyof departmentLike, JSONSchema>>;
 
@@ -66,7 +65,7 @@ export const departmentTable = sqliteTable("system_department", {
   name: text("name").notNull().unique(),
   description: text("description"),
   parentId: integer("parent_id"),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
@@ -82,7 +81,7 @@ export async function tableInit() {
       name TEXT NOT NULL UNIQUE,
       description TEXT,
       parent_id INTEGER,
-      is_enabled INTEGER NOT NULL DEFAULT 1,
+      is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (
