@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
+export const SUPER_ADMIN_ROLE_ID = 1;
 
 // 超级管理员配置
 const SUPER_ADMIN = {
@@ -17,7 +18,6 @@ const SUPER_ADMIN = {
 
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
-  id: 1,
   name: "超级管理员",
   description: "系统超级管理员，拥有所有权限",
   permissions: JSON.stringify([
@@ -40,12 +40,12 @@ async function initSuperAdminRole() {
     const existingRole = await db
       .select()
       .from(roleTable)
-      .where(eq(roleTable.id, SUPER_ADMIN_ROLE.id))
+      .where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID))
       .limit(1);
 
     if (existingRole.length > 0) {
       console.log("ℹ️  超级管理员角色已存在，跳过初始化");
-      return SUPER_ADMIN_ROLE.id;
+      return SUPER_ADMIN_ROLE_ID;
     }
 
     // 创建超级管理员角色

@@ -20,7 +20,7 @@ import {
   type UserGetVOLike,
 } from "./db.table";
 import { getDepartmentNameById } from "@/api/system/department/service";
-import { getRolesByIds } from "@/api/system/role/service";
+import { utils as roleUtils } from "@/api/system/role/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
@@ -31,6 +31,7 @@ import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
+import hasValue from "@/utils/hasValue";
 
 const listReq = {
   type: "object",
@@ -52,7 +53,7 @@ const listReq = {
     keyword: {
       type: "string",
       examples: [""],
-      description: "搜索用户名、部门或角色",
+      description: "搜索用户名",
     },
     isEnabled: { type: "boolean", description: "是否启用状态过滤" },
   },
@@ -92,7 +93,6 @@ const listRes = {
   required: ["total", "totalPage", "currentPage", "pageSize", "list"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
   const {
@@ -108,30 +108,28 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 函数重载：根据 getAll 参数提供不同的返回类型
-  function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<UserPOLike[]>;
-  function queryDB(
-    getAll: boolean
-  ): Promise<{ total: number }[] | UserPOLike[]> {
-    const baseQuery = db
-      .select(getAll ? { total: count(userTable.id).as("total") } : undefined)
-      .from(userTable)
-      .where(
-        and(
-          keyword ? or(like(userTable.username, `%${keyword}%`)) : undefined,
-          isEnabled !== undefined
-            ? eq(userTable.isEnabled, isEnabled)
-            : undefined
-        )
-      )
-      .orderBy(!descend ? asc(orderField) : desc(orderField))
-      .limit(getAll ? maxPageSize : finalPageSize)
-      .offset(getAll ? 0 : offset);
-    return baseQuery;
-  }
-  const getAllResult = await queryDB(true);
-  const total = getAllResult[0]?.total || 0;
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    const conditions = [];
+    if (hasValue(keyword)) {
+      conditions.push(or(like(userTable.username, `%${keyword}%`)));
+    }
+    if (isEnabled !== undefined) {
+      conditions.push(eq(userTable.isEnabled, isEnabled));
+    }
+    return conditions.length > 0
+      ? conditions.length === 1
+        ? conditions[0]
+        : and(...conditions)
+      : undefined;
+  };
+
+  // 查询总数
+  const countResult = await db
+    .select({ total: count(userTable.id).as("total") })
+    .from(userTable)
+    .where(buildWhereCondition());
+  const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
       total,
@@ -141,7 +139,14 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
       list: [],
     };
   }
-  const rows = await queryDB(false);
+  // 查询列表数据
+  const rows = await db
+    .select()
+    .from(userTable)
+    .where(buildWhereCondition())
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(finalPageSize)
+    .offset(offset);
   const rowsFiltered = rows.map((row) => {
     const { password, ...rest } = row; // 注意：不返回密码字段
     return rest;
@@ -189,7 +194,7 @@ async function onAdd(
     langCode,
     roleArr,
     departmentObj,
-    isEnabled = true,
+    isEnabled,
   } = obj;
   const departmentId = departmentObj ? departmentObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
@@ -245,7 +250,6 @@ async function onUpdate(
   const isEnabled = id === SUPER_ADMIN_ID ? true : obj.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
-    id,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
     password: undefined,
@@ -308,16 +312,13 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
   const { id } = uniqueKeyObj;
-  if (id === undefined) return null;
   if (id === SUPER_ADMIN_ID) {
     throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
   }
   const result = await db
     .delete(userTable)
     .where(eq(userTable.id, id))
-    .returning({
-      id: userTable.id,
-    });
+    .returning({ id: userTable.id });
   if (!result || result.length === 0) return null;
   return result[0].id;
 }
@@ -359,7 +360,7 @@ async function onGet(
     .where(eq(userTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
     });
   }
@@ -370,7 +371,8 @@ async function onGet(
         value: departmentId,
       }
     : null;
-  const roleArr = roleIdArr.length > 0 ? await getRolesByIds(roleIdArr) : [];
+  const roleArr =
+    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
   return {
     ...rest,
     departmentObj,
@@ -511,7 +513,8 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
         value: departmentId,
       }
     : null;
-  const roleArr = roleIdArr.length > 0 ? await getRolesByIds(roleIdArr) : [];
+  const roleArr =
+    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
   return {
     ...rest,
     departmentObj,

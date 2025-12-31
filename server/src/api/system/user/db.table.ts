@@ -8,11 +8,11 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
-  IndexKeyLike,
-  AuditAddOmitKeyLike,
-  AuditUpdateOmitKeyLike,
+  type IndexKeyLike,
+  type AuditAddOmitKeyLike,
+  type AuditUpdateOmitKeyLike,
 } from "@/db/common/schema";
-import { RequiredKeys } from "@/types/app";
+import { type RequiredKeys } from "@/types/app";
 
 //----------------- PO ----------------//
 const UserUniquePO = {
@@ -38,7 +38,6 @@ const UserBasePO = {
   isEnabled: {
     type: "boolean",
     description: "是否启用",
-    default: true,
   },
   departmentId: {
     type: "number",
@@ -111,6 +110,7 @@ type UserDTOLike = {
   departmentObj?: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]>;
   roleArr: FromSchema<(typeof UserRoleDTO)["roleArr"]>;
 };
+type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
@@ -124,7 +124,6 @@ const UserBaseVO = {
   isEnabled: {
     type: "boolean",
     description: "是否启用",
-    default: true,
   },
   ...UserDepartmentDTO,
   ...UserRoleDTO,
@@ -151,17 +150,13 @@ export const UserUpdateVO = {
   ...UserUniqueVO,
   ...UserBaseVO,
 } as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 更新
-export type UserVOLike = Omit<UserPOLike, "roleIdArr" | "departmentId"> &
-  UserDTOLike;
+export type UserVOLike = Omit<UserPOLike, UserDTOMapKeyLike> & UserDTOLike;
 export type UserAddVOLike = Omit<
   UserAddPOLike,
-  "creatorId" | "roleIdArr" | "departmentId"
+  "creatorId" | UserDTOMapKeyLike
 > &
   UserDTOLike;
-export type UserUpdateVOLike = Omit<
-  UserUpdatePOLike,
-  "roleIdArr" | "departmentId"
-> &
+export type UserUpdateVOLike = Omit<UserUpdatePOLike, UserDTOMapKeyLike> &
   Partial<UserDTOLike>;
 export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
 export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
@@ -233,7 +228,7 @@ export async function tableInit() {
             lang_code TEXT NOT NULL,
             department_id INTEGER,
             role_id_arr TEXT NOT NULL,
-            is_enabled INTEGER NOT NULL DEFAULT 1,
+            is_enabled INTEGER NOT NULL,
             creator_id INTEGER NOT NULL,
             updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
