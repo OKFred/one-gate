@@ -30,132 +30,6 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 
-const addReq = {
-  type: "object",
-  properties: {
-    ...DepartmentAddVO,
-  } satisfies Partial<Record<keyof DepartmentAddVOLike, JSONSchema>>,
-  required: [
-    ...DepartmentAddKeys,
-  ] as const satisfies RequiredKeys<DepartmentAddVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const addRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-async function onAdd(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
-  const { name, description, parentId, isEnabled = true } = obj;
-  // 如果有父部门，检查父部门是否存在
-  if (hasValue(parentId)) {
-    const parent = await db
-      .select()
-      .from(departmentTable)
-      .where(eq(departmentTable.id, parentId))
-      .limit(1);
-
-    if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
-    }
-  }
-  const result = await db
-    .insert(departmentTable)
-    .values({
-      name,
-      description,
-      parentId,
-      isEnabled,
-      creatorId: userObj.userId,
-    })
-    .returning({ id: departmentTable.id });
-
-  return result[0]?.id;
-}
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加部门",
-  } as const,
-  service: onAdd,
-};
-
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...DepartmentDeleteKeys,
-  ] as const satisfies RequiredKeys<DepartmentDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-
-async function onDelete(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
-  if (!userObj?.userId) {
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" as any,
-      }
-    );
-  }
-  const { id } = uniqueKeyObj;
-  if (id === undefined) return null;
-
-  // 检查是否有子部门
-  const children = await db
-    .select()
-    .from(departmentTable)
-    .where(eq(departmentTable.parentId, id))
-    .limit(1);
-
-  if (children.length > 0) {
-    throw new HTTPException(
-      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.department.hasChildren" satisfies LanguageKey,
-      }
-    );
-  }
-
-  const result = await db
-    .delete(departmentTable)
-    .where(eq(departmentTable.id, id))
-    .returning({ id: departmentTable.id });
-
-  if (!result || result.length === 0) return null;
-  return result[0].id;
-}
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除部门",
-  } as const,
-  service: onDelete,
-};
-
 const listReq = {
   type: "object",
   properties: {
@@ -214,7 +88,6 @@ const listRes = {
   required: ["total", "totalPage", "currentPage", "pageSize", "list"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
   const {
@@ -226,43 +99,51 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     isEnabled,
     parentId,
   } = listParamObj;
-
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
-
-  // 函数重载：根据 getAll 参数提供不同的返回类型
-  function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<DepartmentPOLike[]>;
-  function queryDB(
-    getAll: boolean
-  ): Promise<{ total: number }[] | DepartmentPOLike[]> {
-    return db
-      .select(
-        getAll ? { total: count(departmentTable.id).as("total") } : undefined
-      )
-      .from(departmentTable)
-      .where(
-        hasValue(keyword)
-          ? and(
-              like(departmentTable.name, `%${keyword}%`),
-              isEnabled !== undefined
-                ? eq(departmentTable.isEnabled, isEnabled)
-                : undefined,
-              parentId !== undefined
-                ? eq(departmentTable.parentId, parentId)
-                : undefined
-            )
-          : undefined
-      )
-      .orderBy(!descend ? asc(orderField) : desc(orderField))
-      .limit(getAll ? maxPageSize : finalPageSize)
-      .offset(getAll ? 0 : offset);
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    const conditions = [];
+    if (hasValue(keyword)) {
+      conditions.push(like(departmentTable.name, `%${keyword}%`));
+    }
+    if (isEnabled !== undefined) {
+      conditions.push(eq(departmentTable.isEnabled, isEnabled));
+    }
+    if (parentId !== undefined) {
+      conditions.push(eq(departmentTable.parentId, parentId));
+    }
+    return conditions.length > 0
+      ? conditions.length === 1
+        ? conditions[0]
+        : and(...conditions)
+      : undefined;
+  };
+  // 查询总数
+  const countResult = await db
+    .select({ total: count(departmentTable.id) })
+    .from(departmentTable)
+    .where(buildWhereCondition());
+  const total = countResult[0]?.total || 0;
+  if (total === 0) {
+    return {
+      total,
+      totalPage: 0,
+      currentPage: pageNo,
+      pageSize: finalPageSize,
+      list: [],
+    };
   }
-  const getAllResult = await queryDB(true);
-  const total = getAllResult[0]?.total || 0;
-  const rows = await queryDB(false);
+  // 查询列表数据
+  const rows = await db
+    .select()
+    .from(departmentTable)
+    .where(buildWhereCondition())
+    .orderBy(descend ? desc(orderField) : asc(orderField))
+    .limit(finalPageSize)
+    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
@@ -283,6 +164,67 @@ const listApi = {
   service: onList,
 };
 
+const addReq = {
+  type: "object",
+  properties: {
+    ...DepartmentAddVO,
+  } satisfies Partial<Record<keyof DepartmentAddVOLike, JSONSchema>>,
+  required: [
+    ...DepartmentAddKeys,
+  ] as const satisfies RequiredKeys<DepartmentAddVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const addRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onAdd(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof addRes> | null> {
+  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
+  const userObj = c.get("userObj");
+  const { userId: creatorId } = userObj;
+  const { name, description, parentId, isEnabled = true } = obj;
+  // 如果有父部门，检查父部门是否存在
+  if (hasValue(parentId)) {
+    const parent = await db
+      .select()
+      .from(departmentTable)
+      .where(eq(departmentTable.id, parentId))
+      .limit(1);
+
+    if (parent.length === 0) {
+      throw new HTTPException(
+        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+        {
+          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+        }
+      );
+    }
+  }
+  const result = await db
+    .insert(departmentTable)
+    .values({
+      name,
+      description,
+      parentId,
+      isEnabled,
+      creatorId,
+    })
+    .returning({ id: departmentTable.id });
+
+  return result[0]?.id;
+}
+const addApi = {
+  req: addReq,
+  res: addRes,
+  pathInfo: {
+    path: "/add",
+    method: "post",
+    summary: "添加部门",
+  } as const,
+  service: onAdd,
+};
+
 const updateReq = {
   type: "object",
   properties: {
@@ -293,16 +235,15 @@ const updateReq = {
   ] as const satisfies RequiredKeys<DepartmentUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
-
 async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
 
   // 如果更新父部门，检查是否会造成循环引用
@@ -333,7 +274,7 @@ async function onUpdate(
 
   const updateData = {
     ...rest,
-    updaterId: userObj.userId,
+    updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
@@ -346,7 +287,6 @@ async function onUpdate(
   if (!res || res.length === 0) return null;
   return res[0].id;
 }
-
 const updateApi = {
   req: updateReq,
   res: updateRes,
@@ -356,6 +296,70 @@ const updateApi = {
     summary: "更新部门",
   } as const,
   service: onUpdate,
+};
+
+const deleteReq = {
+  type: "object",
+  properties: {
+    ...IndexVO,
+  },
+  required: [
+    ...DepartmentDeleteKeys,
+  ] as const satisfies RequiredKeys<DepartmentDeleteVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const deleteRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onDelete(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const userObj = c.get("userObj");
+  if (!userObj?.userId) {
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.notAuthenticated" as any,
+      }
+    );
+  }
+  const { id } = uniqueKeyObj;
+  if (id === undefined) return null;
+
+  // 检查是否有子部门
+  const children = await db
+    .select()
+    .from(departmentTable)
+    .where(eq(departmentTable.parentId, id))
+    .limit(1);
+
+  if (children.length > 0) {
+    throw new HTTPException(
+      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.department.hasChildren" satisfies LanguageKey,
+      }
+    );
+  }
+
+  const result = await db
+    .delete(departmentTable)
+    .where(eq(departmentTable.id, id))
+    .returning({ id: departmentTable.id });
+
+  if (!result || result.length === 0) return null;
+  return result[0].id;
+}
+const deleteApi = {
+  req: deleteReq,
+  res: deleteRes,
+  pathInfo: {
+    path: "/delete",
+    method: "post",
+    summary: "删除部门",
+  } as const,
+  service: onDelete,
 };
 
 const getReq = {
@@ -368,7 +372,6 @@ const getReq = {
   ] as const satisfies RequiredKeys<DepartmentGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const getRes = {
   type: "object",
   properties: {
@@ -379,7 +382,6 @@ const getRes = {
   ] as const satisfies RequiredKeys<DepartmentVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onGet(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof getRes> | null> {
@@ -410,12 +412,8 @@ const getApi = {
   service: onGet,
 };
 
-/**
- * 内部服务调用：根据ID获取部门名称
- */
-export async function getDepartmentNameById(
-  id: number
-): Promise<string | null> {
+/** @description 根据ID获取部门名称 */
+async function getDepartmentNameById(id: number): Promise<string | null> {
   const rows = await db
     .select({ name: departmentTable.name })
     .from(departmentTable)
@@ -424,10 +422,14 @@ export async function getDepartmentNameById(
   return rows.length > 0 ? rows[0].name : null;
 }
 
+export const utils = {
+  getDepartmentNameById,
+};
+
 export default {
+  list: listApi,
   add: addApi,
   delete: deleteApi,
-  list: listApi,
   update: updateApi,
   get: getApi,
 };

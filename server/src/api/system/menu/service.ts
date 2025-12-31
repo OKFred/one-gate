@@ -233,70 +233,6 @@ const addApi = {
   service: onAdd,
 };
 
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...MenuDeleteKeys,
-  ] as const satisfies RequiredKeys<MenuDeleteVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const deleteRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-async function onDelete(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
-  if (!userObj?.userId) {
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" as any,
-      }
-    );
-  }
-  const { id } = uniqueKeyObj;
-  if (id === undefined) return null;
-
-  // 检查是否有子菜单
-  const children = await db
-    .select()
-    .from(menuTable)
-    .where(eq(menuTable.parentId, id))
-    .limit(1);
-
-  if (children.length > 0) {
-    throw new HTTPException(
-      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.menu.hasChildren" satisfies LanguageKey,
-      }
-    );
-  }
-
-  const result = await db
-    .delete(menuTable)
-    .where(eq(menuTable.id, id))
-    .returning({ id: menuTable.id });
-
-  if (!result || result.length === 0) return null;
-  return result[0].id;
-}
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除菜单",
-  } as const,
-  service: onDelete,
-};
-
 const updateReq = {
   type: "object",
   properties: {
@@ -366,6 +302,70 @@ const updateApi = {
     summary: "更新菜单",
   } as const,
   service: onUpdate,
+};
+
+const deleteReq = {
+  type: "object",
+  properties: {
+    ...IndexVO,
+  },
+  required: [
+    ...MenuDeleteKeys,
+  ] as const satisfies RequiredKeys<MenuDeleteVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const deleteRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onDelete(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const userObj = c.get("userObj");
+  if (!userObj?.userId) {
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.notAuthenticated" as any,
+      }
+    );
+  }
+  const { id } = uniqueKeyObj;
+  if (id === undefined) return null;
+
+  // 检查是否有子菜单
+  const children = await db
+    .select()
+    .from(menuTable)
+    .where(eq(menuTable.parentId, id))
+    .limit(1);
+
+  if (children.length > 0) {
+    throw new HTTPException(
+      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.menu.hasChildren" satisfies LanguageKey,
+      }
+    );
+  }
+
+  const result = await db
+    .delete(menuTable)
+    .where(eq(menuTable.id, id))
+    .returning({ id: menuTable.id });
+
+  if (!result || result.length === 0) return null;
+  return result[0].id;
+}
+const deleteApi = {
+  req: deleteReq,
+  res: deleteRes,
+  pathInfo: {
+    path: "/delete",
+    method: "post",
+    summary: "删除菜单",
+  } as const,
+  service: onDelete,
 };
 
 const getReq = {

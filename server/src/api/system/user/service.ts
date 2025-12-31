@@ -19,7 +19,7 @@ import {
   type UserDeleteVOLike,
   type UserGetVOLike,
 } from "./db.table";
-import { getDepartmentNameById } from "@/api/system/department/service";
+import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -367,7 +367,8 @@ async function onGet(
   const { password, departmentId, roleIdArr, ...rest } = rows[0];
   const departmentObj = departmentId
     ? {
-        label: (await getDepartmentNameById(departmentId)) || "",
+        label:
+          (await departmentUtils.getDepartmentNameById(departmentId)) || "",
         value: departmentId,
       }
     : null;
@@ -509,7 +510,8 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
   const { departmentId, roleIdArr, ...rest } = userObj;
   const departmentObj = departmentId
     ? {
-        label: (await getDepartmentNameById(departmentId)) || "",
+        label:
+          (await departmentUtils.getDepartmentNameById(departmentId)) || "",
         value: departmentId,
       }
     : null;
