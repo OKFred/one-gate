@@ -44,7 +44,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   };
 
   const handleProfile = () => {
-    navigate('user');
+    navigate('me');
   };
 
   // 处理语言切换

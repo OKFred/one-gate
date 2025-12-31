@@ -34,7 +34,7 @@ const RootRedirect: React.FC = () => {
   }
 
   // 根据登录状态重定向
-  return <Navigate to={isAuthenticated ? '/' : '/login'} replace />;
+  return <Navigate to={isAuthenticated ? '/home' : '/login'} replace />;
 };
 
 export default RootRedirect;
