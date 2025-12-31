@@ -1,29 +1,20 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import { Chip } from '@mui/material';
-import ResponsiveList, { type TableColumn, type CardField } from '@/components/Responsive/ResponsiveList';
+import ResponsiveList, {
+  type TableColumn,
+  type CardField,
+} from '@/components/Responsive/ResponsiveList';
 import * as mailAccountAPI from '@/api/mail/account';
-import { AccountActionButtons } from './AccountButtons';
-import type { ListMailAccount, FilterState } from '../type.d';
-import type { Props } from '../type.d';
+import { AccountActionButtons } from './TheActionButtons';
+import type { ListMailAccount, FilterState, TableState } from '../type';
+import type { Props } from '../type';
+import dayjs from 'dayjs';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
-export interface AccountTableRef {
+export interface TheTableRef {
   /** 刷新表格数据 */
   refresh: (filters?: FilterState) => void;
-  /** 获取当前筛选条件 */
-  getFilters: () => FilterState;
-  /** 获取当前总数 */
-  getTotal: () => number;
-}
-
-// 表格内部状态
-interface TableState {
-  accounts: ListMailAccount[];
-  loading: boolean;
-  page: number;
-  pageSize: number;
-  total: number;
-  filters: FilterState;
 }
 
 const DEFAULT_FILTERS: FilterState = {
@@ -32,9 +23,10 @@ const DEFAULT_FILTERS: FilterState = {
   descend: false,
 };
 
-const AccountTable = memo(
-  forwardRef<AccountTableRef, Props>(({ localObj }, ref) => {
+const TheTable = memo(
+  forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
+    const t = useTranslation();
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
@@ -103,10 +95,8 @@ const AccountTable = memo(
           const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
           fetchAccounts(filtersToUse, pageToUse);
         },
-        getFilters: () => filters,
-        getTotal: () => total,
       }),
-      [fetchAccounts, filters, page, total],
+      [fetchAccounts, filters, page],
     );
 
     // 处理分页
@@ -114,15 +104,26 @@ const AccountTable = memo(
       fetchAccounts(filters, newPage);
     };
 
+    // 处理每页条数变化
+    const handlePageSizeChange = (newPageSize: number) => {
+      setState((prev) => ({ ...prev, pageSize: newPageSize }));
+      // 重置到第一页并刷新数据
+      fetchAccounts(filters, 1);
+    };
+
     // 表格列配置（PC端）
     const columns: TableColumn<ListMailAccount>[] = [
-      { title: 'ID', render: (acc) => acc.id },
-      { title: '昵称', render: (acc) => acc.nickname },
-      { title: '邮箱', render: (acc) => acc.mailAddress },
-      { title: '主机', render: (acc) => acc.host },
-      { title: '端口', render: (acc) => acc.port },
+      { title: t('i18n.pages.mail.account.columns.id'), render: (acc) => acc.id },
+      { title: t('i18n.pages.mail.account.columns.nickname'), render: (acc) => acc.nickname },
+      { title: t('i18n.pages.mail.account.columns.email'), render: (acc) => acc.mailAddress },
+      { title: t('i18n.pages.mail.account.columns.host'), render: (acc) => acc.host },
+      { title: t('i18n.pages.mail.account.columns.port'), render: (acc) => acc.port },
       {
-        title: '操作',
+        title: t('i18n.pages.mail.account.columns.createTime'),
+        render: (acc) => dayjs(acc.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      {
+        title: t('i18n.pages.mail.account.columns.actions'),
         align: 'center',
         render: (acc) => (
           <AccountActionButtons
@@ -137,15 +138,15 @@ const AccountTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<ListMailAccount>[] = [
       { type: 'title', render: (acc) => acc.nickname },
-      { type: 'subtitle', label: 'ID', render: (acc) => acc.id },
-      { type: 'content', label: '邮箱地址', render: (acc) => acc.mailAddress },
-      { type: 'content', label: 'SMTP服务器', render: (acc) => `${acc.host}:${acc.port}` },
+      { type: 'subtitle', label: t('i18n.pages.mail.account.columns.id'), render: (acc) => acc.id },
+      { type: 'content', label: t('i18n.pages.mail.account.columns.email'), render: (acc) => acc.mailAddress },
+      { type: 'content', label: t('i18n.pages.mail.account.columns.host') + ':' + t('i18n.pages.mail.account.columns.port'), render: (acc) => `${acc.host}:${acc.port}` },
       {
         type: 'tags',
         render: (acc) => (
           <>
-            {acc.sslEnable && <Chip label="SSL" color="success" size="small" />}
-            {acc.starttlsEnable && <Chip label="STARTTLS" color="info" size="small" />}
+            {acc.sslEnable && <Chip label={t('i18n.pages.mail.account.tags.ssl')} color="success" size="small" />}
+            {acc.starttlsEnable && <Chip label={t('i18n.pages.mail.account.tags.starttls')} color="info" size="small" />}
           </>
         ),
       },
@@ -159,6 +160,7 @@ const AccountTable = memo(
         total={total}
         pageSize={pageSize}
         onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
         keyExtractor={(acc) => acc.id!}
         columns={columns}
         cardFields={cardFields}
@@ -169,12 +171,10 @@ const AccountTable = memo(
             onDeleteSuccess={handleDeleteSuccess}
           />
         )}
-        emptyText="暂无邮件账户"
+        emptyText={t('i18n.pages.mail.account.empty')}
       />
     );
   }),
 );
 
-AccountTable.displayName = 'AccountTable';
-
-export default AccountTable;
+export default TheTable;

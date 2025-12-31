@@ -42,9 +42,10 @@ export default function LoginForm() {
 
     setLoading(true);
     setError('');
-
     try {
-      const response = await commonLogin({ data: credentials });
+      const data = { ...credentials };
+      data.password = globalThis.btoa(credentials.password); // 防小白
+      const response = await commonLogin({ data });
 
       if (response.data.ok && response.data.data) {
         const loginData = response.data.data as CommonLoginData['data'];

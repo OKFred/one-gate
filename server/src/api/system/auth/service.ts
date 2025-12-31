@@ -1,4 +1,4 @@
-import userService from "@/api/system/user/service";
+import userService, { utils as userUtils } from "@/api/system/user/service";
 import { tokenUtils } from "@/utils/token";
 import { HTTPException } from "hono/http-exception";
 import httpStatusCode from "http-status-codes";
@@ -19,7 +19,7 @@ const loginReq = {
     password: {
       type: "string",
       description: "密码",
-      examples: ["password123"],
+      examples: ["pass"],
     },
   },
   required: ["username", "password"] as const,
@@ -44,21 +44,54 @@ const loginRes = {
           type: "string",
           description: "用户名",
         },
-        roleIdArr: {
-          type: "array",
-          description: "角色ID列表",
-          items: { type: "number", description: "角色ID" },
-        },
-        departmentId: {
-          type: ["number", "null"],
-          description: "部门ID",
+        langCode: {
+          type: "string",
+          description: "用户语言代码",
         },
         isEnabled: {
           type: "boolean",
           description: "是否启用",
         },
+        departmentObj: {
+          type: "object",
+          description: "部门对象",
+          properties: {
+            value: { type: "number", description: "部门ID", examples: [1] },
+            label: {
+              type: "string",
+              description: "部门名称",
+              examples: ["研发部"],
+            },
+          },
+          required: ["value", "label"],
+          additionalProperties: false,
+        },
+        roleArr: {
+          type: "array",
+          description: "角色数组",
+          items: {
+            type: "object",
+            properties: {
+              value: { type: "number", description: "角色ID", examples: [1] },
+              label: {
+                type: "string",
+                description: "角色名称",
+                examples: ["管理员"],
+              },
+            },
+            required: ["value", "label"],
+            additionalProperties: false,
+          },
+        },
       },
-      required: ["token", "id", "username", "roleIdArr", "isEnabled"] as const,
+      required: [
+        "token",
+        "id",
+        "username",
+        "langCode",
+        "roleArr",
+        "isEnabled",
+      ] as const,
       additionalProperties: false,
     },
   },
@@ -69,8 +102,20 @@ const loginRes = {
 async function onLogin(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof loginRes> | null> {
-  const verifyResult = await userService.verify.service(c);
-  if (!verifyResult || !verifyResult.valid || !verifyResult.userObj)
+  const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
+  const { username, password: base64Password } = obj;
+  const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
+  const password = plainPassword;
+  const verifyResult = await userUtils.verifyUsernameAndPassword({
+    username,
+    password,
+  });
+  if (
+    !verifyResult ||
+    !verifyResult.valid ||
+    !verifyResult.userObj ||
+    !verifyResult.userObj.isEnabled
+  )
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
       {
@@ -78,7 +123,7 @@ async function onLogin(
       }
     );
   const userObj = verifyResult.userObj;
-  const { id, username, roleIdArr, departmentId, isEnabled } = userObj;
+  const { id, ...rest } = userObj;
   // 生成token
   const token = tokenUtils.generateToken({
     userId: id,
@@ -89,10 +134,7 @@ async function onLogin(
     userObj: {
       token,
       id,
-      username,
-      roleIdArr,
-      departmentId: departmentId ?? null,
-      isEnabled,
+      ...rest,
     },
   };
 }
@@ -255,9 +297,101 @@ const refreshTokenApi = {
   service: onRefreshToken,
 };
 
+// 获取当前用户信息
+const profileReq = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const profileRes = {
+  type: "object",
+  properties: {
+    userObj: {
+      type: "object",
+      properties: {
+        id: {
+          type: "number",
+          description: "用户ID",
+        },
+        username: {
+          type: "string",
+          description: "用户名",
+        },
+        langCode: {
+          type: "string",
+          description: "用户语言代码",
+        },
+        isEnabled: {
+          type: "boolean",
+          description: "是否启用",
+        },
+        departmentObj: {
+          type: "object",
+          description: "部门对象",
+          properties: {
+            value: { type: "number", description: "部门ID", examples: [1] },
+            label: {
+              type: "string",
+              description: "部门名称",
+              examples: ["研发部"],
+            },
+          },
+          required: ["value", "label"],
+          additionalProperties: false,
+        },
+        roleArr: {
+          type: "array",
+          description: "角色数组",
+          items: {
+            type: "object",
+            properties: {
+              value: { type: "number", description: "角色ID", examples: [1] },
+              label: {
+                type: "string",
+                description: "角色名称",
+                examples: ["管理员"],
+              },
+            },
+            required: ["value", "label"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["id", "username", "langCode", "roleArr", "isEnabled"] as const,
+      additionalProperties: false,
+    },
+  },
+  required: ["userObj"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onProfile(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof profileRes> | null> {
+  const userObj = c.get("userObj");
+  const { userId } = userObj;
+  // 设置 bodyObj for userService.get
+  c.set("bodyObj", { id: userId });
+  const userDataObj = await userService.get.service(c);
+  return { userObj: userDataObj };
+}
+
+const profileApi = {
+  req: profileReq,
+  res: profileRes,
+  pathInfo: {
+    path: "/profile",
+    method: "post",
+    summary: "获取当前用户信息",
+  } as const,
+  service: onProfile,
+};
+
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
   verify: verifyTokenApi,
   refresh: refreshTokenApi,
+  profile: profileApi,
 };

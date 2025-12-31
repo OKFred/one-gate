@@ -61,7 +61,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 部门ID
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.departmentId || '未分配'}
+                {user.departmentObj?.label || '未分配'}
               </Typography>
             </Box>
             
@@ -70,7 +70,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 角色ID
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.roleIdArr?.join(', ') || '未分配'}
+                {user.roleArr.map((role) => role.label).join(', ') || '未分配'}
               </Typography>
             </Box>
             

@@ -38,11 +38,11 @@ export default function UserProfile({ user, onEdit }: UserProfileProps) {
         </Typography>
         
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          部门ID: {user.departmentId || '未分配'}
+          部门ID: {user.departmentObj?.label || '未分配'}
         </Typography>
         
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          角色ID: {user.roleIdArr?.join(', ') || '未分配'}
+          角色ID: {user.roleArr.map((role) => role.label).join(', ') || '未分配'}
         </Typography>
         
         <Box mt={2}>

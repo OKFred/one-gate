@@ -1,12 +1,25 @@
 import db from "@/db/index";
 import {
-  menuIndex,
-  menuData,
-  menuAudit,
   menuTable,
-  type menuAddLike,
+  IndexVO,
+  MenuVO,
+  MenuListVO,
+  MenuAddVO,
+  MenuUpdateVO,
+  MenuListKeys,
+  MenuDetailKeys,
+  MenuGetKeys,
+  MenuDeleteKeys,
+  MenuAddKeys,
+  MenuUpdateKeys,
+  type MenuPOLike,
+  type MenuVOLike,
+  type MenuAddVOLike,
+  type MenuUpdateVOLike,
+  type MenuDeleteVOLike,
+  type MenuGetVOLike,
 } from "./db.table";
-import { asc, eq, or } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
@@ -14,36 +27,159 @@ import type { NodeHonoContext } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
+import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 
-// ============ 添加菜单 ============
+const listReq = {
+  type: "object",
+  properties: {
+    orderBy: {
+      type: "string",
+      enum: [
+        "id",
+        "text",
+        "isEnabled",
+        "createTimeUtc",
+      ] satisfies (keyof MenuPOLike)[],
+    },
+    descend: { type: "boolean" },
+    pageNo: { type: "number", minimum: 1, default: 1 },
+    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
+    keyword: {
+      type: "string",
+      examples: [""],
+      description: "搜索菜单名称",
+    },
+    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listRes = {
+  type: "object",
+  properties: {
+    total: { type: "number", description: "总记录数" },
+    totalPage: { type: "number", description: "总页数" },
+    currentPage: { type: "number", description: "当前页码" },
+    pageSize: { type: "number", description: "每页记录数" },
+    list: {
+      type: "array",
+      oneOf: [
+        {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              ...MenuListVO,
+            },
+            required: [
+              ...MenuListKeys,
+            ] as const satisfies RequiredKeys<MenuPOLike>[],
+            additionalProperties: false,
+          },
+        },
+        {
+          type: "array",
+          maxItems: 0,
+        },
+      ],
+    },
+  },
+  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
+  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
+  const {
+    orderBy = "id",
+    descend = true,
+    pageNo = 1,
+    pageSize = 10,
+    keyword = "",
+    isEnabled,
+  } = listParamObj;
+  const offset = (pageNo - 1) * pageSize;
+  const orderField = menuTable[orderBy] || menuTable.id;
+  const maxPageSize = 1000;
+  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    const conditions = [];
+    if (hasValue(keyword)) {
+      conditions.push(or(like(menuTable.text, `%${keyword}%`)));
+    }
+    if (isEnabled !== undefined) {
+      conditions.push(eq(menuTable.isEnabled, isEnabled));
+    }
+    return conditions.length > 0
+      ? conditions.length === 1
+        ? conditions[0]
+        : and(...conditions)
+      : undefined;
+  };
+
+  // 查询总数
+  const countResult = await db
+    .select({ total: count(menuTable.id).as("total") })
+    .from(menuTable)
+    .where(buildWhereCondition());
+  const total = countResult[0]?.total || 0;
+  if (total === 0) {
+    return {
+      total,
+      totalPage: 0,
+      currentPage: pageNo,
+      pageSize: finalPageSize,
+      list: [],
+    };
+  }
+  // 查询列表数据
+  const rows = await db
+    .select()
+    .from(menuTable)
+    .where(buildWhereCondition())
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(finalPageSize)
+    .offset(offset);
+  const totalPage = Math.ceil(total / finalPageSize);
+  return {
+    total,
+    totalPage,
+    currentPage: pageNo,
+    pageSize: finalPageSize,
+    list: rows,
+  };
+}
+const listApi = {
+  req: listReq,
+  res: listRes,
+  pathInfo: {
+    path: "/list",
+    method: "post",
+    summary: "获取菜单列表",
+  } as const,
+  service: onList,
+};
+
 const addReq = {
   type: "object",
   properties: {
-    ...menuData,
-  } satisfies Partial<Record<keyof menuAddLike, JSONSchema>>,
-  required: ["text", "icon"],
+    ...MenuAddVO,
+  } satisfies Partial<Record<keyof MenuAddVOLike, JSONSchema>>,
+  required: [...MenuAddKeys] as const satisfies RequiredKeys<MenuAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const addRes = {
-  ...menuIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
-
 async function onAdd(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-  const {
-    text,
-    icon,
-    path,
-    parentId,
-    sort = 0,
-    roleIdArr,
-    isEnabled = true,
-  } = obj;
+  const { userId: creatorId } = userObj;
+  const { text, icon, path, parentId, sort, roleIdArr, isEnabled } = obj;
 
   // 如果有父菜单，检查父菜单是否存在
   if (hasValue(parentId)) {
@@ -73,13 +209,12 @@ async function onAdd(
       sort,
       roleIdArr,
       isEnabled,
-      creatorId: userObj.userId,
-    } satisfies menuAddLike)
+      creatorId,
+    })
     .returning({ id: menuTable.id });
 
   return result[0]?.id;
 }
-
 const addApi = {
   req: addReq,
   res: addRes,
@@ -91,94 +226,25 @@ const addApi = {
   service: onAdd,
 };
 
-// ============ 删除菜单 ============
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...menuIndex,
-  },
-  required: ["id"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const deleteRes = {
-  ...menuIndex["id"],
-} as const satisfies JSONSchema;
-
-async function onDelete(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
-  if (!userObj?.userId) {
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" as any,
-      }
-    );
-  }
-  const { id } = uniqueKeyObj;
-  if (id === undefined) return null;
-
-  // 检查是否有子菜单
-  const children = await db
-    .select()
-    .from(menuTable)
-    .where(eq(menuTable.parentId, id))
-    .limit(1);
-
-  if (children.length > 0) {
-    throw new HTTPException(
-      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.menu.hasChildren" satisfies LanguageKey,
-      }
-    );
-  }
-
-  const result = await db
-    .delete(menuTable)
-    .where(eq(menuTable.id, id))
-    .returning({ id: menuTable.id });
-
-  if (!result || result.length === 0) return null;
-  return result[0].id;
-}
-
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除菜单",
-  } as const,
-  service: onDelete,
-};
-
-// ============ 更新菜单 ============
 const updateReq = {
   type: "object",
   properties: {
-    ...menuIndex,
-    ...menuData,
+    ...MenuUpdateVO,
   },
-  required: ["id"],
+  required: [
+    ...MenuUpdateKeys,
+  ] as const satisfies RequiredKeys<MenuUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const updateRes = {
-  ...menuIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
-
 async function onUpdate(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
   const { id, ...rest } = obj;
-
   // 如果更新父菜单，检查是否会造成循环引用
   if (rest.parentId) {
     // 不能将自己设为父菜单
@@ -220,7 +286,6 @@ async function onUpdate(
   if (!res || res.length === 0) return null;
   return res[0].id;
 }
-
 const updateApi = {
   req: updateReq,
   res: updateRes,
@@ -232,24 +297,86 @@ const updateApi = {
   service: onUpdate,
 };
 
+const deleteReq = {
+  type: "object",
+  properties: {
+    ...IndexVO,
+  },
+  required: [
+    ...MenuDeleteKeys,
+  ] as const satisfies RequiredKeys<MenuDeleteVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const deleteRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onDelete(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof deleteRes> | null> {
+  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
+  const userObj = c.get("userObj");
+  if (!userObj?.userId) {
+    throw new HTTPException(
+      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.notAuthenticated" as any,
+      }
+    );
+  }
+  const { id } = uniqueKeyObj;
+  if (id === undefined) return null;
+
+  // 检查是否有子菜单
+  const children = await db
+    .select()
+    .from(menuTable)
+    .where(eq(menuTable.parentId, id))
+    .limit(1);
+
+  if (children.length > 0) {
+    throw new HTTPException(
+      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
+      {
+        message: "i18n.api.system.menu.hasChildren" satisfies LanguageKey,
+      }
+    );
+  }
+
+  const result = await db
+    .delete(menuTable)
+    .where(eq(menuTable.id, id))
+    .returning({ id: menuTable.id });
+
+  if (!result || result.length === 0) return null;
+  return result[0].id;
+}
+const deleteApi = {
+  req: deleteReq,
+  res: deleteRes,
+  pathInfo: {
+    path: "/delete",
+    method: "post",
+    summary: "删除菜单",
+  } as const,
+  service: onDelete,
+};
+
 const getReq = {
   type: "object",
   properties: {
-    ...menuIndex,
+    ...IndexVO,
   },
-  required: ["id"],
+  required: [...MenuGetKeys] as const satisfies RequiredKeys<MenuGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const getRes = {
   type: "object",
   properties: {
-    ...menuIndex,
-    ...menuData,
-    ...menuAudit,
+    ...MenuVO,
   },
+  required: [...MenuDetailKeys] as const satisfies RequiredKeys<MenuVOLike>[],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onGet(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof getRes> | null> {
@@ -266,10 +393,8 @@ async function onGet(
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
     });
   }
-
   return rows[0];
 }
-
 const getApi = {
   req: getReq,
   res: getRes,
@@ -292,14 +417,13 @@ const treeReq = {
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const menuTreeItem = {
   type: "object",
   properties: {
     id: { type: "number" },
     text: { type: "string" },
     icon: { type: "string" },
-    path: { type: "string" },
+    path: { type: ["string", "null"], nullable: true },
     sort: { type: "number" },
     children: {
       type: "array",
@@ -311,28 +435,28 @@ const menuTreeItem = {
           icon: { type: "string" },
           path: { type: "string" },
           sort: { type: "number" },
+          parentId: { type: "number" },
         },
-        required: ["id", "text", "icon", "path"],
+        required: ["id", "text", "icon", "path", "sort", "parentId"],
+        additionalProperties: false,
       },
     },
   },
-  required: ["id", "text", "icon", "path"],
+  required: ["id", "text", "icon", "path", "sort", "parentId", "children"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const treeRes = {
   type: "array",
   items: {
     ...menuTreeItem,
   },
 } as const satisfies JSONSchema;
-
 async function onTree(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof treeRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
   const userObj = c.get("userObj");
-  const { roleIdArr } = userObj;
+  const { roleArr } = userObj;
   // 获取所有菜单
   const { showAll } = obj;
   // 构建查询条件
@@ -357,7 +481,9 @@ async function onTree(
   let filteredMenus = allMenus.filter((menu) => {
     if (!menu.roleIdArr) return true;
     if (menu.roleIdArr.length === 0) return true;
-    return menu.roleIdArr.some((roleId) => roleIdArr.includes(roleId));
+    return menu.roleIdArr.some((roleId) =>
+      roleArr.find((r) => r.value === roleId)
+    );
   });
   // 父菜单没有权限时，所有子菜单也不显示
   filteredMenus = filteredMenus.filter((menu) => {
@@ -366,21 +492,19 @@ async function onTree(
     return !!parentMenu;
   });
   function buildMenuTree(
-    data: typeof filteredMenus,
+    data,
     parentId: number | null = null
   ): FromSchema<typeof treeRes> {
     return data
       .filter((item) => item.parentId === parentId)
       .map((item) => ({
         ...item,
-        roleIdArr: undefined, // 不返回角色信息到前端
         children: buildMenuTree(data, item.id),
       }));
   }
   const menuTree = buildMenuTree(filteredMenus);
   return menuTree;
 }
-
 const treeApi = {
   req: treeReq,
   res: treeRes,
@@ -393,6 +517,7 @@ const treeApi = {
 };
 
 export default {
+  list: listApi,
   add: addApi,
   delete: deleteApi,
   update: updateApi,

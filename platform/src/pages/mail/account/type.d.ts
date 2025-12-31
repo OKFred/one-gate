@@ -4,6 +4,16 @@ export interface Props {
   localObj: LocalObj;
 }
 
+// 表格内部状态
+export interface TableState {
+  accounts: ListMailAccount[];
+  loading: boolean;
+  page: number;
+  pageSize: number;
+  total: number;
+  filters: FilterState;
+}
+
 // 筛选状态类型
 export interface FilterState {
   keyword: string;

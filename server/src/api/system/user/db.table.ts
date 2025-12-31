@@ -1,79 +1,218 @@
 import db from "@/db/index";
-import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import type { JSONSchema } from "json-schema-to-ts";
+import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import {
+  IndexPO,
+  IndexVO,
+  AuditPO,
+  AuditVO,
+  type IndexKeyLike,
+  type AuditAddOmitKeyLike,
+  type AuditUpdateOmitKeyLike,
+} from "@/db/common/schema";
+import { type RequiredKeys } from "@/types/app";
 
-export const userIndex = {
-  id: {
-    type: "number",
-    description: "用户id",
-    examples: [1],
-  },
-} as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
-
-export const userUnique = {
+//----------------- PO ----------------//
+const UserUniquePO = {
   username: {
     type: "string",
     description: "用户名",
-    examples: ["admin"],
+    examples: ["user"],
   },
-} as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
-
-export const userData = {
-  username: {
-    type: "string",
-    description: "用户名",
-    examples: ["admin"],
-  },
+} as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
+const UserPasswordPO = {
   password: {
     type: "string",
     description: "密码",
-    examples: ["password123"],
+    examples: ["pass"],
+  },
+} as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
+const UserBasePO = {
+  langCode: {
+    type: "string",
+    description: "语言代码",
+    examples: ["en-US", "zh-CN"],
+  },
+  isEnabled: {
+    type: "boolean",
+    description: "是否启用",
   },
   departmentId: {
-    type: ["number", "null"],
+    type: "number",
     description: "部门ID",
     examples: [1],
   },
   roleIdArr: {
     type: "array",
-    items: { type: "number" },
     description: "角色ID数组",
-    examples: [[1, 2, 3]],
+    items: {
+      type: "number",
+      examples: [1],
+    },
+  },
+} as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
+const UserPO = {
+  ...IndexPO,
+  ...UserUniquePO,
+  ...UserPasswordPO,
+  ...UserBasePO,
+  ...AuditPO,
+} as const satisfies Record<keyof UserPOLike, JSONSchema>;
+export type UserPOLike = InferSelectModel<typeof userTable>; // 列表
+type UserSelectPOLike = InferInsertModel<typeof userTable>;
+type UserAddPOLike = Omit<UserSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type UserUpdatePOLike = Partial<
+  Omit<UserSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+> &
+  Pick<UserPOLike, IndexKeyLike>;
+// type UserDeletePOLike = Pick<UserPOLike, IndexKeyLike>;
+
+//----------------- DTO ----------------//
+const UserDepartmentDTO = {
+  departmentObj: {
+    type: ["object", "null"],
+    nullable: true,
+    description: "部门对象",
+    properties: {
+      value: { type: "number", description: "部门ID", examples: [1] },
+      label: {
+        type: "string",
+        description: "部门名称",
+        examples: ["研发部"],
+      },
+    },
+    required: ["value", "label"],
+    additionalProperties: false,
+  },
+} as const satisfies Partial<Record<string, JSONSchema>>;
+const UserRoleDTO = {
+  roleArr: {
+    type: "array",
+    description: "角色数组",
+    items: {
+      type: "object",
+      properties: {
+        value: { type: "number", description: "角色ID", examples: [1] },
+        label: {
+          type: "string",
+          description: "角色名称",
+          examples: ["管理员"],
+        },
+      },
+      required: ["value", "label"],
+      additionalProperties: false,
+    },
+  },
+} as const satisfies Partial<Record<string, JSONSchema>>;
+type UserDTOLike = {
+  departmentObj?: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]>;
+  roleArr: FromSchema<(typeof UserRoleDTO)["roleArr"]>;
+};
+type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
+
+//----------------- VO ----------------//
+export { IndexVO }; // 删改查
+const UserUniqueVO = UserUniquePO;
+const UserBaseVO = {
+  langCode: {
+    type: "string",
+    description: "语言代码",
+    examples: ["en-US", "zh-CN"],
   },
   isEnabled: {
     type: "boolean",
     description: "是否启用",
-    default: true,
   },
-} as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
+  ...UserDepartmentDTO,
+  ...UserRoleDTO,
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;
+export const UserVO = {
+  ...IndexVO,
+  ...UserUniqueVO,
+  ...UserBaseVO,
+  ...AuditVO,
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 详情
+export const UserListVO = {
+  ...IndexVO,
+  ...UserUniqueVO,
+  ...UserBasePO,
+  ...AuditVO,
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 列表
+export const UserAddVO = {
+  ...UserUniqueVO,
+  ...UserPasswordPO,
+  ...UserBaseVO,
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 新增
+export const UserUpdateVO = {
+  ...IndexVO,
+  ...UserUniqueVO,
+  ...UserBaseVO,
+} as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 更新
+export type UserVOLike = Omit<UserPOLike, UserDTOMapKeyLike> & UserDTOLike;
+export type UserAddVOLike = Omit<
+  UserAddPOLike,
+  "creatorId" | UserDTOMapKeyLike
+> &
+  UserDTOLike;
+export type UserUpdateVOLike = Omit<UserUpdatePOLike, UserDTOMapKeyLike> &
+  Partial<UserDTOLike>;
+export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
+export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
 
-export const userAudit = {
-  createTimeUtc: {
-    type: "number",
-    description: "创建时间",
-    examples: [1672531199000],
-  },
-  updateTimeUtc: {
-    type: "number",
-    nullable: true,
-    description: "更新时间",
-    examples: [1672531199000],
-  },
-} as const satisfies Partial<Record<keyof userLike, JSONSchema>>;
+//----------------- Required Keys ----------------//
+export const UserListKeys = [
+  "id",
+  "username",
+  "langCode",
+  "departmentId",
+  "roleIdArr",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
+export const UserDetailKeys = [
+  "id",
+  "username",
+  "langCode",
+  "roleArr",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<UserVOLike>[];
+export const UserAddKeys = [
+  "username",
+  "password",
+  "langCode",
+  "isEnabled",
+  "roleArr",
+] as const satisfies RequiredKeys<UserAddVOLike>[];
+export const UserUpdateKeys = [
+  "id",
+] as const satisfies RequiredKeys<UserUpdateVOLike>[];
+export const UserDeleteKeys = [
+  "id",
+] as const satisfies RequiredKeys<UserDeleteVOLike>[];
+export const UserGetKeys = [
+  "id",
+] as const satisfies RequiredKeys<UserGetVOLike>[];
 
-export type userLike = InferSelectModel<typeof userTable>;
-export type userAddLike = InferInsertModel<typeof userTable>;
-
+//----------------- Table ----------------//
 export const userTable = sqliteTable("system_user", {
   id: integer("id").primaryKey().notNull(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  langCode: text("lang_code").notNull(),
   departmentId: integer("department_id"),
   roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+  creatorId: integer("creator_id").notNull(),
+  updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
     .notNull()
     .default(getCurrentTimestampUtcSql()),
@@ -86,9 +225,12 @@ export async function tableInit() {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
+            lang_code TEXT NOT NULL,
             department_id INTEGER,
             role_id_arr TEXT NOT NULL,
-            is_enabled INTEGER NOT NULL DEFAULT 1,
+            is_enabled INTEGER NOT NULL,
+            creator_id INTEGER NOT NULL,
+            updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
               CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
               CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)

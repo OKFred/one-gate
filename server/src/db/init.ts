@@ -1,21 +1,25 @@
 import db from "@/db/index";
 import bcrypt from "bcrypt";
+import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
-import { eq } from "drizzle-orm";
+import { menuTable } from "@/api/system/menu/db.table";
+import { initialMenuData } from "@/api/system/menu/initialMenu";
 
-const SALT_ROUNDS = 12;
+export const SALT_ROUNDS = 12;
+export const SUPER_ADMIN_ID = 1;
+export const SUPER_ADMIN_ROLE_ID = 1;
 
 // 超级管理员配置
 const SUPER_ADMIN = {
   username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
   password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
+  langCode: "zh-CN",
   roleId: 1, // 超级管理员角色ID
 };
 
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
-  id: 1,
   name: "超级管理员",
   description: "系统超级管理员，拥有所有权限",
   permissions: JSON.stringify([
@@ -38,12 +42,12 @@ async function initSuperAdminRole() {
     const existingRole = await db
       .select()
       .from(roleTable)
-      .where(eq(roleTable.id, SUPER_ADMIN_ROLE.id))
+      .where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID))
       .limit(1);
 
     if (existingRole.length > 0) {
       console.log("ℹ️  超级管理员角色已存在，跳过初始化");
-      return SUPER_ADMIN_ROLE.id;
+      return SUPER_ADMIN_ROLE_ID;
     }
 
     // 创建超级管理员角色
@@ -86,8 +90,10 @@ async function initSuperAdminUser(roleId: number) {
       .values({
         username: SUPER_ADMIN.username,
         password: hashedPassword,
+        langCode: SUPER_ADMIN.langCode,
         roleIdArr: [roleId], // 关联超级管理员角色
         isEnabled: true,
+        creatorId: 1, // 系统初始化
       })
       .returning({ id: userTable.id });
 
@@ -104,6 +110,32 @@ async function initSuperAdminUser(roleId: number) {
 }
 
 /**
+ * 初始化菜单
+ */
+async function initMenu() {
+  // 检查是否已有数据，没有则插入初始数据
+  const countResult = await db
+    .select({ total: count(menuTable.id).as("total") })
+    .from(menuTable);
+  if (countResult[0]?.total === 0) {
+    for (const menu of initialMenuData) {
+      await db.insert(menuTable).values({
+        id: menu.id,
+        text: menu.text,
+        icon: menu.icon,
+        sort: menu.sort,
+        path: menu.path || null,
+        parentId: menu.parentId || null,
+        roleIdArr: menu.roleIdArr || null,
+        isEnabled: true,
+        creatorId: 1, // 系统初始化
+      });
+    }
+    console.log("💾 表 system_menu 初始数据已插入");
+  }
+}
+
+/**
  * 初始化数据库数据
  */
 export async function initDatabase() {
@@ -115,6 +147,8 @@ export async function initDatabase() {
 
     // 2. 初始化超级管理员账号
     await initSuperAdminUser(roleId);
+    // 3. 初始化菜单
+    await initMenu();
 
     console.log("✅ 数据库初始化完成");
   } catch (error) {

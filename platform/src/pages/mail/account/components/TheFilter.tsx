@@ -19,26 +19,21 @@ import {
   ExpandMore,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import {
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
+import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { FilterState } from '../type';
-import type { Props } from '../type.d';
+import type { Props } from '../type';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
-export interface AccountFilterRef {
+export interface TheFilterRef {
   /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
 }
 
-const AccountFilter = memo(
-  forwardRef<AccountFilterRef, Props>(({ localObj }, ref) => {
+const TheFilter = memo(
+  forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
+    const t = useTranslation();
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
     const [isSearching, setIsSearching] = useState(false); // 搜索状态
@@ -120,13 +115,13 @@ const AccountFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">搜索与筛选</Typography>
+            <Typography variant="h6">{t('i18n.pages.mail.account.filter.title')}</Typography>
             {isSearching && (
-              <Chip label="搜索中..." size="small" color="default" variant="outlined" />
+              <Chip label={t('i18n.pages.mail.account.filter.searching')} size="small" color="default" variant="outlined" />
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={`${filterCount} 个结果`}
+                label={t('i18n.pages.mail.account.filter.results').replace('{count}', filterCount.toString())}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -136,7 +131,7 @@ const AccountFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label="清除筛选"
+                label={t('i18n.pages.mail.account.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -153,8 +148,8 @@ const AccountFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label="关键字搜索"
-                placeholder="搜索昵称、邮箱地址、主机地址..."
+                label={t('i18n.pages.mail.account.filter.keywordLabel')}
+                placeholder={t('i18n.pages.mail.account.filter.keywordPlaceholder')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -170,26 +165,26 @@ const AccountFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>排序字段</InputLabel>
+                  <InputLabel>{t('i18n.pages.mail.account.filter.orderByLabel')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label="排序字段"
+                    label={t('i18n.pages.mail.account.filter.orderByLabel')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
-                    <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="createTimeUtc">创建时间</MenuItem>
+                    <MenuItem value="id">{t('i18n.pages.mail.account.filter.orderBy.id')}</MenuItem>
+                    <MenuItem value="createTimeUtc">{t('i18n.pages.mail.account.filter.orderBy.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>排序方式</InputLabel>
+                  <InputLabel>{t('i18n.pages.mail.account.filter.sortOrderLabel')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label="排序方式"
+                    label={t('i18n.pages.mail.account.filter.sortOrderLabel')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">升序</MenuItem>
-                    <MenuItem value="desc">降序</MenuItem>
+                    <MenuItem value="asc">{t('i18n.pages.mail.account.filter.sortOrder.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('i18n.pages.mail.account.filter.sortOrder.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
@@ -201,4 +196,4 @@ const AccountFilter = memo(
   }),
 );
 
-export default AccountFilter;
+export default TheFilter;

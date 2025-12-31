@@ -12,8 +12,10 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
+import LanguageIcon from '@mui/icons-material/Language';
 import { authUtils, type UserInfo } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
+import * as UserApiService from '@/api/system/user';
 
 interface TopbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -42,7 +44,22 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   };
 
   const handleProfile = () => {
-    navigate('user');
+    navigate('me');
+  };
+
+  // 处理语言切换
+  const handleChangeLanguage = async (newLang: string) => {
+    if (!userInfo) return;
+    try {
+      await UserApiService.updateLangCodeFn({ data: { langCode: newLang } });
+      // 更新本地用户信息
+      const updatedUserInfo = { ...userInfo, langCode: newLang };
+      authUtils.setUserInfo(updatedUserInfo);
+      // 刷新页面以应用新语言
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to update language:', error);
+    }
   };
   // 处理登出
   const handleLogout = () => {
@@ -64,10 +81,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   };
 
   return (
-    <AppBar
-      position="fixed"
-      sx={{ left: 0, right: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}
-    >
+    <AppBar position="fixed" sx={{ left: 0, right: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}>
       <Toolbar sx={{ minHeight: '64px', pl: { sm: 0 } }}>
         <Box
           sx={{
@@ -149,7 +163,8 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             <Box>
               <Typography variant="subtitle2">{userInfo?.username}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {userInfo?.departmentId} · {userInfo?.roleIdArr?.join(',')}
+                {userInfo?.departmentObj?.label} ·{' '}
+                {userInfo?.roleArr.map((role) => role.label).join(',')}
               </Typography>
             </Box>
           </MenuItem>
@@ -160,6 +175,20 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             </ListItemIcon>
             个人设置
           </MenuItem>
+          <Divider />
+          <MenuItem onClick={() => handleChangeLanguage('zh-CN')}>
+            <ListItemIcon>
+              <LanguageIcon fontSize="small" />
+            </ListItemIcon>
+            简体中文 {userInfo?.langCode === 'zh-CN' && '✓'}
+          </MenuItem>
+          <MenuItem onClick={() => handleChangeLanguage('en-US')}>
+            <ListItemIcon>
+              <LanguageIcon fontSize="small" />
+            </ListItemIcon>
+            English {userInfo?.langCode === 'en-US' && '✓'}
+          </MenuItem>
+          <Divider />
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>
               <Logout fontSize="small" />

@@ -112,9 +112,9 @@ export async function tableInit() {
             password TEXT NOT NULL,
             nickname TEXT NOT NULL,
             host TEXT NOT NULL,
-            port INTEGER NOT NULL DEFAULT 465,
-            ssl_enable INTEGER NOT NULL DEFAULT 1,
-            starttls_enable INTEGER NOT NULL DEFAULT 0,
+            port INTEGER NOT NULL,
+            ssl_enable INTEGER NOT NULL,
+            starttls_enable INTEGER NOT NULL,
             creator_id INTEGER NOT NULL,
             updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
