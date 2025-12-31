@@ -3,21 +3,26 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import {
+  IndexPO,
+  IndexVO,
+  AuditPO,
+  AuditVO,
+  type IndexKeyLike,
+  type AuditAddOmitKeyLike,
+  type AuditUpdateOmitKeyLike,
+} from "@/db/common/schema";
+import { type RequiredKeys } from "@/types/app";
 
-export const roleIndex = {
-  id: {
-    type: "number",
-    description: "角色ID",
-    examples: [1],
-  },
-} as const satisfies Partial<Record<keyof roleLike, JSONSchema>>;
-
-export const roleData = {
+//----------------- PO ----------------//
+const RoleUniquePO = {
   name: {
     type: "string",
     description: "角色名称",
     examples: ["管理员"],
   },
+} as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
+const RoleBasePO = {
   description: {
     type: "string",
     description: "角色描述",
@@ -31,42 +36,91 @@ export const roleData = {
   isEnabled: {
     type: "boolean",
     description: "是否启用",
-    default: true,
   },
-} as const satisfies Partial<Record<keyof roleLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
+const RolePO = {
+  ...IndexPO,
+  ...RoleUniquePO,
+  ...RoleBasePO,
+  ...AuditPO,
+} as const satisfies Record<keyof RolePOLike, JSONSchema>;
+export type RolePOLike = InferSelectModel<typeof roleTable>; // 列表
+type RoleSelectPOLike = InferInsertModel<typeof roleTable>;
+type RoleAddPOLike = Omit<RoleSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type RoleUpdatePOLike = Partial<
+  Omit<RoleSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+> &
+  Pick<RolePOLike, IndexKeyLike>;
 
-export const roleAudit = {
-  creatorId: {
-    type: "number",
-    description: "创建者ID",
-  },
-  updaterId: {
-    type: "number",
-    description: "更新者ID",
-    nullable: true,
-  },
-  createTimeUtc: {
-    type: "number",
-    description: "创建时间",
-    examples: [1672531199000],
-  },
-  updateTimeUtc: {
-    type: "number",
-    nullable: true,
-    description: "更新时间",
-    examples: [1672531199000],
-  },
-} as const satisfies Partial<Record<keyof roleLike, JSONSchema>>;
+//----------------- VO ----------------//
+export { IndexVO }; // 删改查
+const RoleUniqueVO = RoleUniquePO;
+const RoleBaseVO = RoleBasePO;
+export const RoleVO = {
+  ...IndexVO,
+  ...RoleUniqueVO,
+  ...RoleBaseVO,
+  ...AuditVO,
+} as const satisfies Partial<Record<keyof RoleVOLike, JSONSchema>>; // 详情
+export const RoleListVO = RoleVO; // 列表
+export const RoleAddVO = {
+  ...RoleUniqueVO,
+  ...RoleBaseVO,
+} as const satisfies Partial<Record<keyof RoleVOLike, JSONSchema>>; // 新增
+export const RoleUpdateVO = {
+  ...IndexVO,
+  ...RoleUniqueVO,
+  ...RoleBaseVO,
+} as const satisfies Partial<Record<keyof RoleVOLike, JSONSchema>>; // 更新
+export type RoleVOLike = RolePOLike;
+export type RoleAddVOLike = Omit<RoleAddPOLike, "creatorId">;
+export type RoleUpdateVOLike = RoleUpdatePOLike;
+export type RoleDeleteVOLike = Pick<RoleVOLike, IndexKeyLike>;
+export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 
-export type roleLike = InferSelectModel<typeof roleTable>;
-export type roleAddLike = InferInsertModel<typeof roleTable>;
+//----------------- Required Keys ----------------//
+export const RoleListKeys = [
+  "id",
+  "name",
+  "description",
+  "permissions",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<RolePOLike>[];
+export const RoleDetailKeys = [
+  "id",
+  "name",
+  "description",
+  "permissions",
+  "isEnabled",
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const satisfies RequiredKeys<RoleVOLike>[];
+export const RoleAddKeys = [
+  "name",
+  "isEnabled",
+] as const satisfies RequiredKeys<RoleAddVOLike>[];
+export const RoleUpdateKeys = [
+  "id",
+] as const satisfies RequiredKeys<RoleUpdateVOLike>[];
+export const RoleDeleteKeys = [
+  "id",
+] as const satisfies RequiredKeys<RoleDeleteVOLike>[];
+export const RoleGetKeys = [
+  "id",
+] as const satisfies RequiredKeys<RoleGetVOLike>[];
 
 export const roleTable = sqliteTable("system_role", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull().unique(),
   description: text("description"),
   permissions: text("permissions"), // JSON array string
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
@@ -82,7 +136,7 @@ export async function tableInit() {
       name TEXT NOT NULL UNIQUE,
       description TEXT,
       permissions TEXT,
-      is_enabled INTEGER NOT NULL DEFAULT 1,
+      is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

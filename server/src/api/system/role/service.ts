@@ -1,11 +1,22 @@
 import db from "@/db/index";
 import {
-  roleIndex,
-  roleData,
-  roleAudit,
   roleTable,
-  type roleAddLike,
-  type roleLike,
+  IndexVO,
+  RoleVO,
+  RoleListVO,
+  RoleAddVO,
+  RoleUpdateVO,
+  RoleListKeys,
+  RoleDetailKeys,
+  RoleAddKeys,
+  RoleUpdateKeys,
+  RoleDeleteKeys,
+  RoleGetKeys,
+  type RoleAddVOLike,
+  type RoleUpdateVOLike,
+  type RoleDeleteVOLike,
+  type RoleGetVOLike,
+  type RolePOLike,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -15,21 +26,22 @@ import type { NodeHonoContext } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-
-const superAdminRoleId = 1; // 超级管理员角色ID
+import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import type { RequiredKeys } from "@/types/app";
+import hasValue from "@/utils/hasValue";
 
 // 添加角色
 const addReq = {
   type: "object",
   properties: {
-    ...roleData,
-  } satisfies Partial<Record<keyof roleAddLike, JSONSchema>>,
-  required: ["name"],
+    ...RoleAddVO,
+  } satisfies Partial<Record<keyof RoleAddVOLike, JSONSchema>>,
+  required: [...RoleAddKeys] as const satisfies RequiredKeys<RoleAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const addRes = {
-  ...roleIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 
 async function onAdd(
@@ -39,7 +51,7 @@ async function onAdd(
   const userObj = c.get("userObj");
   const { name, description, permissions, isEnabled = true } = obj;
   // 如果提供了permissions，验证是否为有效JSON数组
-  if (permissions) {
+  if (hasValue(permissions)) {
     const parsed = JSON.parse(permissions);
     if (!Array.isArray(parsed)) {
       throw new HTTPException(
@@ -56,7 +68,7 @@ async function onAdd(
       permissions,
       isEnabled,
       creatorId: userObj.userId,
-    } satisfies roleAddLike)
+    })
     .returning({ id: roleTable.id });
 
   return result[0]?.id;
@@ -77,14 +89,16 @@ const addApi = {
 const deleteReq = {
   type: "object",
   properties: {
-    ...roleIndex,
+    ...IndexVO,
   },
-  required: ["id"] as const,
+  required: [
+    ...RoleDeleteKeys,
+  ] as const satisfies RequiredKeys<RoleDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const deleteRes = {
-  ...roleIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 
 async function onDelete(
@@ -94,7 +108,7 @@ async function onDelete(
   const { id } = uniqueKeyObj;
 
   if (!id) return null;
-  if (id === superAdminRoleId) {
+  if (id === SUPER_ADMIN_ROLE_ID) {
     throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
   }
   const result = await db
@@ -123,11 +137,16 @@ const listReq = {
   properties: {
     orderBy: {
       type: "string",
-      enum: ["id", "name", "createTimeUtc"] satisfies (keyof roleLike)[],
+      enum: [
+        "id",
+        "name",
+        "isEnabled",
+        "createTimeUtc",
+      ] satisfies (keyof RolePOLike)[],
     },
     descend: { type: "boolean" },
     pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", maximum: 1000, default: 10 },
+    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
     keyword: {
       type: "string",
       examples: [""],
@@ -148,16 +167,29 @@ const listRes = {
     pageSize: { type: "number", description: "每页记录数" },
     list: {
       type: "array",
-      items: {
-        type: "object",
-        properties: {
-          ...roleIndex,
-          ...roleData,
-          ...roleAudit,
+      oneOf: [
+        {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              ...RoleListVO,
+            },
+            required: [
+              ...RoleListKeys,
+            ] as const satisfies RequiredKeys<RolePOLike>[],
+            additionalProperties: false,
+          },
         },
-      },
+        {
+          type: "array",
+          maxItems: 0,
+        },
+      ],
     },
   },
+  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
 
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
@@ -179,7 +211,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   // 构建查询条件
   const buildWhereCondition = () => {
     const conditions = [];
-    if (keyword) {
+    if (hasValue(keyword)) {
       conditions.push(
         or(
           like(roleTable.id, `%${keyword}%`),
@@ -248,15 +280,16 @@ const listApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...roleIndex,
-    ...roleData,
+    ...RoleUpdateVO,
   },
-  required: ["id"],
+  required: [
+    ...RoleUpdateKeys,
+  ] as const satisfies RequiredKeys<RoleUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const updateRes = {
-  ...roleIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 
 async function onUpdate(
@@ -267,7 +300,7 @@ async function onUpdate(
   const { id, permissions, isEnabled, ...rest } = obj;
 
   // 如果更新permissions，验证是否为有效JSON数组
-  if (permissions) {
+  if (hasValue(permissions)) {
     const parsed = JSON.parse(permissions);
     if (!Array.isArray(parsed)) {
       throw new HTTPException(
@@ -278,7 +311,7 @@ async function onUpdate(
 
   const updateData = {
     ...rest,
-    isEnabled: id === superAdminRoleId ? true : isEnabled, // 禁止禁用超级管理员角色
+    isEnabled: id === SUPER_ADMIN_ROLE_ID ? true : isEnabled, // 禁止禁用超级管理员角色
     permissions,
     updaterId: userObj.userId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
@@ -309,19 +342,19 @@ const updateApi = {
 const getReq = {
   type: "object",
   properties: {
-    ...roleIndex,
+    ...IndexVO,
   },
-  required: ["id"],
+  required: [...RoleGetKeys] as const satisfies RequiredKeys<RoleGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const getRes = {
   type: "object",
   properties: {
-    ...roleIndex,
-    ...roleData,
-    ...roleAudit,
+    ...RoleVO,
   },
+  required: [...RoleDetailKeys] as const satisfies RequiredKeys<RolePOLike>[],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
 
 async function onGet(
