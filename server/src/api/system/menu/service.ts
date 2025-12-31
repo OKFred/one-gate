@@ -178,15 +178,8 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-  const {
-    text,
-    icon,
-    path,
-    parentId,
-    sort = 0,
-    roleIdArr,
-    isEnabled = true,
-  } = obj;
+  const { userId: creatorId } = userObj;
+  const { text, icon, path, parentId, sort, roleIdArr, isEnabled } = obj;
 
   // 如果有父菜单，检查父菜单是否存在
   if (hasValue(parentId)) {
@@ -216,7 +209,7 @@ async function onAdd(
       sort,
       roleIdArr,
       isEnabled,
-      creatorId: userObj.userId,
+      creatorId,
     })
     .returning({ id: menuTable.id });
 
@@ -442,13 +435,14 @@ const menuTreeItem = {
           icon: { type: "string" },
           path: { type: "string" },
           sort: { type: "number" },
+          parentId: { type: "number" },
         },
-        required: ["id", "text", "icon", "path"],
+        required: ["id", "text", "icon", "path", "sort", "parentId"],
         additionalProperties: false,
       },
     },
   },
-  required: ["id", "text", "icon"],
+  required: ["id", "text", "icon", "path", "sort", "parentId", "children"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const treeRes = {
@@ -504,11 +498,7 @@ async function onTree(
     return data
       .filter((item) => item.parentId === parentId)
       .map((item) => ({
-        id: item.id,
-        text: item.text,
-        icon: item.icon,
-        path: item.path,
-        sort: item.sort,
+        ...item,
         children: buildMenuTree(data, item.id),
       }));
   }
