@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -40,7 +41,8 @@ const UserBasePO = {
     description: "是否启用",
   },
   departmentId: {
-    type: "number",
+    type: ["number", "null"],
+    nullable: true,
     description: "部门ID",
     examples: [1],
   },
@@ -107,7 +109,7 @@ const UserRoleDTO = {
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
 type UserDTOLike = {
-  departmentObj?: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]>;
+  departmentObj: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]> | null;
   roleArr: FromSchema<(typeof UserRoleDTO)["roleArr"]>;
 };
 type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
@@ -162,28 +164,22 @@ export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
 export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const UserListKeys = [
+const UserBaseKeys = [
   "id",
   "username",
   "langCode",
+  "isEnabled",
+  ...AuditKeys,
+] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
+export const UserListKeys = [
+  ...UserBaseKeys,
   "departmentId",
   "roleIdArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
 ] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
 export const UserDetailKeys = [
-  "id",
-  "username",
-  "langCode",
+  ...UserBaseKeys,
+  "departmentObj",
   "roleArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
 ] as const satisfies RequiredKeys<UserVOLike>[];
 export const UserAddKeys = [
   "username",

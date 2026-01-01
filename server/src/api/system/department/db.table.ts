@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -73,28 +74,16 @@ export type DepartmentDeleteVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const DepartmentListKeys = [
+const DepartmentBaseKeys = [
   "id",
   "name",
   "description",
   "parentId",
   "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
+  ...AuditKeys,
 ] as const satisfies RequiredKeys<DepartmentPOLike>[];
-export const DepartmentDetailKeys = [
-  "id",
-  "name",
-  "description",
-  "parentId",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<DepartmentVOLike>[];
+export const DepartmentListKeys = DepartmentBaseKeys;
+export const DepartmentDetailKeys = DepartmentBaseKeys;
 export const DepartmentAddKeys = [
   "name",
   "isEnabled",

@@ -67,6 +67,12 @@ export const AuditPO = {
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
 
+export const AuditKeys = [
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const;
 export const IndexVO = IndexPO;
 export const AuditVO = AuditPO;
 // 不需要定义，因为这些字段在服务器端自动生成，不通过请求体传递

@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -88,7 +89,7 @@ export type MenuDeleteVOLike = Pick<MenuVOLike, IndexKeyLike>;
 export type MenuGetVOLike = Pick<MenuVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const MenuListKeys = [
+const MenuBaseKeys = [
   "id",
   "text",
   "icon",
@@ -97,25 +98,10 @@ export const MenuListKeys = [
   "sort",
   "roleIdArr",
   "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
+  ...AuditKeys,
 ] as const satisfies RequiredKeys<MenuPOLike>[];
-export const MenuDetailKeys = [
-  "id",
-  "text",
-  "icon",
-  "path",
-  "parentId",
-  "sort",
-  "roleIdArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<MenuVOLike>[];
+export const MenuListKeys = MenuBaseKeys;
+export const MenuDetailKeys = MenuBaseKeys;
 export const MenuAddKeys = [
   "text",
   "icon",

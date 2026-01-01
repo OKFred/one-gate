@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -79,28 +80,16 @@ export type RoleDeleteVOLike = Pick<RoleVOLike, IndexKeyLike>;
 export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const RoleListKeys = [
+const RoleBaseKeys = [
   "id",
   "name",
   "description",
   "permissions",
   "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
+  ...AuditKeys,
 ] as const satisfies RequiredKeys<RolePOLike>[];
-export const RoleDetailKeys = [
-  "id",
-  "name",
-  "description",
-  "permissions",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<RoleVOLike>[];
+export const RoleListKeys = RoleBaseKeys;
+export const RoleDetailKeys = RoleBaseKeys;
 export const RoleAddKeys = [
   "name",
   "isEnabled",
