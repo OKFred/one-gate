@@ -6,6 +6,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
+import { UserDetailKeys, UserVO } from "../user/db.table";
 
 // 普通登录
 const loginReq = {
@@ -36,62 +37,9 @@ const loginRes = {
           type: "string",
           description: "用户token",
         },
-        id: {
-          type: "number",
-          description: "用户ID",
-        },
-        username: {
-          type: "string",
-          description: "用户名",
-        },
-        langCode: {
-          type: "string",
-          description: "用户语言代码",
-        },
-        isEnabled: {
-          type: "boolean",
-          description: "是否启用",
-        },
-        departmentObj: {
-          type: "object",
-          description: "部门对象",
-          properties: {
-            value: { type: "number", description: "部门ID", examples: [1] },
-            label: {
-              type: "string",
-              description: "部门名称",
-              examples: ["研发部"],
-            },
-          },
-          required: ["value", "label"],
-          additionalProperties: false,
-        },
-        roleArr: {
-          type: "array",
-          description: "角色数组",
-          items: {
-            type: "object",
-            properties: {
-              value: { type: "number", description: "角色ID", examples: [1] },
-              label: {
-                type: "string",
-                description: "角色名称",
-                examples: ["管理员"],
-              },
-            },
-            required: ["value", "label"],
-            additionalProperties: false,
-          },
-        },
+        ...UserVO,
       },
-      required: [
-        "token",
-        "id",
-        "username",
-        "langCode",
-        "roleArr",
-        "isEnabled",
-      ] as const,
+      required: ["token", ...UserDetailKeys] as const,
       additionalProperties: false,
     },
   },
@@ -310,55 +258,9 @@ const profileRes = {
     userObj: {
       type: "object",
       properties: {
-        id: {
-          type: "number",
-          description: "用户ID",
-        },
-        username: {
-          type: "string",
-          description: "用户名",
-        },
-        langCode: {
-          type: "string",
-          description: "用户语言代码",
-        },
-        isEnabled: {
-          type: "boolean",
-          description: "是否启用",
-        },
-        departmentObj: {
-          type: "object",
-          description: "部门对象",
-          properties: {
-            value: { type: "number", description: "部门ID", examples: [1] },
-            label: {
-              type: "string",
-              description: "部门名称",
-              examples: ["研发部"],
-            },
-          },
-          required: ["value", "label"],
-          additionalProperties: false,
-        },
-        roleArr: {
-          type: "array",
-          description: "角色数组",
-          items: {
-            type: "object",
-            properties: {
-              value: { type: "number", description: "角色ID", examples: [1] },
-              label: {
-                type: "string",
-                description: "角色名称",
-                examples: ["管理员"],
-              },
-            },
-            required: ["value", "label"],
-            additionalProperties: false,
-          },
-        },
+        ...UserVO,
       },
-      required: ["id", "username", "langCode", "roleArr", "isEnabled"] as const,
+      required: [...UserDetailKeys] as const,
       additionalProperties: false,
     },
   },
