@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
   AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
@@ -82,16 +83,6 @@ export type RoleDeleteVOLike = Pick<RoleVOLike, IndexKeyLike>;
 export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-const RoleBaseKeys = [
-  "id",
-  "name",
-  "description",
-  "permissions",
-  "isEnabled",
-  ...AuditKeys,
-] as const satisfies RequiredKeys<RolePOLike>[];
-export const RoleListKeys = RoleBaseKeys;
-export const RoleDetailKeys = RoleBaseKeys;
 export const RoleAddKeys = [
   "name",
   "description",
@@ -99,14 +90,21 @@ export const RoleAddKeys = [
   "isEnabled",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];
 export const RoleUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<RoleUpdateVOLike>[];
 export const RoleDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<RoleDeleteVOLike>[];
 export const RoleGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<RoleGetVOLike>[];
+const RoleBaseKeys = [
+  ...IndexKey,
+  ...RoleAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<RolePOLike>[];
+export const RoleListKeys = RoleBaseKeys;
+export const RoleDetailKeys = RoleBaseKeys;
 
 export const roleTable = sqliteTable("system_role", {
   id: integer("id").primaryKey().notNull(),

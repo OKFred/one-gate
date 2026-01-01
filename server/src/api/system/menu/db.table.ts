@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
   AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
@@ -90,19 +91,6 @@ export type MenuDeleteVOLike = Pick<MenuVOLike, IndexKeyLike>;
 export type MenuGetVOLike = Pick<MenuVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-const MenuBaseKeys = [
-  "id",
-  "text",
-  "icon",
-  "path",
-  "parentId",
-  "sort",
-  "roleIdArr",
-  "isEnabled",
-  ...AuditKeys,
-] as const satisfies RequiredKeys<MenuPOLike>[];
-export const MenuListKeys = MenuBaseKeys;
-export const MenuDetailKeys = MenuBaseKeys;
 export const MenuAddKeys = [
   "text",
   "icon",
@@ -113,14 +101,21 @@ export const MenuAddKeys = [
   "isEnabled",
 ] as const satisfies RequiredKeys<MenuAddVOLike>[];
 export const MenuUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<MenuUpdateVOLike>[];
 export const MenuDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<MenuDeleteVOLike>[];
 export const MenuGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<MenuGetVOLike>[];
+const MenuBaseKeys = [
+  ...IndexKey,
+  ...MenuAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<MenuPOLike>[];
+export const MenuListKeys = MenuBaseKeys;
+export const MenuDetailKeys = MenuBaseKeys;
 
 export const menuTable = sqliteTable("system_menu", {
   id: integer("id").primaryKey().notNull(),

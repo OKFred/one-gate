@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
   AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
@@ -45,7 +46,10 @@ const DepartmentPO = {
 } as const satisfies Record<keyof DepartmentPOLike, JSONSchema>;
 export type DepartmentPOLike = InferSelectModel<typeof departmentTable>; // 列表
 type DepartmentSelectPOLike = InferInsertModel<typeof departmentTable>;
-type DepartmentAddPOLike = Omit<DepartmentPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type DepartmentAddPOLike = Omit<
+  DepartmentPOLike,
+  IndexKeyLike | AuditAddOmitKeyLike
+>;
 type DepartmentUpdatePOLike = Partial<
   Omit<DepartmentSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -74,16 +78,6 @@ export type DepartmentDeleteVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-const DepartmentBaseKeys = [
-  "id",
-  "name",
-  "description",
-  "parentId",
-  "isEnabled",
-  ...AuditKeys,
-] as const satisfies RequiredKeys<DepartmentPOLike>[];
-export const DepartmentListKeys = DepartmentBaseKeys;
-export const DepartmentDetailKeys = DepartmentBaseKeys;
 export const DepartmentAddKeys = [
   "name",
   "description",
@@ -91,14 +85,21 @@ export const DepartmentAddKeys = [
   "isEnabled",
 ] as const satisfies RequiredKeys<DepartmentAddVOLike>[];
 export const DepartmentUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<DepartmentUpdateVOLike>[];
 export const DepartmentDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<DepartmentDeleteVOLike>[];
 export const DepartmentGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<DepartmentGetVOLike>[];
+const DepartmentBaseKeys = [
+  ...IndexKey,
+  ...DepartmentAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<DepartmentPOLike>[];
+export const DepartmentListKeys = DepartmentBaseKeys;
+export const DepartmentDetailKeys = DepartmentBaseKeys;
 
 export const departmentTable = sqliteTable("system_department", {
   id: integer("id").primaryKey().notNull(),

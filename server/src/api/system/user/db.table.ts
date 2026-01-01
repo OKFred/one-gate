@@ -8,6 +8,7 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
   AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
@@ -164,8 +165,25 @@ export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
 export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
+export const UserAddKeys = [
+  "username",
+  "password",
+  "langCode",
+  "isEnabled",
+  "departmentObj",
+  "roleArr",
+] as const satisfies RequiredKeys<UserAddVOLike>[];
+export const UserUpdateKeys = [
+  ...IndexKey,
+] as const satisfies RequiredKeys<UserUpdateVOLike>[];
+export const UserDeleteKeys = [
+  ...IndexKey,
+] as const satisfies RequiredKeys<UserDeleteVOLike>[];
+export const UserGetKeys = [
+  ...IndexKey,
+] as const satisfies RequiredKeys<UserGetVOLike>[];
 const UserBaseKeys = [
-  "id",
+  ...IndexKey,
   "username",
   "langCode",
   "isEnabled",
@@ -181,23 +199,6 @@ export const UserDetailKeys = [
   "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserVOLike>[];
-export const UserAddKeys = [
-  "username",
-  "password",
-  "langCode",
-  "isEnabled",
-  "departmentObj",
-  "roleArr",
-] as const satisfies RequiredKeys<UserAddVOLike>[];
-export const UserUpdateKeys = [
-  "id",
-] as const satisfies RequiredKeys<UserUpdateVOLike>[];
-export const UserDeleteKeys = [
-  "id",
-] as const satisfies RequiredKeys<UserDeleteVOLike>[];
-export const UserGetKeys = [
-  "id",
-] as const satisfies RequiredKeys<UserGetVOLike>[];
 
 //----------------- Table ----------------//
 export const userTable = sqliteTable("system_user", {

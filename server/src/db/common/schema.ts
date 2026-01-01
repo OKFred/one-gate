@@ -1,5 +1,6 @@
 import { JSONSchema } from "json-schema-to-ts";
 
+export const IndexKey = ["id"] as const;
 /** @description 主键 */
 export type IndexKeyLike = "id";
 /** @description 新增时省略的审计字段 */
