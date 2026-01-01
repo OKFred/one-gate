@@ -335,15 +335,10 @@ async function onGet(
     });
   }
   const { password, departmentId, roleIdArr, ...rest } = rows[0];
-  const departmentObj = departmentId
-    ? {
-        label:
-          (await departmentUtils.getDepartmentNameById(departmentId)) || "",
-        value: departmentId,
-      }
-    : null;
-  const roleArr =
-    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
+  const { departmentObj, roleArr } = await getDepartmentAndRoles(
+    departmentId,
+    roleIdArr
+  );
   return {
     ...rest,
     departmentObj,
@@ -478,20 +473,32 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
   if (userArr.length === 0) return null;
   const userObj = userArr[0];
   const { departmentId, roleIdArr, ...rest } = userObj;
-  const departmentObj = departmentId
-    ? {
-        label:
-          (await departmentUtils.getDepartmentNameById(departmentId)) || "",
-        value: departmentId,
-      }
-    : null;
-  const roleArr =
-    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
+  const { departmentObj, roleArr } = await getDepartmentAndRoles(
+    departmentId,
+    roleIdArr
+  );
   return {
     ...rest,
     departmentObj,
     roleArr,
   };
+}
+
+async function getDepartmentAndRoles(
+  departmentId: number | null,
+  roleIdArr: number[]
+) {
+  const departmentObj =
+    departmentId === null
+      ? null
+      : {
+          label:
+            (await departmentUtils.getDepartmentNameById(departmentId)) || "",
+          value: departmentId,
+        };
+  const roleArr =
+    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
+  return { departmentObj, roleArr };
 }
 
 export const utils = {
