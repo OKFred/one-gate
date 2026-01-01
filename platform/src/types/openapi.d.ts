@@ -2690,12 +2690,22 @@ export interface components {
         MailAccountListReq: {
             /** @enum {string} */
             orderBy?: "id" | "createTimeUtc";
+            /** @description 是否降序 */
             descend?: boolean;
-            /** @default 1 */
+            /**
+             * @description 页码
+             * @default 1
+             */
             pageNo: number;
-            /** @default 10 */
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
             pageSize: number;
-            /** @example  */
+            /**
+             * @description 关键词
+             * @example
+             */
             keyword?: string;
         };
         MailAccountListRes: {
@@ -3013,12 +3023,22 @@ export interface components {
         MailLogListReq: {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
+            /** @description 是否降序 */
             descend?: boolean;
-            /** @default 1 */
+            /**
+             * @description 页码
+             * @default 1
+             */
             pageNo: number;
-            /** @default 10 */
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
             pageSize: number;
-            /** @example  */
+            /**
+             * @description 关键词
+             * @example
+             */
             keyword?: string;
             /** @description 发送状态过滤 */
             sendStatus?: boolean;
@@ -3242,12 +3262,22 @@ export interface components {
         MailTemplateListReq: {
             /** @enum {string} */
             orderBy?: "id" | "name" | "creatorId" | "createTimeUtc";
+            /** @description 是否降序 */
             descend?: boolean;
-            /** @default 1 */
+            /**
+             * @description 页码
+             * @default 1
+             */
             pageNo: number;
-            /** @default 10 */
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
             pageSize: number;
-            /** @example  */
+            /**
+             * @description 关键词
+             * @example
+             */
             keyword?: string;
         };
         MailTemplateListRes: {
@@ -3420,16 +3450,26 @@ export interface components {
                 userObj: {
                     /** @description 用户token */
                     token: string;
-                    /** @description 用户ID */
+                    /**
+                     * @description id
+                     * @example 1
+                     */
                     id: number;
-                    /** @description 用户名 */
+                    /**
+                     * @description 用户名
+                     * @example user
+                     */
                     username: string;
-                    /** @description 用户语言代码 */
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 部门对象 */
-                    departmentObj?: {
+                    departmentObj: (({
                         /**
                          * @description 部门ID
                          * @example 1
@@ -3440,7 +3480,7 @@ export interface components {
                          * @example 研发部
                          */
                         label: string;
-                    };
+                    } | null) | null) | null;
                     /** @description 角色数组 */
                     roleArr: {
                         /**
@@ -3454,6 +3494,20 @@ export interface components {
                          */
                         label: string;
                     }[];
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
                 };
             };
             message: string;
@@ -3476,16 +3530,26 @@ export interface components {
                 userObj: {
                     /** @description 用户token */
                     token: string;
-                    /** @description 用户ID */
+                    /**
+                     * @description id
+                     * @example 1
+                     */
                     id: number;
-                    /** @description 用户名 */
+                    /**
+                     * @description 用户名
+                     * @example user
+                     */
                     username: string;
-                    /** @description 用户语言代码 */
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 部门对象 */
-                    departmentObj?: {
+                    departmentObj: (({
                         /**
                          * @description 部门ID
                          * @example 1
@@ -3496,7 +3560,7 @@ export interface components {
                          * @example 研发部
                          */
                         label: string;
-                    };
+                    } | null) | null) | null;
                     /** @description 角色数组 */
                     roleArr: {
                         /**
@@ -3510,6 +3574,20 @@ export interface components {
                          */
                         label: string;
                     }[];
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
                 };
             };
             message: string;
@@ -3546,16 +3624,26 @@ export interface components {
             ok: boolean;
             data: {
                 userObj: {
-                    /** @description 用户ID */
+                    /**
+                     * @description id
+                     * @example 1
+                     */
                     id: number;
-                    /** @description 用户名 */
+                    /**
+                     * @description 用户名
+                     * @example user
+                     */
                     username: string;
-                    /** @description 用户语言代码 */
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 部门对象 */
-                    departmentObj?: {
+                    departmentObj: (({
                         /**
                          * @description 部门ID
                          * @example 1
@@ -3566,7 +3654,7 @@ export interface components {
                          * @example 研发部
                          */
                         label: string;
-                    };
+                    } | null) | null) | null;
                     /** @description 角色数组 */
                     roleArr: {
                         /**
@@ -3580,24 +3668,48 @@ export interface components {
                          */
                         label: string;
                     }[];
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
                 };
             };
             message: string;
         };
         SystemDepartmentListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
-            descend?: boolean;
-            /** @default 1 */
-            pageNo: number;
-            /** @default 10 */
-            pageSize: number;
-            /** @example  */
-            keyword?: string;
             /** @description 是否启用状态过滤 */
             isEnabled?: boolean;
             /** @description 父部门ID过滤 */
-            parentId?: ((number | null) | null) | null;
+            parentId?: number;
         };
         SystemDepartmentListRes: {
             ok: boolean;
@@ -3610,7 +3722,7 @@ export interface components {
                 currentPage: number;
                 /** @description 每页记录数 */
                 pageSize: number;
-                list: unknown[] & ({
+                list: {
                     /**
                      * @description id
                      * @example 1
@@ -3638,13 +3750,13 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新者ID */
-                    updaterId: number | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: number | null;
-                }[] | unknown[]);
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };
@@ -3658,9 +3770,9 @@ export interface components {
              * @description 部门描述
              * @example 负责技术研发工作
              */
-            description?: ((string | null) | null) | null;
+            description: ((string | null) | null) | null;
             /** @description 父部门ID，支持部门层级 */
-            parentId?: ((number | null) | null) | null;
+            parentId: ((number | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
@@ -3756,28 +3868,35 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新者ID */
-                updaterId: number | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: number | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
         SystemMenuListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "text" | "isEnabled" | "createTimeUtc";
+            /** @description 是否降序 */
             descend?: boolean;
-            /** @default 1 */
+            /**
+             * @description 页码
+             * @default 1
+             */
             pageNo: number;
-            /** @default 10 */
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
             pageSize: number;
             /**
-             * @description 搜索菜单名称
+             * @description 关键词
              * @example
              */
             keyword?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "text" | "isEnabled" | "createTimeUtc";
             /** @description 是否启用状态过滤 */
             isEnabled?: boolean;
         };
@@ -3792,7 +3911,7 @@ export interface components {
                 currentPage: number;
                 /** @description 每页记录数 */
                 pageSize: number;
-                list: unknown[] & ({
+                list: {
                     /**
                      * @description id
                      * @example 1
@@ -3817,14 +3936,8 @@ export interface components {
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
-                    /**
-                     * @description 需要的角色ID列表
-                     * @example [
-                     *       1,
-                     *       2
-                     *     ]
-                     */
-                    roleIdArr: number[];
+                    /** @description 需要的角色ID列表 */
+                    roleIdArr: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
@@ -3835,13 +3948,13 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新者ID */
-                    updaterId: number | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: number | null;
-                }[] | unknown[]);
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };
@@ -3860,19 +3973,13 @@ export interface components {
              * @description 路由路径
              * @example /home
              */
-            path?: ((string | null) | null) | null;
+            path: ((string | null) | null) | null;
             /** @description 父菜单ID，支持菜单层级 */
-            parentId?: ((number | null) | null) | null;
+            parentId: ((number | null) | null) | null;
             /** @description 排序 */
             sort: number;
-            /**
-             * @description 需要的角色ID列表
-             * @example [
-             *       1,
-             *       2
-             *     ]
-             */
-            roleIdArr: number[];
+            /** @description 需要的角色ID列表 */
+            roleIdArr: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
@@ -3926,14 +4033,8 @@ export interface components {
             parentId?: ((number | null) | null) | null;
             /** @description 排序 */
             sort?: number;
-            /**
-             * @description 需要的角色ID列表
-             * @example [
-             *       1,
-             *       2
-             *     ]
-             */
-            roleIdArr?: number[];
+            /** @description 需要的角色ID列表 */
+            roleIdArr?: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
@@ -3980,14 +4081,8 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
-                /**
-                 * @description 需要的角色ID列表
-                 * @example [
-                 *       1,
-                 *       2
-                 *     ]
-                 */
-                roleIdArr: number[];
+                /** @description 需要的角色ID列表 */
+                roleIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -3998,12 +4093,12 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新者ID */
-                updaterId: number | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: number | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -4014,35 +4109,116 @@ export interface components {
         SystemMenuTreeRes: {
             ok: boolean;
             data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
                 id: number;
+                /**
+                 * @description 菜单名称
+                 * @example 主页
+                 */
                 text: string;
+                /**
+                 * @description 图标名称，使用 Iconify material-symbols 图标
+                 * @example material-symbols:home
+                 */
                 icon: string;
+                /**
+                 * @description 路由路径
+                 * @example /home
+                 */
                 path: ((string | null) | null) | null;
+                /** @description 父菜单ID，支持菜单层级 */
+                parentId: ((number | null) | null) | null;
+                /** @description 排序 */
                 sort: number;
+                /** @description 需要的角色ID列表 */
+                roleIdArr: ((number[] | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
                 children: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
                     id: number;
+                    /**
+                     * @description 菜单名称
+                     * @example 主页
+                     */
                     text: string;
+                    /**
+                     * @description 图标名称，使用 Iconify material-symbols 图标
+                     * @example material-symbols:home
+                     */
                     icon: string;
-                    path: string;
+                    /**
+                     * @description 路由路径
+                     * @example /home
+                     */
+                    path: ((string | null) | null) | null;
+                    /** @description 父菜单ID，支持菜单层级 */
+                    parentId: ((number | null) | null) | null;
+                    /** @description 排序 */
                     sort: number;
-                    parentId: number;
+                    /** @description 需要的角色ID列表 */
+                    roleIdArr: ((number[] | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                    children: unknown[];
                 }[];
             }[];
             message: string;
         };
         SystemRoleListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+            /** @description 是否降序 */
             descend?: boolean;
-            /** @default 1 */
+            /**
+             * @description 页码
+             * @default 1
+             */
             pageNo: number;
-            /** @default 10 */
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
             pageSize: number;
             /**
-             * @description 搜索角色名称
+             * @description 关键词
              * @example
              */
             keyword?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
             /** @description 是否启用状态过滤 */
             isEnabled?: boolean;
         };
@@ -4057,7 +4233,7 @@ export interface components {
                 currentPage: number;
                 /** @description 每页记录数 */
                 pageSize: number;
-                list: unknown[] & ({
+                list: {
                     /**
                      * @description id
                      * @example 1
@@ -4072,12 +4248,12 @@ export interface components {
                      * @description 角色描述
                      * @example 系统管理员，拥有所有权限
                      */
-                    description: string;
+                    description: ((string | null) | null) | null;
                     /**
                      * @description 权限列表，JSON数组格式
                      * @example ["user:read","user:write","system:admin"]
                      */
-                    permissions: string;
+                    permissions: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
@@ -4088,13 +4264,13 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新者ID */
-                    updaterId: number | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: number | null;
-                }[] | unknown[]);
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };
@@ -4108,12 +4284,12 @@ export interface components {
              * @description 角色描述
              * @example 系统管理员，拥有所有权限
              */
-            description?: string;
+            description: ((string | null) | null) | null;
             /**
              * @description 权限列表，JSON数组格式
              * @example ["user:read","user:write","system:admin"]
              */
-            permissions?: string;
+            permissions: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
@@ -4141,12 +4317,12 @@ export interface components {
              * @description 角色描述
              * @example 系统管理员，拥有所有权限
              */
-            description?: string;
+            description?: ((string | null) | null) | null;
             /**
              * @description 权限列表，JSON数组格式
              * @example ["user:read","user:write","system:admin"]
              */
-            permissions?: string;
+            permissions?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
@@ -4199,12 +4375,12 @@ export interface components {
                  * @description 角色描述
                  * @example 系统管理员，拥有所有权限
                  */
-                description: string;
+                description: ((string | null) | null) | null;
                 /**
                  * @description 权限列表，JSON数组格式
                  * @example ["user:read","user:write","system:admin"]
                  */
-                permissions: string;
+                permissions: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -4215,28 +4391,35 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新者ID */
-                updaterId: number | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: number | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
         SystemUserListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
+            /** @description 是否降序 */
             descend?: boolean;
-            /** @default 1 */
+            /**
+             * @description 页码
+             * @default 1
+             */
             pageNo: number;
-            /** @default 10 */
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
             pageSize: number;
             /**
-             * @description 搜索用户名
+             * @description 关键词
              * @example
              */
             keyword?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
             /** @description 是否启用状态过滤 */
             isEnabled?: boolean;
         };
@@ -4251,7 +4434,7 @@ export interface components {
                 currentPage: number;
                 /** @description 每页记录数 */
                 pageSize: number;
-                list: unknown[] & ({
+                list: {
                     /**
                      * @description id
                      * @example 1
@@ -4274,7 +4457,7 @@ export interface components {
                      * @description 部门ID
                      * @example 1
                      */
-                    departmentId: number;
+                    departmentId: ((number | null) | null) | null;
                     /** @description 角色ID数组 */
                     roleIdArr: number[];
                     /** @description 创建者ID */
@@ -4285,13 +4468,13 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新者ID */
-                    updaterId: number | null;
+                    updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: number | null;
-                }[] | unknown[]);
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };
@@ -4315,7 +4498,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
             /** @description 部门对象 */
-            departmentObj?: (({
+            departmentObj: (({
                 /**
                  * @description 部门ID
                  * @example 1
@@ -4450,7 +4633,7 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 部门对象 */
-                departmentObj?: (({
+                departmentObj: (({
                     /**
                      * @description 部门ID
                      * @example 1
@@ -4483,12 +4666,12 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新者ID */
-                updaterId: number | null;
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: number | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };

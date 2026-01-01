@@ -223,6 +223,12 @@ async function onUpdate(
       );
     }
   }
+  if (permissions !== undefined) {
+    updateData = {
+      ...updateData,  
+      permissions,
+    };
+  }
   if (isEnabled !== undefined) {
     updateData = {
       ...updateData,

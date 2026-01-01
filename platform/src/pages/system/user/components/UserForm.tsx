@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import type { AddUserParams } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import hasValue from '@/utils/hasValue';
 
 interface UserFormDialogProps {
   open: boolean;
@@ -147,12 +148,13 @@ export default function UserFormDialog({
               label="部门ID"
               type="number"
               value={form.departmentId || ''}
-              onChange={(e) =>
+              onChange={(e) => {
+                const value = e.target.value;
                 onFormChange({
                   ...form,
-                  departmentId: e.target.value ? Number(e.target.value) : null,
-                })
-              }
+                  departmentId: hasValue(value) ? Number(value) : null,
+                });
+              }}
               fullWidth
               size={isMobile ? 'medium' : 'medium'}
             />

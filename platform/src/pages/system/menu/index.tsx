@@ -34,33 +34,11 @@ import * as MenuAPI from '@/api/system/menu';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout } from '@/components/Responsive/index';
 import { useResponsive } from '@/hooks/useResponsive';
-
-// 菜单接口 (从tree接口返回的数据，部分字段可选)
-interface Menu {
-  id: number;
-  text: string;
-  icon: string;
-  path?: string | null;
-  parentId?: number | null;
-  sort?: number;
-  roleIdArr?: number[];
-  isEnabled?: boolean;
-  children?: Menu[];
-}
-
-// 表单数据类型
-interface MenuFormData {
-  text: string;
-  icon: string;
-  path: string;
-  parentId: number | null;
-  sort: number;
-  roleIdArr: number[];
-  isEnabled: boolean;
-}
+import hasValue from '@/utils/hasValue';
+import type { AddMenuParams, Menu } from './type';
 
 // 默认表单数据
-const defaultFormData: MenuFormData = {
+const defaultFormData: AddMenuParams = {
   text: '',
   icon: 'material-symbols:folder',
   path: '',
@@ -105,7 +83,7 @@ export default function MenuManagement() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [showAll, setShowAll] = useState<boolean>(true);
   const [editingMenu, setEditingMenu] = useState<Menu | null>(null);
-  const [formValues, setFormValues] = useState<MenuFormData>(defaultFormData);
+  const [formValues, setFormValues] = useState<AddMenuParams>(defaultFormData);
   const [error, setError] = useState<string>('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [menuToDelete, setMenuToDelete] = useState<Menu | null>(null);
@@ -152,6 +130,7 @@ export default function MenuManagement() {
       // 编辑模式
       setEditingMenu(menu);
       setFormValues({
+        ...menu,
         text: menu.text,
         icon: menu.icon,
         path: menu.path || '',
@@ -181,7 +160,7 @@ export default function MenuManagement() {
 
   // 处理表单变化
   const handleFormChange = (
-    field: keyof MenuFormData,
+    field: keyof AddMenuParams,
     value: string | number | number[] | boolean | null,
   ) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
@@ -208,10 +187,10 @@ export default function MenuManagement() {
       const submitData = {
         text: formValues.text,
         icon: formValues.icon,
-        path: formValues.path || null,
-        parentId: formValues.parentId,
+        path: hasValue(formValues.path) ? formValues.path : null,
+        parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
         sort: formValues.sort,
-        roleIdArr: formValues.roleIdArr,
+        roleIdArr: formValues.roleIdArr && formValues.roleIdArr.length > 0 ? formValues.roleIdArr : null,
         isEnabled: formValues.isEnabled,
       };
 
@@ -460,7 +439,10 @@ export default function MenuManagement() {
           <TextField
             label="路由路径"
             value={formValues.path}
-            onChange={(e) => handleFormChange('path', e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleFormChange('path', hasValue(value) ? value : null);
+            }}
             fullWidth
             margin="normal"
             helperText="例如: /system/menu"

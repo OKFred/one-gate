@@ -1,32 +1,8 @@
 import type * as MenuAPI from '@/api/system/menu';
 
-// 菜单接口定义
-export interface Menu {
-  id: number;
-  text: string;
-  icon: string;
-  path?: string | null;
-  parentId?: number | null;
-  sort: number;
-  roleIdArr: number[];
-  isEnabled: boolean;
-  children?: Menu[];
-}
-
-// 表单数据类型
-export interface MenuFormData {
-  text: string;
-  icon: string;
-  path: string;
-  parentId: number | null;
-  sort: number;
-  roleIdArr: number[];
-  isEnabled: boolean;
-}
-
 // 获取菜单树
 export type TreeMenuResponse = Awaited<ReturnType<typeof MenuAPI.treeFn>>;
-export type TreeMenuData = NonNullable<TreeMenuResponse['data']>;
+export type Menu = NonNullable<TreeMenuResponse['data']>['data'][0];
 
 // 获取单个菜单
 export type GetMenuParams = Parameters<typeof MenuAPI.getFn>[0];
@@ -35,7 +11,7 @@ export type GetMenuReq = NonNullable<GetMenuParams['data']>;
 export type GetMenuData = NonNullable<GetMenuResponse['data']>;
 
 // 添加菜单
-export type AddMenuParams = Parameters<typeof MenuAPI.addFn>[0]['data'];
+export type AddMenuParams = NonNullable<Parameters<typeof MenuAPI.addFn>[0]['data']>;
 export type AddMenuResponse = Awaited<ReturnType<typeof MenuAPI.addFn>>;
 export type AddMenuReq = NonNullable<AddMenuParams['data']>;
 export type AddMenuData = NonNullable<AddMenuResponse['data']>;

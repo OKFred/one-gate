@@ -26,15 +26,11 @@ import { listFn, addFn, updateFn, deleteFn } from '@/api/system/department';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout } from '@/components/Responsive/index';
 import { useResponsive } from '@/hooks/useResponsive';
-
-interface Department {
-  id: number;
-  name: string;
-  description?: string;
-  parentId?: number | null;
-  isEnabled: boolean;
-  children?: Department[]; // Added children property to fix the type error
-}
+import hasValue from '@/utils/hasValue';
+import type { GetDepartmentData } from './type';
+type Department = GetDepartmentData['data'] & {
+  children?: Department[];
+};
 
 function buildTree(data: Department[], parentId: number | null = null): Department[] {
   return data
@@ -49,7 +45,6 @@ export default function DepartmentManagement() {
   const { isMobile } = useResponsive();
 
   const [departments, setDepartments] = useState<Department[]>([]);
-  const [flatDepartments, setFlatDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
@@ -76,7 +71,6 @@ export default function DepartmentManagement() {
       const flatData = res.data.data.list || [];
       const treeData = buildTree(flatData);
       setDepartments(treeData);
-      setFlatDepartments(flatData);
     } catch (err) {
       console.error(err);
       showGlobalNotification({ message: '获取部门列表失败', type: 'error' });
@@ -116,7 +110,7 @@ export default function DepartmentManagement() {
     setError('');
   };
 
-  const handleFormChange = (field: string, value: string | boolean) => {
+  const handleFormChange = (field: string, value: string | boolean | null) => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -322,7 +316,10 @@ export default function DepartmentManagement() {
           <TextField
             label="描述"
             value={formValues.description}
-            onChange={(e) => handleFormChange('description', e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleFormChange('description', hasValue(value) ? value : null);
+            }}
             fullWidth
             margin="normal"
           />

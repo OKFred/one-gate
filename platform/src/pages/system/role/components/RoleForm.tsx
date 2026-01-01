@@ -18,6 +18,7 @@ import * as roleAPI from '@/api/system/role';
 import type { AddRoleRequest, ListRole } from '../type';
 import type { Props } from '../type.d';
 import { useResponsive } from '@/hooks/useResponsive';
+import hasValue from '@/utils/hasValue';
 
 // 暴露给父组件的方法
 export interface RoleFormRef {
@@ -146,7 +147,12 @@ const RoleForm = memo(
               <TextField
                 label="角色描述"
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    description: hasValue(e.target.value) ? e.target.value : null,
+                  })
+                }
                 fullWidth
                 multiline
                 rows={3}
@@ -157,7 +163,12 @@ const RoleForm = memo(
               <TextField
                 label="权限列表"
                 value={form.permissions}
-                onChange={(e) => setForm({ ...form, permissions: e.target.value })}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    permissions: hasValue(e.target.value) ? e.target.value : null,
+                  })
+                }
                 fullWidth
                 multiline
                 rows={4}
