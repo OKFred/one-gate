@@ -30,64 +30,34 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
+import {
+  listReqBase,
+  listResponseWrapper,
+  orderByWrapper,
+} from "@/middleware/encapsulation/common.schema";
 
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: [
-        "id",
-        "name",
-        "isEnabled",
-        "createTimeUtc",
-      ] satisfies (keyof RolePOLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
-    keyword: {
-      type: "string",
-      examples: [""],
-      description: "搜索角色名称",
-    },
+    ...listReqBase,
+    orderBy: orderByWrapper<(keyof RolePOLike)[]>([
+      "id",
+      "name",
+      "isEnabled",
+      "createTimeUtc",
+    ]),
     isEnabled: { type: "boolean", description: "是否启用状态过滤" },
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  type: "object",
-  properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      oneOf: [
-        {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              ...RoleListVO,
-            },
-            required: [
-              ...RoleListKeys,
-            ] as const satisfies RequiredKeys<RolePOLike>[],
-            additionalProperties: false,
-          },
-        },
-        {
-          type: "array",
-          maxItems: 0,
-        },
-      ],
+  ...listResponseWrapper<RequiredKeys<RolePOLike>[]>(
+    {
+      ...RoleListVO,
     },
-  },
-  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
-  additionalProperties: false,
+    [...RoleListKeys]
+  ),
 } as const satisfies JSONSchema;
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;

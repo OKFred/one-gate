@@ -32,66 +32,36 @@ import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
+import {
+  listReqBase,
+  listResponseWrapper,
+  orderByWrapper,
+} from "@/middleware/encapsulation/common.schema";
 
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: [
-        "id",
-        "username",
-        "langCode",
-        "departmentId",
-        "isEnabled",
-        "createTimeUtc",
-      ] satisfies (keyof UserPOLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
-    keyword: {
-      type: "string",
-      examples: [""],
-      description: "搜索用户名",
-    },
+    ...listReqBase,
+    orderBy: orderByWrapper<(keyof UserPOLike)[]>([
+      "id",
+      "username",
+      "langCode",
+      "departmentId",
+      "isEnabled",
+      "createTimeUtc",
+    ]),
     isEnabled: { type: "boolean", description: "是否启用状态过滤" },
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  type: "object",
-  properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      oneOf: [
-        {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              ...UserListVO,
-            },
-            required: [...UserListKeys] as const satisfies RequiredKeys<
-              Omit<UserPOLike, "password">
-            >[],
-            additionalProperties: false,
-          },
-        },
-        {
-          type: "array",
-          maxItems: 0,
-        },
-      ],
+  ...listResponseWrapper<RequiredKeys<Omit<UserPOLike, "password">>[]>(
+    {
+      ...UserListVO,
     },
-  },
-  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
-  additionalProperties: false,
+    [...UserListKeys]
+  ),
 } as const satisfies JSONSchema;
 async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
