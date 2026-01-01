@@ -26,23 +26,16 @@ export function listWrapper<T extends readonly string[]>(
   requiredKeys: T = [] as unknown as T
 ) {
   return {
-    oneOf: [
-      {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            ...itemProperties,
-          },
-          required: [...requiredKeys],
-          additionalProperties: false,
-        },
+    type: "array",
+    minItems: 0,
+    items: {
+      type: "object",
+      properties: {
+        ...itemProperties,
       },
-      {
-        type: "array",
-        maxItems: 0,
-      },
-    ],
+      required: [...requiredKeys],
+      additionalProperties: false,
+    },
   } as const satisfies JSONSchema;
 }
 
