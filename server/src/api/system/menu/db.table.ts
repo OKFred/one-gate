@@ -43,7 +43,8 @@ const MenuBasePO = {
     description: "排序",
   },
   roleIdArr: {
-    type: "array",
+    type: ["array", "null"],
+    nullable: true,
     description: "需要的角色ID列表",
     items: { type: "number" },
     examples: [[1, 2]],
@@ -60,7 +61,7 @@ const MenuPO = {
 } as const satisfies Record<keyof MenuPOLike, JSONSchema>;
 export type MenuPOLike = InferSelectModel<typeof menuTable>; // 列表
 type MenuSelectPOLike = InferInsertModel<typeof menuTable>;
-type MenuAddPOLike = Omit<MenuSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type MenuAddPOLike = Omit<MenuPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type MenuUpdatePOLike = Partial<
   Omit<MenuSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -105,6 +106,8 @@ export const MenuDetailKeys = MenuBaseKeys;
 export const MenuAddKeys = [
   "text",
   "icon",
+  "path",
+  "parentId",
   "sort",
   "roleIdArr",
   "isEnabled",
@@ -126,7 +129,7 @@ export const menuTable = sqliteTable("system_menu", {
   path: text("path"),
   parentId: integer("parent_id"),
   sort: integer("sort").notNull(),
-  roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
+  roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),

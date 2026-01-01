@@ -25,12 +25,14 @@ const RoleUniquePO = {
 } as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
 const RoleBasePO = {
   description: {
-    type: "string",
+    type: ["string", "null"],
+    nullable: true,
     description: "角色描述",
     examples: ["系统管理员，拥有所有权限"],
   },
   permissions: {
-    type: "string",
+    type: ["string", "null"],
+    nullable: true,
     description: "权限列表，JSON数组格式",
     examples: ['["user:read","user:write","system:admin"]'],
   },
@@ -47,7 +49,7 @@ const RolePO = {
 } as const satisfies Record<keyof RolePOLike, JSONSchema>;
 export type RolePOLike = InferSelectModel<typeof roleTable>; // 列表
 type RoleSelectPOLike = InferInsertModel<typeof roleTable>;
-type RoleAddPOLike = Omit<RoleSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type RoleAddPOLike = Omit<RolePOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type RoleUpdatePOLike = Partial<
   Omit<RoleSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -92,6 +94,8 @@ export const RoleListKeys = RoleBaseKeys;
 export const RoleDetailKeys = RoleBaseKeys;
 export const RoleAddKeys = [
   "name",
+  "description",
+  "permissions",
   "isEnabled",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];
 export const RoleUpdateKeys = [

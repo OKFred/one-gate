@@ -45,7 +45,7 @@ const DepartmentPO = {
 } as const satisfies Record<keyof DepartmentPOLike, JSONSchema>;
 export type DepartmentPOLike = InferSelectModel<typeof departmentTable>; // 列表
 type DepartmentSelectPOLike = InferInsertModel<typeof departmentTable>;
-type DepartmentAddPOLike = Omit<DepartmentSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type DepartmentAddPOLike = Omit<DepartmentPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type DepartmentUpdatePOLike = Partial<
   Omit<DepartmentSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -86,6 +86,8 @@ export const DepartmentListKeys = DepartmentBaseKeys;
 export const DepartmentDetailKeys = DepartmentBaseKeys;
 export const DepartmentAddKeys = [
   "name",
+  "description",
+  "parentId",
   "isEnabled",
 ] as const satisfies RequiredKeys<DepartmentAddVOLike>[];
 export const DepartmentUpdateKeys = [

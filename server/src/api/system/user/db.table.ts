@@ -64,7 +64,7 @@ const UserPO = {
 } as const satisfies Record<keyof UserPOLike, JSONSchema>;
 export type UserPOLike = InferSelectModel<typeof userTable>; // 列表
 type UserSelectPOLike = InferInsertModel<typeof userTable>;
-type UserAddPOLike = Omit<UserSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type UserAddPOLike = Omit<UserPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type UserUpdatePOLike = Partial<
   Omit<UserSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -186,6 +186,7 @@ export const UserAddKeys = [
   "password",
   "langCode",
   "isEnabled",
+  "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserAddVOLike>[];
 export const UserUpdateKeys = [
