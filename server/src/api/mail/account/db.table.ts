@@ -1,5 +1,4 @@
 import db from "@/db/index";
-import { sql } from "drizzle-orm";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";

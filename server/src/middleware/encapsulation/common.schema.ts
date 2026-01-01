@@ -1,10 +1,28 @@
 import { JSONSchema } from "json-schema-to-ts";
 
 export const listReqBase = {
-  descend: { type: "boolean" } as const,
-  pageNo: { type: "number", minimum: 1, default: 1 } as const,
-  pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 } as const,
-  keyword: { type: "string", examples: [""] } as const,
+  descend: {
+    type: "boolean",
+    description: "是否降序",
+  } as const,
+  pageNo: {
+    type: "number",
+    minimum: 1,
+    default: 1,
+    description: "页码",
+  } as const,
+  pageSize: {
+    type: "number",
+    minimum: 1,
+    maximum: 1000,
+    default: 10,
+    description: "每页记录数",
+  } as const,
+  keyword: {
+    type: "string",
+    examples: [""],
+    description: "关键词",
+  } as const,
 } as const;
 
 export const listResBase = {

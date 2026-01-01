@@ -384,29 +384,25 @@ const treeReq = {
 const menuTreeItem = {
   type: "object",
   properties: {
-    id: { type: "number" },
-    text: { type: "string" },
-    icon: { type: "string" },
-    path: { type: ["string", "null"], nullable: true },
-    sort: { type: "number" },
+    ...MenuVO,
     children: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          id: { type: "number" },
-          text: { type: "string" },
-          icon: { type: "string" },
-          path: { type: "string" },
-          sort: { type: "number" },
-          parentId: { type: "number" },
+          ...MenuVO,
+          children: {
+            type: "array",
+            maxLength: 0,
+            minLength: 0,
+          },
         },
-        required: ["id", "text", "icon", "path", "sort", "parentId"],
+        required: [...MenuDetailKeys, "children"],
         additionalProperties: false,
       },
     },
   },
-  required: ["id", "text", "icon", "path", "sort", "parentId", "children"],
+  required: [...MenuDetailKeys, "children"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const treeRes = {

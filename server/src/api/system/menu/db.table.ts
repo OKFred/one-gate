@@ -47,8 +47,7 @@ const MenuBasePO = {
     type: ["array", "null"],
     nullable: true,
     description: "需要的角色ID列表",
-    items: { type: "number" },
-    examples: [[1, 2]],
+    items: { type: "number", examples: [1]},
   },
   isEnabled: {
     type: "boolean",
