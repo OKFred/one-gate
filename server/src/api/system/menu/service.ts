@@ -149,7 +149,7 @@ async function onAdd(
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
-  const { text, icon, path, parentId, sort, roleIdArr, isEnabled } = obj;
+  const { parentId } = obj;
 
   // 如果有父菜单，检查父菜单是否存在
   if (hasValue(parentId)) {
@@ -168,19 +168,13 @@ async function onAdd(
       );
     }
   }
-
+  const updateData = {
+    ...obj,
+    creatorId,
+  };
   const result = await db
     .insert(menuTable)
-    .values({
-      text,
-      icon,
-      path,
-      parentId,
-      sort,
-      roleIdArr,
-      isEnabled,
-      creatorId,
-    })
+    .values(updateData)
     .returning({ id: menuTable.id });
 
   return result[0]?.id;
