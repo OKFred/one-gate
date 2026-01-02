@@ -41,7 +41,7 @@ const listReq = {
     ...listReqBase,
     orderBy: orderByWrapper<(keyof MenuPOLike)[]>([
       "id",
-      "text",
+      "name",
       "isEnabled",
       "createTimeUtc",
     ]),
@@ -77,7 +77,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const buildWhereCondition = () => {
     const conditions = [];
     if (hasValue(keyword)) {
-      conditions.push(or(like(menuTable.text, `%${keyword}%`)));
+      conditions.push(or(like(menuTable.name, `%${keyword}%`)));
     }
     if (isEnabled !== undefined) {
       conditions.push(eq(menuTable.isEnabled, isEnabled));

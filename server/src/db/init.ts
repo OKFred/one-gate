@@ -121,7 +121,7 @@ async function initMenu() {
     for (const menu of initialMenuData) {
       await db.insert(menuTable).values({
         id: menu.id,
-        text: menu.text,
+        name: menu.name,
         icon: menu.icon,
         sort: menu.sort,
         path: menu.path || null,

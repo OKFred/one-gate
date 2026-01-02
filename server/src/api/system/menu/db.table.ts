@@ -18,7 +18,7 @@ import { type RequiredKeys } from "@/types/app";
 
 //----------------- PO ----------------//
 const MenuBasePO = {
-  text: {
+  name: {
     type: "string",
     description: "菜单名称",
     examples: ["主页"],
@@ -91,7 +91,7 @@ export type MenuGetVOLike = Pick<MenuVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
 export const MenuAddKeys = [
-  "text",
+  "name",
   "icon",
   "path",
   "parentId",
@@ -118,7 +118,7 @@ export const MenuDetailKeys = MenuBaseKeys;
 
 export const menuTable = sqliteTable("system_menu", {
   id: integer("id").primaryKey().notNull(),
-  text: text("text").notNull(),
+  name: text("name").notNull(),
   icon: text("icon").notNull(),
   path: text("path"),
   parentId: integer("parent_id"),
@@ -137,7 +137,7 @@ export async function tableInit() {
   await db.run(`
     CREATE TABLE IF NOT EXISTS system_menu (
       id INTEGER PRIMARY KEY,
-      text TEXT NOT NULL,
+      name TEXT NOT NULL,
       icon TEXT NOT NULL,
       path TEXT,
       parent_id INTEGER,
