@@ -395,6 +395,93 @@ async function getDepartmentNameById(id: number): Promise<string | null> {
   return rows.length > 0 ? rows[0].name : null;
 }
 
+const treeReq = {
+  type: "object",
+  properties: {
+    showAll: {
+      description: "是否显示所有部门（包括未启用的）",
+      type: "boolean",
+    },
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+// 定义递归类型用于树形结构
+type DepartmentTreeItem = DepartmentVOLike & {
+  children: DepartmentTreeItem[];
+};
+
+const departmentTreeItemSchema: JSONSchema = {
+  type: "object",
+  properties: {
+    ...DepartmentVO,
+    children: {
+      type: "array",
+      items: {
+        properties: {
+          ...DepartmentVO,
+          children: { type: "array" },
+        },
+      }, // 递归引用自身
+    },
+  },
+  required: [...DepartmentDetailKeys, "children"],
+  additionalProperties: false,
+};
+
+const treeRes = {
+  type: "array",
+  items: departmentTreeItemSchema,
+} as const satisfies JSONSchema;
+
+async function onTree(c: NodeHonoContext): Promise<DepartmentTreeItem[]> {
+  const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
+  const { showAll } = obj;
+
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    if (showAll !== true) {
+      return eq(departmentTable.isEnabled, true); // 默认只查询启用的部门
+    }
+    return undefined;
+  };
+
+  // 获取所有部门
+  const allDepartments = await db
+    .select()
+    .from(departmentTable)
+    .where(buildWhereCondition())
+    .orderBy(asc(departmentTable.id));
+
+  // 递归构建树形结构
+  function buildDepartmentTree(
+    data: typeof allDepartments,
+    parentId: number | null = null
+  ): DepartmentTreeItem[] {
+    return data
+      .filter((item) => item.parentId === parentId)
+      .map((item) => ({
+        ...item,
+        children: buildDepartmentTree(data, item.id),
+      }));
+  }
+
+  const departmentTree = buildDepartmentTree(allDepartments);
+  return departmentTree;
+}
+
+const treeApi = {
+  req: treeReq,
+  res: treeRes,
+  pathInfo: {
+    path: "/tree",
+    method: "post",
+    summary: "获取树形部门列表",
+  } as const,
+  service: onTree,
+};
+
 export const utils = {
   getDepartmentNameById,
 };
@@ -405,4 +492,5 @@ export default {
   delete: deleteApi,
   update: updateApi,
   get: getApi,
+  tree: treeApi,
 };

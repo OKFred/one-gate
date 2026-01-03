@@ -11,6 +11,10 @@ import {
   IconButton,
   Typography,
   Alert,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -22,7 +26,7 @@ import {
   Apartment as ApartmentIcon,
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
-import { listFn, addFn, updateFn, deleteFn } from '@/api/system/department';
+import { treeFn, addFn, updateFn, deleteFn } from '@/api/system/department';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout } from '@/components/Responsive/index';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -32,14 +36,12 @@ type Department = GetDepartmentData['data'] & {
   children?: Department[];
 };
 
-function buildTree(data: Department[], parentId: number | null = null): Department[] {
-  return data
-    .filter((item) => item.parentId === parentId)
-    .map((item) => ({
-      ...item,
-      children: buildTree(data, item.id),
-    }));
-}
+// 扁平化部门树，用于下拉选择
+type FlatDepartment = {
+  id: number;
+  name: string;
+  level: number; // 层级，用于显示缩进
+};
 
 export default function DepartmentManagement() {
   const { isMobile } = useResponsive();
@@ -61,15 +63,12 @@ export default function DepartmentManagement() {
   const fetchDepartments = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await listFn({
+      const res = await treeFn({
         data: {
-          pageNo: 1,
-          pageSize: 100,
-          isEnabled: true, // 默认启用状态
+          showAll: false, // 默认只显示启用的部门
         },
       });
-      const flatData = res.data.data.list || [];
-      const treeData = buildTree(flatData);
+      const treeData = res.data.data || [];
       setDepartments(treeData);
     } catch (err) {
       console.error(err);
@@ -247,6 +246,64 @@ export default function DepartmentManagement() {
     return ids;
   }, []);
 
+  // 将树形结构扁平化，用于下拉选择
+  const flattenDepartments = useCallback(
+    (deptList: Department[], level: number = 0): FlatDepartment[] => {
+      const result: FlatDepartment[] = [];
+      deptList.forEach((dept) => {
+        result.push({
+          id: dept.id,
+          name: dept.name,
+          level,
+        });
+        if (dept.children && dept.children.length > 0) {
+          result.push(...flattenDepartments(dept.children, level + 1));
+        }
+      });
+      return result;
+    },
+    []
+  );
+
+  // 获取当前部门及其所有子部门的ID（用于避免循环引用）
+  const getDescendantIds = useCallback((dept: Department): number[] => {
+    const ids = [dept.id];
+    if (dept.children && dept.children.length > 0) {
+      dept.children.forEach((child) => {
+        ids.push(...getDescendantIds(child));
+      });
+    }
+    return ids;
+  }, []);
+
+  // 从树中查找部门
+  const findDepartmentInTree = useCallback(
+    (deptList: Department[], id: number): Department | null => {
+      for (const dept of deptList) {
+        if (dept.id === id) return dept;
+        if (dept.children && dept.children.length > 0) {
+          const found = findDepartmentInTree(dept.children, id);
+          if (found) return found;
+        }
+      }
+      return null;
+    },
+    []
+  );
+
+  // 获取可选的父部门列表
+  const getAvailableParentDepartments = useCallback((): FlatDepartment[] => {
+    const flatList = flattenDepartments(departments);
+    
+    // 如果是编辑模式，需要排除当前部门及其所有子部门
+    if (editingDepartment) {
+      const excludeIds = getDescendantIds(editingDepartment);
+      return flatList.filter((dept) => !excludeIds.includes(dept.id));
+    }
+    
+    return flatList;
+  }, [departments, editingDepartment, flattenDepartments, getDescendantIds]);
+
   return (
     <PageLayout
       title="部门管理"
@@ -323,6 +380,25 @@ export default function DepartmentManagement() {
             fullWidth
             margin="normal"
           />
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="parent-department-label">上级部门</InputLabel>
+            <Select
+              labelId="parent-department-label"
+              label="上级部门"
+              value={formValues.parentId}
+              onChange={(e) => handleFormChange('parentId', e.target.value)}
+            >
+              <MenuItem value="">
+                <em>无（顶级部门）</em>
+              </MenuItem>
+              {getAvailableParentDepartments().map((dept) => (
+                <MenuItem key={dept.id} value={dept.id.toString()}>
+                  {'\u00A0\u00A0'.repeat(dept.level)}
+                  {dept.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleCloseDialog} disabled={loading}>

@@ -1570,6 +1570,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/department/tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取树形部门列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentTreeReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentTreeRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/menu/list": {
         parameters: {
             query?: never;
@@ -3875,6 +3933,85 @@ export interface components {
                  */
                 updateTimeUtc: ((number | null) | null) | null;
             };
+            message: string;
+        };
+        SystemDepartmentTreeReq: {
+            /** @description 是否显示所有部门（包括未启用的） */
+            showAll?: boolean;
+        };
+        SystemDepartmentTreeRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 部门名称
+                 * @example 技术部
+                 */
+                name: string;
+                /**
+                 * @description 部门描述
+                 * @example 负责技术研发工作
+                 */
+                description: ((string | null) | null) | null;
+                /** @description 父部门ID，支持部门层级 */
+                parentId: ((number | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+                children: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /**
+                     * @description 部门名称
+                     * @example 技术部
+                     */
+                    name?: string;
+                    /**
+                     * @description 部门描述
+                     * @example 负责技术研发工作
+                     */
+                    description?: ((string | null) | null) | null;
+                    /** @description 父部门ID，支持部门层级 */
+                    parentId?: ((number | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled?: boolean;
+                    /** @description 创建者ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /** @description 更新者ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    children?: unknown[];
+                }[];
+            }[];
             message: string;
         };
         SystemMenuListReq: {

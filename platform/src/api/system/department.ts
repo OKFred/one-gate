@@ -50,3 +50,13 @@ export const deleteFn = (
     ...axiosConfig,
   });
 };
+
+export const treeFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/department/tree', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/department/tree',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
