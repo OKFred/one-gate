@@ -104,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           <ListItemIcon sx={{ minWidth: 40 }}>
             {item.icon && <Icon name={item.icon} size={24} />}
           </ListItemIcon>
-          <ListItemText primary={item.text} />
+          <ListItemText primary={item.name} />
           {hasChildren && (
             <Icon
               name={isExpanded ? 'material-symbols:expand-less' : 'material-symbols:expand-more'}

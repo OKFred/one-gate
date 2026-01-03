@@ -3896,7 +3896,7 @@ export interface components {
              */
             keyword?: string;
             /** @enum {string} */
-            orderBy?: "id" | "text" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
             /** @description 是否启用状态过滤 */
             isEnabled?: boolean;
         };
@@ -3921,7 +3921,7 @@ export interface components {
                      * @description 菜单名称
                      * @example 主页
                      */
-                    text: string;
+                    name: string;
                     /**
                      * @description 图标名称，使用 Iconify material-symbols 图标
                      * @example material-symbols:home
@@ -3963,7 +3963,7 @@ export interface components {
              * @description 菜单名称
              * @example 主页
              */
-            text: string;
+            name: string;
             /**
              * @description 图标名称，使用 Iconify material-symbols 图标
              * @example material-symbols:home
@@ -4018,7 +4018,7 @@ export interface components {
              * @description 菜单名称
              * @example 主页
              */
-            text?: string;
+            name?: string;
             /**
              * @description 图标名称，使用 Iconify material-symbols 图标
              * @example material-symbols:home
@@ -4066,7 +4066,7 @@ export interface components {
                  * @description 菜单名称
                  * @example 主页
                  */
-                text: string;
+                name: string;
                 /**
                  * @description 图标名称，使用 Iconify material-symbols 图标
                  * @example material-symbols:home
@@ -4118,7 +4118,7 @@ export interface components {
                  * @description 菜单名称
                  * @example 主页
                  */
-                text: string;
+                name: string;
                 /**
                  * @description 图标名称，使用 Iconify material-symbols 图标
                  * @example material-symbols:home
@@ -4161,7 +4161,7 @@ export interface components {
                      * @description 菜单名称
                      * @example 主页
                      */
-                    text: string;
+                    name: string;
                     /**
                      * @description 图标名称，使用 Iconify material-symbols 图标
                      * @example material-symbols:home

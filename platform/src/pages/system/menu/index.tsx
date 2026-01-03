@@ -39,7 +39,7 @@ import type { AddMenuParams, Menu } from './type';
 
 // 默认表单数据
 const defaultFormData: AddMenuParams = {
-  text: '',
+  name: '',
   icon: 'material-symbols:folder',
   path: '',
   parentId: null,
@@ -131,7 +131,7 @@ export default function MenuManagement() {
       setEditingMenu(menu);
       setFormValues({
         ...menu,
-        text: menu.text,
+        name: menu.name,
         icon: menu.icon,
         path: menu.path || '',
         parentId: menu.parentId ?? null,
@@ -174,7 +174,7 @@ export default function MenuManagement() {
 
   // 提交表单
   const handleSubmit = async () => {
-    if (!formValues.text) {
+    if (!formValues.name) {
       setError('菜单名称不能为空');
       return;
     }
@@ -185,7 +185,7 @@ export default function MenuManagement() {
     setLoading(true);
     try {
       const submitData = {
-        text: formValues.text,
+        name: formValues.name,
         icon: formValues.icon,
         path: hasValue(formValues.path) ? formValues.path : null,
         parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
@@ -263,7 +263,7 @@ export default function MenuManagement() {
               sx={{ mr: 1, fontSize: 20, display: 'flex', alignItems: 'center' }}
             />
             <Typography sx={{ flexGrow: 1 }}>
-              {node.text}
+              {node.name}
               {node.path && (
                 <Typography component="span" variant="body2" color="text.secondary" sx={{ ml: 1 }}>
                   ({node.path})
@@ -402,8 +402,8 @@ export default function MenuManagement() {
 
           <TextField
             label="菜单名称"
-            value={formValues.text}
-            onChange={(e) => handleFormChange('text', e.target.value)}
+            value={formValues.name}
+            onChange={(e) => handleFormChange('name', e.target.value)}
             fullWidth
             margin="normal"
             required
@@ -465,7 +465,7 @@ export default function MenuManagement() {
                 .filter((m) => m.id !== editingMenu?.id)
                 .map((menu) => (
                   <MenuItem key={menu.id} value={menu.id}>
-                    {menu.text}
+                    {menu.name}
                   </MenuItem>
                 ))}
             </Select>
@@ -534,7 +534,7 @@ export default function MenuManagement() {
         <DialogTitle>确认删除</DialogTitle>
         <DialogContent>
           <Typography>
-            确定要删除菜单 "<strong>{menuToDelete?.text}</strong>" 吗？此操作不可恢复。
+            确定要删除菜单 "<strong>{menuToDelete?.name}</strong>" 吗？此操作不可恢复。
           </Typography>
           {menuToDelete?.children && menuToDelete.children.length > 0 && (
             <Alert severity="warning" sx={{ mt: 2 }}>
