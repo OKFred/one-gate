@@ -1,5 +1,11 @@
 import db from "@/db/index";
-import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  integer,
+  text,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -18,19 +24,10 @@ import { type RequiredKeys } from "@/types/app";
 
 //----------------- PO ----------------//
 const LanguageUniquePO = {
-  namespace: {
-    type: "string",
-    description: "命名空间",
-    examples: ["common"],
-  },
-  langCode: {
-    type: "string",
-    description: "语言代码",
-    examples: ["en-US", "zh-CN"],
-  },
   tKey: {
     type: "string",
     description: "翻译键",
+    pattern: "^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$",
     examples: ["welcome.message"],
   },
 } as const satisfies Partial<Record<keyof LanguagePOLike, JSONSchema>>;
@@ -44,6 +41,16 @@ const LanguageBasePO = {
     type: "string",
     description: "值的SHA256哈希",
     examples: ["abc123..."],
+  },
+  langCode: {
+    type: "string",
+    description: "语言代码",
+    examples: ["en-US", "zh-CN"],
+  },
+  namespace: {
+    type: "string",
+    description: "命名空间",
+    examples: ["common"],
   },
   description: {
     type: ["string", "null"],
@@ -129,7 +136,7 @@ export const languageTable = sqliteTable(
     langCode: text("lang_code", { length: 10 }).notNull(),
     tKey: text("t_key").notNull(),
     tValue: text("t_value").notNull(),
-    valueHash: text("value_hash", { length: 64 }).notNull(), // sha256 hex
+    valueHash: text("value_hash", { length: 64 }).notNull(),
     description: text("description"),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),
@@ -138,7 +145,10 @@ export const languageTable = sqliteTable(
       .default(getCurrentTimestampUtcSql()),
     updateTimeUtc: integer("update_time_utc"),
   },
-  (table) => [index("idx_value_hash").on(table.valueHash)]
+  (table) => [
+    index("idx_value_hash").on(table.valueHash),
+    uniqueIndex("idx_unique_tkey_langcode").on(table.tKey, table.langCode),
+  ]
 );
 
 export async function tableInit() {
@@ -162,6 +172,9 @@ export async function tableInit() {
   `);
   await db.run(`
     CREATE INDEX IF NOT EXISTS idx_value_hash ON system_language(value_hash)
+  `);
+  await db.run(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tkey_langcode ON system_language(t_key, lang_code)
   `);
   console.log("💾 表 system_language 已初始化");
 }

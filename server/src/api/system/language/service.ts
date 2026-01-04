@@ -19,7 +19,7 @@ import {
   type LanguageDeleteVOLike,
   type LanguageGetVOLike,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, inArray, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
@@ -164,7 +164,8 @@ async function onAdd(
   const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
   const { namespace, langCode, tKey, tValue, valueHash, description } = obj;
-
+  // 检查 tKey 是否与其他记录冲突
+  await uniqueCheck(obj);
   const result = await db
     .insert(languageTable)
     .values({
@@ -211,7 +212,8 @@ async function onUpdate(
   const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
-
+  // 检查 tKey 是否与其他记录冲突
+  await uniqueCheck(obj);
   let updateData = {
     ...rest,
     updaterId,
@@ -223,7 +225,10 @@ async function onUpdate(
     .set(updateData)
     .where(eq(languageTable.id, id))
     .returning({ id: languageTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0)
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
   return res[0].id;
 }
 const updateApi = {
@@ -250,6 +255,7 @@ const deleteReq = {
 const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
+
 async function onDelete(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
@@ -332,6 +338,112 @@ async function getTranslationsByIds(
   return rows;
 }
 
+// 检查重复文案
+const checkDuplicateReq = {
+  type: "object",
+  properties: {
+    tValue: {
+      type: "string",
+      description: "翻译值",
+    },
+    valueHash: {
+      type: "string",
+      description: "值的SHA256哈希",
+    },
+    excludeId: {
+      type: ["number", "null"],
+      nullable: true,
+      description: "排除的ID（编辑时使用）",
+    },
+  },
+  required: ["valueHash"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const checkDuplicateRes = {
+  type: "object",
+  properties: {
+    hasDuplicate: { type: "boolean" },
+    duplicates: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          namespace: { type: "string" },
+          langCode: { type: "string" },
+          tKey: { type: "string" },
+          tValue: { type: "string" },
+        },
+      },
+    },
+  },
+  required: ["hasDuplicate", "duplicates"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onCheckDuplicate(
+  c: NodeHonoContext
+): Promise<FromSchema<typeof checkDuplicateRes>> {
+  const obj = c.get("bodyObj") as FromSchema<typeof checkDuplicateReq>;
+  const { tValue, valueHash, excludeId } = obj;
+
+  const whereCondition = excludeId
+    ? and(
+        eq(languageTable.valueHash, valueHash),
+        ne(languageTable.id, excludeId)
+      )
+    : eq(languageTable.valueHash, valueHash);
+
+  const rows = await db
+    .select({
+      id: languageTable.id,
+      namespace: languageTable.namespace,
+      langCode: languageTable.langCode,
+      tKey: languageTable.tKey,
+      tValue: languageTable.tValue,
+    })
+    .from(languageTable)
+    .where(whereCondition);
+  const filteredRows = rows.filter((row) => row.tValue === tValue);
+  return {
+    hasDuplicate: filteredRows.length > 0,
+    duplicates: filteredRows,
+  };
+}
+
+const checkDuplicateApi = {
+  req: checkDuplicateReq,
+  res: checkDuplicateRes,
+  pathInfo: {
+    path: "/checkDuplicate",
+    method: "post",
+    summary: "检查是否有重复的翻译文案",
+  } as const,
+  service: onCheckDuplicate,
+};
+
+async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
+  if (hasValue(obj.tKey)) {
+    const existingRecord = await db
+      .select({ id: languageTable.id })
+      .from(languageTable)
+      .where(
+        and(
+          eq(languageTable.tKey, obj.tKey),
+          eq(languageTable.langCode, obj.langCode),
+          "id" in obj ? ne(languageTable.id, obj.id) : undefined
+        )
+      )
+      .limit(1);
+    if (existingRecord.length > 0) {
+      throw new HTTPException(httpStatusCode.CONFLICT as ContentfulStatusCode, {
+        message: "翻译键已存在",
+      });
+    }
+  }
+}
+
 export const utils = {
   getTranslationsByIds,
 };
@@ -342,4 +454,5 @@ export default {
   update: updateApi,
   delete: deleteApi,
   get: getApi,
+  checkDuplicate: checkDuplicateApi,
 };

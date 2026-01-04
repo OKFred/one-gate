@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle, memo } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, memo, useCallback } from 'react';
 import {
   Button,
   Dialog,
@@ -10,10 +10,21 @@ import {
   Box,
   useTheme,
   IconButton,
+  Alert,
+  CircularProgress,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Chip,
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import {
+  Close as CloseIcon,
+  WarningAmber as WarningIcon,
+  CheckCircle as CheckCircleIcon,
+} from '@mui/icons-material';
 import * as i18nAPI from '@/api/system/i18n';
-import type { AddI18nRequest, ListI18n } from '../type';
+import type { AddI18nRequest, CheckDuplicateI18nResponse, ListI18n } from '../type';
 import type { Props } from '../type.d';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
@@ -37,6 +48,8 @@ const DEFAULT_FORM: AddI18nRequest = {
   description: null,
 };
 
+type DuplicateInfo = CheckDuplicateI18nResponse['data']['data'];
+
 const I18nForm = memo(
   forwardRef<I18nFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
@@ -47,22 +60,45 @@ const I18nForm = memo(
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
     const [form, setForm] = useState<AddI18nRequest>(DEFAULT_FORM);
+    const [duplicateInfo, setDuplicateInfo] = useState<DuplicateInfo | null>(null);
+    const [checking, setChecking] = useState(false);
 
-    // 计算 valueHash
-    const calculateHash = (value: string): string => {
-      if (typeof window !== 'undefined' && window.crypto && window.crypto.subtle) {
-        // 在浏览器中使用 Web Crypto API
-        return value; // 暂时返回原值，实际应该异步计算
-      }
-      // 简单的哈希实现（仅用于演示）
-      let hash = 0;
-      for (let i = 0; i < value.length; i++) {
-        const char = value.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-      }
-      return Math.abs(hash).toString(16);
-    };
+    // SHA256 哈希计算
+    const calculateSHA256 = useCallback(async (text: string): Promise<string> => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    }, []);
+
+    // 检查重复的核心函数
+    const checkDuplicate = useCallback(
+      async (tValue: string) => {
+        if (!tValue.trim()) {
+          setDuplicateInfo(null);
+          return;
+        }
+
+        setChecking(true);
+        try {
+          const hash = await calculateSHA256(tValue);
+          const res = await i18nAPI.checkDuplicateFn({
+            data: {
+              tValue,
+              valueHash: hash,
+              excludeId: editId,
+            },
+          });
+          setDuplicateInfo(res.data?.data);
+        } catch (error) {
+          console.error('检查重复失败:', error);
+        } finally {
+          setChecking(false);
+        }
+      },
+      [calculateSHA256, editId],
+    );
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -71,6 +107,7 @@ const I18nForm = memo(
         openAdd: () => {
           setEditId(null);
           setForm(DEFAULT_FORM);
+          setDuplicateInfo(null);
           setOpen(true);
         },
         openEdit: (i18n: ListI18n) => {
@@ -83,6 +120,7 @@ const I18nForm = memo(
             valueHash: i18n.valueHash || '',
             description: i18n.description || null,
           });
+          setDuplicateInfo(null);
           setOpen(true);
         },
         close: () => {
@@ -96,13 +134,14 @@ const I18nForm = memo(
       setEditId(null);
       setOpen(false);
       setForm(DEFAULT_FORM);
+      setDuplicateInfo(null);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      
-      // 自动计算 valueHash
-      const hash = calculateHash(form.tValue);
+
+      // 前端计算 hash，后端会再次验证
+      const hash = await calculateSHA256(form.tValue);
       const formData = { ...form, valueHash: hash };
 
       if (editId) {
@@ -173,7 +212,7 @@ const I18nForm = memo(
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder="例如：en, zh-CN, ja"
+                  placeholder="例如：en-US, zh-CN, de-DE"
                 />
               </Stack>
 
@@ -187,17 +226,66 @@ const I18nForm = memo(
                 placeholder="例如：welcome.message, user.login.title"
               />
 
-              <TextField
-                label="翻译值"
-                value={form.tValue}
-                onChange={(e) => setForm({ ...form, tValue: e.target.value })}
-                required
-                fullWidth
-                multiline
-                rows={4}
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder="请输入翻译内容"
-              />
+              <Box>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="flex-start">
+                  <TextField
+                    label="翻译值"
+                    value={form.tValue}
+                    onChange={(e) => setForm({ ...form, tValue: e.target.value })}
+                    onBlur={() => checkDuplicate(form.tValue)}
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    size={isMobile ? 'medium' : 'medium'}
+                    placeholder="请输入翻译内容"
+                    sx={{ flex: 1 }}
+                  />
+                  {checking && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', pt: 2 }}>
+                      <CircularProgress size={24} />
+                    </Box>
+                  )}
+                </Stack>
+
+                {/* 重复提示 */}
+                {duplicateInfo && duplicateInfo.hasDuplicate && (
+                  <Alert severity="warning" sx={{ mt: 2 }} icon={<WarningIcon />}>
+                    <Box sx={{ mb: 1 }}>
+                      <strong>发现 {duplicateInfo.duplicates.length} 个相同的翻译文案：</strong>
+                    </Box>
+                    <List dense sx={{ bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, mb: 1 }}>
+                      {duplicateInfo.duplicates.map((dup) => (
+                        <ListItem key={dup.id} sx={{ py: 0.5 }}>
+                          <ListItemIcon sx={{ minWidth: 32 }}>
+                            <CheckCircleIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Box
+                                sx={{
+                                  display: 'flex',
+                                  gap: 1,
+                                  flexWrap: 'wrap',
+                                  alignItems: 'center',
+                                }}
+                              >
+                                <Chip label={dup.namespace} size="small" variant="outlined" />
+                                <Chip label={dup.langCode} size="small" variant="outlined" />
+                                <span style={{ fontWeight: 500 }}>{dup.tKey}</span>
+                              </Box>
+                            }
+                            sx={{ py: 0.5 }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                    <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
+                      💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键
+                    </Box>
+                  </Alert>
+                )}
+              </Box>
 
               <TextField
                 label="描述信息"

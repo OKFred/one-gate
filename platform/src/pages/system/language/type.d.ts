@@ -35,3 +35,9 @@ export type UpdateI18nResponse = Awaited<ReturnType<typeof I18nAPI.updateFn>>;
 // 删除翻译
 export type DeleteI18nRequest = NonNullable<Parameters<typeof I18nAPI.deleteFn>[0]['data']>;
 export type DeleteI18nResponse = Awaited<ReturnType<typeof I18nAPI.deleteFn>>;
+
+// 检查重复
+export type CheckDuplicateI18nRequest = NonNullable<
+  Parameters<typeof I18nAPI.checkDuplicateFn>[0]['data']
+>;
+export type CheckDuplicateI18nResponse = Awaited<ReturnType<typeof I18nAPI.checkDuplicateFn>>;

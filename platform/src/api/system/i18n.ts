@@ -50,3 +50,14 @@ export const deleteFn = (
     ...axiosConfig,
   });
 };
+
+export const checkDuplicateFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/language/checkDuplicate', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/language/checkDuplicate',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+

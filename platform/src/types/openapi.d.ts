@@ -1918,6 +1918,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/language/checkDuplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 检查是否有重复的翻译文案 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemLanguageCheckDuplicateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemLanguageCheckDuplicateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/menu/list": {
         parameters: {
             query?: never;
@@ -4347,17 +4405,6 @@ export interface components {
                      */
                     id: number;
                     /**
-                     * @description 命名空间
-                     * @example common
-                     */
-                    namespace: string;
-                    /**
-                     * @description 语言代码
-                     * @example en-US
-                     * @example zh-CN
-                     */
-                    langCode: string;
-                    /**
                      * @description 翻译键
                      * @example welcome.message
                      */
@@ -4372,6 +4419,17 @@ export interface components {
                      * @example abc123...
                      */
                     valueHash: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode: string;
+                    /**
+                     * @description 命名空间
+                     * @example common
+                     */
+                    namespace: string;
                     /**
                      * @description 描述信息
                      * @example 欢迎消息的翻译
@@ -4397,17 +4455,6 @@ export interface components {
         };
         SystemLanguageAddReq: {
             /**
-             * @description 命名空间
-             * @example common
-             */
-            namespace: string;
-            /**
-             * @description 语言代码
-             * @example en-US
-             * @example zh-CN
-             */
-            langCode: string;
-            /**
              * @description 翻译键
              * @example welcome.message
              */
@@ -4422,6 +4469,17 @@ export interface components {
              * @example abc123...
              */
             valueHash: string;
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode: string;
+            /**
+             * @description 命名空间
+             * @example common
+             */
+            namespace: string;
             /**
              * @description 描述信息
              * @example 欢迎消息的翻译
@@ -4444,17 +4502,6 @@ export interface components {
              */
             id: number;
             /**
-             * @description 命名空间
-             * @example common
-             */
-            namespace?: string;
-            /**
-             * @description 语言代码
-             * @example en-US
-             * @example zh-CN
-             */
-            langCode?: string;
-            /**
              * @description 翻译键
              * @example welcome.message
              */
@@ -4469,6 +4516,17 @@ export interface components {
              * @example abc123...
              */
             valueHash?: string;
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /**
+             * @description 命名空间
+             * @example common
+             */
+            namespace?: string;
             /**
              * @description 描述信息
              * @example 欢迎消息的翻译
@@ -4516,17 +4574,6 @@ export interface components {
                  */
                 id: number;
                 /**
-                 * @description 命名空间
-                 * @example common
-                 */
-                namespace: string;
-                /**
-                 * @description 语言代码
-                 * @example en-US
-                 * @example zh-CN
-                 */
-                langCode: string;
-                /**
                  * @description 翻译键
                  * @example welcome.message
                  */
@@ -4541,6 +4588,17 @@ export interface components {
                  * @example abc123...
                  */
                 valueHash: string;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode: string;
+                /**
+                 * @description 命名空间
+                 * @example common
+                 */
+                namespace: string;
                 /**
                  * @description 描述信息
                  * @example 欢迎消息的翻译
@@ -4560,6 +4618,28 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        SystemLanguageCheckDuplicateReq: {
+            /** @description 翻译值 */
+            tValue?: string;
+            /** @description 值的SHA256哈希 */
+            valueHash: string;
+            /** @description 排除的ID（编辑时使用） */
+            excludeId?: ((number | null) | null) | null;
+        };
+        SystemLanguageCheckDuplicateRes: {
+            ok: boolean;
+            data: {
+                hasDuplicate: boolean;
+                duplicates: {
+                    id?: number;
+                    namespace?: string;
+                    langCode?: string;
+                    tKey?: string;
+                    tValue?: string;
+                }[];
             };
             message: string;
         };
