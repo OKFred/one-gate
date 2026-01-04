@@ -91,6 +91,14 @@ export const initialMenuData = [
     parentId: 8,
     sort: 4,
   },
+  {
+    id: 13,
+    name: "国际化",
+    icon: "material-symbols:language",
+    path: "/system/language",
+    parentId: 8,
+    sort: 5,
+  },
 ] as menuLike[];
 
 type menuLike = {
