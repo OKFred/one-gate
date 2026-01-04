@@ -32,7 +32,7 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-   const {
+  const {
     mailTo,
     mailFrom,
     title,
@@ -94,7 +94,11 @@ async function onDelete(
     .returning({
       id: mailLogTable.id,
     });
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return result[0].id;
 }
 const deleteApi = {
@@ -246,7 +250,11 @@ async function onUpdate(
     })
     .where(eq(mailLogTable.id, id))
     .returning({ id: mailLogTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateApi = {

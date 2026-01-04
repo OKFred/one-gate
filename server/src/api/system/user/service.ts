@@ -250,7 +250,11 @@ async function onUpdate(
     .set(updateData)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -289,7 +293,11 @@ async function onDelete(
     .delete(userTable)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return result[0].id;
 }
 const deleteApi = {
@@ -384,7 +392,11 @@ async function onUpdateLangCode(
     })
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateLangCodeApi = {
@@ -427,7 +439,11 @@ async function onUpdatePassword(
     })
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updatePasswordApi = {

@@ -247,7 +247,11 @@ async function onUpdate(
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
 
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -311,7 +315,11 @@ async function onDelete(
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
 
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return result[0].id;
 }
 const deleteApi = {

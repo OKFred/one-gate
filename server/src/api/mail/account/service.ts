@@ -113,7 +113,11 @@ async function onDelete(
     .delete(mailAccountTable)
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return result[0].id;
 }
 const deleteApi = {
@@ -231,7 +235,11 @@ async function onUpdate(
     })
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateApi = {

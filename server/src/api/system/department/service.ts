@@ -257,7 +257,11 @@ async function onUpdate(
     .where(eq(departmentTable.id, id))
     .returning({ id: departmentTable.id });
 
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -321,7 +325,11 @@ async function onDelete(
     .where(eq(departmentTable.id, id))
     .returning({ id: departmentTable.id });
 
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return result[0].id;
 }
 const deleteApi = {

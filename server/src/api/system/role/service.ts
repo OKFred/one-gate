@@ -225,7 +225,7 @@ async function onUpdate(
   }
   if (permissions !== undefined) {
     updateData = {
-      ...updateData,  
+      ...updateData,
       permissions,
     };
   }
@@ -240,7 +240,11 @@ async function onUpdate(
     .set(updateData)
     .where(eq(roleTable.id, id))
     .returning({ id: roleTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -279,7 +283,11 @@ async function onDelete(
     .delete(roleTable)
     .where(eq(roleTable.id, id))
     .returning({ id: roleTable.id });
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   return result[0].id;
 }
 const deleteApi = {
