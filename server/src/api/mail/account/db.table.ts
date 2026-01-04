@@ -1,5 +1,10 @@
 import db from "@/db/index";
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  integer,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -83,22 +88,26 @@ export const mailAccountAudit = {
   },
 } as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
 
-export const mailAccountTable = sqliteTable("mail_account", {
-  id: integer("id").primaryKey().notNull(),
-  mailAddress: text("mail_address").notNull().unique(),
-  password: text("password").notNull(),
-  nickname: text("nickname").notNull(),
-  host: text("host").notNull(),
-  port: integer("port").notNull(),
-  sslEnable: integer("ssl_enable", { mode: "boolean" }).notNull(),
-  starttlsEnable: integer("starttls_enable", { mode: "boolean" }).notNull(),
-  creatorId: integer("creator_id").notNull(),
-  updaterId: integer("updater_id"),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-});
+export const mailAccountTable = sqliteTable(
+  "mail_account",
+  {
+    id: integer("id").primaryKey().notNull(),
+    mailAddress: text("mail_address").notNull().unique(),
+    password: text("password").notNull(),
+    nickname: text("nickname").notNull(),
+    host: text("host").notNull(),
+    port: integer("port").notNull(),
+    sslEnable: integer("ssl_enable", { mode: "boolean" }).notNull(),
+    starttlsEnable: integer("starttls_enable", { mode: "boolean" }).notNull(),
+    creatorId: integer("creator_id").notNull(),
+    updaterId: integer("updater_id"),
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+  },
+  () => [uniqueIndex("idx_mail_address").on(mailAccountTable.mailAddress)]
+);
 
 export type mailAccountLike = InferSelectModel<typeof mailAccountTable>;
 export type mailAccountAddLike = InferInsertModel<typeof mailAccountTable>;
