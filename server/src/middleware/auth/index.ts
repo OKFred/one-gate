@@ -4,10 +4,7 @@ import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { LanguageKey } from "@/types/locales";
 import { NodeHonoContext } from "@/types/app";
-import db from "@/db/index";
-import { userTable } from "@/api/system/user/db.table";
 import { utils as userUtils } from "@/api/system/user/service";
-import { eq } from "drizzle-orm";
 
 export const authMiddleware = async (c: NodeHonoContext) => {
   try {

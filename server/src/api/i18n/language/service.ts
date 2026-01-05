@@ -163,20 +163,15 @@ async function onAdd(
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
-  const { namespace, langCode, tKey, tValue, valueHash, description } = obj;
   // 检查 tKey 是否与其他记录冲突
   await uniqueCheck(obj);
+  const updateData = {
+    ...obj,
+    creatorId,
+  };
   const result = await db
     .insert(languageTable)
-    .values({
-      namespace,
-      langCode,
-      tKey,
-      tValue,
-      valueHash,
-      description,
-      creatorId,
-    })
+    .values(updateData)
     .returning({ id: languageTable.id });
 
   return result[0]?.id;

@@ -208,6 +208,7 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
   const userObj = c.get("userObj");
+  const { userId: updaterId } = userObj;
   const { id, ...rest } = obj;
   // 如果更新父菜单，检查是否会造成循环引用
   if (rest.parentId) {
@@ -237,7 +238,7 @@ async function onUpdate(
 
   const updateData = {
     ...rest,
-    updaterId: userObj.userId,
+    updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
@@ -282,15 +283,6 @@ async function onDelete(
   c: NodeHonoContext
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
-  if (!userObj?.userId) {
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" as any,
-      }
-    );
-  }
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
 
@@ -314,7 +306,6 @@ async function onDelete(
     .delete(menuTable)
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
-
   if (!result || result.length === 0) {
     throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
       message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
@@ -487,8 +478,8 @@ const treeApi = {
 export default {
   list: listApi,
   add: addApi,
-  delete: deleteApi,
   update: updateApi,
+  delete: deleteApi,
   get: getApi,
   tree: treeApi,
 };

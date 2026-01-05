@@ -26,10 +26,10 @@ export type AppBindings = {
       username: string;
       langCode: string;
       isEnabled: boolean;
-      departmentObj?: {
+      departmentObj: {
         value: number;
         label: string;
-      };
+      } | null;
       roleArr: {
         value: number;
         label: string;

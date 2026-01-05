@@ -26,13 +26,13 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import * as i18nAPI from '@/api/system/i18n';
-import type { ListI18n, FilterState, ListI18nRequest } from '../type.d';
-import type { Props } from '../type.d';
+import * as i18nAPI from '@/api/i18n/language';
+import type { ListLanguage, FilterState, ListLanguageRequest } from '../type';
+import type { Props } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
 
 // 暴露给父组件的方法
-export interface I18nTableRef {
+export interface LanguageTableRef {
   /** 刷新表格数据 */
   refresh: (filters?: FilterState) => void;
   /** 获取当前筛选条件 */
@@ -43,7 +43,7 @@ export interface I18nTableRef {
 
 // 表格内部状态
 interface TableState {
-  i18ns: ListI18n[];
+  i18ns: ListLanguage[];
   loading: boolean;
   page: number;
   pageSize: number;
@@ -59,8 +59,8 @@ const DEFAULT_FILTERS: FilterState = {
   langCode: undefined,
 };
 
-const I18nTable = memo(
-  forwardRef<I18nTableRef, Props>(({ localObj }, ref) => {
+const LanguageTable = memo(
+  forwardRef<LanguageTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
     const { isMobile } = useResponsive();
 
@@ -85,11 +85,11 @@ const I18nTable = memo(
     }>({ open: false, id: null, tKey: '' });
 
     // 获取数据的核心函数
-    const fetchI18ns = useCallback(
+    const fetchLanguages = useCallback(
       async (searchFilters: FilterState, currentPage: number = 1) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
-          const requestData: ListI18nRequest = {
+          const requestData: ListLanguageRequest = {
             pageNo: currentPage,
             pageSize: state.pageSize,
             orderBy: searchFilters.orderBy,
@@ -131,8 +131,8 @@ const I18nTable = memo(
 
     // 初始加载
     useEffect(() => {
-      fetchI18ns(DEFAULT_FILTERS, 1);
-    }, [fetchI18ns]);
+      fetchLanguages(DEFAULT_FILTERS, 1);
+    }, [fetchLanguages]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -141,12 +141,12 @@ const I18nTable = memo(
         refresh: (newFilters?: FilterState) => {
           const filtersToUse = newFilters || filters;
           const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
-          fetchI18ns(filtersToUse, pageToUse);
+          fetchLanguages(filtersToUse, pageToUse);
         },
         getFilters: () => filters,
         getTotal: () => total,
       }),
-      [fetchI18ns, filters, page, total],
+      [fetchLanguages, filters, page, total],
     );
 
     // 处理新增
@@ -155,7 +155,7 @@ const I18nTable = memo(
     };
 
     // 处理编辑
-    const handleEdit = (i18n: ListI18n) => {
+    const handleEdit = (i18n: ListLanguage) => {
       formRef.current?.openEdit(i18n);
     };
 
@@ -173,14 +173,14 @@ const I18nTable = memo(
     const handleConfirmDelete = async () => {
       if (deleteDialog.id) {
         await i18nAPI.deleteFn({ data: { id: deleteDialog.id } });
-        fetchI18ns(filters, page);
+        fetchLanguages(filters, page);
       }
       closeDeleteDialog();
     };
 
     // 处理分页
     const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
-      fetchI18ns(filters, newPage);
+      fetchLanguages(filters, newPage);
     };
 
     // 格式化时间
@@ -439,6 +439,4 @@ const I18nTable = memo(
   }),
 );
 
-I18nTable.displayName = 'I18nTable';
-
-export default I18nTable;
+export default LanguageTable;

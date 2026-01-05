@@ -3,7 +3,7 @@ import { tableInit } from "./db.table";
 import service from "./service";
 
 function createApp() {
-  return encapsulation(service, "SystemLanguage", () => {
+  return encapsulation(service, "LanguageLanguage", () => {
     tableInit();
   });
 }

@@ -28,16 +28,16 @@ import {
   useImperativeHandle,
 } from 'react';
 import type { FilterState } from '../type';
-import type { Props } from '../type.d';
+import type { Props } from '../type';
 
 // 暴露给父组件的方法
-export interface I18nFilterRef {
+export interface LanguageFilterRef {
   /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
 }
 
-const I18nFilter = memo(
-  forwardRef<I18nFilterRef, Props>(({ localObj }, ref) => {
+const LanguageFilter = memo(
+  forwardRef<LanguageFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
@@ -228,6 +228,6 @@ const I18nFilter = memo(
   }),
 );
 
-I18nFilter.displayName = 'I18nFilter';
+LanguageFilter.displayName = 'LanguageFilter';
 
-export default I18nFilter;
+export default LanguageFilter;

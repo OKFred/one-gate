@@ -95,10 +95,25 @@ export const initialMenuData = [
     id: 13,
     name: "国际化",
     icon: "material-symbols:language",
-    path: "/system/language",
-    parentId: 8,
     sort: 5,
+    roleIdArr: [1], // 仅管理员可见
   },
+  {
+    id: 14,
+    name: "多语言",
+    icon: "material-symbols:font-download",
+    path: "/i18n/language",
+    parentId: 13,
+    sort: 1,
+  },
+  {
+    id: 15,
+    name: "国家地区",
+    icon: "material-symbols:public",
+    path: "/i18n/region",
+    parentId: 13,
+    sort: 2,
+  }
 ] as menuLike[];
 
 type menuLike = {

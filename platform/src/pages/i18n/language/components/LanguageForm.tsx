@@ -23,23 +23,23 @@ import {
   WarningAmber as WarningIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import * as i18nAPI from '@/api/system/i18n';
-import type { AddI18nRequest, CheckDuplicateI18nResponse, ListI18n } from '../type';
-import type { Props } from '../type.d';
+import * as i18nAPI from '@/api/i18n/language';
+import type { AddLanguageRequest, CheckDuplicateLanguageResponse, ListLanguage } from '../type';
+import type { Props } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
 // 暴露给父组件的方法
-export interface I18nFormRef {
+export interface LanguageFormRef {
   /** 打开新增表单 */
   openAdd: () => void;
   /** 打开编辑表单 */
-  openEdit: (i18n: ListI18n) => void;
+  openEdit: (i18n: ListLanguage) => void;
   /** 关闭表单 */
   close: () => void;
 }
 
-const DEFAULT_FORM: AddI18nRequest = {
+const DEFAULT_FORM: AddLanguageRequest = {
   namespace: '',
   langCode: '',
   tKey: '',
@@ -48,10 +48,10 @@ const DEFAULT_FORM: AddI18nRequest = {
   description: null,
 };
 
-type DuplicateInfo = CheckDuplicateI18nResponse['data']['data'];
+type DuplicateInfo = CheckDuplicateLanguageResponse['data']['data'];
 
-const I18nForm = memo(
-  forwardRef<I18nFormRef, Props>(({ localObj }, ref) => {
+const LanguageForm = memo(
+  forwardRef<LanguageFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -59,7 +59,7 @@ const I18nForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddI18nRequest>(DEFAULT_FORM);
+    const [form, setForm] = useState<AddLanguageRequest>(DEFAULT_FORM);
     const [duplicateInfo, setDuplicateInfo] = useState<DuplicateInfo | null>(null);
     const [checking, setChecking] = useState(false);
 
@@ -110,7 +110,7 @@ const I18nForm = memo(
           setDuplicateInfo(null);
           setOpen(true);
         },
-        openEdit: (i18n: ListI18n) => {
+        openEdit: (i18n: ListLanguage) => {
           setEditId(i18n.id!);
           setForm({
             namespace: i18n.namespace || '',
@@ -324,6 +324,6 @@ const I18nForm = memo(
   }),
 );
 
-I18nForm.displayName = 'I18nForm';
+LanguageForm.displayName = 'LanguageForm';
 
-export default I18nForm;
+export default LanguageForm;

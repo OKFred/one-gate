@@ -129,7 +129,7 @@ export const LanguageListKeys = LanguageBaseKeys;
 export const LanguageDetailKeys = LanguageBaseKeys;
 
 export const languageTable = sqliteTable(
-  "system_language",
+  "i18n_language",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     namespace: text("namespace", { length: 100 }).notNull(),
@@ -153,7 +153,7 @@ export const languageTable = sqliteTable(
 
 export async function tableInit() {
   await db.run(`
-    CREATE TABLE IF NOT EXISTS system_language (
+    CREATE TABLE IF NOT EXISTS i18n_language (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       namespace TEXT NOT NULL,
       lang_code TEXT NOT NULL,
@@ -171,12 +171,12 @@ export async function tableInit() {
     )
   `);
   await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_value_hash ON system_language(value_hash)
+    CREATE INDEX IF NOT EXISTS idx_value_hash ON i18n_language(value_hash)
   `);
   await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tkey_langcode ON system_language(t_key, lang_code)
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tkey_langcode ON i18n_language(t_key, lang_code)
   `);
-  console.log("💾 表 system_language 已初始化");
+  console.log("💾 表 i18n_language 已初始化");
 }
 
 export default languageTable;
