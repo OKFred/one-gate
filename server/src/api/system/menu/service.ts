@@ -23,17 +23,18 @@ import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
+import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 
 const listReq = {
   type: "object",
@@ -58,8 +59,9 @@ const listRes = {
     [...MenuListKeys]
   ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -67,7 +69,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     pageSize = 10,
     keyword = "",
     isEnabled,
-  } = listParamObj;
+  } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = menuTable[orderBy] || menuTable.id;
   const maxPageSize = 1000;
@@ -129,8 +131,9 @@ const listApi = {
     method: "post",
     summary: "获取菜单列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -144,12 +147,11 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
-  const { parentId } = obj;
+  const { parentId } = params;
 
   // 如果有父菜单，检查父菜单是否存在
   if (hasValue(parentId)) {
@@ -169,7 +171,7 @@ async function onAdd(
     }
   }
   const updateData = {
-    ...obj,
+    ...params,
     creatorId,
   };
   const result = await db
@@ -187,8 +189,9 @@ const addApi = {
     method: "post",
     summary: "添加菜单",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -204,12 +207,11 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
-  const { id, ...rest } = obj;
+  const { id, ...rest } = params;
   // 如果更新父菜单，检查是否会造成循环引用
   if (rest.parentId) {
     // 不能将自己设为父菜单
@@ -263,8 +265,9 @@ const updateApi = {
     method: "post",
     summary: "更新菜单",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -280,10 +283,9 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   if (id === undefined) return null;
 
   // 检查是否有子菜单
@@ -321,8 +323,9 @@ const deleteApi = {
     method: "post",
     summary: "删除菜单",
   } as const,
+  adapter: bodyAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -341,10 +344,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(menuTable)
@@ -366,8 +368,9 @@ const getApi = {
     method: "post",
     summary: "获取菜单信息",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 const treeReq = {
   type: "object",
@@ -411,13 +414,12 @@ const treeRes = {
   },
 } as const satisfies JSONSchema;
 async function onTree(
-  c: NodeHonoContext
+  params: FromSchema<typeof treeReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof treeRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
-  const userObj = c.get("userObj");
   const { roleArr } = userObj;
   // 获取所有菜单
-  const { showAll } = obj;
+  const { showAll } = params;
   // 构建查询条件
   const buildWhereCondition = () => {
     const conditions = [];
@@ -472,8 +474,9 @@ const treeApi = {
     method: "post",
     summary: "获取树形菜单（根据用户角色过滤）",
   } as const,
+  adapter: bodyUserAdapter,
   service: onTree,
-};
+} satisfies API;
 
 export default {
   list: listApi,

@@ -211,12 +211,12 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  obj: FromSchema<typeof updateReq>,
+  params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, permissions, ...rest } = obj;
-  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : obj.isEnabled; // 禁止禁用超级管理员角色
+  const { id, permissions, ...rest } = params;
+  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled; // 禁止禁用超级管理员角色
 
   let updateData = {
     ...rest,

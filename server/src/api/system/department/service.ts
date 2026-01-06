@@ -23,17 +23,18 @@ import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
+import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 
 const listReq = {
   type: "object",
@@ -61,8 +62,9 @@ const listRes = {
     [...DepartmentListKeys]
   ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -71,7 +73,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     keyword = "",
     isEnabled,
     parentId,
-  } = listParamObj;
+  } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
@@ -134,8 +136,9 @@ const listApi = {
     method: "post",
     summary: "获取部门列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -151,12 +154,11 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
-  const { name, description, parentId, isEnabled = true } = obj;
+  const { name, description, parentId, isEnabled = true } = params;
   // 如果有父部门，检查父部门是否存在
   if (hasValue(parentId)) {
     const parent = await db
@@ -195,8 +197,9 @@ const addApi = {
     method: "post",
     summary: "添加部门",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -212,12 +215,11 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
-  const { id, ...rest } = obj;
+  const { id, ...rest } = params;
 
   // 如果更新父部门，检查是否会造成循环引用
   if (rest.parentId) {
@@ -272,8 +274,9 @@ const updateApi = {
     method: "post",
     summary: "更新部门",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -289,10 +292,9 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
   if (!userObj?.userId) {
     throw new HTTPException(
       httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
@@ -301,7 +303,7 @@ async function onDelete(
       }
     );
   }
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   if (id === undefined) return null;
 
   // 检查是否有子部门
@@ -340,8 +342,9 @@ const deleteApi = {
     method: "post",
     summary: "删除部门",
   } as const,
+  adapter: bodyUserAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -364,10 +367,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(departmentTable)
@@ -390,8 +392,9 @@ const getApi = {
     method: "post",
     summary: "获取部门信息",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 /** @description 根据ID获取部门名称 */
 async function getDepartmentNameById(id: number): Promise<string | null> {
@@ -443,9 +446,10 @@ const treeRes = {
   items: departmentTreeItemSchema,
 } as const satisfies JSONSchema;
 
-async function onTree(c: NodeHonoContext): Promise<DepartmentTreeItem[]> {
-  const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
-  const { showAll } = obj;
+async function onTree(
+  params: FromSchema<typeof treeReq>
+): Promise<DepartmentTreeItem[]> {
+  const { showAll } = params;
 
   // 构建查询条件
   const buildWhereCondition = () => {
@@ -487,11 +491,22 @@ const treeApi = {
     method: "post",
     summary: "获取树形部门列表",
   } as const,
+  adapter: bodyAdapter,
   service: onTree,
-};
+} satisfies API;
 
 export const utils = {
   getDepartmentNameById,
+};
+
+// 业务函数导出，便于非 HTTP 场景复用
+export const services = {
+  onList,
+  onAdd,
+  onUpdate,
+  onDelete,
+  onGet,
+  onTree,
 };
 
 export default {

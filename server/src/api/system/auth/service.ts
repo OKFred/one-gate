@@ -5,8 +5,13 @@ import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj } from "@/types/app";
 import { UserDetailKeys, UserVO } from "../user/db.table";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 
 // 普通登录
 const loginReq = {
@@ -48,10 +53,9 @@ const loginRes = {
 } as const satisfies JSONSchema;
 
 async function onLogin(
-  c: NodeHonoContext
+  params: FromSchema<typeof loginReq>
 ): Promise<FromSchema<typeof loginRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
-  const { username, password: base64Password } = obj;
+  const { username, password: base64Password } = params;
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
   const password = plainPassword;
   const verifyResult = await userUtils.verifyUsernameAndPassword({
@@ -95,8 +99,9 @@ const loginApi = {
     method: "post",
     summary: "用户登录",
   } as const,
+  adapter: bodyAdapter,
   service: onLogin,
-};
+} satisfies API;
 
 // 微信登录
 const wechatLoginReq = {
@@ -122,10 +127,9 @@ const wechatLoginRes = {
 } as const satisfies JSONSchema;
 
 async function onWechatLogin(
-  c: NodeHonoContext
+  params: FromSchema<typeof wechatLoginReq>
 ): Promise<FromSchema<typeof wechatLoginRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof wechatLoginReq>;
-  const { code, state } = obj;
+  const { code, state } = params;
 
   // TODO: 实现微信登录逻辑
   // 1. 使用code换取access_token
@@ -152,8 +156,9 @@ const wechatLoginApi = {
     method: "post",
     summary: "微信登录",
   } as const,
+  adapter: bodyAdapter,
   service: onWechatLogin,
-};
+} satisfies API;
 
 // 验证token
 const verifyTokenReq = {
@@ -174,10 +179,9 @@ const verifyTokenRes = {
 } as const satisfies JSONSchema;
 
 async function onVerifyToken(
-  c: NodeHonoContext
+  params: FromSchema<typeof verifyTokenReq>
 ): Promise<FromSchema<typeof verifyTokenRes>> {
-  const obj = c.get("bodyObj") as FromSchema<typeof verifyTokenReq>;
-  const { token } = obj;
+  const { token } = params;
   const isValid = tokenUtils.verifyToken(token) !== null;
   return isValid;
 }
@@ -190,8 +194,9 @@ const verifyTokenApi = {
     method: "post",
     summary: "验证token",
   } as const,
+  adapter: bodyAdapter,
   service: onVerifyToken,
-};
+} satisfies API;
 
 // 刷新token
 const refreshTokenReq = {
@@ -220,10 +225,9 @@ const refreshTokenRes = {
 } as const satisfies JSONSchema;
 
 async function onRefreshToken(
-  c: NodeHonoContext
+  params: FromSchema<typeof refreshTokenReq>
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof refreshTokenReq>;
-  const { token } = obj;
+  const { token } = params;
   const newToken = tokenUtils.refreshToken(token);
   if (!newToken) {
     return null;
@@ -242,8 +246,9 @@ const refreshTokenApi = {
     method: "post",
     summary: "刷新token",
   } as const,
+  adapter: bodyAdapter,
   service: onRefreshToken,
-};
+} satisfies API;
 
 // 获取当前用户信息
 const profileReq = {
@@ -269,13 +274,11 @@ const profileRes = {
 } as const satisfies JSONSchema;
 
 async function onProfile(
-  c: NodeHonoContext
+  _params: FromSchema<typeof profileReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof profileRes> | null> {
-  const userObj = c.get("userObj");
   const { userId } = userObj;
-  // 设置 bodyObj for userService.get
-  c.set("bodyObj", { id: userId });
-  const userDataObj = await userService.get.service(c);
+  const userDataObj = await userService.get.service({ id: userId });
   return { userObj: userDataObj };
 }
 
@@ -287,8 +290,9 @@ const profileApi = {
     method: "post",
     summary: "获取当前用户信息",
   } as const,
+  adapter: bodyUserAdapter,
   service: onProfile,
-};
+} satisfies API;
 
 export default {
   login: loginApi,

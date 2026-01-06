@@ -26,7 +26,7 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext, RequiredKeys } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
@@ -37,6 +37,8 @@ import {
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
+import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 
 const listReq = {
   type: "object",
@@ -63,8 +65,9 @@ const listRes = {
     [...UserListKeys]
   ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -72,7 +75,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     pageSize = 10,
     keyword = "",
     isEnabled,
-  } = listParamObj;
+  } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = userTable[orderBy] || userTable.id;
   const maxPageSize = 1000;
@@ -138,8 +141,9 @@ const listApi = {
     method: "post",
     summary: "获取用户列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -153,10 +157,9 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
   const {
     username,
@@ -165,7 +168,7 @@ async function onAdd(
     roleArr,
     departmentObj,
     isEnabled,
-  } = obj;
+  } = params;
   const departmentId = departmentObj ? departmentObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
@@ -192,8 +195,9 @@ const addApi = {
     method: "post",
     summary: "添加用户",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -209,15 +213,14 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
-  const { id, departmentObj, roleArr, ...rest } = obj;
+  const { id, departmentObj, roleArr, ...rest } = params;
   const departmentId = departmentObj ? departmentObj.value : null;
   const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
-  const isEnabled = id === SUPER_ADMIN_ID ? true : obj.isEnabled; // 禁止禁用超级管理员
+  const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
     updaterId,
@@ -265,8 +268,9 @@ const updateApi = {
     method: "post",
     summary: "更新用户",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -282,10 +286,9 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   if (id === SUPER_ADMIN_ID) {
     throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
   }
@@ -308,8 +311,9 @@ const deleteApi = {
     method: "post",
     summary: "删除用户",
   } as const,
+  adapter: bodyAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -328,10 +332,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(userTable)
@@ -361,8 +364,9 @@ const getApi = {
     method: "post",
     summary: "获取用户",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 const updateLangCodeReq = {
   type: "object",
@@ -376,13 +380,12 @@ const updateLangCodeRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdateLangCode(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateLangCodeReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateLangCodeRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateLangCodeReq>;
-  const userObj = c.get("userObj");
   const { userId: id } = userObj;
   const { userId: updaterId } = userObj;
-  const { langCode } = obj;
+  const { langCode } = params;
   const res = await db
     .update(userTable)
     .set({
@@ -407,8 +410,9 @@ const updateLangCodeApi = {
     method: "post",
     summary: "更新用户语言",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdateLangCode,
-};
+} satisfies API;
 
 const updatePasswordReq = {
   type: "object",
@@ -422,13 +426,12 @@ const updatePasswordRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdatePassword(
-  c: NodeHonoContext
+  params: FromSchema<typeof updatePasswordReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updatePasswordRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updatePasswordReq>;
-  const userObj = c.get("userObj");
   const { userId: id } = userObj;
   const { userId: updaterId } = userObj;
-  const { password: base64Password } = obj;
+  const { password: base64Password } = params;
   const password = await convertPassword(base64Password);
   const res = await db
     .update(userTable)
@@ -454,8 +457,9 @@ const updatePasswordApi = {
     method: "post",
     summary: "更新用户密码",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdatePassword,
-};
+} satisfies API;
 
 async function convertPassword(base64Password: string): Promise<string> {
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
