@@ -35,6 +35,10 @@ import {
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
 
 const listReq = {
   type: "object",
@@ -59,8 +63,15 @@ const listRes = {
     [...RoleListKeys]
   ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
+
+/**
+ * 查询角色列表（纯业务逻辑）
+ * @param params 查询参数
+ * @returns 角色列表
+ */
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -68,7 +79,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     pageSize = 10,
     keyword = "",
     isEnabled,
-  } = listParamObj;
+  } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = roleTable[orderBy] || roleTable.id;
   const maxPageSize = 1000;
@@ -130,7 +141,7 @@ const listApi = {
     method: "post",
     summary: "获取角色列表",
   } as const,
-  service: onList,
+  service: bodyAdapter(onList),
 };
 
 const addReq = {
@@ -145,10 +156,9 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  obj: FromSchema<typeof addReq>,
+  userObj: any
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
   const { name, description, permissions, isEnabled } = obj;
   // 如果提供了permissions，验证是否为有效JSON数组
@@ -182,7 +192,7 @@ const addApi = {
     method: "post",
     summary: "添加角色",
   } as const,
-  service: onAdd,
+  service: bodyUserAdapter(onAdd),
 };
 
 const updateReq = {
@@ -199,10 +209,9 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  obj: FromSchema<typeof updateReq>,
+  userObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
   const { id, permissions, ...rest } = obj;
   const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : obj.isEnabled; // 禁止禁用超级管理员角色
@@ -255,7 +264,7 @@ const updateApi = {
     method: "post",
     summary: "更新角色",
   } as const,
-  service: onUpdate,
+  service: bodyUserAdapter(onUpdate),
 };
 
 const deleteReq = {
@@ -272,10 +281,10 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  obj: FromSchema<typeof deleteReq>,
+  userObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = obj;
   if (id === SUPER_ADMIN_ROLE_ID) {
     throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
   }
@@ -298,7 +307,7 @@ const deleteApi = {
     method: "post",
     summary: "删除角色",
   } as const,
-  service: onDelete,
+  service: bodyUserAdapter(onDelete),
 };
 
 const getReq = {
@@ -318,10 +327,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = obj;
   const rows = await db
     .select()
     .from(roleTable)
@@ -342,7 +350,7 @@ const getApi = {
     method: "post",
     summary: "获取角色",
   } as const,
-  service: onGet,
+  service: bodyAdapter(onGet),
 };
 
 async function getRolesByIds(
