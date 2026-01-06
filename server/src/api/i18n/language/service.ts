@@ -23,17 +23,18 @@ import { asc, count, desc, eq, or, like, inArray, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
+import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 
 const listReq = {
   type: "object",
@@ -60,8 +61,9 @@ const listRes = {
     [...LanguageListKeys]
   ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
   const {
     orderBy = "id",
     descend = true,
@@ -70,7 +72,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
     keyword = "",
     namespace,
     langCode,
-  } = listParamObj;
+  } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = languageTable[orderBy] || languageTable.id;
   const maxPageSize = 1000;
@@ -141,8 +143,9 @@ const listApi = {
     method: "post",
     summary: "获取多语言翻译列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -158,15 +161,14 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
   // 检查 tKey 是否与其他记录冲突
-  await uniqueCheck(obj);
+  await uniqueCheck(params);
   const updateData = {
-    ...obj,
+    ...params,
     creatorId,
   };
   const result = await db
@@ -184,8 +186,9 @@ const addApi = {
     method: "post",
     summary: "添加多语言翻译",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -201,14 +204,13 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
-  const { id, ...rest } = obj;
+  const { id, ...rest } = params;
   // 检查 tKey 是否与其他记录冲突
-  await uniqueCheck(obj);
+  await uniqueCheck(params);
   let updateData = {
     ...rest,
     updaterId,
@@ -235,8 +237,9 @@ const updateApi = {
     method: "post",
     summary: "更新多语言翻译",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -253,10 +256,9 @@ const deleteRes = {
 } as const satisfies JSONSchema;
 
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const result = await db
     .delete(languageTable)
     .where(eq(languageTable.id, id))
@@ -276,8 +278,9 @@ const deleteApi = {
     method: "post",
     summary: "删除多语言翻译",
   } as const,
+  adapter: bodyAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -300,10 +303,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(languageTable)
@@ -324,8 +326,9 @@ const getApi = {
     method: "post",
     summary: "获取多语言翻译",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 async function getTranslationsByIds(
   ids: number[]
@@ -383,10 +386,9 @@ const checkDuplicateRes = {
 } as const satisfies JSONSchema;
 
 async function onCheckDuplicate(
-  c: NodeHonoContext
+  params: FromSchema<typeof checkDuplicateReq>
 ): Promise<FromSchema<typeof checkDuplicateRes>> {
-  const obj = c.get("bodyObj") as FromSchema<typeof checkDuplicateReq>;
-  const { tValue, valueHash, excludeId } = obj;
+  const { tValue, valueHash, excludeId } = params;
 
   const whereCondition = excludeId
     ? and(
@@ -420,8 +422,9 @@ const checkDuplicateApi = {
     method: "post",
     summary: "检查是否有重复的翻译文案",
   } as const,
+  adapter: bodyAdapter,
   service: onCheckDuplicate,
-};
+} satisfies API;
 
 async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
   if (hasValue(obj.tKey)) {
