@@ -21,14 +21,13 @@ import {
 } from "./db.table";
 import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { HTTPException } from "hono/http-exception";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import { HTTPException } from "hono/http-exception";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import httpStatusCode from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
-import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
@@ -39,6 +38,7 @@ import {
   bodyAdapter,
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 
 const listReq = {
   type: "object",
@@ -141,8 +141,9 @@ const listApi = {
     method: "post",
     summary: "获取角色列表",
   } as const,
-  service: bodyAdapter(onList),
-};
+  adapter: bodyAdapter,
+  service: onList,
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -157,7 +158,7 @@ const addRes = {
 } as const satisfies JSONSchema;
 async function onAdd(
   obj: FromSchema<typeof addReq>,
-  userObj: any
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
   const { name, description, permissions, isEnabled } = obj;
@@ -192,8 +193,9 @@ const addApi = {
     method: "post",
     summary: "添加角色",
   } as const,
-  service: bodyUserAdapter(onAdd),
-};
+  adapter: bodyUserAdapter,
+  service: onAdd,
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -210,7 +212,7 @@ const updateRes = {
 } as const satisfies JSONSchema;
 async function onUpdate(
   obj: FromSchema<typeof updateReq>,
-  userObj
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, permissions, ...rest } = obj;
@@ -264,8 +266,9 @@ const updateApi = {
     method: "post",
     summary: "更新角色",
   } as const,
-  service: bodyUserAdapter(onUpdate),
-};
+  adapter: bodyUserAdapter,
+  service: onUpdate,
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -282,7 +285,7 @@ const deleteRes = {
 } as const satisfies JSONSchema;
 async function onDelete(
   obj: FromSchema<typeof deleteReq>,
-  userObj
+  userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
   if (id === SUPER_ADMIN_ROLE_ID) {
@@ -307,8 +310,9 @@ const deleteApi = {
     method: "post",
     summary: "删除角色",
   } as const,
-  service: bodyUserAdapter(onDelete),
-};
+  adapter: bodyUserAdapter,
+  service: onDelete,
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -350,8 +354,9 @@ const getApi = {
     method: "post",
     summary: "获取角色",
   } as const,
-  service: bodyAdapter(onGet),
-};
+  adapter: bodyAdapter,
+  service: onGet,
+} satisfies API;
 
 async function getRolesByIds(
   ids: number[]

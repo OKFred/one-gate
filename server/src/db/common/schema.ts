@@ -16,6 +16,7 @@ export const IndexPO = {
     type: "number",
     description: "id",
     examples: [1],
+    minimum: 1,
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
 
