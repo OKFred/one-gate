@@ -37,7 +37,10 @@ import {
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
-import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 
 const listReq = {
@@ -185,6 +188,11 @@ async function onAdd(
       creatorId,
     })
     .returning({ id: userTable.id });
+  if (!result || result.length === 0) {
+    throw new HTTPException(
+      httpStatusCode.INTERNAL_SERVER_ERROR as ContentfulStatusCode
+    );
+  }
   return result[0]?.id;
 }
 const addApi = {
@@ -490,7 +498,11 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-  if (userArr.length === 0) return null;
+  if (userArr.length === 0) {
+    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
+      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
+    });
+  }
   const userObj = userArr[0];
   const { departmentId, roleIdArr, ...rest } = userObj;
   const { departmentObj, roleArr } = await getDepartmentAndRoles(
