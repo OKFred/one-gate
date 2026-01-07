@@ -21,12 +21,8 @@ import {
 } from "./db.table";
 import { asc, count, desc, eq, or, like, inArray, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
@@ -35,6 +31,10 @@ import {
 } from "@/middleware/encapsulation/common.schema";
 import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 
 const listReq = {
   type: "object",
@@ -223,9 +223,7 @@ async function onUpdate(
     .where(eq(languageTable.id, id))
     .returning({ id: languageTable.id });
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return res[0].id;
 }
@@ -264,9 +262,7 @@ async function onDelete(
     .where(eq(languageTable.id, id))
     .returning({ id: languageTable.id });
   if (!result || result.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return result[0].id;
 }
@@ -312,9 +308,7 @@ async function onGet(
     .where(eq(languageTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return rows[0];
 }
@@ -440,8 +434,9 @@ async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
       )
       .limit(1);
     if (existingRecord.length > 0) {
-      throw new HTTPException(httpStatusCode.CONFLICT as ContentfulStatusCode, {
-        message: "翻译键已存在",
+      throw new BusinessError(BusinessErrorCode.DUPLICATE_KEYS, {
+        tKey: obj.tKey,
+        langCode: obj.langCode,
       });
     }
   }

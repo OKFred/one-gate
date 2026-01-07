@@ -21,20 +21,23 @@ import {
 } from "./db.table";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
-import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 
 const listReq = {
   type: "object",
@@ -162,24 +165,19 @@ async function onAdd(
       .limit(1);
 
     if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   }
   const updateData = {
     ...params,
     creatorId,
   };
-  const result = await db
+  const res = await db
     .insert(menuTable)
     .values(updateData)
     .returning({ id: menuTable.id });
 
-  return result[0]?.id;
+  return res[0]?.id;
 }
 const addApi = {
   req: addReq,
@@ -216,9 +214,7 @@ async function onUpdate(
   if (rest.parentId) {
     // 不能将自己设为父菜单
     if (rest.parentId === id) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
-      );
+      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
     }
 
     // 检查父菜单是否存在
@@ -229,12 +225,7 @@ async function onUpdate(
       .limit(1);
 
     if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   }
 
@@ -251,9 +242,7 @@ async function onUpdate(
     .returning({ id: menuTable.id });
 
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return res[0].id;
 }
@@ -296,24 +285,17 @@ async function onDelete(
     .limit(1);
 
   if (children.length > 0) {
-    throw new HTTPException(
-      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.menu.hasChildren" satisfies LanguageKey,
-      }
-    );
+    throw new BusinessError(BusinessErrorCode.MENU_HAS_CHILDREN);
   }
 
-  const result = await db
+  const res = await db
     .delete(menuTable)
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
-  if (!result || result.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  return result[0].id;
+  return res[0].id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -354,9 +336,7 @@ async function onGet(
     .limit(1);
 
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return rows[0];
 }

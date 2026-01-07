@@ -1,10 +1,6 @@
 import userService, { utils as userUtils } from "@/api/system/user/service";
 import { tokenUtils } from "@/utils/token";
-import { HTTPException } from "hono/http-exception";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { LanguageKey } from "@/types/locales";
 import type { UserObj } from "@/types/app";
 import { UserDetailKeys, UserVO } from "../user/db.table";
 import {
@@ -12,6 +8,10 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 
 // 普通登录
 const loginReq = {
@@ -68,12 +68,7 @@ async function onLogin(
     !verifyResult.userObj ||
     !verifyResult.userObj.isEnabled
   )
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.authFailed" satisfies LanguageKey,
-      }
-    );
+    throw new BusinessError(BusinessErrorCode.AUTH_FAILED);
   const userObj = verifyResult.userObj;
   const { id, ...rest } = userObj;
   // 生成token
@@ -140,12 +135,7 @@ async function onWechatLogin(
   // 暂时返回null，需要配置微信开发者信息
   console.log("微信登录暂未实现，需要配置微信AppID和AppSecret");
   console.log("收到的参数:", { code, state });
-  throw new HTTPException(
-    httpStatusCode.NOT_IMPLEMENTED as ContentfulStatusCode,
-    {
-      message: "i18n.api.system.wechatNotImplemented" satisfies LanguageKey,
-    }
-  );
+  throw new BusinessError(BusinessErrorCode.NOT_YET_IMPLEMENTED);
 }
 
 const wechatLoginApi = {

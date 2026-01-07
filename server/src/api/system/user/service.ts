@@ -189,7 +189,7 @@ async function onAdd(
     })
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   return res[0].id;
 }
@@ -260,7 +260,7 @@ async function onUpdate(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   return res[0].id;
 }
@@ -301,7 +301,7 @@ async function onDelete(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   return res[0].id;
 }
@@ -343,7 +343,7 @@ async function onGet(
     .where(eq(userTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   const { password, departmentId, roleIdArr, ...rest } = rows[0];
   const { departmentObj, roleArr } = await getDepartmentAndRoles(
@@ -396,7 +396,7 @@ async function onUpdateLangCode(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   return res[0].id;
 }
@@ -441,7 +441,7 @@ async function onUpdatePassword(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   return res[0].id;
 }
@@ -487,7 +487,7 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     .where(eq(userTable.username, username))
     .limit(1);
   if (userArr.length === 0) {
-    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   const userObj = userArr[0];
   const { departmentId, roleIdArr, ...rest } = userObj;

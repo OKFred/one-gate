@@ -22,11 +22,7 @@ import {
 import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import type { LanguageKey } from "@/types/locales";
-import { HTTPException } from "hono/http-exception";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
@@ -39,6 +35,10 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 
 const listReq = {
   type: "object",
@@ -166,9 +166,7 @@ async function onAdd(
   if (hasValue(permissions)) {
     const parsed = JSON.parse(permissions);
     if (!Array.isArray(parsed)) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
-      );
+      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
     }
   }
 
@@ -229,9 +227,7 @@ async function onUpdate(
   if (hasValue(permissions)) {
     const parsed = JSON.parse(permissions);
     if (!Array.isArray(parsed)) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
-      );
+      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
     }
   }
   if (permissions !== undefined) {
@@ -252,9 +248,7 @@ async function onUpdate(
     .where(eq(roleTable.id, id))
     .returning({ id: roleTable.id });
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return res[0].id;
 }
@@ -289,16 +283,14 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
   if (id === SUPER_ADMIN_ROLE_ID) {
-    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
+    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
   }
   const result = await db
     .delete(roleTable)
     .where(eq(roleTable.id, id))
     .returning({ id: roleTable.id });
   if (!result || result.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return result[0].id;
 }
@@ -340,9 +332,7 @@ async function onGet(
     .where(eq(roleTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return rows[0];
 }
