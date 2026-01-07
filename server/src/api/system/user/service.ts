@@ -24,12 +24,8 @@ import { utils as roleUtils } from "@/api/system/role/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
@@ -42,6 +38,10 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 
 const listReq = {
   type: "object",
@@ -176,7 +176,7 @@ async function onAdd(
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
 
-  const result = await db
+  const res = await db
     .insert(userTable)
     .values({
       username,
@@ -188,12 +188,10 @@ async function onAdd(
       creatorId,
     })
     .returning({ id: userTable.id });
-  if (!result || result.length === 0) {
-    throw new HTTPException(
-      httpStatusCode.INTERNAL_SERVER_ERROR as ContentfulStatusCode
-    );
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
-  return result[0]?.id;
+  return res[0].id;
 }
 const addApi = {
   req: addReq,
@@ -262,9 +260,7 @@ async function onUpdate(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
   return res[0].id;
 }
@@ -298,18 +294,16 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
   if (id === SUPER_ADMIN_ID) {
-    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
+    throw new BusinessError(BusinessErrorCode["PERMISSION_DENIED"]);
   }
-  const result = await db
+  const res = await db
     .delete(userTable)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!result || result.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
-  return result[0].id;
+  return res[0].id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -349,9 +343,7 @@ async function onGet(
     .where(eq(userTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
   const { password, departmentId, roleIdArr, ...rest } = rows[0];
   const { departmentObj, roleArr } = await getDepartmentAndRoles(
@@ -404,9 +396,7 @@ async function onUpdateLangCode(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
   return res[0].id;
 }
@@ -451,9 +441,7 @@ async function onUpdatePassword(
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
   return res[0].id;
 }
@@ -499,9 +487,7 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     .where(eq(userTable.username, username))
     .limit(1);
   if (userArr.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode["RECORD_NOT_FOUND"]);
   }
   const userObj = userArr[0];
   const { departmentId, roleIdArr, ...rest } = userObj;
