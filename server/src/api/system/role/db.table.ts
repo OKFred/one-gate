@@ -61,8 +61,8 @@ type RoleUpdatePOLike = Partial<
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const RoleUniqueVO = RoleUniquePO;
-const RoleBaseVO = RoleBasePO;
+export const RoleUniqueVO = RoleUniquePO;
+export const RoleBaseVO = RoleBasePO;
 export const RoleVO = {
   ...IndexVO,
   ...RoleUniqueVO,
@@ -108,6 +108,15 @@ const RoleBaseKeys = [
 ] as const satisfies RequiredKeys<RolePOLike>[];
 export const RoleListKeys = RoleBaseKeys;
 export const RoleDetailKeys = RoleBaseKeys;
+export const RoleUniqueKeys = ["name"] as const;
+
+// 可排序字段（解耦供 service 使用）
+export const RoleSortableKeys = [
+  "id",
+  "name",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<RolePOLike>[];
 
 export const roleTable = sqliteTable("system_role", {
   id: integer("id").primaryKey().notNull(),

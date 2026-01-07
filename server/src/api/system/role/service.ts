@@ -12,12 +12,16 @@ import {
   RoleDeleteKeys,
   RoleAddKeys,
   RoleUpdateKeys,
+  RoleSortableKeys,
   type RolePOLike,
   type RoleVOLike,
   type RoleAddVOLike,
   type RoleUpdateVOLike,
   type RoleDeleteVOLike,
   type RoleGetVOLike,
+  RoleBaseVO,
+  RoleUniqueKeys,
+  RoleUniqueVO,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -26,6 +30,7 @@ import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
+  listAllReqBase,
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
@@ -40,17 +45,87 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(or(like(roleTable.name, `%${keyword}%`)));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(roleTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: RoleVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof RolePOLike)[]>(RoleSortableKeys),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...RoleBaseVO,
+      ...RoleUniqueVO,
+    },
+    required: [...RoleGetKeys, ...RoleUniqueKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = roleTable[orderBy] || roleTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: roleTable.id,
+      name: roleTable.name,
+      description: roleTable.description,
+      permissions: roleTable.permissions,
+      isEnabled: roleTable.isEnabled,
+    })
+    .from(roleTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有角色（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
+
 const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    orderBy: orderByWrapper<(keyof RolePOLike)[]>([
-      "id",
-      "name",
-      "isEnabled",
-      "createTimeUtc",
-    ]),
-    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
+    isEnabled: RoleVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof RolePOLike)[]>(RoleSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -72,40 +147,17 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    isEnabled,
-  } = params;
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = roleTable[orderBy] || roleTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(or(like(roleTable.name, `%${keyword}%`)));
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(roleTable.isEnabled, isEnabled));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
-
   // 查询总数
   const countResult = await db
     .select({ total: count(roleTable.id).as("total") })
     .from(roleTable)
-    .where(buildWhereCondition());
+    .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -120,7 +172,7 @@ async function onList(
   const rows = await db
     .select()
     .from(roleTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -379,6 +431,7 @@ export const utils = {
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   update: updateApi,

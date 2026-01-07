@@ -122,6 +122,14 @@ const MenuBaseKeys = [
 export const MenuListKeys = MenuBaseKeys;
 export const MenuDetailKeys = MenuBaseKeys;
 
+// 可排序字段（解耦供 service 使用）
+export const MenuSortableKeys = [
+  "id",
+  "name",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<MenuPOLike>[];
+
 export const menuTable = sqliteTable("system_menu", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull(),

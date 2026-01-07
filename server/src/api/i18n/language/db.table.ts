@@ -142,6 +142,14 @@ const LanguageBaseKeys = [
 
 export const LanguageListKeys = LanguageBaseKeys;
 export const LanguageDetailKeys = LanguageBaseKeys;
+export const LanguageSortableKeys = [
+  "id",
+  "application",
+  "business",
+  "langCode",
+  "tKey",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<LanguagePOLike>[];
 
 export const languageTable = sqliteTable(
   "i18n_language",

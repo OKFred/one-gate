@@ -104,6 +104,13 @@ const DepartmentBaseKeys = [
 export const DepartmentListKeys = DepartmentBaseKeys;
 export const DepartmentDetailKeys = DepartmentBaseKeys;
 
+// 可排序字段（解耦供 service 使用）
+export const DepartmentSortableKeys = [
+  "id",
+  "name",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<DepartmentPOLike>[];
+
 export const departmentTable = sqliteTable("system_department", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull().unique(),

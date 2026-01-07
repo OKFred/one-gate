@@ -12,6 +12,7 @@ import {
   LanguageDeleteKeys,
   LanguageAddKeys,
   LanguageUpdateKeys,
+  LanguageSortableKeys,
   type LanguagePOLike,
   type LanguageVOLike,
   type LanguageAddVOLike,
@@ -25,6 +26,7 @@ import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import hasValue from "@/utils/hasValue";
 import {
+  listAllReqBase,
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
@@ -77,19 +79,11 @@ const buildWhereCondition = ({
 const listAllReq = {
   type: "object",
   properties: {
+    ...listAllReqBase,
     application: LanguageVO["application"],
     business: LanguageVO["business"],
     langCode: LanguageVO["langCode"],
-    keyword: { type: "string", description: "关键字搜索" },
-    descend: { type: "boolean", description: "是否降序" },
-    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>([
-      "id",
-      "application",
-      "business",
-      "langCode",
-      "tKey",
-      "createTimeUtc",
-    ]),
+    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -106,7 +100,7 @@ const listAllRes = {
       tKey: LanguageVO.tKey,
       tValue: LanguageVO.tValue,
     },
-    required: ["id", "application", "business", "langCode", "tKey", "tValue"],
+    required: [...LanguageGetKeys],
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
@@ -148,17 +142,10 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>([
-      "id",
-      "application",
-      "business",
-      "langCode",
-      "tKey",
-      "createTimeUtc",
-    ]),
     application: LanguageVO["application"],
     business: LanguageVO["business"],
     langCode: LanguageVO["langCode"],
+    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -174,16 +161,7 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    application,
-    business,
-    langCode,
-  } = params;
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = languageTable[orderBy] || languageTable.id;
   const maxPageSize = 1000;

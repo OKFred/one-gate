@@ -84,7 +84,12 @@ const UserDepartmentDTO = {
     nullable: true,
     description: "部门对象",
     properties: {
-      value: { type: "number", description: "部门ID", examples: [1], minimum: 1 },
+      value: {
+        type: "number",
+        description: "部门ID",
+        examples: [1],
+        minimum: 1,
+      },
       label: {
         type: "string",
         description: "部门名称",
@@ -103,7 +108,12 @@ const UserRoleDTO = {
     items: {
       type: "object",
       properties: {
-        value: { type: "number", description: "角色ID", examples: [1], minimum: 1 },
+        value: {
+          type: "number",
+          description: "角色ID",
+          examples: [1],
+          minimum: 1,
+        },
         label: {
           type: "string",
           description: "角色名称",
@@ -124,8 +134,8 @@ type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const UserUniqueVO = UserUniquePO;
-const UserBaseVO = {
+export const UserUniqueVO = UserUniquePO;
+export const UserBaseVO = {
   langCode: {
     type: "string",
     description: "语言代码",
@@ -207,6 +217,17 @@ export const UserDetailKeys = [
   "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserVOLike>[];
+export const UserUniqueKeys = ["username"] as const;
+
+// 可排序字段（解耦供 service 使用）
+export const UserSortableKeys = [
+  "id",
+  "username",
+  "langCode",
+  "departmentId",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<UserPOLike>[];
 
 //----------------- Table ----------------//
 export const userTable = sqliteTable("system_user", {

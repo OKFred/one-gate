@@ -2,6 +2,8 @@ import db from "@/db/index";
 import {
   userTable,
   IndexVO,
+  UserUniqueVO,
+  UserBaseVO,
   UserVO,
   UserListVO,
   UserAddVO,
@@ -12,6 +14,8 @@ import {
   UserDeleteKeys,
   UserAddKeys,
   UserUpdateKeys,
+  UserUniqueKeys,
+  UserSortableKeys,
   type UserPOLike,
   type UserVOLike,
   type UserAddVOLike,
@@ -29,6 +33,7 @@ import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
+  listAllReqBase,
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
@@ -43,19 +48,88 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(or(like(userTable.username, `%${keyword}%`)));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(userTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: UserVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof UserPOLike)[]>(UserSortableKeys),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...UserUniqueVO,
+      ...UserBaseVO,
+    },
+    required: [...UserGetKeys, ...UserUniqueKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = userTable[orderBy] || userTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: userTable.id,
+      username: userTable.username,
+      langCode: userTable.langCode,
+      departmentId: userTable.departmentId,
+      roleIdArr: userTable.roleIdArr,
+      isEnabled: userTable.isEnabled,
+    })
+    .from(userTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有用户（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
+
 const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    orderBy: orderByWrapper<(keyof UserPOLike)[]>([
-      "id",
-      "username",
-      "langCode",
-      "departmentId",
-      "isEnabled",
-      "createTimeUtc",
-    ]),
-    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
+    isEnabled: UserVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof UserPOLike)[]>(UserSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -71,40 +145,17 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    isEnabled,
-  } = params;
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = userTable[orderBy] || userTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(or(like(userTable.username, `%${keyword}%`)));
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(userTable.isEnabled, isEnabled));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
-
   // 查询总数
   const countResult = await db
     .select({ total: count(userTable.id).as("total") })
     .from(userTable)
-    .where(buildWhereCondition());
+    .where(buildWhereCondition(params));
   const total = countResult[0]?.total;
   if (total === 0) {
     return {
@@ -119,7 +170,7 @@ async function onList(
   const rows = await db
     .select()
     .from(userTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -539,6 +590,7 @@ export const utils = {
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   update: updateApi,

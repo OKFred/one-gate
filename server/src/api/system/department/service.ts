@@ -12,6 +12,7 @@ import {
   DepartmentDeleteKeys,
   DepartmentAddKeys,
   DepartmentUpdateKeys,
+  DepartmentSortableKeys,
   type DepartmentPOLike,
   type DepartmentVOLike,
   type DepartmentAddVOLike,
@@ -39,21 +40,36 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+  parentId,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled" | "parentId">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(like(departmentTable.name, `%${keyword}%`));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(departmentTable.isEnabled, isEnabled));
+  }
+  if (parentId !== undefined) {
+    conditions.push(eq(departmentTable.parentId, parentId));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
 const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    orderBy: orderByWrapper<(keyof DepartmentPOLike)[]>([
-      "id",
-      "name",
-      "createTimeUtc",
-    ]),
-    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
-    parentId: {
-      type: "number",
-      description: "父部门ID过滤",
-      minimum: 1,
-    },
+    isEnabled: DepartmentVO["isEnabled"],
+    parentId: { ...{ ...IndexVO.id, description: "父部门ID" } },
+    orderBy: orderByWrapper<(keyof DepartmentPOLike)[]>(DepartmentSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -69,42 +85,16 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    isEnabled,
-    parentId,
-  } = params;
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(like(departmentTable.name, `%${keyword}%`));
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(departmentTable.isEnabled, isEnabled));
-    }
-    if (parentId !== undefined) {
-      conditions.push(eq(departmentTable.parentId, parentId));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
   // 查询总数
   const countResult = await db
     .select({ total: count(departmentTable.id) })
     .from(departmentTable)
-    .where(buildWhereCondition());
+    .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -119,7 +109,7 @@ async function onList(
   const rows = await db
     .select()
     .from(departmentTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(descend ? desc(orderField) : asc(orderField))
     .limit(finalPageSize)
     .offset(offset);
