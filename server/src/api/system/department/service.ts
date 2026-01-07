@@ -52,6 +52,7 @@ const listReq = {
     parentId: {
       type: "number",
       description: "父部门ID过滤",
+      minimum: 1,
     },
   },
   required: [],

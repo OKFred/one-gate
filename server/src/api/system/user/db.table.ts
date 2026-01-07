@@ -49,6 +49,7 @@ const UserBasePO = {
     nullable: true,
     description: "部门ID",
     examples: [1],
+    minimum: 1,
   },
   roleIdArr: {
     type: "array",
@@ -56,6 +57,7 @@ const UserBasePO = {
     items: {
       type: "number",
       examples: [1],
+      minimum: 1,
     },
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
@@ -82,7 +84,7 @@ const UserDepartmentDTO = {
     nullable: true,
     description: "部门对象",
     properties: {
-      value: { type: "number", description: "部门ID", examples: [1] },
+      value: { type: "number", description: "部门ID", examples: [1], minimum: 1 },
       label: {
         type: "string",
         description: "部门名称",
@@ -101,7 +103,7 @@ const UserRoleDTO = {
     items: {
       type: "object",
       properties: {
-        value: { type: "number", description: "角色ID", examples: [1] },
+        value: { type: "number", description: "角色ID", examples: [1], minimum: 1 },
         label: {
           type: "string",
           description: "角色名称",

@@ -35,6 +35,7 @@ const DepartmentBasePO = {
     type: ["number", "null"],
     nullable: true,
     description: "父部门ID，支持部门层级",
+    minimum: 1,
   },
   isEnabled: {
     type: "boolean",

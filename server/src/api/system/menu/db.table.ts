@@ -41,16 +41,19 @@ const MenuBasePO = {
     type: ["number", "null"],
     nullable: true,
     description: "父菜单ID，支持菜单层级",
+    minimum: 1,
   },
   sort: {
     type: "number",
     description: "排序",
+    minimum: 0,
+    maximum: 1000,
   },
   roleIdArr: {
     type: ["array", "null"],
     nullable: true,
     description: "需要的角色ID列表",
-    items: { type: "number", examples: [1]},
+    items: { type: "number", examples: [1], minimum: 1 },
   },
   isEnabled: {
     type: "boolean",
