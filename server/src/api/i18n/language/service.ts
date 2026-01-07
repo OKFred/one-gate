@@ -39,6 +39,111 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  application,
+  business,
+  langCode,
+}: Pick<
+  FromSchema<typeof listReq>,
+  "keyword" | "application" | "business" | "langCode"
+>) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(
+      or(
+        like(languageTable.tKey, `%${keyword}%`),
+        like(languageTable.tValue, `%${keyword}%`)
+      )
+    );
+  }
+  if (hasValue(application)) {
+    conditions.push(eq(languageTable.application, application));
+  }
+  if (hasValue(business)) {
+    conditions.push(eq(languageTable.business, business));
+  }
+  if (hasValue(langCode)) {
+    conditions.push(eq(languageTable.langCode, langCode));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    application: LanguageVO["application"],
+    business: LanguageVO["business"],
+    langCode: LanguageVO["langCode"],
+    keyword: { type: "string", description: "关键字搜索" },
+    descend: { type: "boolean", description: "是否降序" },
+    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>([
+      "id",
+      "application",
+      "business",
+      "langCode",
+      "tKey",
+      "createTimeUtc",
+    ]),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      id: IndexVO.id,
+      application: LanguageVO.application,
+      business: LanguageVO.business,
+      langCode: LanguageVO.langCode,
+      tKey: LanguageVO.tKey,
+      tValue: LanguageVO.tValue,
+    },
+    required: ["id", "application", "business", "langCode", "tKey", "tValue"],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = languageTable[orderBy] || languageTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: languageTable.id,
+      application: languageTable.application,
+      business: languageTable.business,
+      langCode: languageTable.langCode,
+      tKey: languageTable.tKey,
+      tValue: languageTable.tValue,
+    })
+    .from(languageTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有多语言翻译（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
+
 const listReq = {
   type: "object",
   properties: {
@@ -84,39 +189,11 @@ async function onList(
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(
-        or(
-          like(languageTable.tKey, `%${keyword}%`),
-          like(languageTable.tValue, `%${keyword}%`),
-          like(languageTable.description, `%${keyword}%`)
-        )
-      );
-    }
-    if (hasValue(application)) {
-      conditions.push(eq(languageTable.application, application));
-    }
-    if (hasValue(business)) {
-      conditions.push(eq(languageTable.business, business));
-    }
-    if (hasValue(langCode)) {
-      conditions.push(eq(languageTable.langCode, langCode));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
-
   // 查询总数
   const countResult = await db
     .select({ total: count(languageTable.id).as("total") })
     .from(languageTable)
-    .where(buildWhereCondition());
+    .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -131,7 +208,7 @@ async function onList(
   const rows = await db
     .select()
     .from(languageTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -448,6 +525,7 @@ export const utils = {
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   update: updateApi,
