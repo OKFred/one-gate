@@ -108,6 +108,33 @@ export const LanguageUpdateVO = {
   ...LanguageUniqueVO,
   ...LanguageBaseVO,
 } as const satisfies Partial<Record<keyof LanguageVOLike, JSONSchema>>; // 更新
+
+// 检查重复请求 VO
+export const CheckDuplicateReqVO = {
+  tValue: LanguageBasePO.tValue,
+  valueHash: LanguageBasePO.valueHash,
+  excludeId: { ...IndexPO.id },
+} as const satisfies Record<string, JSONSchema>;
+
+// 检查重复响应 VO
+export const CheckDuplicateResVO = {
+  hasDuplicate: { type: "boolean" },
+  duplicates: {
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        id: IndexPO.id,
+        application: LanguageBasePO.application,
+        business: LanguageBasePO.business,
+        langCode: LanguageBasePO.langCode,
+        tKey: LanguageUniquePO.tKey,
+        tValue: LanguageBasePO.tValue,
+      },
+    },
+  },
+} as const satisfies Record<string, JSONSchema>;
+
 export type LanguageVOLike = LanguagePOLike;
 export type LanguageAddVOLike = Omit<LanguageAddPOLike, "creatorId">;
 export type LanguageUpdateVOLike = LanguageUpdatePOLike;
@@ -138,6 +165,9 @@ const LanguageBaseKeys = [
   ...LanguageAddKeys,
   ...AuditKeys,
 ] as const satisfies RequiredKeys<LanguagePOLike>[];
+
+export const CheckDuplicateReqKeys = ["valueHash"] as const;
+export const CheckDuplicateResKeys = ["hasDuplicate", "duplicates"] as const;
 export const LanguageListKeys = LanguageBaseKeys;
 export const LanguageDetailKeys = LanguageBaseKeys;
 

@@ -12,6 +12,10 @@ import {
   LanguageDeleteKeys,
   LanguageAddKeys,
   LanguageUpdateKeys,
+  CheckDuplicateReqVO,
+  CheckDuplicateResVO,
+  CheckDuplicateReqKeys,
+  CheckDuplicateResKeys,
   type LanguagePOLike,
   type LanguageVOLike,
   type LanguageAddVOLike,
@@ -348,47 +352,18 @@ async function getTranslationsByIds(
 const checkDuplicateReq = {
   type: "object",
   properties: {
-    tValue: {
-      type: "string",
-      description: "翻译值",
-      maxLength: 500,
-    },
-    valueHash: {
-      type: "string",
-      description: "值的SHA256哈希",
-      maxLength: 100,
-    },
-    excludeId: {
-      type: ["number", "null"],
-      nullable: true,
-      description: "排除的ID（编辑时使用）",
-      minimum: 1,
-    },
+    ...CheckDuplicateReqVO,
   },
-  required: ["valueHash"] as const,
+  required: [...CheckDuplicateReqKeys],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const checkDuplicateRes = {
   type: "object",
   properties: {
-    hasDuplicate: { type: "boolean" },
-    duplicates: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          id: { type: "number", minimum: 1 },
-          application: { type: "string", maxLength: 100 },
-          business: { type: "string", maxLength: 100 },
-          langCode: { type: "string", maxLength: 10 },
-          tKey: { type: "string", maxLength: 100 },
-          tValue: { type: "string", maxLength: 500 },
-        },
-      },
-    },
+    ...CheckDuplicateResVO,
   },
-  required: ["hasDuplicate", "duplicates"],
+  required: [...CheckDuplicateResKeys],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
