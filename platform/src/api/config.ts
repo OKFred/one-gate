@@ -89,7 +89,7 @@ function setupInterceptors(service: AxiosInstance) {
       if (response.status === 200) {
         // 检查响应数据中的 ok 字段
         if (!response.data || response.data?.ok === false) {
-          const errorMessage = extractServerMessage(response) || '请求失败';
+          const errorMessage = response.data.message || '请求失败';
           handleErrorResponse(errorMessage);
           return Promise.reject(response);
         }
@@ -98,13 +98,12 @@ function setupInterceptors(service: AxiosInstance) {
     },
     function (error) {
       const status = error.response?.status;
-      const serverMessage = extractServerMessage(error.response);
 
       // 401 未授权：清理并跳转登录
       if (status === 401) {
         if (window.location.pathname !== '/login') {
           showGlobalNotification({
-            message: serverMessage || '登录已过期，请重新登录',
+            message: '登录已过期，请重新登录',
             type: 'warning',
             beforeClose: (action, instance, done) => {
               console.log(action, instance);
@@ -113,23 +112,18 @@ function setupInterceptors(service: AxiosInstance) {
               done();
             },
           });
+        } else {
+          handleErrorResponse('登录失败，请检查用户名和密码');
         }
         return Promise.reject(error);
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(serverMessage || error.message || '网络错误');
+      handleErrorResponse(error.message || '网络错误');
       return Promise.reject(error);
     },
   );
   return service;
-}
-
-function extractServerMessage(response?: AxiosResponse | undefined) {
-  if (!response) return '';
-  const data = response.data;
-  if (typeof data?.message === 'string') return data.message;
-  return '';
 }
 
 function handleErrorResponse(errorMessage: string) {
