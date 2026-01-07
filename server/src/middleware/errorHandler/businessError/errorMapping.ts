@@ -13,6 +13,10 @@ export const BusinessErrorCode = {
   DUPLICATE_KEYS: "DUPLICATE_KEYS",
   /** @description 功能暂未实现 */
   NOT_YET_IMPLEMENTED: "NOT_YET_IMPLEMENTED",
+  /** @description 部门不存在或已被禁用 */
+  DEPARTMENT_NOT_EXIST: "DEPARTMENT_NOT_EXIST",
+  /** @description 角色不存在或已被禁用 */
+  ROLE_NOT_EXIST: "ROLE_NOT_EXIST",
 } as const;
 
 export type BusinessErrorCode =
@@ -28,6 +32,12 @@ export const ERROR_PRESENTATION_MAP: Record<
 > = {
   HAS_CHILDREN: {
     i18nKey: "i18n.api.system.hasChildren",
+  },
+  DEPARTMENT_NOT_EXIST: {
+    i18nKey: "i18n.api.system.departmentNotExist",
+  },
+  ROLE_NOT_EXIST: {
+    i18nKey: "i18n.api.system.roleNotExist",
   },
   INVALID_PARAMS: {
     status: 400,

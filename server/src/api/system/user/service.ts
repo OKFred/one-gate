@@ -105,7 +105,7 @@ async function onList(
     .select({ total: count(userTable.id).as("total") })
     .from(userTable)
     .where(buildWhereCondition());
-  const total = countResult[0]?.total || 0;
+  const total = countResult[0]?.total;
   if (total === 0) {
     return {
       total,
@@ -176,6 +176,10 @@ async function onAdd(
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
 
+  await departmentUtils.verifyDepartment(departmentId);
+  await roleUtils.verifyRoles(roleIdArr);
+
+  // 插入用户数据
   const res = await db
     .insert(userTable)
     .values({
@@ -224,8 +228,6 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, departmentObj, roleArr, ...rest } = params;
-  const departmentId = departmentObj ? departmentObj.value : null;
-  const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
   const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
@@ -237,12 +239,16 @@ async function onUpdate(
     isEnabled: undefined,
   };
   if (departmentObj !== undefined) {
+    const departmentId = departmentObj ? departmentObj.value : null;
+    await departmentUtils.verifyDepartment(departmentId);
     updateData = {
       ...updateData,
       departmentId,
     };
   }
   if (roleArr !== undefined) {
+    const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
+    await roleUtils.verifyRoles(roleIdArr);
     updateData = {
       ...updateData,
       roleIdArr,
@@ -254,6 +260,7 @@ async function onUpdate(
       isEnabled,
     };
   }
+
   const res = await db
     .update(userTable)
     .set(updateData)
@@ -463,7 +470,13 @@ async function convertPassword(base64Password: string): Promise<string> {
   return hashedPassword;
 }
 
-async function verifyUsernameAndPassword({ username, password }): Promise<{
+async function verifyUsernameAndPassword({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}): Promise<{
   userObj?: Omit<UserVOLike, "password">;
   valid: boolean;
 }> {

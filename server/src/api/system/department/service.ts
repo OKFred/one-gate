@@ -371,16 +371,6 @@ const getApi = {
   service: onGet,
 } satisfies API;
 
-/** @description 根据ID获取部门名称 */
-async function getDepartmentNameById(id: number): Promise<string | null> {
-  const rows = await db
-    .select({ name: departmentTable.name })
-    .from(departmentTable)
-    .where(eq(departmentTable.id, id))
-    .limit(1);
-  return rows.length > 0 ? rows[0].name : null;
-}
-
 const treeReq = {
   type: "object",
   properties: {
@@ -392,12 +382,10 @@ const treeReq = {
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 // 定义递归类型用于树形结构
 type DepartmentTreeItem = DepartmentVOLike & {
   children: DepartmentTreeItem[];
 };
-
 const departmentTreeItemSchema: JSONSchema = {
   type: "object",
   properties: {
@@ -415,12 +403,10 @@ const departmentTreeItemSchema: JSONSchema = {
   required: [...DepartmentDetailKeys, "children"],
   additionalProperties: false,
 };
-
 const treeRes = {
   type: "array",
   items: departmentTreeItemSchema,
 } as const satisfies JSONSchema;
-
 async function onTree(
   params: FromSchema<typeof treeReq>
 ): Promise<DepartmentTreeItem[]> {
@@ -470,18 +456,26 @@ const treeApi = {
   service: onTree,
 } satisfies API;
 
+/** @description 根据ID获取部门名称 */
+async function getDepartmentNameById(id: number): Promise<string | null> {
+  const rows = await db
+    .select({ name: departmentTable.name })
+    .from(departmentTable)
+    .where(eq(departmentTable.id, id))
+    .limit(1);
+  return rows.length > 0 ? rows[0].name : null;
+}
+
+async function verifyDepartment(departmentId: number) {
+  const departmentName = await getDepartmentNameById(departmentId);
+  if (!departmentName) {
+    throw new BusinessError(BusinessErrorCode["DEPARTMENT_NOT_EXIST"]);
+  }
+}
+
 export const utils = {
   getDepartmentNameById,
-};
-
-// 业务函数导出，便于非 HTTP 场景复用
-export const services = {
-  onList,
-  onAdd,
-  onUpdate,
-  onDelete,
-  onGet,
-  onTree,
+  verifyDepartment,
 };
 
 export default {

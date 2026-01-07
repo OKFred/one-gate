@@ -359,8 +359,23 @@ async function getRolesByIds(
   return rows;
 }
 
+async function verifyRoles(roleIdArr: number[]) {
+  const rows = await getRolesByIds(roleIdArr);
+  // 检查返回的角色数量是否与请求的数量一致
+  if (rows.length !== roleIdArr.length) {
+    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
+  }
+  // 检查每个请求的角色ID是否都在返回结果中
+  const returnedRoleIds = rows.map((r) => r.value);
+  const allRolesExist = roleIdArr.every((id) => returnedRoleIds.includes(id));
+  if (!allRolesExist) {
+    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
+  }
+}
+
 export const utils = {
   getRolesByIds,
+  verifyRoles,
 };
 
 export default {
