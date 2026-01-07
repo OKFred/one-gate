@@ -17,11 +17,14 @@ export class BusinessError extends Error {
 
 export function toHttpException(err: BusinessError) {
   const presentation = ERROR_PRESENTATION_MAP[err.code];
-  return new HTTPException(presentation.status as ContentfulStatusCode, {
-    message: presentation.i18nKey,
-    cause: {
-      code: err.code || undefined,
-      params: err.meta || undefined,
-    },
-  });
+  return new HTTPException(
+    (presentation.status || 200) as ContentfulStatusCode,
+    {
+      message: presentation.i18nKey,
+      cause: {
+        code: err.code || undefined,
+        params: err.meta || undefined,
+      },
+    }
+  );
 }

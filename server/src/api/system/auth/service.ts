@@ -68,7 +68,7 @@ async function onLogin(
     !verifyResult.userObj ||
     !verifyResult.userObj.isEnabled
   )
-    throw new BusinessError(BusinessErrorCode.AUTH_FAILED);
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   const userObj = verifyResult.userObj;
   const { id, ...rest } = userObj;
   // 生成token

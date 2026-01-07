@@ -19,7 +19,7 @@ import {
   type DepartmentDeleteVOLike,
   type DepartmentGetVOLike,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -298,7 +298,7 @@ async function onDelete(
     .limit(1);
 
   if (children.length > 0) {
-    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_CHILDREN);
+    throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
   }
 
   const result = await db

@@ -285,7 +285,7 @@ async function onDelete(
     .limit(1);
 
   if (children.length > 0) {
-    throw new BusinessError(BusinessErrorCode.MENU_HAS_CHILDREN);
+    throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
   }
 
   const res = await db
