@@ -12,10 +12,6 @@ import {
   LanguageDeleteKeys,
   LanguageAddKeys,
   LanguageUpdateKeys,
-  CheckDuplicateReqVO,
-  CheckDuplicateResVO,
-  CheckDuplicateReqKeys,
-  CheckDuplicateResKeys,
   type LanguagePOLike,
   type LanguageVOLike,
   type LanguageAddVOLike,
@@ -55,9 +51,9 @@ const listReq = {
       "tKey",
       "createTimeUtc",
     ]),
-    application: { type: "string", description: "应用过滤", maxLength: 100 },
-    business: { type: "string", description: "业务过滤", maxLength: 100 },
-    langCode: { type: "string", description: "语言代码过滤", maxLength: 10 },
+    application: LanguageVO["application"],
+    business: LanguageVO["business"],
+    langCode: LanguageVO["langCode"],
   },
   required: [],
   additionalProperties: false,
@@ -352,18 +348,34 @@ async function getTranslationsByIds(
 const checkDuplicateReq = {
   type: "object",
   properties: {
-    ...CheckDuplicateReqVO,
+    tValue: LanguageVO.tValue,
+    valueHash: LanguageVO.valueHash,
+    excludeId: IndexVO.id,
   },
-  required: [...CheckDuplicateReqKeys],
+  required: ["tValue", "valueHash"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const checkDuplicateRes = {
   type: "object",
   properties: {
-    ...CheckDuplicateResVO,
+    hasDuplicate: { type: "boolean", description: "是否有重复" },
+    duplicates: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: IndexVO.id,
+          application: LanguageVO.application,
+          business: LanguageVO.business,
+          langCode: LanguageVO.langCode,
+          tKey: LanguageVO.tKey,
+          tValue: LanguageVO.tValue,
+        },
+      },
+    },
   },
-  required: [...CheckDuplicateResKeys],
+  required: ["hasDuplicate", "duplicates"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
