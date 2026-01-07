@@ -30,6 +30,7 @@ import * as i18nAPI from '@/api/i18n/language';
 import type { ListLanguage, FilterState, ListLanguageRequest } from '../type';
 import type { Props } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import dayjs from 'dayjs';
 
 // 暴露给父组件的方法
 export interface LanguageTableRef {
@@ -190,7 +191,7 @@ const LanguageTable = memo(
     // 格式化时间
     const formatTime = (timestamp?: number | null) => {
       if (!timestamp) return '-';
-      return new Date(timestamp).toLocaleString('zh-CN');
+      return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
     };
 
     if (loading) {
@@ -223,8 +224,18 @@ const LanguageTable = memo(
                           {i18n.tKey}
                         </Typography>
                         <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                          <Chip label={i18n.application} size="small" color="primary" variant="outlined" />
-                          <Chip label={i18n.business} size="small" color="secondary" variant="outlined" />
+                          <Chip
+                            label={i18n.application}
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                          />
+                          <Chip
+                            label={i18n.business}
+                            size="small"
+                            color="secondary"
+                            variant="outlined"
+                          />
                           <Chip label={i18n.langCode} size="small" variant="outlined" />
                         </Stack>
                         <Typography variant="body2" color="text.secondary">
@@ -238,7 +249,12 @@ const LanguageTable = memo(
                     </Typography>
 
                     {i18n.description && (
-                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        display="block"
+                        sx={{ mb: 1 }}
+                      >
                         描述: {i18n.description}
                       </Typography>
                     )}
@@ -342,10 +358,20 @@ const LanguageTable = memo(
                   <TableRow key={i18n.id} hover>
                     <TableCell>{i18n.id}</TableCell>
                     <TableCell>
-                      <Chip label={i18n.application} size="small" color="primary" variant="outlined" />
+                      <Chip
+                        label={i18n.application}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
                     </TableCell>
                     <TableCell>
-                      <Chip label={i18n.business} size="small" color="secondary" variant="outlined" />
+                      <Chip
+                        label={i18n.business}
+                        size="small"
+                        color="secondary"
+                        variant="outlined"
+                      />
                     </TableCell>
                     <TableCell>
                       <Chip label={i18n.langCode} size="small" variant="outlined" />

@@ -30,6 +30,7 @@ import * as roleAPI from '@/api/system/role';
 import type { ListRole, FilterState } from '../type.d';
 import type { Props } from '../type.d';
 import { useResponsive } from '@/hooks/useResponsive';
+import dayjs from 'dayjs';
 
 // 暴露给父组件的方法
 export interface RoleTableRef {
@@ -175,7 +176,7 @@ const RoleTable = memo(
     // 格式化时间
     const formatTime = (timestamp?: number | null) => {
       if (!timestamp) return '-';
-      return new Date(timestamp).toLocaleString('zh-CN');
+      return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
     };
 
     if (loading) {

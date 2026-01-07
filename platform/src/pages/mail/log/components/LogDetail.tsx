@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import type { ListMailLog } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import dayjs from 'dayjs';
 
 interface LogDetailProps {
   open: boolean;
@@ -32,7 +33,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
-    return new Date(timestamp * 1000).toLocaleString('zh-CN');
+    return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
   };
 
   const formatTemplateParams = (params?: string) => {
