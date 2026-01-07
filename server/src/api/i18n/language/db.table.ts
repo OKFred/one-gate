@@ -51,10 +51,16 @@ const LanguageBasePO = {
     examples: ["en-US", "zh-CN"],
     maxLength: 10,
   },
-  namespace: {
+  application: {
     type: "string",
-    description: "命名空间",
-    examples: ["common"],
+    description: "应用",
+    examples: ["frontend", "backend", "common"],
+    maxLength: 100,
+  },
+  business: {
+    type: "string",
+    description: "业务",
+    examples: ["email", "order"],
     maxLength: 100,
   },
   description: {
@@ -110,7 +116,8 @@ export type LanguageGetVOLike = Pick<LanguageVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
 export const LanguageAddKeys = [
-  "namespace",
+  "application",
+  "business",
   "langCode",
   "tKey",
   "tValue",
@@ -138,7 +145,8 @@ export const languageTable = sqliteTable(
   "i18n_language",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    namespace: text("namespace", { length: 100 }).notNull(),
+    application: text("application", { length: 100 }).notNull(),
+    business: text("business", { length: 100 }).notNull(),
     langCode: text("lang_code", { length: 10 }).notNull(),
     tKey: text("t_key").notNull(),
     tValue: text("t_value").notNull(),
@@ -161,7 +169,8 @@ export async function tableInit() {
   await db.run(`
     CREATE TABLE IF NOT EXISTS i18n_language (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      namespace TEXT NOT NULL,
+      application TEXT NOT NULL,
+      business TEXT NOT NULL,
       lang_code TEXT NOT NULL,
       t_key TEXT NOT NULL,
       t_value TEXT NOT NULL,

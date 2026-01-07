@@ -55,7 +55,8 @@ const DEFAULT_FILTERS: FilterState = {
   keyword: '',
   orderBy: 'id',
   descend: false,
-  namespace: undefined,
+  application: undefined,
+  business: undefined,
   langCode: undefined,
 };
 
@@ -99,8 +100,11 @@ const LanguageTable = memo(
           if (searchFilters.keyword) {
             requestData.keyword = searchFilters.keyword;
           }
-          if (searchFilters.namespace) {
-            requestData.namespace = searchFilters.namespace;
+          if (searchFilters.application) {
+            requestData.application = searchFilters.application;
+          }
+          if (searchFilters.business) {
+            requestData.business = searchFilters.business;
           }
           if (searchFilters.langCode) {
             requestData.langCode = searchFilters.langCode;
@@ -219,8 +223,9 @@ const LanguageTable = memo(
                           {i18n.tKey}
                         </Typography>
                         <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                          <Chip label={i18n.namespace} size="small" color="primary" variant="outlined" />
-                          <Chip label={i18n.langCode} size="small" color="secondary" variant="outlined" />
+                          <Chip label={i18n.application} size="small" color="primary" variant="outlined" />
+                          <Chip label={i18n.business} size="small" color="secondary" variant="outlined" />
+                          <Chip label={i18n.langCode} size="small" variant="outlined" />
                         </Stack>
                         <Typography variant="body2" color="text.secondary">
                           ID: {i18n.id}
@@ -321,7 +326,8 @@ const LanguageTable = memo(
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
-                <TableCell>命名空间</TableCell>
+                <TableCell>应用</TableCell>
+                <TableCell>业务</TableCell>
                 <TableCell>语言</TableCell>
                 <TableCell>翻译键</TableCell>
                 <TableCell>翻译值</TableCell>
@@ -336,10 +342,13 @@ const LanguageTable = memo(
                   <TableRow key={i18n.id} hover>
                     <TableCell>{i18n.id}</TableCell>
                     <TableCell>
-                      <Chip label={i18n.namespace} size="small" color="primary" variant="outlined" />
+                      <Chip label={i18n.application} size="small" color="primary" variant="outlined" />
                     </TableCell>
                     <TableCell>
-                      <Chip label={i18n.langCode} size="small" color="secondary" variant="outlined" />
+                      <Chip label={i18n.business} size="small" color="secondary" variant="outlined" />
+                    </TableCell>
+                    <TableCell>
+                      <Chip label={i18n.langCode} size="small" variant="outlined" />
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight="medium">
@@ -398,7 +407,7 @@ const LanguageTable = memo(
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">暂无数据</Typography>
                   </TableCell>
                 </TableRow>

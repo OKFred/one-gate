@@ -23,7 +23,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["LanguageLanguageListReq"];
+                    "application/json": components["schemas"]["I18nLanguageListReq"];
                 };
             };
             responses: {
@@ -33,7 +33,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LanguageLanguageListRes"];
+                        "application/json": components["schemas"]["I18nLanguageListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -81,7 +81,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["LanguageLanguageAddReq"];
+                    "application/json": components["schemas"]["I18nLanguageAddReq"];
                 };
             };
             responses: {
@@ -91,7 +91,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LanguageLanguageAddRes"];
+                        "application/json": components["schemas"]["I18nLanguageAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -139,7 +139,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["LanguageLanguageUpdateReq"];
+                    "application/json": components["schemas"]["I18nLanguageUpdateReq"];
                 };
             };
             responses: {
@@ -149,7 +149,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LanguageLanguageUpdateRes"];
+                        "application/json": components["schemas"]["I18nLanguageUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -197,7 +197,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["LanguageLanguageDeleteReq"];
+                    "application/json": components["schemas"]["I18nLanguageDeleteReq"];
                 };
             };
             responses: {
@@ -207,7 +207,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LanguageLanguageDeleteRes"];
+                        "application/json": components["schemas"]["I18nLanguageDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -255,7 +255,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["LanguageLanguageGetReq"];
+                    "application/json": components["schemas"]["I18nLanguageGetReq"];
                 };
             };
             responses: {
@@ -265,7 +265,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LanguageLanguageGetRes"];
+                        "application/json": components["schemas"]["I18nLanguageGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -313,7 +313,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["LanguageLanguageCheckDuplicateReq"];
+                    "application/json": components["schemas"]["I18nLanguageCheckDuplicateReq"];
                 };
             };
             responses: {
@@ -323,7 +323,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["LanguageLanguageCheckDuplicateRes"];
+                        "application/json": components["schemas"]["I18nLanguageCheckDuplicateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1426,64 +1426,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["SystemAuthWechatRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/system/auth/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 验证token */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["SystemAuthVerifyReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SystemAuthVerifyRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3029,7 +2971,7 @@ export interface components {
             message: string;
             data: Record<string, never>;
         };
-        LanguageLanguageListReq: {
+        I18nLanguageListReq: {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -3048,13 +2990,15 @@ export interface components {
              */
             keyword?: string;
             /** @enum {string} */
-            orderBy?: "id" | "namespace" | "langCode" | "tKey" | "createTimeUtc";
-            /** @description 命名空间过滤 */
-            namespace?: string;
+            orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
+            /** @description 应用过滤 */
+            application?: string;
+            /** @description 业务过滤 */
+            business?: string;
             /** @description 语言代码过滤 */
             langCode?: string;
         };
-        LanguageLanguageListRes: {
+        I18nLanguageListRes: {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -3093,10 +3037,18 @@ export interface components {
                      */
                     langCode: string;
                     /**
-                     * @description 命名空间
+                     * @description 应用
+                     * @example frontend
+                     * @example backend
                      * @example common
                      */
-                    namespace: string;
+                    application: string;
+                    /**
+                     * @description 业务
+                     * @example email
+                     * @example order
+                     */
+                    business: string;
                     /**
                      * @description 描述信息
                      * @example 欢迎消息的翻译
@@ -3120,7 +3072,7 @@ export interface components {
             };
             message: string;
         };
-        LanguageLanguageAddReq: {
+        I18nLanguageAddReq: {
             /**
              * @description 翻译键
              * @example welcome.message
@@ -3143,17 +3095,25 @@ export interface components {
              */
             langCode: string;
             /**
-             * @description 命名空间
+             * @description 应用
+             * @example frontend
+             * @example backend
              * @example common
              */
-            namespace: string;
+            application: string;
+            /**
+             * @description 业务
+             * @example email
+             * @example order
+             */
+            business: string;
             /**
              * @description 描述信息
              * @example 欢迎消息的翻译
              */
             description: ((string | null) | null) | null;
         };
-        LanguageLanguageAddRes: {
+        I18nLanguageAddRes: {
             ok: boolean;
             /**
              * @description id
@@ -3162,7 +3122,7 @@ export interface components {
             data: number;
             message: string;
         };
-        LanguageLanguageUpdateReq: {
+        I18nLanguageUpdateReq: {
             /**
              * @description id
              * @example 1
@@ -3190,17 +3150,25 @@ export interface components {
              */
             langCode?: string;
             /**
-             * @description 命名空间
+             * @description 应用
+             * @example frontend
+             * @example backend
              * @example common
              */
-            namespace?: string;
+            application?: string;
+            /**
+             * @description 业务
+             * @example email
+             * @example order
+             */
+            business?: string;
             /**
              * @description 描述信息
              * @example 欢迎消息的翻译
              */
             description?: ((string | null) | null) | null;
         };
-        LanguageLanguageUpdateRes: {
+        I18nLanguageUpdateRes: {
             ok: boolean;
             /**
              * @description id
@@ -3209,14 +3177,14 @@ export interface components {
             data: number;
             message: string;
         };
-        LanguageLanguageDeleteReq: {
+        I18nLanguageDeleteReq: {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        LanguageLanguageDeleteRes: {
+        I18nLanguageDeleteRes: {
             ok: boolean;
             /**
              * @description id
@@ -3225,14 +3193,14 @@ export interface components {
             data: number;
             message: string;
         };
-        LanguageLanguageGetReq: {
+        I18nLanguageGetReq: {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        LanguageLanguageGetRes: {
+        I18nLanguageGetRes: {
             ok: boolean;
             data: {
                 /**
@@ -3262,10 +3230,18 @@ export interface components {
                  */
                 langCode: string;
                 /**
-                 * @description 命名空间
+                 * @description 应用
+                 * @example frontend
+                 * @example backend
                  * @example common
                  */
-                namespace: string;
+                application: string;
+                /**
+                 * @description 业务
+                 * @example email
+                 * @example order
+                 */
+                business: string;
                 /**
                  * @description 描述信息
                  * @example 欢迎消息的翻译
@@ -3288,7 +3264,7 @@ export interface components {
             };
             message: string;
         };
-        LanguageLanguageCheckDuplicateReq: {
+        I18nLanguageCheckDuplicateReq: {
             /** @description 翻译值 */
             tValue?: string;
             /** @description 值的SHA256哈希 */
@@ -3296,13 +3272,14 @@ export interface components {
             /** @description 排除的ID（编辑时使用） */
             excludeId?: ((number | null) | null) | null;
         };
-        LanguageLanguageCheckDuplicateRes: {
+        I18nLanguageCheckDuplicateRes: {
             ok: boolean;
             data: {
                 hasDuplicate: boolean;
                 duplicates: {
                     id?: number;
-                    namespace?: string;
+                    application?: string;
+                    business?: string;
                     langCode?: string;
                     tKey?: string;
                     tValue?: string;
@@ -4277,18 +4254,6 @@ export interface components {
                     updateTimeUtc: ((number | null) | null) | null;
                 };
             };
-            message: string;
-        };
-        SystemAuthVerifyReq: {
-            /**
-             * @description 需要验证的token
-             * @example example-session-token
-             */
-            token: string;
-        };
-        SystemAuthVerifyRes: {
-            ok: boolean;
-            data: boolean;
             message: string;
         };
         SystemAuthRefreshReq: {

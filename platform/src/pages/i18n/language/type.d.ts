@@ -9,7 +9,8 @@ export interface FilterState {
   keyword: string;
   orderBy: NonNullable<ListLanguageRequest['orderBy']>;
   descend: boolean;
-  namespace?: string;
+  application?: string;
+  business?: string;
   langCode?: string;
 }
 

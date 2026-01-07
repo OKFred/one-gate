@@ -40,7 +40,8 @@ export interface LanguageFormRef {
 }
 
 const DEFAULT_FORM: AddLanguageRequest = {
-  namespace: '',
+  application: '',
+  business: '',
   langCode: '',
   tKey: '',
   tValue: '',
@@ -113,7 +114,8 @@ const LanguageForm = memo(
         openEdit: (i18n: ListLanguage) => {
           setEditId(i18n.id!);
           setForm({
-            namespace: i18n.namespace || '',
+            application: i18n.application || '',
+            business: i18n.business || '',
             langCode: i18n.langCode || '',
             tKey: i18n.tKey || '',
             tValue: i18n.tValue || '',
@@ -196,15 +198,26 @@ const LanguageForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="命名空间"
-                  value={form.namespace}
-                  onChange={(e) => setForm({ ...form, namespace: e.target.value })}
+                  label="应用"
+                  value={form.application}
+                  onChange={(e) => setForm({ ...form, application: e.target.value })}
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder="例如：common, system, user"
+                  placeholder="例如：frontend, backend, common"
                 />
 
+                <TextField
+                  label="业务"
+                  value={form.business}
+                  onChange={(e) => setForm({ ...form, business: e.target.value })}
+                  required
+                  fullWidth
+                  size={isMobile ? 'medium' : 'medium'}
+                  placeholder="例如：email, order"
+                />
+              </Stack>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
                   label="语言代码"
                   value={form.langCode}
@@ -270,7 +283,8 @@ const LanguageForm = memo(
                                   alignItems: 'center',
                                 }}
                               >
-                                <Chip label={dup.namespace} size="small" variant="outlined" />
+                                <Chip label={dup.application} size="small" variant="outlined" />
+                                <Chip label={dup.business} size="small" variant="outlined" />
                                 <Chip label={dup.langCode} size="small" variant="outlined" />
                                 <span style={{ fontWeight: 500 }}>{dup.tKey}</span>
                               </Box>

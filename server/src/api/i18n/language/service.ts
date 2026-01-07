@@ -29,7 +29,10 @@ import {
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
-import { bodyAdapter, bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import {
   BusinessError,
@@ -42,12 +45,14 @@ const listReq = {
     ...listReqBase,
     orderBy: orderByWrapper<(keyof LanguagePOLike)[]>([
       "id",
-      "namespace",
+      "application",
+      "business",
       "langCode",
       "tKey",
       "createTimeUtc",
     ]),
-    namespace: { type: "string", description: "命名空间过滤", maxLength: 100 },
+    application: { type: "string", description: "应用过滤", maxLength: 100 },
+    business: { type: "string", description: "业务过滤", maxLength: 100 },
     langCode: { type: "string", description: "语言代码过滤", maxLength: 10 },
   },
   required: [],
@@ -70,7 +75,8 @@ async function onList(
     pageNo = 1,
     pageSize = 10,
     keyword = "",
-    namespace,
+    application,
+    business,
     langCode,
   } = params;
   const offset = (pageNo - 1) * pageSize;
@@ -90,8 +96,11 @@ async function onList(
         )
       );
     }
-    if (hasValue(namespace)) {
-      conditions.push(eq(languageTable.namespace, namespace));
+    if (hasValue(application)) {
+      conditions.push(eq(languageTable.application, application));
+    }
+    if (hasValue(business)) {
+      conditions.push(eq(languageTable.business, business));
     }
     if (hasValue(langCode)) {
       conditions.push(eq(languageTable.langCode, langCode));
@@ -370,7 +379,8 @@ const checkDuplicateRes = {
         type: "object",
         properties: {
           id: { type: "number", minimum: 1 },
-          namespace: { type: "string", maxLength: 100 },
+          application: { type: "string", maxLength: 100 },
+          business: { type: "string", maxLength: 100 },
           langCode: { type: "string", maxLength: 10 },
           tKey: { type: "string", maxLength: 100 },
           tValue: { type: "string", maxLength: 500 },
@@ -397,7 +407,8 @@ async function onCheckDuplicate(
   const rows = await db
     .select({
       id: languageTable.id,
-      namespace: languageTable.namespace,
+      business: languageTable.business,
+      application: languageTable.application,
       langCode: languageTable.langCode,
       tKey: languageTable.tKey,
       tValue: languageTable.tValue,

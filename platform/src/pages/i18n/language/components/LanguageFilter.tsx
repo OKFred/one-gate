@@ -47,7 +47,8 @@ const LanguageFilter = memo(
       keyword: '',
       orderBy: 'id',
       descend: false,
-      namespace: undefined,
+      application: undefined,
+      business: undefined,
       langCode: undefined,
     });
 
@@ -107,7 +108,8 @@ const LanguageFilter = memo(
         keyword: '',
         orderBy: 'id',
         descend: false,
-        namespace: undefined,
+        application: undefined,
+        business: undefined,
         langCode: undefined,
       };
       setKeywordInput(''); // 清空输入框
@@ -116,7 +118,7 @@ const LanguageFilter = memo(
     };
 
     const hasActiveFilters = () => {
-      return keywordInput || filters.orderBy !== 'id' || filters.descend || filters.namespace || filters.langCode;
+      return keywordInput || filters.orderBy !== 'id' || filters.descend || filters.application || filters.business || filters.langCode;
     };
 
     return (
@@ -174,10 +176,19 @@ const LanguageFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="命名空间"
-                  placeholder="如：common, system"
-                  value={filters.namespace || ''}
-                  onChange={(e) => handleFilterChange('namespace', e.target.value)}
+                  label="应用"
+                  placeholder="如：frontend, backend, common"
+                  value={filters.application || ''}
+                  onChange={(e) => handleFilterChange('application', e.target.value)}
+                  size="small"
+                  fullWidth
+                />
+
+                <TextField
+                  label="业务"
+                  placeholder="如：email, order"
+                  value={filters.business || ''}
+                  onChange={(e) => handleFilterChange('business', e.target.value)}
                   size="small"
                   fullWidth
                 />
@@ -201,7 +212,8 @@ const LanguageFilter = memo(
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
                     <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="namespace">命名空间</MenuItem>
+                    <MenuItem value="application">应用</MenuItem>
+                    <MenuItem value="business">业务</MenuItem>
                     <MenuItem value="langCode">语言代码</MenuItem>
                     <MenuItem value="tKey">翻译键</MenuItem>
                     <MenuItem value="createTimeUtc">创建时间</MenuItem>
