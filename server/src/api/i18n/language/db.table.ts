@@ -29,6 +29,7 @@ const LanguageUniquePO = {
     description: "翻译键",
     pattern: "^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$",
     examples: ["welcome.message"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof LanguagePOLike, JSONSchema>>;
 const LanguageBasePO = {
@@ -36,27 +37,32 @@ const LanguageBasePO = {
     type: "string",
     description: "翻译值",
     examples: ["Welcome to our application"],
+    maxLength: 500,
   },
   valueHash: {
     type: "string",
     description: "值的SHA256哈希",
     examples: ["abc123..."],
+    maxLength: 100,
   },
   langCode: {
     type: "string",
     description: "语言代码",
     examples: ["en-US", "zh-CN"],
+    maxLength: 10,
   },
   namespace: {
     type: "string",
     description: "命名空间",
     examples: ["common"],
+    maxLength: 100,
   },
   description: {
     type: ["string", "null"],
     nullable: true,
     description: "描述信息",
     examples: ["欢迎消息的翻译"],
+    maxLength: 500,
   },
 } as const satisfies Partial<Record<keyof LanguagePOLike, JSONSchema>>;
 const LanguagePO = {
