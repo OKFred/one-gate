@@ -22,17 +22,20 @@ const MenuBasePO = {
     type: "string",
     description: "菜单名称",
     examples: ["主页"],
+    maxLength: 100,
   },
   icon: {
     type: "string",
     description: "图标名称，使用 Iconify material-symbols 图标",
     examples: ["material-symbols:home"],
+    maxLength: 100,
   },
   path: {
     type: ["string", "null"],
     nullable: true,
     description: "路由路径",
     examples: ["/home"],
+    maxLength: 500,
   },
   parentId: {
     type: ["number", "null"],

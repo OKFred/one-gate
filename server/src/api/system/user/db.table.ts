@@ -22,6 +22,7 @@ const UserUniquePO = {
     type: "string",
     description: "用户名",
     examples: ["user"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
 const UserPasswordPO = {
@@ -29,6 +30,7 @@ const UserPasswordPO = {
     type: "string",
     description: "密码",
     examples: ["pass"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
 const UserBasePO = {
@@ -36,6 +38,7 @@ const UserBasePO = {
     type: "string",
     description: "语言代码",
     examples: ["en-US", "zh-CN"],
+    maxLength: 10,
   },
   isEnabled: {
     type: "boolean",
@@ -84,6 +87,7 @@ const UserDepartmentDTO = {
         type: "string",
         description: "部门名称",
         examples: ["研发部"],
+        maxLength: 100,
       },
     },
     required: ["value", "label"],
@@ -102,6 +106,7 @@ const UserRoleDTO = {
           type: "string",
           description: "角色名称",
           examples: ["管理员"],
+          maxLength: 100,
         },
       },
       required: ["value", "label"],
@@ -123,6 +128,7 @@ const UserBaseVO = {
     type: "string",
     description: "语言代码",
     examples: ["en-US", "zh-CN"],
+    maxLength: 10,
   },
   isEnabled: {
     type: "boolean",

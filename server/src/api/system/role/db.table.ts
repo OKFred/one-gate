@@ -22,6 +22,7 @@ const RoleUniquePO = {
     type: "string",
     description: "角色名称",
     examples: ["管理员"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
 const RoleBasePO = {
@@ -30,12 +31,14 @@ const RoleBasePO = {
     nullable: true,
     description: "角色描述",
     examples: ["系统管理员，拥有所有权限"],
+    maxLength: 500,
   },
   permissions: {
     type: ["string", "null"],
     nullable: true,
     description: "权限列表，JSON数组格式",
     examples: ['["user:read","user:write","system:admin"]'],
+    maxLength: 500,
   },
   isEnabled: {
     type: "boolean",

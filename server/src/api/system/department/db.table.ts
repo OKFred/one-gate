@@ -22,12 +22,14 @@ const DepartmentBasePO = {
     type: "string",
     description: "部门名称",
     examples: ["技术部"],
+    maxLength: 100,
   },
   description: {
     type: ["string", "null"],
     nullable: true,
     description: "部门描述",
     examples: ["负责技术研发工作"],
+    maxLength: 500,
   },
   parentId: {
     type: ["number", "null"],
