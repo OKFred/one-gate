@@ -52,9 +52,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     if (!userInfo) return;
     try {
       await UserApiService.updateLangCodeFn({ data: { langCode: newLang } });
-      // 更新本地用户信息
-      const updatedUserInfo = { ...userInfo, langCode: newLang };
-      authUtils.setUserInfo(updatedUserInfo);
       // 刷新页面以应用新语言
       window.location.reload();
     } catch (error) {
