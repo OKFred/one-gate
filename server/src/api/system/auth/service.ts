@@ -155,45 +155,6 @@ const wechatLoginApi = {
   service: onWechatLogin,
 } satisfies API;
 
-// 验证token
-const verifyTokenReq = {
-  type: "object",
-  properties: {
-    token: {
-      type: "string",
-      description: "需要验证的token",
-      examples: ["example-session-token"],
-      maxLength: 500,
-    },
-  },
-  required: ["token"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const verifyTokenRes = {
-  type: "boolean",
-} as const satisfies JSONSchema;
-
-async function onVerifyToken(
-  params: FromSchema<typeof verifyTokenReq>
-): Promise<FromSchema<typeof verifyTokenRes>> {
-  const { token } = params;
-  const isValid = tokenUtils.verifyToken(token) !== null;
-  return isValid;
-}
-
-const verifyTokenApi = {
-  req: verifyTokenReq,
-  res: verifyTokenRes,
-  pathInfo: {
-    path: "/verify",
-    method: "post",
-    summary: "验证token",
-  } as const,
-  adapter: bodyAdapter,
-  service: onVerifyToken,
-} satisfies API;
-
 // 刷新token
 const refreshTokenReq = {
   type: "object",
@@ -295,7 +256,6 @@ const profileApi = {
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
-  verify: verifyTokenApi,
   refresh: refreshTokenApi,
   profile: profileApi,
 };

@@ -21,11 +21,11 @@ export const wechatLogin = (
   });
 };
 
-export const verifyToken = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/verify', 'post'>, 'url' | 'method'>,
+export const getProfile = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/profile', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
-    url: '/api/v1/system/auth/verify',
+    url: '/api/v1/system/auth/profile',
     method: 'post',
     ...axiosConfig,
   });

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { authUtils } from '@/utils/auth';
-import { verifyToken } from '@/api/system/auth';
+import { authUtils, type UserInfo } from '@/utils/auth';
+import { getProfile } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 
 import { listFn } from '@/api/i18n/language';
@@ -40,33 +40,42 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     };
     loadLanguageList();
   }
+
+  function failedLogin() {
+    // token无效，清理本地存储
+    authUtils.logout();
+    setIsAuthenticated(false);
+  }
+
+  function successfulLogin(newUserInfo: UserInfo) {
+    authUtils.setUserInfo(newUserInfo);
+    setIsAuthenticated(true);
+    getLanguageData();
+  }
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = authUtils.getUserInfo()?.token;
 
       if (!token) {
-        setIsAuthenticated(false);
+        failedLogin();
         setIsLoading(false);
         return;
       }
 
       try {
         // 验证token是否有效
-        const result = await verifyToken({ data: { token } });
-        const verified = result.data;
+        const result = await getProfile({ data: {} });
 
-        if (result.data.ok && verified) {
-          setIsAuthenticated(true);
-          getLanguageData();
+        if (result.data.ok) {
+          const { userObj } = result.data.data;
+          successfulLogin({ token, ...userObj });
+          return;
         } else {
-          // token无效，清理本地存储
-          authUtils.logout();
-          setIsAuthenticated(false);
+          failedLogin();
         }
       } catch {
-        // 验证失败，清理本地存储
-        authUtils.logout();
-        setIsAuthenticated(false);
+        failedLogin();
       } finally {
         setIsLoading(false);
       }
