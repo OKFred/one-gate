@@ -3,7 +3,11 @@ import { PageLayout } from '@/components/Responsive/index';
 import RoleForm, { type RoleFormRef } from './components/RoleForm';
 import RoleTable, { type RoleTableRef } from './components/RoleTable';
 import RoleFilter, { type RoleFilterRef } from './components/RoleFilter';
+import { TheActionButtons } from './components/TheActionButtons';
 
+export interface Props {
+  localObj: LocalObj;
+}
 export interface LocalObj {
   tableRef: React.RefObject<RoleTableRef | null>;
   formRef: React.RefObject<RoleFormRef | null>;
@@ -17,7 +21,7 @@ export default function RoleManagementPage() {
   const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title="角色管理">
+    <PageLayout title="角色管理" actions={<TheActionButtons formRef={formRef} />}>
       <RoleFilter ref={localObj.filterRef} localObj={localObj} />
       <RoleForm ref={localObj.formRef} localObj={localObj} />
       <RoleTable ref={localObj.tableRef} localObj={localObj} />

@@ -19,16 +19,16 @@ import {
   ExpandMore,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import {
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
-import type { FilterState } from '../type';
-import type { Props } from '../type.d';
+import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
+import type { Props } from '../index';
+import type { ListRoleReq } from '@/api/system/type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListRoleReq['orderBy']>;
+  descend: boolean;
+}
 
 // 暴露给父组件的方法
 export interface RoleFilterRef {

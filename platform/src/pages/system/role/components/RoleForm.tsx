@@ -14,23 +14,20 @@ import {
   IconButton,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import * as roleAPI from '@/api/system/role';
-import type { AddRoleRequest, ListRole } from '../type';
-import type { Props } from '../type.d';
+import * as RoleAPI from '@/api/system/role';
+import type { AddRoleReq } from '@/api/system/type';
+import type { Props } from '../index';
+import type { TableState } from './RoleTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
 // 暴露给父组件的方法
 export interface RoleFormRef {
-  /** 打开新增表单 */
-  openAdd: () => void;
   /** 打开编辑表单 */
-  openEdit: (role: ListRole) => void;
-  /** 关闭表单 */
-  close: () => void;
+  onOpen: (role?: TableState['list'][0]) => void;
 }
 
-const DEFAULT_FORM: AddRoleRequest = {
+const DEFAULT_FORM: AddRoleReq = {
   name: '',
   description: '',
   permissions: '',
@@ -38,7 +35,7 @@ const DEFAULT_FORM: AddRoleRequest = {
 };
 
 const RoleForm = memo(
-  forwardRef<RoleFormRef, Props>(({ localObj }, ref) => {
+  forwardRef<RoleFormRef, Props>(function RoleForm({ localObj }, ref) {
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -46,29 +43,26 @@ const RoleForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddRoleRequest>(DEFAULT_FORM);
+    const [form, setForm] = useState<AddRoleReq>(DEFAULT_FORM);
 
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
       () => ({
-        openAdd: () => {
-          setEditId(null);
-          setForm(DEFAULT_FORM);
+        onOpen: (role?: TableState['list'][0]) => {
+          if (role) {
+            setEditId(role.id!);
+            setForm({
+              name: role.name || '',
+              description: role.description || '',
+              permissions: role.permissions || '',
+              isEnabled: role.isEnabled,
+            });
+          } else {
+            setEditId(null);
+            setForm(DEFAULT_FORM);
+          }
           setOpen(true);
-        },
-        openEdit: (role: ListRole) => {
-          setEditId(role.id!);
-          setForm({
-            name: role.name || '',
-            description: role.description || '',
-            permissions: role.permissions || '',
-            isEnabled: role.isEnabled,
-          });
-          setOpen(true);
-        },
-        close: () => {
-          handleCancel();
         },
       }),
       [],
@@ -85,9 +79,9 @@ const RoleForm = memo(
       const formData = { ...form };
 
       if (editId) {
-        await roleAPI.updateFn({ data: { id: editId, ...formData } });
+        await RoleAPI.updateFn({ data: { id: editId, ...formData } });
       } else {
-        await roleAPI.addFn({ data: formData });
+        await RoleAPI.addFn({ data: formData });
       }
       handleCancel();
       // 刷新表格数据
