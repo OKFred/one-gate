@@ -26,7 +26,7 @@ export interface AddButtonProps {
  * 新增账户按钮组件
  * 用于页面顶部的新增操作
  */
-export const AddTheButton = memo(({ formRef }: AddButtonProps) => {
+export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
   const t = useTranslation();
   const handleAdd = useCallback(() => {
     formRef.current?.onOpen();
