@@ -1,251 +1,269 @@
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Stack,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Pagination,
-} from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
+import { Chip } from '@mui/material';
+import ResponsiveList, {
+  type TableColumn,
+  type CardField,
+} from '@/components/Responsive/ResponsiveList';
+import * as UserAPI from '@/api/system/user';
+import * as RoleAPI from '@/api/system/role';
+import * as DepartmentAPI from '@/api/system/department';
+import { UserActionButtons } from './TheActionButtons';
 import type { ListUserRes, TreeDepartmentRes } from '@/api/system/type';
+import type { Props } from '../index';
 import dayjs from 'dayjs';
-import { useResponsive } from '@/hooks/useResponsive';
+import type { FilterState } from './TheFilter';
 
-interface UserTableProps {
+// 表格内部状态
+export interface TableState {
   list: NonNullable<ListUserRes['list']>;
   loading: boolean;
-  onEdit: (row: NonNullable<ListUserRes['list']>[0]) => void;
-  onDelete: (id: number) => void;
   page: number;
   pageSize: number;
   total: number;
-  onPageChange: (page: number) => void;
-  roleOptions: { value: number; label: string }[];
-  departmentTree: TreeDepartmentRes;
+  filters: FilterState;
 }
 
-export default function UserTable({
-  list,
-  loading,
-  onEdit,
-  onDelete,
-  page,
-  pageSize,
-  total,
-  onPageChange,
-  roleOptions,
-  departmentTree,
-}: UserTableProps) {
-  const { isMobile } = useResponsive();
+// 暴露给父组件的方法
+export interface TheTableRef {
+  /** 刷新表格数据 */
+  refresh: (filters?: FilterState) => void;
+}
 
-  const totalPages = Math.ceil(total / pageSize);
+const DEFAULT_FILTERS: FilterState = {
+  keyword: '',
+  orderBy: 'id',
+  descend: true,
+};
 
-  // 根据部门ID获取部门名称
-  const getDepartmentName = (departmentId: number | null | undefined): string => {
-    if (!departmentId) return '--';
-    const findDepartment = (tree: TreeDepartmentRes, id: number) => {
-      for (const node of tree) {
-        if (node.id === id) return node;
-        if (node.children) {
-          const found = findDepartment(node.children, id);
-          if (found) return found;
+const TheTable = memo(
+  forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
+    const { formRef, filterRef } = localObj;
+
+    // 整合所有表格相关状态
+    const [state, setState] = useState<TableState>({
+      list: [],
+      loading: false,
+      page: 1,
+      pageSize: 10,
+      total: 0,
+      filters: DEFAULT_FILTERS,
+    });
+
+    const { list, loading, page, pageSize, total, filters } = state;
+
+    // 角色和部门数据
+    const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
+    const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
+
+    // 获取角色和部门数据
+    useEffect(() => {
+      async function fetchRoles() {
+        try {
+          const res = await RoleAPI.listAllFn({ data: {} });
+          const roles = res.data.data || [];
+          const options = roles.map((role) => ({
+            value: role.id,
+            label: role.name,
+          }));
+          setRoleOptions(options);
+        } catch (error) {
+          console.error('获取角色列表失败:', error);
         }
       }
-      return null;
+
+      async function fetchDepartments() {
+        try {
+          const res = await DepartmentAPI.treeFn({ data: {} });
+          const departments = res.data.data || [];
+          setDepartmentTree(departments);
+        } catch (error) {
+          console.error('获取部门列表失败:', error);
+        }
+      }
+
+      fetchRoles();
+      fetchDepartments();
+    }, []);
+
+    // 根据部门ID获取部门名称
+    const getDepartmentName = useCallback(
+      (departmentId: number | null | undefined): string => {
+        if (!departmentId) return '--';
+        const findDepartment = (
+          tree: TreeDepartmentRes,
+          id: number,
+        ): TreeDepartmentRes[0] | null => {
+          for (const node of tree) {
+            if (node.id === id) return node;
+            if (node.children) {
+              const found = findDepartment(node.children as TreeDepartmentRes, id);
+              if (found) return found;
+            }
+          }
+          return null;
+        };
+        const department = findDepartment(departmentTree, departmentId);
+        return department?.name || '--';
+      },
+      [departmentTree],
+    );
+
+    // 根据角色ID数组获取角色名称数组
+    const getRoleNames = useCallback(
+      (roleIds: number[] | null | undefined): string => {
+        if (!roleIds || roleIds.length === 0) return '--';
+        const names = roleIds
+          .map((id) => roleOptions.find((role) => role.value === id)?.label)
+          .filter(Boolean);
+        return names.length > 0 ? names.join(', ') : '--';
+      },
+      [roleOptions],
+    );
+
+    // 获取数据的核心函数
+    const fetchUsers = useCallback(
+      async (searchFilters: FilterState, currentPage: number = 1) => {
+        setState((prev) => ({ ...prev, loading: true }));
+        try {
+          const requestData = {
+            pageNo: currentPage,
+            pageSize: state.pageSize,
+            ...(searchFilters.keyword && { keyword: searchFilters.keyword }),
+            orderBy: searchFilters.orderBy,
+            descend: searchFilters.descend,
+          };
+
+          const res = await UserAPI.listFn({ data: requestData });
+          const response = res.data;
+          const usersList = response?.data?.list || [];
+          const totalCount = response?.data?.total || 0;
+
+          setState((prev) => ({
+            ...prev,
+            list: usersList,
+            total: totalCount,
+            page: currentPage,
+            filters: searchFilters,
+            loading: false,
+          }));
+
+          // 通知筛选组件更新数量
+          filterRef.current?.updateCount(totalCount);
+        } catch {
+          setState((prev) => ({ ...prev, loading: false }));
+        }
+      },
+      [state.pageSize, filterRef],
+    );
+
+    // 删除成功后的回调
+    const handleDeleteSuccess = useCallback(() => {
+      fetchUsers(filters, page);
+    }, [fetchUsers, filters, page]);
+
+    // 初始加载
+    useEffect(() => {
+      fetchUsers(DEFAULT_FILTERS, 1);
+    }, [fetchUsers]);
+
+    // 暴露给父组件的方法
+    useImperativeHandle(
+      ref,
+      () => ({
+        refresh: (newFilters?: FilterState) => {
+          const filtersToUse = newFilters || filters;
+          const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
+          fetchUsers(filtersToUse, pageToUse);
+        },
+      }),
+      [fetchUsers, filters, page],
+    );
+
+    // 处理分页
+    const handlePageChange = (newPage: number) => {
+      fetchUsers(filters, newPage);
     };
-    const department = findDepartment(departmentTree, departmentId);
-    return department?.name || '--';
-  };
 
-  // 根据角色ID数组获取角色名称数组
-  const getRoleNames = (roleIds: number[] | null | undefined): string => {
-    if (!roleIds || roleIds.length === 0) return '--';
-    const names = roleIds
-      .map((id) => roleOptions.find((role) => role.value === id)?.label)
-      .filter(Boolean);
-    return names.length > 0 ? names.join(', ') : '--';
-  };
+    // 处理每页条数变化
+    const handlePageSizeChange = (newPageSize: number) => {
+      setState((prev) => ({ ...prev, pageSize: newPageSize }));
+      // 重置到第一页并刷新数据
+      fetchUsers(filters, 1);
+    };
 
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" py={4}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  // 移动端卡片布局
-  if (isMobile) {
-    return (
-      <Box sx={{ mt: 2, mb: 8 }}>
-        {list.length > 0 ? (
-          <Stack spacing={2}>
-            {list.map((row) => (
-              <Card key={row.id} variant="outlined">
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      mb: 2,
-                    }}
-                  >
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6" component="div" gutterBottom>
-                        {row.username}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        ID: {row.id}
-                      </Typography>
-                    </Box>
-                    <Stack direction="row" spacing={1}>
-                      <IconButton onClick={() => onEdit(row)} color="primary" size="small">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => row.id && onDelete(row.id)}
-                        disabled={row.id === 1}
-                        color="error"
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Stack>
-                  </Box>
-
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      部门
-                    </Typography>
-                    <Typography variant="body1">{getDepartmentName(row.departmentId)}</Typography>
-                  </Box>
-
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      角色
-                    </Typography>
-                    <Typography variant="body1">{getRoleNames(row.roleIdArr)}</Typography>
-                  </Box>
-
-                  <Box sx={{ mb: 2 }}>
-                    <Typography variant="body2" color="text.secondary" gutterBottom>
-                      创建时间
-                    </Typography>
-                    <Typography variant="body1">
-                      {row.createTimeUtc
-                        ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                        : '暂无'}
-                    </Typography>
-                  </Box>
-
-                  <Box>
-                    <Chip
-                      label={row.isEnabled ? '启用' : '禁用'}
-                      color={row.isEnabled ? 'success' : 'error'}
-                      size="small"
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </Stack>
-        ) : (
-          <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="body1" color="text.secondary">
-              暂无用户
-            </Typography>
-          </Box>
-        )}
-        {totalPages > 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={(_, value) => onPageChange(value)}
-              color="primary"
-              size="medium"
-            />
-          </Box>
-        )}
-      </Box>
-    );
-  }
-
-  // 桌面端表格布局
-  return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>用户名</TableCell>
-            <TableCell>部门</TableCell>
-            <TableCell>角色</TableCell>
-            <TableCell>状态</TableCell>
-            <TableCell>创建时间</TableCell>
-            <TableCell align="center">操作</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {list.length > 0 &&
-            list.map((row) => (
-              <TableRow key={row.id} hover>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{getDepartmentName(row.departmentId)}</TableCell>
-                <TableCell>{getRoleNames(row.roleIdArr)}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={row.isEnabled ? '启用' : '禁用'}
-                    color={row.isEnabled ? 'success' : 'error'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  {row.createTimeUtc
-                    ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                    : '暂无'}
-                </TableCell>
-                <TableCell align="center">
-                  <Stack direction="row" spacing={1} justifyContent="center">
-                    <IconButton onClick={() => onEdit(row)} color="primary" size="small">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => row.id && onDelete(row.id)}
-                      color="error"
-                      size="small"
-                      disabled={row.id === 1}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-      {totalPages > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(_, value) => onPageChange(value)}
-            color="primary"
+    // 表格列配置（PC端）
+    const columns: TableColumn<TableState['list'][0]>[] = [
+      { title: 'ID', render: (row) => row.id },
+      { title: '用户名', render: (row) => row.username },
+      { title: '部门', render: (row) => getDepartmentName(row.departmentId) },
+      { title: '角色', render: (row) => getRoleNames(row.roleIdArr) },
+      {
+        title: '状态',
+        render: (row) => (
+          <Chip
+            label={row.isEnabled ? '启用' : '禁用'}
+            color={row.isEnabled ? 'success' : 'error'}
+            size="small"
           />
-        </Box>
-      )}
-    </TableContainer>
-  );
-}
+        ),
+      },
+      {
+        title: '创建时间',
+        render: (row) =>
+          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '暂无',
+      },
+      {
+        title: '操作',
+        align: 'center',
+        render: (row) => (
+          <UserActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
+        ),
+      },
+    ];
+
+    // 卡片字段配置（移动端）
+    const cardFields: CardField<TableState['list'][0]>[] = [
+      { type: 'title', render: (row) => row.username },
+      { type: 'subtitle', label: 'ID', render: (row) => row.id },
+      { type: 'content', label: '部门', render: (row) => getDepartmentName(row.departmentId) },
+      { type: 'content', label: '角色', render: (row) => getRoleNames(row.roleIdArr) },
+      {
+        type: 'content',
+        label: '创建时间',
+        render: (row) =>
+          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '暂无',
+      },
+      {
+        type: 'tags',
+        render: (row) => (
+          <Chip
+            label={row.isEnabled ? '启用' : '禁用'}
+            color={row.isEnabled ? 'success' : 'error'}
+            size="small"
+          />
+        ),
+      },
+    ];
+
+    return (
+      <ResponsiveList
+        data={list}
+        loading={loading}
+        page={page}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        keyExtractor={(row) => row.id!}
+        columns={columns}
+        cardFields={cardFields}
+        cardActions={(row) => (
+          <UserActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
+        )}
+        emptyText="暂无用户"
+      />
+    );
+  }),
+);
+
+export default TheTable;
