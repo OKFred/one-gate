@@ -69,7 +69,7 @@ export const initialMenuData = [
   },
   {
     id: 10,
-    name: "人员",
+    name: "用户",
     icon: "material-symbols:group",
     path: "/system/user",
     parentId: 8,
