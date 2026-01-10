@@ -46,6 +46,10 @@ export type DeleteRoleReq = NonNullable<Parameters<typeof RoleAPI.deleteFn>[0]['
 export type DeleteRoleRes = Awaited<ReturnType<typeof RoleAPI.deleteFn>>['data']['data'];
 
 // ==================== Department ====================
+// 获取部门树
+export type TreeDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.treeFn>[0]['data']>;
+export type TreeDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.treeFn>>['data']['data'];
+
 // 获取部门列表
 export type ListDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.listFn>[0]['data']>;
 export type ListDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.listFn>>['data']['data'];
@@ -60,11 +64,15 @@ export type AddDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.addFn>>['
 
 // 更新部门
 export type UpdateDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.updateFn>[0]['data']>;
-export type UpdateDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.updateFn>>['data']['data'];
+export type UpdateDepartmentRes = Awaited<
+  ReturnType<typeof DepartmentAPI.updateFn>
+>['data']['data'];
 
 // 删除部门
 export type DeleteDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.deleteFn>[0]['data']>;
-export type DeleteDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.deleteFn>>['data']['data'];
+export type DeleteDepartmentRes = Awaited<
+  ReturnType<typeof DepartmentAPI.deleteFn>
+>['data']['data'];
 
 // ==================== Menu ====================
 // 获取菜单树

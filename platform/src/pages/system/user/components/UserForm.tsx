@@ -18,16 +18,21 @@ import {
   OutlinedInput,
   useTheme,
   IconButton,
+  Paper,
+  Typography,
+  Popover,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import {
   Close as CloseIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
+  ArrowDropDown as ArrowDropDownIcon,
 } from '@mui/icons-material';
-import type { AddUserReq } from '../index';
+import type { AddUserReq, TreeDepartmentRes } from '@/api/system/type';
 import { useResponsive } from '@/hooks/useResponsive';
-import hasValue from '@/utils/hasValue';
 
 interface UserFormDialogProps {
   open: boolean;
@@ -36,14 +41,9 @@ interface UserFormDialogProps {
   onFormChange: (form: AddUserReq) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
+  roleOptions: { value: number; label: string }[];
+  departmentTree: TreeDepartmentRes;
 }
-
-// 预定义的角色选项
-const roleOptions = [
-  { value: 1, label: '超级管理员' },
-  { value: 2, label: '管理员' },
-  { value: 3, label: '普通用户' },
-];
 
 export default function UserFormDialog({
   open,
@@ -52,11 +52,19 @@ export default function UserFormDialog({
   onFormChange,
   onSubmit,
   onCancel,
+  roleOptions,
+  departmentTree,
 }: UserFormDialogProps) {
   const theme = useTheme();
   const { isMobile } = useResponsive();
 
   const [showPassword, setShowPassword] = React.useState(false);
+  const [departmentAnchorEl, setDepartmentAnchorEl] = React.useState<HTMLDivElement | null>(null);
+
+  const selectedRoleValues = React.useMemo(
+    () => form.roleArr?.map((item) => item.value) ?? [],
+    [form.roleArr],
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,12 +73,67 @@ export default function UserFormDialog({
 
   // 处理角色多选变化
   const handleRoleChange = (event: SelectChangeEvent<number[]>) => {
-    const value = event.target.value;
+    const value = event.target.value as number[] | number;
+    const roleArr = (Array.isArray(value) ? value : [value]).map((val) => {
+      const role = roleOptions.find((r) => r.value === val);
+      return role
+        ? { value: role.value, label: role.label }
+        : { value: Number(val), label: String(val) };
+    });
     onFormChange({
       ...form,
-      roleIdArr: typeof value === 'string' ? value.split(',').map(Number) : value,
+      roleArr,
     });
   };
+
+  const handleDepartmentClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    setDepartmentAnchorEl(event.currentTarget);
+  };
+
+  const handleDepartmentClose = () => {
+    setDepartmentAnchorEl(null);
+  };
+
+  const handleDepartmentSelect = (nodeId: number, nodeName: string) => {
+    const departmentId = nodeId;
+    onFormChange({
+      ...form,
+      departmentObj: { value: departmentId, label: nodeName },
+    });
+    handleDepartmentClose();
+  };
+
+  const handleDepartmentClear = () => {
+    onFormChange({ ...form, departmentObj: null });
+    handleDepartmentClose();
+  };
+
+  const renderTreeItems = (nodes: TreeDepartmentRes): React.ReactNode => {
+    return nodes.map((node) => (
+      <TreeItem
+        key={node.id}
+        itemId={String(node.id)}
+        label={
+          <Box
+            onClick={() => handleDepartmentSelect(node.id, node.name)}
+            sx={{
+              py: 1,
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'action.hover' },
+            }}
+          >
+            {node.name}
+          </Box>
+        }
+      >
+        {node.children && node.children.length > 0
+          ? renderTreeItems(node.children as TreeDepartmentRes)
+          : null}
+      </TreeItem>
+    ));
+  };
+
+  const departmentPopoverOpen = Boolean(departmentAnchorEl);
 
   return (
     <Dialog
@@ -119,58 +182,114 @@ export default function UserFormDialog({
               size={isMobile ? 'medium' : 'medium'}
             />
 
-            <TextField
-              label={editId ? '新密码' : '密码'}
-              type={showPassword ? 'text' : 'password'}
-              value={form.password}
-              onChange={(e) => onFormChange({ ...form, password: e.target.value })}
-              required={!editId}
-              fullWidth
-              size={isMobile ? 'medium' : 'medium'}
-              helperText={editId ? '留空则不修改密码' : ''}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                    </IconButton>
-                  ),
-                },
-              }}
-            />
+            {!editId && (
+              <TextField
+                label="密码"
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={(e) => onFormChange({ ...form, password: e.target.value })}
+                required
+                fullWidth
+                size={isMobile ? 'medium' : 'medium'}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      </IconButton>
+                    ),
+                  },
+                }}
+              />
+            )}
 
-            <TextField
-              label="部门ID"
-              type="number"
-              value={form.departmentId || ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                onFormChange({
-                  ...form,
-                  departmentId: hasValue(value) ? Number(value) : null,
-                });
-              }}
-              fullWidth
-              size={isMobile ? 'medium' : 'medium'}
-            />
+            <Box>
+              <InputLabel sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
+                部门
+              </InputLabel>
+              <Paper
+                variant="outlined"
+                onClick={handleDepartmentClick}
+                sx={{
+                  p: 1.5,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  minHeight: '56px',
+                  '&:hover': {
+                    borderColor: 'primary.main',
+                  },
+                }}
+              >
+                <Typography color={form.departmentObj ? 'text.primary' : 'text.secondary'}>
+                  {form.departmentObj?.label || '选择部门'}
+                </Typography>
+                <ArrowDropDownIcon color="action" />
+              </Paper>
+
+              <Popover
+                open={departmentPopoverOpen}
+                anchorEl={departmentAnchorEl}
+                onClose={handleDepartmentClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'left',
+                }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      width: departmentAnchorEl?.offsetWidth || 300,
+                      maxHeight: 400,
+                      mt: 1,
+                    },
+                  },
+                }}
+              >
+                <Box sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                    <Typography variant="subtitle2">选择部门</Typography>
+                    {form.departmentObj && (
+                      <Button size="small" onClick={handleDepartmentClear}>
+                        清除
+                      </Button>
+                    )}
+                  </Box>
+                  {departmentTree.length > 0 ? (
+                    <SimpleTreeView>{renderTreeItems(departmentTree)}</SimpleTreeView>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+                      暂无部门数据
+                    </Typography>
+                  )}
+                </Box>
+              </Popover>
+            </Box>
 
             <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
               <InputLabel>角色</InputLabel>
               <Select
                 multiple
-                value={form.roleIdArr}
+                value={selectedRoleValues}
                 onChange={handleRoleChange}
                 input={<OutlinedInput label="角色" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => {
-                      const role = roleOptions.find((r) => r.value === value);
-                      return <Chip key={value} label={role?.label || value} size="small" />;
+                      const label =
+                        roleOptions.find((r) => r.value === value)?.label ||
+                        form.roleArr?.find((r) => r.value === value)?.label ||
+                        value;
+                      return <Chip key={value} label={label} size="small" />;
                     })}
                   </Box>
                 )}
