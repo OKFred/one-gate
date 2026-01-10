@@ -6,6 +6,9 @@ import TheFilter, { type TheFilterRef } from './components/TheFilter';
 import { AddTheButton } from './components/TheActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
 
+export interface Props {
+  localObj: LocalObj;
+}
 export interface LocalObj {
   tableRef: React.RefObject<TheTableRef | null>;
   formRef: React.RefObject<TheFormRef | null>;

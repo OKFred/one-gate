@@ -20,8 +20,8 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
-import type { FilterState } from '../type';
-import type { Props } from '../type';
+import type { FilterState } from './TheTable';
+import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
