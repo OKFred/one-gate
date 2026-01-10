@@ -1,14 +1,30 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Add as AddIcon } from '@mui/icons-material';
-import * as UserApiService from '@/api/system/user';
+import * as UserAPI from '@/api/system/user';
+import type { ListUserReq, ListUserRes } from '@/api/system/type';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import UserFilter from './components/UserFilter';
 import UserTable from './components/UserTable';
 import UserForm from './components/UserForm';
-import type { FilterState, User, AddUserParams } from './type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListUserReq['orderBy']>;
+  descend: boolean;
+}
+
+// 表单数据类型（保持原有字段）
+export interface AddUserReq {
+  username: string;
+  password: string;
+  departmentId: number | null;
+  roleIdArr: number[];
+  isEnabled: boolean;
+}
 
 // 默认表单数据
-const defaultFormData: AddUserParams = {
+const defaultFormData: AddUserReq = {
   username: '',
   password: '',
   departmentId: null,
@@ -17,7 +33,7 @@ const defaultFormData: AddUserParams = {
 };
 
 export default function UserManagement() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [list, setList] = useState<NonNullable<ListUserRes['list']>>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -29,7 +45,7 @@ export default function UserManagement() {
     orderBy: 'id',
     descend: true,
   });
-  const [form, setForm] = useState<AddUserParams>(defaultFormData);
+  const [form, setForm] = useState<AddUserReq>(defaultFormData);
 
   // 获取用户列表
   const fetchUsers = useCallback(
@@ -44,12 +60,12 @@ export default function UserManagement() {
           descend: searchParams.descend,
         };
 
-        const res = await UserApiService.listFn({ data: requestData });
+        const res = await UserAPI.listFn({ data: requestData });
         const response = res.data;
-        const usersList = response?.data?.list || [];
+        const list = response?.data?.list || [];
         const total = response?.data?.total || 0;
 
-        setUsers(usersList);
+        setList(list);
         setTotalCount(total);
       } finally {
         setLoading(false);
@@ -87,14 +103,14 @@ export default function UserManagement() {
   }, [fetchUsers]);
 
   // 编辑用户
-  const handleEdit = (user: User) => {
-    setEditId(user.id);
+  const handleEdit = (row: NonNullable<ListUserRes['list']>[0]) => {
+    setEditId(row.id);
     setForm({
-      username: user.username || '',
+      username: row.username || '',
       password: '',
-      departmentId: user.departmentId || null,
-      roleIdArr: user.roleIdArr || [3],
-      isEnabled: user.isEnabled,
+      departmentId: row.departmentId || null,
+      roleIdArr: row.roleIdArr || [3],
+      isEnabled: row.isEnabled,
     });
     setOpen(true);
   };
@@ -108,7 +124,7 @@ export default function UserManagement() {
 
   // 删除用户
   const handleDelete = async (id: number) => {
-    await UserApiService.deleteFn({ data: { id } });
+    await UserAPI.deleteFn({ data: { id } });
     fetchUsers(filters, page);
   };
 
@@ -122,10 +138,14 @@ export default function UserManagement() {
       const updateData = formData.password
         ? { id: editId, ...formData }
         : { id: editId, ...formData, password: undefined };
-      await UserApiService.updateFn({ data: updateData });
+      await UserAPI.updateFn({
+        data: updateData as unknown as Parameters<typeof UserAPI.updateFn>[0]['data'],
+      });
     } else {
       // 添加用户
-      await UserApiService.addFn({ data: formData });
+      await UserAPI.addFn({
+        data: formData as unknown as Parameters<typeof UserAPI.addFn>[0]['data'],
+      });
     }
     handleCancel();
     fetchUsers(filters, page);
@@ -162,7 +182,7 @@ export default function UserManagement() {
 
       {/* 数据表格 */}
       <UserTable
-        users={users}
+        list={list}
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}

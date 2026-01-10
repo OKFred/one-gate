@@ -17,14 +17,14 @@ import {
   Pagination,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import type { User } from '../type';
+import type { ListUserRes } from '@/api/system/type';
 import dayjs from 'dayjs';
 import { useResponsive } from '@/hooks/useResponsive';
 
 interface UserTableProps {
-  users: User[];
+  list: NonNullable<ListUserRes['list']>;
   loading: boolean;
-  onEdit: (user: User) => void;
+  onEdit: (row: NonNullable<ListUserRes['list']>[0]) => void;
   onDelete: (id: number) => void;
   page: number;
   pageSize: number;
@@ -33,7 +33,7 @@ interface UserTableProps {
 }
 
 export default function UserTable({
-  users,
+  list,
   loading,
   onEdit,
   onDelete,
@@ -58,10 +58,10 @@ export default function UserTable({
   if (isMobile) {
     return (
       <Box sx={{ mt: 2, mb: 8 }}>
-        {users.length > 0 ? (
+        {list.length > 0 ? (
           <Stack spacing={2}>
-            {users.map((user) => (
-              <Card key={user.id} variant="outlined">
+            {list.map((row) => (
+              <Card key={row.id} variant="outlined">
                 <CardContent>
                   <Box
                     sx={{
@@ -73,19 +73,19 @@ export default function UserTable({
                   >
                     <Box sx={{ flex: 1 }}>
                       <Typography variant="h6" component="div" gutterBottom>
-                        {user.username}
+                        {row.username}
                       </Typography>
                       <Typography variant="body2" color="text.secondary" gutterBottom>
-                        ID: {user.id}
+                        ID: {row.id}
                       </Typography>
                     </Box>
                     <Stack direction="row" spacing={1}>
-                      <IconButton onClick={() => onEdit(user)} color="primary" size="small">
+                      <IconButton onClick={() => onEdit(row)} color="primary" size="small">
                         <EditIcon />
                       </IconButton>
                       <IconButton
-                        onClick={() => user.id && onDelete(user.id)}
-                        disabled={user.id === 1}
+                        onClick={() => row.id && onDelete(row.id)}
+                        disabled={row.id === 1}
                         color="error"
                         size="small"
                       >
@@ -98,14 +98,14 @@ export default function UserTable({
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                       部门ID
                     </Typography>
-                    <Typography variant="body1">{user.departmentId || '-'}</Typography>
+                    <Typography variant="body1">{row.departmentId || '-'}</Typography>
                   </Box>
 
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
                       角色ID
                     </Typography>
-                    <Typography variant="body1">{user.roleIdArr?.join(', ') || '-'}</Typography>
+                    <Typography variant="body1">{row.roleIdArr?.join(', ') || '-'}</Typography>
                   </Box>
 
                   <Box sx={{ mb: 2 }}>
@@ -113,16 +113,16 @@ export default function UserTable({
                       创建时间
                     </Typography>
                     <Typography variant="body1">
-                      {user.createTimeUtc
-                        ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
+                      {row.createTimeUtc
+                        ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
                         : '暂无'}
                     </Typography>
                   </Box>
 
                   <Box>
                     <Chip
-                      label={user.isEnabled ? '启用' : '禁用'}
-                      color={user.isEnabled ? 'success' : 'error'}
+                      label={row.isEnabled ? '启用' : '禁用'}
+                      color={row.isEnabled ? 'success' : 'error'}
                       size="small"
                     />
                   </Box>
@@ -168,35 +168,35 @@ export default function UserTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.length > 0 &&
-            users.map((user) => (
-              <TableRow key={user.id} hover>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>{user.username}</TableCell>
-                <TableCell>{user.departmentId || '-'}</TableCell>
-                <TableCell>{user.roleIdArr?.join(', ') || '-'}</TableCell>
+          {list.length > 0 &&
+            list.map((row) => (
+              <TableRow key={row.id} hover>
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{row.username}</TableCell>
+                <TableCell>{row.departmentId || '-'}</TableCell>
+                <TableCell>{row.roleIdArr?.join(', ') || '-'}</TableCell>
                 <TableCell>
                   <Chip
-                    label={user.isEnabled ? '启用' : '禁用'}
-                    color={user.isEnabled ? 'success' : 'error'}
+                    label={row.isEnabled ? '启用' : '禁用'}
+                    color={row.isEnabled ? 'success' : 'error'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell>
-                  {user.createTimeUtc
-                    ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
+                  {row.createTimeUtc
+                    ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
                     : '暂无'}
                 </TableCell>
                 <TableCell align="center">
                   <Stack direction="row" spacing={1} justifyContent="center">
-                    <IconButton onClick={() => onEdit(user)} color="primary" size="small">
+                    <IconButton onClick={() => onEdit(row)} color="primary" size="small">
                       <EditIcon />
                     </IconButton>
                     <IconButton
-                      onClick={() => user.id && onDelete(user.id)}
+                      onClick={() => row.id && onDelete(row.id)}
                       color="error"
                       size="small"
-                      disabled={user.id === 1}
+                      disabled={row.id === 1}
                     >
                       <DeleteIcon />
                     </IconButton>

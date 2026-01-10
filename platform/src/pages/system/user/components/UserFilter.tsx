@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { FilterList as FilterIcon, ExpandLess, ExpandMore, Search as SearchIcon } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
-import type { FilterState } from '../type';
+import type { FilterState } from '../index';
 
 interface UserFilterProps {
   onFilterChange: (filters: FilterState) => void;

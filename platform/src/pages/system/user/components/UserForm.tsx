@@ -25,15 +25,15 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import type { AddUserParams } from '../type';
+import type { AddUserReq } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
 interface UserFormDialogProps {
   open: boolean;
-  form: AddUserParams;
+  form: AddUserReq;
   editId: number | null;
-  onFormChange: (form: AddUserParams) => void;
+  onFormChange: (form: AddUserReq) => void;
   onSubmit: (e: React.FormEvent) => void;
   onCancel: () => void;
 }
