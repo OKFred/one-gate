@@ -50,6 +50,7 @@ const LanguageFilter = memo(
       application: undefined,
       business: undefined,
       langCode: undefined,
+      isEnabled: undefined,
     });
 
     // 暴露给父组件的方法
@@ -97,7 +98,10 @@ const LanguageFilter = memo(
       if (key === 'keyword') {
         setKeywordInput(value as string);
       } else {
-        const newFilters = { ...filters, [key]: value || undefined };
+        const newFilters = { 
+          ...filters, 
+          [key]: typeof value === 'boolean' ? value : (value || undefined) 
+        };
         setFilters(newFilters);
         refreshTable(newFilters);
       }
@@ -111,6 +115,7 @@ const LanguageFilter = memo(
         application: undefined,
         business: undefined,
         langCode: undefined,
+        isEnabled: undefined,
       };
       setKeywordInput(''); // 清空输入框
       setFilters(emptyFilters);
@@ -118,7 +123,7 @@ const LanguageFilter = memo(
     };
 
     const hasActiveFilters = () => {
-      return keywordInput || filters.orderBy !== 'id' || filters.descend || filters.application || filters.business || filters.langCode;
+      return keywordInput || filters.orderBy !== 'id' || filters.descend || filters.application || filters.business || filters.langCode || filters.isEnabled !== undefined;
     };
 
     return (
@@ -201,6 +206,22 @@ const LanguageFilter = memo(
                   size="small"
                   fullWidth
                 />
+
+                <FormControl size="small" fullWidth>
+                  <InputLabel>启用状态</InputLabel>
+                  <Select
+                    value={filters.isEnabled === undefined ? 'all' : filters.isEnabled ? 'enabled' : 'disabled'}
+                    label="启用状态"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleFilterChange('isEnabled', value === 'all' ? undefined : value === 'enabled');
+                    }}
+                  >
+                    <MenuItem value="all">全部</MenuItem>
+                    <MenuItem value="enabled">已启用</MenuItem>
+                    <MenuItem value="disabled">已禁用</MenuItem>
+                  </Select>
+                </FormControl>
               </Stack>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>

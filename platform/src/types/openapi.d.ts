@@ -4,6 +4,64 @@
  */
 
 export interface paths {
+    "/api/v1/i18n/language/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有多语言翻译（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/i18n/language/list": {
         parameters: {
             query?: never;
@@ -2266,6 +2324,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/role/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有角色（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRoleListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRoleListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/role/list": {
         parameters: {
             query?: never;
@@ -2528,6 +2644,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["SystemRoleGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/user/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有用户（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemUserListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemUserListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2971,9 +3145,91 @@ export interface components {
             message: string;
             data: Record<string, never>;
         };
+        I18nLanguageListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 应用
+             * @example frontend
+             * @example backend
+             * @example common
+             */
+            application?: string;
+            /**
+             * @description 业务
+             * @example email
+             * @example order
+             */
+            business?: string;
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
+        };
+        I18nLanguageListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 应用
+                 * @example frontend
+                 * @example backend
+                 * @example common
+                 */
+                application?: string;
+                /**
+                 * @description 业务
+                 * @example email
+                 * @example order
+                 */
+                business?: string;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode?: string;
+                /**
+                 * @description 翻译键
+                 * @example welcome.message
+                 */
+                tKey?: string;
+                /**
+                 * @description 翻译值
+                 * @example Welcome to our application
+                 */
+                tValue?: string;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled?: boolean;
+            }[];
+            message: string;
+        };
         I18nLanguageListReq: {
             /** @description 是否降序 */
             descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
             /**
              * @description 页码
              * @default 1
@@ -2985,18 +3241,32 @@ export interface components {
              */
             pageSize: number;
             /**
-             * @description 关键词
-             * @example
+             * @description 应用
+             * @example frontend
+             * @example backend
+             * @example common
              */
-            keyword?: string;
+            application?: string;
+            /**
+             * @description 业务
+             * @example email
+             * @example order
+             */
+            business?: string;
+            /**
+             * @description 语言代码
+             * @example en-US
+             * @example zh-CN
+             */
+            langCode?: string;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
-            /** @description 应用过滤 */
-            application?: string;
-            /** @description 业务过滤 */
-            business?: string;
-            /** @description 语言代码过滤 */
-            langCode?: string;
         };
         I18nLanguageListRes: {
             ok: boolean;
@@ -3054,6 +3324,12 @@ export interface components {
                      * @example 欢迎消息的翻译
                      */
                     description: ((string | null) | null) | null;
+                    /**
+                     * @description 是否启用
+                     * @example true
+                     * @example false
+                     */
+                    isEnabled: boolean;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -3112,6 +3388,12 @@ export interface components {
              * @example 欢迎消息的翻译
              */
             description: ((string | null) | null) | null;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled: boolean;
         };
         I18nLanguageAddRes: {
             ok: boolean;
@@ -3167,6 +3449,12 @@ export interface components {
              * @example 欢迎消息的翻译
              */
             description?: ((string | null) | null) | null;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
         };
         I18nLanguageUpdateRes: {
             ok: boolean;
@@ -3247,6 +3535,12 @@ export interface components {
                  * @example 欢迎消息的翻译
                  */
                 description: ((string | null) | null) | null;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled: boolean;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**
@@ -3265,24 +3559,68 @@ export interface components {
             message: string;
         };
         I18nLanguageCheckDuplicateReq: {
-            /** @description 翻译值 */
-            tValue?: string;
-            /** @description 值的SHA256哈希 */
+            /**
+             * @description 翻译值
+             * @example Welcome to our application
+             */
+            tValue: string;
+            /**
+             * @description 值的SHA256哈希
+             * @example abc123...
+             */
             valueHash: string;
-            /** @description 排除的ID（编辑时使用） */
+            /**
+             * @description 要排除的记录 ID（可选）
+             * @example 1
+             */
             excludeId?: ((number | null) | null) | null;
         };
         I18nLanguageCheckDuplicateRes: {
             ok: boolean;
             data: {
+                /** @description 是否有重复 */
                 hasDuplicate: boolean;
                 duplicates: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
                     id?: number;
+                    /**
+                     * @description 应用
+                     * @example frontend
+                     * @example backend
+                     * @example common
+                     */
                     application?: string;
+                    /**
+                     * @description 业务
+                     * @example email
+                     * @example order
+                     */
                     business?: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
                     langCode?: string;
+                    /**
+                     * @description 翻译键
+                     * @example welcome.message
+                     */
                     tKey?: string;
+                    /**
+                     * @description 翻译值
+                     * @example Welcome to our application
+                     */
                     tValue?: string;
+                    /**
+                     * @description 是否启用
+                     * @example true
+                     * @example false
+                     */
+                    isEnabled?: boolean;
                 }[];
             };
             message: string;
@@ -3357,6 +3695,11 @@ export interface components {
             /** @description 是否降序 */
             descend?: boolean;
             /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
              * @description 页码
              * @default 1
              */
@@ -3366,11 +3709,6 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
         };
         MailAccountListRes: {
             ok: boolean;
@@ -3690,6 +4028,11 @@ export interface components {
             /** @description 是否降序 */
             descend?: boolean;
             /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
              * @description 页码
              * @default 1
              */
@@ -3699,11 +4042,6 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
             /** @description 发送状态过滤 */
             sendStatus?: boolean;
             /** @description 模板ID过滤 */
@@ -3929,6 +4267,11 @@ export interface components {
             /** @description 是否降序 */
             descend?: boolean;
             /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
              * @description 页码
              * @default 1
              */
@@ -3938,11 +4281,6 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
         };
         MailTemplateListRes: {
             ok: boolean;
@@ -4342,6 +4680,11 @@ export interface components {
             /** @description 是否降序 */
             descend?: boolean;
             /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
              * @description 页码
              * @default 1
              */
@@ -4351,17 +4694,15 @@ export interface components {
              * @default 10
              */
             pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /**
-             * @description 关键词
-             * @example
+             * @description 父部门ID
+             * @example 1
              */
-            keyword?: string;
+            parentId?: number;
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
-            /** @description 是否启用状态过滤 */
-            isEnabled?: boolean;
-            /** @description 父部门ID过滤 */
-            parentId?: number;
         };
         SystemDepartmentListRes: {
             ok: boolean;
@@ -4612,6 +4953,11 @@ export interface components {
             /** @description 是否降序 */
             descend?: boolean;
             /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
              * @description 页码
              * @default 1
              */
@@ -4621,15 +4967,10 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
-            /** @description 是否启用状态过滤 */
-            isEnabled?: boolean;
         };
         SystemMenuListRes: {
             ok: boolean;
@@ -4930,9 +5271,50 @@ export interface components {
             }[];
             message: string;
         };
+        SystemRoleListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        SystemRoleListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 角色描述
+                 * @example 系统管理员，拥有所有权限
+                 */
+                description?: ((string | null) | null) | null;
+                /**
+                 * @description 权限列表，JSON数组格式
+                 * @example ["user:read","user:write","system:admin"]
+                 */
+                permissions?: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /**
+                 * @description 角色名称
+                 * @example 管理员
+                 */
+                name: string;
+            }[];
+            message: string;
+        };
         SystemRoleListReq: {
             /** @description 是否降序 */
             descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
             /**
              * @description 页码
              * @default 1
@@ -4943,15 +5325,10 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
-            /** @description 是否启用状态过滤 */
-            isEnabled?: boolean;
         };
         SystemRoleListRes: {
             ok: boolean;
@@ -5131,9 +5508,72 @@ export interface components {
             };
             message: string;
         };
+        SystemUserListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
+        };
+        SystemUserListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 用户名
+                 * @example user
+                 */
+                username: string;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 * @example zh-CN
+                 */
+                langCode?: string;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /** @description 部门对象 */
+                departmentObj?: (({
+                    /**
+                     * @description 部门ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 部门名称
+                     * @example 研发部
+                     */
+                    label: string;
+                } | null) | null) | null;
+                /** @description 角色数组 */
+                roleArr?: {
+                    /**
+                     * @description 角色ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 角色名称
+                     * @example 管理员
+                     */
+                    label: string;
+                }[];
+            }[];
+            message: string;
+        };
         SystemUserListReq: {
             /** @description 是否降序 */
             descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
             /**
              * @description 页码
              * @default 1
@@ -5144,15 +5584,10 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
-            /** @description 是否启用状态过滤 */
-            isEnabled?: boolean;
         };
         SystemUserListRes: {
             ok: boolean;

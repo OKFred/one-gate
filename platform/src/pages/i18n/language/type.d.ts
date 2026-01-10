@@ -12,6 +12,7 @@ export interface FilterState {
   application?: string;
   business?: string;
   langCode?: string;
+  isEnabled?: boolean;
 }
 
 // 获取翻译列表

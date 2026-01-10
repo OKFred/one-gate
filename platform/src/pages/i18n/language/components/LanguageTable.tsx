@@ -59,6 +59,7 @@ const DEFAULT_FILTERS: FilterState = {
   application: undefined,
   business: undefined,
   langCode: undefined,
+  isEnabled: undefined,
 };
 
 const LanguageTable = memo(
@@ -95,6 +96,7 @@ const LanguageTable = memo(
             pageNo: currentPage,
             pageSize: state.pageSize,
             orderBy: searchFilters.orderBy,
+            isEnabled: searchFilters.isEnabled,
             descend: searchFilters.descend,
           };
 
@@ -109,6 +111,9 @@ const LanguageTable = memo(
           }
           if (searchFilters.langCode) {
             requestData.langCode = searchFilters.langCode;
+          }
+          if (searchFilters.isEnabled !== undefined) {
+            requestData.isEnabled = searchFilters.isEnabled;
           }
 
           const res = await i18nAPI.listFn({ data: requestData });
@@ -259,6 +264,15 @@ const LanguageTable = memo(
                       </Typography>
                     )}
 
+                    <Box sx={{ mb: 1 }}>
+                      <Chip
+                        label={i18n.isEnabled ? '已启用' : '已禁用'}
+                        size="small"
+                        color={i18n.isEnabled ? 'success' : 'default'}
+                        variant="outlined"
+                      />
+                    </Box>
+
                     <Typography variant="caption" color="text.secondary" display="block">
                       创建时间: {formatTime(i18n.createTimeUtc)}
                     </Typography>
@@ -348,6 +362,7 @@ const LanguageTable = memo(
                 <TableCell>翻译键</TableCell>
                 <TableCell>翻译值</TableCell>
                 <TableCell>描述</TableCell>
+                <TableCell>启用状态</TableCell>
                 <TableCell>创建时间</TableCell>
                 <TableCell align="right">操作</TableCell>
               </TableRow>
@@ -409,6 +424,14 @@ const LanguageTable = memo(
                       </Typography>
                     </TableCell>
                     <TableCell>
+                      <Chip
+                        label={i18n.isEnabled ? '已启用' : '已禁用'}
+                        size="small"
+                        color={i18n.isEnabled ? 'success' : 'default'}
+                        variant="outlined"
+                      />
+                    </TableCell>
+                    <TableCell>
                       <Typography variant="body2" color="text.secondary">
                         {formatTime(i18n.createTimeUtc)}
                       </Typography>
@@ -433,7 +456,7 @@ const LanguageTable = memo(
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                  <TableCell colSpan={10} align="center" sx={{ py: 4 }}>
                     <Typography color="text.secondary">暂无数据</Typography>
                   </TableCell>
                 </TableRow>

@@ -47,9 +47,10 @@ const buildWhereCondition = ({
   application,
   business,
   langCode,
+  isEnabled,
 }: Pick<
   FromSchema<typeof listReq>,
-  "keyword" | "application" | "business" | "langCode"
+  "keyword" | "application" | "business" | "langCode" | "isEnabled"
 >) => {
   const conditions = [];
   if (hasValue(keyword)) {
@@ -69,6 +70,9 @@ const buildWhereCondition = ({
   if (hasValue(langCode)) {
     conditions.push(eq(languageTable.langCode, langCode));
   }
+  if (hasValue(isEnabled)) {
+    conditions.push(eq(languageTable.isEnabled, isEnabled));
+  }
   return conditions.length > 0
     ? conditions.length === 1
       ? conditions[0]
@@ -83,6 +87,7 @@ const listAllReq = {
     application: LanguageVO["application"],
     business: LanguageVO["business"],
     langCode: LanguageVO["langCode"],
+    isEnabled: LanguageVO["isEnabled"],
     orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
   },
   required: [],
@@ -99,6 +104,7 @@ const listAllRes = {
       langCode: LanguageVO.langCode,
       tKey: LanguageVO.tKey,
       tValue: LanguageVO.tValue,
+      isEnabled: LanguageVO.isEnabled,
     },
     required: [...LanguageGetKeys],
     additionalProperties: false,
@@ -119,6 +125,7 @@ async function onListAll(
       langCode: languageTable.langCode,
       tKey: languageTable.tKey,
       tValue: languageTable.tValue,
+      isEnabled: languageTable.isEnabled,
     })
     .from(languageTable)
     .where(buildWhereCondition(params))
@@ -145,6 +152,7 @@ const listReq = {
     application: LanguageVO["application"],
     business: LanguageVO["business"],
     langCode: LanguageVO["langCode"],
+    isEnabled: LanguageVO["isEnabled"],
     orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
   },
   required: [],
@@ -405,7 +413,12 @@ const checkDuplicateReq = {
   properties: {
     tValue: LanguageVO.tValue,
     valueHash: LanguageVO.valueHash,
-    excludeId: IndexVO.id,
+    excludeId: {
+      ...IndexVO.id,
+      description: "要排除的记录 ID（可选）",
+      type: ["number", "null"],
+      nullable: true,
+    },
   },
   required: ["tValue", "valueHash"],
   additionalProperties: false,
@@ -426,6 +439,7 @@ const checkDuplicateRes = {
           langCode: LanguageVO.langCode,
           tKey: LanguageVO.tKey,
           tValue: LanguageVO.tValue,
+          isEnabled: LanguageVO.isEnabled,
         },
       },
     },
@@ -454,6 +468,7 @@ async function onCheckDuplicate(
       langCode: languageTable.langCode,
       tKey: languageTable.tKey,
       tValue: languageTable.tValue,
+      isEnabled: languageTable.isEnabled,
     })
     .from(languageTable)
     .where(whereCondition);

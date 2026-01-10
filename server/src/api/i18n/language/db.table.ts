@@ -70,6 +70,11 @@ const LanguageBasePO = {
     examples: ["欢迎消息的翻译"],
     maxLength: 500,
   },
+  isEnabled: {
+    type: "boolean",
+    description: "是否启用",
+    examples: [true, false],
+  },
 } as const satisfies Partial<Record<keyof LanguagePOLike, JSONSchema>>;
 const LanguagePO = {
   ...IndexPO,
@@ -124,6 +129,7 @@ export const LanguageAddKeys = [
   "tValue",
   "valueHash",
   "description",
+  "isEnabled",
 ] as const satisfies RequiredKeys<LanguageAddVOLike>[];
 export const LanguageUpdateKeys = [
   ...IndexKey,
@@ -162,6 +168,7 @@ export const languageTable = sqliteTable(
     tValue: text("t_value").notNull(),
     valueHash: text("value_hash", { length: 64 }).notNull(),
     description: text("description"),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),
     createTimeUtc: integer("create_time_utc")
@@ -186,6 +193,7 @@ export async function tableInit() {
       t_value TEXT NOT NULL,
       value_hash TEXT NOT NULL,
       description TEXT,
+      is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

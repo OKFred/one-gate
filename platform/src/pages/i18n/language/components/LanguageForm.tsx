@@ -17,6 +17,7 @@ import {
   ListItemText,
   ListItemIcon,
   Chip,
+  Typography,
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -47,6 +48,7 @@ const DEFAULT_FORM: AddLanguageRequest = {
   tValue: '',
   valueHash: '',
   description: null,
+  isEnabled: true,
 };
 
 type DuplicateInfo = CheckDuplicateLanguageResponse['data']['data'];
@@ -120,6 +122,7 @@ const LanguageForm = memo(
             tKey: i18n.tKey || '',
             tValue: i18n.tValue || '',
             valueHash: i18n.valueHash || '',
+            isEnabled: i18n.isEnabled,
             description: i18n.description || null,
           });
           setDuplicateInfo(null);
@@ -316,6 +319,28 @@ const LanguageForm = memo(
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder="请输入描述信息（可选）"
               />
+
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Typography variant="body2">是否启用</Typography>
+                <Box
+                  component="label"
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.isEnabled}
+                    onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
+                    style={{ width: 20, height: 20, cursor: 'pointer' }}
+                  />
+                  <Typography variant="body2" sx={{ ml: 1 }}>
+                    {form.isEnabled ? '已启用' : '已禁用'}
+                  </Typography>
+                </Box>
+              </Stack>
             </Stack>
           </form>
         </DialogContent>
