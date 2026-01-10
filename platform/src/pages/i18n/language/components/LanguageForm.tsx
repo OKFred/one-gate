@@ -24,9 +24,10 @@ import {
   WarningAmber as WarningIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import * as i18nAPI from '@/api/i18n/language';
-import type { AddLanguageReq, CheckDuplicateLanguageRes, ListLanguageRes } from '@/api/i18n/type';
+import * as LanguageAPI from '@/api/i18n/language';
+import type { AddLanguageReq, CheckDuplicateLanguageRes } from '@/api/i18n/type';
 import type { Props } from '../index';
+import type { TableState } from './LanguageTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
@@ -35,7 +36,7 @@ export interface LanguageFormRef {
   /** 打开新增表单 */
   openAdd: () => void;
   /** 打开编辑表单 */
-  openEdit: (i18n: ListLanguageRes['list'][0]) => void;
+  openEdit: (row: TableState['list'][0]) => void;
   /** 关闭表单 */
   close: () => void;
 }
@@ -84,7 +85,7 @@ const LanguageForm = memo(
         setChecking(true);
         try {
           const hash = await calculateSHA256(tValue);
-          const res = await i18nAPI.checkDuplicateFn({
+          const res = await LanguageAPI.checkDuplicateFn({
             data: {
               tValue,
               valueHash: hash,
@@ -111,17 +112,17 @@ const LanguageForm = memo(
           setDuplicateInfo(null);
           setOpen(true);
         },
-        openEdit: (i18n: ListLanguageRes['list'][0]) => {
-          setEditId(i18n.id!);
+        openEdit: (row: TableState['list'][0]) => {
+          setEditId(row.id!);
           setForm({
-            application: i18n.application || '',
-            business: i18n.business || '',
-            langCode: i18n.langCode || '',
-            tKey: i18n.tKey || '',
-            tValue: i18n.tValue || '',
-            valueHash: i18n.valueHash || '',
-            isEnabled: i18n.isEnabled,
-            description: i18n.description || null,
+            application: row.application || '',
+            business: row.business || '',
+            langCode: row.langCode || '',
+            tKey: row.tKey || '',
+            tValue: row.tValue || '',
+            valueHash: row.valueHash || '',
+            isEnabled: row.isEnabled,
+            description: row.description || null,
           });
           setDuplicateInfo(null);
           setOpen(true);
@@ -148,9 +149,9 @@ const LanguageForm = memo(
       const formData = { ...form, valueHash: hash };
 
       if (editId) {
-        await i18nAPI.updateFn({ data: { id: editId, ...formData } });
+        await LanguageAPI.updateFn({ data: { id: editId, ...formData } });
       } else {
-        await i18nAPI.addFn({ data: formData });
+        await LanguageAPI.addFn({ data: formData });
       }
       handleCancel();
       // 刷新表格数据
