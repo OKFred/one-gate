@@ -4,6 +4,9 @@ import LanguageForm, { type LanguageFormRef } from './components/LanguageForm';
 import LanguageTable, { type LanguageTableRef } from './components/LanguageTable';
 import LanguageFilter, { type LanguageFilterRef } from './components/LanguageFilter';
 
+export interface Props {
+  localObj: LocalObj;
+}
 export interface LocalObj {
   tableRef: React.RefObject<LanguageTableRef | null>;
   formRef: React.RefObject<LanguageFormRef | null>;

@@ -27,8 +27,9 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import * as i18nAPI from '@/api/i18n/language';
-import type { ListLanguage, FilterState, ListLanguageRequest } from '../type';
-import type { Props } from '../type';
+import type { ListLanguageReq, ListLanguageRes } from '@/api/i18n/type';
+import type { Props } from '../index';
+import type { FilterState } from './LanguageFilter';
 import { useResponsive } from '@/hooks/useResponsive';
 import dayjs from 'dayjs';
 
@@ -44,7 +45,7 @@ export interface LanguageTableRef {
 
 // 表格内部状态
 interface TableState {
-  i18ns: ListLanguage[];
+  i18ns: ListLanguageRes['list'];
   loading: boolean;
   page: number;
   pageSize: number;
@@ -92,7 +93,7 @@ const LanguageTable = memo(
       async (searchFilters: FilterState, currentPage: number = 1) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
-          const requestData: ListLanguageRequest = {
+          const requestData: ListLanguageReq = {
             pageNo: currentPage,
             pageSize: state.pageSize,
             orderBy: searchFilters.orderBy,
@@ -165,7 +166,7 @@ const LanguageTable = memo(
     };
 
     // 处理编辑
-    const handleEdit = (i18n: ListLanguage) => {
+    const handleEdit = (i18n: TableState['i18ns'][0]) => {
       formRef.current?.openEdit(i18n);
     };
 

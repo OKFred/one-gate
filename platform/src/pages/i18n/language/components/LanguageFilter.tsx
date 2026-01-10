@@ -19,16 +19,20 @@ import {
   ExpandMore,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import {
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
-import type { FilterState } from '../type';
-import type { Props } from '../type';
+import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
+import type { Props } from '../index';
+import type { ListLanguageReq } from '@/api/i18n/type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListLanguageReq['orderBy']>;
+  descend: boolean;
+  application?: string;
+  business?: string;
+  langCode?: string;
+  isEnabled?: boolean;
+}
 
 // 暴露给父组件的方法
 export interface LanguageFilterRef {
@@ -98,9 +102,9 @@ const LanguageFilter = memo(
       if (key === 'keyword') {
         setKeywordInput(value as string);
       } else {
-        const newFilters = { 
-          ...filters, 
-          [key]: typeof value === 'boolean' ? value : (value || undefined) 
+        const newFilters = {
+          ...filters,
+          [key]: typeof value === 'boolean' ? value : value || undefined,
         };
         setFilters(newFilters);
         refreshTable(newFilters);
@@ -123,7 +127,15 @@ const LanguageFilter = memo(
     };
 
     const hasActiveFilters = () => {
-      return keywordInput || filters.orderBy !== 'id' || filters.descend || filters.application || filters.business || filters.langCode || filters.isEnabled !== undefined;
+      return (
+        keywordInput ||
+        filters.orderBy !== 'id' ||
+        filters.descend ||
+        filters.application ||
+        filters.business ||
+        filters.langCode ||
+        filters.isEnabled !== undefined
+      );
     };
 
     return (
@@ -210,11 +222,20 @@ const LanguageFilter = memo(
                 <FormControl size="small" fullWidth>
                   <InputLabel>启用状态</InputLabel>
                   <Select
-                    value={filters.isEnabled === undefined ? 'all' : filters.isEnabled ? 'enabled' : 'disabled'}
+                    value={
+                      filters.isEnabled === undefined
+                        ? 'all'
+                        : filters.isEnabled
+                          ? 'enabled'
+                          : 'disabled'
+                    }
                     label="启用状态"
                     onChange={(e) => {
                       const value = e.target.value;
-                      handleFilterChange('isEnabled', value === 'all' ? undefined : value === 'enabled');
+                      handleFilterChange(
+                        'isEnabled',
+                        value === 'all' ? undefined : value === 'enabled',
+                      );
                     }}
                   >
                     <MenuItem value="all">全部</MenuItem>

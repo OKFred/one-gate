@@ -25,8 +25,8 @@ import {
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import * as i18nAPI from '@/api/i18n/language';
-import type { AddLanguageRequest, CheckDuplicateLanguageResponse, ListLanguage } from '../type';
-import type { Props } from '../type';
+import type { AddLanguageReq, CheckDuplicateLanguageRes, ListLanguageRes } from '@/api/i18n/type';
+import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
@@ -35,12 +35,12 @@ export interface LanguageFormRef {
   /** 打开新增表单 */
   openAdd: () => void;
   /** 打开编辑表单 */
-  openEdit: (i18n: ListLanguage) => void;
+  openEdit: (i18n: ListLanguageRes['list'][0]) => void;
   /** 关闭表单 */
   close: () => void;
 }
 
-const DEFAULT_FORM: AddLanguageRequest = {
+const DEFAULT_FORM: AddLanguageReq = {
   application: '',
   business: '',
   langCode: '',
@@ -51,8 +51,6 @@ const DEFAULT_FORM: AddLanguageRequest = {
   isEnabled: true,
 };
 
-type DuplicateInfo = CheckDuplicateLanguageResponse['data']['data'];
-
 const LanguageForm = memo(
   forwardRef<LanguageFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
@@ -62,8 +60,8 @@ const LanguageForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddLanguageRequest>(DEFAULT_FORM);
-    const [duplicateInfo, setDuplicateInfo] = useState<DuplicateInfo | null>(null);
+    const [form, setForm] = useState<AddLanguageReq>(DEFAULT_FORM);
+    const [duplicateInfo, setDuplicateInfo] = useState<CheckDuplicateLanguageRes | null>(null);
     const [checking, setChecking] = useState(false);
 
     // SHA256 哈希计算
@@ -113,7 +111,7 @@ const LanguageForm = memo(
           setDuplicateInfo(null);
           setOpen(true);
         },
-        openEdit: (i18n: ListLanguage) => {
+        openEdit: (i18n: ListLanguageRes['list'][0]) => {
           setEditId(i18n.id!);
           setForm({
             application: i18n.application || '',
