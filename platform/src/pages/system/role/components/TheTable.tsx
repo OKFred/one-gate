@@ -9,7 +9,7 @@ import { RoleActionButtons } from './TheActionButtons';
 import type { ListRoleRes } from '@/api/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
-import type { FilterState } from './RoleFilter';
+import type { FilterState } from './TheFilter';
 
 // 表格内部状态
 export interface TableState {
@@ -33,7 +33,7 @@ const DEFAULT_FILTERS: FilterState = {
   descend: false,
 };
 
-const RoleTable = memo(
+const TheTable = memo(
   forwardRef<RoleTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
 
@@ -201,6 +201,6 @@ const RoleTable = memo(
   }),
 );
 
-RoleTable.displayName = 'RoleTable';
+TheTable.displayName = 'TheTable';
 
-export default RoleTable;
+export default TheTable;

@@ -12,8 +12,8 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import * as RoleAPI from '@/api/system/role';
-import type { RoleFormRef } from './RoleForm';
-import type { TableState } from './RoleTable';
+import type { RoleFormRef } from './TheForm';
+import type { TableState } from './TheTable';
 
 // ==================== 新增角色按钮 ====================
 

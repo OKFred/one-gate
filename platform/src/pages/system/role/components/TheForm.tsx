@@ -17,7 +17,7 @@ import { Close as CloseIcon } from '@mui/icons-material';
 import * as RoleAPI from '@/api/system/role';
 import type { AddRoleReq } from '@/api/system/type';
 import type { Props } from '../index';
-import type { TableState } from './RoleTable';
+import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
@@ -34,8 +34,8 @@ const DEFAULT_FORM: AddRoleReq = {
   isEnabled: true,
 };
 
-const RoleForm = memo(
-  forwardRef<RoleFormRef, Props>(function RoleForm({ localObj }, ref) {
+const TheForm = memo(
+  forwardRef<RoleFormRef, Props>(function TheForm({ localObj }, ref) {
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -203,6 +203,6 @@ const RoleForm = memo(
   }),
 );
 
-RoleForm.displayName = 'RoleForm';
+TheForm.displayName = 'TheForm';
 
-export default RoleForm;
+export default TheForm;

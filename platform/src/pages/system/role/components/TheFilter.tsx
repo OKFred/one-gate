@@ -36,7 +36,7 @@ export interface RoleFilterRef {
   updateCount: (count: number) => void;
 }
 
-const RoleFilter = memo(
+const TheFilter = memo(
   forwardRef<RoleFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
@@ -202,6 +202,6 @@ const RoleFilter = memo(
   }),
 );
 
-RoleFilter.displayName = 'RoleFilter';
+TheFilter.displayName = 'TheFilter';
 
-export default RoleFilter;
+export default TheFilter;
