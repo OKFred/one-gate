@@ -3,18 +3,11 @@ import { Add as AddIcon } from '@mui/icons-material';
 import * as UserAPI from '@/api/system/user';
 import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
-import type { AddUserReq, ListUserReq, ListUserRes, TreeDepartmentRes } from '@/api/system/type';
+import type { AddUserReq, ListUserRes, TreeDepartmentRes } from '@/api/system/type';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
-import UserFilter from './components/UserFilter';
+import UserFilter, { type FilterState } from './components/UserFilter';
 import UserTable from './components/UserTable';
 import UserForm from './components/UserForm';
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListUserReq['orderBy']>;
-  descend: boolean;
-}
 
 // 默认表单数据
 const defaultFormData: AddUserReq = {

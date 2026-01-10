@@ -13,9 +13,21 @@ import {
   Collapse,
   InputAdornment,
 } from '@mui/material';
-import { FilterList as FilterIcon, ExpandLess, ExpandMore, Search as SearchIcon } from '@mui/icons-material';
+import {
+  FilterList as FilterIcon,
+  ExpandLess,
+  ExpandMore,
+  Search as SearchIcon,
+} from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
-import type { FilterState } from '../index';
+import type { ListUserReq } from '@/api/system/type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListUserReq['orderBy']>;
+  descend: boolean;
+}
 
 interface UserFilterProps {
   onFilterChange: (filters: FilterState) => void;
@@ -75,9 +87,7 @@ export default function UserFilter({ onFilterChange, filterCount = 0 }: UserFilt
   };
 
   const hasActiveFilters = () => {
-    return keywordInput || 
-           filters.orderBy !== 'id' || 
-           !filters.descend;
+    return keywordInput || filters.orderBy !== 'id' || !filters.descend;
   };
 
   return (
@@ -87,28 +97,18 @@ export default function UserFilter({ onFilterChange, filterCount = 0 }: UserFilt
           <FilterIcon color="action" />
           <Typography variant="h6">搜索与筛选</Typography>
           {isSearching && (
-            <Chip 
-              label="搜索中..." 
-              size="small" 
-              color="default" 
-              variant="outlined"
-            />
+            <Chip label="搜索中..." size="small" color="default" variant="outlined" />
           )}
           {!isSearching && filterCount > 0 && (
-            <Chip 
-              label={`${filterCount} 个用户`} 
-              size="small" 
-              color="primary" 
-              variant="outlined"
-            />
+            <Chip label={`${filterCount} 个用户`} size="small" color="primary" variant="outlined" />
           )}
         </Box>
         <Box display="flex" alignItems="center" gap={1}>
           {hasActiveFilters() && (
-            <Chip 
-              label="清除筛选" 
-              size="small" 
-              variant="outlined" 
+            <Chip
+              label="清除筛选"
+              size="small"
+              variant="outlined"
               onClick={clearFilters}
               onDelete={clearFilters}
             />
@@ -118,7 +118,7 @@ export default function UserFilter({ onFilterChange, filterCount = 0 }: UserFilt
           </IconButton>
         </Box>
       </Box>
-      
+
       <Collapse in={expanded}>
         <Box sx={{ mt: 2 }}>
           <Stack spacing={2}>
@@ -137,7 +137,7 @@ export default function UserFilter({ onFilterChange, filterCount = 0 }: UserFilt
                 ),
               }}
             />
-            
+
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl size="small" fullWidth>
                 <InputLabel>排序字段</InputLabel>
@@ -150,7 +150,7 @@ export default function UserFilter({ onFilterChange, filterCount = 0 }: UserFilt
                   <MenuItem value="createTimeUtc">创建时间</MenuItem>
                 </Select>
               </FormControl>
-              
+
               <FormControl size="small" fullWidth>
                 <InputLabel>排序方式</InputLabel>
                 <Select
