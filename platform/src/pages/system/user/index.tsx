@@ -5,9 +5,9 @@ import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
 import type { AddUserReq, ListUserRes, TreeDepartmentRes } from '@/api/system/type';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
-import UserFilter, { type FilterState } from './components/UserFilter';
-import UserTable from './components/UserTable';
-import UserForm from './components/UserForm';
+import TheFilter, { type FilterState } from './components/TheFilter';
+import TheTable from './components/TheTable';
+import TheForm from './components/TheForm';
 
 // 默认表单数据
 const defaultFormData: AddUserReq = {
@@ -187,10 +187,10 @@ export default function UserManagement() {
       }
     >
       {/* 筛选组件 */}
-      <UserFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
+      <TheFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
 
       {/* 表单对话框 */}
-      <UserForm
+      <TheForm
         open={open}
         form={form}
         editId={editId}
@@ -202,7 +202,7 @@ export default function UserManagement() {
       />
 
       {/* 数据表格 */}
-      <UserTable
+      <TheTable
         list={list}
         loading={loading}
         onEdit={handleEdit}

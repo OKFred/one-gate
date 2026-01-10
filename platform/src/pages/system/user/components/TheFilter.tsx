@@ -34,7 +34,7 @@ interface UserFilterProps {
   filterCount?: number;
 }
 
-export default function UserFilter({ onFilterChange, filterCount = 0 }: UserFilterProps) {
+export default function TheFilter({ onFilterChange, filterCount = 0 }: UserFilterProps) {
   const [expanded, setExpanded] = useState(true);
   const [keywordInput, setKeywordInput] = useState('');
   const [isSearching, setIsSearching] = useState(false);
