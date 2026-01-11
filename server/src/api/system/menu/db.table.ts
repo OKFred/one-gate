@@ -75,7 +75,7 @@ type MenuUpdatePOLike = Partial<
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const MenuBaseVO = MenuBasePO;
+export const MenuBaseVO = MenuBasePO;
 export const MenuVO = {
   ...IndexVO,
   ...MenuBaseVO,

@@ -19,6 +19,7 @@ import {
   type MenuUpdateVOLike,
   type MenuDeleteVOLike,
   type MenuGetVOLike,
+  MenuBaseVO,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -26,6 +27,7 @@ import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import hasValue from "@/utils/hasValue";
 import {
+  listAllReqBase,
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
@@ -59,6 +61,64 @@ const buildWhereCondition = ({
     : undefined;
 };
 
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: MenuVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof MenuPOLike)[]>(MenuSortableKeys),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...MenuBaseVO,
+    },
+    required: [...MenuGetKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = menuTable[orderBy] || menuTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: menuTable.id,
+      name: menuTable.name,
+      icon: menuTable.icon,
+      path: menuTable.path,
+      parentId: menuTable.parentId,
+      sort: menuTable.sort,
+      roleIdArr: menuTable.roleIdArr,
+      isEnabled: menuTable.isEnabled,
+    })
+    .from(menuTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有菜单（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
+
 const listReq = {
   type: "object",
   properties: {
@@ -80,12 +140,7 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-  } = params;
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = menuTable[orderBy] || menuTable.id;
   const maxPageSize = 1000;
@@ -449,13 +504,14 @@ const treeApi = {
   pathInfo: {
     path: "/tree",
     method: "post",
-    summary: "获取树形菜单（根据用户角色过滤）",
+    summary: "获取树形菜单",
   } as const,
   adapter: bodyUserAdapter,
   service: onTree,
 } satisfies API;
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   update: updateApi,

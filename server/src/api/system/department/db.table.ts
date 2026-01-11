@@ -60,7 +60,7 @@ type DepartmentUpdatePOLike = Partial<
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const DepartmentBaseVO = DepartmentBasePO;
+export const DepartmentBaseVO = DepartmentBasePO;
 export const DepartmentVO = {
   ...IndexVO,
   ...DepartmentBaseVO,
