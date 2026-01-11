@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/i18n/language/listAll": {
+    "/api/v1/i18n/translation/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -23,7 +23,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageListAllReq"];
+                    "application/json": components["schemas"]["I18nTranslationListAllReq"];
                 };
             };
             responses: {
@@ -33,7 +33,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageListAllRes"];
+                        "application/json": components["schemas"]["I18nTranslationListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -62,7 +62,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/list": {
+    "/api/v1/i18n/translation/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -81,7 +81,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageListReq"];
+                    "application/json": components["schemas"]["I18nTranslationListReq"];
                 };
             };
             responses: {
@@ -91,7 +91,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageListRes"];
+                        "application/json": components["schemas"]["I18nTranslationListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -120,7 +120,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/add": {
+    "/api/v1/i18n/translation/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -139,7 +139,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageAddReq"];
+                    "application/json": components["schemas"]["I18nTranslationAddReq"];
                 };
             };
             responses: {
@@ -149,7 +149,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageAddRes"];
+                        "application/json": components["schemas"]["I18nTranslationAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -178,7 +178,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/update": {
+    "/api/v1/i18n/translation/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -197,7 +197,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageUpdateReq"];
+                    "application/json": components["schemas"]["I18nTranslationUpdateReq"];
                 };
             };
             responses: {
@@ -207,7 +207,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageUpdateRes"];
+                        "application/json": components["schemas"]["I18nTranslationUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -236,7 +236,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/delete": {
+    "/api/v1/i18n/translation/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -255,7 +255,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageDeleteReq"];
+                    "application/json": components["schemas"]["I18nTranslationDeleteReq"];
                 };
             };
             responses: {
@@ -265,7 +265,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageDeleteRes"];
+                        "application/json": components["schemas"]["I18nTranslationDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -294,7 +294,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/get": {
+    "/api/v1/i18n/translation/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -313,7 +313,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageGetReq"];
+                    "application/json": components["schemas"]["I18nTranslationGetReq"];
                 };
             };
             responses: {
@@ -323,7 +323,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageGetRes"];
+                        "application/json": components["schemas"]["I18nTranslationGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -352,7 +352,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/checkDuplicate": {
+    "/api/v1/i18n/translation/checkDuplicate": {
         parameters: {
             query?: never;
             header?: never;
@@ -371,7 +371,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageCheckDuplicateReq"];
+                    "application/json": components["schemas"]["I18nTranslationCheckDuplicateReq"];
                 };
             };
             responses: {
@@ -381,7 +381,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageCheckDuplicateRes"];
+                        "application/json": components["schemas"]["I18nTranslationCheckDuplicateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3145,7 +3145,7 @@ export interface components {
             message: string;
             data: Record<string, never>;
         };
-        I18nLanguageListAllReq: {
+        I18nTranslationListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -3176,7 +3176,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
         };
-        I18nLanguageListAllRes: {
+        I18nTranslationListAllRes: {
             ok: boolean;
             data: {
                 /**
@@ -3222,7 +3222,7 @@ export interface components {
             }[];
             message: string;
         };
-        I18nLanguageListReq: {
+        I18nTranslationListReq: {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -3268,7 +3268,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
         };
-        I18nLanguageListRes: {
+        I18nTranslationListRes: {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -3348,7 +3348,7 @@ export interface components {
             };
             message: string;
         };
-        I18nLanguageAddReq: {
+        I18nTranslationAddReq: {
             /**
              * @description 翻译键
              * @example welcome.message
@@ -3395,7 +3395,7 @@ export interface components {
              */
             isEnabled: boolean;
         };
-        I18nLanguageAddRes: {
+        I18nTranslationAddRes: {
             ok: boolean;
             /**
              * @description id
@@ -3404,7 +3404,7 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nLanguageUpdateReq: {
+        I18nTranslationUpdateReq: {
             /**
              * @description id
              * @example 1
@@ -3456,7 +3456,7 @@ export interface components {
              */
             isEnabled?: boolean;
         };
-        I18nLanguageUpdateRes: {
+        I18nTranslationUpdateRes: {
             ok: boolean;
             /**
              * @description id
@@ -3465,14 +3465,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nLanguageDeleteReq: {
+        I18nTranslationDeleteReq: {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nLanguageDeleteRes: {
+        I18nTranslationDeleteRes: {
             ok: boolean;
             /**
              * @description id
@@ -3481,14 +3481,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nLanguageGetReq: {
+        I18nTranslationGetReq: {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nLanguageGetRes: {
+        I18nTranslationGetRes: {
             ok: boolean;
             data: {
                 /**
@@ -3558,7 +3558,7 @@ export interface components {
             };
             message: string;
         };
-        I18nLanguageCheckDuplicateReq: {
+        I18nTranslationCheckDuplicateReq: {
             /**
              * @description 翻译值
              * @example Welcome to our application
@@ -3575,7 +3575,7 @@ export interface components {
              */
             excludeId?: ((number | null) | null) | null;
         };
-        I18nLanguageCheckDuplicateRes: {
+        I18nTranslationCheckDuplicateRes: {
             ok: boolean;
             data: {
                 /** @description 是否有重复 */

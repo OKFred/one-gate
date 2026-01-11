@@ -100,9 +100,9 @@ export const initialMenuData = [
   },
   {
     id: 14,
-    name: "多语言",
+    name: "翻译",
     icon: "material-symbols:font-download",
-    path: "/i18n/language",
+    path: "/i18n/translation",
     parentId: 13,
     sort: 1,
   },

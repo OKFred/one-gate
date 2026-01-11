@@ -21,12 +21,12 @@ import {
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { Props } from '../index';
-import type { ListLanguageReq } from '@/api/i18n/type';
+import type { ListTranslationReq } from '@/api/i18n/type';
 
 // 筛选状态类型
 export interface FilterState {
   keyword: string;
-  orderBy: NonNullable<ListLanguageReq['orderBy']>;
+  orderBy: NonNullable<ListTranslationReq['orderBy']>;
   descend: boolean;
   application?: string;
   business?: string;

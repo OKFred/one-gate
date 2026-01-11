@@ -26,8 +26,8 @@ import {
   Tooltip,
 } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import * as LanguageAPI from '@/api/i18n/language';
-import type { ListLanguageReq, ListLanguageRes } from '@/api/i18n/type';
+import * as TranslationAPI from '@/api/i18n/translation';
+import type { ListTranslationReq, ListTranslationRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import type { FilterState } from './TheFilter';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -45,7 +45,7 @@ export interface TheTableRef {
 
 // 表格内部状态
 export interface TableState {
-  list: NonNullable<ListLanguageRes['list']>;
+  list: NonNullable<ListTranslationRes['list']>;
   loading: boolean;
   page: number;
   pageSize: number;
@@ -89,11 +89,11 @@ const TheTable = memo(
     }>({ open: false, id: null, tKey: '' });
 
     // 获取数据的核心函数
-    const fetchLanguages = useCallback(
+    const fetchTranslations = useCallback(
       async (searchFilters: FilterState, currentPage: number = 1) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
-          const requestData: ListLanguageReq = {
+          const requestData: ListTranslationReq = {
             pageNo: currentPage,
             pageSize: state.pageSize,
             orderBy: searchFilters.orderBy,
@@ -117,7 +117,7 @@ const TheTable = memo(
             requestData.isEnabled = searchFilters.isEnabled;
           }
 
-          const res = await LanguageAPI.listFn({ data: requestData });
+          const res = await TranslationAPI.listFn({ data: requestData });
           const response = res.data;
           const list = response?.data?.list || [];
           const totalCount = response?.data?.total || 0;
@@ -142,8 +142,8 @@ const TheTable = memo(
 
     // 初始加载
     useEffect(() => {
-      fetchLanguages(DEFAULT_FILTERS, 1);
-    }, [fetchLanguages]);
+      fetchTranslations(DEFAULT_FILTERS, 1);
+    }, [fetchTranslations]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -152,12 +152,12 @@ const TheTable = memo(
         refresh: (newFilters?: FilterState) => {
           const filtersToUse = newFilters || filters;
           const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
-          fetchLanguages(filtersToUse, pageToUse);
+          fetchTranslations(filtersToUse, pageToUse);
         },
         getFilters: () => filters,
         getTotal: () => total,
       }),
-      [fetchLanguages, filters, page, total],
+      [fetchTranslations, filters, page, total],
     );
 
     // 处理新增
@@ -183,15 +183,15 @@ const TheTable = memo(
     // 确认删除
     const handleConfirmDelete = async () => {
       if (deleteDialog.id) {
-        await LanguageAPI.deleteFn({ data: { id: deleteDialog.id } });
-        fetchLanguages(filters, page);
+        await TranslationAPI.deleteFn({ data: { id: deleteDialog.id } });
+        fetchTranslations(filters, page);
       }
       closeDeleteDialog();
     };
 
     // 处理分页
     const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
-      fetchLanguages(filters, newPage);
+      fetchTranslations(filters, newPage);
     };
 
     // 格式化时间

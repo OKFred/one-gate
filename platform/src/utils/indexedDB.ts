@@ -3,7 +3,7 @@ const DB_NAME = 'OkFredDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'i18n';
 
-interface LanguageData {
+interface TranslationData {
   id: number;
   [key: string]: unknown;
 }
@@ -37,7 +37,7 @@ class IndexedDBHelper {
   }
 
   // 保存多语言列表
-  async saveLanguageList(data: LanguageData[]): Promise<number> {
+  async saveTranslationList(data: TranslationData[]): Promise<number> {
     if (!this.db) {
       await this.init();
     }
@@ -77,7 +77,7 @@ class IndexedDBHelper {
   }
 
   // 获取多语言列表
-  async getLanguageList(): Promise<LanguageData[]> {
+  async getTranslationList(): Promise<TranslationData[]> {
     if (!this.db) {
       await this.init();
     }
@@ -103,7 +103,7 @@ class IndexedDBHelper {
   }
 
   // 清除所有数据
-  async clearLanguageList(): Promise<void> {
+  async clearTranslationList(): Promise<void> {
     if (!this.db) {
       await this.init();
     }

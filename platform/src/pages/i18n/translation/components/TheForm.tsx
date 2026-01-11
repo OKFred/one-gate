@@ -24,8 +24,8 @@ import {
   WarningAmber as WarningIcon,
   CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
-import * as LanguageAPI from '@/api/i18n/language';
-import type { AddLanguageReq, CheckDuplicateLanguageRes } from '@/api/i18n/type';
+import * as TranslationAPI from '@/api/i18n/translation';
+import type { AddTranslationReq, CheckDuplicateTranslationRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -41,7 +41,7 @@ export interface TheFormRef {
   close: () => void;
 }
 
-const DEFAULT_FORM: AddLanguageReq = {
+const DEFAULT_FORM: AddTranslationReq = {
   application: '',
   business: '',
   langCode: '',
@@ -61,8 +61,8 @@ const TheForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddLanguageReq>(DEFAULT_FORM);
-    const [duplicateInfo, setDuplicateInfo] = useState<CheckDuplicateLanguageRes | null>(null);
+    const [form, setForm] = useState<AddTranslationReq>(DEFAULT_FORM);
+    const [duplicateInfo, setDuplicateInfo] = useState<CheckDuplicateTranslationRes | null>(null);
     const [checking, setChecking] = useState(false);
 
     // SHA256 哈希计算
@@ -85,7 +85,7 @@ const TheForm = memo(
         setChecking(true);
         try {
           const hash = await calculateSHA256(tValue);
-          const res = await LanguageAPI.checkDuplicateFn({
+          const res = await TranslationAPI.checkDuplicateFn({
             data: {
               tValue,
               valueHash: hash,
@@ -149,9 +149,9 @@ const TheForm = memo(
       const formData = { ...form, valueHash: hash };
 
       if (editId) {
-        await LanguageAPI.updateFn({ data: { id: editId, ...formData } });
+        await TranslationAPI.updateFn({ data: { id: editId, ...formData } });
       } else {
-        await LanguageAPI.addFn({ data: formData });
+        await TranslationAPI.addFn({ data: formData });
       }
       handleCancel();
       // 刷新表格数据

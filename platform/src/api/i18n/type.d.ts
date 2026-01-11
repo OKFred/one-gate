@@ -1,29 +1,29 @@
-import * as LanguageAPI from '@/api/i18n/language';
+import * as TranslationAPI from '@/api/i18n/translation';
 
 // 获取翻译列表
-export type ListLanguageReq = NonNullable<Parameters<typeof LanguageAPI.listFn>[0]['data']>;
-export type ListLanguageRes = Awaited<ReturnType<typeof LanguageAPI.listFn>>['data']['data'];
+export type ListTranslationReq = NonNullable<Parameters<typeof TranslationAPI.listFn>[0]['data']>;
+export type ListTranslationRes = Awaited<ReturnType<typeof TranslationAPI.listFn>>['data']['data'];
 
 // 获取单个翻译
-export type GetLanguageReq = NonNullable<Parameters<typeof LanguageAPI.getFn>[0]['data']>;
-export type GetLanguageRes = Awaited<ReturnType<typeof LanguageAPI.getFn>>['data']['data'];
+export type GetTranslationReq = NonNullable<Parameters<typeof TranslationAPI.getFn>[0]['data']>;
+export type GetTranslationRes = Awaited<ReturnType<typeof TranslationAPI.getFn>>['data']['data'];
 
 // 添加翻译
-export type AddLanguageReq = NonNullable<Parameters<typeof LanguageAPI.addFn>[0]['data']>;
-export type AddLanguageRes = Awaited<ReturnType<typeof LanguageAPI.addFn>>['data']['data'];
+export type AddTranslationReq = NonNullable<Parameters<typeof TranslationAPI.addFn>[0]['data']>;
+export type AddTranslationRes = Awaited<ReturnType<typeof TranslationAPI.addFn>>['data']['data'];
 
 // 更新翻译
-export type UpdateLanguageReq = NonNullable<Parameters<typeof LanguageAPI.updateFn>[0]['data']>;
-export type UpdateLanguageRes = Awaited<ReturnType<typeof LanguageAPI.updateFn>>['data']['data'];
+export type UpdateTranslationReq = NonNullable<Parameters<typeof TranslationAPI.updateFn>[0]['data']>;
+export type UpdateTranslationRes = Awaited<ReturnType<typeof TranslationAPI.updateFn>>['data']['data'];
 
 // 删除翻译
-export type DeleteLanguageReq = NonNullable<Parameters<typeof LanguageAPI.deleteFn>[0]['data']>;
-export type DeleteLanguageRes = Awaited<ReturnType<typeof LanguageAPI.deleteFn>>['data']['data'];
+export type DeleteTranslationReq = NonNullable<Parameters<typeof TranslationAPI.deleteFn>[0]['data']>;
+export type DeleteTranslationRes = Awaited<ReturnType<typeof TranslationAPI.deleteFn>>['data']['data'];
 
 // 检查重复
-export type CheckDuplicateLanguageReq = NonNullable<
-  Parameters<typeof LanguageAPI.checkDuplicateFn>[0]['data']
+export type CheckDuplicateTranslationReq = NonNullable<
+  Parameters<typeof TranslationAPI.checkDuplicateFn>[0]['data']
 >;
-export type CheckDuplicateLanguageRes = Awaited<
-  ReturnType<typeof LanguageAPI.checkDuplicateFn>
+export type CheckDuplicateTranslationRes = Awaited<
+  ReturnType<typeof TranslationAPI.checkDuplicateFn>
 >['data']['data'];
