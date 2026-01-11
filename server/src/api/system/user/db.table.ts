@@ -33,7 +33,7 @@ const UserPasswordPO = {
     maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
-const UserBasePO = {
+export const UserBasePO = {
   langCode: {
     type: "string",
     description: "语言代码",

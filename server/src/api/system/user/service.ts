@@ -22,6 +22,7 @@ import {
   type UserUpdateVOLike,
   type UserDeleteVOLike,
   type UserGetVOLike,
+  UserBasePO,
 } from "./db.table";
 import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
@@ -84,7 +85,7 @@ const listAllRes = {
     properties: {
       ...IndexVO,
       ...UserUniqueVO,
-      ...UserBaseVO,
+      ...UserBasePO,
     },
     required: [...UserGetKeys, ...UserUniqueKeys],
     additionalProperties: false,
