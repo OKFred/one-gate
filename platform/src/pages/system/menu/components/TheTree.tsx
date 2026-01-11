@@ -2,19 +2,9 @@ import { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect
 import {
   Box,
   CircularProgress,
-  IconButton,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Alert,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
 } from '@mui/icons-material';
@@ -25,6 +15,7 @@ import type { MenuData } from './TheForm';
 import type { Props } from '../index';
 import { showGlobalNotification } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
+import { TreeNodeActionButtons } from './TheActionButtons';
 
 // 暴露给父组件的方法
 export interface TheTreeRef {
@@ -38,8 +29,6 @@ const TheTree = memo(
 
     const [menus, setMenus] = useState<MenuData[]>([]);
     const [loading, setLoading] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [menuToDelete, setMenuToDelete] = useState<MenuData | null>(null);
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
 
     // 将平铺的菜单列表构造成树形结构
@@ -154,35 +143,20 @@ const TheTree = memo(
       fetchMenus();
     }, [fetchMenus]);
 
-    // 删除菜单
-    const handleDelete = (menu: MenuData) => {
-      setMenuToDelete(menu);
-      setDeleteDialogOpen(true);
-    };
-
-    // 确认删除
-    const confirmDeleteMenu = async () => {
-      if (!menuToDelete) return;
-
+    // 删除成功后的回调
+    const handleDeleteSuccess = useCallback(async (menuId: number) => {
       setLoading(true);
       try {
-        await MenuAPI.deleteFn({ data: { id: menuToDelete.id } });
-        fetchMenus();
-        setDeleteDialogOpen(false);
-        setMenuToDelete(null);
+        await MenuAPI.deleteFn({ data: { id: menuId } });
+        fetchMenus(filters);
         showGlobalNotification({ message: '菜单删除成功', type: 'success' });
       } catch (err) {
         console.error(err);
+        showGlobalNotification({ message: '删除失败，该菜单可能存在子菜单', type: 'error' });
       } finally {
         setLoading(false);
       }
-    };
-
-    // 取消删除
-    const cancelDelete = () => {
-      setDeleteDialogOpen(false);
-      setMenuToDelete(null);
-    };
+    }, [fetchMenus, filters]);
 
     // 获取所有展开项的ID
     const getAllExpandedIds = useCallback((menuList: MenuData[]): string[] => {
@@ -200,8 +174,9 @@ const TheTree = memo(
     }, []);
 
     // 渲染菜单树
-    const renderTree = (nodes: MenuData[]) =>
-      nodes.map((node) => (
+    const renderTree = useCallback(
+      (nodes: MenuData[]) =>
+        nodes.map((node) => (
         <TreeItem
           key={node.id}
           itemId={node.id.toString()}
@@ -230,100 +205,38 @@ const TheTree = memo(
                   </Typography>
                 )}
               </Typography>
-              <Box sx={{ display: 'flex', gap: 0.5 }}>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (formRef.current) {
-                      formRef.current.openAdd(node.id);
-                    }
-                  }}
-                  title="添加子菜单"
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (formRef.current) {
-                      formRef.current.openEdit(node);
-                    }
-                  }}
-                  title="编辑"
-                >
-                  <EditIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(node);
-                  }}
-                  title="删除"
-                  disabled={!!(node.children && node.children.length > 0)}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Box>
+              <TreeNodeActionButtons
+                node={node}
+                formRef={formRef}
+                onDeleteSuccess={() => handleDeleteSuccess(node.id)}
+              />
             </Box>
           }
         >
           {node.children && node.children.length > 0 && renderTree(node.children)}
         </TreeItem>
-      ));
+      )),
+    [formRef, handleDeleteSuccess]);
 
     return (
-      <>
-        {/* 菜单树 */}
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-          {loading ? (
-            <Box display="flex" justifyContent="center" py={4}>
-              <CircularProgress />
-            </Box>
-          ) : menus.length > 0 ? (
-            <SimpleTreeView
-              slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-              defaultExpandedItems={getAllExpandedIds(menus)}
-            >
-              {renderTree(menus)}
-            </SimpleTreeView>
-          ) : (
-            <Typography color="text.secondary" textAlign="center" py={4}>
-              暂无菜单数据，点击上方按钮添加
-            </Typography>
-          )}
-        </Box>
-
-        {/* 删除确认对话框 */}
-        <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
-          <DialogTitle>确认删除</DialogTitle>
-          <DialogContent>
-            <Typography>
-              确定要删除菜单 "<strong>{menuToDelete?.name}</strong>" 吗？此操作不可恢复。
-            </Typography>
-            {menuToDelete?.children && menuToDelete.children.length > 0 && (
-              <Alert severity="warning" sx={{ mt: 2 }}>
-                该菜单存在子菜单，请先删除子菜单后再删除该菜单。
-              </Alert>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={cancelDelete} disabled={loading}>
-              取消
-            </Button>
-            <Button
-              onClick={confirmDeleteMenu}
-              color="error"
-              variant="contained"
-              disabled={loading || !!(menuToDelete?.children && menuToDelete.children.length > 0)}
-            >
-              {loading ? <CircularProgress size={20} /> : '删除'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+      <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+        {loading ? (
+          <Box display="flex" justifyContent="center" py={4}>
+            <CircularProgress />
+          </Box>
+        ) : menus.length > 0 ? (
+          <SimpleTreeView
+            slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
+            defaultExpandedItems={getAllExpandedIds(menus)}
+          >
+            {renderTree(menus)}
+          </SimpleTreeView>
+        ) : (
+          <Typography color="text.secondary" textAlign="center" py={4}>
+            暂无菜单数据，点击上方按钮添加
+          </Typography>
+        )}
+      </Box>
     );
   }),
 );

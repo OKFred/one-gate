@@ -2,19 +2,9 @@ import { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect
 import {
   Box,
   CircularProgress,
-  IconButton,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Alert,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  Edit as EditIcon,
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
   Apartment as ApartmentIcon,
@@ -25,6 +15,7 @@ import type { DepartmentData } from './TheForm';
 import type { Props } from '../index';
 import { showGlobalNotification } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
+import { TreeNodeActionButtons } from './TheActionButtons';
 
 // 暴露给父组件的方法
 export interface TheTreeRef {
@@ -38,8 +29,6 @@ const TheTree = memo(
 
     const [departments, setDepartments] = useState<DepartmentData[]>([]);
     const [loading, setLoading] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [departmentToDelete, setDepartmentToDelete] = useState<DepartmentData | null>(null);
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
 
     // 将扁平的部门列表构造成树形结构（支持无限层级）
@@ -168,35 +157,20 @@ const TheTree = memo(
       fetchDepartments();
     }, [fetchDepartments]);
 
-    // 删除部门
-    const handleDelete = (department: DepartmentData) => {
-      setDepartmentToDelete(department);
-      setDeleteDialogOpen(true);
-    };
-
-    // 确认删除
-    const confirmDeleteDepartment = async () => {
-      if (!departmentToDelete) return;
-
+    // 删除成功后的回调
+    const handleDeleteSuccess = useCallback(async (deptId: number) => {
       setLoading(true);
       try {
-        await DepartmentAPI.deleteFn({ data: { id: departmentToDelete.id } });
+        await DepartmentAPI.deleteFn({ data: { id: deptId } });
         fetchDepartments(filters);
-        setDeleteDialogOpen(false);
-        setDepartmentToDelete(null);
         showGlobalNotification({ message: '部门删除成功', type: 'success' });
       } catch (err) {
         console.error(err);
+        showGlobalNotification({ message: '删除失败，该部门可能存在子部门或关联数据', type: 'error' });
       } finally {
         setLoading(false);
       }
-    };
-
-    // 取消删除
-    const cancelDelete = () => {
-      setDeleteDialogOpen(false);
-      setDepartmentToDelete(null);
-    };
+    }, [fetchDepartments, filters]);
 
     // 获取所有展开项的ID（递归遍历所有层级）
     const getAllExpandedIds = useCallback((deptList: DepartmentData[]): string[] => {
@@ -241,43 +215,11 @@ const TheTree = memo(
                     </Typography>
                   )}
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (formRef.current) {
-                        formRef.current.openAdd(node.id);
-                      }
-                    }}
-                    title="添加子部门"
-                  >
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (formRef.current) {
-                        formRef.current.openEdit(node);
-                      }
-                    }}
-                    title="编辑"
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(node);
-                    }}
-                    title="删除"
-                    disabled={!!(node.children && node.children.length > 0)}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
+                <TreeNodeActionButtons
+                  node={node}
+                  formRef={formRef}
+                  onDeleteSuccess={() => handleDeleteSuccess(node.id)}
+                />
               </Box>
             }
           >
@@ -285,62 +227,28 @@ const TheTree = memo(
             {node.children && node.children.length > 0 && renderTree(node.children)}
           </TreeItem>
         )),
-      [formRef],
+      [formRef, handleDeleteSuccess],
     );
 
     return (
-      <>
-        {/* 部门树 */}
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-          {loading ? (
-            <Box display="flex" justifyContent="center" py={4}>
-              <CircularProgress />
-            </Box>
-          ) : departments.length > 0 ? (
-            <SimpleTreeView
-              slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-              defaultExpandedItems={getAllExpandedIds(departments)}
-            >
-              {renderTree(departments)}
-            </SimpleTreeView>
-          ) : (
-            <Typography color="text.secondary" textAlign="center" py={4}>
-              暂无部门数据，点击上方按钮添加
-            </Typography>
-          )}
-        </Box>
-
-        {/* 删除确认对话框 */}
-        <Dialog open={deleteDialogOpen} onClose={cancelDelete}>
-          <DialogTitle>确认删除</DialogTitle>
-          <DialogContent>
-            <Typography>
-              确定要删除部门 "<strong>{departmentToDelete?.name}</strong>" 吗？此操作不可恢复。
-            </Typography>
-            {departmentToDelete?.children && departmentToDelete.children.length > 0 && (
-              <Alert severity="warning" sx={{ mt: 2 }}>
-                该部门存在子部门，请先删除子部门后再删除该部门。
-              </Alert>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={cancelDelete} disabled={loading}>
-              取消
-            </Button>
-            <Button
-              onClick={confirmDeleteDepartment}
-              color="error"
-              variant="contained"
-              disabled={
-                loading ||
-                !!(departmentToDelete?.children && departmentToDelete.children.length > 0)
-              }
-            >
-              {loading ? <CircularProgress size={20} /> : '删除'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+      <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+        {loading ? (
+          <Box display="flex" justifyContent="center" py={4}>
+            <CircularProgress />
+          </Box>
+        ) : departments.length > 0 ? (
+          <SimpleTreeView
+            slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
+            defaultExpandedItems={getAllExpandedIds(departments)}
+          >
+            {renderTree(departments)}
+          </SimpleTreeView>
+        ) : (
+          <Typography color="text.secondary" textAlign="center" py={4}>
+            暂无部门数据，点击上方按钮添加
+          </Typography>
+        )}
+      </Box>
     );
   }),
 );
