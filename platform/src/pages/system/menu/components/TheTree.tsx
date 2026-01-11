@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as MenuAPI from '@/api/system/menu';
+import Icon from '@/components/Icon';
 import type { MenuData } from './TheForm';
 import type { Props } from '../index';
 import { showGlobalNotification } from '@/components/Notification';
@@ -107,6 +108,7 @@ const TheTree = memo(
         setLoading(true);
         try {
           const requestData = {
+            descend: false,
             ...(searchFilters?.keyword && { keyword: searchFilters.keyword }),
             ...(searchFilters?.isEnabled !== undefined && { isEnabled: searchFilters.isEnabled }),
           };
@@ -206,11 +208,11 @@ const TheTree = memo(
           itemId={node.id.toString()}
           label={
             <Box display="flex" alignItems="center" py={0.5}>
-              <Box
-                component="span"
-                className={node.icon}
-                sx={{ mr: 1, fontSize: 20, display: 'flex', alignItems: 'center' }}
-              />
+              {node.icon && (
+                <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                  <Icon name={node.icon} size={20} />
+                </Box>
+              )}
               <Typography sx={{ flexGrow: 1 }}>
                 {node.name}
                 {node.path && (
