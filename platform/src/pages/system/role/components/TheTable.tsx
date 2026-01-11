@@ -122,7 +122,7 @@ const TheTable = memo(
 
     // 格式化时间
     const formatTime = (timestamp?: number | null) => {
-      if (!timestamp) return '-';
+      if (!timestamp) return '--';
       return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
     };
 
@@ -130,7 +130,7 @@ const TheTable = memo(
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: 'ID', render: (row) => row.id },
       { title: '角色名称', render: (row) => row.name },
-      { title: '描述', render: (row) => row.description || '-' },
+      { title: '描述', render: (row) => row.description || '--' },
       {
         title: '状态',
         render: (row) => (
@@ -162,7 +162,7 @@ const TheTable = memo(
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.name },
       { type: 'subtitle', label: 'ID', render: (row) => row.id },
-      { type: 'content', label: '描述', render: (row) => row.description || '-' },
+      { type: 'content', label: '描述', render: (row) => row.description || '--' },
       {
         type: 'content',
         label: '创建时间',
@@ -200,7 +200,5 @@ const TheTable = memo(
     );
   }),
 );
-
-TheTable.displayName = 'TheTable';
 
 export default TheTable;

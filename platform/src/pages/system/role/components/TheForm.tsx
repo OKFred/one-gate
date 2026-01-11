@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as RoleAPI from '@/api/system/role';
-import type { AddRoleReq } from '@/api/system/type';
+import type { AddRoleReq, UpdateRoleReq } from '@/api/system/type';
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -27,10 +27,10 @@ export interface RoleFormRef {
   onOpen: (role?: TableState['list'][0]) => void;
 }
 
-const DEFAULT_FORM: AddRoleReq = {
+const DEFAULT_FORM: AddRoleReq | UpdateRoleReq = {
   name: '',
-  description: '',
-  permissions: '',
+  description: null,
+  permissions: null,
   isEnabled: true,
 };
 
@@ -43,7 +43,7 @@ const TheForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddRoleReq>(DEFAULT_FORM);
+    const [form, setForm] = useState<AddRoleReq | UpdateRoleReq>(DEFAULT_FORM);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -53,9 +53,9 @@ const TheForm = memo(
           if (role) {
             setEditId(role.id!);
             setForm({
-              name: role.name || '',
-              description: role.description || '',
-              permissions: role.permissions || '',
+              name: role.name,
+              description: role.description,
+              permissions: role.permissions,
               isEnabled: role.isEnabled,
             });
           } else {
@@ -79,9 +79,9 @@ const TheForm = memo(
       const formData = { ...form };
 
       if (editId) {
-        await RoleAPI.updateFn({ data: { id: editId, ...formData } });
+        await RoleAPI.updateFn({ data: { id: editId, ...formData } as UpdateRoleReq });
       } else {
-        await RoleAPI.addFn({ data: formData });
+        await RoleAPI.addFn({ data: formData as AddRoleReq });
       }
       handleCancel();
       // 刷新表格数据
@@ -130,7 +130,7 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <TextField
                 label="角色名称"
-                value={form.name}
+                value={form.name ?? ''}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
                 fullWidth
@@ -140,7 +140,7 @@ const TheForm = memo(
 
               <TextField
                 label="角色描述"
-                value={form.description}
+                value={form.description ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -156,7 +156,7 @@ const TheForm = memo(
 
               <TextField
                 label="权限列表"
-                value={form.permissions}
+                value={form.permissions ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
