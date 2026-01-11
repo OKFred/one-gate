@@ -42,10 +42,16 @@ const routeWhitelist = ["/system/auth/login"];
 function routeMaker({
   pathInfo,
   nameSpace,
+  adapter,
   service,
   reqSchema,
   resSchema,
   componentArr,
+}: API & {
+  nameSpace: string;
+  reqSchema: JSONSchema;
+  resSchema: JSONSchema;
+  componentArr: ReturnType<typeof componentMaker>[];
 }) {
   const controller = async (c: NodeHonoContext) => {
     //获取request header content type
@@ -69,7 +75,7 @@ function routeMaker({
       );
     }
     c.set("bodyObj", bodyObj);
-    const result = await service(c);
+    const result = adapter ? await adapter(service)(c) : await service(c); // 暂时设置为可选，后续改造完了变为必须
     if (process.env.NODE_ENV !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
@@ -118,23 +124,24 @@ function routeMaker({
   return { pathObj: newPathObj, controller };
 }
 
-export interface ServiceItem {
+export interface API {
   req: JSONSchema;
   res: JSONSchema;
-  pathInfo: Partial<RawRouteConfig>;
-  service: (c: NodeHonoContext) => Promise<any>;
+  pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
+  adapter?: Function;
+  service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
 }
 
 export default function main(
-  service: Record<string, ServiceItem>,
+  apiObj: Record<string, API>,
   nameSpace: string,
-  prerequisites: Function
+  prerequisites?: Function
 ) {
   if (prerequisites) {
     prerequisites();
   }
   const app = new OpenAPIHono<AppBindings>();
-  Array.from(Object.values(service)).forEach((obj) => {
+  Array.from(Object.values(apiObj)).forEach((obj) => {
     const { req, res, pathInfo } = obj;
     const subNameSpace = pathInfo.path
       .replace(/\//g, "_")

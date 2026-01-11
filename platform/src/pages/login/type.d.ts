@@ -17,11 +17,11 @@ export type WechatLoginResponse = Awaited<ReturnType<typeof AuthAPI.wechatLogin>
 export type WechatLoginReq = NonNullable<WechatLoginParams['data']>;
 export type WechatLoginData = NonNullable<WechatLoginResponse['data']>;
 
-// Token 验证
-export type VerifyTokenParams = Parameters<typeof AuthAPI.verifyToken>[0];
-export type VerifyTokenResponse = Awaited<ReturnType<typeof AuthAPI.verifyToken>>;
-export type VerifyTokenReq = NonNullable<VerifyTokenParams['data']>;
-export type VerifyTokenData = NonNullable<VerifyTokenResponse['data']>;
+// 获取用户信息
+export type GetProfileParams = Parameters<typeof AuthAPI.getProfile>[0];
+export type GetProfileResponse = Awaited<ReturnType<typeof AuthAPI.getProfile>>;
+export type GetProfileReq = NonNullable<GetProfileParams['data']>;
+export type GetProfileData = NonNullable<GetProfileResponse['data']>;
 
 // Token 刷新
 export type RefreshTokenParams = Parameters<typeof AuthAPI.refreshToken>[0];

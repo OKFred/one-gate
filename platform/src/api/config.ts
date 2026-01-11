@@ -88,58 +88,47 @@ function setupInterceptors(service: AxiosInstance) {
     function (response) {
       if (response.status === 200) {
         // 检查响应数据中的 ok 字段
-        if (response.data && response.data.ok === false) {
+        if (!response.data || response.data?.ok === false) {
           const errorMessage = response.data.message || '请求失败';
-          showGlobalNotification({ message: errorMessage, type: 'error' });
-          console.error(errorMessage);
+          handleErrorResponse(errorMessage);
           return Promise.reject(response);
         }
-        return response;
-      } else {
-        const errorMessage = response.data?.message || '请求失败';
-        showGlobalNotification({ message: errorMessage, type: 'error' });
-        console.error(errorMessage);
-        return Promise.reject(response);
       }
+      return response;
     },
     function (error) {
-      if (error.response) {
-        // 处理401未授权错误
-        if (error.response.status === 401) {
-          // 如果当前不在登录页，才执行跳转逻辑
-          if (window.location.pathname !== '/login') {
-            showGlobalNotification({
-              message: '登录已过期，请重新登录',
-              type: 'warning',
-              beforeClose: (action, instance, done) => {
-                console.log(action, instance);
-                authUtils.logout();
-                window.location.href = '/login';
-                done();
-              },
-            });
-          } else {
-            // 如果在登录页，说明是登录失败（密码错误等），显示错误信息即可
-            const errorMessage = error.response.data?.message || '登录失败';
-            showGlobalNotification({ message: errorMessage, type: 'error' });
-          }
-          return Promise.reject(error);
-        }
+      const status = error.response?.status;
 
-        // 显示错误消息
-        const errorMessage = error.response.data?.message || '请求失败';
-        showGlobalNotification({ message: errorMessage, type: 'error' });
-        console.error(errorMessage);
-      } else {
-        // 网络错误或其他错误
-        const errorMessage = error.message || '网络错误';
-        showGlobalNotification({ message: errorMessage, type: 'error' });
-        console.error(errorMessage);
+      // 401 未授权：清理并跳转登录
+      if (status === 401) {
+        if (window.location.pathname !== '/login') {
+          showGlobalNotification({
+            message: '登录已过期，请重新登录',
+            type: 'warning',
+            beforeClose: (action, instance, done) => {
+              console.log(action, instance);
+              authUtils.logout();
+              window.location.href = '/login';
+              done();
+            },
+          });
+        } else {
+          handleErrorResponse('登录失败，请检查用户名和密码');
+        }
+        return Promise.reject(error);
       }
+
+      // 其他业务错误：优先展示后端 message
+      handleErrorResponse(error.message || '网络错误');
       return Promise.reject(error);
     },
   );
   return service;
+}
+
+function handleErrorResponse(errorMessage: string) {
+  showGlobalNotification({ message: errorMessage, type: 'error' });
+  console.error(errorMessage);
 }
 
 // 初始化拦截器
@@ -148,8 +137,6 @@ setupInterceptors(service);
 // axiosPlus 函数，直接使用已配置好拦截器的 service
 const axiosPlus = async <U extends keyof paths, M extends keyof UrlGeneric<U>>(
   axiosConfig: AxiosConfig<U, M>,
-  /*  customOptions,
-  loadingOptions, */
 ): Promise<Omit<AxiosResponse, 'data' | 'headers'> & ResponseGeneric<U, M>> => {
   return await service(axiosConfig as AxiosRequestConfig);
 };

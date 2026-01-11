@@ -6,13 +6,39 @@ import { axiosPlus } from '../config';
 import type { AxiosConfig } from '../config';
 
 /**
- * 获取树形菜单列表（根据用户角色自动过滤）
+ * 获取树形菜单列表
  */
 export const treeFn = async (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/menu/tree', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
     url: '/api/v1/system/menu/tree',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+/**
+ * 获取所有菜单列表
+ */
+export const listAllFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/menu/listAll', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/menu/listAll',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+/**
+ * 获取菜单列表
+ */
+export const listFn = async (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/menu/list', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/menu/list',
     method: 'post',
     ...axiosConfig,
   });

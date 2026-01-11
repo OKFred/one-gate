@@ -1,17 +1,8 @@
-import { 
-  Card, 
-  CardContent, 
-  Typography, 
-  Box, 
-  Chip, 
-  Paper 
-} from '@mui/material';
-import { 
-  AccountBox as AccountBoxIcon, 
-  Edit as EditIcon 
-} from '@mui/icons-material';
+import { Card, CardContent, Typography, Box, Chip, Paper } from '@mui/material';
+import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import type { User } from '@/pages/me/type';
+import dayjs from 'dayjs';
 
 interface UserDetailsProps {
   user: User;
@@ -27,11 +18,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
             <AccountBoxIcon sx={{ mr: 1 }} />
             <Typography variant="h6">个人信息</Typography>
           </Box>
-          <ResponsiveButton
-            variant="contained"
-            startIcon={<EditIcon />}
-            onClick={onEdit}
-          >
+          <ResponsiveButton variant="contained" startIcon={<EditIcon />} onClick={onEdit}>
             编辑
           </ResponsiveButton>
         </Box>
@@ -46,7 +33,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 {user.id}
               </Typography>
             </Box>
-            
+
             <Box>
               <Typography variant="body2" color="text.secondary">
                 用户名
@@ -55,7 +42,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 {user.username}
               </Typography>
             </Box>
-            
+
             <Box>
               <Typography variant="body2" color="text.secondary">
                 部门ID
@@ -64,7 +51,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 {user.departmentObj?.label || '未分配'}
               </Typography>
             </Box>
-            
+
             <Box>
               <Typography variant="body2" color="text.secondary">
                 角色ID
@@ -73,7 +60,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 {user.roleArr.map((role) => role.label).join(', ') || '未分配'}
               </Typography>
             </Box>
-            
+
             <Box>
               <Typography variant="body2" color="text.secondary">
                 账户状态
@@ -84,28 +71,24 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 size="small"
               />
             </Box>
-            
+
             <Box>
               <Typography variant="body2" color="text.secondary">
                 创建时间
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.createTimeUtc
-                  ? new Date(user.createTimeUtc).toLocaleString()
-                  : '暂无'
-                }
+                {user.createTimeUtc ? new Date(user.createTimeUtc).toLocaleString() : '暂无'}
               </Typography>
             </Box>
-            
+
             <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
               <Typography variant="body2" color="text.secondary">
                 更新时间
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.updateTimeUtc
-                  ? new Date(user.updateTimeUtc).toLocaleString()
-                  : '暂无'
-                }
+                  ? dayjs(user.updateTimeUtc).format('YYYY-MM-DD HH:mm:ss')
+                  : '暂无'}
               </Typography>
             </Box>
           </Box>

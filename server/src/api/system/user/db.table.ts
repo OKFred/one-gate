@@ -8,6 +8,8 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -20,6 +22,7 @@ const UserUniquePO = {
     type: "string",
     description: "用户名",
     examples: ["user"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
 const UserPasswordPO = {
@@ -27,22 +30,26 @@ const UserPasswordPO = {
     type: "string",
     description: "密码",
     examples: ["pass"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
-const UserBasePO = {
+export const UserBasePO = {
   langCode: {
     type: "string",
     description: "语言代码",
     examples: ["en-US", "zh-CN"],
+    maxLength: 10,
   },
   isEnabled: {
     type: "boolean",
     description: "是否启用",
   },
   departmentId: {
-    type: "number",
+    type: ["number", "null"],
+    nullable: true,
     description: "部门ID",
     examples: [1],
+    minimum: 1,
   },
   roleIdArr: {
     type: "array",
@@ -50,6 +57,7 @@ const UserBasePO = {
     items: {
       type: "number",
       examples: [1],
+      minimum: 1,
     },
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
@@ -62,7 +70,7 @@ const UserPO = {
 } as const satisfies Record<keyof UserPOLike, JSONSchema>;
 export type UserPOLike = InferSelectModel<typeof userTable>; // 列表
 type UserSelectPOLike = InferInsertModel<typeof userTable>;
-type UserAddPOLike = Omit<UserSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type UserAddPOLike = Omit<UserPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type UserUpdatePOLike = Partial<
   Omit<UserSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -76,11 +84,17 @@ const UserDepartmentDTO = {
     nullable: true,
     description: "部门对象",
     properties: {
-      value: { type: "number", description: "部门ID", examples: [1] },
+      value: {
+        type: "number",
+        description: "部门ID",
+        examples: [1],
+        minimum: 1,
+      },
       label: {
         type: "string",
         description: "部门名称",
         examples: ["研发部"],
+        maxLength: 100,
       },
     },
     required: ["value", "label"],
@@ -94,11 +108,17 @@ const UserRoleDTO = {
     items: {
       type: "object",
       properties: {
-        value: { type: "number", description: "角色ID", examples: [1] },
+        value: {
+          type: "number",
+          description: "角色ID",
+          examples: [1],
+          minimum: 1,
+        },
         label: {
           type: "string",
           description: "角色名称",
           examples: ["管理员"],
+          maxLength: 100,
         },
       },
       required: ["value", "label"],
@@ -107,19 +127,20 @@ const UserRoleDTO = {
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
 type UserDTOLike = {
-  departmentObj?: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]>;
+  departmentObj: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]> | null;
   roleArr: FromSchema<(typeof UserRoleDTO)["roleArr"]>;
 };
 type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const UserUniqueVO = UserUniquePO;
-const UserBaseVO = {
+export const UserUniqueVO = UserUniquePO;
+export const UserBaseVO = {
   langCode: {
     type: "string",
     description: "语言代码",
     examples: ["en-US", "zh-CN"],
+    maxLength: 10,
   },
   isEnabled: {
     type: "boolean",
@@ -162,45 +183,51 @@ export type UserDeleteVOLike = Pick<UserVOLike, IndexKeyLike>;
 export type UserGetVOLike = Pick<UserVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const UserListKeys = [
-  "id",
-  "username",
-  "langCode",
-  "departmentId",
-  "roleIdArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
-export const UserDetailKeys = [
-  "id",
-  "username",
-  "langCode",
-  "roleArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<UserVOLike>[];
 export const UserAddKeys = [
   "username",
   "password",
   "langCode",
   "isEnabled",
+  "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserAddVOLike>[];
 export const UserUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<UserUpdateVOLike>[];
 export const UserDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<UserDeleteVOLike>[];
 export const UserGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<UserGetVOLike>[];
+const UserBaseKeys = [
+  ...IndexKey,
+  "username",
+  "langCode",
+  "isEnabled",
+  ...AuditKeys,
+] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
+export const UserListKeys = [
+  ...UserBaseKeys,
+  "departmentId",
+  "roleIdArr",
+] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
+export const UserDetailKeys = [
+  ...UserBaseKeys,
+  "departmentObj",
+  "roleArr",
+] as const satisfies RequiredKeys<UserVOLike>[];
+export const UserUniqueKeys = ["username"] as const;
+
+// 可排序字段（解耦供 service 使用）
+export const UserSortableKeys = [
+  "id",
+  "username",
+  "langCode",
+  "departmentId",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<UserPOLike>[];
 
 //----------------- Table ----------------//
 export const userTable = sqliteTable("system_user", {

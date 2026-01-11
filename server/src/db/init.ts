@@ -4,7 +4,7 @@ import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
 import { menuTable } from "@/api/system/menu/db.table";
-import { initialMenuData } from "@/api/system/menu/initialMenu";
+import { initialMenuData } from "@/db/initialMenu";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -121,7 +121,7 @@ async function initMenu() {
     for (const menu of initialMenuData) {
       await db.insert(menuTable).values({
         id: menu.id,
-        text: menu.text,
+        name: menu.name,
         icon: menu.icon,
         sort: menu.sort,
         path: menu.path || null,

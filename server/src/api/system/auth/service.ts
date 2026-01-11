@@ -1,11 +1,17 @@
 import userService, { utils as userUtils } from "@/api/system/user/service";
 import { tokenUtils } from "@/utils/token";
-import { HTTPException } from "hono/http-exception";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj } from "@/types/app";
+import { UserDetailKeys, UserVO } from "../user/db.table";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 
 // 普通登录
 const loginReq = {
@@ -15,11 +21,13 @@ const loginReq = {
       type: "string",
       description: "用户名",
       examples: ["admin"],
+      maxLength: 100,
     },
     password: {
       type: "string",
       description: "密码",
       examples: ["pass"],
+      maxLength: 100,
     },
   },
   required: ["username", "password"] as const,
@@ -35,63 +43,11 @@ const loginRes = {
         token: {
           type: "string",
           description: "用户token",
+          maxLength: 500,
         },
-        id: {
-          type: "number",
-          description: "用户ID",
-        },
-        username: {
-          type: "string",
-          description: "用户名",
-        },
-        langCode: {
-          type: "string",
-          description: "用户语言代码",
-        },
-        isEnabled: {
-          type: "boolean",
-          description: "是否启用",
-        },
-        departmentObj: {
-          type: "object",
-          description: "部门对象",
-          properties: {
-            value: { type: "number", description: "部门ID", examples: [1] },
-            label: {
-              type: "string",
-              description: "部门名称",
-              examples: ["研发部"],
-            },
-          },
-          required: ["value", "label"],
-          additionalProperties: false,
-        },
-        roleArr: {
-          type: "array",
-          description: "角色数组",
-          items: {
-            type: "object",
-            properties: {
-              value: { type: "number", description: "角色ID", examples: [1] },
-              label: {
-                type: "string",
-                description: "角色名称",
-                examples: ["管理员"],
-              },
-            },
-            required: ["value", "label"],
-            additionalProperties: false,
-          },
-        },
+        ...UserVO,
       },
-      required: [
-        "token",
-        "id",
-        "username",
-        "langCode",
-        "roleArr",
-        "isEnabled",
-      ] as const,
+      required: ["token", ...UserDetailKeys] as const,
       additionalProperties: false,
     },
   },
@@ -100,10 +56,9 @@ const loginRes = {
 } as const satisfies JSONSchema;
 
 async function onLogin(
-  c: NodeHonoContext
+  params: FromSchema<typeof loginReq>
 ): Promise<FromSchema<typeof loginRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof loginReq>;
-  const { username, password: base64Password } = obj;
+  const { username, password: base64Password } = params;
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
   const password = plainPassword;
   const verifyResult = await userUtils.verifyUsernameAndPassword({
@@ -116,12 +71,7 @@ async function onLogin(
     !verifyResult.userObj ||
     !verifyResult.userObj.isEnabled
   )
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.authFailed" satisfies LanguageKey,
-      }
-    );
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   const userObj = verifyResult.userObj;
   const { id, ...rest } = userObj;
   // 生成token
@@ -147,8 +97,9 @@ const loginApi = {
     method: "post",
     summary: "用户登录",
   } as const,
+  adapter: bodyAdapter,
   service: onLogin,
-};
+} satisfies API;
 
 // 微信登录
 const wechatLoginReq = {
@@ -158,11 +109,13 @@ const wechatLoginReq = {
       type: "string",
       description: "微信授权码",
       examples: ["061abc123"],
+      maxLength: 50,
     },
     state: {
       type: "string",
       description: "状态参数(可选)",
       examples: ["STATE"],
+      maxLength: 100,
     },
   },
   required: ["code"] as const,
@@ -174,10 +127,9 @@ const wechatLoginRes = {
 } as const satisfies JSONSchema;
 
 async function onWechatLogin(
-  c: NodeHonoContext
+  params: FromSchema<typeof wechatLoginReq>
 ): Promise<FromSchema<typeof wechatLoginRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof wechatLoginReq>;
-  const { code, state } = obj;
+  const { code, state } = params;
 
   // TODO: 实现微信登录逻辑
   // 1. 使用code换取access_token
@@ -188,12 +140,7 @@ async function onWechatLogin(
   // 暂时返回null，需要配置微信开发者信息
   console.log("微信登录暂未实现，需要配置微信AppID和AppSecret");
   console.log("收到的参数:", { code, state });
-  throw new HTTPException(
-    httpStatusCode.NOT_IMPLEMENTED as ContentfulStatusCode,
-    {
-      message: "i18n.api.system.wechatNotImplemented" satisfies LanguageKey,
-    }
-  );
+  throw new BusinessError(BusinessErrorCode.NOT_YET_IMPLEMENTED);
 }
 
 const wechatLoginApi = {
@@ -204,46 +151,9 @@ const wechatLoginApi = {
     method: "post",
     summary: "微信登录",
   } as const,
+  adapter: bodyAdapter,
   service: onWechatLogin,
-};
-
-// 验证token
-const verifyTokenReq = {
-  type: "object",
-  properties: {
-    token: {
-      type: "string",
-      description: "需要验证的token",
-      examples: ["example-session-token"],
-    },
-  },
-  required: ["token"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const verifyTokenRes = {
-  type: "boolean",
-} as const satisfies JSONSchema;
-
-async function onVerifyToken(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof verifyTokenRes>> {
-  const obj = c.get("bodyObj") as FromSchema<typeof verifyTokenReq>;
-  const { token } = obj;
-  const isValid = tokenUtils.verifyToken(token) !== null;
-  return isValid;
-}
-
-const verifyTokenApi = {
-  req: verifyTokenReq,
-  res: verifyTokenRes,
-  pathInfo: {
-    path: "/verify",
-    method: "post",
-    summary: "验证token",
-  } as const,
-  service: onVerifyToken,
-};
+} satisfies API;
 
 // 刷新token
 const refreshTokenReq = {
@@ -253,6 +163,7 @@ const refreshTokenReq = {
       type: "string",
       description: "需要刷新的token",
       examples: ["example-session-token"],
+      maxLength: 500,
     },
   },
   required: ["token"] as const,
@@ -265,6 +176,7 @@ const refreshTokenRes = {
     token: {
       type: "string",
       description: "新的token",
+      maxLength: 500,
     },
   },
   required: ["token"] as const,
@@ -272,10 +184,9 @@ const refreshTokenRes = {
 } as const satisfies JSONSchema;
 
 async function onRefreshToken(
-  c: NodeHonoContext
+  params: FromSchema<typeof refreshTokenReq>
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof refreshTokenReq>;
-  const { token } = obj;
+  const { token } = params;
   const newToken = tokenUtils.refreshToken(token);
   if (!newToken) {
     return null;
@@ -294,8 +205,9 @@ const refreshTokenApi = {
     method: "post",
     summary: "刷新token",
   } as const,
+  adapter: bodyAdapter,
   service: onRefreshToken,
-};
+} satisfies API;
 
 // 获取当前用户信息
 const profileReq = {
@@ -310,55 +222,9 @@ const profileRes = {
     userObj: {
       type: "object",
       properties: {
-        id: {
-          type: "number",
-          description: "用户ID",
-        },
-        username: {
-          type: "string",
-          description: "用户名",
-        },
-        langCode: {
-          type: "string",
-          description: "用户语言代码",
-        },
-        isEnabled: {
-          type: "boolean",
-          description: "是否启用",
-        },
-        departmentObj: {
-          type: "object",
-          description: "部门对象",
-          properties: {
-            value: { type: "number", description: "部门ID", examples: [1] },
-            label: {
-              type: "string",
-              description: "部门名称",
-              examples: ["研发部"],
-            },
-          },
-          required: ["value", "label"],
-          additionalProperties: false,
-        },
-        roleArr: {
-          type: "array",
-          description: "角色数组",
-          items: {
-            type: "object",
-            properties: {
-              value: { type: "number", description: "角色ID", examples: [1] },
-              label: {
-                type: "string",
-                description: "角色名称",
-                examples: ["管理员"],
-              },
-            },
-            required: ["value", "label"],
-            additionalProperties: false,
-          },
-        },
+        ...UserVO,
       },
-      required: ["id", "username", "langCode", "roleArr", "isEnabled"] as const,
+      required: [...UserDetailKeys] as const,
       additionalProperties: false,
     },
   },
@@ -367,13 +233,11 @@ const profileRes = {
 } as const satisfies JSONSchema;
 
 async function onProfile(
-  c: NodeHonoContext
+  _params: FromSchema<typeof profileReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof profileRes> | null> {
-  const userObj = c.get("userObj");
   const { userId } = userObj;
-  // 设置 bodyObj for userService.get
-  c.set("bodyObj", { id: userId });
-  const userDataObj = await userService.get.service(c);
+  const userDataObj = await userService.get.service({ id: userId });
   return { userObj: userDataObj };
 }
 
@@ -385,13 +249,13 @@ const profileApi = {
     method: "post",
     summary: "获取当前用户信息",
   } as const,
+  adapter: bodyUserAdapter,
   service: onProfile,
-};
+} satisfies API;
 
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
-  verify: verifyTokenApi,
   refresh: refreshTokenApi,
   profile: profileApi,
 };

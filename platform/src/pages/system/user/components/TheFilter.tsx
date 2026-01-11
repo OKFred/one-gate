@@ -19,25 +19,25 @@ import {
   ExpandMore,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import {
-  useState,
-  useEffect,
-  useCallback,
-  memo,
-  forwardRef,
-  useImperativeHandle,
-} from 'react';
-import type { FilterState } from '../type';
-import type { Props } from '../type.d';
+import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
+import type { Props } from '../index';
+import type { ListUserReq } from '@/api/system/type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListUserReq['orderBy']>;
+  descend: boolean;
+}
 
 // 暴露给父组件的方法
-export interface RoleFilterRef {
+export interface TheFilterRef {
   /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
 }
 
-const RoleFilter = memo(
-  forwardRef<RoleFilterRef, Props>(({ localObj }, ref) => {
+const TheFilter = memo(
+  forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
@@ -46,7 +46,7 @@ const RoleFilter = memo(
     const [filters, setFilters] = useState<FilterState>({
       keyword: '',
       orderBy: 'id',
-      descend: false,
+      descend: true,
     });
 
     // 暴露给父组件的方法
@@ -104,19 +104,20 @@ const RoleFilter = memo(
       const emptyFilters: FilterState = {
         keyword: '',
         orderBy: 'id',
-        descend: false,
+        descend: true,
       };
-      setKeywordInput(''); // 清空输入框
+      setKeywordInput('');
       setFilters(emptyFilters);
+      setIsSearching(false);
       refreshTable(emptyFilters);
     };
 
     const hasActiveFilters = () => {
-      return keywordInput || filters.orderBy !== 'id' || filters.descend;
+      return keywordInput || filters.orderBy !== 'id' || !filters.descend;
     };
 
     return (
-      <Paper sx={{ p: 2, mb: 2, position: 'relative' }}>
+      <Paper sx={{ p: 2, mb: 2 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
@@ -126,7 +127,7 @@ const RoleFilter = memo(
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={`${filterCount} 个结果`}
+                label={`${filterCount} 个用户`}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -154,7 +155,7 @@ const RoleFilter = memo(
             <Stack spacing={2}>
               <TextField
                 label="关键字搜索"
-                placeholder="搜索角色ID、名称..."
+                placeholder="搜索用户名、姓名、邮箱..."
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -177,7 +178,6 @@ const RoleFilter = memo(
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
                     <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="name">名称</MenuItem>
                     <MenuItem value="createTimeUtc">创建时间</MenuItem>
                   </Select>
                 </FormControl>
@@ -202,6 +202,4 @@ const RoleFilter = memo(
   }),
 );
 
-RoleFilter.displayName = 'RoleFilter';
-
-export default RoleFilter;
+export default TheFilter;

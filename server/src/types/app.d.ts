@@ -3,6 +3,20 @@ import type { Context } from "hono";
 import type { RouteConfig } from "@hono/zod-openapi";
 import { ParameterObject, RequestBodyObject } from "openapi3-ts/oas31";
 
+export type UserObj = {
+  userId: number;
+  username: string;
+  langCode: string;
+  isEnabled: boolean;
+  departmentObj: {
+    value: number;
+    label: string;
+  } | null;
+  roleArr: {
+    value: number;
+    label: string;
+  }[];
+}
 export type RawRouteConfig = RouteConfig & {
   method: Exclude<RouteConfig["method"], "head" | "trace">;
   request?: {
@@ -21,20 +35,7 @@ export type routeLike = {
 export type AppBindings = {
   Variables: {
     bodyObj?: any;
-    userObj?: {
-      userId: number;
-      username: string;
-      langCode: string;
-      isEnabled: boolean;
-      departmentObj?: {
-        value: number;
-        label: string;
-      };
-      roleArr: {
-        value: number;
-        label: string;
-      }[];
-    };
+    userObj?: UserObj;
   };
   Bindings: Env;
 };

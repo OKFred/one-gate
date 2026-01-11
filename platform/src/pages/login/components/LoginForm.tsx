@@ -1,4 +1,4 @@
-import { TextField, Button, Box, Stack, Alert, CircularProgress, IconButton } from '@mui/material';
+import { TextField, Button, Box, Stack, CircularProgress, IconButton } from '@mui/material';
 import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
@@ -9,6 +9,8 @@ import { commonLogin } from '@/api/system/auth';
 import { authUtils } from '@/utils/auth';
 import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { showGlobalNotification } from '@/components/Notification';
+
 export default function LoginForm() {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
@@ -19,7 +21,6 @@ export default function LoginForm() {
     password: '',
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
 
   // 处理输入变化
@@ -29,40 +30,27 @@ export default function LoginForm() {
         ...prev,
         [field]: event.target.value,
       }));
-      // 清除错误信息
-      if (error) setError('');
     };
 
   // 处理普通登录
   const handleLogin = async () => {
     if (!credentials.username || !credentials.password) {
-      setError('请输入用户名和密码');
+      showGlobalNotification({ message: '请输入用户名和密码', type: 'error' });
       return;
     }
 
     setLoading(true);
-    setError('');
     try {
       const data = { ...credentials };
       data.password = globalThis.btoa(credentials.password); // 防小白
       const response = await commonLogin({ data });
-
-      if (response.data.ok && response.data.data) {
-        const loginData = response.data.data as CommonLoginData['data'];
-        const { userObj } = loginData;
-        if (!userObj || !userObj.isEnabled) {
-          setError('用户未启用，请联系管理员');
-          return;
-        }
-        authUtils.setUserInfo(userObj);
-        // 登录成功，跳转到首页
-        navigate('/home');
-      } else {
-        setError(response.data.message || '登录失败');
-      }
+      const loginData = response.data.data as CommonLoginData['data'];
+      const { userObj } = loginData;
+      authUtils.setUserInfo(userObj);
+      // 登录成功，跳转到首页
+      navigate('/home');
     } catch (err) {
       console.log(err);
-      setError(err instanceof Error ? err.message : '登录失败');
     } finally {
       setLoading(false);
     }
@@ -70,7 +58,7 @@ export default function LoginForm() {
 
   // 处理微信登录
   const handleWechatLogin = async () => {
-    setError('微信登录功能正在开发中...');
+    showGlobalNotification({ message: '微信登录功能正在开发中...', type: 'info' });
   };
 
   // 处理回车键登录
@@ -83,12 +71,6 @@ export default function LoginForm() {
   return (
     <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
       <Stack spacing={isMobile ? 2 : 3}>
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
         <TextField
           label="用户名"
           variant="outlined"

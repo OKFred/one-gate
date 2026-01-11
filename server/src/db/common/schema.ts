@@ -1,5 +1,6 @@
 import { JSONSchema } from "json-schema-to-ts";
 
+export const IndexKey = ["id"] as const;
 /** @description 主键 */
 export type IndexKeyLike = "id";
 /** @description 新增时省略的审计字段 */
@@ -15,6 +16,7 @@ export const IndexPO = {
     type: "number",
     description: "id",
     examples: [1],
+    minimum: 1,
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
 
@@ -32,12 +34,12 @@ export const AddAuditPO = {
 
 export const UpdateAuditPO = {
   updaterId: {
-    type: "number",
-    description: "更新者ID",
+    type: ["number", "null"],
     nullable: true,
+    description: "更新者ID",
   },
   updateTimeUtc: {
-    type: "number",
+    type: ["number", "null"],
     nullable: true,
     description: "更新时间",
     examples: [1672531199000],
@@ -45,28 +47,21 @@ export const UpdateAuditPO = {
 } as const satisfies Partial<Record<string, JSONSchema>>;
 
 export const AuditPO = {
-  creatorId: {
-    type: "number",
-    description: "创建者ID",
-  },
+  ...AddAuditPO,
   createTimeUtc: {
     type: "number",
     description: "创建时间",
     examples: [1672531199000],
   },
-  updaterId: {
-    type: "number",
-    description: "更新者ID",
-    nullable: true,
-  },
-  updateTimeUtc: {
-    type: "number",
-    nullable: true,
-    description: "更新时间",
-    examples: [1672531199000],
-  },
+  ...UpdateAuditPO,
 } as const satisfies Partial<Record<string, JSONSchema>>;
 
+export const AuditKeys = [
+  "creatorId",
+  "createTimeUtc",
+  "updaterId",
+  "updateTimeUtc",
+] as const;
 export const IndexVO = IndexPO;
 export const AuditVO = AuditPO;
 // 不需要定义，因为这些字段在服务器端自动生成，不通过请求体传递

@@ -8,6 +8,8 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -16,36 +18,42 @@ import { type RequiredKeys } from "@/types/app";
 
 //----------------- PO ----------------//
 const MenuBasePO = {
-  text: {
+  name: {
     type: "string",
     description: "菜单名称",
     examples: ["主页"],
+    maxLength: 100,
   },
   icon: {
     type: "string",
     description: "图标名称，使用 Iconify material-symbols 图标",
     examples: ["material-symbols:home"],
+    maxLength: 100,
   },
   path: {
     type: ["string", "null"],
     nullable: true,
     description: "路由路径",
     examples: ["/home"],
+    maxLength: 500,
   },
   parentId: {
     type: ["number", "null"],
     nullable: true,
     description: "父菜单ID，支持菜单层级",
+    minimum: 1,
   },
   sort: {
     type: "number",
     description: "排序",
+    minimum: 0,
+    maximum: 1000,
   },
   roleIdArr: {
-    type: "array",
+    type: ["array", "null"],
+    nullable: true,
     description: "需要的角色ID列表",
-    items: { type: "number" },
-    examples: [[1, 2]],
+    items: { type: "number", examples: [1], minimum: 1 },
   },
   isEnabled: {
     type: "boolean",
@@ -59,7 +67,7 @@ const MenuPO = {
 } as const satisfies Record<keyof MenuPOLike, JSONSchema>;
 export type MenuPOLike = InferSelectModel<typeof menuTable>; // 列表
 type MenuSelectPOLike = InferInsertModel<typeof menuTable>;
-type MenuAddPOLike = Omit<MenuSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type MenuAddPOLike = Omit<MenuPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type MenuUpdatePOLike = Partial<
   Omit<MenuSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -67,7 +75,7 @@ type MenuUpdatePOLike = Partial<
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const MenuBaseVO = MenuBasePO;
+export const MenuBaseVO = MenuBasePO;
 export const MenuVO = {
   ...IndexVO,
   ...MenuBaseVO,
@@ -88,59 +96,48 @@ export type MenuDeleteVOLike = Pick<MenuVOLike, IndexKeyLike>;
 export type MenuGetVOLike = Pick<MenuVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const MenuListKeys = [
-  "id",
-  "text",
-  "icon",
-  "path",
-  "parentId",
-  "sort",
-  "roleIdArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<MenuPOLike>[];
-export const MenuDetailKeys = [
-  "id",
-  "text",
-  "icon",
-  "path",
-  "parentId",
-  "sort",
-  "roleIdArr",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<MenuVOLike>[];
 export const MenuAddKeys = [
-  "text",
+  "name",
   "icon",
+  "path",
+  "parentId",
   "sort",
   "roleIdArr",
   "isEnabled",
 ] as const satisfies RequiredKeys<MenuAddVOLike>[];
 export const MenuUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<MenuUpdateVOLike>[];
 export const MenuDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<MenuDeleteVOLike>[];
 export const MenuGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<MenuGetVOLike>[];
+const MenuBaseKeys = [
+  ...IndexKey,
+  ...MenuAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<MenuPOLike>[];
+export const MenuListKeys = MenuBaseKeys;
+export const MenuDetailKeys = MenuBaseKeys;
+
+// 可排序字段（解耦供 service 使用）
+export const MenuSortableKeys = [
+  "id",
+  "name",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<MenuPOLike>[];
 
 export const menuTable = sqliteTable("system_menu", {
   id: integer("id").primaryKey().notNull(),
-  text: text("text").notNull(),
+  name: text("name").notNull(),
   icon: text("icon").notNull(),
   path: text("path"),
   parentId: integer("parent_id"),
   sort: integer("sort").notNull(),
-  roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
+  roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -154,7 +151,7 @@ export async function tableInit() {
   await db.run(`
     CREATE TABLE IF NOT EXISTS system_menu (
       id INTEGER PRIMARY KEY,
-      text TEXT NOT NULL,
+      name TEXT NOT NULL,
       icon TEXT NOT NULL,
       path TEXT,
       parent_id INTEGER,

@@ -2,6 +2,8 @@ import db from "@/db/index";
 import {
   userTable,
   IndexVO,
+  UserUniqueVO,
+  UserBaseVO,
   UserVO,
   UserListVO,
   UserAddVO,
@@ -12,124 +14,150 @@ import {
   UserDeleteKeys,
   UserAddKeys,
   UserUpdateKeys,
+  UserUniqueKeys,
+  UserSortableKeys,
   type UserPOLike,
   type UserVOLike,
   type UserAddVOLike,
   type UserUpdateVOLike,
   type UserDeleteVOLike,
   type UserGetVOLike,
+  UserBasePO,
 } from "./db.table";
 import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext, RequiredKeys } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
 import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
+import {
+  listAllReqBase,
+  listReqBase,
+  listResponseWrapper,
+  orderByWrapper,
+} from "@/middleware/encapsulation/common.schema";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
+
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(or(like(userTable.username, `%${keyword}%`)));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(userTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: UserVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof UserPOLike)[]>(UserSortableKeys),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...UserUniqueVO,
+      ...UserBasePO,
+    },
+    required: [...UserGetKeys, ...UserUniqueKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = userTable[orderBy] || userTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: userTable.id,
+      username: userTable.username,
+      langCode: userTable.langCode,
+      departmentId: userTable.departmentId,
+      roleIdArr: userTable.roleIdArr,
+      isEnabled: userTable.isEnabled,
+    })
+    .from(userTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有用户（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
 
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: [
-        "id",
-        "username",
-        "langCode",
-        "departmentId",
-        "isEnabled",
-        "createTimeUtc",
-      ] satisfies (keyof UserPOLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
-    keyword: {
-      type: "string",
-      examples: [""],
-      description: "搜索用户名",
-    },
-    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
+    ...listReqBase,
+    isEnabled: UserVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof UserPOLike)[]>(UserSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  type: "object",
-  properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      oneOf: [
-        {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              ...UserListVO,
-            },
-            required: [...UserListKeys] as const satisfies RequiredKeys<
-              Omit<UserPOLike, "password">
-            >[],
-            additionalProperties: false,
-          },
-        },
-        {
-          type: "array",
-          maxItems: 0,
-        },
-      ],
+  ...listResponseWrapper<RequiredKeys<Omit<UserPOLike, "password">>[]>(
+    {
+      ...UserListVO,
     },
-  },
-  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
-  additionalProperties: false,
+    [...UserListKeys]
+  ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    isEnabled,
-  } = listParamObj;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = userTable[orderBy] || userTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(or(like(userTable.username, `%${keyword}%`)));
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(userTable.isEnabled, isEnabled));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
-
   // 查询总数
   const countResult = await db
     .select({ total: count(userTable.id).as("total") })
     .from(userTable)
-    .where(buildWhereCondition());
-  const total = countResult[0]?.total || 0;
+    .where(buildWhereCondition(params));
+  const total = countResult[0]?.total;
   if (total === 0) {
     return {
       total,
@@ -143,7 +171,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const rows = await db
     .select()
     .from(userTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -168,8 +196,9 @@ const listApi = {
     method: "post",
     summary: "获取用户列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -183,10 +212,9 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
   const {
     username,
@@ -195,12 +223,16 @@ async function onAdd(
     roleArr,
     departmentObj,
     isEnabled,
-  } = obj;
+  } = params;
   const departmentId = departmentObj ? departmentObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
 
-  const result = await db
+  await departmentUtils.verifyDepartment(departmentId);
+  await roleUtils.verifyRoles(roleIdArr);
+
+  // 插入用户数据
+  const res = await db
     .insert(userTable)
     .values({
       username,
@@ -212,7 +244,10 @@ async function onAdd(
       creatorId,
     })
     .returning({ id: userTable.id });
-  return result[0]?.id;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
+  return res[0].id;
 }
 const addApi = {
   req: addReq,
@@ -222,8 +257,9 @@ const addApi = {
     method: "post",
     summary: "添加用户",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -239,15 +275,12 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
-  const { id, departmentObj, roleArr, ...rest } = obj;
-  const departmentId = departmentObj ? departmentObj.value : null;
-  const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
-  const isEnabled = id === SUPER_ADMIN_ID ? true : obj.isEnabled; // 禁止禁用超级管理员
+  const { id, departmentObj, roleArr, ...rest } = params;
+  const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
     updaterId,
@@ -258,12 +291,16 @@ async function onUpdate(
     isEnabled: undefined,
   };
   if (departmentObj !== undefined) {
+    const departmentId = departmentObj ? departmentObj.value : null;
+    await departmentUtils.verifyDepartment(departmentId);
     updateData = {
       ...updateData,
       departmentId,
     };
   }
   if (roleArr !== undefined) {
+    const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
+    await roleUtils.verifyRoles(roleIdArr);
     updateData = {
       ...updateData,
       roleIdArr,
@@ -275,12 +312,15 @@ async function onUpdate(
       isEnabled,
     };
   }
+
   const res = await db
     .update(userTable)
     .set(updateData)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -291,8 +331,9 @@ const updateApi = {
     method: "post",
     summary: "更新用户",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -308,19 +349,20 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   if (id === SUPER_ADMIN_ID) {
-    throw new HTTPException(httpStatusCode.FORBIDDEN as ContentfulStatusCode);
+    throw new BusinessError(BusinessErrorCode["PERMISSION_DENIED"]);
   }
-  const result = await db
+  const res = await db
     .delete(userTable)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!result || result.length === 0) return null;
-  return result[0].id;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
+  return res[0].id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -330,8 +372,9 @@ const deleteApi = {
     method: "post",
     summary: "删除用户",
   } as const,
+  adapter: bodyAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -350,30 +393,22 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(userTable)
     .where(eq(userTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   const { password, departmentId, roleIdArr, ...rest } = rows[0];
-  const departmentObj = departmentId
-    ? {
-        label:
-          (await departmentUtils.getDepartmentNameById(departmentId)) || "",
-        value: departmentId,
-      }
-    : null;
-  const roleArr =
-    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
+  const { departmentObj, roleArr } = await getDepartmentAndRoles(
+    departmentId,
+    roleIdArr
+  );
   return {
     ...rest,
     departmentObj,
@@ -388,8 +423,9 @@ const getApi = {
     method: "post",
     summary: "获取用户",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 const updateLangCodeReq = {
   type: "object",
@@ -403,13 +439,12 @@ const updateLangCodeRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdateLangCode(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateLangCodeReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateLangCodeRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateLangCodeReq>;
-  const userObj = c.get("userObj");
   const { userId: id } = userObj;
   const { userId: updaterId } = userObj;
-  const { langCode } = obj;
+  const { langCode } = params;
   const res = await db
     .update(userTable)
     .set({
@@ -419,7 +454,9 @@ async function onUpdateLangCode(
     })
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
   return res[0].id;
 }
 const updateLangCodeApi = {
@@ -430,8 +467,9 @@ const updateLangCodeApi = {
     method: "post",
     summary: "更新用户语言",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdateLangCode,
-};
+} satisfies API;
 
 const updatePasswordReq = {
   type: "object",
@@ -445,13 +483,12 @@ const updatePasswordRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdatePassword(
-  c: NodeHonoContext
+  params: FromSchema<typeof updatePasswordReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updatePasswordRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updatePasswordReq>;
-  const userObj = c.get("userObj");
   const { userId: id } = userObj;
   const { userId: updaterId } = userObj;
-  const { password: base64Password } = obj;
+  const { password: base64Password } = params;
   const password = await convertPassword(base64Password);
   const res = await db
     .update(userTable)
@@ -462,7 +499,9 @@ async function onUpdatePassword(
     })
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
   return res[0].id;
 }
 const updatePasswordApi = {
@@ -473,8 +512,9 @@ const updatePasswordApi = {
     method: "post",
     summary: "更新用户密码",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdatePassword,
-};
+} satisfies API;
 
 async function convertPassword(base64Password: string): Promise<string> {
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
@@ -482,7 +522,13 @@ async function convertPassword(base64Password: string): Promise<string> {
   return hashedPassword;
 }
 
-async function verifyUsernameAndPassword({ username, password }): Promise<{
+async function verifyUsernameAndPassword({
+  username,
+  password,
+}: {
+  username: string;
+  password: string;
+}): Promise<{
   userObj?: Omit<UserVOLike, "password">;
   valid: boolean;
 }> {
@@ -505,23 +551,37 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-  if (userArr.length === 0) return null;
+  if (userArr.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
   const userObj = userArr[0];
   const { departmentId, roleIdArr, ...rest } = userObj;
-  const departmentObj = departmentId
-    ? {
-        label:
-          (await departmentUtils.getDepartmentNameById(departmentId)) || "",
-        value: departmentId,
-      }
-    : null;
-  const roleArr =
-    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
+  const { departmentObj, roleArr } = await getDepartmentAndRoles(
+    departmentId,
+    roleIdArr
+  );
   return {
     ...rest,
     departmentObj,
     roleArr,
   };
+}
+
+async function getDepartmentAndRoles(
+  departmentId: number | null,
+  roleIdArr: number[]
+) {
+  const departmentObj =
+    departmentId === null
+      ? null
+      : {
+          label:
+            (await departmentUtils.getDepartmentNameById(departmentId)) || "",
+          value: departmentId,
+        };
+  const roleArr =
+    roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
+  return { departmentObj, roleArr };
 }
 
 export const utils = {
@@ -531,6 +591,7 @@ export const utils = {
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   update: updateApi,

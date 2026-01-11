@@ -12,120 +12,146 @@ import {
   DepartmentDeleteKeys,
   DepartmentAddKeys,
   DepartmentUpdateKeys,
+  DepartmentSortableKeys,
   type DepartmentPOLike,
   type DepartmentVOLike,
   type DepartmentAddVOLike,
   type DepartmentUpdateVOLike,
   type DepartmentDeleteVOLike,
   type DepartmentGetVOLike,
+  DepartmentBaseVO,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
-import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
+import {
+  listAllReqBase,
+  listReqBase,
+  listResponseWrapper,
+  orderByWrapper,
+} from "@/middleware/encapsulation/common.schema";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
+
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+  parentId,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled" | "parentId">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(like(departmentTable.name, `%${keyword}%`));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(departmentTable.isEnabled, isEnabled));
+  }
+  if (parentId !== undefined) {
+    conditions.push(eq(departmentTable.parentId, parentId));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: DepartmentVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof DepartmentPOLike)[]>(DepartmentSortableKeys),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...DepartmentBaseVO,
+    },
+    required: [...DepartmentGetKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = departmentTable[orderBy] || departmentTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: departmentTable.id,
+      name: departmentTable.name,
+      description: departmentTable.description,
+      parentId: departmentTable.parentId,
+      isEnabled: departmentTable.isEnabled,
+    })
+    .from(departmentTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有部门（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
 
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: [
-        "id",
-        "name",
-        "createTimeUtc",
-      ] satisfies (keyof DepartmentPOLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
-    keyword: { type: "string", examples: [""] },
-    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
-    parentId: {
-      type: ["number", "null"],
-      nullable: true,
-      description: "父部门ID过滤",
-    },
+    ...listReqBase,
+    isEnabled: DepartmentVO["isEnabled"],
+    parentId: { ...{ ...IndexVO.id, description: "父部门ID" } },
+    orderBy: orderByWrapper<(keyof DepartmentPOLike)[]>(DepartmentSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  type: "object",
-  properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      oneOf: [
-        {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              ...DepartmentListVO,
-            },
-            required: [
-              ...DepartmentListKeys,
-            ] as const satisfies RequiredKeys<DepartmentPOLike>[],
-            additionalProperties: false,
-          },
-        },
-        {
-          type: "array",
-          maxItems: 0,
-        },
-      ],
+  ...listResponseWrapper<RequiredKeys<DepartmentPOLike>[]>(
+    {
+      ...DepartmentListVO,
     },
-  },
-  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
-  additionalProperties: false,
+    [...DepartmentListKeys]
+  ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    isEnabled,
-    parentId,
-  } = listParamObj;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(like(departmentTable.name, `%${keyword}%`));
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(departmentTable.isEnabled, isEnabled));
-    }
-    if (parentId !== undefined) {
-      conditions.push(eq(departmentTable.parentId, parentId));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
   // 查询总数
   const countResult = await db
     .select({ total: count(departmentTable.id) })
     .from(departmentTable)
-    .where(buildWhereCondition());
+    .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -140,7 +166,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const rows = await db
     .select()
     .from(departmentTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(descend ? desc(orderField) : asc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -161,8 +187,9 @@ const listApi = {
     method: "post",
     summary: "获取部门列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -178,12 +205,11 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
-  const { name, description, parentId, isEnabled = true } = obj;
+  const { name, description, parentId, isEnabled = true } = params;
   // 如果有父部门，检查父部门是否存在
   if (hasValue(parentId)) {
     const parent = await db
@@ -193,15 +219,10 @@ async function onAdd(
       .limit(1);
 
     if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   }
-  const result = await db
+  const res = await db
     .insert(departmentTable)
     .values({
       name,
@@ -212,7 +233,7 @@ async function onAdd(
     })
     .returning({ id: departmentTable.id });
 
-  return result[0]?.id;
+  return res[0]?.id;
 }
 const addApi = {
   req: addReq,
@@ -222,8 +243,9 @@ const addApi = {
     method: "post",
     summary: "添加部门",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -239,20 +261,17 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
   const { userId: updaterId } = userObj;
-  const { id, ...rest } = obj;
+  const { id, ...rest } = params;
 
   // 如果更新父部门，检查是否会造成循环引用
   if (rest.parentId) {
     // 不能将自己设为父部门
     if (rest.parentId === id) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
-      );
+      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
     }
 
     // 检查父部门是否存在
@@ -263,12 +282,7 @@ async function onUpdate(
       .limit(1);
 
     if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   }
 
@@ -284,7 +298,9 @@ async function onUpdate(
     .where(eq(departmentTable.id, id))
     .returning({ id: departmentTable.id });
 
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -295,8 +311,9 @@ const updateApi = {
     method: "post",
     summary: "更新部门",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -312,19 +329,13 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
   if (!userObj?.userId) {
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" as any,
-      }
-    );
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   }
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   if (id === undefined) return null;
 
   // 检查是否有子部门
@@ -335,12 +346,7 @@ async function onDelete(
     .limit(1);
 
   if (children.length > 0) {
-    throw new HTTPException(
-      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.department.hasChildren" satisfies LanguageKey,
-      }
-    );
+    throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
   }
 
   const result = await db
@@ -348,7 +354,9 @@ async function onDelete(
     .where(eq(departmentTable.id, id))
     .returning({ id: departmentTable.id });
 
-  if (!result || result.length === 0) return null;
+  if (!result || result.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
   return result[0].id;
 }
 const deleteApi = {
@@ -359,8 +367,9 @@ const deleteApi = {
     method: "post",
     summary: "删除部门",
   } as const,
+  adapter: bodyUserAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -383,10 +392,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(departmentTable)
@@ -394,9 +402,7 @@ async function onGet(
     .limit(1);
 
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
 
   return rows[0];
@@ -409,8 +415,94 @@ const getApi = {
     method: "post",
     summary: "获取部门信息",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
+} satisfies API;
+
+const treeReq = {
+  type: "object",
+  properties: {
+    showAll: {
+      description: "是否显示所有部门（包括未启用的）",
+      type: "boolean",
+    },
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+// 定义递归类型用于树形结构
+type DepartmentTreeItem = DepartmentVOLike & {
+  children: DepartmentTreeItem[];
 };
+const departmentTreeItemSchema: JSONSchema = {
+  type: "object",
+  properties: {
+    ...DepartmentVO,
+    children: {
+      type: "array",
+      items: {
+        properties: {
+          ...DepartmentVO,
+          children: { type: "array" },
+        },
+      }, // 递归引用自身
+    },
+  },
+  required: [...DepartmentDetailKeys, "children"],
+  additionalProperties: false,
+};
+const treeRes = {
+  type: "array",
+  items: departmentTreeItemSchema,
+} as const satisfies JSONSchema;
+async function onTree(
+  params: FromSchema<typeof treeReq>
+): Promise<DepartmentTreeItem[]> {
+  const { showAll } = params;
+
+  // 构建查询条件
+  const buildWhereCondition = () => {
+    if (showAll !== true) {
+      return eq(departmentTable.isEnabled, true); // 默认只查询启用的部门
+    }
+    return undefined;
+  };
+
+  // 获取所有部门
+  const allDepartments = await db
+    .select()
+    .from(departmentTable)
+    .where(buildWhereCondition())
+    .orderBy(asc(departmentTable.id));
+
+  // 递归构建树形结构
+  function buildDepartmentTree(
+    data: typeof allDepartments,
+    parentId: number | null = null
+  ): DepartmentTreeItem[] {
+    return data
+      .filter((item) => item.parentId === parentId)
+      .map((item) => ({
+        ...item,
+        children: buildDepartmentTree(data, item.id),
+      }));
+  }
+
+  const departmentTree = buildDepartmentTree(allDepartments);
+  return departmentTree;
+}
+
+const treeApi = {
+  req: treeReq,
+  res: treeRes,
+  pathInfo: {
+    path: "/tree",
+    method: "post",
+    summary: "获取树形部门列表",
+  } as const,
+  adapter: bodyAdapter,
+  service: onTree,
+} satisfies API;
 
 /** @description 根据ID获取部门名称 */
 async function getDepartmentNameById(id: number): Promise<string | null> {
@@ -422,14 +514,24 @@ async function getDepartmentNameById(id: number): Promise<string | null> {
   return rows.length > 0 ? rows[0].name : null;
 }
 
+async function verifyDepartment(departmentId: number) {
+  const departmentName = await getDepartmentNameById(departmentId);
+  if (!departmentName) {
+    throw new BusinessError(BusinessErrorCode["DEPARTMENT_NOT_EXIST"]);
+  }
+}
+
 export const utils = {
   getDepartmentNameById,
+  verifyDepartment,
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   delete: deleteApi,
   update: updateApi,
   get: getApi,
+  tree: treeApi,
 };

@@ -12,118 +12,145 @@ import {
   MenuDeleteKeys,
   MenuAddKeys,
   MenuUpdateKeys,
+  MenuSortableKeys,
   type MenuPOLike,
   type MenuVOLike,
   type MenuAddVOLike,
   type MenuUpdateVOLike,
   type MenuDeleteVOLike,
   type MenuGetVOLike,
+  MenuBaseVO,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import httpStatusCode from "http-status-codes";
-import { ContentfulStatusCode } from "hono/utils/http-status";
-import type { RequiredKeys } from "@/types/app";
 import hasValue from "@/utils/hasValue";
+import {
+  listAllReqBase,
+  listReqBase,
+  listResponseWrapper,
+  orderByWrapper,
+} from "@/middleware/encapsulation/common.schema";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
+
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(or(like(menuTable.name, `%${keyword}%`)));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(menuTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: MenuVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof MenuPOLike)[]>(MenuSortableKeys),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...MenuBaseVO,
+    },
+    required: [...MenuGetKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = menuTable[orderBy] || menuTable.id;
+  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  // 查询所有匹配的数据
+  const rows = await db
+    .select({
+      id: menuTable.id,
+      name: menuTable.name,
+      icon: menuTable.icon,
+      path: menuTable.path,
+      parentId: menuTable.parentId,
+      sort: menuTable.sort,
+      roleIdArr: menuTable.roleIdArr,
+      isEnabled: menuTable.isEnabled,
+    })
+    .from(menuTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有菜单（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
 
 const listReq = {
   type: "object",
   properties: {
-    orderBy: {
-      type: "string",
-      enum: [
-        "id",
-        "text",
-        "isEnabled",
-        "createTimeUtc",
-      ] satisfies (keyof MenuPOLike)[],
-    },
-    descend: { type: "boolean" },
-    pageNo: { type: "number", minimum: 1, default: 1 },
-    pageSize: { type: "number", minimum: 1, maximum: 1000, default: 10 },
-    keyword: {
-      type: "string",
-      examples: [""],
-      description: "搜索菜单名称",
-    },
-    isEnabled: { type: "boolean", description: "是否启用状态过滤" },
+    ...listReqBase,
+    isEnabled: MenuVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof MenuPOLike)[]>(MenuSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  type: "object",
-  properties: {
-    total: { type: "number", description: "总记录数" },
-    totalPage: { type: "number", description: "总页数" },
-    currentPage: { type: "number", description: "当前页码" },
-    pageSize: { type: "number", description: "每页记录数" },
-    list: {
-      type: "array",
-      oneOf: [
-        {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              ...MenuListVO,
-            },
-            required: [
-              ...MenuListKeys,
-            ] as const satisfies RequiredKeys<MenuPOLike>[],
-            additionalProperties: false,
-          },
-        },
-        {
-          type: "array",
-          maxItems: 0,
-        },
-      ],
+  ...listResponseWrapper<RequiredKeys<MenuPOLike>[]>(
+    {
+      ...MenuListVO,
     },
-  },
-  required: ["total", "totalPage", "currentPage", "pageSize", "list"],
-  additionalProperties: false,
+    [...MenuListKeys]
+  ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-    isEnabled,
-  } = listParamObj;
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = menuTable[orderBy] || menuTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (hasValue(keyword)) {
-      conditions.push(or(like(menuTable.text, `%${keyword}%`)));
-    }
-    if (isEnabled !== undefined) {
-      conditions.push(eq(menuTable.isEnabled, isEnabled));
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : and(...conditions)
-      : undefined;
-  };
-
   // 查询总数
   const countResult = await db
     .select({ total: count(menuTable.id).as("total") })
     .from(menuTable)
-    .where(buildWhereCondition());
+    .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -138,7 +165,7 @@ async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
   const rows = await db
     .select()
     .from(menuTable)
-    .where(buildWhereCondition())
+    .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -159,8 +186,9 @@ const listApi = {
     method: "post",
     summary: "获取菜单列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
 
 const addReq = {
   type: "object",
@@ -174,12 +202,11 @@ const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onAdd(
-  c: NodeHonoContext
+  params: FromSchema<typeof addReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
   const { userId: creatorId } = userObj;
-  const { text, icon, path, parentId, sort, roleIdArr, isEnabled } = obj;
+  const { parentId } = params;
 
   // 如果有父菜单，检查父菜单是否存在
   if (hasValue(parentId)) {
@@ -190,30 +217,19 @@ async function onAdd(
       .limit(1);
 
     if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   }
-
-  const result = await db
+  const updateData = {
+    ...params,
+    creatorId,
+  };
+  const res = await db
     .insert(menuTable)
-    .values({
-      text,
-      icon,
-      path,
-      parentId,
-      sort,
-      roleIdArr,
-      isEnabled,
-      creatorId,
-    })
+    .values(updateData)
     .returning({ id: menuTable.id });
 
-  return result[0]?.id;
+  return res[0]?.id;
 }
 const addApi = {
   req: addReq,
@@ -223,8 +239,9 @@ const addApi = {
     method: "post",
     summary: "添加菜单",
   } as const,
+  adapter: bodyUserAdapter,
   service: onAdd,
-};
+} satisfies API;
 
 const updateReq = {
   type: "object",
@@ -240,18 +257,16 @@ const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
-  const { id, ...rest } = obj;
+  const { userId: updaterId } = userObj;
+  const { id, ...rest } = params;
   // 如果更新父菜单，检查是否会造成循环引用
   if (rest.parentId) {
     // 不能将自己设为父菜单
     if (rest.parentId === id) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode
-      );
+      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
     }
 
     // 检查父菜单是否存在
@@ -262,18 +277,13 @@ async function onUpdate(
       .limit(1);
 
     if (parent.length === 0) {
-      throw new HTTPException(
-        httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-        {
-          message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   }
 
   const updateData = {
     ...rest,
-    updaterId: userObj.userId,
+    updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
@@ -283,7 +293,9 @@ async function onUpdate(
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
 
-  if (!res || res.length === 0) return null;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
   return res[0].id;
 }
 const updateApi = {
@@ -294,8 +306,9 @@ const updateApi = {
     method: "post",
     summary: "更新菜单",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
 
 const deleteReq = {
   type: "object",
@@ -311,19 +324,9 @@ const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onDelete(
-  c: NodeHonoContext
+  params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
-  if (!userObj?.userId) {
-    throw new HTTPException(
-      httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.notAuthenticated" as any,
-      }
-    );
-  }
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   if (id === undefined) return null;
 
   // 检查是否有子菜单
@@ -334,21 +337,17 @@ async function onDelete(
     .limit(1);
 
   if (children.length > 0) {
-    throw new HTTPException(
-      httpStatusCode.BAD_REQUEST as ContentfulStatusCode,
-      {
-        message: "i18n.api.system.menu.hasChildren" satisfies LanguageKey,
-      }
-    );
+    throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
   }
 
-  const result = await db
+  const res = await db
     .delete(menuTable)
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
-
-  if (!result || result.length === 0) return null;
-  return result[0].id;
+  if (!res || res.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  return res[0].id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -358,8 +357,9 @@ const deleteApi = {
     method: "post",
     summary: "删除菜单",
   } as const,
+  adapter: bodyAdapter,
   service: onDelete,
-};
+} satisfies API;
 
 const getReq = {
   type: "object",
@@ -378,10 +378,9 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = params;
   const rows = await db
     .select()
     .from(menuTable)
@@ -389,9 +388,7 @@ async function onGet(
     .limit(1);
 
   if (rows.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return rows[0];
 }
@@ -403,8 +400,9 @@ const getApi = {
     method: "post",
     summary: "获取菜单信息",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 const treeReq = {
   type: "object",
@@ -420,29 +418,25 @@ const treeReq = {
 const menuTreeItem = {
   type: "object",
   properties: {
-    id: { type: "number" },
-    text: { type: "string" },
-    icon: { type: "string" },
-    path: { type: ["string", "null"], nullable: true },
-    sort: { type: "number" },
+    ...MenuVO,
     children: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          id: { type: "number" },
-          text: { type: "string" },
-          icon: { type: "string" },
-          path: { type: "string" },
-          sort: { type: "number" },
-          parentId: { type: "number" },
+          ...MenuVO,
+          children: {
+            type: "array",
+            maxLength: 0,
+            minLength: 0,
+          },
         },
-        required: ["id", "text", "icon", "path", "sort", "parentId"],
+        required: [...MenuDetailKeys, "children"],
         additionalProperties: false,
       },
     },
   },
-  required: ["id", "text", "icon", "path", "sort", "parentId", "children"],
+  required: [...MenuDetailKeys, "children"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const treeRes = {
@@ -452,13 +446,12 @@ const treeRes = {
   },
 } as const satisfies JSONSchema;
 async function onTree(
-  c: NodeHonoContext
+  params: FromSchema<typeof treeReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof treeRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof treeReq>;
-  const userObj = c.get("userObj");
   const { roleArr } = userObj;
   // 获取所有菜单
-  const { showAll } = obj;
+  const { showAll } = params;
   // 构建查询条件
   const buildWhereCondition = () => {
     const conditions = [];
@@ -511,16 +504,18 @@ const treeApi = {
   pathInfo: {
     path: "/tree",
     method: "post",
-    summary: "获取树形菜单（根据用户角色过滤）",
+    summary: "获取树形菜单",
   } as const,
+  adapter: bodyUserAdapter,
   service: onTree,
-};
+} satisfies API;
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
-  delete: deleteApi,
   update: updateApi,
+  delete: deleteApi,
   get: getApi,
   tree: treeApi,
 };

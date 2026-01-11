@@ -3,6 +3,8 @@ import { createTranslator, getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
 import type { LanguageKey } from "@/types/locales.ts";
+import { BusinessError } from "@/middleware/errorHandler/businessError/index";
+import { toHttpException } from "./businessError";
 
 type HTTPExceptionConstructorParams = Required<
   ConstructorParameters<typeof HTTPException>
@@ -36,6 +38,10 @@ export default function errorHandler(app: App) {
   app.onError((e, c: NodeHonoContext) => {
     const t = getTranslator(c);
 
+    // 业务异常处理
+    if (e instanceof BusinessError) {
+      throw toHttpException(e);
+    }
     if (e instanceof HTTPException) {
       const message = e.message
         ? e.message.startsWith("i18n.")
@@ -61,7 +67,6 @@ export default function errorHandler(app: App) {
         },
         {
           status: e.status,
-          headers: { "Content-Type": "application/json" },
         }
       );
     }

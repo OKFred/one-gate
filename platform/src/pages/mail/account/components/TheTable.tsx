@@ -6,10 +6,27 @@ import ResponsiveList, {
 } from '@/components/Responsive/ResponsiveList';
 import * as mailAccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './TheActionButtons';
-import type { ListMailAccount, FilterState, TableState } from '../type';
-import type { Props } from '../type';
+import type { ListMailAccountReq, ListMailAccountRes } from '@/api/mail/type';
+import type { Props } from '../index';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListMailAccountReq['orderBy']>;
+  descend: boolean;
+}
+
+// 表格内部状态
+export interface TableState {
+  list: NonNullable<ListMailAccountRes['list']>;
+  loading: boolean;
+  page: number;
+  pageSize: number;
+  total: number;
+  filters: FilterState;
+}
 
 // 暴露给父组件的方法
 export interface TheTableRef {
@@ -30,7 +47,7 @@ const TheTable = memo(
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
-      accounts: [],
+      list: [],
       loading: false,
       page: 1,
       pageSize: 10,
@@ -38,7 +55,7 @@ const TheTable = memo(
       filters: DEFAULT_FILTERS,
     });
 
-    const { accounts, loading, page, pageSize, total, filters } = state;
+    const { list, loading, page, pageSize, total, filters } = state;
 
     // 获取数据的核心函数
     const fetchAccounts = useCallback(
@@ -60,7 +77,7 @@ const TheTable = memo(
 
           setState((prev) => ({
             ...prev,
-            accounts: accountsList,
+            list: accountsList,
             total: totalCount,
             page: currentPage,
             filters: searchFilters,
@@ -112,22 +129,22 @@ const TheTable = memo(
     };
 
     // 表格列配置（PC端）
-    const columns: TableColumn<ListMailAccount>[] = [
-      { title: t('i18n.pages.mail.account.columns.id'), render: (acc) => acc.id },
-      { title: t('i18n.pages.mail.account.columns.nickname'), render: (acc) => acc.nickname },
-      { title: t('i18n.pages.mail.account.columns.email'), render: (acc) => acc.mailAddress },
-      { title: t('i18n.pages.mail.account.columns.host'), render: (acc) => acc.host },
-      { title: t('i18n.pages.mail.account.columns.port'), render: (acc) => acc.port },
+    const columns: TableColumn<TableState['list'][0]>[] = [
+      { title: t('i18n.pages.mail.account.columns.id'), render: (row) => row.id },
+      { title: t('i18n.pages.mail.account.columns.nickname'), render: (row) => row.nickname },
+      { title: t('i18n.pages.mail.account.columns.email'), render: (row) => row.mailAddress },
+      { title: t('i18n.pages.mail.account.columns.host'), render: (row) => row.host },
+      { title: t('i18n.pages.mail.account.columns.port'), render: (row) => row.port },
       {
         title: t('i18n.pages.mail.account.columns.createTime'),
-        render: (acc) => dayjs(acc.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
+        render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
         title: t('i18n.pages.mail.account.columns.actions'),
         align: 'center',
-        render: (acc) => (
+        render: (row) => (
           <AccountActionButtons
-            account={acc}
+            row={row}
             formRef={formRef}
             onDeleteSuccess={handleDeleteSuccess}
           />
@@ -136,17 +153,17 @@ const TheTable = memo(
     ];
 
     // 卡片字段配置（移动端）
-    const cardFields: CardField<ListMailAccount>[] = [
-      { type: 'title', render: (acc) => acc.nickname },
-      { type: 'subtitle', label: t('i18n.pages.mail.account.columns.id'), render: (acc) => acc.id },
-      { type: 'content', label: t('i18n.pages.mail.account.columns.email'), render: (acc) => acc.mailAddress },
-      { type: 'content', label: t('i18n.pages.mail.account.columns.host') + ':' + t('i18n.pages.mail.account.columns.port'), render: (acc) => `${acc.host}:${acc.port}` },
+    const cardFields: CardField<TableState['list'][0]>[] = [
+      { type: 'title', render: (row) => row.nickname },
+      { type: 'subtitle', label: t('i18n.pages.mail.account.columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('i18n.pages.mail.account.columns.email'), render: (row) => row.mailAddress },
+      { type: 'content', label: t('i18n.pages.mail.account.columns.host') + ':' + t('i18n.pages.mail.account.columns.port'), render: (row) => `${row.host}:${row.port}` },
       {
         type: 'tags',
-        render: (acc) => (
+        render: (row) => (
           <>
-            {acc.sslEnable && <Chip label={t('i18n.pages.mail.account.tags.ssl')} color="success" size="small" />}
-            {acc.starttlsEnable && <Chip label={t('i18n.pages.mail.account.tags.starttls')} color="info" size="small" />}
+            {row.sslEnable && <Chip label={t('i18n.pages.mail.account.tags.ssl')} color="success" size="small" />}
+            {row.starttlsEnable && <Chip label={t('i18n.pages.mail.account.tags.starttls')} color="info" size="small" />}
           </>
         ),
       },
@@ -154,19 +171,19 @@ const TheTable = memo(
 
     return (
       <ResponsiveList
-        data={accounts}
+        data={list}
         loading={loading}
         page={page}
         total={total}
         pageSize={pageSize}
         onPageChange={handlePageChange}
         onPageSizeChange={handlePageSizeChange}
-        keyExtractor={(acc) => acc.id!}
+        keyExtractor={(row) => row.id!}
         columns={columns}
         cardFields={cardFields}
-        cardActions={(acc) => (
+        cardActions={(row) => (
           <AccountActionButtons
-            account={acc}
+            row={row}
             formRef={formRef}
             onDeleteSuccess={handleDeleteSuccess}
           />

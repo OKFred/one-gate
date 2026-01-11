@@ -3,9 +3,12 @@ import { PageLayout } from '@/components/Responsive/index';
 import TheForm, { type TheFormRef } from './components/TheForm';
 import TheTable, { type TheTableRef } from './components/TheTable';
 import TheFilter, { type TheFilterRef } from './components/TheFilter';
-import { AddTheButton } from './components/TheActionButtons';
+import { TheActionButtons } from './components/TheActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
 
+export interface Props {
+  localObj: LocalObj;
+}
 export interface LocalObj {
   tableRef: React.RefObject<TheTableRef | null>;
   formRef: React.RefObject<TheFormRef | null>;
@@ -20,7 +23,7 @@ export default function MailAccountPage() {
   const t = useTranslation();
 
   return (
-    <PageLayout title={t("i18n.pages.mail.account.title")} actions={<AddTheButton formRef={formRef} />}>
+    <PageLayout title={t("i18n.pages.mail.account.title")} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />

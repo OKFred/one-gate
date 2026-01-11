@@ -8,6 +8,8 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -20,18 +22,23 @@ const RoleUniquePO = {
     type: "string",
     description: "角色名称",
     examples: ["管理员"],
+    maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
 const RoleBasePO = {
   description: {
-    type: "string",
+    type: ["string", "null"],
+    nullable: true,
     description: "角色描述",
     examples: ["系统管理员，拥有所有权限"],
+    maxLength: 500,
   },
   permissions: {
-    type: "string",
+    type: ["string", "null"],
+    nullable: true,
     description: "权限列表，JSON数组格式",
     examples: ['["user:read","user:write","system:admin"]'],
+    maxLength: 500,
   },
   isEnabled: {
     type: "boolean",
@@ -46,7 +53,7 @@ const RolePO = {
 } as const satisfies Record<keyof RolePOLike, JSONSchema>;
 export type RolePOLike = InferSelectModel<typeof roleTable>; // 列表
 type RoleSelectPOLike = InferInsertModel<typeof roleTable>;
-type RoleAddPOLike = Omit<RoleSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type RoleAddPOLike = Omit<RolePOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type RoleUpdatePOLike = Partial<
   Omit<RoleSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -54,8 +61,8 @@ type RoleUpdatePOLike = Partial<
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const RoleUniqueVO = RoleUniquePO;
-const RoleBaseVO = RoleBasePO;
+export const RoleUniqueVO = RoleUniquePO;
+export const RoleBaseVO = RoleBasePO;
 export const RoleVO = {
   ...IndexVO,
   ...RoleUniqueVO,
@@ -79,41 +86,37 @@ export type RoleDeleteVOLike = Pick<RoleVOLike, IndexKeyLike>;
 export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const RoleListKeys = [
-  "id",
-  "name",
-  "description",
-  "permissions",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<RolePOLike>[];
-export const RoleDetailKeys = [
-  "id",
-  "name",
-  "description",
-  "permissions",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<RoleVOLike>[];
 export const RoleAddKeys = [
   "name",
+  "description",
+  "permissions",
   "isEnabled",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];
 export const RoleUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<RoleUpdateVOLike>[];
 export const RoleDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<RoleDeleteVOLike>[];
 export const RoleGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<RoleGetVOLike>[];
+const RoleBaseKeys = [
+  ...IndexKey,
+  ...RoleAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<RolePOLike>[];
+export const RoleListKeys = RoleBaseKeys;
+export const RoleDetailKeys = RoleBaseKeys;
+export const RoleUniqueKeys = ["name"] as const;
+
+// 可排序字段（解耦供 service 使用）
+export const RoleSortableKeys = [
+  "id",
+  "name",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<RolePOLike>[];
 
 export const roleTable = sqliteTable("system_role", {
   id: integer("id").primaryKey().notNull(),

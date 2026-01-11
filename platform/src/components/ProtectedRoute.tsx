@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { authUtils } from '@/utils/auth';
-import { verifyToken } from '@/api/system/auth';
+import { authUtils, type UserInfo } from '@/utils/auth';
+import { getProfile } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 
+import { listFn } from '@/api/i18n/translation';
+import { indexedDBHelper } from '@/utils/indexedDB';
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -12,33 +14,68 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  async function getTranslationData() {
+    // 页面加载时请求多语言列表并保存到IndexedDB
+    const loadTranslationList = async () => {
+      try {
+        // 初始化IndexedDB
+        await indexedDBHelper.init();
+
+        // 请求多语言列表
+        const response = await listFn({ data: { pageNo: 1, pageSize: 1000 } });
+
+        if (response.data?.ok && response.data?.data) {
+          const i18nList = response.data.data;
+
+          // 保存到IndexedDB
+          const count = await indexedDBHelper.saveTranslationList(i18nList.list);
+
+          console.log(`✅ 多语言列表已保存到IndexedDB，共 ${count} 条数据`);
+        } else {
+          console.warn('⚠️ 获取多语言列表失败：响应数据格式错误');
+        }
+      } catch (error) {
+        console.error('❌ 加载多语言列表失败：', error);
+      }
+    };
+    loadTranslationList();
+  }
+
+  function failedLogin() {
+    // token无效，清理本地存储
+    authUtils.logout();
+    setIsAuthenticated(false);
+  }
+
+  function successfulLogin(newUserInfo: UserInfo) {
+    authUtils.setUserInfo(newUserInfo);
+    setIsAuthenticated(true);
+    getTranslationData();
+  }
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = authUtils.getUserInfo()?.token;
 
       if (!token) {
-        setIsAuthenticated(false);
+        failedLogin();
         setIsLoading(false);
         return;
       }
 
       try {
         // 验证token是否有效
-        const result = await verifyToken({ data: { token } });
-        const verified = result.data;
+        const result = await getProfile({ data: {} });
 
-        if (result.data.ok && verified) {
-          setIsAuthenticated(true);
+        if (result.data.ok) {
+          const { userObj } = result.data.data;
+          successfulLogin({ token, ...userObj });
+          return;
         } else {
-          // token无效，清理本地存储
-          authUtils.logout();
-          setIsAuthenticated(false);
+          failedLogin();
         }
       } catch {
-        // 验证失败，清理本地存储
-        authUtils.logout();
-        setIsAuthenticated(false);
+        failedLogin();
       } finally {
         setIsLoading(false);
       }

@@ -8,6 +8,8 @@ import {
   IndexVO,
   AuditPO,
   AuditVO,
+  IndexKey,
+  AuditKeys,
   type IndexKeyLike,
   type AuditAddOmitKeyLike,
   type AuditUpdateOmitKeyLike,
@@ -20,17 +22,20 @@ const DepartmentBasePO = {
     type: "string",
     description: "部门名称",
     examples: ["技术部"],
+    maxLength: 100,
   },
   description: {
     type: ["string", "null"],
     nullable: true,
     description: "部门描述",
     examples: ["负责技术研发工作"],
+    maxLength: 500,
   },
   parentId: {
     type: ["number", "null"],
     nullable: true,
     description: "父部门ID，支持部门层级",
+    minimum: 1,
   },
   isEnabled: {
     type: "boolean",
@@ -44,7 +49,10 @@ const DepartmentPO = {
 } as const satisfies Record<keyof DepartmentPOLike, JSONSchema>;
 export type DepartmentPOLike = InferSelectModel<typeof departmentTable>; // 列表
 type DepartmentSelectPOLike = InferInsertModel<typeof departmentTable>;
-type DepartmentAddPOLike = Omit<DepartmentSelectPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type DepartmentAddPOLike = Omit<
+  DepartmentPOLike,
+  IndexKeyLike | AuditAddOmitKeyLike
+>;
 type DepartmentUpdatePOLike = Partial<
   Omit<DepartmentSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -52,7 +60,7 @@ type DepartmentUpdatePOLike = Partial<
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const DepartmentBaseVO = DepartmentBasePO;
+export const DepartmentBaseVO = DepartmentBasePO;
 export const DepartmentVO = {
   ...IndexVO,
   ...DepartmentBaseVO,
@@ -73,41 +81,35 @@ export type DepartmentDeleteVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const DepartmentListKeys = [
-  "id",
-  "name",
-  "description",
-  "parentId",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<DepartmentPOLike>[];
-export const DepartmentDetailKeys = [
-  "id",
-  "name",
-  "description",
-  "parentId",
-  "isEnabled",
-  "creatorId",
-  "createTimeUtc",
-  "updaterId",
-  "updateTimeUtc",
-] as const satisfies RequiredKeys<DepartmentVOLike>[];
 export const DepartmentAddKeys = [
   "name",
+  "description",
+  "parentId",
   "isEnabled",
 ] as const satisfies RequiredKeys<DepartmentAddVOLike>[];
 export const DepartmentUpdateKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<DepartmentUpdateVOLike>[];
 export const DepartmentDeleteKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<DepartmentDeleteVOLike>[];
 export const DepartmentGetKeys = [
-  "id",
+  ...IndexKey,
 ] as const satisfies RequiredKeys<DepartmentGetVOLike>[];
+const DepartmentBaseKeys = [
+  ...IndexKey,
+  ...DepartmentAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<DepartmentPOLike>[];
+export const DepartmentListKeys = DepartmentBaseKeys;
+export const DepartmentDetailKeys = DepartmentBaseKeys;
+
+// 可排序字段（解耦供 service 使用）
+export const DepartmentSortableKeys = [
+  "id",
+  "name",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<DepartmentPOLike>[];
 
 export const departmentTable = sqliteTable("system_department", {
   id: integer("id").primaryKey().notNull(),

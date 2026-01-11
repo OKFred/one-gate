@@ -22,18 +22,19 @@ import {
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import * as mailAccountAPI from '@/api/mail/account';
-import type { AddMailAccountRequest, ListMailAccount } from '../type';
-import type { Props } from '../type';
+import type { AddMailAccountReq } from '@/api/mail/type';
+import type { Props } from '../index';
+import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
   /** 打开编辑表单 */
-  onOpen: (account?: ListMailAccount) => void;
+  onOpen: (row?: TableState['list'][0]) => void;
 }
 
-const DEFAULT_FORM: AddMailAccountRequest = {
+const DEFAULT_FORM: AddMailAccountReq = {
   nickname: '',
   mailAddress: '',
   host: '',
@@ -53,24 +54,24 @@ const TheForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddMailAccountRequest>(DEFAULT_FORM);
+    const [form, setForm] = useState<AddMailAccountReq>(DEFAULT_FORM);
     const [showPassword, setShowPassword] = useState(false);
 
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
       () => ({
-        onOpen: (account?: ListMailAccount) => {
-          if (account) {
-            setEditId(account.id!);
+        onOpen: (row?: TableState['list'][0]) => {
+          if (row) {
+            setEditId(row.id!);
             setForm({
-              nickname: account.nickname || '',
-              mailAddress: account.mailAddress || '',
-              host: account.host || '',
-              port: account.port,
-              password: account.password || '',
-              sslEnable: account.sslEnable,
-              starttlsEnable: account.starttlsEnable,
+              nickname: row.nickname || '',
+              mailAddress: row.mailAddress || '',
+              host: row.host || '',
+              port: row.port,
+              password: row.password || '',
+              sslEnable: row.sslEnable,
+              starttlsEnable: row.starttlsEnable,
             });
           } else {
             setEditId(null);
