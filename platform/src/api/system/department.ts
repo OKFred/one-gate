@@ -1,6 +1,16 @@
 import { axiosPlus } from '../config';
 import type { AxiosConfig } from '../config';
 
+export const listAllFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/department/listAll', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/department/listAll',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const listFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/department/list', 'post'>, 'url' | 'method'>,
 ) => {

@@ -1628,6 +1628,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/department/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有部门（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemDepartmentListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemDepartmentListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/department/list": {
         parameters: {
             query?: never;
@@ -1976,6 +2034,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/menu/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有菜单（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemMenuListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemMenuListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/menu/list": {
         parameters: {
             query?: never;
@@ -2275,7 +2391,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取树形菜单（根据用户角色过滤） */
+        /** 获取树形菜单 */
         post: {
             parameters: {
                 query?: never;
@@ -4676,6 +4792,39 @@ export interface components {
             };
             message: string;
         };
+        SystemDepartmentListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "createTimeUtc";
+        };
+        SystemDepartmentListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 部门名称
+                 * @example 技术部
+                 */
+                name?: string;
+                /**
+                 * @description 部门描述
+                 * @example 负责技术研发工作
+                 */
+                description?: ((string | null) | null) | null;
+                /** @description 父部门ID，支持部门层级 */
+                parentId?: ((number | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+            }[];
+            message: string;
+        };
         SystemDepartmentListReq: {
             /** @description 是否降序 */
             descend?: boolean;
@@ -4946,6 +5095,48 @@ export interface components {
                     updateTimeUtc?: ((number | null) | null) | null;
                     children?: unknown[];
                 }[];
+            }[];
+            message: string;
+        };
+        SystemMenuListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        SystemMenuListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 菜单名称
+                 * @example 主页
+                 */
+                name?: string;
+                /**
+                 * @description 图标名称，使用 Iconify material-symbols 图标
+                 * @example material-symbols:home
+                 */
+                icon?: string;
+                /**
+                 * @description 路由路径
+                 * @example /home
+                 */
+                path?: ((string | null) | null) | null;
+                /** @description 父菜单ID，支持菜单层级 */
+                parentId?: ((number | null) | null) | null;
+                /** @description 排序 */
+                sort?: number;
+                /** @description 需要的角色ID列表 */
+                roleIdArr?: ((number[] | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
             }[];
             message: string;
         };
@@ -5537,32 +5728,13 @@ export interface components {
                 langCode?: string;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
-                /** @description 部门对象 */
-                departmentObj?: (({
-                    /**
-                     * @description 部门ID
-                     * @example 1
-                     */
-                    value: number;
-                    /**
-                     * @description 部门名称
-                     * @example 研发部
-                     */
-                    label: string;
-                } | null) | null) | null;
-                /** @description 角色数组 */
-                roleArr?: {
-                    /**
-                     * @description 角色ID
-                     * @example 1
-                     */
-                    value: number;
-                    /**
-                     * @description 角色名称
-                     * @example 管理员
-                     */
-                    label: string;
-                }[];
+                /**
+                 * @description 部门ID
+                 * @example 1
+                 */
+                departmentId?: ((number | null) | null) | null;
+                /** @description 角色ID数组 */
+                roleIdArr?: number[];
             }[];
             message: string;
         };

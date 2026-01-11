@@ -1,6 +1,16 @@
 import { axiosPlus } from '../config';
 import type { AxiosConfig } from '../config';
 
+export const listAllFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/i18n/translation/listAll', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/i18n/translation/listAll',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const listFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/i18n/translation/list', 'post'>, 'url' | 'method'>,
 ) => {
@@ -52,7 +62,10 @@ export const deleteFn = (
 };
 
 export const checkDuplicateFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/i18n/translation/checkDuplicate', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/i18n/translation/checkDuplicate', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/i18n/translation/checkDuplicate',
@@ -60,4 +73,3 @@ export const checkDuplicateFn = (
     ...axiosConfig,
   });
 };
-
