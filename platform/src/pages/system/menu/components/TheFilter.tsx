@@ -102,7 +102,7 @@ const TheFilter = memo(
         return;
       }
 
-      // 关键词变化：防抖执行
+      // 关键词变化：防抖处理
       if (keywordChanged) {
         const timer = setTimeout(() => {
           refreshTree(newFilters);
@@ -147,7 +147,7 @@ const TheFilter = memo(
         <Collapse in={expanded} timeout="auto">
           <Stack spacing={2} sx={{ mt: 2 }}>
             <TextField
-              label="搜索菜单"
+              label="关键词"
               placeholder="输入菜单名称或路径"
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}

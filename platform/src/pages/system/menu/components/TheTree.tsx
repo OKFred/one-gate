@@ -173,7 +173,6 @@ const TheTree = memo(
         showGlobalNotification({ message: '菜单删除成功', type: 'success' });
       } catch (err) {
         console.error(err);
-        showGlobalNotification({ message: '删除失败，该菜单可能存在子菜单', type: 'error' });
       } finally {
         setLoading(false);
       }
@@ -223,6 +222,11 @@ const TheTree = memo(
                     sx={{ ml: 1 }}
                   >
                     ({node.path})
+                  </Typography>
+                )}
+                {!node.isEnabled && (
+                  <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
+                    [已禁用]
                   </Typography>
                 )}
               </Typography>
