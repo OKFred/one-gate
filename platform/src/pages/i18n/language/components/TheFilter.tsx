@@ -35,13 +35,13 @@ export interface FilterState {
 }
 
 // 暴露给父组件的方法
-export interface LanguageFilterRef {
+export interface TheFilterRef {
   /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
 }
 
-const LanguageFilter = memo(
-  forwardRef<LanguageFilterRef, Props>(({ localObj }, ref) => {
+const TheFilter = memo(
+  forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
@@ -282,6 +282,4 @@ const LanguageFilter = memo(
   }),
 );
 
-LanguageFilter.displayName = 'LanguageFilter';
-
-export default LanguageFilter;
+export default TheFilter;

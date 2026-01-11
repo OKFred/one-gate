@@ -27,12 +27,12 @@ import {
 import * as LanguageAPI from '@/api/i18n/language';
 import type { AddLanguageReq, CheckDuplicateLanguageRes } from '@/api/i18n/type';
 import type { Props } from '../index';
-import type { TableState } from './LanguageTable';
+import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
 
 // 暴露给父组件的方法
-export interface LanguageFormRef {
+export interface TheFormRef {
   /** 打开新增表单 */
   openAdd: () => void;
   /** 打开编辑表单 */
@@ -52,8 +52,8 @@ const DEFAULT_FORM: AddLanguageReq = {
   isEnabled: true,
 };
 
-const LanguageForm = memo(
-  forwardRef<LanguageFormRef, Props>(({ localObj }, ref) => {
+const TheForm = memo(
+  forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -362,6 +362,4 @@ const LanguageForm = memo(
   }),
 );
 
-LanguageForm.displayName = 'LanguageForm';
-
-export default LanguageForm;
+export default TheForm;

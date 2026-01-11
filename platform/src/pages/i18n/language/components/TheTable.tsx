@@ -29,12 +29,12 @@ import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/ico
 import * as LanguageAPI from '@/api/i18n/language';
 import type { ListLanguageReq, ListLanguageRes } from '@/api/i18n/type';
 import type { Props } from '../index';
-import type { FilterState } from './LanguageFilter';
+import type { FilterState } from './TheFilter';
 import { useResponsive } from '@/hooks/useResponsive';
 import dayjs from 'dayjs';
 
 // 暴露给父组件的方法
-export interface LanguageTableRef {
+export interface TheTableRef {
   /** 刷新表格数据 */
   refresh: (filters?: FilterState) => void;
   /** 获取当前筛选条件 */
@@ -63,8 +63,8 @@ const DEFAULT_FILTERS: FilterState = {
   isEnabled: undefined,
 };
 
-const LanguageTable = memo(
-  forwardRef<LanguageTableRef, Props>(({ localObj }, ref) => {
+const TheTable = memo(
+  forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
     const { isMobile } = useResponsive();
 
@@ -498,4 +498,4 @@ const LanguageTable = memo(
   }),
 );
 
-export default LanguageTable;
+export default TheTable;

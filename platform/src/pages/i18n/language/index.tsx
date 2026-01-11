@@ -1,29 +1,29 @@
 import { useRef, useMemo } from 'react';
 import { PageLayout } from '@/components/Responsive/index';
-import LanguageForm, { type LanguageFormRef } from './components/LanguageForm';
-import LanguageTable, { type LanguageTableRef } from './components/LanguageTable';
-import LanguageFilter, { type LanguageFilterRef } from './components/LanguageFilter';
+import TheForm, { type TheFormRef } from './components/TheForm';
+import TheTable, { type TheTableRef } from './components/TheTable';
+import TheFilter, { type TheFilterRef } from './components/TheFilter';
 
 export interface Props {
   localObj: LocalObj;
 }
 export interface LocalObj {
-  tableRef: React.RefObject<LanguageTableRef | null>;
-  formRef: React.RefObject<LanguageFormRef | null>;
-  filterRef: React.RefObject<LanguageFilterRef | null>;
+  tableRef: React.RefObject<TheTableRef | null>;
+  formRef: React.RefObject<TheFormRef | null>;
+  filterRef: React.RefObject<TheFilterRef | null>;
 }
 
-export default function LanguageManagementPage() {
-  const tableRef = useRef<LanguageTableRef>(null);
-  const formRef = useRef<LanguageFormRef>(null);
-  const filterRef = useRef<LanguageFilterRef>(null);
+export default function ThePage() {
+  const tableRef = useRef<TheTableRef>(null);
+  const formRef = useRef<TheFormRef>(null);
+  const filterRef = useRef<TheFilterRef>(null);
   const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
     <PageLayout title="多语言管理">
-      <LanguageFilter ref={localObj.filterRef} localObj={localObj} />
-      <LanguageForm ref={localObj.formRef} localObj={localObj} />
-      <LanguageTable ref={localObj.tableRef} localObj={localObj} />
+      <TheFilter ref={localObj.filterRef} localObj={localObj} />
+      <TheForm ref={localObj.formRef} localObj={localObj} />
+      <TheTable ref={localObj.tableRef} localObj={localObj} />
     </PageLayout>
   );
 }
