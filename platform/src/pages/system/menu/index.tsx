@@ -31,6 +31,7 @@ import {
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as MenuAPI from '@/api/system/menu';
+import * as RoleAPI from '@/api/system/role';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout } from '@/components/Responsive/index';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -41,19 +42,12 @@ import type { AddMenuParams, Menu } from './type';
 const defaultFormData: AddMenuParams = {
   name: '',
   icon: 'material-symbols:folder',
-  path: '',
+  path: null,
   parentId: null,
   sort: 0,
   roleIdArr: [],
   isEnabled: true,
 };
-
-// 预定义的角色选项
-const roleOptions = [
-  { value: 1, label: '超级管理员' },
-  { value: 2, label: '管理员' },
-  { value: 3, label: '普通用户' },
-];
 
 // 常用图标选项
 const iconOptions = [
@@ -87,6 +81,27 @@ export default function MenuManagement() {
   const [error, setError] = useState<string>('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [menuToDelete, setMenuToDelete] = useState<Menu | null>(null);
+
+  // 角色和部门数据
+  const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
+  // 获取角色和部门数据
+  useEffect(() => {
+    async function fetchRoles() {
+      try {
+        const res = await RoleAPI.listAllFn({ data: {} });
+        const roles = res.data.data || [];
+        const options = roles.map((role) => ({
+          value: role.id,
+          label: role.name,
+        }));
+        setRoleOptions(options);
+      } catch (error) {
+        console.error('获取角色列表失败:', error);
+      }
+    }
+
+    fetchRoles();
+  }, []);
 
   // 将树形结构展平
   const flattenMenus = useCallback((menuList: Menu[]): Menu[] => {
@@ -133,7 +148,7 @@ export default function MenuManagement() {
         ...menu,
         name: menu.name,
         icon: menu.icon,
-        path: menu.path || '',
+        path: menu.path,
         parentId: menu.parentId ?? null,
         sort: menu.sort ?? 0,
         roleIdArr: menu.roleIdArr || [],
@@ -190,7 +205,8 @@ export default function MenuManagement() {
         path: hasValue(formValues.path) ? formValues.path : null,
         parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
         sort: formValues.sort,
-        roleIdArr: formValues.roleIdArr && formValues.roleIdArr.length > 0 ? formValues.roleIdArr : null,
+        roleIdArr:
+          formValues.roleIdArr && formValues.roleIdArr.length > 0 ? formValues.roleIdArr : null,
         isEnabled: formValues.isEnabled,
       };
 
@@ -402,7 +418,7 @@ export default function MenuManagement() {
 
           <TextField
             label="菜单名称"
-            value={formValues.name}
+            value={formValues.name ?? ''}
             onChange={(e) => handleFormChange('name', e.target.value)}
             fullWidth
             margin="normal"
@@ -429,7 +445,7 @@ export default function MenuManagement() {
 
           <TextField
             label="自定义图标 (Iconify格式)"
-            value={formValues.icon}
+            value={formValues.icon ?? ''}
             onChange={(e) => handleFormChange('icon', e.target.value)}
             fullWidth
             margin="normal"
@@ -438,7 +454,7 @@ export default function MenuManagement() {
 
           <TextField
             label="路由路径"
-            value={formValues.path}
+            value={formValues.path ?? ''}
             onChange={(e) => {
               const value = e.target.value;
               handleFormChange('path', hasValue(value) ? value : null);

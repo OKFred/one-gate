@@ -34,7 +34,7 @@ import {
 import * as UserAPI from '@/api/system/user';
 import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
-import type { AddUserReq, TreeDepartmentRes } from '@/api/system/type';
+import type { AddUserReq, UpdateUserReq, TreeDepartmentRes } from '@/api/system/type';
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -45,7 +45,7 @@ export interface TheFormRef {
   onOpen: (row?: TableState['list'][0]) => void;
 }
 
-const DEFAULT_FORM: AddUserReq = {
+const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
   username: '',
   password: '',
   departmentObj: null,
@@ -63,7 +63,7 @@ const TheForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddUserReq>(DEFAULT_FORM);
+    const [form, setForm] = useState<AddUserReq | UpdateUserReq>(DEFAULT_FORM);
     const [showPassword, setShowPassword] = useState(false);
     const [departmentAnchorEl, setDepartmentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
@@ -111,10 +111,7 @@ const TheForm = memo(
             setEditId(detail.id);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { creatorId, updaterId, createTimeUtc, updateTimeUtc, ...rest } = detail;
-            setForm({
-              ...rest,
-              password: '',
-            });
+            setForm({ ...rest });
           } else {
             setEditId(null);
             setForm(DEFAULT_FORM);
@@ -143,17 +140,15 @@ const TheForm = memo(
       const formData = { ...form };
 
       if (editId) {
-        // 编辑用户 - 如果密码为空则不传
-        const updateData = formData.password
-          ? { id: editId, ...formData }
-          : { id: editId, ...formData, password: undefined };
+        // 编辑用户
+        const updateData = { id: editId, ...formData };
         await UserAPI.updateFn({
-          data: updateData as unknown as Parameters<typeof UserAPI.updateFn>[0]['data'],
+          data: updateData as UpdateUserReq,
         });
       } else {
         // 添加用户
         await UserAPI.addFn({
-          data: formData as unknown as Parameters<typeof UserAPI.addFn>[0]['data'],
+          data: formData as AddUserReq,
         });
       }
       handleCancel();
@@ -265,7 +260,7 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <TextField
                 label="用户名"
-                value={form.username}
+                value={form.username ?? ''}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
                 required
                 fullWidth
@@ -276,7 +271,7 @@ const TheForm = memo(
                 <TextField
                   label="密码"
                   type={showPassword ? 'text' : 'password'}
-                  value={form.password}
+                  value={(form as AddUserReq).password ?? ''}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
                   fullWidth
@@ -414,11 +409,7 @@ const TheForm = memo(
             gap: isMobile ? 1 : 0,
           }}
         >
-          <Button
-            onClick={handleCancel}
-            fullWidth={isMobile}
-            size={isMobile ? 'large' : 'medium'}
-          >
+          <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
             取消
           </Button>
           <Button

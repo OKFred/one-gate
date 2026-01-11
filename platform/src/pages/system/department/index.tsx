@@ -52,7 +52,7 @@ export default function DepartmentManagement() {
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
   const [formValues, setFormValues] = useState({
     name: '',
-    description: '',
+    description: null as string | null,
     parentId: '',
     isEnabled: true,
   });
@@ -87,7 +87,7 @@ export default function DepartmentManagement() {
       setEditingDepartment(department);
       setFormValues({
         name: department.name,
-        description: department.description || '',
+        description: department.description,
         parentId: department.parentId?.toString() || '',
         isEnabled: department.isEnabled,
       });
@@ -95,7 +95,7 @@ export default function DepartmentManagement() {
       setEditingDepartment(null);
       setFormValues({
         name: '',
-        description: '',
+        description: null,
         parentId: parentId ? parentId.toString() : '',
         isEnabled: true,
       });
@@ -372,7 +372,7 @@ export default function DepartmentManagement() {
           />
           <TextField
             label="描述"
-            value={formValues.description}
+            value={formValues.description ?? ''}
             onChange={(e) => {
               const value = e.target.value;
               handleFormChange('description', hasValue(value) ? value : null);

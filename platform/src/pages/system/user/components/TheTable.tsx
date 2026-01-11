@@ -210,7 +210,7 @@ const TheTable = memo(
       {
         title: '创建时间',
         render: (row) =>
-          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '暂无',
+          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
       },
       {
         title: '操作',
@@ -231,7 +231,7 @@ const TheTable = memo(
         type: 'content',
         label: '创建时间',
         render: (row) =>
-          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '暂无',
+          row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
       },
       {
         type: 'tags',
