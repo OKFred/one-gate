@@ -1,24 +1,24 @@
 import db from "@/db/index";
 import {
-  languageTable,
+  translationTable,
   IndexVO,
-  LanguageVO,
-  LanguageListVO,
-  LanguageAddVO,
-  LanguageUpdateVO,
-  LanguageListKeys,
-  LanguageDetailKeys,
-  LanguageGetKeys,
-  LanguageDeleteKeys,
-  LanguageAddKeys,
-  LanguageUpdateKeys,
-  LanguageSortableKeys,
-  type LanguagePOLike,
-  type LanguageVOLike,
-  type LanguageAddVOLike,
-  type LanguageUpdateVOLike,
-  type LanguageDeleteVOLike,
-  type LanguageGetVOLike,
+  TranslationVO,
+  TranslationListVO,
+  TranslationAddVO,
+  TranslationUpdateVO,
+  TranslationListKeys,
+  TranslationDetailKeys,
+  TranslationGetKeys,
+  TranslationDeleteKeys,
+  TranslationAddKeys,
+  TranslationUpdateKeys,
+  TranslationSortableKeys,
+  type TranslationPOLike,
+  type TranslationVOLike,
+  type TranslationAddVOLike,
+  type TranslationUpdateVOLike,
+  type TranslationDeleteVOLike,
+  type TranslationGetVOLike,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, inArray, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -56,22 +56,22 @@ const buildWhereCondition = ({
   if (hasValue(keyword)) {
     conditions.push(
       or(
-        like(languageTable.tKey, `%${keyword}%`),
-        like(languageTable.tValue, `%${keyword}%`)
+        like(translationTable.tKey, `%${keyword}%`),
+        like(translationTable.tValue, `%${keyword}%`)
       )
     );
   }
   if (hasValue(application)) {
-    conditions.push(eq(languageTable.application, application));
+    conditions.push(eq(translationTable.application, application));
   }
   if (hasValue(business)) {
-    conditions.push(eq(languageTable.business, business));
+    conditions.push(eq(translationTable.business, business));
   }
   if (hasValue(langCode)) {
-    conditions.push(eq(languageTable.langCode, langCode));
+    conditions.push(eq(translationTable.langCode, langCode));
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(languageTable.isEnabled, isEnabled));
+    conditions.push(eq(translationTable.isEnabled, isEnabled));
   }
   return conditions.length > 0
     ? conditions.length === 1
@@ -84,11 +84,11 @@ const listAllReq = {
   type: "object",
   properties: {
     ...listAllReqBase,
-    application: LanguageVO["application"],
-    business: LanguageVO["business"],
-    langCode: LanguageVO["langCode"],
-    isEnabled: LanguageVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
+    application: TranslationVO["application"],
+    business: TranslationVO["business"],
+    langCode: TranslationVO["langCode"],
+    isEnabled: TranslationVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(TranslationSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -99,14 +99,14 @@ const listAllRes = {
     type: "object",
     properties: {
       id: IndexVO.id,
-      application: LanguageVO.application,
-      business: LanguageVO.business,
-      langCode: LanguageVO.langCode,
-      tKey: LanguageVO.tKey,
-      tValue: LanguageVO.tValue,
-      isEnabled: LanguageVO.isEnabled,
+      application: TranslationVO.application,
+      business: TranslationVO.business,
+      langCode: TranslationVO.langCode,
+      tKey: TranslationVO.tKey,
+      tValue: TranslationVO.tValue,
+      isEnabled: TranslationVO.isEnabled,
     },
-    required: [...LanguageGetKeys],
+    required: [...TranslationGetKeys],
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
@@ -114,20 +114,20 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
   const { orderBy = "id", descend = true } = params;
-  const orderField = languageTable[orderBy] || languageTable.id;
+  const orderField = translationTable[orderBy] || translationTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
   // 查询所有匹配的数据
   const rows = await db
     .select({
-      id: languageTable.id,
-      application: languageTable.application,
-      business: languageTable.business,
-      langCode: languageTable.langCode,
-      tKey: languageTable.tKey,
-      tValue: languageTable.tValue,
-      isEnabled: languageTable.isEnabled,
+      id: translationTable.id,
+      application: translationTable.application,
+      business: translationTable.business,
+      langCode: translationTable.langCode,
+      tKey: translationTable.tKey,
+      tValue: translationTable.tValue,
+      isEnabled: translationTable.isEnabled,
     })
-    .from(languageTable)
+    .from(translationTable)
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(maxLimit);
@@ -149,21 +149,21 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    application: LanguageVO["application"],
-    business: LanguageVO["business"],
-    langCode: LanguageVO["langCode"],
-    isEnabled: LanguageVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
+    application: TranslationVO["application"],
+    business: TranslationVO["business"],
+    langCode: TranslationVO["langCode"],
+    isEnabled: TranslationVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(TranslationSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<LanguagePOLike>[]>(
+  ...listResponseWrapper<RequiredKeys<TranslationPOLike>[]>(
     {
-      ...LanguageListVO,
+      ...TranslationListVO,
     },
-    [...LanguageListKeys]
+    [...TranslationListKeys]
   ),
 } as const satisfies JSONSchema;
 async function onList(
@@ -171,14 +171,14 @@ async function onList(
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
-  const orderField = languageTable[orderBy] || languageTable.id;
+  const orderField = translationTable[orderBy] || translationTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   // 查询总数
   const countResult = await db
-    .select({ total: count(languageTable.id).as("total") })
-    .from(languageTable)
+    .select({ total: count(translationTable.id).as("total") })
+    .from(translationTable)
     .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
@@ -193,7 +193,7 @@ async function onList(
   // 查询列表数据
   const rows = await db
     .select()
-    .from(languageTable)
+    .from(translationTable)
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
@@ -222,11 +222,11 @@ const listApi = {
 const addReq = {
   type: "object",
   properties: {
-    ...LanguageAddVO,
-  } satisfies Partial<Record<keyof LanguageAddVOLike, JSONSchema>>,
+    ...TranslationAddVO,
+  } satisfies Partial<Record<keyof TranslationAddVOLike, JSONSchema>>,
   required: [
-    ...LanguageAddKeys,
-  ] as const satisfies RequiredKeys<LanguageAddVOLike>[],
+    ...TranslationAddKeys,
+  ] as const satisfies RequiredKeys<TranslationAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -244,9 +244,9 @@ async function onAdd(
     creatorId,
   };
   const result = await db
-    .insert(languageTable)
+    .insert(translationTable)
     .values(updateData)
-    .returning({ id: languageTable.id });
+    .returning({ id: translationTable.id });
 
   return result[0]?.id;
 }
@@ -265,11 +265,11 @@ const addApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...LanguageUpdateVO,
+    ...TranslationUpdateVO,
   },
   required: [
-    ...LanguageUpdateKeys,
-  ] as const satisfies RequiredKeys<LanguageUpdateVOLike>[],
+    ...TranslationUpdateKeys,
+  ] as const satisfies RequiredKeys<TranslationUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
@@ -290,10 +290,10 @@ async function onUpdate(
   };
 
   const res = await db
-    .update(languageTable)
+    .update(translationTable)
     .set(updateData)
-    .where(eq(languageTable.id, id))
-    .returning({ id: languageTable.id });
+    .where(eq(translationTable.id, id))
+    .returning({ id: translationTable.id });
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -317,8 +317,8 @@ const deleteReq = {
     ...IndexVO,
   },
   required: [
-    ...LanguageDeleteKeys,
-  ] as const satisfies RequiredKeys<LanguageDeleteVOLike>[],
+    ...TranslationDeleteKeys,
+  ] as const satisfies RequiredKeys<TranslationDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const deleteRes = {
@@ -330,9 +330,9 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
   const result = await db
-    .delete(languageTable)
-    .where(eq(languageTable.id, id))
-    .returning({ id: languageTable.id });
+    .delete(translationTable)
+    .where(eq(translationTable.id, id))
+    .returning({ id: translationTable.id });
   if (!result || result.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -356,18 +356,18 @@ const getReq = {
     ...IndexVO,
   },
   required: [
-    ...LanguageGetKeys,
-  ] as const satisfies RequiredKeys<LanguageGetVOLike>[],
+    ...TranslationGetKeys,
+  ] as const satisfies RequiredKeys<TranslationGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
   type: "object",
   properties: {
-    ...LanguageVO,
+    ...TranslationVO,
   },
   required: [
-    ...LanguageDetailKeys,
-  ] as const satisfies RequiredKeys<LanguageVOLike>[],
+    ...TranslationDetailKeys,
+  ] as const satisfies RequiredKeys<TranslationVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
@@ -376,8 +376,8 @@ async function onGet(
   const { id } = params;
   const rows = await db
     .select()
-    .from(languageTable)
-    .where(eq(languageTable.id, id))
+    .from(translationTable)
+    .where(eq(translationTable.id, id))
     .limit(1);
   if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
@@ -401,9 +401,9 @@ async function getTranslationsByIds(
 ): Promise<{ value: number; label: string }[]> {
   if (ids.length === 0) return [];
   const rows = await db
-    .select({ value: languageTable.id, label: languageTable.tKey })
-    .from(languageTable)
-    .where(inArray(languageTable.id, ids));
+    .select({ value: translationTable.id, label: translationTable.tKey })
+    .from(translationTable)
+    .where(inArray(translationTable.id, ids));
   return rows;
 }
 
@@ -411,8 +411,8 @@ async function getTranslationsByIds(
 const checkDuplicateReq = {
   type: "object",
   properties: {
-    tValue: LanguageVO.tValue,
-    valueHash: LanguageVO.valueHash,
+    tValue: TranslationVO.tValue,
+    valueHash: TranslationVO.valueHash,
     excludeId: {
       ...IndexVO.id,
       description: "要排除的记录 ID（可选）",
@@ -434,12 +434,12 @@ const checkDuplicateRes = {
         type: "object",
         properties: {
           id: IndexVO.id,
-          application: LanguageVO.application,
-          business: LanguageVO.business,
-          langCode: LanguageVO.langCode,
-          tKey: LanguageVO.tKey,
-          tValue: LanguageVO.tValue,
-          isEnabled: LanguageVO.isEnabled,
+          application: TranslationVO.application,
+          business: TranslationVO.business,
+          langCode: TranslationVO.langCode,
+          tKey: TranslationVO.tKey,
+          tValue: TranslationVO.tValue,
+          isEnabled: TranslationVO.isEnabled,
         },
       },
     },
@@ -455,22 +455,22 @@ async function onCheckDuplicate(
 
   const whereCondition = excludeId
     ? and(
-        eq(languageTable.valueHash, valueHash),
-        ne(languageTable.id, excludeId)
+        eq(translationTable.valueHash, valueHash),
+        ne(translationTable.id, excludeId)
       )
-    : eq(languageTable.valueHash, valueHash);
+    : eq(translationTable.valueHash, valueHash);
 
   const rows = await db
     .select({
-      id: languageTable.id,
-      business: languageTable.business,
-      application: languageTable.application,
-      langCode: languageTable.langCode,
-      tKey: languageTable.tKey,
-      tValue: languageTable.tValue,
-      isEnabled: languageTable.isEnabled,
+      id: translationTable.id,
+      business: translationTable.business,
+      application: translationTable.application,
+      langCode: translationTable.langCode,
+      tKey: translationTable.tKey,
+      tValue: translationTable.tValue,
+      isEnabled: translationTable.isEnabled,
     })
-    .from(languageTable)
+    .from(translationTable)
     .where(whereCondition);
   const filteredRows = rows.filter((row) => row.tValue === tValue);
   return {
@@ -494,13 +494,13 @@ const checkDuplicateApi = {
 async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
   if (hasValue(obj.tKey)) {
     const existingRecord = await db
-      .select({ id: languageTable.id })
-      .from(languageTable)
+      .select({ id: translationTable.id })
+      .from(translationTable)
       .where(
         and(
-          eq(languageTable.tKey, obj.tKey),
-          eq(languageTable.langCode, obj.langCode),
-          "id" in obj ? ne(languageTable.id, obj.id) : undefined
+          eq(translationTable.tKey, obj.tKey),
+          eq(translationTable.langCode, obj.langCode),
+          "id" in obj ? ne(translationTable.id, obj.id) : undefined
         )
       )
       .limit(1);

@@ -23,7 +23,7 @@ import {
 import { type RequiredKeys } from "@/types/app";
 
 //----------------- PO ----------------//
-const LanguageUniquePO = {
+const TranslationUniquePO = {
   tKey: {
     type: "string",
     description: "翻译键",
@@ -31,8 +31,8 @@ const LanguageUniquePO = {
     examples: ["welcome.message"],
     maxLength: 100,
   },
-} as const satisfies Partial<Record<keyof LanguagePOLike, JSONSchema>>;
-const LanguageBasePO = {
+} as const satisfies Partial<Record<keyof TranslationPOLike, JSONSchema>>;
+const TranslationBasePO = {
   tValue: {
     type: "string",
     description: "翻译值",
@@ -75,53 +75,53 @@ const LanguageBasePO = {
     description: "是否启用",
     examples: [true, false],
   },
-} as const satisfies Partial<Record<keyof LanguagePOLike, JSONSchema>>;
-const LanguagePO = {
+} as const satisfies Partial<Record<keyof TranslationPOLike, JSONSchema>>;
+const TranslationPO = {
   ...IndexPO,
-  ...LanguageUniquePO,
-  ...LanguageBasePO,
+  ...TranslationUniquePO,
+  ...TranslationBasePO,
   ...AuditPO,
-} as const satisfies Record<keyof LanguagePOLike, JSONSchema>;
-export type LanguagePOLike = InferSelectModel<typeof languageTable>; // 列表
-type LanguageSelectPOLike = InferInsertModel<typeof languageTable>;
-type LanguageAddPOLike = Omit<
-  LanguagePOLike,
+} as const satisfies Record<keyof TranslationPOLike, JSONSchema>;
+export type TranslationPOLike = InferSelectModel<typeof translationTable>; // 列表
+type TranslationSelectPOLike = InferInsertModel<typeof translationTable>;
+type TranslationAddPOLike = Omit<
+  TranslationPOLike,
   IndexKeyLike | AuditAddOmitKeyLike
 >;
-type LanguageUpdatePOLike = Partial<
-  Omit<LanguageSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+type TranslationUpdatePOLike = Partial<
+  Omit<TranslationSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
-  Pick<LanguagePOLike, IndexKeyLike>;
+  Pick<TranslationPOLike, IndexKeyLike>;
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
-const LanguageUniqueVO = LanguageUniquePO;
-const LanguageBaseVO = LanguageBasePO;
-export const LanguageVO = {
+const TranslationUniqueVO = TranslationUniquePO;
+const TranslationBaseVO = TranslationBasePO;
+export const TranslationVO = {
   ...IndexVO,
-  ...LanguageUniqueVO,
-  ...LanguageBaseVO,
+  ...TranslationUniqueVO,
+  ...TranslationBaseVO,
   ...AuditVO,
-} as const satisfies Partial<Record<keyof LanguageVOLike, JSONSchema>>; // 详情
-export const LanguageListVO = LanguageVO; // 列表
-export const LanguageAddVO = {
-  ...LanguageUniqueVO,
-  ...LanguageBaseVO,
-} as const satisfies Partial<Record<keyof LanguageVOLike, JSONSchema>>; // 新增
-export const LanguageUpdateVO = {
+} as const satisfies Partial<Record<keyof TranslationVOLike, JSONSchema>>; // 详情
+export const TranslationListVO = TranslationVO; // 列表
+export const TranslationAddVO = {
+  ...TranslationUniqueVO,
+  ...TranslationBaseVO,
+} as const satisfies Partial<Record<keyof TranslationVOLike, JSONSchema>>; // 新增
+export const TranslationUpdateVO = {
   ...IndexVO,
-  ...LanguageUniqueVO,
-  ...LanguageBaseVO,
-} as const satisfies Partial<Record<keyof LanguageVOLike, JSONSchema>>; // 更新
+  ...TranslationUniqueVO,
+  ...TranslationBaseVO,
+} as const satisfies Partial<Record<keyof TranslationVOLike, JSONSchema>>; // 更新
 
-export type LanguageVOLike = LanguagePOLike;
-export type LanguageAddVOLike = Omit<LanguageAddPOLike, "creatorId">;
-export type LanguageUpdateVOLike = LanguageUpdatePOLike;
-export type LanguageDeleteVOLike = Pick<LanguageVOLike, IndexKeyLike>;
-export type LanguageGetVOLike = Pick<LanguageVOLike, IndexKeyLike>;
+export type TranslationVOLike = TranslationPOLike;
+export type TranslationAddVOLike = Omit<TranslationAddPOLike, "creatorId">;
+export type TranslationUpdateVOLike = TranslationUpdatePOLike;
+export type TranslationDeleteVOLike = Pick<TranslationVOLike, IndexKeyLike>;
+export type TranslationGetVOLike = Pick<TranslationVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
-export const LanguageAddKeys = [
+export const TranslationAddKeys = [
   "application",
   "business",
   "langCode",
@@ -130,35 +130,35 @@ export const LanguageAddKeys = [
   "valueHash",
   "description",
   "isEnabled",
-] as const satisfies RequiredKeys<LanguageAddVOLike>[];
-export const LanguageUpdateKeys = [
+] as const satisfies RequiredKeys<TranslationAddVOLike>[];
+export const TranslationUpdateKeys = [
   ...IndexKey,
-] as const satisfies RequiredKeys<LanguageUpdateVOLike>[];
-export const LanguageDeleteKeys = [
+] as const satisfies RequiredKeys<TranslationUpdateVOLike>[];
+export const TranslationDeleteKeys = [
   ...IndexKey,
-] as const satisfies RequiredKeys<LanguageDeleteVOLike>[];
-export const LanguageGetKeys = [
+] as const satisfies RequiredKeys<TranslationDeleteVOLike>[];
+export const TranslationGetKeys = [
   ...IndexKey,
-] as const satisfies RequiredKeys<LanguageGetVOLike>[];
-const LanguageBaseKeys = [
+] as const satisfies RequiredKeys<TranslationGetVOLike>[];
+const TranslationBaseKeys = [
   ...IndexKey,
-  ...LanguageAddKeys,
+  ...TranslationAddKeys,
   ...AuditKeys,
-] as const satisfies RequiredKeys<LanguagePOLike>[];
+] as const satisfies RequiredKeys<TranslationPOLike>[];
 
-export const LanguageListKeys = LanguageBaseKeys;
-export const LanguageDetailKeys = LanguageBaseKeys;
-export const LanguageSortableKeys = [
+export const TranslationListKeys = TranslationBaseKeys;
+export const TranslationDetailKeys = TranslationBaseKeys;
+export const TranslationSortableKeys = [
   "id",
   "application",
   "business",
   "langCode",
   "tKey",
   "createTimeUtc",
-] as const satisfies RequiredKeys<LanguagePOLike>[];
+] as const satisfies RequiredKeys<TranslationPOLike>[];
 
-export const languageTable = sqliteTable(
-  "i18n_language",
+export const translationTable = sqliteTable(
+  "i18n_translation",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     application: text("application", { length: 100 }).notNull(),
@@ -184,7 +184,7 @@ export const languageTable = sqliteTable(
 
 export async function tableInit() {
   await db.run(`
-    CREATE TABLE IF NOT EXISTS i18n_language (
+    CREATE TABLE IF NOT EXISTS i18n_translation (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       application TEXT NOT NULL,
       business TEXT NOT NULL,
@@ -204,12 +204,12 @@ export async function tableInit() {
     )
   `);
   await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_value_hash ON i18n_language(value_hash)
+    CREATE INDEX IF NOT EXISTS idx_value_hash ON i18n_translation(value_hash)
   `);
   await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tkey_langcode ON i18n_language(t_key, lang_code)
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tkey_langcode ON i18n_translation(t_key, lang_code)
   `);
-  console.log("💾 表 i18n_language 已初始化");
+  console.log("💾 表 i18n_translation 已初始化");
 }
 
-export default languageTable;
+export default translationTable;
