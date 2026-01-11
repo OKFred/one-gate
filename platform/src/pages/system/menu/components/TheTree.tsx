@@ -30,6 +30,7 @@ const TheTree = memo(
     const [menus, setMenus] = useState<MenuData[]>([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
+    const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
     // 将平铺的菜单列表构造成树形结构
     const buildTree = useCallback((list: MenuData[]): MenuData[] => {
@@ -109,6 +110,18 @@ const TheTree = memo(
           const currentFilters = searchFilters || { keyword: '', isEnabled: undefined };
           const filteredData = filterMenus(treeData as MenuData[], currentFilters);
           setMenus(filteredData);
+          // 设置所有节点为展开状态
+          const expandedIds: string[] = [];
+          const traverse = (items: MenuData[]) => {
+            items.forEach((item) => {
+              if (item.children && item.children.length > 0) {
+                expandedIds.push(item.id.toString());
+                traverse(item.children);
+              }
+            });
+          };
+          traverse(filteredData);
+          setExpandedItems(expandedIds);
           if (searchFilters) {
             setFilters(searchFilters);
           }
@@ -157,21 +170,6 @@ const TheTree = memo(
         setLoading(false);
       }
     }, [fetchMenus, filters]);
-
-    // 获取所有展开项的ID
-    const getAllExpandedIds = useCallback((menuList: MenuData[]): string[] => {
-      const ids: string[] = [];
-      const traverse = (items: MenuData[]) => {
-        items.forEach((item) => {
-          if (item.children && item.children.length > 0) {
-            ids.push(item.id.toString());
-            traverse(item.children);
-          }
-        });
-      };
-      traverse(menuList);
-      return ids;
-    }, []);
 
     // 渲染菜单树
     const renderTree = useCallback(
@@ -227,7 +225,8 @@ const TheTree = memo(
         ) : menus.length > 0 ? (
           <SimpleTreeView
             slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-            defaultExpandedItems={getAllExpandedIds(menus)}
+            expandedItems={expandedItems}
+            onExpandedItemsChange={(_, itemIds) => setExpandedItems(itemIds)}
           >
             {renderTree(menus)}
           </SimpleTreeView>

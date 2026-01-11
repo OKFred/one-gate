@@ -30,6 +30,7 @@ const TheTree = memo(
     const [departments, setDepartments] = useState<DepartmentData[]>([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
+    const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
     // 将扁平的部门列表构造成树形结构（支持无限层级）
     const buildTree = useCallback((list: DepartmentData[]): DepartmentData[] => {
@@ -122,6 +123,18 @@ const TheTree = memo(
           const currentFilters = searchFilters || { keyword: '', isEnabled: undefined };
           const filteredData = filterDepartments(treeData, currentFilters);
           setDepartments(filteredData);
+          // 设置所有节点为展开状态
+          const expandedIds: string[] = [];
+          const traverse = (items: DepartmentData[]) => {
+            items.forEach((item) => {
+              if (item.children && item.children.length > 0) {
+                expandedIds.push(item.id.toString());
+                traverse(item.children);
+              }
+            });
+          };
+          traverse(filteredData);
+          setExpandedItems(expandedIds);
 
           if (searchFilters) {
             setFilters(searchFilters);
@@ -172,20 +185,6 @@ const TheTree = memo(
       }
     }, [fetchDepartments, filters]);
 
-    // 获取所有展开项的ID（递归遍历所有层级）
-    const getAllExpandedIds = useCallback((deptList: DepartmentData[]): string[] => {
-      const ids: string[] = [];
-      const traverse = (items: DepartmentData[]) => {
-        items.forEach((item) => {
-          if (item.children && item.children.length > 0) {
-            ids.push(item.id.toString());
-            traverse(item.children); // 递归遍历子节点
-          }
-        });
-      };
-      traverse(deptList);
-      return ids;
-    }, []);
 
     // 渲染树节点（递归渲染无限层级）
     const renderTree = useCallback(
@@ -239,7 +238,8 @@ const TheTree = memo(
         ) : departments.length > 0 ? (
           <SimpleTreeView
             slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
-            defaultExpandedItems={getAllExpandedIds(departments)}
+            expandedItems={expandedItems}
+            onExpandedItemsChange={(_, itemIds) => setExpandedItems(itemIds)}
           >
             {renderTree(departments)}
           </SimpleTreeView>
