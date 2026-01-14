@@ -205,6 +205,7 @@ const TheForm = memo(
                   onChange={(e) => setForm({ ...form, application: e.target.value })}
                   required
                   fullWidth
+                  autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder="例如：frontend, backend, common"
                 />
@@ -215,6 +216,7 @@ const TheForm = memo(
                   onChange={(e) => setForm({ ...form, business: e.target.value })}
                   required
                   fullWidth
+                  autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder="例如：email, order"
                 />
@@ -226,6 +228,7 @@ const TheForm = memo(
                   onChange={(e) => setForm({ ...form, langCode: e.target.value })}
                   required
                   fullWidth
+                  autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder="例如：en-US, zh-CN, de-DE"
                 />
