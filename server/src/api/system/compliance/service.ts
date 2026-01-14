@@ -159,17 +159,17 @@ const listApi = {
  */
 export async function exportDeletionRecord(
   data: {
-    sourceSystem?: string;
-    sourceDatabase?: string;
+    sourceSystem?: string | "self";
+    sourceDatabase?: string | "self";
     sourceTable: string;
-    sourcePrimaryKey: string;
-    deleteReason?: string;
-    deleteType?: string;
+    sourcePrimaryKey: string | "id";
+    deleteReason?: string | "personal_data" | "system";
+    deleteType?: string | "anonymize" | "purge";
     recordSnapshot?: string;
     remark?: string;
     restorable?: boolean;
     restoreUntilTimeUtc?: number;
-    complianceNote?: string;
+    complianceNote?: string | "(EU) 2016/679" | "(CN) PIPL 2021";
   },
   creatorId: number
 ): Promise<number | null> {
@@ -177,7 +177,7 @@ export async function exportDeletionRecord(
     sourceSystem: data.sourceSystem || "self",
     sourceDatabase: data.sourceDatabase || "self",
     sourceTable: data.sourceTable,
-    sourcePrimaryKey: data.sourcePrimaryKey,
+    sourcePrimaryKey: data.sourcePrimaryKey || "id",
     deleteReason: data.deleteReason || null,
     deleteType: data.deleteType || null,
     recordSnapshot: data.recordSnapshot || null,

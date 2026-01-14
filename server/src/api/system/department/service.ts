@@ -377,11 +377,14 @@ async function onDelete(
       {
         sourceTable: "department",
         sourcePrimaryKey: String(id),
-        deleteReason: "admin_delete",
-        deleteType: "hard_delete",
+        deleteReason: "system",
+        deleteType: "purge",
         recordSnapshot: JSON.stringify(recordToDelete[0]),
         remark: `部门"${recordToDelete[0].name}"被删除`,
-        restorable: false, // 硬删除不可恢复
+        restorable: true,
+        restoreUntilTimeUtc: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000
+        ).getTime(), // 30天后不可恢复
         complianceNote: null,
       },
       userObj.userId
