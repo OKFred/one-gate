@@ -5,36 +5,47 @@ import { indexedDBHelper } from '@/utils/indexedDB';
 // 翻译数据缓存
 let translationCache: Record<string, Record<string, string>> = {};
 let isLoaded = false;
+let loadingPromise: Promise<void> | null = null;
 
 /**
  * 从 IndexedDB 加载翻译数据到缓存
  */
 const loadTranslationsFromDB = async (): Promise<void> => {
+  // 如果已加载，直接返回
   if (isLoaded) return;
 
-  try {
-    await indexedDBHelper.init();
-    const data = await indexedDBHelper.getTranslationList();
+  // 如果正在加载，返回同一个 Promise
+  if (loadingPromise) return loadingPromise;
 
-    // 重置缓存
-    translationCache = {}
+  // 开始加载
+  loadingPromise = (async () => {
+    try {
+      await indexedDBHelper.init();
+      const data = await indexedDBHelper.getTranslationList();
 
-    // 按语言代码分组
-    data.forEach((item) => {
-      if (!item.langCode) return;
-      if (!translationCache[item.langCode]) {
-        translationCache[item.langCode] = {};
-      }
-      const fullKey = `${item.tKey}`;
-      if (!item.tValue) return;
-      translationCache[item.langCode][fullKey] = item.tValue;
-    });
+      // 重置缓存
+      translationCache = {};
 
-    isLoaded = true;
-    console.log('✅ 多语言数据已加载到缓存', translationCache);
-  } catch (error) {
-    console.error('❌ 加载多语言数据失败：', error);
-  }
+      // 按语言代码分组
+      data.forEach((item) => {
+        if (!item.langCode) return;
+        if (!translationCache[item.langCode]) {
+          translationCache[item.langCode] = {};
+        }
+        const fullKey = `${item.tKey}`;
+        if (!item.tValue) return;
+        translationCache[item.langCode][fullKey] = item.tValue;
+      });
+
+      isLoaded = true;
+    } catch (error) {
+      console.error('❌ 加载多语言数据失败：', error);
+    } finally {
+      loadingPromise = null;
+    }
+  })();
+
+  return loadingPromise;
 };
 
 /**
@@ -62,9 +73,11 @@ export const useTranslation = () => {
 
   useEffect(() => {
     if (!isLoaded) {
-      loadTranslationsFromDB().then(() => {
+      async function init() {
+        await loadTranslationsFromDB();
         setIsReady(true);
-      });
+      }
+      init();
     }
   }, []);
 
