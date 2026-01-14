@@ -4,7 +4,7 @@ import { authUtils, type UserInfo } from '@/utils/auth';
 import { getProfile } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 
-import { listFn } from '@/api/i18n/translation';
+import { listAllFn } from '@/api/i18n/translation';
 import { indexedDBHelper } from '@/utils/indexedDB';
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -22,13 +22,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         await indexedDBHelper.init();
 
         // 请求多语言列表
-        const response = await listFn({ data: { pageNo: 1, pageSize: 1000 } });
+        const response = await listAllFn({ data: { isEnabled: true } });
 
         if (response.data?.ok && response.data?.data) {
           const i18nList = response.data.data;
 
           // 保存到IndexedDB
-          const count = await indexedDBHelper.saveTranslationList(i18nList.list);
+          const count = await indexedDBHelper.saveTranslationList(i18nList);
 
           console.log(`✅ 多语言列表已保存到IndexedDB，共 ${count} 条数据`);
         } else {
@@ -38,7 +38,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
         console.error('❌ 加载多语言列表失败：', error);
       }
     };
-    loadTranslationList();
+    await loadTranslationList();
   }
 
   function failedLogin() {
@@ -47,10 +47,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     setIsAuthenticated(false);
   }
 
-  function successfulLogin(newUserInfo: UserInfo) {
+  async function successfulLogin(newUserInfo: UserInfo) {
     authUtils.setUserInfo(newUserInfo);
     setIsAuthenticated(true);
-    getTranslationData();
+    await getTranslationData();
   }
 
   useEffect(() => {
@@ -69,7 +69,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
         if (result.data.ok) {
           const { userObj } = result.data.data;
-          successfulLogin({ token, ...userObj });
+          await successfulLogin({ token, ...userObj });
           return;
         } else {
           failedLogin();
