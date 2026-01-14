@@ -3,11 +3,8 @@ const DB_NAME = 'OkFredDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'i18n';
 
-interface TranslationData {
-  id: number;
-  [key: string]: unknown;
-}
 
+type TranslationData = Awaited<ReturnType<typeof import('@/api/i18n/translation').listAllFn>>['data']['data'][0]
 class IndexedDBHelper {
   private db: IDBDatabase | null = null;
 

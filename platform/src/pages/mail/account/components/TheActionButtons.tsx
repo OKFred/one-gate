@@ -34,7 +34,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('i18n.pages.mail.account.actions.add')}
+      {t('mail.account.actions.add')}
     </ResponsiveButton>
   );
 });
@@ -95,19 +95,19 @@ export const AccountActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('i18n.pages.mail.account.actions.deleteConfirmTitle')}</DialogTitle>
+          <DialogTitle>{t('mail.account.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('i18n.pages.mail.account.actions.deleteConfirmMessage').replace(
+              {t('mail.account.actions.deleteConfirmMessage').replace(
                 '{nickname}',
                 row.nickname || '',
               )}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>{t('i18n.pages.mail.account.form.cancel')}</Button>
+            <Button onClick={closeDeleteDialog}>{t('mail.account.form.cancel')}</Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus>
-              {t('i18n.pages.mail.account.actions.delete')}
+              {t('mail.account.actions.delete')}
             </Button>
           </DialogActions>
         </Dialog>

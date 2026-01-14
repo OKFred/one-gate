@@ -1,11 +1,40 @@
-import { useMemo } from 'react';
-import zhCN from '@/locales/zh-CN';
-import enUS from '@/locales/en-US';
+import { useMemo, useState, useEffect } from 'react';
 import { authUtils } from '@/utils/auth';
+import { indexedDBHelper } from '@/utils/indexedDB';
 
-const languageObj = {
-  'en-US': enUS,
-  'zh-CN': zhCN,
+// 翻译数据缓存
+let translationCache: Record<string, Record<string, string>> = {};
+let isLoaded = false;
+
+/**
+ * 从 IndexedDB 加载翻译数据到缓存
+ */
+const loadTranslationsFromDB = async (): Promise<void> => {
+  if (isLoaded) return;
+
+  try {
+    await indexedDBHelper.init();
+    const data = await indexedDBHelper.getTranslationList();
+
+    // 重置缓存
+    translationCache = {}
+
+    // 按语言代码分组
+    data.forEach((item) => {
+      if (!item.langCode) return;
+      if (!translationCache[item.langCode]) {
+        translationCache[item.langCode] = {};
+      }
+      const fullKey = `${item.tKey}`;
+      if (!item.tValue) return;
+      translationCache[item.langCode][fullKey] = item.tValue;
+    });
+
+    isLoaded = true;
+    console.log('✅ 多语言数据已加载到缓存', translationCache);
+  } catch (error) {
+    console.error('❌ 加载多语言数据失败：', error);
+  }
 };
 
 /**
@@ -14,12 +43,11 @@ const languageObj = {
  * @returns 翻译函数，如果找不到文案则原样返回
  */
 export const createTranslator = (langCode?: string) => {
-  const supportedLanguages = ['en-US', 'zh-CN'];
-  const language = supportedLanguages.includes(langCode || '') ? langCode! : 'zh-CN';
+  const language = langCode || 'zh-CN';
 
   return (key: string): string => {
-    const translations = languageObj[language as keyof typeof languageObj];
-    return (translations as Record<string, string>)[key] || key;
+    const translations = translationCache[language] || {};
+    return translations[key] || key;
   };
 };
 
@@ -30,8 +58,17 @@ export const createTranslator = (langCode?: string) => {
 export const useTranslation = () => {
   const userInfo = authUtils.getUserInfo();
   const langCode = userInfo?.langCode || 'zh-CN';
+  const [isReady, setIsReady] = useState(isLoaded);
 
-  const t = useMemo(() => createTranslator(langCode), [langCode]);
+  useEffect(() => {
+    if (!isLoaded) {
+      loadTranslationsFromDB().then(() => {
+        setIsReady(true);
+      });
+    }
+  }, []);
+
+  const t = useMemo(() => createTranslator(langCode), [langCode, isReady]);
 
   return t;
 };

@@ -88,7 +88,9 @@ const listAllReq = {
     business: TranslationVO["business"],
     langCode: TranslationVO["langCode"],
     isEnabled: TranslationVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(TranslationSortableKeys),
+    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(
+      TranslationSortableKeys
+    ),
   },
   required: [],
   additionalProperties: false,
@@ -153,7 +155,9 @@ const listReq = {
     business: TranslationVO["business"],
     langCode: TranslationVO["langCode"],
     isEnabled: TranslationVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(TranslationSortableKeys),
+    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(
+      TranslationSortableKeys
+    ),
   },
   required: [],
   additionalProperties: false,
@@ -234,7 +238,7 @@ const addRes = {
 } as const satisfies JSONSchema;
 async function onAdd(
   params: FromSchema<typeof addReq>,
-  userObj: UserObj
+  userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
   // 检查 tKey 是否与其他记录冲突
@@ -513,8 +517,18 @@ async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
   }
 }
 
+/** SHA256 哈希计算 */
+async function calculateSHA256(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export const utils = {
   getTranslationsByIds,
+  calculateSHA256,
 };
 
 export default {

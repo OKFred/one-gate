@@ -5,6 +5,10 @@ import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
 import { menuTable } from "@/api/system/menu/db.table";
 import { initialMenuData } from "@/db/initialMenu";
+import { initialI18nData } from "./initI18n";
+import translationService, {
+  utils as translationUtils,
+} from "@/api/i18n/translation/service";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -136,6 +140,31 @@ async function initMenu() {
 }
 
 /**
+ * 初始化多语言数据
+ */
+async function initI18n() {
+  const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
+  const results = [];
+  for (const item of initialI18nData) {
+    // 计算 hash 值
+    const valueHash = await translationUtils.calculateSHA256(item.tValue);
+    const params = {
+      ...item,
+      valueHash,
+    };
+    results.push(await translationService.add.service(params, userObj));
+  }
+  const addResults = await Promise.allSettled(results);
+  const successCount = addResults.filter(
+    (res) => res.status === "fulfilled"
+  ).length;
+  const totalCount = initialI18nData.length;
+  console.log(
+    `🌐 多语言数据初始化完成: ${successCount}/${totalCount} 条记录已添加`
+  );
+}
+
+/**
  * 初始化数据库数据
  */
 export async function initDatabase() {
@@ -149,6 +178,8 @@ export async function initDatabase() {
     await initSuperAdminUser(roleId);
     // 3. 初始化菜单
     await initMenu();
+
+    await initI18n();
 
     console.log("✅ 数据库初始化完成");
   } catch (error) {

@@ -131,7 +131,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('i18n.pages.mail.account.form.title.edit') : t('i18n.pages.mail.account.form.title.add')}
+            {editId ? t('mail.account.form.title.edit') : t('mail.account.form.title.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -150,7 +150,7 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.pages.mail.account.form.nickname')}
+                  label={t('mail.account.form.nickname')}
                   value={form.nickname}
                   onChange={(e) => setForm({ ...form, nickname: e.target.value })}
                   required
@@ -158,7 +158,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label={t('i18n.pages.mail.account.form.email')}
+                  label={t('mail.account.form.email')}
                   type="email"
                   value={form.mailAddress}
                   onChange={(e) => setForm({ ...form, mailAddress: e.target.value })}
@@ -170,7 +170,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.pages.mail.account.form.host')}
+                  label={t('mail.account.form.host')}
                   value={form.host}
                   onChange={(e) => setForm({ ...form, host: e.target.value })}
                   required
@@ -178,7 +178,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label={t('i18n.pages.mail.account.form.port')}
+                  label={t('mail.account.form.port')}
                   type="number"
                   value={form.port}
                   onChange={(e) => setForm({ ...form, port: Number(e.target.value) })}
@@ -190,7 +190,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.pages.mail.account.form.password')}
+                  label={t('mail.account.form.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -228,8 +228,8 @@ const TheForm = memo(
                     });
                   }}
                 >
-                  <FormControlLabel value="ssl" control={<Radio />} label={t('i18n.pages.mail.account.form.ssl')} />
-                  <FormControlLabel value="starttls" control={<Radio />} label={t('i18n.pages.mail.account.form.starttls')} />
+                  <FormControlLabel value="ssl" control={<Radio />} label={t('mail.account.form.ssl')} />
+                  <FormControlLabel value="starttls" control={<Radio />} label={t('mail.account.form.starttls')} />
                 </RadioGroup>
               </FormControl>
             </Stack>
@@ -245,7 +245,7 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
-            {t('i18n.pages.mail.account.form.cancel')}
+            {t('mail.account.form.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -254,7 +254,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {t('i18n.pages.mail.account.form.save')}
+            {t('mail.account.form.save')}
           </Button>
         </DialogActions>
       </Dialog>
