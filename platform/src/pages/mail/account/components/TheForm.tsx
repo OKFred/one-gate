@@ -7,11 +7,6 @@ import {
   DialogActions,
   TextField,
   Stack,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  Radio,
   Box,
   useTheme,
   IconButton,
@@ -40,8 +35,8 @@ const DEFAULT_FORM: AddMailAccountReq = {
   host: '',
   port: 465,
   password: '',
-  sslEnable: true,
-  starttlsEnable: false,
+  isEnabled: true,
+  remark: null,
 };
 
 const TheForm = memo(
@@ -65,13 +60,13 @@ const TheForm = memo(
           if (row) {
             setEditId(row.id!);
             setForm({
-              nickname: row.nickname || '',
-              mailAddress: row.mailAddress || '',
-              host: row.host || '',
+              nickname: row.nickname ?? '',
+              mailAddress: row.mailAddress ?? '',
+              host: row.host ?? '',
               port: row.port,
-              password: row.password || '',
-              sslEnable: row.sslEnable,
-              starttlsEnable: row.starttlsEnable,
+              password: row.password ?? '',
+              isEnabled: row.isEnabled,
+              remark: row.remark ?? null,
             });
           } else {
             setEditId(null);
@@ -93,8 +88,10 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      const base64Password = globalThis.btoa(form.password); // 防小白
       const formData = {
         ...form,
+        password: base64Password,
         port: form.port,
       };
 
@@ -214,24 +211,17 @@ const TheForm = memo(
                 />
               </Stack>
 
-              <FormControl component="fieldset">
-                <FormLabel component="legend">加密方式</FormLabel>
-                <RadioGroup
-                  row
-                  value={form.sslEnable ? 'ssl' : form.starttlsEnable ? 'starttls' : ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setForm({
-                      ...form,
-                      sslEnable: value === 'ssl',
-                      starttlsEnable: value === 'starttls',
-                    });
-                  }}
-                >
-                  <FormControlLabel value="ssl" control={<Radio />} label={t('mail.account.form.ssl')} />
-                  <FormControlLabel value="starttls" control={<Radio />} label={t('mail.account.form.starttls')} />
-                </RadioGroup>
-              </FormControl>
+              <TextField
+                label={t('mail.account.columns.remark')}
+                value={form.remark || ''}
+                onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
+              />
             </Stack>
           </form>
         </DialogContent>

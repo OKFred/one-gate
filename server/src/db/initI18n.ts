@@ -738,4 +738,22 @@ export const initialI18nData = [
     description: "需求20260115",
     isEnabled: true,
   },
+  {
+    application: "frontend",
+    business: "mail",
+    langCode: "zh-CN",
+    tKey: "mail.account.columns.remark",
+    tValue: "备注",
+    description: "需求20260115",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "mail",
+    langCode: "en-US",
+    tKey: "mail.account.columns.remark",
+    tValue: "Remark",
+    description: "需求20260115",
+    isEnabled: true,
+  },
 ];

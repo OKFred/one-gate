@@ -140,14 +140,14 @@ const TheTable = memo(
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
+        title: t('mail.account.columns.remark'),
+        render: (row) => row.remark || '-',
+      },
+      {
         title: t('mail.account.columns.actions'),
         align: 'center',
         render: (row) => (
-          <AccountActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
+          <AccountActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         ),
       },
     ];
@@ -157,13 +157,25 @@ const TheTable = memo(
       { type: 'title', render: (row) => row.nickname },
       { type: 'subtitle', label: t('mail.account.columns.id'), render: (row) => row.id },
       { type: 'content', label: t('mail.account.columns.email'), render: (row) => row.mailAddress },
-      { type: 'content', label: t('mail.account.columns.host') + ':' + t('mail.account.columns.port'), render: (row) => `${row.host}:${row.port}` },
+      {
+        type: 'content',
+        label: t('mail.account.columns.host') + ':' + t('mail.account.columns.port'),
+        render: (row) => `${row.host}:${row.port}`,
+      },
+      {
+        type: 'content',
+        label: t('mail.account.columns.remark'),
+        render: (row) => row.remark || '-',
+      },
       {
         type: 'tags',
         render: (row) => (
           <>
-            {row.sslEnable && <Chip label={t('mail.account.tags.ssl')} color="success" size="small" />}
-            {row.starttlsEnable && <Chip label={t('mail.account.tags.starttls')} color="info" size="small" />}
+            {row.port === 465 ? (
+              <Chip label={t('mail.account.tags.ssl')} color="success" size="small" />
+            ) : (
+              <Chip label={t('mail.account.tags.starttls')} color="info" size="small" />
+            )}
           </>
         ),
       },
@@ -182,11 +194,7 @@ const TheTable = memo(
         columns={columns}
         cardFields={cardFields}
         cardActions={(row) => (
-          <AccountActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
+          <AccountActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
         emptyText={t('mail.account.empty')}
       />

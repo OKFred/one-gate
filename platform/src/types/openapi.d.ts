@@ -410,7 +410,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/add": {
+    "/api/v1/mail/account/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -419,7 +419,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加邮件账户 */
+        /** 获取所有邮件账户（不分页） */
         post: {
             parameters: {
                 query?: never;
@@ -429,7 +429,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountAddReq"];
+                    "application/json": components["schemas"]["MailAccountListAllReq"];
                 };
             };
             responses: {
@@ -439,65 +439,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/mail/account/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除邮件账户 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["MailAccountDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["MailAccountDeleteRes"];
+                        "application/json": components["schemas"]["MailAccountListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -584,6 +526,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/mail/account/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加邮件账户 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MailAccountAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MailAccountAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/mail/account/update": {
         parameters: {
             query?: never;
@@ -614,6 +614,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["MailAccountUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mail/account/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除邮件账户 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MailAccountDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MailAccountDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3741,6 +3799,151 @@ export interface components {
             };
             message: string;
         };
+        MailAccountListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "mailAddress" | "isEnabled" | "createTimeUtc";
+        };
+        MailAccountListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 邮箱密码
+                 * @example jn7jnAPss4f63QBp6D
+                 */
+                password?: string;
+                /**
+                 * @description 昵称
+                 * @example Maddison Foo KochZh
+                 */
+                nickname?: string;
+                /**
+                 * @description 邮箱服务器地址
+                 * @example smtp.ethereal.email
+                 */
+                host?: string;
+                /**
+                 * @description 邮箱服务器端口
+                 * @example 587
+                 * @example 465
+                 */
+                port?: number;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /**
+                 * @description 备注
+                 * @example 这是一个测试邮箱账号
+                 */
+                remark?: ((string | null) | null) | null;
+                /**
+                 * Format: email
+                 * @description 邮箱地址
+                 * @example maddison53@ethereal.email
+                 */
+                mailAddress: string;
+            }[];
+            message: string;
+        };
+        MailAccountListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "mailAddress" | "isEnabled" | "createTimeUtc";
+        };
+        MailAccountListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * Format: email
+                     * @description 邮箱地址
+                     * @example maddison53@ethereal.email
+                     */
+                    mailAddress: string;
+                    /**
+                     * @description 邮箱密码
+                     * @example jn7jnAPss4f63QBp6D
+                     */
+                    password: string;
+                    /**
+                     * @description 昵称
+                     * @example Maddison Foo KochZh
+                     */
+                    nickname: string;
+                    /**
+                     * @description 邮箱服务器地址
+                     * @example smtp.ethereal.email
+                     */
+                    host: string;
+                    /**
+                     * @description 邮箱服务器端口
+                     * @example 587
+                     * @example 465
+                     */
+                    port: number;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /**
+                     * @description 备注
+                     * @example 这是一个测试邮箱账号
+                     */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
         MailAccountAddReq: {
             /**
              * Format: email
@@ -3762,145 +3965,33 @@ export interface components {
              * @description 邮箱服务器地址
              * @example smtp.ethereal.email
              */
-            host?: string;
+            host: string;
             /**
              * @description 邮箱服务器端口
              * @example 587
              * @example 465
              */
-            port?: number;
+            port: number;
+            /** @description 是否启用 */
+            isEnabled: boolean;
             /**
-             * @description 是否启用SSL
-             * @default true
+             * @description 备注
+             * @example 这是一个测试邮箱账号
              */
-            sslEnable: boolean;
-            /**
-             * @description 是否启用STARTTLS
-             * @default false
-             */
-            starttlsEnable: boolean;
+            remark: ((string | null) | null) | null;
         };
         MailAccountAddRes: {
             ok: boolean;
             /**
-             * @description 邮箱账号ID
+             * @description id
              * @example 1
              */
             data: number;
-            message: string;
-        };
-        MailAccountDeleteReq: {
-            /**
-             * @description 邮箱账号ID
-             * @example 1
-             */
-            id: number;
-        };
-        MailAccountDeleteRes: {
-            ok: boolean;
-            /**
-             * @description 邮箱账号ID
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        MailAccountListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "createTimeUtc";
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-        };
-        MailAccountListRes: {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total?: number;
-                /** @description 总页数 */
-                totalPage?: number;
-                /** @description 当前页码 */
-                currentPage?: number;
-                /** @description 每页记录数 */
-                pageSize?: number;
-                list?: {
-                    /**
-                     * @description 邮箱账号ID
-                     * @example 1
-                     */
-                    id?: number;
-                    /**
-                     * Format: email
-                     * @description 邮箱地址
-                     * @example maddison53@ethereal.email
-                     */
-                    mailAddress?: string;
-                    /**
-                     * @description 邮箱密码
-                     * @example jn7jnAPss4f63QBp6D
-                     */
-                    password?: string;
-                    /**
-                     * @description 昵称
-                     * @example Maddison Foo KochZh
-                     */
-                    nickname?: string;
-                    /**
-                     * @description 邮箱服务器地址
-                     * @example smtp.ethereal.email
-                     */
-                    host?: string;
-                    /**
-                     * @description 邮箱服务器端口
-                     * @example 587
-                     * @example 465
-                     */
-                    port?: number;
-                    /**
-                     * @description 是否启用SSL
-                     * @default true
-                     */
-                    sslEnable: boolean;
-                    /**
-                     * @description 是否启用STARTTLS
-                     * @default false
-                     */
-                    starttlsEnable: boolean;
-                    /** @description 创建者ID */
-                    creatorId?: number;
-                    /** @description 更新者ID */
-                    updaterId?: number | null;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc?: number;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc?: number | null;
-                }[];
-            };
             message: string;
         };
         MailAccountUpdateReq: {
             /**
-             * @description 邮箱账号ID
+             * @description id
              * @example 1
              */
             id: number;
@@ -3931,21 +4022,34 @@ export interface components {
              * @example 465
              */
             port?: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /**
-             * @description 是否启用SSL
-             * @default true
+             * @description 备注
+             * @example 这是一个测试邮箱账号
              */
-            sslEnable: boolean;
-            /**
-             * @description 是否启用STARTTLS
-             * @default false
-             */
-            starttlsEnable: boolean;
+            remark?: ((string | null) | null) | null;
         };
         MailAccountUpdateRes: {
             ok: boolean;
             /**
-             * @description 邮箱账号ID
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        MailAccountDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        MailAccountDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
              * @example 1
              */
             data: number;
@@ -3953,7 +4057,7 @@ export interface components {
         };
         MailAccountGetReq: {
             /**
-             * @description 邮箱账号ID
+             * @description id
              * @example 1
              */
             id: number;
@@ -3962,67 +4066,64 @@ export interface components {
             ok: boolean;
             data: {
                 /**
-                 * @description 邮箱账号ID
+                 * @description id
                  * @example 1
                  */
-                id?: number;
+                id: number;
                 /**
                  * Format: email
                  * @description 邮箱地址
                  * @example maddison53@ethereal.email
                  */
-                mailAddress?: string;
+                mailAddress: string;
                 /**
                  * @description 邮箱密码
                  * @example jn7jnAPss4f63QBp6D
                  */
-                password?: string;
+                password: string;
                 /**
                  * @description 昵称
                  * @example Maddison Foo KochZh
                  */
-                nickname?: string;
+                nickname: string;
                 /**
                  * @description 邮箱服务器地址
                  * @example smtp.ethereal.email
                  */
-                host?: string;
+                host: string;
                 /**
                  * @description 邮箱服务器端口
                  * @example 587
                  * @example 465
                  */
-                port?: number;
+                port: number;
+                /** @description 是否启用 */
+                isEnabled: boolean;
                 /**
-                 * @description 是否启用SSL
-                 * @default true
+                 * @description 备注
+                 * @example 这是一个测试邮箱账号
                  */
-                sslEnable: boolean;
-                /**
-                 * @description 是否启用STARTTLS
-                 * @default false
-                 */
-                starttlsEnable: boolean;
+                remark: ((string | null) | null) | null;
                 /** @description 创建者ID */
-                creatorId?: number;
-                /** @description 更新者ID */
-                updaterId?: number | null;
+                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc?: number;
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: number | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
         MailAccountVerifyReq: {
             /**
-             * @description 邮箱账号ID
+             * @description id
              * @example 1
              */
             id: number;

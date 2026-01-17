@@ -98,7 +98,7 @@ async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
     obj;
 
   // 1. 获取邮件账户信息
-  const accountObj = await mailAccountService.get.service(c);
+  const accountObj = await mailAccountService.get.service({ id: accountId });
   if (!accountObj) {
     throw new Error("未找到该邮件账户");
   }
@@ -142,7 +142,7 @@ async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
   const transporter = nodemailer.default.createTransport({
     host: accountObj.host,
     port: accountObj.port,
-    secure: accountObj.sslEnable,
+    secure: accountObj.port === 465, // true for 465, false for other ports
     auth: {
       user: accountObj.mailAddress,
       pass: accountObj.password,

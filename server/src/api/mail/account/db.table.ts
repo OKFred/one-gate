@@ -8,31 +8,30 @@ import {
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import {
+  IndexPO,
+  IndexVO,
+  AuditPO,
+  AuditVO,
+  IndexKey,
+  AuditKeys,
+  type IndexKeyLike,
+  type AuditAddOmitKeyLike,
+  type AuditUpdateOmitKeyLike,
+} from "@/db/common/schema";
+import { type RequiredKeys } from "@/types/app";
 
-export const mailAccountIndex = {
-  id: {
-    type: "number",
-    description: "邮箱账号ID",
-    examples: [1],
-  },
-} as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
-
-export const mailAccountUnique = {
+//----------------- PO ----------------//
+const MailAccountUniquePO = {
   mailAddress: {
     type: "string",
     format: "email",
     description: "邮箱地址",
     examples: ["maddison53@ethereal.email"],
   },
-} as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof MailAccountPOLike, JSONSchema>>;
 
-export const mailAccountData = {
-  mailAddress: {
-    type: "string",
-    format: "email",
-    description: "邮箱地址",
-    examples: ["maddison53@ethereal.email"],
-  },
+const MailAccountBasePO = {
   password: {
     type: "string",
     description: "邮箱密码",
@@ -53,40 +52,104 @@ export const mailAccountData = {
     description: "邮箱服务器端口",
     examples: [587, 465],
   },
-  sslEnable: {
+  isEnabled: {
     type: "boolean",
-    description: "是否启用SSL",
-    default: true,
+    description: "是否启用",
   },
-  starttlsEnable: {
-    type: "boolean",
-    description: "是否启用STARTTLS",
-    default: false,
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注",
+    examples: ["这是一个测试邮箱账号"],
+    maxLength: 500,
   },
-} as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof MailAccountPOLike, JSONSchema>>;
 
-export const mailAccountAudit = {
-  creatorId: {
-    type: "number",
-    description: "创建者ID",
-  },
-  updaterId: {
-    type: "number",
-    description: "更新者ID",
-    nullable: true,
-  },
-  createTimeUtc: {
-    type: "number",
-    description: "创建时间",
-    examples: [1672531199000],
-  },
-  updateTimeUtc: {
-    type: "number",
-    nullable: true,
-    description: "更新时间",
-    examples: [1672531199000],
-  },
-} as const satisfies Partial<Record<keyof mailAccountLike, JSONSchema>>;
+const MailAccountPO = {
+  ...IndexPO,
+  ...MailAccountUniquePO,
+  ...MailAccountBasePO,
+  ...AuditPO,
+} as const satisfies Record<keyof MailAccountPOLike, JSONSchema>;
+
+export type MailAccountPOLike = InferSelectModel<typeof mailAccountTable>;
+type MailAccountSelectPOLike = InferInsertModel<typeof mailAccountTable>;
+type MailAccountAddPOLike = Omit<
+  MailAccountPOLike,
+  IndexKeyLike | AuditAddOmitKeyLike
+>;
+type MailAccountUpdatePOLike = Partial<
+  Omit<MailAccountSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+> &
+  Pick<MailAccountPOLike, IndexKeyLike>;
+
+//----------------- VO ----------------//
+export { IndexVO };
+export const MailAccountUniqueVO = MailAccountUniquePO;
+export const MailAccountBaseVO = MailAccountBasePO;
+export const MailAccountVO = {
+  ...IndexVO,
+  ...MailAccountUniqueVO,
+  ...MailAccountBaseVO,
+  ...AuditVO,
+} as const satisfies Partial<Record<keyof MailAccountVOLike, JSONSchema>>;
+export const MailAccountListVO = MailAccountVO;
+export const MailAccountAddVO = {
+  ...MailAccountUniqueVO,
+  ...MailAccountBaseVO,
+} as const satisfies Partial<Record<keyof MailAccountVOLike, JSONSchema>>;
+export const MailAccountUpdateVO = {
+  ...IndexVO,
+  ...MailAccountUniqueVO,
+  ...MailAccountBaseVO,
+} as const satisfies Partial<Record<keyof MailAccountVOLike, JSONSchema>>;
+
+export type MailAccountVOLike = MailAccountPOLike;
+export type MailAccountAddVOLike = Omit<MailAccountAddPOLike, "creatorId">;
+export type MailAccountUpdateVOLike = MailAccountUpdatePOLike;
+export type MailAccountDeleteVOLike = Pick<MailAccountVOLike, IndexKeyLike>;
+export type MailAccountGetVOLike = Pick<MailAccountVOLike, IndexKeyLike>;
+
+//----------------- Required Keys ----------------//
+export const MailAccountAddKeys = [
+  "mailAddress",
+  "password",
+  "nickname",
+  "host",
+  "port",
+  "isEnabled",
+  "remark",
+] as const satisfies RequiredKeys<MailAccountAddVOLike>[];
+
+export const MailAccountUpdateKeys = [
+  ...IndexKey,
+] as const satisfies RequiredKeys<MailAccountUpdateVOLike>[];
+
+export const MailAccountDeleteKeys = [
+  ...IndexKey,
+] as const satisfies RequiredKeys<MailAccountDeleteVOLike>[];
+
+export const MailAccountGetKeys = [
+  ...IndexKey,
+] as const satisfies RequiredKeys<MailAccountGetVOLike>[];
+
+const MailAccountBaseKeys = [
+  ...IndexKey,
+  ...MailAccountAddKeys,
+  ...AuditKeys,
+] as const satisfies RequiredKeys<MailAccountPOLike>[];
+
+export const MailAccountListKeys = MailAccountBaseKeys;
+export const MailAccountDetailKeys = MailAccountBaseKeys;
+export const MailAccountUniqueKeys = ["mailAddress"] as const;
+
+// 可排序字段
+export const MailAccountSortableKeys = [
+  "id",
+  "mailAddress",
+  "isEnabled",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<MailAccountPOLike>[];
 
 export const mailAccountTable = sqliteTable(
   "mail_account",
@@ -97,8 +160,8 @@ export const mailAccountTable = sqliteTable(
     nickname: text("nickname").notNull(),
     host: text("host").notNull(),
     port: integer("port").notNull(),
-    sslEnable: integer("ssl_enable", { mode: "boolean" }).notNull(),
-    starttlsEnable: integer("starttls_enable", { mode: "boolean" }).notNull(),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+    remark: text("remark"),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),
     createTimeUtc: integer("create_time_utc")
@@ -106,32 +169,29 @@ export const mailAccountTable = sqliteTable(
       .default(getCurrentTimestampUtcSql()),
     updateTimeUtc: integer("update_time_utc"),
   },
-  () => [uniqueIndex("idx_mail_address").on(mailAccountTable.mailAddress)]
+  (table) => [uniqueIndex("idx_mail_address").on(table.mailAddress)]
 );
-
-export type mailAccountLike = InferSelectModel<typeof mailAccountTable>;
-export type mailAccountAddLike = InferInsertModel<typeof mailAccountTable>;
 
 export async function tableInit() {
   await db.run(`
-        CREATE TABLE IF NOT EXISTS mail_account (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            mail_address TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            nickname TEXT NOT NULL,
-            host TEXT NOT NULL,
-            port INTEGER NOT NULL,
-            ssl_enable INTEGER NOT NULL,
-            starttls_enable INTEGER NOT NULL,
-            creator_id INTEGER NOT NULL,
-            updater_id INTEGER,
-            create_time_utc INTEGER DEFAULT (
-              CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-              CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-            ),
-            update_time_utc INTEGER
-        )
-    `);
+    CREATE TABLE IF NOT EXISTS mail_account (
+      id INTEGER PRIMARY KEY,
+      mail_address TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      nickname TEXT NOT NULL,
+      host TEXT NOT NULL,
+      port INTEGER NOT NULL,
+      is_enabled INTEGER NOT NULL,
+      remark TEXT,
+      creator_id INTEGER NOT NULL,
+      updater_id INTEGER,
+      create_time_utc INTEGER DEFAULT (
+        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
+        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
+      ),
+      update_time_utc INTEGER
+    )
+  `);
   console.log("💾 表 mail_account 已初始化");
 }
 

@@ -213,7 +213,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { name, description, permissions, isEnabled } = obj;
+  const { permissions } = obj;
   // 如果提供了permissions，验证是否为有效JSON数组
   if (hasValue(permissions)) {
     const parsed = JSON.parse(permissions);
@@ -225,10 +225,7 @@ async function onAdd(
   const result = await db
     .insert(roleTable)
     .values({
-      name,
-      description,
-      permissions,
-      isEnabled,
+      ...obj,
       creatorId,
     })
     .returning({ id: roleTable.id });
