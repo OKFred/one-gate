@@ -874,7 +874,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/add": {
+    "/api/v1/mail/log/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -883,7 +883,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加邮件日志 */
+        /** 获取所有邮件日志（不分页） */
         post: {
             parameters: {
                 query?: never;
@@ -893,7 +893,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogAddReq"];
+                    "application/json": components["schemas"]["MailLogListAllReq"];
                 };
             };
             responses: {
@@ -903,65 +903,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/mail/log/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除邮件日志 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["MailLogDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["MailLogDeleteRes"];
+                        "application/json": components["schemas"]["MailLogListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1048,6 +990,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/mail/log/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加邮件日志 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MailLogAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MailLogAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/mail/log/update": {
         parameters: {
             query?: never;
@@ -1078,6 +1078,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["MailLogUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mail/log/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除邮件日志 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MailLogDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MailLogDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1164,7 +1222,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/add": {
+    "/api/v1/mail/template/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1173,7 +1231,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加邮件模板 */
+        /** 获取所有邮件模板（不分页） */
         post: {
             parameters: {
                 query?: never;
@@ -1183,7 +1241,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateAddReq"];
+                    "application/json": components["schemas"]["MailTemplateListAllReq"];
                 };
             };
             responses: {
@@ -1193,65 +1251,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/mail/template/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除邮件模板 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["MailTemplateDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["MailTemplateDeleteRes"];
+                        "application/json": components["schemas"]["MailTemplateListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1338,6 +1338,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/mail/template/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加邮件模板 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MailTemplateAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MailTemplateAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/mail/template/update": {
         parameters: {
             query?: never;
@@ -1368,6 +1426,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["MailTemplateUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mail/template/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除邮件模板 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["MailTemplateDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["MailTemplateDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4185,6 +4301,153 @@ export interface components {
             };
             message: string;
         };
+        MailLogListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 发送状态 */
+            sendStatus?: boolean;
+            /** @description 模板ID */
+            templateId?: string;
+            /** @description 开始时间（UTC毫秒） */
+            startTimeUtc?: number;
+            /** @description 结束时间（UTC毫秒） */
+            endTimeUtc?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
+        };
+        MailLogListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * Format: email
+                 * @description 收件人邮箱地址
+                 * @example receiver@example.com
+                 */
+                mailTo?: string;
+                /**
+                 * Format: email
+                 * @description 发件人邮箱地址
+                 * @example sender@example.com
+                 */
+                mailFrom?: string;
+                /**
+                 * @description 邮件标题
+                 * @example Welcome to register on our platform!
+                 */
+                title?: string;
+                /** @description 邮件模板ID */
+                templateId?: ((string | null) | null) | null;
+                /** @description 邮件模板参数 */
+                templateParams?: ((string | null) | null) | null;
+                /** @description 发送状态 */
+                sendStatus?: boolean;
+                /** @description 异常代码 */
+                exceptionCode?: ((string | null) | null) | null;
+                /** @description 异常详情 */
+                exceptionDetails?: ((string | null) | null) | null;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+            }[];
+            message: string;
+        };
+        MailLogListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 发送状态 */
+            sendStatus?: boolean;
+            /** @description 模板ID */
+            templateId?: string;
+            /** @description 开始时间（UTC毫秒） */
+            startTimeUtc?: number;
+            /** @description 结束时间（UTC毫秒） */
+            endTimeUtc?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
+        };
+        MailLogListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * Format: email
+                     * @description 收件人邮箱地址
+                     * @example receiver@example.com
+                     */
+                    mailTo: string;
+                    /**
+                     * Format: email
+                     * @description 发件人邮箱地址
+                     * @example sender@example.com
+                     */
+                    mailFrom: string;
+                    /**
+                     * @description 邮件标题
+                     * @example Welcome to register on our platform!
+                     */
+                    title: string;
+                    /** @description 邮件模板ID */
+                    templateId?: ((string | null) | null) | null;
+                    /** @description 邮件模板参数 */
+                    templateParams?: ((string | null) | null) | null;
+                    /** @description 发送状态 */
+                    sendStatus: boolean;
+                    /** @description 异常代码 */
+                    exceptionCode?: ((string | null) | null) | null;
+                    /** @description 异常详情 */
+                    exceptionDetails?: ((string | null) | null) | null;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
         MailLogAddReq: {
             /**
              * Format: email
@@ -4204,135 +4467,30 @@ export interface components {
              */
             title: string;
             /** @description 邮件模板ID */
-            templateId?: string;
+            templateId?: ((string | null) | null) | null;
             /** @description 邮件模板参数 */
-            templateParams?: string;
+            templateParams?: ((string | null) | null) | null;
             /** @description 发送状态 */
             sendStatus: boolean;
             /** @description 异常代码 */
-            exceptionCode?: string;
+            exceptionCode?: ((string | null) | null) | null;
             /** @description 异常详情 */
-            exceptionDetails?: string;
+            exceptionDetails?: ((string | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
         };
         MailLogAddRes: {
             ok: boolean;
             /**
-             * @description 邮件日志id
+             * @description id
              * @example 1
              */
             data: number;
-            message: string;
-        };
-        MailLogDeleteReq: {
-            /**
-             * @description 邮件日志id
-             * @example 1
-             */
-            id: number;
-        };
-        MailLogDeleteRes: {
-            ok: boolean;
-            /**
-             * @description 邮件日志id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        MailLogListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-            /** @description 发送状态过滤 */
-            sendStatus?: boolean;
-            /** @description 模板ID过滤 */
-            templateId?: string;
-            /** @description 开始时间（UTC毫秒） */
-            startTimeUtc?: number;
-            /** @description 结束时间（UTC毫秒） */
-            endTimeUtc?: number;
-        };
-        MailLogListRes: {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total?: number;
-                /** @description 总页数 */
-                totalPage?: number;
-                /** @description 当前页码 */
-                currentPage?: number;
-                /** @description 每页记录数 */
-                pageSize?: number;
-                list?: {
-                    /**
-                     * @description 邮件日志id
-                     * @example 1
-                     */
-                    id?: number;
-                    /**
-                     * Format: email
-                     * @description 收件人邮箱地址
-                     * @example receiver@example.com
-                     */
-                    mailTo?: string;
-                    /**
-                     * Format: email
-                     * @description 发件人邮箱地址
-                     * @example sender@example.com
-                     */
-                    mailFrom?: string;
-                    /**
-                     * @description 邮件标题
-                     * @example Welcome to register on our platform!
-                     */
-                    title?: string;
-                    /** @description 邮件模板ID */
-                    templateId?: string;
-                    /** @description 邮件模板参数 */
-                    templateParams?: string;
-                    /** @description 发送状态 */
-                    sendStatus?: boolean;
-                    /** @description 异常代码 */
-                    exceptionCode?: string;
-                    /** @description 异常详情 */
-                    exceptionDetails?: string;
-                    /** @description 创建者ID */
-                    creatorId?: number;
-                    /** @description 更新者ID */
-                    updaterId?: number | null;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc?: number;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc?: number | null;
-                }[];
-            };
             message: string;
         };
         MailLogUpdateReq: {
             /**
-             * @description 邮件日志id
+             * @description id
              * @example 1
              */
             id: number;
@@ -4354,20 +4512,38 @@ export interface components {
              */
             title?: string;
             /** @description 邮件模板ID */
-            templateId?: string;
+            templateId?: ((string | null) | null) | null;
             /** @description 邮件模板参数 */
-            templateParams?: string;
+            templateParams?: ((string | null) | null) | null;
             /** @description 发送状态 */
             sendStatus?: boolean;
             /** @description 异常代码 */
-            exceptionCode?: string;
+            exceptionCode?: ((string | null) | null) | null;
             /** @description 异常详情 */
-            exceptionDetails?: string;
+            exceptionDetails?: ((string | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
         };
         MailLogUpdateRes: {
             ok: boolean;
             /**
-             * @description 邮件日志id
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        MailLogDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        MailLogDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
              * @example 1
              */
             data: number;
@@ -4375,7 +4551,7 @@ export interface components {
         };
         MailLogGetReq: {
             /**
-             * @description 邮件日志id
+             * @description id
              * @example 1
              */
             id: number;
@@ -4384,51 +4560,182 @@ export interface components {
             ok: boolean;
             data: {
                 /**
-                 * @description 邮件日志id
+                 * @description id
                  * @example 1
                  */
-                id?: number;
+                id: number;
                 /**
                  * Format: email
                  * @description 收件人邮箱地址
                  * @example receiver@example.com
                  */
-                mailTo?: string;
+                mailTo: string;
                 /**
                  * Format: email
                  * @description 发件人邮箱地址
                  * @example sender@example.com
                  */
-                mailFrom?: string;
+                mailFrom: string;
                 /**
                  * @description 邮件标题
                  * @example Welcome to register on our platform!
                  */
-                title?: string;
+                title: string;
                 /** @description 邮件模板ID */
-                templateId?: string;
+                templateId?: ((string | null) | null) | null;
                 /** @description 邮件模板参数 */
-                templateParams?: string;
+                templateParams?: ((string | null) | null) | null;
                 /** @description 发送状态 */
-                sendStatus?: boolean;
+                sendStatus: boolean;
                 /** @description 异常代码 */
-                exceptionCode?: string;
+                exceptionCode?: ((string | null) | null) | null;
                 /** @description 异常详情 */
-                exceptionDetails?: string;
+                exceptionDetails?: ((string | null) | null) | null;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
                 /** @description 创建者ID */
-                creatorId?: number;
-                /** @description 更新者ID */
-                updaterId?: number | null;
+                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc?: number;
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: number | null;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        MailTemplateListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        MailTemplateListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 邮件标题
+                 * @example Welcome to our service!
+                 */
+                title?: string;
+                /**
+                 * @description 语言代码
+                 * @example en-US
+                 */
+                langCode?: string;
+                /** @description 邮件内容 */
+                content?: string;
+                /** @description 邮件分类 */
+                category?: string;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /**
+                 * @description 备注
+                 * @example 这是一个测试邮箱模板
+                 */
+                remark?: ((string | null) | null) | null;
+                /**
+                 * @description 邮件模板名称
+                 * @example welcome_email
+                 */
+                name: string;
+            }[];
+            message: string;
+        };
+        MailTemplateListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        MailTemplateListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 邮件模板名称
+                     * @example welcome_email
+                     */
+                    name: string;
+                    /**
+                     * @description 邮件标题
+                     * @example Welcome to our service!
+                     */
+                    title: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     */
+                    langCode: string;
+                    /** @description 邮件内容 */
+                    content: string;
+                    /** @description 邮件分类 */
+                    category?: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /**
+                     * @description 备注
+                     * @example 这是一个测试邮箱模板
+                     */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };
@@ -4452,114 +4759,26 @@ export interface components {
             content: string;
             /** @description 邮件分类 */
             category?: string;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /**
+             * @description 备注
+             * @example 这是一个测试邮箱模板
+             */
+            remark?: ((string | null) | null) | null;
         };
         MailTemplateAddRes: {
             ok: boolean;
             /**
-             * @description 邮件模板id
+             * @description id
              * @example 1
              */
             data: number;
-            message: string;
-        };
-        MailTemplateDeleteReq: {
-            /**
-             * @description 邮件模板id
-             * @example 1
-             */
-            id: number;
-        };
-        MailTemplateDeleteRes: {
-            ok: boolean;
-            /**
-             * @description 邮件模板id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        MailTemplateListReq: {
-            /** @enum {string} */
-            orderBy?: "id" | "name" | "creatorId" | "createTimeUtc";
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-        };
-        MailTemplateListRes: {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total?: number;
-                /** @description 总页数 */
-                totalPage?: number;
-                /** @description 当前页码 */
-                currentPage?: number;
-                /** @description 每页记录数 */
-                pageSize?: number;
-                list?: {
-                    /**
-                     * @description 邮件模板id
-                     * @example 1
-                     */
-                    id?: number;
-                    /**
-                     * @description 邮件模板名称
-                     * @example welcome_email
-                     */
-                    name?: string;
-                    /**
-                     * @description 邮件标题
-                     * @example Welcome to our service!
-                     */
-                    title?: string;
-                    /**
-                     * @description 语言代码
-                     * @example en-US
-                     */
-                    langCode?: string;
-                    /** @description 邮件内容 */
-                    content?: string;
-                    /** @description 邮件分类 */
-                    category?: string;
-                    /** @description 创建者ID */
-                    creatorId?: number;
-                    /** @description 更新者ID */
-                    updaterId?: number | null;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc?: number;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc?: number | null;
-                    /** @description 状态 */
-                    status?: boolean;
-                    /** @description 备注 */
-                    remark?: string | null;
-                }[];
-            };
             message: string;
         };
         MailTemplateUpdateReq: {
             /**
-             * @description 邮件模板id
+             * @description id
              * @example 1
              */
             id: number;
@@ -4582,15 +4801,34 @@ export interface components {
             content?: string;
             /** @description 邮件分类 */
             category?: string;
-            /** @description 状态 */
-            status?: boolean;
-            /** @description 备注 */
-            remark?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /**
+             * @description 备注
+             * @example 这是一个测试邮箱模板
+             */
+            remark?: ((string | null) | null) | null;
         };
         MailTemplateUpdateRes: {
             ok: boolean;
             /**
-             * @description 邮件模板id
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        MailTemplateDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        MailTemplateDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
              * @example 1
              */
             data: number;
@@ -4598,7 +4836,7 @@ export interface components {
         };
         MailTemplateGetReq: {
             /**
-             * @description 邮件模板id
+             * @description id
              * @example 1
              */
             id: number;
@@ -4607,47 +4845,50 @@ export interface components {
             ok: boolean;
             data: {
                 /**
-                 * @description 邮件模板id
+                 * @description id
                  * @example 1
                  */
-                id?: number;
+                id: number;
                 /**
                  * @description 邮件模板名称
                  * @example welcome_email
                  */
-                name?: string;
+                name: string;
                 /**
                  * @description 邮件标题
                  * @example Welcome to our service!
                  */
-                title?: string;
+                title: string;
                 /**
                  * @description 语言代码
                  * @example en-US
                  */
-                langCode?: string;
+                langCode: string;
                 /** @description 邮件内容 */
-                content?: string;
+                content: string;
                 /** @description 邮件分类 */
                 category?: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /**
+                 * @description 备注
+                 * @example 这是一个测试邮箱模板
+                 */
+                remark?: ((string | null) | null) | null;
                 /** @description 创建者ID */
-                creatorId?: number;
-                /** @description 更新者ID */
-                updaterId?: number | null;
+                creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc?: number;
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc?: number | null;
-                /** @description 状态 */
-                status?: boolean;
-                /** @description 备注 */
-                remark?: string | null;
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
