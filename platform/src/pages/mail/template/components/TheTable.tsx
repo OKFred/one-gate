@@ -209,7 +209,7 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('mail.template.columns.preview'),
+        title: t('mail.template.columns.contentPreview'),
         render: (row) => truncateText(stripHtml(row.content), 40),
       },
       {
@@ -249,7 +249,7 @@ const TheTable = memo(
       },
       {
         type: 'content',
-        label: t('mail.template.columns.preview'),
+        label: t('mail.template.columns.contentPreview'),
         render: (row) => truncateText(stripHtml(row.content), 100),
       },
       {
