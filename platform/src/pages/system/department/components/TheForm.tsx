@@ -19,30 +19,24 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as DepartmentAPI from '@/api/system/department';
+import type {
+  AddDepartmentReq,
+  ListAllDepartmentRes,
+} from '@/api/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showGlobalNotification } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
 
-// 部门数据接口
-export interface DepartmentFormData {
+// 部门表单数据类型（复用自动生成的类型）
+export type DepartmentFormData = AddDepartmentReq & {
   id?: number;
-  name: string;
-  description: string | null;
-  remark: string | null;
-  parentId: number | null;
-  isEnabled: boolean;
-}
+};
 
-// 部门类型（简化版）
-export interface DepartmentData {
-  id: number;
-  name: string;
-  description: string | null;
-  parentId: number | null;
-  isEnabled: boolean;
+// 部门数据类型（复用自动生成的类型，扩展 children 用于树形结构）
+export type DepartmentData = ListAllDepartmentRes[number] & {
   children?: DepartmentData[] | null;
-}
+};
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -147,7 +141,7 @@ const TheForm = memo(
         deptList.forEach((dept) => {
           result.push({
             id: dept.id,
-            name: dept.name,
+            name: dept.name ?? '',
             level,
           });
           if (dept.children && dept.children.length > 0) {
@@ -195,8 +189,8 @@ const TheForm = memo(
           setEditingDepartment(department);
           setFormValues({
             id: department.id,
-            name: department.name,
-            description: department.description,
+            name: department.name ?? '',
+            description: department.description ?? null,
             remark: null,
             parentId: department.parentId ?? null,
             isEnabled: department.isEnabled ?? true,
