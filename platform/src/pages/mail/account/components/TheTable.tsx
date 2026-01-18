@@ -4,7 +4,7 @@ import ResponsiveList, {
   type TableColumn,
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
-import * as mailAccountAPI from '@/api/mail/account';
+import * as AccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './TheActionButtons';
 import type { ListMailAccountReq, ListMailAccountRes } from '@/api/mail/type';
 import type { Props } from '../index';
@@ -70,7 +70,7 @@ const TheTable = memo(
             descend: searchFilters.descend,
           };
 
-          const res = await mailAccountAPI.listFn({ data: requestData });
+          const res = await AccountAPI.listFn({ data: requestData });
           const response = res.data;
           const accountsList = response?.data?.list || [];
           const totalCount = response?.data?.total || 0;

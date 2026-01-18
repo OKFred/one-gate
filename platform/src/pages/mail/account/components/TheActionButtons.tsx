@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
-import * as mailAccountAPI from '@/api/mail/account';
+import * as AccountAPI from '@/api/mail/account';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -76,7 +76,7 @@ export const AccountActionButtons = memo(
     // 确认删除
     const handleConfirmDelete = useCallback(async () => {
       if (row.id) {
-        await mailAccountAPI.deleteFn({ data: { id: row.id } });
+        await AccountAPI.deleteFn({ data: { id: row.id } });
         onDeleteSuccess?.();
       }
       closeDeleteDialog();

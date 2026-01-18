@@ -16,7 +16,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import * as mailAccountAPI from '@/api/mail/account';
+import * as AccountAPI from '@/api/mail/account';
 import type { AddMailAccountReq } from '@/api/mail/type';
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
@@ -96,9 +96,9 @@ const TheForm = memo(
       };
 
       if (editId) {
-        await mailAccountAPI.updateFn({ data: { id: editId, ...formData } });
+        await AccountAPI.updateFn({ data: { id: editId, ...formData } });
       } else {
-        await mailAccountAPI.addFn({ data: formData });
+        await AccountAPI.addFn({ data: formData });
       }
       handleCancel();
       // 刷新表格数据

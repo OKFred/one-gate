@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import * as mailAccountAPI from '@/api/mail/account';
+import * as AccountAPI from '@/api/mail/account';
 import * as mailTemplateAPI from '@/api/mail/template';
 import * as mailActionAPI from '@/api/mail/action';
 import { showGlobalNotification } from '@/components/Notification';
@@ -52,7 +52,7 @@ export default function MailSend() {
     const fetchAccounts = async () => {
       setAccountsLoading(true);
       try {
-        const res = await mailAccountAPI.listFn({
+        const res = await AccountAPI.listFn({
           data: {
             pageNo: 1,
             pageSize: 100,
