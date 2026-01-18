@@ -99,6 +99,7 @@ async function onListAll(
       id: roleTable.id,
       name: roleTable.name,
       description: roleTable.description,
+      remark: roleTable.remark,
       permissions: roleTable.permissions,
       isEnabled: roleTable.isEnabled,
     })

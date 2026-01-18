@@ -30,6 +30,7 @@ export interface RoleFormRef {
 const DEFAULT_FORM: AddRoleReq | UpdateRoleReq = {
   name: '',
   description: null,
+  remark: null,
   permissions: null,
   isEnabled: true,
 };
@@ -55,6 +56,7 @@ const TheForm = memo(
             setForm({
               name: role.name,
               description: role.description,
+              remark: null,
               permissions: role.permissions,
               isEnabled: role.isEnabled,
             });
@@ -77,6 +79,10 @@ const TheForm = memo(
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       const formData = { ...form };
+      // 保证 remark 字段传递（允许为 null）
+      if (!('remark' in formData)) {
+        (formData as any).remark = null;
+      }
 
       if (editId) {
         await RoleAPI.updateFn({ data: { id: editId, ...formData } as UpdateRoleReq });
@@ -152,6 +158,22 @@ const TheForm = memo(
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder="请输入角色描述"
+              />
+
+              <TextField
+                label="备注"
+                value={(form as any).remark ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    remark: hasValue(e.target.value) ? e.target.value : null,
+                  } as any)
+                }
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
+                placeholder="请输入备注"
               />
 
               <TextField

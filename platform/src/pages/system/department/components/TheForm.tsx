@@ -29,6 +29,7 @@ export interface DepartmentFormData {
   id?: number;
   name: string;
   description: string | null;
+  remark: string | null;
   parentId: number | null;
   isEnabled: boolean;
 }
@@ -56,6 +57,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: DepartmentFormData = {
   name: '',
   description: null,
+  remark: null,
   parentId: null,
   isEnabled: true,
 };
@@ -195,6 +197,7 @@ const TheForm = memo(
             id: department.id,
             name: department.name,
             description: department.description,
+            remark: null,
             parentId: department.parentId ?? null,
             isEnabled: department.isEnabled ?? true,
           });
@@ -229,6 +232,7 @@ const TheForm = memo(
         const submitData = {
           ...formValues,
           description: hasValue(formValues.description) ? formValues.description : null,
+          remark: hasValue(formValues.remark) ? formValues.remark : null,
         };
 
         if (editingDepartment && formValues.id) {
@@ -302,6 +306,17 @@ const TheForm = memo(
               onChange={(e) => {
                 const value = e.target.value;
                 handleFormChange('description', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
+            />
+            <TextField
+              label="备注"
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
               }}
               fullWidth
               multiline

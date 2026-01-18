@@ -96,6 +96,7 @@ async function onListAll(
       name: menuTable.name,
       icon: menuTable.icon,
       path: menuTable.path,
+      remark: menuTable.remark,
       parentId: menuTable.parentId,
       sort: menuTable.sort,
       roleIdArr: menuTable.roleIdArr,

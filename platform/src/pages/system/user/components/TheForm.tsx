@@ -52,6 +52,7 @@ const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
   roleArr: [],
   langCode: '',
   isEnabled: true,
+  remark: null,
 };
 
 const TheForm = memo(
@@ -138,6 +139,10 @@ const TheForm = memo(
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       const formData = { ...form };
+      // 保证 remark 字段传递（允许为 null）
+      if (!('remark' in formData)) {
+        (formData as any).remark = null;
+      }
 
       if (editId) {
         // 编辑用户
@@ -396,6 +401,16 @@ const TheForm = memo(
                   />
                 }
                 label="启用账户"
+              />
+
+              <TextField
+                label="备注"
+                value={(form as any).remark ?? ''}
+                onChange={(e) => setForm({ ...form, remark: e.target.value ? e.target.value : null } as any)}
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
               />
             </Stack>
           </form>

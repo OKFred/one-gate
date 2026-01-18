@@ -4687,6 +4687,8 @@ export interface components {
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -4767,6 +4769,8 @@ export interface components {
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -4849,6 +4853,8 @@ export interface components {
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -4923,6 +4929,8 @@ export interface components {
                 parentId?: ((number | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
             }[];
             message: string;
         };
@@ -4985,6 +4993,8 @@ export interface components {
                     parentId: ((number | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -5018,6 +5028,8 @@ export interface components {
             parentId: ((number | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
         };
         SystemDepartmentAddRes: {
             ok: boolean;
@@ -5064,6 +5076,8 @@ export interface components {
             parentId?: ((number | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
         };
         SystemDepartmentUpdateRes: {
             ok: boolean;
@@ -5103,6 +5117,8 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**
@@ -5146,6 +5162,8 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**
@@ -5180,6 +5198,8 @@ export interface components {
                     parentId?: ((number | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled?: boolean;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId?: number;
                     /**
@@ -5230,6 +5250,8 @@ export interface components {
                  * @example /home
                  */
                 path?: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
                 /** @description 父菜单ID，支持菜单层级 */
                 parentId?: ((number | null) | null) | null;
                 /** @description 排序 */
@@ -5296,6 +5318,8 @@ export interface components {
                      * @example /home
                      */
                     path: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
                     /** @description 父菜单ID，支持菜单层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
@@ -5338,6 +5362,8 @@ export interface components {
              * @example /home
              */
             path: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
             /** @description 父菜单ID，支持菜单层级 */
             parentId: ((number | null) | null) | null;
             /** @description 排序 */
@@ -5377,6 +5403,8 @@ export interface components {
              * @example /home
              */
             path?: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
             /** @description 父菜单ID，支持菜单层级 */
             parentId?: ((number | null) | null) | null;
             /** @description 排序 */
@@ -5441,6 +5469,8 @@ export interface components {
                  * @example /home
                  */
                 path: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 父菜单ID，支持菜单层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
@@ -5493,6 +5523,8 @@ export interface components {
                  * @example /home
                  */
                 path: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 父菜单ID，支持菜单层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
@@ -5536,6 +5568,8 @@ export interface components {
                      * @example /home
                      */
                     path: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
                     /** @description 父菜单ID，支持菜单层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
@@ -5584,6 +5618,8 @@ export interface components {
                  * @example 系统管理员，拥有所有权限
                  */
                 description?: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
                 /**
                  * @description 权限列表，JSON数组格式
                  * @example ["user:read","user:write","system:admin"]
@@ -5649,6 +5685,8 @@ export interface components {
                      * @example 系统管理员，拥有所有权限
                      */
                     description: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
                     /**
                      * @description 权限列表，JSON数组格式
                      * @example ["user:read","user:write","system:admin"]
@@ -5685,6 +5723,8 @@ export interface components {
              * @example 系统管理员，拥有所有权限
              */
             description: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
             /**
              * @description 权限列表，JSON数组格式
              * @example ["user:read","user:write","system:admin"]
@@ -5718,6 +5758,8 @@ export interface components {
              * @example 系统管理员，拥有所有权限
              */
             description?: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
             /**
              * @description 权限列表，JSON数组格式
              * @example ["user:read","user:write","system:admin"]
@@ -5776,6 +5818,8 @@ export interface components {
                  * @example 系统管理员，拥有所有权限
                  */
                 description: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /**
                  * @description 权限列表，JSON数组格式
                  * @example ["user:read","user:write","system:admin"]
@@ -5829,6 +5873,8 @@ export interface components {
                 langCode?: string;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
                 /**
                  * @description 部门ID
                  * @example 1
@@ -5892,6 +5938,8 @@ export interface components {
                     langCode: string;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
                     /**
                      * @description 部门ID
                      * @example 1
@@ -5936,6 +5984,8 @@ export interface components {
             langCode: string;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
             /** @description 部门对象 */
             departmentObj: (({
                 /**
@@ -5991,6 +6041,8 @@ export interface components {
             langCode?: string;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
             /** @description 部门对象 */
             departmentObj?: (({
                 /**
@@ -6071,6 +6123,8 @@ export interface components {
                 langCode: string;
                 /** @description 是否启用 */
                 isEnabled: boolean;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
                 /** @description 部门对象 */
                 departmentObj: (({
                     /**

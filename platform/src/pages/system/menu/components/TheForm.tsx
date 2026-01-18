@@ -38,6 +38,7 @@ export interface MenuFormData {
   name: string;
   icon: string;
   path: string | null;
+  remark: string | null;
   parentId: number | null;
   sort: number;
   roleIdArr: number[];
@@ -71,6 +72,7 @@ const DEFAULT_FORM: MenuFormData = {
   name: '',
   icon: 'material-symbols:folder',
   path: null,
+  remark: null,
   parentId: null,
   sort: 0,
   roleIdArr: [],
@@ -157,6 +159,7 @@ const TheForm = memo(
             name: menu.name,
             icon: menu.icon,
             path: menu.path ?? null,
+            remark: null,
             parentId: menu.parentId ?? null,
             sort: menu.sort ?? 0,
             roleIdArr: menu.roleIdArr || [],
@@ -201,6 +204,7 @@ const TheForm = memo(
           name: formValues.name,
           icon: formValues.icon || 'material-symbols:folder',
           path: hasValue(formValues.path) ? formValues.path : null,
+          remark: hasValue(formValues.remark) ? formValues.remark : null,
           parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
           sort: formValues.sort,
           roleIdArr:
@@ -315,6 +319,17 @@ const TheForm = memo(
               }}
               fullWidth
               helperText="例如: /system/menu"
+            />
+            <TextField
+              label="备注"
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
             />
 
             <FormControl fullWidth>
