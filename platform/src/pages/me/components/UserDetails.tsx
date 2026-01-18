@@ -81,7 +81,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.createTimeUtc
-                  ? new Date(user.createTimeUtc).toLocaleString()
+                  ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
                   : t('common.noData')}
               </Typography>
             </Box>

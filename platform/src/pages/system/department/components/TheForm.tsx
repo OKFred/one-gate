@@ -308,7 +308,7 @@ const TheForm = memo(
               rows={2}
             />
             <TextField
-              label="备注"
+              label={t('common.form.remark')}
               value={formValues.remark ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
