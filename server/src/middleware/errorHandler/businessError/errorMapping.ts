@@ -17,6 +17,8 @@ export const BusinessErrorCode = {
   DEPARTMENT_NOT_EXIST: "DEPARTMENT_NOT_EXIST",
   /** @description 角色不存在或已被禁用 */
   ROLE_NOT_EXIST: "ROLE_NOT_EXIST",
+  /** @description 数据版本冲突 */
+  DATA_VERSION_CONFLICT: "DATA_VERSION_CONFLICT",
 } as const;
 
 export type BusinessErrorCode =
@@ -62,5 +64,9 @@ export const ERROR_PRESENTATION_MAP: Record<
   NOT_YET_IMPLEMENTED: {
     status: 501,
     i18nKey: "i18n.api.system.wechatNotImplemented",
+  },
+  DATA_VERSION_CONFLICT: {
+    status: 409,
+    i18nKey: "i18n.api.dataVersionConflict",
   },
 };

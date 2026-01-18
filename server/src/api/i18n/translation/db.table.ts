@@ -75,6 +75,12 @@ const TranslationBasePO = {
     description: "是否启用",
     examples: [true, false],
   },
+  version: {
+    type: "integer",
+    description: "版本号",
+    examples: [0, 1, 2],
+    default: 0,
+  },
 } as const satisfies Partial<Record<keyof TranslationPOLike, JSONSchema>>;
 const TranslationPO = {
   ...IndexPO,
@@ -169,6 +175,7 @@ export const translationTable = sqliteTable(
     valueHash: text("value_hash", { length: 64 }).notNull(),
     description: text("description"),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+    version: integer("version").notNull().default(0),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),
     createTimeUtc: integer("create_time_utc")
@@ -194,6 +201,7 @@ export async function tableInit() {
       value_hash TEXT NOT NULL,
       description TEXT,
       is_enabled INTEGER NOT NULL,
+      version INTEGER NOT NULL DEFAULT 0,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

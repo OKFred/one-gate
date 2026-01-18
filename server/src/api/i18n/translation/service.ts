@@ -287,10 +287,20 @@ async function onUpdate(
   const { id, ...rest } = params;
   // 检查 tKey 是否与其他记录冲突
   await uniqueCheck(params);
+  const previousRecord = await onGet({ id });
+  if (!previousRecord) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  const previousVersion = previousRecord.version;
+  if (params.version !== previousVersion) {
+    throw new BusinessError(BusinessErrorCode.DATA_VERSION_CONFLICT);
+  }
+  const currentVersion = previousVersion + 1;
   let updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
+    version: currentVersion,
   };
 
   const res = await db
