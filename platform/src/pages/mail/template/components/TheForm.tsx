@@ -16,12 +16,12 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import JoditEditor from '@/components/JoditEditor/index';
 import * as MailTemplateAPI from '@/api/mail/template';
-import type { AddMailTemplateRequest } from '../type';
+import type { AddMailTemplateReq } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showGlobalNotification } from '@/components/Notification';
 
-const DEFAULT_FORM: AddMailTemplateRequest = {
+const DEFAULT_FORM: AddMailTemplateReq = {
   name: '',
   title: '',
   langCode: '',
@@ -33,7 +33,7 @@ const DEFAULT_FORM: AddMailTemplateRequest = {
 // 暴露给父组件的方法
 export interface TheFormRef {
   /** 打开编辑表单 */
-  onOpen: (template?: AddMailTemplateRequest) => void;
+  onOpen: (template?: AddMailTemplateReq & { id?: number }) => void;
 }
 
 const TheForm = memo(
@@ -46,17 +46,17 @@ const TheForm = memo(
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddMailTemplateRequest>(DEFAULT_FORM);
+    const [form, setForm] = useState<AddMailTemplateReq>(DEFAULT_FORM);
     const [loading, setLoading] = useState(false);
 
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
       () => ({
-        onOpen: (template?: AddMailTemplateRequest) => {
+        onOpen: (template?: AddMailTemplateReq & { id?: number }) => {
           if (template) {
             const templateId = template.id;
-            setEditId(templateId);
+            setEditId(templateId ?? null);
             setForm({
               name: template.name || '',
               title: template.title || '',

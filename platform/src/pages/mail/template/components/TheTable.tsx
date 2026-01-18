@@ -30,14 +30,21 @@ import {
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
 import { showGlobalNotification } from '@/components/Notification';
-import type { ListMailTemplate, FilterState } from '../type';
+import type { ListMailTemplateReq, ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListMailTemplateReq['orderBy']>;
+  descend: boolean;
+}
+
 // 表格内部状态
 export interface TableState {
-  list: ListMailTemplate[];
+  list: NonNullable<ListMailTemplateRes['list']>;
   loading: boolean;
   filters: FilterState;
 }
@@ -136,11 +143,11 @@ const TheTable = memo(
       return doc.body.textContent || '';
     };
 
-    const handleEdit = (template: ListMailTemplate) => {
+    const handleEdit = (template: NonNullable<ListMailTemplateRes['list']>[0]) => {
       formRef.current?.onOpen(template);
     };
 
-    const handlePreview = (template: ListMailTemplate) => {
+    const handlePreview = (template: NonNullable<ListMailTemplateRes['list']>[0]) => {
       previewRef.current?.onOpen(template);
     };
 

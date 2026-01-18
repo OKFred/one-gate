@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { FilterState } from '../type';
+import type { FilterState } from './TheTable';
 import type { Props } from '../index';
 
 // 暴露给父组件的方法

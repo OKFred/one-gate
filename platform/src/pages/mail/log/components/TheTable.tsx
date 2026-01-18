@@ -24,10 +24,17 @@ import {
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import * as mailLogAPI from '@/api/mail/log';
-import type { ListMailLog, FilterState } from '../type';
+import type { ListMailLogReq, ListMailLogRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListMailLogReq['orderBy']>;
+  descend: boolean;
+}
 
 // 暴露给父组件的方法
 export interface TheTableRef {
@@ -46,7 +53,7 @@ const TheTable = memo(
     const { filterRef, detailRef } = localObj;
     const { isMobile } = useResponsive();
     const t = useTranslation();
-    const [logs, setLogs] = useState<ListMailLog[]>([]);
+    const [logs, setLogs] = useState<NonNullable<ListMailLogRes['list']>>([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
@@ -94,7 +101,7 @@ const TheTable = memo(
       fetchLogs(DEFAULT_FILTERS);
     }, [fetchLogs]);
 
-    const handleViewLog = (log: ListMailLog) => {
+    const handleViewLog = (log: NonNullable<ListMailLogRes['list']>[0]) => {
       detailRef.current?.open(log);
     };
 

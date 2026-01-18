@@ -27,10 +27,6 @@ export type DeleteMailAccountRes = Awaited<ReturnType<typeof AccountAPI.deleteFn
 export type ListMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.listFn>[0]['data']>;
 export type ListMailTemplateRes = Awaited<ReturnType<typeof TemplateAPI.listFn>>['data']['data'];
 
-// 获取单个邮件模板
-export type GetMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.getFn>[0]['data']>;
-export type GetMailTemplateRes = Awaited<ReturnType<typeof TemplateAPI.getFn>>['data']['data'];
-
 // 添加邮件模板
 export type AddMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.addFn>[0]['data']>;
 export type AddMailTemplateRes = Awaited<ReturnType<typeof TemplateAPI.addFn>>['data']['data'];
@@ -50,10 +46,6 @@ export type DeleteMailTemplateRes = Awaited<
 // 获取邮件日志列表
 export type ListMailLogReq = NonNullable<Parameters<typeof LogAPI.listFn>[0]['data']>;
 export type ListMailLogRes = Awaited<ReturnType<typeof LogAPI.listFn>>['data']['data'];
-
-// 获取单个邮件日志
-export type GetMailLogReq = NonNullable<Parameters<typeof LogAPI.getFn>[0]['data']>;
-export type GetMailLogRes = Awaited<ReturnType<typeof LogAPI.getFn>>['data']['data'];
 
 // 发送邮件
 export type SendMailReq = NonNullable<Parameters<typeof ActionAPI.sendFn>[0]['data']>;

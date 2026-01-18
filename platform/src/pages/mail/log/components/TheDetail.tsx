@@ -19,7 +19,7 @@ import {
   Schedule as TimeIcon,
   Description as TemplateIcon,
 } from '@mui/icons-material';
-import type { ListMailLog } from '../type';
+import type { ListMailLogRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -28,7 +28,7 @@ import dayjs from 'dayjs';
 // 暴露给父组件的方法
 export interface TheDetailRef {
   /** 打开详情对话框 */
-  open: (log: ListMailLog) => void;
+  open: (log: NonNullable<ListMailLogRes['list']>[0]) => void;
 }
 
 const TheDetail = memo(
@@ -36,13 +36,13 @@ const TheDetail = memo(
     const { isMobile } = useResponsive();
     const t = useTranslation();
     const [open, setOpen] = useState(false);
-    const [log, setLog] = useState<ListMailLog | null>(null);
+    const [log, setLog] = useState<NonNullable<ListMailLogRes['list']>[0] | null>(null);
 
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
       () => ({
-        open: (selectedLog: ListMailLog) => {
+        open: (selectedLog: NonNullable<ListMailLogRes['list']>[0]) => {
           setLog(selectedLog);
           setOpen(true);
         },

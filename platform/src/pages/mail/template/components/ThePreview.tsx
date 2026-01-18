@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
-import type { ListMailTemplate } from '../type';
+import type { ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -23,7 +23,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 // 暴露给父组件的方法
 export interface ThePreviewRef {
   /** 打开预览对话框 */
-  onOpen: (template: ListMailTemplate) => void;
+  onOpen: (template: NonNullable<ListMailTemplateRes['list']>[0]) => void;
 }
 
 const ThePreview = memo(
@@ -32,13 +32,15 @@ const ThePreview = memo(
     const { isMobile } = useResponsive();
     const t = useTranslation();
     const [open, setOpen] = useState(false);
-    const [template, setTemplate] = useState<ListMailTemplate | null>(null);
+    const [template, setTemplate] = useState<NonNullable<ListMailTemplateRes['list']>[0] | null>(
+      null,
+    );
 
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
       () => ({
-        onOpen: (selectedTemplate: ListMailTemplate) => {
+        onOpen: (selectedTemplate: NonNullable<ListMailTemplateRes['list']>[0]) => {
           setTemplate(selectedTemplate);
           setOpen(true);
         },
