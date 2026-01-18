@@ -2,7 +2,6 @@ import type { App, NodeHonoContext } from "@/types/app.ts";
 import { createTranslator, getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales.ts";
 import { BusinessError } from "@/middleware/errorHandler/businessError/index";
 import { toHttpException } from "./businessError";
 
@@ -45,7 +44,7 @@ export default function errorHandler(app: App) {
     if (e instanceof HTTPException) {
       const message = e.message
         ? e.message.startsWith("i18n.")
-          ? t(e.message as LanguageKey)
+          ? t(e.message)
           : e.message
         : e.status === 403
           ? t("i18n.middleware.errorHandler.forbidden")

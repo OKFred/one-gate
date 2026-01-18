@@ -3620,6 +3620,13 @@ export interface components {
                      * @example false
                      */
                     isEnabled: boolean;
+                    /**
+                     * @description 版本号
+                     * @example 0
+                     * @example 1
+                     * @example 2
+                     */
+                    version?: ((number | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -3684,6 +3691,13 @@ export interface components {
              * @example false
              */
             isEnabled: boolean;
+            /**
+             * @description 版本号
+             * @example 0
+             * @example 1
+             * @example 2
+             */
+            version?: ((number | null) | null) | null;
         };
         I18nTranslationAddRes: {
             ok: boolean;
@@ -3745,6 +3759,13 @@ export interface components {
              * @example false
              */
             isEnabled?: boolean;
+            /**
+             * @description 版本号
+             * @example 0
+             * @example 1
+             * @example 2
+             */
+            version?: ((number | null) | null) | null;
         };
         I18nTranslationUpdateRes: {
             ok: boolean;
@@ -3831,6 +3852,13 @@ export interface components {
                  * @example false
                  */
                 isEnabled: boolean;
+                /**
+                 * @description 版本号
+                 * @example 0
+                 * @example 1
+                 * @example 2
+                 */
+                version?: ((number | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**

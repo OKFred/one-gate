@@ -9,6 +9,7 @@ import { initialI18nData } from "./initI18n";
 import translationService, {
   utils as translationUtils,
 } from "@/api/i18n/translation/service";
+import { loadI18nCache } from "@/utils/i18n";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -35,6 +36,7 @@ const SUPER_ADMIN_ROLE = {
   ]),
   isEnabled: true,
   creatorId: 1, // 系统初始化
+  remark: "系统初始化创建的超级管理员角色",
 };
 
 /**
@@ -98,6 +100,7 @@ async function initSuperAdminUser(roleId: number) {
         roleIdArr: [roleId], // 关联超级管理员角色
         isEnabled: true,
         creatorId: 1, // 系统初始化
+        remark: "系统初始化创建的超级管理员账号",
       })
       .returning({ id: userTable.id });
 
@@ -144,17 +147,26 @@ async function initMenu() {
  */
 async function initI18n() {
   const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
-  const results = [];
-  for (const item of initialI18nData) {
+  const promises = initialI18nData.map(async (item) => {
     // 计算 hash 值
     const valueHash = await translationUtils.calculateSHA256(item.tValue);
     const params = {
-      ...item,
+      application: item.application,
+      business: item.business,
+      langCode: item.langCode,
+      tKey: item.tKey,
+      tValue: item.tValue,
       valueHash,
+      version: 0,
+      description: item.description,
+      isEnabled: item.isEnabled,
     };
-    results.push(await translationService.add.service(params, userObj));
-  }
-  const addResults = await Promise.allSettled(results);
+    return translationService.add.service(params, userObj, {
+      skipCacheReload: true,
+    });
+  });
+
+  const addResults = await Promise.allSettled(promises);
   const successCount = addResults.filter(
     (res) => res.status === "fulfilled"
   ).length;
@@ -179,7 +191,11 @@ export async function initDatabase() {
     // 3. 初始化菜单
     await initMenu();
 
+    // 4. 初始化多语言
     await initI18n();
+
+    // 5. 加载多语言缓存
+    await loadI18nCache();
 
     console.log("✅ 数据库初始化完成");
   } catch (error) {
