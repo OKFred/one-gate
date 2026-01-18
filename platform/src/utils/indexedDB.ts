@@ -1,5 +1,5 @@
 // IndexedDB 工具类
-const DB_NAME = 'OkFredDB';
+const DB_NAME = 'frontend_db';
 const DB_VERSION = 1;
 const STORE_NAME = 'i18n';
 

@@ -29,9 +29,9 @@ export default function HomeRefactored() {
   ];
 
   return (
-    <PageLayout title="欢迎使用 OKFred 平台">
+    <PageLayout title="欢迎使用">
       {/* 副标题 */}
-      <Typography sx={{ mb: { xs: 3, md: 4 } }}>一站式邮件管理解决方案</Typography>
+      <Typography sx={{ mb: { xs: 3, md: 4 } }}>一站式信息管理解决方案</Typography>
 
       {/* 统计卡片网格 */}
       <SectionLayout>
