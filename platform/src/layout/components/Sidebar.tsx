@@ -13,6 +13,7 @@ import Icon from '@/components/Icon';
 import { treeFn } from '@/api/system/menu';
 import type { SystemMenuTree } from './type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const drawerWidth = 240;
 
@@ -27,6 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const [navItems, setNavItems] = useState<SystemMenuTree[]>([]);
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   // 递归查找匹配路径的菜单项，并返回需要展开的菜单 ID 集合
   const findExpandedMenus = (items: SystemMenuTree[], currentPath: string): Record<string, boolean> => {
@@ -104,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           <ListItemIcon sx={{ minWidth: 40 }}>
             {item.icon && <Icon name={item.icon} size={24} />}
           </ListItemIcon>
-          <ListItemText primary={item.name} />
+          <ListItemText primary={t(item.name)} />
           {hasChildren && (
             <Icon
               name={isExpanded ? 'material-symbols:expand-less' : 'material-symbols:expand-more'}
