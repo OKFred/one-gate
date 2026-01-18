@@ -21,4 +21,5 @@ export default {
   "i18n.api.system.wechatNotImplemented":
     "微信登录暂未实现，需要配置微信开发者信息",
   "i18n.api.mail.sslAndStarttlsConflict": "SSL 和 STARTTLS 不能同时启用",
+  "i18n.api.dataVersionConflict": "数据版本冲突，请刷新后重试",
 };

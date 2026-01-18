@@ -8,6 +8,7 @@ import * as UserAPI from '@/api/system/user';
 import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
 import { UserActionButtons } from './TheActionButtons';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { ListUserRes, TreeDepartmentRes } from '@/api/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
@@ -38,6 +39,7 @@ const DEFAULT_FILTERS: FilterState = {
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
+    const t = useTranslation();
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
@@ -193,27 +195,27 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: 'ID', render: (row) => row.id },
-      { title: '用户名', render: (row) => row.username },
-      { title: '部门', render: (row) => getDepartmentName(row.departmentId) },
-      { title: '角色', render: (row) => getRoleNames(row.roleIdArr) },
+      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('system.user.columns.username'), render: (row) => row.username },
+      { title: t('system.user.columns.department'), render: (row) => getDepartmentName(row.departmentId) },
+      { title: t('system.user.columns.roles'), render: (row) => getRoleNames(row.roleIdArr) },
       {
-        title: '状态',
+        title: t('common.columns.status'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? '启用' : '禁用'}
+            label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
             color={row.isEnabled ? 'success' : 'error'}
             size="small"
           />
         ),
       },
       {
-        title: '创建时间',
+        title: t('common.columns.createTime'),
         render: (row) =>
           row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
       },
       {
-        title: '操作',
+        title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
           <UserActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
@@ -224,12 +226,12 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.username },
-      { type: 'subtitle', label: 'ID', render: (row) => row.id },
-      { type: 'content', label: '部门', render: (row) => getDepartmentName(row.departmentId) },
-      { type: 'content', label: '角色', render: (row) => getRoleNames(row.roleIdArr) },
+      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('system.user.columns.department'), render: (row) => getDepartmentName(row.departmentId) },
+      { type: 'content', label: t('system.user.columns.roles'), render: (row) => getRoleNames(row.roleIdArr) },
       {
         type: 'content',
-        label: '创建时间',
+        label: t('common.columns.createTime'),
         render: (row) =>
           row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
       },
@@ -237,7 +239,7 @@ const TheTable = memo(
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? '启用' : '禁用'}
+            label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
             color={row.isEnabled ? 'success' : 'error'}
             size="small"
           />
@@ -260,7 +262,7 @@ const TheTable = memo(
         cardActions={(row) => (
           <UserActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText="暂无用户"
+        emptyText={t('system.user.empty')}
       />
     );
   }),

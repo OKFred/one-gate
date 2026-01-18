@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
 
-export default function LoginHeader() {
+export default function TheHeader() {
   return (
     <>
       <Typography variant="h1">Ant Design</Typography>

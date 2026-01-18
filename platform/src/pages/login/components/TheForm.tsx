@@ -10,10 +10,12 @@ import { authUtils } from '@/utils/auth';
 import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showGlobalNotification } from '@/components/Notification';
+import { useTranslation } from '@/hooks/useTranslation';
 
-export default function LoginForm() {
+export default function TheForm() {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   // 状态管理
   const [credentials, setCredentials] = useState<CommonLoginReq>({
@@ -35,7 +37,7 @@ export default function LoginForm() {
   // 处理普通登录
   const handleLogin = async () => {
     if (!credentials.username || !credentials.password) {
-      showGlobalNotification({ message: '请输入用户名和密码', type: 'error' });
+      showGlobalNotification({ message: t('login.missingCredentials'), type: 'error' });
       return;
     }
 
@@ -58,7 +60,7 @@ export default function LoginForm() {
 
   // 处理微信登录
   const handleWechatLogin = async () => {
-    showGlobalNotification({ message: '微信登录功能正在开发中...', type: 'info' });
+    showGlobalNotification({ message: t('login.wechatWIP'), type: 'info' });
   };
 
   // 处理回车键登录
@@ -72,7 +74,7 @@ export default function LoginForm() {
     <Box sx={{ width: '100%', maxWidth: 400, mx: 'auto' }}>
       <Stack spacing={isMobile ? 2 : 3}>
         <TextField
-          label="用户名"
+          label={t('login.username')}
           variant="outlined"
           fullWidth
           size={isMobile ? 'medium' : 'medium'}
@@ -83,7 +85,7 @@ export default function LoginForm() {
         />
 
         <TextField
-          label="密码"
+          label={t('login.password')}
           type={showPassword ? 'text' : 'password'}
           variant="outlined"
           fullWidth
@@ -109,7 +111,7 @@ export default function LoginForm() {
 
         <Box sx={{ textAlign: 'right' }}>
           <Button variant="text" color="primary" size="small">
-            忘记密码？
+            {t('login.forgotPassword')}
           </Button>
         </Box>
 
@@ -123,7 +125,7 @@ export default function LoginForm() {
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
-          {loading ? '登录中...' : '登录'}
+          {loading ? t('login.signingIn') : t('login.signIn')}
         </Button>
 
         <Button
@@ -135,7 +137,7 @@ export default function LoginForm() {
           onClick={handleWechatLogin}
           disabled={loading}
         >
-          微信登录
+          {t('login.wechatSignIn')}
         </Button>
       </Stack>
     </Box>

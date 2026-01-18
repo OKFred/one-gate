@@ -41,6 +41,12 @@ const DepartmentBasePO = {
     type: "boolean",
     description: "是否启用",
   },
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注说明",
+    maxLength: 1000,
+  },
 } as const satisfies Partial<Record<keyof DepartmentPOLike, JSONSchema>>;
 const DepartmentPO = {
   ...IndexPO,
@@ -86,6 +92,7 @@ export const DepartmentAddKeys = [
   "description",
   "parentId",
   "isEnabled",
+  "remark",
 ] as const satisfies RequiredKeys<DepartmentAddVOLike>[];
 export const DepartmentUpdateKeys = [
   ...IndexKey,
@@ -116,6 +123,7 @@ export const departmentTable = sqliteTable("system_department", {
   name: text("name").notNull().unique(),
   description: text("description"),
   parentId: integer("parent_id"),
+  remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -132,6 +140,7 @@ export async function tableInit() {
       name TEXT NOT NULL UNIQUE,
       description TEXT,
       parent_id INTEGER,
+      remark TEXT,
       is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,

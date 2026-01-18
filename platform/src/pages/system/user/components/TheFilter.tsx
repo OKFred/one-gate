@@ -22,6 +22,7 @@ import {
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { Props } from '../index';
 import type { ListUserReq } from '@/api/system/type';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
 export interface FilterState {
@@ -39,6 +40,7 @@ export interface TheFilterRef {
 const TheFilter = memo(
   forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
+    const t = useTranslation();
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
     const [isSearching, setIsSearching] = useState(false); // 搜索状态
@@ -121,13 +123,13 @@ const TheFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">搜索与筛选</Typography>
+            <Typography variant="h6">{t('common.filter.title')}</Typography>
             {isSearching && (
-              <Chip label="搜索中..." size="small" color="default" variant="outlined" />
+              <Chip label={t('common.filter.searching')} size="small" color="default" variant="outlined" />
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={`${filterCount} 个用户`}
+                label={t('system.user.filter.count').replace('{count}', String(filterCount))}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -137,7 +139,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label="清除筛选"
+                label={t('common.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -154,8 +156,8 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label="关键字搜索"
-                placeholder="搜索用户名、姓名、邮箱..."
+                label={t('common.filter.keywordLabel')}
+                placeholder={t('system.user.filter.keywordPlaceholder')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -171,26 +173,26 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>排序字段</InputLabel>
+                  <InputLabel>{t('common.filter.orderBy')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label="排序字段"
+                    label={t('common.filter.orderBy')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
-                    <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="createTimeUtc">创建时间</MenuItem>
+                    <MenuItem value="id">{t('common.columns.id')}</MenuItem>
+                    <MenuItem value="createTimeUtc">{t('common.columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>排序方式</InputLabel>
+                  <InputLabel>{t('common.filter.sortOrder')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label="排序方式"
+                    label={t('common.filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">升序</MenuItem>
-                    <MenuItem value="desc">降序</MenuItem>
+                    <MenuItem value="asc">{t('common.filter.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('common.filter.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

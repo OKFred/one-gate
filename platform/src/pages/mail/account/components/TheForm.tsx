@@ -7,11 +7,6 @@ import {
   DialogActions,
   TextField,
   Stack,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  Radio,
   Box,
   useTheme,
   IconButton,
@@ -21,7 +16,7 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import * as mailAccountAPI from '@/api/mail/account';
+import * as AccountAPI from '@/api/mail/account';
 import type { AddMailAccountReq } from '@/api/mail/type';
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
@@ -40,8 +35,8 @@ const DEFAULT_FORM: AddMailAccountReq = {
   host: '',
   port: 465,
   password: '',
-  sslEnable: true,
-  starttlsEnable: false,
+  isEnabled: true,
+  remark: null,
 };
 
 const TheForm = memo(
@@ -65,13 +60,13 @@ const TheForm = memo(
           if (row) {
             setEditId(row.id!);
             setForm({
-              nickname: row.nickname || '',
-              mailAddress: row.mailAddress || '',
-              host: row.host || '',
+              nickname: row.nickname ?? '',
+              mailAddress: row.mailAddress ?? '',
+              host: row.host ?? '',
               port: row.port,
-              password: row.password || '',
-              sslEnable: row.sslEnable,
-              starttlsEnable: row.starttlsEnable,
+              password: row.password ?? '',
+              isEnabled: row.isEnabled,
+              remark: row.remark ?? null,
             });
           } else {
             setEditId(null);
@@ -93,15 +88,17 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      const base64Password = globalThis.btoa(form.password); // 防小白
       const formData = {
         ...form,
+        password: base64Password,
         port: form.port,
       };
 
       if (editId) {
-        await mailAccountAPI.updateFn({ data: { id: editId, ...formData } });
+        await AccountAPI.updateFn({ data: { id: editId, ...formData } });
       } else {
-        await mailAccountAPI.addFn({ data: formData });
+        await AccountAPI.addFn({ data: formData });
       }
       handleCancel();
       // 刷新表格数据
@@ -131,7 +128,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('i18n.pages.mail.account.form.title.edit') : t('i18n.pages.mail.account.form.title.add')}
+            {editId ? t('mail.account.form.title.edit') : t('mail.account.form.title.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -150,7 +147,7 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.pages.mail.account.form.nickname')}
+                  label={t('mail.account.form.nickname')}
                   value={form.nickname}
                   onChange={(e) => setForm({ ...form, nickname: e.target.value })}
                   required
@@ -158,7 +155,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label={t('i18n.pages.mail.account.form.email')}
+                  label={t('mail.account.form.email')}
                   type="email"
                   value={form.mailAddress}
                   onChange={(e) => setForm({ ...form, mailAddress: e.target.value })}
@@ -170,7 +167,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.pages.mail.account.form.host')}
+                  label={t('mail.account.form.host')}
                   value={form.host}
                   onChange={(e) => setForm({ ...form, host: e.target.value })}
                   required
@@ -178,7 +175,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label={t('i18n.pages.mail.account.form.port')}
+                  label={t('mail.account.form.port')}
                   type="number"
                   value={form.port}
                   onChange={(e) => setForm({ ...form, port: Number(e.target.value) })}
@@ -190,7 +187,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.pages.mail.account.form.password')}
+                  label={t('mail.account.form.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -214,24 +211,17 @@ const TheForm = memo(
                 />
               </Stack>
 
-              <FormControl component="fieldset">
-                <FormLabel component="legend">加密方式</FormLabel>
-                <RadioGroup
-                  row
-                  value={form.sslEnable ? 'ssl' : form.starttlsEnable ? 'starttls' : ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setForm({
-                      ...form,
-                      sslEnable: value === 'ssl',
-                      starttlsEnable: value === 'starttls',
-                    });
-                  }}
-                >
-                  <FormControlLabel value="ssl" control={<Radio />} label={t('i18n.pages.mail.account.form.ssl')} />
-                  <FormControlLabel value="starttls" control={<Radio />} label={t('i18n.pages.mail.account.form.starttls')} />
-                </RadioGroup>
-              </FormControl>
+              <TextField
+                label={t('mail.account.columns.remark')}
+                value={form.remark || ''}
+                onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
+              />
             </Stack>
           </form>
         </DialogContent>
@@ -245,7 +235,7 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
-            {t('i18n.pages.mail.account.form.cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -254,7 +244,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {t('i18n.pages.mail.account.form.save')}
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

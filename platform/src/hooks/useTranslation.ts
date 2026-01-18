@@ -1,11 +1,51 @@
-import { useMemo } from 'react';
-import zhCN from '@/locales/zh-CN';
-import enUS from '@/locales/en-US';
+import { useMemo, useState, useEffect } from 'react';
 import { authUtils } from '@/utils/auth';
+import { indexedDBHelper } from '@/utils/indexedDB';
 
-const languageObj = {
-  'en-US': enUS,
-  'zh-CN': zhCN,
+// 翻译数据缓存
+let translationCache: Record<string, Record<string, string>> = {};
+let isLoaded = false;
+let loadingPromise: Promise<void> | null = null;
+
+/**
+ * 从 IndexedDB 加载翻译数据到缓存
+ */
+const loadTranslationsFromDB = async (): Promise<void> => {
+  // 如果已加载，直接返回
+  if (isLoaded) return;
+
+  // 如果正在加载，返回同一个 Promise
+  if (loadingPromise) return loadingPromise;
+
+  // 开始加载
+  loadingPromise = (async () => {
+    try {
+      await indexedDBHelper.init();
+      const data = await indexedDBHelper.getTranslationList();
+
+      // 重置缓存
+      translationCache = {};
+
+      // 按语言代码分组
+      data.forEach((item) => {
+        if (!item.langCode) return;
+        if (!translationCache[item.langCode]) {
+          translationCache[item.langCode] = {};
+        }
+        const fullKey = `${item.tKey}`;
+        if (!item.tValue) return;
+        translationCache[item.langCode][fullKey] = item.tValue;
+      });
+
+      isLoaded = true;
+    } catch (error) {
+      console.error('❌ 加载多语言数据失败：', error);
+    } finally {
+      loadingPromise = null;
+    }
+  })();
+
+  return loadingPromise;
 };
 
 /**
@@ -14,12 +54,11 @@ const languageObj = {
  * @returns 翻译函数，如果找不到文案则原样返回
  */
 export const createTranslator = (langCode?: string) => {
-  const supportedLanguages = ['en-US', 'zh-CN'];
-  const language = supportedLanguages.includes(langCode || '') ? langCode! : 'zh-CN';
+  const language = langCode || 'zh-CN';
 
   return (key: string): string => {
-    const translations = languageObj[language as keyof typeof languageObj];
-    return (translations as Record<string, string>)[key] || key;
+    const translations = translationCache[language] || {};
+    return translations[key] || key;
   };
 };
 
@@ -30,8 +69,19 @@ export const createTranslator = (langCode?: string) => {
 export const useTranslation = () => {
   const userInfo = authUtils.getUserInfo();
   const langCode = userInfo?.langCode || 'zh-CN';
+  const [isReady, setIsReady] = useState(isLoaded);
 
-  const t = useMemo(() => createTranslator(langCode), [langCode]);
+  useEffect(() => {
+    if (!isLoaded) {
+      async function init() {
+        await loadTranslationsFromDB();
+        setIsReady(true);
+      }
+      init();
+    }
+  }, []);
+
+  const t = useMemo(() => createTranslator(langCode), [langCode, isReady]);
 
   return t;
 };

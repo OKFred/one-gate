@@ -4,7 +4,7 @@ import ResponsiveList, {
   type TableColumn,
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
-import * as mailAccountAPI from '@/api/mail/account';
+import * as AccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './TheActionButtons';
 import type { ListMailAccountReq, ListMailAccountRes } from '@/api/mail/type';
 import type { Props } from '../index';
@@ -70,7 +70,7 @@ const TheTable = memo(
             descend: searchFilters.descend,
           };
 
-          const res = await mailAccountAPI.listFn({ data: requestData });
+          const res = await AccountAPI.listFn({ data: requestData });
           const response = res.data;
           const accountsList = response?.data?.list || [];
           const totalCount = response?.data?.total || 0;
@@ -130,24 +130,24 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('i18n.pages.mail.account.columns.id'), render: (row) => row.id },
-      { title: t('i18n.pages.mail.account.columns.nickname'), render: (row) => row.nickname },
-      { title: t('i18n.pages.mail.account.columns.email'), render: (row) => row.mailAddress },
-      { title: t('i18n.pages.mail.account.columns.host'), render: (row) => row.host },
-      { title: t('i18n.pages.mail.account.columns.port'), render: (row) => row.port },
+      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('mail.account.columns.nickname'), render: (row) => row.nickname },
+      { title: t('mail.account.columns.email'), render: (row) => row.mailAddress },
+      { title: t('mail.account.columns.host'), render: (row) => row.host },
+      { title: t('mail.account.columns.port'), render: (row) => row.port },
       {
-        title: t('i18n.pages.mail.account.columns.createTime'),
+        title: t('common.columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('i18n.pages.mail.account.columns.actions'),
+        title: t('mail.account.columns.remark'),
+        render: (row) => row.remark || '-',
+      },
+      {
+        title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
-          <AccountActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
+          <AccountActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         ),
       },
     ];
@@ -155,15 +155,27 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.nickname },
-      { type: 'subtitle', label: t('i18n.pages.mail.account.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('i18n.pages.mail.account.columns.email'), render: (row) => row.mailAddress },
-      { type: 'content', label: t('i18n.pages.mail.account.columns.host') + ':' + t('i18n.pages.mail.account.columns.port'), render: (row) => `${row.host}:${row.port}` },
+      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('mail.account.columns.email'), render: (row) => row.mailAddress },
+      {
+        type: 'content',
+        label: t('mail.account.columns.host') + ':' + t('mail.account.columns.port'),
+        render: (row) => `${row.host}:${row.port}`,
+      },
+      {
+        type: 'content',
+        label: t('mail.account.columns.remark'),
+        render: (row) => row.remark || '-',
+      },
       {
         type: 'tags',
         render: (row) => (
           <>
-            {row.sslEnable && <Chip label={t('i18n.pages.mail.account.tags.ssl')} color="success" size="small" />}
-            {row.starttlsEnable && <Chip label={t('i18n.pages.mail.account.tags.starttls')} color="info" size="small" />}
+            {row.port === 465 ? (
+              <Chip label={t('mail.account.tags.ssl')} color="success" size="small" />
+            ) : (
+              <Chip label={t('mail.account.tags.starttls')} color="info" size="small" />
+            )}
           </>
         ),
       },
@@ -182,13 +194,9 @@ const TheTable = memo(
         columns={columns}
         cardFields={cardFields}
         cardActions={(row) => (
-          <AccountActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
+          <AccountActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText={t('i18n.pages.mail.account.empty')}
+        emptyText={t('mail.account.empty')}
       />
     );
   }),

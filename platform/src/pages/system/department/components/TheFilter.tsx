@@ -27,6 +27,7 @@ import {
   useRef,
 } from 'react';
 import type { Props } from '../index';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
 export interface FilterState {
@@ -42,6 +43,7 @@ export interface TheFilterRef {
 
 const TheFilter = memo(
   forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
+    const t = useTranslation();
     const { treeRef } = localObj;
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState('');
@@ -132,7 +134,7 @@ const TheFilter = memo(
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FilterIcon fontSize="small" />
-            <span>筛选条件</span>
+            <span>{t('common.filter.condition')}</span>
           </Box>
           <IconButton size="small" onClick={() => setExpanded(!expanded)}>
             {expanded ? <ExpandLess /> : <ExpandMore />}
@@ -142,8 +144,8 @@ const TheFilter = memo(
         <Collapse in={expanded} timeout="auto">
           <Stack spacing={2} sx={{ mt: 2 }}>
             <TextField
-              label="关键词"
-              placeholder="搜索部门名称或描述"
+              label={t('common.filter.keyword')}
+              placeholder={t('system.department.filter.keywordPlaceholder')}
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
               fullWidth
@@ -158,15 +160,15 @@ const TheFilter = memo(
             />
 
             <FormControl size="small" fullWidth>
-              <InputLabel>启用状态</InputLabel>
+              <InputLabel>{t('common.filter.enabledStatus')}</InputLabel>
               <Select
                 value={isEnabledFilter}
-                label="启用状态"
+                label={t('common.filter.enabledStatus')}
                 onChange={(e) => setIsEnabledFilter(e.target.value)}
               >
-                <MenuItem value="all">全部</MenuItem>
-                <MenuItem value="enabled">启用</MenuItem>
-                <MenuItem value="disabled">禁用</MenuItem>
+                <MenuItem value="all">{t('common.filter.all')}</MenuItem>
+                <MenuItem value="enabled">{t('common.status.enabled')}</MenuItem>
+                <MenuItem value="disabled">{t('common.status.disabled')}</MenuItem>
               </Select>
             </FormControl>
           </Stack>

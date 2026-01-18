@@ -78,7 +78,7 @@ const TheTree = memo(
           // 检查当前部门是否匹配关键词
           const matchesKeyword =
             !searchFilters.keyword ||
-            dept.name.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
+            dept.name?.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
             (dept.description &&
               dept.description.toLowerCase().includes(searchFilters.keyword.toLowerCase()));
 

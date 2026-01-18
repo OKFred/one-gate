@@ -14,6 +14,7 @@ import { ResponsiveButton } from '@/components/Responsive/index';
 import * as UserAPI from '@/api/system/user';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // ==================== 新增用户按钮 ====================
 
@@ -26,13 +27,14 @@ export interface AddButtonProps {
  * 用于页面顶部的新增操作
  */
 export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
+  const t = useTranslation();
   const handleAdd = useCallback(() => {
     formRef.current?.onOpen();
   }, [formRef]);
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      添加用户
+      {t('system.user.actions.add')}
     </ResponsiveButton>
   );
 });
@@ -51,6 +53,7 @@ export interface RowButtonProps {
  * 用于表格/卡片中的行操作
  */
 export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowButtonProps) => {
+  const t = useTranslation();
   // 删除确认对话框状态
   const [deleteDialog, setDeleteDialog] = useState(false);
 
@@ -91,16 +94,16 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
 
       {/* 删除确认对话框 */}
       <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-        <DialogTitle>确认删除</DialogTitle>
+        <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            确定要删除用户 <strong>{row.username}</strong> 吗？此操作无法撤销。
+            {t('system.user.actions.deleteConfirmMessage').replace('{username}', row.username || '')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>取消</Button>
+          <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
           <Button onClick={handleConfirmDelete} color="error" variant="contained">
-            删除
+            {t('common.actions.delete')}
           </Button>
         </DialogActions>
       </Dialog>

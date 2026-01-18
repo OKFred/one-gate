@@ -4,6 +4,7 @@ import TheForm, { type RoleFormRef } from './components/TheForm';
 import TheTable, { type RoleTableRef } from './components/TheTable';
 import TheFilter, { type RoleFilterRef } from './components/TheFilter';
 import { TheActionButtons } from './components/TheActionButtons';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export interface Props {
   localObj: LocalObj;
@@ -15,13 +16,14 @@ export interface LocalObj {
 }
 
 export default function RoleManagementPage() {
+  const t = useTranslation();
   const tableRef = useRef<RoleTableRef>(null);
   const formRef = useRef<RoleFormRef>(null);
   const filterRef = useRef<RoleFilterRef>(null);
   const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title="角色管理" actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('system.role.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />

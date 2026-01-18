@@ -44,6 +44,12 @@ export const UserBasePO = {
     type: "boolean",
     description: "是否启用",
   },
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注说明",
+    maxLength: 1000,
+  },
   departmentId: {
     type: ["number", "null"],
     nullable: true,
@@ -146,6 +152,12 @@ export const UserBaseVO = {
     type: "boolean",
     description: "是否启用",
   },
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注说明",
+    maxLength: 1000,
+  },
   ...UserDepartmentDTO,
   ...UserRoleDTO,
 } as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;
@@ -188,6 +200,7 @@ export const UserAddKeys = [
   "password",
   "langCode",
   "isEnabled",
+  "remark",
   "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserAddVOLike>[];
@@ -235,6 +248,7 @@ export const userTable = sqliteTable("system_user", {
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   langCode: text("lang_code").notNull(),
+  remark: text("remark"),
   departmentId: integer("department_id"),
   roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
@@ -253,6 +267,7 @@ export async function tableInit() {
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             lang_code TEXT NOT NULL,
+            remark TEXT,
             department_id INTEGER,
             role_id_arr TEXT NOT NULL,
             is_enabled INTEGER NOT NULL,

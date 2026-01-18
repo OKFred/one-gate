@@ -41,6 +41,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { exportDeletionRecord } from "@/api/system/compliance";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -99,6 +100,7 @@ async function onListAll(
       id: departmentTable.id,
       name: departmentTable.name,
       description: departmentTable.description,
+      remark: departmentTable.remark,
       parentId: departmentTable.parentId,
       isEnabled: departmentTable.isEnabled,
     })
@@ -209,7 +211,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { name, description, parentId, isEnabled = true } = params;
+  const { name, description, remark, parentId, isEnabled = true } = params;
   // 如果有父部门，检查父部门是否存在
   if (hasValue(parentId)) {
     const parent = await db
@@ -227,6 +229,7 @@ async function onAdd(
     .values({
       name,
       description,
+      remark,
       parentId,
       isEnabled,
       creatorId,
@@ -349,6 +352,18 @@ async function onDelete(
     throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
   }
 
+  // 获取要删除的记录（用于归档）
+  const recordToDelete = await db
+    .select()
+    .from(departmentTable)
+    .where(eq(departmentTable.id, id))
+    .limit(1);
+
+  if (recordToDelete.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
+  // 执行删除操作
   const result = await db
     .delete(departmentTable)
     .where(eq(departmentTable.id, id))
@@ -357,6 +372,30 @@ async function onDelete(
   if (!result || result.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
+
+  // 归档删除记录
+  try {
+    await exportDeletionRecord(
+      {
+        sourceTable: "department",
+        sourcePrimaryKey: String(id),
+        deleteReason: "system",
+        deleteType: "purge",
+        recordSnapshot: JSON.stringify(recordToDelete[0]),
+        remark: `部门"${recordToDelete[0].name}"被删除`,
+        restorable: true,
+        restoreUntilTimeUtc: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000
+        ).getTime(), // 30天后不可恢复
+        complianceNote: null,
+      },
+      userObj.userId
+    );
+  } catch (error) {
+    console.error("归档删除记录失败:", error);
+    // 归档失败不影响删除操作
+  }
+
   return result[0].id;
 }
 const deleteApi = {

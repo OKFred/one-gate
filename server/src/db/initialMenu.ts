@@ -1,28 +1,29 @@
 // 初始菜单数据
+// name 字段使用多语言键，前端需要根据该键获取对应的翻译
 export const initialMenuData = [
   {
     id: 1,
-    name: "主页",
+    name: "menu.home",
     icon: "material-symbols:home",
     path: "/home",
     sort: 1,
   },
   {
     id: 2,
-    name: "我的",
+    name: "menu.me",
     icon: "material-symbols:account-circle",
     path: "/me",
     sort: 2,
   },
   {
     id: 3,
-    name: "邮件管理",
+    name: "menu.mail",
     icon: "material-symbols:mail",
     sort: 3,
   },
   {
     id: 4,
-    name: "模板",
+    name: "menu.mail.template",
     icon: "material-symbols:description",
     path: "/mail/template",
     parentId: 3,
@@ -30,7 +31,7 @@ export const initialMenuData = [
   },
   {
     id: 5,
-    name: "日志",
+    name: "menu.mail.log",
     icon: "material-symbols:history",
     path: "/mail/log",
     parentId: 3,
@@ -38,7 +39,7 @@ export const initialMenuData = [
   },
   {
     id: 6,
-    name: "发送",
+    name: "menu.mail.send",
     icon: "material-symbols:send",
     path: "/mail/send",
     parentId: 3,
@@ -46,7 +47,7 @@ export const initialMenuData = [
   },
   {
     id: 7,
-    name: "账户",
+    name: "menu.mail.account",
     icon: "material-symbols:manage-accounts",
     path: "/mail/account",
     parentId: 3,
@@ -54,14 +55,14 @@ export const initialMenuData = [
   },
   {
     id: 8,
-    name: "系统管理",
+    name: "menu.system",
     icon: "material-symbols:settings",
     sort: 4,
     roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 9,
-    name: "角色",
+    name: "menu.system.role",
     icon: "material-symbols:supervisor-account",
     path: "/system/role",
     parentId: 8,
@@ -69,7 +70,7 @@ export const initialMenuData = [
   },
   {
     id: 10,
-    name: "用户",
+    name: "menu.system.user",
     icon: "material-symbols:group",
     path: "/system/user",
     parentId: 8,
@@ -77,7 +78,7 @@ export const initialMenuData = [
   },
   {
     id: 11,
-    name: "部门",
+    name: "menu.system.department",
     icon: "material-symbols:groups",
     path: "/system/department",
     parentId: 8,
@@ -85,7 +86,7 @@ export const initialMenuData = [
   },
   {
     id: 12,
-    name: "菜单",
+    name: "menu.system.menu",
     icon: "material-symbols:menu",
     path: "/system/menu",
     parentId: 8,
@@ -93,14 +94,14 @@ export const initialMenuData = [
   },
   {
     id: 13,
-    name: "国际化",
+    name: "menu.i18n",
     icon: "material-symbols:language",
     sort: 5,
     roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 14,
-    name: "翻译",
+    name: "menu.i18n.translation",
     icon: "material-symbols:font-download",
     path: "/i18n/translation",
     parentId: 13,
@@ -108,7 +109,7 @@ export const initialMenuData = [
   },
   {
     id: 15,
-    name: "国家地区",
+    name: "menu.i18n.region",
     icon: "material-symbols:public",
     path: "/i18n/region",
     parentId: 13,

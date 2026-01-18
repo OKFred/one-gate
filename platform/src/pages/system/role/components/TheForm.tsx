@@ -20,6 +20,7 @@ import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface RoleFormRef {
@@ -30,12 +31,14 @@ export interface RoleFormRef {
 const DEFAULT_FORM: AddRoleReq | UpdateRoleReq = {
   name: '',
   description: null,
+  remark: null,
   permissions: null,
   isEnabled: true,
 };
 
 const TheForm = memo(
   forwardRef<RoleFormRef, Props>(function TheForm({ localObj }, ref) {
+    const t = useTranslation();
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -55,6 +58,7 @@ const TheForm = memo(
             setForm({
               name: role.name,
               description: role.description,
+              remark: null,
               permissions: role.permissions,
               isEnabled: role.isEnabled,
             });
@@ -77,6 +81,10 @@ const TheForm = memo(
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       const formData = { ...form };
+      // 保证 remark 字段传递（允许为 null）
+      if (!('remark' in formData)) {
+        (formData as any).remark = null;
+      }
 
       if (editId) {
         await RoleAPI.updateFn({ data: { id: editId, ...formData } as UpdateRoleReq });
@@ -111,7 +119,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? '编辑角色' : '新增角色'}
+            {editId ? t('system.role.form.title.edit') : t('system.role.form.title.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -129,17 +137,17 @@ const TheForm = memo(
           <form onSubmit={handleSubmit}>
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <TextField
-                label="角色名称"
+                label={t('common.form.roleName')}
                 value={form.name ?? ''}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder="例如：管理员、编辑、普通用户"
+                placeholder={t('system.role.form.roleNamePlaceholder')}
               />
 
               <TextField
-                label="角色描述"
+                label={t('common.form.roleDescription')}
                 value={form.description ?? ''}
                 onChange={(e) =>
                   setForm({
@@ -151,11 +159,27 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder="请输入角色描述"
+                placeholder={t('system.role.form.descriptionPlaceholder')}
               />
 
               <TextField
-                label="权限列表"
+                label={t('common.form.remark')}
+                value={(form as any).remark ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    remark: hasValue(e.target.value) ? e.target.value : null,
+                  } as any)
+                }
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
+                placeholder={t('system.role.form.remarkPlaceholder')}
+              />
+
+              <TextField
+                label={t('common.form.permissions')}
                 value={form.permissions ?? ''}
                 onChange={(e) =>
                   setForm({
@@ -167,8 +191,8 @@ const TheForm = memo(
                 multiline
                 rows={4}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder='JSON数组格式，例如：["user:read","user:write","system:admin"]'
-                helperText="权限列表为JSON数组格式"
+                placeholder={t('system.role.form.permissionsPlaceholder')}
+                helperText={t('system.role.form.permissionsHelper')}
               />
 
               <FormControlLabel
@@ -179,7 +203,7 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label="启用状态"
+                label={t('common.form.enabledStatus')}
               />
             </Stack>
           </form>
@@ -192,10 +216,10 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} color="inherit">
-            取消
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? '保存' : '创建'}
+            {editId ? t('common.actions.save') : t('common.actions.create')}
           </Button>
         </DialogActions>
       </Dialog>

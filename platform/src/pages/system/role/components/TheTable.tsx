@@ -10,6 +10,7 @@ import type { ListRoleRes } from '@/api/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
 import type { FilterState } from './TheFilter';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 表格内部状态
 export interface TableState {
@@ -36,6 +37,7 @@ const DEFAULT_FILTERS: FilterState = {
 const TheTable = memo(
   forwardRef<RoleTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
+    const t = useTranslation();
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
@@ -128,29 +130,29 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: 'ID', render: (row) => row.id },
-      { title: '角色名称', render: (row) => row.name },
-      { title: '描述', render: (row) => row.description || '--' },
+      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('system.role.columns.name'), render: (row) => row.name },
+      { title: t('common.columns.description'), render: (row) => row.description || '--' },
       {
-        title: '状态',
+        title: t('common.columns.status'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? '已启用' : '已禁用'}
+            label={row.isEnabled ? t('common.status.active') : t('common.status.inactive')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
         ),
       },
       {
-        title: '创建时间',
+        title: t('common.columns.createTime'),
         render: (row) => formatTime(row.createTimeUtc),
       },
       {
-        title: '更新时间',
+        title: t('common.columns.updateTime'),
         render: (row) => formatTime(row.updateTimeUtc),
       },
       {
-        title: '操作',
+        title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
           <RoleActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
@@ -161,18 +163,18 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.name },
-      { type: 'subtitle', label: 'ID', render: (row) => row.id },
-      { type: 'content', label: '描述', render: (row) => row.description || '--' },
+      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('common.columns.description'), render: (row) => row.description || '--' },
       {
         type: 'content',
-        label: '创建时间',
+        label: t('common.columns.createTime'),
         render: (row) => formatTime(row.createTimeUtc),
       },
       {
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? '已启用' : '已禁用'}
+            label={row.isEnabled ? t('common.status.active') : t('common.status.inactive')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
@@ -195,7 +197,7 @@ const TheTable = memo(
         cardActions={(row) => (
           <RoleActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText="暂无角色"
+        emptyText={t('system.role.empty')}
       />
     );
   }),

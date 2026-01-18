@@ -41,6 +41,8 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
+import { reloadI18nCache } from "@/utils/i18n";
+
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
@@ -88,7 +90,9 @@ const listAllReq = {
     business: TranslationVO["business"],
     langCode: TranslationVO["langCode"],
     isEnabled: TranslationVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(TranslationSortableKeys),
+    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(
+      TranslationSortableKeys
+    ),
   },
   required: [],
   additionalProperties: false,
@@ -115,7 +119,7 @@ async function onListAll(
 ): Promise<FromSchema<typeof listAllRes>> {
   const { orderBy = "id", descend = true } = params;
   const orderField = translationTable[orderBy] || translationTable.id;
-  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+  const maxLimit = 100_000; // 设置最大返回数量限制，防止数据过大
   // 查询所有匹配的数据
   const rows = await db
     .select({
@@ -153,7 +157,9 @@ const listReq = {
     business: TranslationVO["business"],
     langCode: TranslationVO["langCode"],
     isEnabled: TranslationVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(TranslationSortableKeys),
+    orderBy: orderByWrapper<(keyof TranslationPOLike)[]>(
+      TranslationSortableKeys
+    ),
   },
   required: [],
   additionalProperties: false,
@@ -234,19 +240,26 @@ const addRes = {
 } as const satisfies JSONSchema;
 async function onAdd(
   params: FromSchema<typeof addReq>,
-  userObj: UserObj
+  userObj: Pick<UserObj, "userId">,
+  options?: { skipCacheReload?: boolean }
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
   // 检查 tKey 是否与其他记录冲突
   await uniqueCheck(params);
-  const updateData = {
+  const addData = {
     ...params,
+    version: params.version ?? 0,
     creatorId,
   };
   const result = await db
     .insert(translationTable)
-    .values(updateData)
+    .values(addData)
     .returning({ id: translationTable.id });
+
+  // 触发多语言缓存重新加载（除非明确跳过）
+  if (!options?.skipCacheReload) {
+    await reloadI18nCache();
+  }
 
   return result[0]?.id;
 }
@@ -277,16 +290,27 @@ const updateRes = {
 } as const satisfies JSONSchema;
 async function onUpdate(
   params: FromSchema<typeof updateReq>,
-  userObj: UserObj
+  userObj: UserObj,
+  options?: { skipCacheReload?: boolean }
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
   // 检查 tKey 是否与其他记录冲突
   await uniqueCheck(params);
+  const previousRecord = await onGet({ id });
+  if (!previousRecord) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  const previousVersion = previousRecord.version;
+  if (params.version !== previousVersion) {
+    throw new BusinessError(BusinessErrorCode.DATA_VERSION_CONFLICT);
+  }
+  const currentVersion = previousVersion + 1;
   let updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
+    version: currentVersion,
   };
 
   const res = await db
@@ -297,6 +321,12 @@ async function onUpdate(
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
+
+  // 触发多语言缓存重新加载（除非明确跳过）
+  if (!options?.skipCacheReload) {
+    await reloadI18nCache();
+  }
+
   return res[0].id;
 }
 const updateApi = {
@@ -326,7 +356,8 @@ const deleteRes = {
 } as const satisfies JSONSchema;
 
 async function onDelete(
-  params: FromSchema<typeof deleteReq>
+  params: FromSchema<typeof deleteReq>,
+  options?: { skipCacheReload?: boolean }
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
   const result = await db
@@ -336,6 +367,12 @@ async function onDelete(
   if (!result || result.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
+
+  // 触发多语言缓存重新加载（除非明确跳过）
+  if (!options?.skipCacheReload) {
+    await reloadI18nCache();
+  }
+
   return result[0].id;
 }
 const deleteApi = {
@@ -513,8 +550,18 @@ async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
   }
 }
 
+/** SHA256 哈希计算 */
+async function calculateSHA256(text: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 export const utils = {
   getTranslationsByIds,
+  calculateSHA256,
 };
 
 export default {

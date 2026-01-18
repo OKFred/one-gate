@@ -16,6 +16,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import { authUtils, type UserInfo } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 import * as UserApiService from '@/api/system/user';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TopbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,6 +27,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+  const t = useTranslation();
 
   // 加载用户信息
   useEffect(() => {
@@ -67,7 +69,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
 
   // 获取用户名显示
   const getUserDisplayName = () => {
-    if (!userInfo) return '未登录';
+    if (!userInfo) return t('topbar.notLoggedIn');
     return userInfo.username;
   };
 
@@ -97,7 +99,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
         </Box>
 
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          OKFred平台
+          {t('topbar.title')}
         </Typography>
 
         {/* 用户信息和菜单 */}
@@ -170,7 +172,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             <ListItemIcon>
               <AccountCircle fontSize="small" />
             </ListItemIcon>
-            个人设置
+            {t('topbar.profile')}
           </MenuItem>
           <Divider />
           <MenuItem onClick={() => handleChangeLanguage('zh-CN')}>
@@ -190,7 +192,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>
-            退出登录
+            {t('topbar.logout')}
           </MenuItem>
         </Menu>
       </Toolbar>

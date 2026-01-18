@@ -32,6 +32,7 @@ import type { Props } from '../index';
 import type { FilterState } from './TheFilter';
 import { useResponsive } from '@/hooks/useResponsive';
 import dayjs from 'dayjs';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheTableRef {
@@ -67,6 +68,7 @@ const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
     const { isMobile } = useResponsive();
+    const t = useTranslation();
 
     // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
@@ -296,7 +298,7 @@ const TheTable = memo(
             </Stack>
           ) : (
             <Paper sx={{ p: 4, textAlign: 'center' }}>
-              <Typography color="text.secondary">暂无数据</Typography>
+              <Typography color="text.secondary">{t('common.noData')}</Typography>
             </Paper>
           )}
 
@@ -325,16 +327,14 @@ const TheTable = memo(
 
           {/* 删除确认对话框 */}
           <Dialog open={deleteDialog.open} onClose={closeDeleteDialog}>
-            <DialogTitle>确认删除</DialogTitle>
+            <DialogTitle>{t('i18n.translation.delete.confirmTitle')}</DialogTitle>
             <DialogContent>
-              <DialogContentText>
-                确定要删除翻译键 "{deleteDialog.tKey}" 吗？此操作无法撤销。
-              </DialogContentText>
+              <DialogContentText>{t('i18n.translation.delete.confirmText')}</DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={closeDeleteDialog}>取消</Button>
+              <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
               <Button onClick={handleConfirmDelete} color="error" autoFocus>
-                删除
+                {t('common.delete')}
               </Button>
             </DialogActions>
           </Dialog>
@@ -348,7 +348,7 @@ const TheTable = memo(
         {/* 操作栏 */}
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            新增翻译
+            {t('i18n.translation.form.submit.create')}
           </Button>
         </Box>
 
@@ -357,15 +357,15 @@ const TheTable = memo(
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
-                <TableCell>应用</TableCell>
-                <TableCell>业务</TableCell>
-                <TableCell>语言</TableCell>
-                <TableCell>翻译键</TableCell>
-                <TableCell>翻译值</TableCell>
-                <TableCell>描述</TableCell>
-                <TableCell>启用状态</TableCell>
-                <TableCell>创建时间</TableCell>
-                <TableCell align="right">操作</TableCell>
+                <TableCell>{t('i18n.translation.form.application')}</TableCell>
+                <TableCell>{t('i18n.translation.form.business')}</TableCell>
+                <TableCell>{t('i18n.translation.form.langCode')}</TableCell>
+                <TableCell>{t('i18n.translation.form.tKey')}</TableCell>
+                <TableCell>{t('i18n.translation.form.tValue')}</TableCell>
+                <TableCell>{t('i18n.translation.form.description')}</TableCell>
+                <TableCell>{t('i18n.translation.columns.enabledStatus')}</TableCell>
+                <TableCell>{t('i18n.translation.columns.createTime')}</TableCell>
+                <TableCell align="right">{t('i18n.translation.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -426,7 +426,7 @@ const TheTable = memo(
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={row.isEnabled ? '已启用' : '已禁用'}
+                        label={row.isEnabled ? t('i18n.translation.switch.enabled') : t('i18n.translation.switch.disabled')}
                         size="small"
                         color={row.isEnabled ? 'success' : 'default'}
                         variant="outlined"
@@ -438,12 +438,12 @@ const TheTable = memo(
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="编辑">
+                      <Tooltip title={t('table.tooltip.edit')}>
                         <IconButton size="small" color="primary" onClick={() => handleEdit(row)}>
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="删除">
+                      <Tooltip title={t('table.tooltip.delete')}>
                         <IconButton
                           size="small"
                           color="error"
@@ -458,7 +458,7 @@ const TheTable = memo(
               ) : (
                 <TableRow>
                   <TableCell colSpan={10} align="center" sx={{ py: 4 }}>
-                    <Typography color="text.secondary">暂无数据</Typography>
+                    <Typography color="text.secondary">{t('common.noData')}</Typography>
                   </TableCell>
                 </TableRow>
               )}

@@ -1,4 +1,5 @@
 import React, { useState, forwardRef, useImperativeHandle, memo, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Button,
   Dialog,
@@ -52,10 +53,12 @@ const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
   roleArr: [],
   langCode: '',
   isEnabled: true,
+  remark: null,
 };
 
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(function TheForm({ localObj }, ref) {
+    const t = useTranslation();
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -138,6 +141,10 @@ const TheForm = memo(
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       const formData = { ...form };
+      // 保证 remark 字段传递（允许为 null）
+      if (!('remark' in formData)) {
+        (formData as any).remark = null;
+      }
 
       if (editId) {
         // 编辑用户
@@ -242,7 +249,7 @@ const TheForm = memo(
             pb: isMobile ? 1 : 2,
           }}
         >
-          <Box>{editId ? '编辑用户' : '添加新用户'}</Box>
+          <Box>{editId ? t('system.user.form.title.edit') : t('system.user.form.title.add')}</Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
               <CloseIcon />
@@ -259,7 +266,7 @@ const TheForm = memo(
           <form onSubmit={handleSubmit}>
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <TextField
-                label="用户名"
+                label={t('system.user.form.username')}
                 value={form.username ?? ''}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
                 required
@@ -269,7 +276,7 @@ const TheForm = memo(
 
               {!editId && (
                 <TextField
-                  label="密码"
+                  label={t('system.user.form.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={(form as AddUserReq).password ?? ''}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -295,7 +302,7 @@ const TheForm = memo(
 
               <Box>
                 <InputLabel sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
-                  部门
+                  {t('system.user.columns.department')}
                 </InputLabel>
                 <Paper
                   variant="outlined"
@@ -313,7 +320,7 @@ const TheForm = memo(
                   }}
                 >
                   <Typography color={form.departmentObj ? 'text.primary' : 'text.secondary'}>
-                    {form.departmentObj?.label || '选择部门'}
+                    {form.departmentObj?.label || t('system.user.form.selectDepartment')}
                   </Typography>
                   <ArrowDropDownIcon color="action" />
                 </Paper>
@@ -342,10 +349,10 @@ const TheForm = memo(
                 >
                   <Box sx={{ p: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="subtitle2">选择部门</Typography>
+                      <Typography variant="subtitle2">{t('system.user.form.selectDepartment')}</Typography>
                       {form.departmentObj && (
                         <Button size="small" onClick={handleDepartmentClear}>
-                          清除
+                          {t('common.clear')}
                         </Button>
                       )}
                     </Box>
@@ -353,7 +360,7 @@ const TheForm = memo(
                       <SimpleTreeView>{renderTreeItems(departmentTree)}</SimpleTreeView>
                     ) : (
                       <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
-                        暂无部门数据
+                        {t('common.noData')}
                       </Typography>
                     )}
                   </Box>
@@ -361,12 +368,12 @@ const TheForm = memo(
               </Box>
 
               <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>角色</InputLabel>
+                <InputLabel>{t('system.user.form.roles')}</InputLabel>
                 <Select
                   multiple
                   value={selectedRoleValues}
                   onChange={handleRoleChange}
-                  input={<OutlinedInput label="角色" />}
+                  input={<OutlinedInput label={t('system.user.form.roles')} />}
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((value) => {
@@ -395,7 +402,17 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label="启用账户"
+                label={t('system.user.form.enableAccount')}
+              />
+
+              <TextField
+                label={t('system.user.form.remark')}
+                value={(form as any).remark ?? ''}
+                onChange={(e) => setForm({ ...form, remark: e.target.value ? e.target.value : null } as any)}
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
               />
             </Stack>
           </form>
@@ -410,7 +427,7 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
-            取消
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -419,7 +436,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {editId ? '更新' : '添加'}
+            {editId ? t('common.update') : t('common.add')}
           </Button>
         </DialogActions>
       </Dialog>

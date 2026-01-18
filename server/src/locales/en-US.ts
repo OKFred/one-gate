@@ -24,4 +24,6 @@ export default {
     "WeChat login is not yet implemented, WeChat developer credentials need to be configured",
   "i18n.api.mail.sslAndStarttlsConflict":
     "SSL and STARTTLS cannot be enabled simultaneously",
+  "i18n.api.dataVersionConflict":
+    "Data version conflict, please refresh and try again",
 };

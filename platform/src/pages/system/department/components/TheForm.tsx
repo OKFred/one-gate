@@ -19,29 +19,25 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as DepartmentAPI from '@/api/system/department';
+import type {
+  AddDepartmentReq,
+  ListAllDepartmentRes,
+} from '@/api/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 import { showGlobalNotification } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
 
-// 部门数据接口
-export interface DepartmentFormData {
+// 部门表单数据类型（复用自动生成的类型）
+export type DepartmentFormData = AddDepartmentReq & {
   id?: number;
-  name: string;
-  description: string | null;
-  parentId: number | null;
-  isEnabled: boolean;
-}
+};
 
-// 部门类型（简化版）
-export interface DepartmentData {
-  id: number;
-  name: string;
-  description: string | null;
-  parentId: number | null;
-  isEnabled: boolean;
+// 部门数据类型（复用自动生成的类型，扩展 children 用于树形结构）
+export type DepartmentData = ListAllDepartmentRes[number] & {
   children?: DepartmentData[] | null;
-}
+};
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -56,6 +52,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: DepartmentFormData = {
   name: '',
   description: null,
+  remark: null,
   parentId: null,
   isEnabled: true,
 };
@@ -71,6 +68,7 @@ const TheForm = memo(
   forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
     const { treeRef } = localObj;
     const { isMobile } = useResponsive();
+    const t = useTranslation();
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingDepartment, setEditingDepartment] = useState<DepartmentData | null>(null);
@@ -145,7 +143,7 @@ const TheForm = memo(
         deptList.forEach((dept) => {
           result.push({
             id: dept.id,
-            name: dept.name,
+            name: dept.name ?? '',
             level,
           });
           if (dept.children && dept.children.length > 0) {
@@ -193,8 +191,9 @@ const TheForm = memo(
           setEditingDepartment(department);
           setFormValues({
             id: department.id,
-            name: department.name,
-            description: department.description,
+            name: department.name ?? '',
+            description: department.description ?? null,
+            remark: null,
             parentId: department.parentId ?? null,
             isEnabled: department.isEnabled ?? true,
           });
@@ -220,7 +219,7 @@ const TheForm = memo(
     // 提交表单
     const handleSubmit = async () => {
       if (!formValues.name.trim()) {
-        setError('部门名称不能为空');
+        setError(t('system.department.form.nameRequired'));
         return;
       }
 
@@ -229,14 +228,15 @@ const TheForm = memo(
         const submitData = {
           ...formValues,
           description: hasValue(formValues.description) ? formValues.description : null,
+          remark: hasValue(formValues.remark) ? formValues.remark : null,
         };
 
         if (editingDepartment && formValues.id) {
           await DepartmentAPI.updateFn({ data: { ...submitData, id: formValues.id } });
-          showGlobalNotification({ message: '部门更新成功', type: 'success' });
+          showGlobalNotification({ message: t('system.department.message.updateSuccess'), type: 'success' });
         } else {
           await DepartmentAPI.addFn({ data: submitData });
-          showGlobalNotification({ message: '部门添加成功', type: 'success' });
+          showGlobalNotification({ message: t('system.department.message.addSuccess'), type: 'success' });
         }
 
         // 刷新树形列表
@@ -250,7 +250,7 @@ const TheForm = memo(
         setError('');
       } catch (err) {
         console.error(err);
-        setError('操作失败，请重试');
+        setError(t('system.department.form.operationFailed'));
       } finally {
         setLoading(false);
       }
@@ -274,7 +274,7 @@ const TheForm = memo(
         <DialogTitle
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <span>{editingDepartment ? '编辑部门' : '添加部门'}</span>
+          <span>{editingDepartment ? t('system.department.form.title.edit') : t('system.department.form.title.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleClose}>
               <CloseIcon />
@@ -289,7 +289,7 @@ const TheForm = memo(
           )}
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label="名称"
+              label={t('system.department.form.name')}
               value={formValues.name}
               onChange={(e) => handleFormChange('name', e.target.value)}
               fullWidth
@@ -297,7 +297,7 @@ const TheForm = memo(
               autoFocus
             />
             <TextField
-              label="描述"
+              label={t('system.department.form.description')}
               value={formValues.description ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
@@ -307,11 +307,22 @@ const TheForm = memo(
               multiline
               rows={2}
             />
+            <TextField
+              label={t('common.form.remark')}
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
+            />
             <FormControl fullWidth>
-              <InputLabel id="parent-department-label">上级部门</InputLabel>
+              <InputLabel id="parent-department-label">{t('system.department.form.parentDepartment')}</InputLabel>
               <Select
                 labelId="parent-department-label"
-                label="上级部门"
+                label={t('system.department.form.parentDepartment')}
                 value={formValues.parentId?.toString() || ''}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -319,7 +330,7 @@ const TheForm = memo(
                 }}
               >
                 <MenuItem value="">
-                  <em>无（顶级部门）</em>
+                  <em>{t('system.department.form.topLevelDepartment')}</em>
                 </MenuItem>
                 {getAvailableParentDepartments().map((dept) => (
                   <MenuItem key={dept.id} value={dept.id.toString()}>
@@ -336,16 +347,16 @@ const TheForm = memo(
                   onChange={(e) => handleFormChange('isEnabled', e.target.checked)}
                 />
               }
-              label="启用"
+              label={t('common.status.enabled')}
             />
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleClose} disabled={loading}>
-            取消
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={20} /> : '保存'}
+            {loading ? <CircularProgress size={20} /> : t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

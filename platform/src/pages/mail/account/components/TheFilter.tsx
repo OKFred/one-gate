@@ -115,13 +115,13 @@ const TheFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">{t('i18n.pages.mail.account.filter.title')}</Typography>
+            <Typography variant="h6">{t('common.filter.title')}</Typography>
             {isSearching && (
-              <Chip label={t('i18n.pages.mail.account.filter.searching')} size="small" color="default" variant="outlined" />
+              <Chip label={t('common.filter.searching')} size="small" color="default" variant="outlined" />
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={t('i18n.pages.mail.account.filter.results').replace('{count}', filterCount.toString())}
+                label={t('mail.account.filter.results').replace('{count}', filterCount.toString())}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -131,7 +131,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label={t('i18n.pages.mail.account.filter.clear')}
+                label={t('common.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -148,8 +148,8 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label={t('i18n.pages.mail.account.filter.keywordLabel')}
-                placeholder={t('i18n.pages.mail.account.filter.keywordPlaceholder')}
+                label={t('common.filter.keywordLabel')}
+                placeholder={t('mail.account.filter.keywordPlaceholder')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -165,26 +165,26 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.pages.mail.account.filter.orderByLabel')}</InputLabel>
+                  <InputLabel>{t('common.filter.orderBy')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label={t('i18n.pages.mail.account.filter.orderByLabel')}
+                    label={t('common.filter.orderBy')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
-                    <MenuItem value="id">{t('i18n.pages.mail.account.filter.orderBy.id')}</MenuItem>
-                    <MenuItem value="createTimeUtc">{t('i18n.pages.mail.account.filter.orderBy.createTime')}</MenuItem>
+                    <MenuItem value="id">{t('common.columns.id')}</MenuItem>
+                    <MenuItem value="createTimeUtc">{t('common.columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.pages.mail.account.filter.sortOrderLabel')}</InputLabel>
+                  <InputLabel>{t('common.filter.sortOrder')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label={t('i18n.pages.mail.account.filter.sortOrderLabel')}
+                    label={t('common.filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">{t('i18n.pages.mail.account.filter.sortOrder.asc')}</MenuItem>
-                    <MenuItem value="desc">{t('i18n.pages.mail.account.filter.sortOrder.desc')}</MenuItem>
+                    <MenuItem value="asc">{t('common.filter.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('common.filter.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

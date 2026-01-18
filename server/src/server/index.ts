@@ -20,7 +20,10 @@ async function createApp() {
   await routeRegister(app);
 
   // 初始化数据库数据（超级管理员角色和账号）
-  setTimeout(initDatabase, 0);
+  // 同时初始化多语言缓存
+  setTimeout(async () => {
+    await initDatabase();
+  }, 0);
 
   nodeServer(app);
   //   normalRouter(app);

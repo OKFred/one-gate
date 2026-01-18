@@ -16,6 +16,7 @@ import type { Props } from '../index';
 import { showGlobalNotification } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
 import { TreeNodeActionButtons } from './TheActionButtons';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheTreeRef {
@@ -25,6 +26,7 @@ export interface TheTreeRef {
 
 const TheTree = memo(
   forwardRef<TheTreeRef, Props>(({ localObj }, ref) => {
+    const t = useTranslation();
     const { formRef } = localObj;
 
     const [menus, setMenus] = useState<MenuData[]>([]);
@@ -127,12 +129,12 @@ const TheTree = memo(
           }
         } catch (err) {
           console.error(err);
-          showGlobalNotification({ message: '获取菜单列表失败', type: 'error' });
+          showGlobalNotification({ message: t('system.menu.message.fetchFailed'), type: 'error' });
         } finally {
           setLoading(false);
         }
       },
-      [buildTree, filterMenus],
+      [buildTree, filterMenus, t],
     );
 
     // 暴露给父组件的方法
@@ -162,14 +164,14 @@ const TheTree = memo(
       try {
         await MenuAPI.deleteFn({ data: { id: menuId } });
         fetchMenus(filters);
-        showGlobalNotification({ message: '菜单删除成功', type: 'success' });
+        showGlobalNotification({ message: t('system.menu.message.deleteSuccess'), type: 'success' });
       } catch (err) {
         console.error(err);
-        showGlobalNotification({ message: '删除失败，该菜单可能存在子菜单', type: 'error' });
+        showGlobalNotification({ message: t('system.menu.message.deleteFailed'), type: 'error' });
       } finally {
         setLoading(false);
       }
-    }, [fetchMenus, filters]);
+    }, [fetchMenus, filters, t]);
 
     // 渲染菜单树
     const renderTree = useCallback(
@@ -199,7 +201,7 @@ const TheTree = memo(
                 )}
                 {!node.isEnabled && (
                   <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                    [已禁用]
+                    {t('system.menu.status.disabled')}
                   </Typography>
                 )}
               </Typography>
@@ -214,7 +216,7 @@ const TheTree = memo(
           {node.children && node.children.length > 0 && renderTree(node.children)}
         </TreeItem>
       )),
-    [formRef, handleDeleteSuccess]);
+    [formRef, handleDeleteSuccess, t]);
 
     return (
       <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
@@ -232,7 +234,7 @@ const TheTree = memo(
           </SimpleTreeView>
         ) : (
           <Typography color="text.secondary" textAlign="center" py={4}>
-            暂无菜单数据，点击上方按钮添加
+            {t('system.menu.empty')}
           </Typography>
         )}
       </Box>

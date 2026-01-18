@@ -22,15 +22,14 @@ import {
   Typography,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
-import {
-  Close as CloseIcon,
-} from '@mui/icons-material';
+import { Close as CloseIcon } from '@mui/icons-material';
 import * as MenuAPI from '@/api/system/menu';
 import * as RoleAPI from '@/api/system/role';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showGlobalNotification } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 菜单数据接口
 export interface MenuFormData {
@@ -38,6 +37,7 @@ export interface MenuFormData {
   name: string;
   icon: string;
   path: string | null;
+  remark: string | null;
   parentId: number | null;
   sort: number;
   roleIdArr: number[];
@@ -71,33 +71,16 @@ const DEFAULT_FORM: MenuFormData = {
   name: '',
   icon: 'material-symbols:folder',
   path: null,
+  remark: null,
   parentId: null,
   sort: 0,
   roleIdArr: [],
   isEnabled: true,
 };
 
-// 常用图标选项
-const iconOptions = [
-  { value: 'material-symbols:home', label: '首页' },
-  { value: 'material-symbols:dashboard', label: '仪表盘' },
-  { value: 'material-symbols:settings', label: '设置' },
-  { value: 'material-symbols:person', label: '用户' },
-  { value: 'material-symbols:group', label: '团队' },
-  { value: 'material-symbols:folder', label: '文件夹' },
-  { value: 'material-symbols:mail', label: '邮件' },
-  { value: 'material-symbols:article', label: '文章' },
-  { value: 'material-symbols:analytics', label: '分析' },
-  { value: 'material-symbols:inventory', label: '库存' },
-  { value: 'material-symbols:shopping-cart', label: '购物车' },
-  { value: 'material-symbols:calendar-month', label: '日历' },
-  { value: 'material-symbols:menu', label: '菜单' },
-  { value: 'material-symbols:apartment', label: '部门' },
-  { value: 'material-symbols:security', label: '安全' },
-];
-
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
+    const t = useTranslation();
     const { treeRef } = localObj;
     const { isMobile } = useResponsive();
 
@@ -157,6 +140,7 @@ const TheForm = memo(
             name: menu.name,
             icon: menu.icon,
             path: menu.path ?? null,
+            remark: null,
             parentId: menu.parentId ?? null,
             sort: menu.sort ?? 0,
             roleIdArr: menu.roleIdArr || [],
@@ -185,13 +169,16 @@ const TheForm = memo(
     // 处理角色多选变化
     const handleRoleChange = (event: SelectChangeEvent<number[]>) => {
       const value = event.target.value;
-      handleFormChange('roleIdArr', typeof value === 'string' ? value.split(',').map(Number) : value);
+      handleFormChange(
+        'roleIdArr',
+        typeof value === 'string' ? value.split(',').map(Number) : value,
+      );
     };
 
     // 提交表单
     const handleSubmit = async () => {
       if (!formValues.name.trim()) {
-        setError('菜单名称不能为空');
+        setError(t('system.menu.form.menuNameRequired'));
         return;
       }
 
@@ -201,6 +188,7 @@ const TheForm = memo(
           name: formValues.name,
           icon: formValues.icon || 'material-symbols:folder',
           path: hasValue(formValues.path) ? formValues.path : null,
+          remark: hasValue(formValues.remark) ? formValues.remark : null,
           parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
           sort: formValues.sort,
           roleIdArr:
@@ -215,12 +203,12 @@ const TheForm = memo(
               ...submitData,
             },
           });
-          showGlobalNotification({ message: '菜单更新成功', type: 'success' });
+          showGlobalNotification({ message: t('system.menu.message.updateSuccess'), type: 'success' });
         } else {
           await MenuAPI.addFn({
             data: submitData,
           });
-          showGlobalNotification({ message: '菜单添加成功', type: 'success' });
+          showGlobalNotification({ message: t('system.menu.message.addSuccess'), type: 'success' });
         }
 
         // 刷新树形结构
@@ -233,7 +221,7 @@ const TheForm = memo(
         setEditingMenu(null);
       } catch (err) {
         console.error(err);
-        setError('操作失败，请重试');
+        setError(t('system.menu.form.operationFailed'));
       } finally {
         setLoading(false);
       }
@@ -255,8 +243,10 @@ const TheForm = memo(
         maxWidth="sm"
         fullScreen={isMobile}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span>{editingMenu ? '编辑菜单' : '添加菜单'}</span>
+        <DialogTitle
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <span>{editingMenu ? t('system.menu.form.title.edit') : t('system.menu.form.title.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>
               <CloseIcon />
@@ -273,62 +263,55 @@ const TheForm = memo(
 
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label="菜单名称"
+              label={t('system.menu.form.menuName')}
               value={formValues.name}
               onChange={(e) => handleFormChange('name', e.target.value)}
               fullWidth
               required
             />
 
-            <FormControl fullWidth>
-              <InputLabel>图标</InputLabel>
-              <Select
-                value={formValues.icon}
-                label="图标"
-                onChange={(e) => handleFormChange('icon', e.target.value)}
-              >
-                {iconOptions.map((opt) => (
-                  <MenuItem key={opt.value} value={opt.value}>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <Box component="span" className={opt.value} sx={{ fontSize: 20 }} />
-                      {opt.label}
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
             <TextField
-              label="自定义图标 (Iconify格式)"
+              label={t('system.menu.form.customIcon')}
               value={formValues.icon}
               onChange={(e) => handleFormChange('icon', e.target.value)}
               fullWidth
-              helperText="例如: material-symbols:home"
+              helperText={t('system.menu.form.iconHelper')}
             />
 
             <TextField
-              label="路由路径"
+              label={t('system.menu.form.routePath')}
               value={formValues.path ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
                 handleFormChange('path', hasValue(value) ? value : null);
               }}
               fullWidth
-              helperText="例如: /system/menu"
+              helperText={t('system.menu.form.pathHelper')}
+            />
+            <TextField
+              label={t('common.form.remark')}
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
             />
 
             <FormControl fullWidth>
-              <InputLabel>父菜单</InputLabel>
+              <InputLabel>{t('system.menu.form.parentMenu')}</InputLabel>
               <Select
                 value={formValues.parentId === null ? '' : formValues.parentId}
-                label="父菜单"
+                label={t('system.menu.form.parentMenu')}
                 onChange={(e) => {
                   const val = e.target.value as string | number;
                   handleFormChange('parentId', val === '' ? null : Number(val));
                 }}
               >
                 <MenuItem value="">
-                  <em>无 (顶级菜单)</em>
+                  <em>{t('system.menu.form.topLevelMenu')}</em>
                 </MenuItem>
                 {allMenus
                   .filter((m) => m.id !== editingMenu?.id)
@@ -341,21 +324,21 @@ const TheForm = memo(
             </FormControl>
 
             <TextField
-              label="排序"
+              label={t('system.menu.form.sort')}
               type="number"
               value={formValues.sort}
               onChange={(e) => handleFormChange('sort', parseInt(e.target.value, 10) || 0)}
               fullWidth
-              helperText="数字越小越靠前"
+              helperText={t('system.menu.form.sortHelper')}
             />
 
             <FormControl fullWidth>
-              <InputLabel>可见角色</InputLabel>
+              <InputLabel>{t('system.menu.form.visibleRoles')}</InputLabel>
               <Select
                 multiple
                 value={formValues.roleIdArr}
                 onChange={handleRoleChange}
-                input={<OutlinedInput label="可见角色" />}
+                input={<OutlinedInput label={t('system.menu.form.visibleRoles')} />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => {
@@ -373,7 +356,7 @@ const TheForm = memo(
               </Select>
             </FormControl>
             <Typography variant="caption" color="text.secondary">
-              留空表示所有角色可见
+              {t('system.menu.form.allRolesVisible')}
             </Typography>
 
             <FormControlLabel
@@ -383,17 +366,17 @@ const TheForm = memo(
                   onChange={(e) => handleFormChange('isEnabled', e.target.checked)}
                 />
               }
-              label="启用状态"
+              label={t('common.form.enabledStatus')}
             />
           </Stack>
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleCloseDialog} disabled={loading}>
-            取消
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={20} /> : '保存'}
+            {loading ? <CircularProgress size={20} /> : t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>
