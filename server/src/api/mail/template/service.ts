@@ -15,6 +15,11 @@ import type { LanguageKey } from "@/types/locales";
 import type { NodeHonoContext } from "@/types/app";
 import * as commonSchema from "@/middleware/encapsulation/common.schema";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 
 const addReq = {
   type: "object",
@@ -32,7 +37,15 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-  const { name, title, langCode, content, category = "", remark } = obj;
+  const {
+    name,
+    title,
+    langCode,
+    content,
+    isEnabled,
+    category = "",
+    remark,
+  } = obj;
   const result = await db
     .insert(mailTemplateTable)
     .values({
@@ -42,6 +55,7 @@ async function onAdd(
       content,
       creatorId: userObj.userId,
       category,
+      isEnabled,
       remark,
     } satisfies mailTemplateAddLike)
     .returning({ id: mailTemplateTable.id });
@@ -76,20 +90,12 @@ async function onDelete(
   const userObj = c.get("userObj");
   const { id } = uniqueKeyObj;
   if (id === undefined) return null;
-  // 软删除：设置 status=false 并记录 updaterId，而不是物理删除
   const result = await db
-    .update(mailTemplateTable)
-    .set({
-      status: false,
-      updaterId: userObj.userId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
+    .delete(mailTemplateTable)
     .where(eq(mailTemplateTable.id, id))
     .returning({ id: mailTemplateTable.id });
   if (!result || result.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return result[0].id;
 }
@@ -126,15 +132,6 @@ const listRes = {
       ...mailTemplateIndex,
       ...mailTemplateData,
       ...mailTemplateAudit,
-      status: {
-        type: "boolean",
-        description: "状态",
-      },
-      remark: {
-        type: "string",
-        nullable: true,
-        description: "备注",
-      },
     } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>),
   },
 } as const satisfies JSONSchema;
@@ -204,14 +201,6 @@ const updateReq = {
   properties: {
     ...mailTemplateIndex,
     ...mailTemplateData,
-    status: {
-      type: "boolean",
-      description: "状态",
-    },
-    remark: {
-      type: "string",
-      description: "备注",
-    },
   },
   required: ["id"],
   additionalProperties: false,
@@ -235,9 +224,7 @@ async function onUpdate(
     .where(eq(mailTemplateTable.id, id))
     .returning({ id: mailTemplateTable.id });
   if (!res || res.length === 0) {
-    throw new HTTPException(httpStatusCode.NOT_FOUND as ContentfulStatusCode, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return res[0].id;
 }
@@ -266,15 +253,6 @@ const getRes = {
     ...mailTemplateIndex,
     ...mailTemplateData,
     ...mailTemplateAudit,
-    status: {
-      type: "boolean",
-      description: "状态",
-    },
-    remark: {
-      type: "string",
-      nullable: true,
-      description: "备注",
-    },
   } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>,
 } as const satisfies JSONSchema;
 async function onGet(

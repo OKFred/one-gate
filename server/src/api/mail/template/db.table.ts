@@ -1,6 +1,5 @@
 import db from "@/db/index";
-import { sql } from "drizzle-orm";
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -40,6 +39,10 @@ export const mailTemplateData = {
   category: {
     type: "string",
     description: "邮件分类",
+  },
+  isEnabled: {
+    type: "boolean",
+    description: "是否启用",
   },
   remark: {
     type: ["string", "null"],
@@ -83,7 +86,7 @@ export const mailTemplateTable = sqliteTable("mail_template", {
   langCode: text("lang_code").notNull(),
   content: text("content").notNull(),
   category: text("category"),
-  status: integer("status", { mode: "boolean" }).notNull(),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -102,7 +105,7 @@ export async function tableInit() {
             lang_code TEXT NOT NULL,
             content TEXT NOT NULL,
             category TEXT,
-            status INTEGER NOT NULL,
+            is_enabled INTEGER NOT NULL,
             remark TEXT,
             creator_id INTEGER NOT NULL,
             updater_id INTEGER,
