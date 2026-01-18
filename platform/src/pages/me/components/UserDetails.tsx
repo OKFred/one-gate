@@ -48,7 +48,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                {t('me.details.departmentId')}
+                {t('me.details.department')}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.departmentObj?.label || t('common.unassigned')}
@@ -57,7 +57,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                {t('me.details.roleId')}
+                {t('me.details.role')}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.roleArr.map((role) => role.label).join(', ') || t('common.unassigned')}
@@ -80,7 +80,9 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
                 {t('common.columns.createTime')}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.createTimeUtc ? new Date(user.createTimeUtc).toLocaleString() : t('common.noData')}
+                {user.createTimeUtc
+                  ? new Date(user.createTimeUtc).toLocaleString()
+                  : t('common.noData')}
               </Typography>
             </Box>
 
