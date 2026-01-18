@@ -1,181 +1,183 @@
-import db from "@/db/index";
+﻿import db from "@/db/index";
 import {
-  mailTemplateIndex,
-  mailTemplateUnique,
-  mailTemplateAudit,
   mailTemplateTable,
-  mailTemplateData,
-  type mailTemplateAddLike,
-  type mailTemplateLike,
+  IndexVO,
+  MailTemplateVO,
+  MailTemplateListVO,
+  MailTemplateAddVO,
+  MailTemplateUpdateVO,
+  MailTemplateListKeys,
+  MailTemplateDetailKeys,
+  MailTemplateGetKeys,
+  MailTemplateDeleteKeys,
+  MailTemplateAddKeys,
+  MailTemplateUpdateKeys,
+  MailTemplateSortableKeys,
+  type MailTemplatePOLike,
+  type MailTemplateVOLike,
+  type MailTemplateAddVOLike,
+  type MailTemplateUpdateVOLike,
+  type MailTemplateDeleteVOLike,
+  type MailTemplateGetVOLike,
+  MailTemplateBaseVO,
+  MailTemplateUniqueKeys,
+  MailTemplateUniqueVO,
 } from "./db.table";
-import { asc, count, desc, eq, like, or } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import { HTTPException } from "hono/http-exception";
-import type { LanguageKey } from "@/types/locales";
-import type { NodeHonoContext } from "@/types/app";
-import * as commonSchema from "@/middleware/encapsulation/common.schema";
+import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import hasValue from "@/utils/hasValue";
+import {
+  listAllReqBase,
+  listReqBase,
+  listResponseWrapper,
+  orderByWrapper,
+} from "@/middleware/encapsulation/common.schema";
+import {
+  bodyAdapter,
+  bodyUserAdapter,
+} from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
 import {
   BusinessError,
   BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError";
-import { ContentfulStatusCode } from "hono/utils/http-status";
+} from "@/middleware/errorHandler/businessError/index";
 
-const addReq = {
-  type: "object",
-  properties: {
-    ...mailTemplateData,
-  } satisfies Partial<Record<keyof mailTemplateAddLike, JSONSchema>>,
-  required: ["name", "title", "langCode", "content"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const addRes = {
-  ...mailTemplateIndex["id"],
-} as const satisfies JSONSchema;
-async function onAdd(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof addRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
-  const userObj = c.get("userObj");
-  const {
-    name,
-    title,
-    langCode,
-    content,
-    isEnabled,
-    category = "",
-    remark,
-  } = obj;
-  const result = await db
-    .insert(mailTemplateTable)
-    .values({
-      name,
-      title,
-      langCode,
-      content,
-      creatorId: userObj.userId,
-      category,
-      isEnabled,
-      remark,
-    } satisfies mailTemplateAddLike)
-    .returning({ id: mailTemplateTable.id });
-  return result[0]?.id;
-}
-const addApi = {
-  req: addReq,
-  res: addRes,
-  pathInfo: {
-    path: "/add",
-    method: "post",
-    summary: "添加邮件模板",
-  } as const,
-  service: onAdd,
-};
-
-const deleteReq = {
-  type: "object",
-  properties: {
-    ...mailTemplateIndex,
-  },
-  required: ["id"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const deleteRes = {
-  ...mailTemplateIndex["id"],
-} as const satisfies JSONSchema;
-async function onDelete(
-  c: NodeHonoContext
-): Promise<FromSchema<typeof deleteRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof deleteReq>;
-  const userObj = c.get("userObj");
-  const { id } = uniqueKeyObj;
-  if (id === undefined) return null;
-  const result = await db
-    .delete(mailTemplateTable)
-    .where(eq(mailTemplateTable.id, id))
-    .returning({ id: mailTemplateTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+// 构建查询条件(列表和全部通用)
+const buildWhereCondition = ({
+  keyword,
+  isEnabled,
+}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(
+      or(
+        like(mailTemplateTable.name, `%${keyword}%`),
+        like(mailTemplateTable.title, `%${keyword}%`),
+        like(mailTemplateTable.category, `%${keyword}%`)
+      )
+    );
   }
-  return result[0].id;
-}
-const deleteApi = {
-  req: deleteReq,
-  res: deleteRes,
-  pathInfo: {
-    path: "/delete",
-    method: "post",
-    summary: "删除邮件模板",
-  } as const,
-  service: onDelete,
+  if (isEnabled !== undefined) {
+    conditions.push(eq(mailTemplateTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
 };
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    isEnabled: MailTemplateVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof MailTemplatePOLike)[]>(
+      MailTemplateSortableKeys
+    ),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...IndexVO,
+      ...MailTemplateBaseVO,
+      ...MailTemplateUniqueVO,
+    },
+    required: [...MailTemplateGetKeys, ...MailTemplateUniqueKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = mailTemplateTable[orderBy] || mailTemplateTable.id;
+  const maxLimit = 10000;
+  const rows = await db
+    .select({
+      id: mailTemplateTable.id,
+      name: mailTemplateTable.name,
+      title: mailTemplateTable.title,
+      langCode: mailTemplateTable.langCode,
+      category: mailTemplateTable.category,
+      isEnabled: mailTemplateTable.isEnabled,
+    })
+    .from(mailTemplateTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有邮件模板（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
 
 const listReq = {
   type: "object",
   properties: {
-    orderBy: commonSchema.orderByWrapper([
-      "id",
-      "name",
-      "creatorId",
-      "createTimeUtc",
-    ] satisfies (keyof mailTemplateLike)[]),
-    ...commonSchema.listReqBase,
+    ...listReqBase,
+    isEnabled: MailTemplateVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof MailTemplatePOLike)[]>(
+      MailTemplateSortableKeys
+    ),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  type: "object",
-  properties: {
-    ...commonSchema.listResBase,
-    list: commonSchema.listWrapper({
-      ...mailTemplateIndex,
-      ...mailTemplateData,
-      ...mailTemplateAudit,
-    } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>),
-  },
+  ...listResponseWrapper<RequiredKeys<MailTemplatePOLike>[]>(
+    {
+      ...MailTemplateListVO,
+    },
+    [...MailTemplateListKeys]
+  ),
 } as const satisfies JSONSchema;
-async function onList(c: NodeHonoContext): Promise<FromSchema<typeof listRes>> {
-  const listParamObj = c.get("bodyObj") as FromSchema<typeof listReq>;
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-    keyword = "",
-  } = listParamObj;
+
+async function onList(
+  params: FromSchema<typeof listReq>
+): Promise<FromSchema<typeof listRes>> {
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = mailTemplateTable[orderBy] || mailTemplateTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 函数重载：根据 getAll 参数提供不同的返回类型
-  function queryDB(getAll: true): Promise<{ total: number }[]>;
-  function queryDB(getAll: false): Promise<mailTemplateLike[]>;
-  function queryDB(
-    getAll: boolean
-  ): Promise<{ total: number }[] | mailTemplateLike[]> {
-    return db
-      .select(
-        getAll ? { total: count(mailTemplateTable.id).as("total") } : undefined
-      )
-      .from(mailTemplateTable)
-      .where(
-        keyword
-          ? or(
-              like(mailTemplateTable.name, `%${keyword}%`),
-              like(mailTemplateTable.title, `%${keyword}%`),
-              like(mailTemplateTable.category, `%${keyword}%`)
-            )
-          : undefined
-      )
-      .orderBy(!descend ? asc(orderField) : desc(orderField))
-      .limit(getAll ? maxPageSize : finalPageSize)
-      .offset(getAll ? 0 : offset);
+  const countResult = await db
+    .select({ total: count(mailTemplateTable.id).as("total") })
+    .from(mailTemplateTable)
+    .where(buildWhereCondition(params));
+  const total = countResult[0]?.total || 0;
+  if (total === 0) {
+    return {
+      total,
+      totalPage: 0,
+      currentPage: pageNo,
+      pageSize: finalPageSize,
+      list: [],
+    };
   }
-  const getAllResult = await queryDB(true);
-  const total = getAllResult[0]?.total || 0;
-  const rows = await queryDB(false);
+  const rows = await db
+    .select()
+    .from(mailTemplateTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(finalPageSize)
+    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
@@ -193,34 +195,80 @@ const listApi = {
     method: "post",
     summary: "获取邮件模板列表",
   } as const,
+  adapter: bodyAdapter,
   service: onList,
-};
+} satisfies API;
+
+const addReq = {
+  type: "object",
+  properties: {
+    ...MailTemplateAddVO,
+  } satisfies Partial<Record<keyof MailTemplateAddVOLike, JSONSchema>>,
+  required: [
+    ...MailTemplateAddKeys,
+  ] as const satisfies RequiredKeys<MailTemplateAddVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const addRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onAdd(
+  obj: FromSchema<typeof addReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof addRes> | null> {
+  const { userId: creatorId } = userObj;
+  const addData = {
+    ...obj,
+    creatorId,
+  };
+  const result = await db
+    .insert(mailTemplateTable)
+    .values(addData)
+    .returning({ id: mailTemplateTable.id });
+
+  return result[0]?.id;
+}
+const addApi = {
+  req: addReq,
+  res: addRes,
+  pathInfo: {
+    path: "/add",
+    method: "post",
+    summary: "添加邮件模板",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onAdd,
+} satisfies API;
 
 const updateReq = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
-    ...mailTemplateData,
+    ...MailTemplateUpdateVO,
   },
-  required: ["id"],
+  required: [
+    ...MailTemplateUpdateKeys,
+  ] as const satisfies RequiredKeys<MailTemplateUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
-  ...mailTemplateIndex["id"],
+  ...IndexVO["id"],
 } as const satisfies JSONSchema;
 async function onUpdate(
-  c: NodeHonoContext
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const obj = c.get("bodyObj") as FromSchema<typeof updateReq>;
-  const userObj = c.get("userObj");
-  const { id, ...rest } = obj;
+  const { userId: updaterId } = userObj;
+  const { id, ...rest } = params;
+
+  const updateData = {
+    ...rest,
+    updaterId,
+    updateTimeUtc: getCurrentTimestampUtcSql(),
+  };
+
   const res = await db
     .update(mailTemplateTable)
-    .set({
-      ...rest,
-      updaterId: userObj.userId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
+    .set(updateData)
     .where(eq(mailTemplateTable.id, id))
     .returning({ id: mailTemplateTable.id });
   if (!res || res.length === 0) {
@@ -236,39 +284,80 @@ const updateApi = {
     method: "post",
     summary: "更新邮件模板",
   } as const,
+  adapter: bodyUserAdapter,
   service: onUpdate,
-};
+} satisfies API;
+
+const deleteReq = {
+  type: "object",
+  properties: {
+    ...IndexVO,
+  },
+  required: [
+    ...MailTemplateDeleteKeys,
+  ] as const satisfies RequiredKeys<MailTemplateDeleteVOLike>[],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const deleteRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onDelete(
+  obj: FromSchema<typeof deleteReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof deleteRes> | null> {
+  const { id } = obj;
+  const result = await db
+    .delete(mailTemplateTable)
+    .where(eq(mailTemplateTable.id, id))
+    .returning({ id: mailTemplateTable.id });
+  if (!result || result.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  return result[0].id;
+}
+const deleteApi = {
+  req: deleteReq,
+  res: deleteRes,
+  pathInfo: {
+    path: "/delete",
+    method: "post",
+    summary: "删除邮件模板",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onDelete,
+} satisfies API;
 
 const getReq = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
+    ...IndexVO,
   },
-  required: ["id"],
+  required: [
+    ...MailTemplateGetKeys,
+  ] as const satisfies RequiredKeys<MailTemplateGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
   type: "object",
   properties: {
-    ...mailTemplateIndex,
-    ...mailTemplateData,
-    ...mailTemplateAudit,
-  } satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>,
+    ...MailTemplateVO,
+  },
+  required: [
+    ...MailTemplateDetailKeys,
+  ] as const satisfies RequiredKeys<MailTemplateVOLike>[],
+  additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  c: NodeHonoContext
+  obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
-  const uniqueKeyObj = c.get("bodyObj") as FromSchema<typeof getReq>;
-  const { id } = uniqueKeyObj;
+  const { id } = obj;
   const rows = await db
     .select()
     .from(mailTemplateTable)
     .where(eq(mailTemplateTable.id, id))
     .limit(1);
   if (rows.length === 0) {
-    throw new HTTPException(404, {
-      message: "i18n.api.notExistOrDisabled" satisfies LanguageKey,
-    });
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   return rows[0];
 }
@@ -280,13 +369,15 @@ const getApi = {
     method: "post",
     summary: "获取邮件模板",
   } as const,
+  adapter: bodyAdapter,
   service: onGet,
-};
+} satisfies API;
 
 export default {
-  add: addApi,
-  delete: deleteApi,
+  listAll: listAllApi,
   list: listApi,
+  add: addApi,
   update: updateApi,
+  delete: deleteApi,
   get: getApi,
 };
