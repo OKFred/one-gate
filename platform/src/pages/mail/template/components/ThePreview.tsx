@@ -18,13 +18,13 @@ import type { ListMailTemplate } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface TemplatePreviewProps {
+interface ThePreviewProps {
   open: boolean;
   template: ListMailTemplate | null;
   onClose: () => void;
 }
 
-export default function TemplatePreview({ open, template, onClose }: TemplatePreviewProps) {
+export default function ThePreview({ open, template, onClose }: ThePreviewProps) {
   const theme = useTheme();
   const { isMobile } = useResponsive();
   const t = useTranslation();

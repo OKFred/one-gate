@@ -12,7 +12,7 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { showGlobalNotification } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
-export default function LoginForm() {
+export default function TheForm() {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const t = useTranslation();

@@ -1,7 +1,7 @@
 import { Box, Container } from '@mui/material';
-import LoginFooter from './components/LoginFooter';
-import LoginForm from './components/LoginForm';
-import LoginHeader from './components/LoginHeader';
+import TheFooter from './components/TheFooter';
+import TheForm from './components/TheForm';
+import TheHeader from './components/TheHeader';
 
 export default function Login() {
   return (
@@ -26,9 +26,9 @@ export default function Login() {
             gap: { xs: 3, md: 4 },
           }}
         >
-          <LoginHeader />
-          <LoginForm />
-          <LoginFooter />
+          <TheHeader />
+          <TheForm />
+          <TheFooter />
         </Box>
       </Box>
     </Container>

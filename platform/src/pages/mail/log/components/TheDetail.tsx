@@ -23,13 +23,13 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import dayjs from 'dayjs';
 
-interface LogDetailProps {
+interface TheDetailProps {
   open: boolean;
   log: ListMailLog | null;
   onClose: () => void;
 }
 
-export default function LogDetail({ open, log, onClose }: LogDetailProps) {
+export default function TheDetail({ open, log, onClose }: TheDetailProps) {
   const { isMobile } = useResponsive();
   const t = useTranslation();
 

@@ -10,9 +10,9 @@ import * as UserApiService from '@/api/system/user';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import UserProfile from './components/UserProfile';
-import UserDetails from './components/UserDetails';
-import UserEditDialog from './components/UserEditDialog';
+import TheProfile from './components/TheProfile';
+import TheDetails from './components/TheDetails';
+import TheDialog from './components/TheDialog';
 import type { User } from './type';
 import type { UpdateUserReq } from '@/api/system/type';
 
@@ -140,17 +140,17 @@ export default function UserCenter() {
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3}>
         {/* 用户资料卡片 */}
         <Box>
-          <UserProfile user={currentUser} onEdit={handleEdit} />
+          <TheProfile user={currentUser} onEdit={handleEdit} />
         </Box>
 
         {/* 详细信息卡片 */}
         <Box>
-          <UserDetails user={currentUser} onEdit={handleEdit} />
+          <TheDetails user={currentUser} onEdit={handleEdit} />
         </Box>
       </Box>
 
       {/* 编辑用户信息对话框 */}
-      <UserEditDialog
+      <TheDialog
         open={editDialogOpen}
         user={currentUser}
         loading={loading}
@@ -160,26 +160,3 @@ export default function UserCenter() {
     </PageLayout>
   );
 }
-
-/**
- * 重构说明：
- *
- * 1. 响应式设计：
- *    - 使用 PageLayout 提供统一的布局结构
- *    - 使用 ResponsiveButton 等响应式组件
- *    - Grid 布局自动适配移动端
- *
- * 2. 组件解耦：
- *    - UserProfile: 用户资料卡片组件
- *    - UserDetails: 详细信息展示组件
- *    - UserEditDialog: 编辑对话框组件
- *
- * 3. 性能优化：
- *    - 使用 useCallback 避免不必要的重渲染
- *    - 清晰的状态管理和数据流
- *
- * 4. 用户体验：
- *    - 统一的错误处理和消息提示
- *    - 加载状态显示
- *    - 自动刷新机制
- */

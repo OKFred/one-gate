@@ -3,10 +3,10 @@ import { Add as AddIcon } from '@mui/icons-material';
 import * as mailTemplateAPI from '@/api/mail/template';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
-import TemplateForm from './components/TemplateForm';
-import TemplateTable from './components/TemplateTable';
-import TemplateFilter from './components/TemplateFilter';
-import TemplatePreview from './components/TemplatePreview';
+import TheForm from './components/TheForm';
+import TheTable from './components/TheTable';
+import TheFilter from './components/TheFilter';
+import ThePreview from './components/ThePreview';
 import type { ListMailTemplate, FilterState } from './type';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -213,10 +213,10 @@ export default function MailTemplate() {
       }
     >
       {/* 筛选组件 */}
-      <TemplateFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
+      <TheFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
 
       {/* 表单对话框 */}
-      <TemplateForm
+      <TheForm
         open={open}
         form={form}
         editId={editId}
@@ -227,7 +227,7 @@ export default function MailTemplate() {
       />
 
       {/* 预览对话框 */}
-      <TemplatePreview
+      <ThePreview
         open={previewOpen}
         template={previewTemplate}
         onClose={() => {
@@ -237,7 +237,7 @@ export default function MailTemplate() {
       />
 
       {/* 数据表格 */}
-      <TemplateTable
+      <TheTable
         templates={templates}
         loading={loading}
         onEdit={handleEdit}

@@ -23,12 +23,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { FilterState } from '../type';
 
-interface LogFilterProps {
+interface TheFilterProps {
   onFilterChange: (filters: FilterState) => void;
   filterCount?: number;
 }
 
-export default function LogFilter({ onFilterChange, filterCount = 0 }: LogFilterProps) {
+export default function TheFilter({ onFilterChange, filterCount = 0 }: TheFilterProps) {
   const t = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态

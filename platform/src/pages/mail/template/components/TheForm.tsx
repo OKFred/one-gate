@@ -22,7 +22,7 @@ interface FormData extends AddMailTemplateRequest {
   creatorName?: string;
 }
 
-interface TemplateFormProps {
+interface TheFormProps {
   open: boolean;
   form: FormData;
   editId: number | null;
@@ -32,7 +32,7 @@ interface TemplateFormProps {
   loading?: boolean;
 }
 
-export default function TemplateForm({
+export default function TheForm({
   open,
   form,
   editId,
@@ -40,7 +40,7 @@ export default function TemplateForm({
   onSubmit,
   onCancel,
   loading = false,
-}: TemplateFormProps) {
+}: TheFormProps) {
   const theme = useTheme();
   const { isMobile } = useResponsive();
   const t = useTranslation();

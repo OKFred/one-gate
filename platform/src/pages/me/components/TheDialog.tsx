@@ -22,7 +22,7 @@ interface FormData {
   password: string;
 }
 
-interface UserEditDialogProps {
+interface TheDialogProps {
   open: boolean;
   user: User | null;
   loading: boolean;
@@ -30,7 +30,7 @@ interface UserEditDialogProps {
   onSave: (formData: FormData) => void;
 }
 
-export default function UserEditDialog({ open, loading, onClose, onSave }: UserEditDialogProps) {
+export default function TheDialog({ open, loading, onClose, onSave }: TheDialogProps) {
   const t = useTranslation();
   const [formData, setFormData] = useState(
     /* <FormData> */ {

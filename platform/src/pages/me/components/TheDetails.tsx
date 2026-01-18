@@ -5,12 +5,12 @@ import type { User } from '@/pages/me/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface UserDetailsProps {
+interface TheDetailsProps {
   user: User;
   onEdit: () => void;
 }
 
-export default function UserDetails({ user, onEdit }: UserDetailsProps) {
+export default function TheDetails({ user, onEdit }: TheDetailsProps) {
   const t = useTranslation();
 
   return (

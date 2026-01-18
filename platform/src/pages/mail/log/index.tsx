@@ -8,9 +8,9 @@ import { Refresh as RefreshIcon } from '@mui/icons-material';
 import * as mailLogAPI from '@/api/mail/log';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import LogFilter from './components/LogFilter';
-import LogTable from './components/LogTable';
-import LogDetail from './components/LogDetail';
+import TheFilter from './components/TheFilter';
+import TheTable from './components/TheTable';
+import TheDetail from './components/TheDetail';
 import type { ListMailLog, FilterState } from './type';
 
 export default function MailLogRefactored() {
@@ -89,13 +89,13 @@ export default function MailLogRefactored() {
       }
     >
       {/* 筛选组件 */}
-      <LogFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
+      <TheFilter onFilterChange={handleFilterChange} filterCount={totalCount} />
 
       {/* 数据表格 */}
-      <LogTable logs={logs} loading={loading} onView={handleViewLog} />
+      <TheTable logs={logs} loading={loading} onView={handleViewLog} />
 
       {/* 详情对话框 */}
-      <LogDetail open={detailOpen} log={selectedLog} onClose={handleCloseDetail} />
+      <TheDetail open={detailOpen} log={selectedLog} onClose={handleCloseDetail} />
     </PageLayout>
   );
 }

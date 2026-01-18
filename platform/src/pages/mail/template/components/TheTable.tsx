@@ -26,7 +26,7 @@ import type { ListMailTemplate } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface TemplateTableProps {
+interface TheTableProps {
   templates: ListMailTemplate[];
   loading: boolean;
   onEdit: (template: ListMailTemplate) => void;
@@ -34,13 +34,13 @@ interface TemplateTableProps {
   onPreview?: (template: ListMailTemplate) => void;
 }
 
-export default function TemplateTable({
+export default function TheTable({
   templates,
   loading,
   onEdit,
   onDelete,
   onPreview,
-}: TemplateTableProps) {
+}: TheTableProps) {
   const { isMobile } = useResponsive();
   const t = useTranslation();
 
