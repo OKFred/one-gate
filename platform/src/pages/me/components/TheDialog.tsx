@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle, memo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -6,7 +6,6 @@ import {
   DialogActions,
   TextField,
   Box,
-  CircularProgress,
   IconButton,
 } from '@mui/material';
 import {
@@ -16,96 +15,122 @@ import {
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { User } from '@/pages/me/type';
+import type { GetUserRes, UpdateUserReq } from '@/api/system/type';
+import type { Props } from '../index';
 
-interface FormData {
-  password: string;
+// 暴露给父组件的方法
+export interface TheDialogRef {
+  /** 打开对话框 */
+  open: (user: GetUserRes) => void;
+  /** 关闭对话框 */
+  close: () => void;
+  /** 设置保存回调 */
+  setSaveHandler: (handler: (formData: UpdateUserReq) => void) => void;
 }
 
-interface TheDialogProps {
-  open: boolean;
-  user: User | null;
-  loading: boolean;
-  onClose: () => void;
-  onSave: (formData: FormData) => void;
-}
+const TheDialog = memo(
+  forwardRef<TheDialogRef, Props>((_, ref) => {
+    const t = useTranslation();
+    const [open, setOpen] = useState(false);
+    const [user, setUser] = useState<GetUserRes | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
+    const [saveHandler, setSaveHandler] = useState<((formData: UpdateUserReq) => void) | null>(
+      null,
+    );
 
-export default function TheDialog({ open, loading, onClose, onSave }: TheDialogProps) {
-  const t = useTranslation();
-  const [formData, setFormData] = useState(
-    /* <FormData> */ {
-      password: '',
-    },
-  );
-  const [showPassword, setShowPassword] = useState(false);
+    // 暴露给父组件的方法
+    useImperativeHandle(
+      ref,
+      () => ({
+        open: (userData: GetUserRes) => {
+          setUser(userData);
+          setOpen(true);
+        },
+        close: () => {
+          setOpen(false);
+          setShowPassword(false);
+        },
+        setSaveHandler: (handler: (formData: UpdateUserReq) => void) => {
+          setSaveHandler(() => handler);
+        },
+      }),
+      [],
+    );
 
-  // 当用户数据改变时更新表单
-  /*   useEffect(() => {
-    if (user) {
-      setFormData({
-        // password: '',
-      });
-    }
-  }, [user]); */
+    // 处理保存
+    const handleSave = () => {
+      if (saveHandler && user) {
+        const formData: UpdateUserReq = {
+          id: user.id,
+          username: user.username,
+          departmentObj: user.departmentObj,
+          roleArr: user.roleArr,
+          isEnabled: user.isEnabled,
+        };
+        saveHandler(formData);
+      }
+    };
 
-  // 处理表单数据变化
-  const handleFormChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+    // 处理关闭
+    const handleClose = () => {
+      setOpen(false);
+      setShowPassword(false);
+    };
 
-  // 处理保存
-  const handleSave = () => {
-    onSave(formData);
-  };
+    return (
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box display="flex" alignItems="center">
+            <SettingsIcon sx={{ mr: 1 }} />
+            {t('me.edit.title')}
+          </Box>
+        </DialogTitle>
 
-  // 处理关闭
-  const handleClose = () => {
-    onClose();
-  };
+        <DialogContent>
+          <Box pt={1}>
+            <TextField
+              fullWidth
+              label={t('me.edit.username')}
+              value={user?.username || ''}
+              margin="normal"
+              disabled
+              helperText={t('me.edit.usernameHelper')}
+            />
+            <TextField
+              fullWidth
+              label={t('me.edit.newPassword')}
+              type={showPassword ? 'text' : 'password'}
+              margin="normal"
+              helperText={t('me.edit.passwordHelper')}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    </IconButton>
+                  ),
+                },
+              }}
+            />
+          </Box>
+        </DialogContent>
 
-  return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        <Box display="flex" alignItems="center">
-          <SettingsIcon sx={{ mr: 1 }} />
-          {t('me.edit.title')}
-        </Box>
-      </DialogTitle>
+        <DialogActions>
+          <ResponsiveButton onClick={handleClose}>{t('common.cancel')}</ResponsiveButton>
+          <ResponsiveButton onClick={handleSave} variant="contained">
+            {t('common.actions.save')}
+          </ResponsiveButton>
+        </DialogActions>
+      </Dialog>
+    );
+  }),
+);
 
-      <DialogContent>
-        <Box pt={1}>
-          <TextField
-            fullWidth
-            label={t('me.edit.newPassword')}
-            type={showPassword ? 'text' : 'password'}
-            value={formData.password}
-            onChange={(e) => handleFormChange('password', e.target.value)}
-            margin="normal"
-            helperText={t('me.edit.passwordHelper')}
-            slotProps={{
-              input: {
-                endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword(!showPassword)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </IconButton>
-                ),
-              },
-            }}
-          />
-        </Box>
-      </DialogContent>
+TheDialog.displayName = 'TheDialog';
 
-      <DialogActions>
-        <ResponsiveButton onClick={handleClose}>{t('common.cancel')}</ResponsiveButton>
-        <ResponsiveButton onClick={handleSave} variant="contained" disabled={loading}>
-          {loading ? <CircularProgress size={20} /> : t('common.actions.save')}
-        </ResponsiveButton>
-      </DialogActions>
-    </Dialog>
-  );
-}
+export default TheDialog;
