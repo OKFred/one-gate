@@ -41,6 +41,7 @@ async function onAdd(
     sendStatus,
     exceptionCode,
     exceptionDetails,
+    remark,
   } = obj;
   const result = await db
     .insert(mailLogTable)
@@ -53,6 +54,7 @@ async function onAdd(
       sendStatus,
       exceptionCode,
       exceptionDetails,
+      remark,
       creatorId: userObj.userId,
     } satisfies mailLogAddLike)
     .returning({ id: mailLogTable.id });

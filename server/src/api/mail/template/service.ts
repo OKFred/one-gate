@@ -32,7 +32,7 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const obj = c.get("bodyObj") as FromSchema<typeof addReq>;
   const userObj = c.get("userObj");
-  const { name, title, langCode, content, category = "" } = obj;
+  const { name, title, langCode, content, category = "", remark } = obj;
   const result = await db
     .insert(mailTemplateTable)
     .values({
@@ -42,6 +42,7 @@ async function onAdd(
       content,
       creatorId: userObj.userId,
       category,
+      remark,
     } satisfies mailTemplateAddLike)
     .returning({ id: mailTemplateTable.id });
   return result[0]?.id;

@@ -41,6 +41,13 @@ export const mailTemplateData = {
     type: "string",
     description: "邮件分类",
   },
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注",
+    examples: ["这是一个测试邮箱账号"],
+    maxLength: 500,
+  },
 } as const satisfies Partial<Record<keyof mailTemplateLike, JSONSchema>>;
 
 export const mailTemplateAudit = {

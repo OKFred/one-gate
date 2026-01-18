@@ -55,6 +55,13 @@ export const mailLogData = {
     type: "string",
     description: "异常详情",
   },
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注",
+    examples: ["这是一个测试邮箱账号"],
+    maxLength: 500,
+  },
 } as const satisfies Partial<Record<keyof mailLogLike, JSONSchema>>;
 
 export const mailLogAudit = {
@@ -95,6 +102,7 @@ export const mailLogTable = sqliteTable(
     sendStatus: integer("send_status", { mode: "boolean" }).notNull(),
     exceptionCode: text("exception_code"),
     exceptionDetails: text("exception_details"),
+    remark: text("remark"),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),
     createTimeUtc: integer("create_time_utc")
@@ -126,6 +134,7 @@ export async function tableInit() {
             send_status INTEGER NOT NULL,
             exception_code TEXT,
             exception_details TEXT,
+            remark TEXT,
             creator_id INTEGER NOT NULL,
             updater_id INTEGER,
             create_time_utc INTEGER DEFAULT (
