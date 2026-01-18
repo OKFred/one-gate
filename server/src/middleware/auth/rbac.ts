@@ -1,33 +1,24 @@
 import { Next } from "hono";
-import { HTTPException } from "hono/http-exception";
 import { NodeHonoContext } from "@/types/app";
-import { ContentfulStatusCode } from "hono/utils/http-status";
-import httpStatusCode from "http-status-codes";
-import type { LanguageKey } from "@/types/locales";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "../errorHandler/businessError";
 
 export const roleMiddleware = (allowedRoles: number[]) => {
   return async (c: NodeHonoContext, next: Next) => {
     const user = c.var.userObj;
 
     if (!user) {
-      throw new HTTPException(
-        httpStatusCode.UNAUTHORIZED as ContentfulStatusCode,
-        {
-          message: "i18n.api.system.noToken" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
     }
-    const userRoles = user.roleIdArr || [];
-    const hasRole = userRoles.some((role) => allowedRoles.includes(role));
+    const userRoles = user.roleArr || [];
+    const hasRole = userRoles.some((roleObj) =>
+      allowedRoles.includes(roleObj.value)
+    );
 
     if (!hasRole) {
-      throw new HTTPException(
-        httpStatusCode.FORBIDDEN as ContentfulStatusCode,
-        {
-          message:
-            "i18n.api.system.insufficientPermission" satisfies LanguageKey,
-        }
-      );
+      throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 
     await next();

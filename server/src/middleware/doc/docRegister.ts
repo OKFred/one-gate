@@ -4,8 +4,10 @@ import path from "path";
 import { swaggerUI } from "@hono/swagger-ui";
 import { Scalar } from "@scalar/hono-api-reference";
 import type { App } from "@/types/app";
-import type { LanguageKey } from "@/types/locales";
-import { HTTPException } from "hono/http-exception";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "../errorHandler/businessError";
 
 const apiDocBase = path.join(process.cwd(), "src", "middleware", "doc");
 export default function docRegister(app: App) {
@@ -15,9 +17,7 @@ export default function docRegister(app: App) {
       const htmlContent = fs.readFileSync(docHtmlPath, "utf-8");
       return c.body(htmlContent, 200, { "Content-Type": "text/html" });
     } catch (e) {
-      throw new HTTPException(404, {
-        message: "i18n.middleware.doc.notFound" satisfies LanguageKey,
-      });
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
   });
   app.doc31("/doc.json", {
