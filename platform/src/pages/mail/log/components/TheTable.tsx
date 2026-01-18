@@ -1,32 +1,18 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Stack,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Tooltip,
-} from '@mui/material';
+import { Chip, Tooltip, IconButton } from '@mui/material';
 import {
   Visibility as ViewIcon,
   CheckCircle as SuccessIcon,
   Error as ErrorIcon,
 } from '@mui/icons-material';
+import ResponsiveList, {
+  type TableColumn,
+  type CardField,
+} from '@/components/Responsive/ResponsiveList';
 import dayjs from 'dayjs';
 import * as mailLogAPI from '@/api/mail/log';
 import type { ListMailLogReq, ListMailLogRes } from '@/api/mail/type';
 import type { Props } from '../index';
-import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
@@ -34,6 +20,16 @@ export interface FilterState {
   keyword: string;
   orderBy: NonNullable<ListMailLogReq['orderBy']>;
   descend: boolean;
+}
+
+// 表格内部状态
+export interface TableState {
+  list: NonNullable<ListMailLogRes['list']>;
+  loading: boolean;
+  page: number;
+  pageSize: number;
+  total: number;
+  filters: FilterState;
 }
 
 // 暴露给父组件的方法
@@ -51,55 +47,85 @@ const DEFAULT_FILTERS: FilterState = {
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { filterRef, detailRef } = localObj;
-    const { isMobile } = useResponsive();
     const t = useTranslation();
-    const [logs, setLogs] = useState<NonNullable<ListMailLogRes['list']>>([]);
-    const [loading, setLoading] = useState(false);
-    const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
 
+    // 整合所有表格相关状态
+    const [state, setState] = useState<TableState>({
+      list: [],
+      loading: false,
+      page: 1,
+      pageSize: 10,
+      total: 0,
+      filters: DEFAULT_FILTERS,
+    });
+
+    const { list, loading, page, pageSize, total, filters } = state;
+
+    // 获取数据的核心函数
     const fetchLogs = useCallback(
-      async (searchParams: FilterState) => {
-        setLoading(true);
+      async (searchFilters: FilterState, currentPage: number = 1) => {
+        setState((prev) => ({ ...prev, loading: true }));
         try {
           const requestData = {
-            pageNo: 1,
-            pageSize: 100,
-            ...(searchParams.keyword && { keyword: searchParams.keyword }),
-            orderBy: searchParams.orderBy,
-            descend: searchParams.descend,
+            pageNo: currentPage,
+            pageSize: state.pageSize,
+            ...(searchFilters.keyword && { keyword: searchFilters.keyword }),
+            orderBy: searchFilters.orderBy,
+            descend: searchFilters.descend,
           };
 
           const res = await mailLogAPI.listFn({ data: requestData });
           const response = res.data;
           const logsList = response?.data?.list || [];
-          const total = response?.data?.total || 0;
+          const totalCount = response?.data?.total || 0;
 
-          setLogs(logsList);
-          filterRef.current?.updateCount(total);
-        } finally {
-          setLoading(false);
+          setState((prev) => ({
+            ...prev,
+            list: logsList,
+            total: totalCount,
+            page: currentPage,
+            filters: searchFilters,
+            loading: false,
+          }));
+
+          // 通知筛选组件更新数量
+          filterRef.current?.updateCount(totalCount);
+        } catch {
+          setState((prev) => ({ ...prev, loading: false }));
         }
       },
-      [filterRef],
+      [state.pageSize, filterRef],
     );
+
+    // 初始加载
+    useEffect(() => {
+      fetchLogs(DEFAULT_FILTERS, 1);
+    }, [fetchLogs]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
       () => ({
         refresh: (newFilters?: FilterState) => {
-          const targetFilters = newFilters || filters;
-          setFilters(targetFilters);
-          fetchLogs(targetFilters);
+          const filtersToUse = newFilters || filters;
+          const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
+          fetchLogs(filtersToUse, pageToUse);
         },
       }),
-      [filters, fetchLogs],
+      [fetchLogs, filters, page],
     );
 
-    // 初始化加载
-    useEffect(() => {
-      fetchLogs(DEFAULT_FILTERS);
-    }, [fetchLogs]);
+    // 处理分页
+    const handlePageChange = (newPage: number) => {
+      fetchLogs(filters, newPage);
+    };
+
+    // 处理每页条数变化
+    const handlePageSizeChange = (newPageSize: number) => {
+      setState((prev) => ({ ...prev, pageSize: newPageSize }));
+      // 重置到第一页并刷新数据
+      fetchLogs(filters, 1);
+    };
 
     const handleViewLog = (log: NonNullable<ListMailLogRes['list']>[0]) => {
       detailRef.current?.open(log);
@@ -115,176 +141,129 @@ const TheTable = memo(
       return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
     };
 
-    if (loading) {
-      return (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
-        </Box>
-      );
-    }
-
-    // 移动端卡片布局
-    if (isMobile) {
-      return (
-        <Box sx={{ mt: 2, mb: 8 }}>
-          {logs.length > 0 ? (
-            <Stack spacing={2}>
-              {logs.map((log) => (
-                <Card key={log.id} variant="outlined">
-                  <CardContent>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        mb: 2,
-                      }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" component="div" gutterBottom>
-                          {truncateText(log.title, 40)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          ID: {log.id}
-                        </Typography>
-                      </Box>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        {log.sendStatus ? (
-                          <Chip
-                            icon={<SuccessIcon />}
-                            label={t('common.status.success')}
-                            color="success"
-                            size="small"
-                          />
-                        ) : (
-                          <Tooltip title={log.exceptionDetails || t('mail.log.sendFailed')}>
-                            <Chip
-                              icon={<ErrorIcon />}
-                              label={t('common.status.failed')}
-                              color="error"
-                              size="small"
-                            />
-                          </Tooltip>
-                        )}
-                        <IconButton onClick={() => handleViewLog(log)} color="primary" size="small">
-                          <ViewIcon />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {t('mail.log.columns.recipient')}
-                      </Typography>
-                      <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                        {log.mailTo}
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {t('mail.log.columns.sender')}
-                      </Typography>
-                      <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                        {log.mailFrom}
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {t('mail.log.columns.sendTime')}
-                      </Typography>
-                      <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
-                    </Box>
-
-                    {log.templateId && (
-                      <Box>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          {t('mail.log.columns.templateId')}
-                        </Typography>
-                        <Typography variant="body1">{log.templateId}</Typography>
-                      </Box>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
+    // 表格列配置（PC端）
+    const columns: TableColumn<TableState['list'][0]>[] = [
+      { title: t('common.columns.id'), render: (row) => row.id },
+      {
+        title: t('mail.log.columns.subject'),
+        render: (row) => (
+          <Tooltip title={row.title || ''}>
+            <span>{truncateText(row.title, 30)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: t('mail.log.columns.recipient'),
+        render: (row) => (
+          <Tooltip title={row.mailTo || ''}>
+            <span>{truncateText(row.mailTo, 25)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: t('mail.log.columns.sender'),
+        render: (row) => (
+          <Tooltip title={row.mailFrom || ''}>
+            <span>{truncateText(row.mailFrom, 25)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: t('common.columns.status'),
+        align: 'center',
+        render: (row) =>
+          row.sendStatus ? (
+            <Chip
+              icon={<SuccessIcon />}
+              label={t('common.status.success')}
+              color="success"
+              size="small"
+            />
           ) : (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <Typography variant="body1" color="text.secondary">
-                {t('mail.log.empty')}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      );
-    }
+            <Tooltip title={row.exceptionDetails || t('mail.log.sendFailed')}>
+              <Chip
+                icon={<ErrorIcon />}
+                label={t('common.status.failed')}
+                color="error"
+                size="small"
+              />
+            </Tooltip>
+          ),
+      },
+      {
+        title: t('mail.log.columns.sendTime'),
+        render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        title: t('common.columns.actions'),
+        align: 'center',
+        render: (row) => (
+          <IconButton onClick={() => handleViewLog(row)} color="primary" size="small">
+            <ViewIcon />
+          </IconButton>
+        ),
+      },
+    ];
 
-    // 桌面端表格布局
+    // 卡片字段配置（移动端）
+    const cardFields: CardField<TableState['list'][0]>[] = [
+      { type: 'title', render: (row) => truncateText(row.title, 40) },
+      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      {
+        type: 'content',
+        label: t('mail.log.columns.recipient'),
+        render: (row) => row.mailTo,
+      },
+      {
+        type: 'content',
+        label: t('mail.log.columns.sender'),
+        render: (row) => row.mailFrom,
+      },
+      {
+        type: 'content',
+        label: t('mail.log.columns.sendTime'),
+        render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        type: 'tags',
+        render: (row) =>
+          row.sendStatus ? (
+            <Chip
+              icon={<SuccessIcon />}
+              label={t('common.status.success')}
+              color="success"
+              size="small"
+            />
+          ) : (
+            <Chip
+              icon={<ErrorIcon />}
+              label={t('common.status.failed')}
+              color="error"
+              size="small"
+            />
+          ),
+      },
+    ];
+
     return (
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('common.columns.id')}</TableCell>
-              <TableCell>{t('mail.log.columns.subject')}</TableCell>
-              <TableCell>{t('mail.log.columns.recipient')}</TableCell>
-              <TableCell>{t('mail.log.columns.sender')}</TableCell>
-              <TableCell align="center">{t('common.columns.status')}</TableCell>
-              <TableCell>{t('mail.log.columns.sendTime')}</TableCell>
-              <TableCell align="center">{t('common.columns.actions')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {logs.length > 0 &&
-              logs.map((log) => (
-                <TableRow key={log.id} hover>
-                  <TableCell>{log.id}</TableCell>
-                  <TableCell>
-                    <Tooltip title={log.title || ''}>
-                      <span>{truncateText(log.title, 30)}</span>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title={log.mailTo || ''}>
-                      <span>{truncateText(log.mailTo, 25)}</span>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell>
-                    <Tooltip title={log.mailFrom || ''}>
-                      <span>{truncateText(log.mailFrom, 25)}</span>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell align="center">
-                    {log.sendStatus ? (
-                      <Chip
-                        icon={<SuccessIcon />}
-                        label={t('common.status.success')}
-                        color="success"
-                        size="small"
-                      />
-                    ) : (
-                      <Tooltip title={log.exceptionDetails || t('mail.log.sendFailed')}>
-                        <Chip
-                          icon={<ErrorIcon />}
-                          label={t('common.status.failed')}
-                          color="error"
-                          size="small"
-                        />
-                      </Tooltip>
-                    )}
-                  </TableCell>
-                  <TableCell>{formatDate(log.createTimeUtc)}</TableCell>
-                  <TableCell align="center">
-                    <IconButton onClick={() => handleViewLog(log)} color="primary" size="small">
-                      <ViewIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <ResponsiveList
+        data={list}
+        loading={loading}
+        page={page}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        keyExtractor={(row) => row.id!}
+        columns={columns}
+        cardFields={cardFields}
+        cardActions={(row) => (
+          <IconButton onClick={() => handleViewLog(row)} color="primary" size="small">
+            <ViewIcon />
+          </IconButton>
+        )}
+        emptyText={t('mail.log.empty')}
+      />
     );
   }),
 );

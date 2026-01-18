@@ -1,38 +1,19 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Stack,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from '@mui/material';
+import { Chip, Tooltip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
+import ResponsiveList, {
+  type TableColumn,
+  type CardField,
+} from '@/components/Responsive/ResponsiveList';
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
 import { showGlobalNotification } from '@/components/Notification';
 import type { ListMailTemplateReq, ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
-import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
@@ -46,6 +27,9 @@ export interface FilterState {
 export interface TableState {
   list: NonNullable<ListMailTemplateRes['list']>;
   loading: boolean;
+  page: number;
+  pageSize: number;
+  total: number;
   filters: FilterState;
 }
 
@@ -64,26 +48,31 @@ const DEFAULT_FILTERS: FilterState = {
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { filterRef, formRef, previewRef } = localObj;
-    const { isMobile } = useResponsive();
     const t = useTranslation();
+
+    // 整合所有表格相关状态
     const [state, setState] = useState<TableState>({
       list: [],
       loading: false,
+      page: 1,
+      pageSize: 10,
+      total: 0,
       filters: DEFAULT_FILTERS,
     });
+
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
 
-    const { list, loading } = state;
+    const { list, loading, page, pageSize, total, filters } = state;
 
     // 获取数据的核心函数
     const fetchTemplates = useCallback(
-      async (searchFilters: FilterState) => {
+      async (searchFilters: FilterState, currentPage: number = 1) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
           const requestData = {
-            pageNo: 1,
-            pageSize: 100,
+            pageNo: currentPage,
+            pageSize: state.pageSize,
             ...(searchFilters.keyword && { keyword: searchFilters.keyword }),
             orderBy: searchFilters.orderBy,
             descend: searchFilters.descend,
@@ -92,27 +81,29 @@ const TheTable = memo(
           const res = await MailTemplateAPI.listFn({ data: requestData });
           const response = res.data;
           const templatesList = response?.data?.list || [];
-          const total = response?.data?.total || 0;
+          const totalCount = response?.data?.total || 0;
 
           setState((prev) => ({
             ...prev,
             list: templatesList,
+            total: totalCount,
+            page: currentPage,
             filters: searchFilters,
             loading: false,
           }));
 
           // 通知筛选组件更新数量
-          filterRef.current?.updateCount(total);
+          filterRef.current?.updateCount(totalCount);
         } catch {
           setState((prev) => ({ ...prev, loading: false }));
         }
       },
-      [filterRef],
+      [state.pageSize, filterRef],
     );
 
     // 初始加载
     useEffect(() => {
-      fetchTemplates(DEFAULT_FILTERS);
+      fetchTemplates(DEFAULT_FILTERS, 1);
     }, [fetchTemplates]);
 
     // 暴露给父组件的方法
@@ -120,12 +111,25 @@ const TheTable = memo(
       ref,
       () => ({
         refresh: (newFilters?: FilterState) => {
-          const filtersToUse = newFilters || DEFAULT_FILTERS;
-          fetchTemplates(filtersToUse);
+          const filtersToUse = newFilters || filters;
+          const pageToUse = newFilters ? 1 : page;
+          fetchTemplates(filtersToUse, pageToUse);
         },
       }),
-      [fetchTemplates],
+      [fetchTemplates, filters, page],
     );
+
+    // 处理分页
+    const handlePageChange = (newPage: number) => {
+      fetchTemplates(filters, newPage);
+    };
+
+    // 处理每页条数变化
+    const handlePageSizeChange = (newPageSize: number) => {
+      setState((prev) => ({ ...prev, pageSize: newPageSize }));
+      // 重置到第一页并刷新数据
+      fetchTemplates(filters, 1);
+    };
 
     const formatDate = (timestamp?: number) => {
       if (!timestamp) return '-';
@@ -166,7 +170,7 @@ const TheTable = memo(
             message: t('mail.template.deleteSuccess'),
             type: 'success',
           });
-          fetchTemplates(DEFAULT_FILTERS);
+          fetchTemplates(filters, page);
         } else {
           showGlobalNotification({
             message: res.data?.message || t('mail.template.deleteFailed'),
@@ -185,181 +189,135 @@ const TheTable = memo(
       }
     };
 
-    if (loading) {
-      return (
-        <Box display="flex" justifyContent="center" py={4}>
-          <CircularProgress />
-        </Box>
-      );
-    }
+    // 表格列配置（PC端）
+    const columns: TableColumn<TableState['list'][0]>[] = [
+      { title: t('common.columns.id'), render: (row) => row.id },
+      {
+        title: t('mail.template.columns.title'),
+        render: (row) => (
+          <Tooltip title={row.title || ''}>
+            <span>{truncateText(row.title, 30)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: t('mail.template.columns.name'),
+        render: (row) => (
+          <Tooltip title={row.name || ''}>
+            <span>{truncateText(row.name, 20)}</span>
+          </Tooltip>
+        ),
+      },
+      {
+        title: t('mail.template.columns.preview'),
+        render: (row) => truncateText(stripHtml(row.content), 40),
+      },
+      {
+        title: t('common.columns.createTime'),
+        render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        title: t('common.columns.actions'),
+        align: 'center',
+        render: (row) => (
+          <>
+            <IconButton onClick={() => handlePreview(row)} color="info" size="small">
+              <ViewIcon />
+            </IconButton>
+            <IconButton onClick={() => handleEdit(row)} color="primary" size="small">
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              onClick={() => row.id && handleDeleteClick(row.id)}
+              color="error"
+              size="small"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </>
+        ),
+      },
+    ];
 
-    // 移动端卡片布局
-    if (isMobile) {
-      return (
-        <>
-          <Box sx={{ mt: 2, mb: 8 }}>
-            {list.length > 0 ? (
-              <Stack spacing={2}>
-                {list.map((template) => (
-                  <Card key={template.id} variant="outlined">
-                    <CardContent>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'flex-start',
-                          mb: 2,
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="h6" component="div" gutterBottom>
-                            {template.title}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" gutterBottom>
-                            ID: {template.id} | {template.name}
-                          </Typography>
-                        </Box>
-                        <Stack direction="row" spacing={1}>
-                          <IconButton
-                            onClick={() => handlePreview(template)}
-                            color="info"
-                            size="small"
-                          >
-                            <ViewIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleEdit(template)}
-                            color="primary"
-                            size="small"
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => template.id && handleDeleteClick(template.id)}
-                            color="error"
-                            size="small"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Stack>
-                      </Box>
-
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          {t('mail.template.columns.preview')}
-                        </Typography>
-                        <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
-                          {truncateText(stripHtml(template.content), 100)}
-                        </Typography>
-                      </Box>
-
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                          {t('common.columns.createTime')}
-                        </Typography>
-                        <Typography variant="body2">
-                          {formatDate(template.createTimeUtc)}
-                        </Typography>
-                      </Box>
-
-                      <Box>
-                        <Stack direction="row" spacing={1} flexWrap="wrap">
-                          {template.langCode && (
-                            <Chip label={template.langCode} color="info" size="small" />
-                          )}
-                          {template.category && (
-                            <Chip label={template.category} color="secondary" size="small" />
-                          )}
-                        </Stack>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Stack>
-            ) : (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography variant="body1" color="text.secondary">
-                  {t('mail.template.empty')}
-                </Typography>
-              </Box>
+    // 卡片字段配置（移动端）
+    const cardFields: CardField<TableState['list'][0]>[] = [
+      { type: 'title', render: (row) => row.title },
+      {
+        type: 'subtitle',
+        label: `ID: ${t('mail.template.columns.name')}`,
+        render: (row) => `${row.id} | ${row.name}`,
+      },
+      {
+        type: 'content',
+        label: t('mail.template.columns.preview'),
+        render: (row) => truncateText(stripHtml(row.content), 100),
+      },
+      {
+        type: 'content',
+        label: t('common.columns.createTime'),
+        render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        type: 'tags',
+        render: (row) => (
+          <>
+            {row.langCode && (
+              <Chip label={row.langCode} color="info" size="small" />
             )}
-          </Box>
+            {row.category && (
+              <Chip label={row.category} color="secondary" size="small" />
+            )}
+          </>
+        ),
+      },
+    ];
 
-          {/* 删除确认对话框 */}
-          <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-            <DialogTitle>{t('common.confirm')}</DialogTitle>
-            <DialogContent>
-              <Typography>{t('mail.template.deleteConfirm')}</Typography>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
-              <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-                {t('common.delete')}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      );
-    }
-
-    // 桌面端表格布局
     return (
       <>
-        <TableContainer component={Paper} sx={{ mt: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('common.columns.id')}</TableCell>
-                <TableCell>{t('mail.template.columns.title')}</TableCell>
-                <TableCell>{t('mail.template.columns.name')}</TableCell>
-                <TableCell>{t('mail.template.columns.preview')}</TableCell>
-                <TableCell>{t('common.columns.createTime')}</TableCell>
-                <TableCell align="center">{t('common.columns.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {list.length > 0 &&
-                list.map((template) => (
-                  <TableRow key={template.id} hover>
-                    <TableCell>{template.id}</TableCell>
-                    <TableCell>
-                      <Tooltip title={template.title || ''}>
-                        <span>{truncateText(template.title, 30)}</span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title={template.name || ''}>
-                        <span>{truncateText(template.name, 20)}</span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell>{truncateText(stripHtml(template.content), 40)}</TableCell>
-                    <TableCell>{formatDate(template.createTimeUtc)}</TableCell>
-                    <TableCell align="center">
-                      <IconButton onClick={() => handlePreview(template)} color="info" size="small">
-                        <ViewIcon />
-                      </IconButton>
-                      <IconButton onClick={() => handleEdit(template)} color="primary" size="small">
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => template.id && handleDeleteClick(template.id)}
-                        color="error"
-                        size="small"
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <ResponsiveList
+          data={list}
+          loading={loading}
+          page={page}
+          total={total}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          keyExtractor={(row) => row.id!}
+          columns={columns}
+          cardFields={cardFields}
+          cardActions={(row) => (
+            <>
+              <IconButton
+                onClick={() => handlePreview(row)}
+                color="info"
+                size="small"
+              >
+                <ViewIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => handleEdit(row)}
+                color="primary"
+                size="small"
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => row.id && handleDeleteClick(row.id)}
+                color="error"
+                size="small"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </>
+          )}
+          emptyText={t('mail.template.empty')}
+        />
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
           <DialogTitle>{t('common.confirm')}</DialogTitle>
           <DialogContent>
-            <Typography>{t('mail.template.deleteConfirm')}</Typography>
+            {t('mail.template.deleteConfirm')}
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
