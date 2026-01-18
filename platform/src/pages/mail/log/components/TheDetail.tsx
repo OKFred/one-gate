@@ -150,7 +150,7 @@ export default function TheDetail({ open, log, onClose }: TheDetailProps) {
                   {log.templateId && (
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary">
-                        模板ID
+                        {t('mail.log.columns.templateId')}
                       </Typography>
                       <Typography variant="body1">{log.templateId}</Typography>
                     </Box>
@@ -159,7 +159,7 @@ export default function TheDetail({ open, log, onClose }: TheDetailProps) {
                   {log.templateParams && (
                     <Box>
                       <Typography variant="subtitle2" color="text.secondary">
-                        模板参数
+                        {t('mail.log.detail.templateParams')}
                       </Typography>
                       <Box
                         component="pre"
@@ -191,14 +191,14 @@ export default function TheDetail({ open, log, onClose }: TheDetailProps) {
                 </Typography>
                 {log.exceptionCode && (
                   <Alert severity="error" sx={{ mb: 2 }}>
-                    <Typography variant="subtitle2">错误代码</Typography>
+                    <Typography variant="subtitle2">{t('mail.log.detail.errorCode')}</Typography>
                     <Typography variant="body2">{log.exceptionCode}</Typography>
                   </Alert>
                 )}
 
                 {log.exceptionDetails && (
                   <Alert severity="error">
-                    <Typography variant="subtitle2">错误详情</Typography>
+                    <Typography variant="subtitle2">{t('mail.log.detail.errorDetails')}</Typography>
                     <Typography variant="body2">{log.exceptionDetails}</Typography>
                   </Alert>
                 )}

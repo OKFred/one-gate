@@ -81,10 +81,10 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
                     </Box>
                     <Stack direction="row" spacing={1} alignItems="center">
                       {log.sendStatus ? (
-                        <Chip icon={<SuccessIcon />} label="成功" color="success" size="small" />
+                        <Chip icon={<SuccessIcon />} label={t('common.status.success')} color="success" size="small" />
                       ) : (
-                        <Tooltip title={log.exceptionDetails || '发送失败'}>
-                          <Chip icon={<ErrorIcon />} label="失败" color="error" size="small" />
+                        <Tooltip title={log.exceptionDetails || t('mail.log.sendFailed')}>
+                          <Chip icon={<ErrorIcon />} label={t('common.status.failed')} color="error" size="small" />
                         </Tooltip>
                       )}
                       {onView && (
@@ -97,7 +97,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
 
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      收件人
+                      {t('mail.log.columns.recipient')}
                     </Typography>
                     <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                       {log.mailTo}
@@ -106,7 +106,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
 
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      发件人
+                      {t('mail.log.columns.sender')}
                     </Typography>
                     <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                       {log.mailFrom}
@@ -115,7 +115,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
 
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      发送时间
+                      {t('mail.log.columns.sendTime')}
                     </Typography>
                     <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
                   </Box>
@@ -123,7 +123,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
                   {log.templateId && (
                     <Box>
                       <Typography variant="body2" color="text.secondary" gutterBottom>
-                        模板ID
+                        {t('mail.log.columns.templateId')}
                       </Typography>
                       <Typography variant="body1">{log.templateId}</Typography>
                     </Box>
@@ -180,10 +180,10 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
                 </TableCell>
                 <TableCell align="center">
                   {log.sendStatus ? (
-                    <Chip icon={<SuccessIcon />} label="成功" color="success" size="small" />
+                    <Chip icon={<SuccessIcon />} label={t('common.status.success')} color="success" size="small" />
                   ) : (
-                    <Tooltip title={log.exceptionDetails || '发送失败'}>
-                      <Chip icon={<ErrorIcon />} label="失败" color="error" size="small" />
+                    <Tooltip title={log.exceptionDetails || t('mail.log.sendFailed')}>
+                      <Chip icon={<ErrorIcon />} label={t('common.status.failed')} color="error" size="small" />
                     </Tooltip>
                   )}
                 </TableCell>
