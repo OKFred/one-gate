@@ -20,6 +20,7 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { FilterState } from '../type';
 
 interface LogFilterProps {
@@ -28,6 +29,7 @@ interface LogFilterProps {
 }
 
 export default function LogFilter({ onFilterChange, filterCount = 0 }: LogFilterProps) {
+  const t = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
   const [isSearching, setIsSearching] = useState(false); // 搜索状态
@@ -88,18 +90,18 @@ export default function LogFilter({ onFilterChange, filterCount = 0 }: LogFilter
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box display="flex" alignItems="center" gap={1}>
           <FilterIcon color="action" />
-          <Typography variant="h6">搜索与筛选</Typography>
+          <Typography variant="h6">{t('common.filter.title')}</Typography>
           {isSearching && (
-            <Chip label="搜索中..." size="small" color="default" variant="outlined" />
+            <Chip label={t('common.filter.searching')} size="small" color="default" variant="outlined" />
           )}
           {!isSearching && filterCount > 0 && (
-            <Chip label={`${filterCount} 个结果`} size="small" color="primary" variant="outlined" />
+            <Chip label={`${filterCount} ${t('mail.log.filter.results')}`} size="small" color="primary" variant="outlined" />
           )}
         </Box>
         <Box display="flex" alignItems="center" gap={1}>
           {hasActiveFilters() && (
             <Chip
-              label="清除筛选"
+              label={t('common.filter.clearFilters')}
               size="small"
               variant="outlined"
               onClick={clearFilters}
@@ -116,8 +118,8 @@ export default function LogFilter({ onFilterChange, filterCount = 0 }: LogFilter
         <Box sx={{ mt: 2 }}>
           <Stack spacing={2}>
             <TextField
-              label="关键字搜索"
-              placeholder="搜索邮件标题、收件人、发件人..."
+              label={t('common.filter.keyword')}
+              placeholder={t('mail.log.filter.keywordPlaceholder')}
               value={keywordInput}
               onChange={(e) => handleFilterChange('keyword', e.target.value)}
               size="small"
@@ -133,28 +135,28 @@ export default function LogFilter({ onFilterChange, filterCount = 0 }: LogFilter
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl size="small" fullWidth>
-                <InputLabel>排序字段</InputLabel>
+                <InputLabel>{t('common.filter.orderBy')}</InputLabel>
                 <Select
                   value={filters.orderBy}
-                  label="排序字段"
+                  label={t('common.filter.orderBy')}
                   onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                 >
-                  <MenuItem value="id">ID</MenuItem>
-                  <MenuItem value="mailTo">收件人</MenuItem>
-                  <MenuItem value="mailFrom">发件人</MenuItem>
-                  <MenuItem value="createTimeUtc">创建时间</MenuItem>
+                  <MenuItem value="id">{t('common.columns.id')}</MenuItem>
+                  <MenuItem value="mailTo">{t('mail.log.columns.recipient')}</MenuItem>
+                  <MenuItem value="mailFrom">{t('mail.log.columns.sender')}</MenuItem>
+                  <MenuItem value="createTimeUtc">{t('common.columns.createTime')}</MenuItem>
                 </Select>
               </FormControl>
 
               <FormControl size="small" fullWidth>
-                <InputLabel>排序方式</InputLabel>
+                <InputLabel>{t('common.filter.sortOrder')}</InputLabel>
                 <Select
                   value={filters.descend ? 'desc' : 'asc'}
-                  label="排序方式"
+                  label={t('common.filter.sortOrder')}
                   onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                 >
-                  <MenuItem value="asc">升序</MenuItem>
-                  <MenuItem value="desc">降序</MenuItem>
+                <MenuItem value="asc">{t('common.filter.ascending')}</MenuItem>
+                <MenuItem value="desc">{t('common.filter.descending')}</MenuItem>
                 </Select>
               </FormControl>
             </Stack>

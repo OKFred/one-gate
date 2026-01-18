@@ -21,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback } from 'react';
 import type { FilterState } from '../type';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TemplateFilterProps {
   onFilterChange: (filters: FilterState) => void;
@@ -28,6 +29,7 @@ interface TemplateFilterProps {
 }
 
 export default function TemplateFilter({ onFilterChange, filterCount = 0 }: TemplateFilterProps) {
+  const t = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
   const [isSearching, setIsSearching] = useState(false); // 搜索状态
@@ -88,24 +90,24 @@ export default function TemplateFilter({ onFilterChange, filterCount = 0 }: Temp
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box display="flex" alignItems="center" gap={1}>
           <FilterIcon color="action" />
-          <Typography variant="h6">搜索与筛选</Typography>
+          <Typography variant="h6">{t('mail.template.filter.title')}</Typography>
           {isSearching && (
-            <Chip label="搜索中..." size="small" color="default" variant="outlined" />
+            <Chip label={t('mail.template.filter.searching')} size="small" color="default" variant="outlined" />
           )}
           {!isSearching && filterCount > 0 && (
-            <Chip label={`${filterCount} 个结果`} size="small" color="primary" variant="outlined" />
+            <Chip label={`${filterCount} ${t('mail.template.filter.resultsSuffix')}`} size="small" color="primary" variant="outlined" />
           )}
         </Box>
         <Box display="flex" alignItems="center" gap={1}>
-          {hasActiveFilters() && (
-            <Chip
-              label="清除筛选"
-              size="small"
-              variant="outlined"
-              onClick={clearFilters}
-              onDelete={clearFilters}
-            />
-          )}
+            {hasActiveFilters() && (
+              <Chip
+                label={t('mail.template.filter.clear')}
+                size="small"
+                variant="outlined"
+                onClick={clearFilters}
+                onDelete={clearFilters}
+              />
+            )}
           <IconButton onClick={() => setExpanded(!expanded)} size="small">
             {expanded ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
@@ -116,8 +118,8 @@ export default function TemplateFilter({ onFilterChange, filterCount = 0 }: Temp
         <Box sx={{ mt: 2 }}>
           <Stack spacing={2}>
             <TextField
-              label="关键字搜索"
-              placeholder="搜索模板名称、标题、创建者、分类..."
+              label={t('mail.template.filter.keywordLabel')}
+              placeholder={t('mail.template.filter.keywordPlaceholder')}
               value={keywordInput}
               onChange={(e) => handleFilterChange('keyword', e.target.value)}
               size="small"
@@ -133,29 +135,29 @@ export default function TemplateFilter({ onFilterChange, filterCount = 0 }: Temp
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl size="small" fullWidth>
-                <InputLabel>排序字段</InputLabel>
+                <InputLabel>{t('mail.template.filter.sortField')}</InputLabel>
                 <Select
                   value={filters.orderBy}
-                  label="排序字段"
+                  label={t('mail.template.filter.sortField')}
                   onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                 >
                   <MenuItem value="id">ID</MenuItem>
-                  <MenuItem value="langCode">语言代码</MenuItem>
-                  <MenuItem value="creatorName">创建者</MenuItem>
-                  <MenuItem value="category">分类</MenuItem>
-                  <MenuItem value="createTimeUtc">创建时间</MenuItem>
+                  <MenuItem value="langCode">{t('mail.template.filter.field.langCode')}</MenuItem>
+                  <MenuItem value="creatorName">{t('mail.template.filter.field.creator')}</MenuItem>
+                  <MenuItem value="category">{t('mail.template.filter.field.category')}</MenuItem>
+                  <MenuItem value="createTimeUtc">{t('mail.template.filter.field.createTime')}</MenuItem>
                 </Select>
               </FormControl>
 
               <FormControl size="small" fullWidth>
-                <InputLabel>排序方式</InputLabel>
+                <InputLabel>{t('mail.template.filter.sortOrder')}</InputLabel>
                 <Select
                   value={filters.descend ? 'desc' : 'asc'}
-                  label="排序方式"
+                  label={t('mail.template.filter.sortOrder')}
                   onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                 >
-                  <MenuItem value="asc">升序</MenuItem>
-                  <MenuItem value="desc">降序</MenuItem>
+                  <MenuItem value="asc">{t('mail.template.filter.sort.asc')}</MenuItem>
+                  <MenuItem value="desc">{t('mail.template.filter.sort.desc')}</MenuItem>
                 </Select>
               </FormControl>
             </Stack>

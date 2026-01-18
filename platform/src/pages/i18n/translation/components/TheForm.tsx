@@ -30,6 +30,7 @@ import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import hasValue from '@/utils/hasValue';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -54,6 +55,7 @@ const DEFAULT_FORM: AddTranslationReq = {
 
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
+    const t = useTranslation();
     const { tableRef } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
@@ -181,7 +183,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? '编辑翻译' : '新增翻译'}
+            {editId ? t('i18n.translation.form.title.edit') : t('i18n.translation.form.title.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -200,54 +202,54 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="应用"
+                  label={t('i18n.translation.form.application')}
                   value={form.application}
                   onChange={(e) => setForm({ ...form, application: e.target.value })}
                   required
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder="例如：frontend, backend, common"
+                  placeholder={t('i18n.translation.form.application.placeholder')}
                 />
 
                 <TextField
-                  label="业务"
+                  label={t('i18n.translation.form.business')}
                   value={form.business}
                   onChange={(e) => setForm({ ...form, business: e.target.value })}
                   required
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder="例如：email, order"
+                  placeholder={t('i18n.translation.form.business.placeholder')}
                 />
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="语言代码"
+                  label={t('i18n.translation.form.langCode')}
                   value={form.langCode}
                   onChange={(e) => setForm({ ...form, langCode: e.target.value })}
                   required
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder="例如：en-US, zh-CN, de-DE"
+                  placeholder={t('i18n.translation.form.langCode.placeholder')}
                 />
               </Stack>
 
               <TextField
-                label="翻译键"
+                label={t('i18n.translation.form.tKey')}
                 value={form.tKey}
                 onChange={(e) => setForm({ ...form, tKey: e.target.value })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder="例如：welcome.message, user.login.title"
+                placeholder={t('i18n.translation.form.tKey.placeholder')}
               />
 
               <Box>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="flex-start">
                   <TextField
-                    label="翻译值"
+                    label={t('i18n.translation.form.tValue')}
                     value={form.tValue}
                     onChange={(e) => setForm({ ...form, tValue: e.target.value })}
                     onBlur={() => checkDuplicate(form.tValue)}
@@ -256,7 +258,7 @@ const TheForm = memo(
                     multiline
                     rows={4}
                     size={isMobile ? 'medium' : 'medium'}
-                    placeholder="请输入翻译内容"
+                    placeholder={t('i18n.translation.form.tValue.placeholder')}
                     sx={{ flex: 1 }}
                   />
                   {checking && (
@@ -270,7 +272,7 @@ const TheForm = memo(
                 {duplicateInfo && duplicateInfo.hasDuplicate && (
                   <Alert severity="warning" sx={{ mt: 2 }} icon={<WarningIcon />}>
                     <Box sx={{ mb: 1 }}>
-                      <strong>发现 {duplicateInfo.duplicates.length} 个相同的翻译文案：</strong>
+                      <strong>{t('i18n.translation.duplicate.foundPrefix')} {duplicateInfo.duplicates.length} {t('i18n.translation.duplicate.foundSuffix')}</strong>
                     </Box>
                     <List dense sx={{ bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, mb: 1 }}>
                       {duplicateInfo.duplicates.map((dup) => (
@@ -300,14 +302,14 @@ const TheForm = memo(
                       ))}
                     </List>
                     <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-                      💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键
+                      {t('i18n.translation.duplicate.suggestion')}
                     </Box>
                   </Alert>
                 )}
               </Box>
 
               <TextField
-                label="描述信息"
+                label={t('i18n.translation.form.description')}
                 value={form.description || ''}
                 onChange={(e) =>
                   setForm({
@@ -319,11 +321,11 @@ const TheForm = memo(
                 multiline
                 rows={2}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder="请输入描述信息（可选）"
+                placeholder={t('i18n.translation.form.description.placeholder')}
               />
 
               <Stack direction="row" spacing={2} alignItems="center">
-                <Typography variant="body2">是否启用</Typography>
+                <Typography variant="body2">{t('i18n.translation.form.enabledLabel')}</Typography>
                 <Box
                   component="label"
                   sx={{
@@ -339,7 +341,7 @@ const TheForm = memo(
                     style={{ width: 20, height: 20, cursor: 'pointer' }}
                   />
                   <Typography variant="body2" sx={{ ml: 1 }}>
-                    {form.isEnabled ? '已启用' : '已禁用'}
+                    {form.isEnabled ? t('i18n.translation.switch.enabled') : t('i18n.translation.switch.disabled')}
                   </Typography>
                 </Box>
               </Stack>
@@ -354,10 +356,10 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} color="inherit">
-            取消
+            {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? '保存' : '创建'}
+            {editId ? t('i18n.translation.form.submit.edit') : t('i18n.translation.form.submit.create')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -11,6 +11,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { TheFormRef, DepartmentData } from './TheForm';
 
 // ==================== 新增部门按钮 ====================
@@ -24,13 +25,14 @@ export interface AddButtonProps {
  * 用于页面顶部的新增操作
  */
 export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
+  const t = useTranslation();
   const handleAdd = useCallback(() => {
     formRef.current?.openAdd();
   }, [formRef]);
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      添加部门
+      {t('system.department.actions.add')}
     </Button>
   );
 });
@@ -52,6 +54,7 @@ export interface TreeNodeButtonsProps {
  */
 export const TreeNodeActionButtons = memo(
   ({ node, formRef, onDeleteSuccess }: TreeNodeButtonsProps) => {
+    const t = useTranslation();
     // 删除确认对话框状态
     const [deleteDialog, setDeleteDialog] = useState(false);
 
@@ -61,7 +64,7 @@ export const TreeNodeActionButtons = memo(
         e.stopPropagation();
         formRef.current?.openAdd(node.id);
       },
-      [formRef, node.id]
+      [formRef, node.id],
     );
 
     // 处理编辑
@@ -70,17 +73,14 @@ export const TreeNodeActionButtons = memo(
         e.stopPropagation();
         formRef.current?.openEdit(node);
       },
-      [formRef, node]
+      [formRef, node],
     );
 
     // 打开删除确认对话框
-    const openDeleteDialog = useCallback(
-      (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setDeleteDialog(true);
-      },
-      []
-    );
+    const openDeleteDialog = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      setDeleteDialog(true);
+    }, []);
 
     // 关闭删除确认对话框
     const closeDeleteDialog = useCallback(() => {
@@ -99,16 +99,20 @@ export const TreeNodeActionButtons = memo(
     return (
       <>
         <Box sx={{ display: 'flex', gap: 0.5 }}>
-          <IconButton size="small" onClick={handleAddChild} title="添加子部门">
+          <IconButton
+            size="small"
+            onClick={handleAddChild}
+            title={t('system.department.actions.addChild')}
+          >
             <AddIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={handleEdit} title="编辑">
+          <IconButton size="small" onClick={handleEdit} title={t('common.actions.edit')}>
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
             onClick={openDeleteDialog}
-            title="删除"
+            title={t('common.actions.delete')}
             disabled={hasChildren}
           >
             <DeleteIcon fontSize="small" />
@@ -117,10 +121,10 @@ export const TreeNodeActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>确认删除</DialogTitle>
+          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              确定要删除部门 "<strong>{node.name}</strong>" 吗？此操作不可恢复。
+              {t('system.department.actions.deleteConfirmMessage').replace('{name}', node.name!)}
             </DialogContentText>
             {hasChildren && (
               <Alert severity="warning" sx={{ mt: 2 }}>
@@ -129,15 +133,15 @@ export const TreeNodeActionButtons = memo(
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>取消</Button>
+            <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus disabled={hasChildren}>
-              删除
+              {t('common.actions.delete')}
             </Button>
           </DialogActions>
         </Dialog>
       </>
     );
-  }
+  },
 );
 
 TreeNodeActionButtons.displayName = 'TreeNodeActionButtons';

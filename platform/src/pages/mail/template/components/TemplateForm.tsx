@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import {
   Button,
   Dialog,
@@ -42,6 +43,7 @@ export default function TemplateForm({
 }: TemplateFormProps) {
   const theme = useTheme();
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +72,7 @@ export default function TemplateForm({
           pb: isMobile ? 1 : 2,
         }}
       >
-        <Box>{editId ? '编辑邮件模板' : '新增邮件模板'}</Box>
+        <Box>{editId ? t('mail.template.form.title.edit') : t('mail.template.form.title.add')}</Box>
         {isMobile && (
           <IconButton edge="end" color="inherit" onClick={onCancel} aria-label="close">
             <CloseIcon />
@@ -88,67 +90,67 @@ export default function TemplateForm({
           <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
-                label="模板名称"
+                label={t('mail.template.form.name')}
                 value={form.name}
                 onChange={(e) => onFormChange({ ...form, name: e.target.value })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                helperText="邮件模板的唯一标识名称"
+                helperText={t('mail.template.form.nameHelp')}
               />
               <TextField
-                label="邮件标题"
+                label={t('mail.template.form.title')}
                 value={form.title}
                 onChange={(e) => onFormChange({ ...form, title: e.target.value })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                helperText="邮件的主题行"
+                helperText={t('mail.template.form.titleHelp')}
               />
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
-                label="语言代码"
+                label={t('mail.template.form.langCode')}
                 value={form.langCode}
                 onChange={(e) => onFormChange({ ...form, langCode: e.target.value })}
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder="如: zh-CN, en-US"
-                helperText="模板使用的语言代码（可选）"
+                placeholder={t('mail.template.form.langCodePlaceholder')}
+                helperText={t('mail.template.form.langCodeHelp')}
               />
               <TextField
-                label="模板分类"
+                label={t('mail.template.form.category')}
                 value={form.category}
                 onChange={(e) => onFormChange({ ...form, category: e.target.value })}
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder="如: 通知, 营销, 系统"
-                helperText="模板的分类标签（可选）"
+                placeholder={t('mail.template.form.categoryPlaceholder')}
+                helperText={t('mail.template.form.categoryHelp')}
               />
             </Stack>
 
             <TextField
-              label="创建者名称"
+              label={t('mail.template.form.creatorName')}
               value={form.creatorName}
               onChange={(e) => onFormChange({ ...form, creatorName: e.target.value })}
               required
               fullWidth
               size={isMobile ? 'medium' : 'medium'}
-              helperText="模板创建者的姓名"
+              helperText={t('mail.template.form.creatorNameHelp')}
             />
 
             <Box>
               <Typography variant="subtitle1" fontWeight={500} mb={1}>
-                邮件内容
+                {t('mail.template.form.contentLabel')}
               </Typography>
               <Typography variant="body2" color="text.secondary" mb={2}>
-                使用富文本编辑器编写邮件模板内容，支持HTML格式
+                {t('mail.template.form.contentHelp')}
               </Typography>
               <JoditEditor
                 value={form.content}
                 onChange={(html) => onFormChange({ ...form, content: html })}
-                placeholder="请输入邮件模板内容..."
+                placeholder={t('mail.template.form.contentPlaceholder')}
                 height={isMobile ? 300 : 450}
               />
             </Box>
@@ -170,7 +172,7 @@ export default function TemplateForm({
           size={isMobile ? 'large' : 'medium'}
           disabled={loading}
         >
-          取消
+          {t('common.cancel')}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -180,7 +182,7 @@ export default function TemplateForm({
           size={isMobile ? 'large' : 'medium'}
           disabled={loading}
         >
-          {loading ? '保存中...' : editId ? '更新' : '新增'}
+          {loading ? t('common.saving') : editId ? t('common.update') : t('common.create')}
         </Button>
       </DialogActions>
     </Dialog>

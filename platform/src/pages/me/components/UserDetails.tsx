@@ -3,6 +3,7 @@ import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-mater
 import { ResponsiveButton } from '@/components/Responsive/index';
 import type { User } from '@/pages/me/type';
 import dayjs from 'dayjs';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface UserDetailsProps {
   user: User;
@@ -10,16 +11,18 @@ interface UserDetailsProps {
 }
 
 export default function UserDetails({ user, onEdit }: UserDetailsProps) {
+  const t = useTranslation();
+
   return (
     <Card>
       <CardContent>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box display="flex" alignItems="center">
             <AccountBoxIcon sx={{ mr: 1 }} />
-            <Typography variant="h6">个人信息</Typography>
+            <Typography variant="h6">{t('me.details.title')}</Typography>
           </Box>
           <ResponsiveButton variant="contained" startIcon={<EditIcon />} onClick={onEdit}>
-            编辑
+            {t('common.actions.edit')}
           </ResponsiveButton>
         </Box>
 
@@ -27,7 +30,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
           <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
             <Box>
               <Typography variant="body2" color="text.secondary">
-                用户ID
+                {t('me.details.userId')}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.id}
@@ -36,7 +39,7 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                用户名
+                {t('me.details.username')}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.username}
@@ -45,28 +48,28 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                部门ID
+                {t('me.details.departmentId')}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.departmentObj?.label || '未分配'}
+                {user.departmentObj?.label || t('common.unassigned')}
               </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                角色ID
+                {t('me.details.roleId')}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.roleArr.map((role) => role.label).join(', ') || '未分配'}
+                {user.roleArr.map((role) => role.label).join(', ') || t('common.unassigned')}
               </Typography>
             </Box>
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                账户状态
+                {t('me.details.accountStatus')}
               </Typography>
               <Chip
-                label={user.isEnabled ? '启用' : '禁用'}
+                label={user.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
                 color={user.isEnabled ? 'success' : 'error'}
                 size="small"
               />
@@ -74,21 +77,21 @@ export default function UserDetails({ user, onEdit }: UserDetailsProps) {
 
             <Box>
               <Typography variant="body2" color="text.secondary">
-                创建时间
+                {t('common.columns.createTime')}
               </Typography>
               <Typography variant="body1" gutterBottom>
-                {user.createTimeUtc ? new Date(user.createTimeUtc).toLocaleString() : '暂无'}
+                {user.createTimeUtc ? new Date(user.createTimeUtc).toLocaleString() : t('common.noData')}
               </Typography>
             </Box>
 
             <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
               <Typography variant="body2" color="text.secondary">
-                更新时间
+                {t('common.columns.updateTime')}
               </Typography>
               <Typography variant="body1" gutterBottom>
                 {user.updateTimeUtc
                   ? dayjs(user.updateTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                  : '暂无'}
+                  : t('common.noData')}
               </Typography>
             </Box>
           </Box>

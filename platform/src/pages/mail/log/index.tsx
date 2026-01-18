@@ -7,12 +7,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import * as mailLogAPI from '@/api/mail/log';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
+import { useTranslation } from '@/hooks/useTranslation';
 import LogFilter from './components/LogFilter';
 import LogTable from './components/LogTable';
 import LogDetail from './components/LogDetail';
 import type { ListMailLog, FilterState } from './type';
 
 export default function MailLogRefactored() {
+  const t = useTranslation();
   const [logs, setLogs] = useState<ListMailLog[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
@@ -79,10 +81,10 @@ export default function MailLogRefactored() {
 
   return (
     <PageLayout
-      title="邮件发送日志"
+      title={t('mail.log.title')}
       actions={
         <ResponsiveButton variant="outlined" startIcon={<RefreshIcon />} onClick={handleRefresh}>
-          刷新
+          {t('common.refresh')}
         </ResponsiveButton>
       }
     >

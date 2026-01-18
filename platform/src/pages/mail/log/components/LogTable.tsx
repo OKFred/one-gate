@@ -24,6 +24,7 @@ import {
 import dayjs from 'dayjs';
 import type { ListMailLog } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface LogTableProps {
   logs: ListMailLog[];
@@ -33,6 +34,7 @@ interface LogTableProps {
 
 export default function LogTable({ logs, loading, onView }: LogTableProps) {
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
@@ -133,7 +135,7 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
         ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="body1" color="text.secondary">
-              暂无邮件日志
+              {t('mail.log.empty')}
             </Typography>
           </Box>
         )}
@@ -147,13 +149,13 @@ export default function LogTable({ logs, loading, onView }: LogTableProps) {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>ID</TableCell>
-            <TableCell>标题</TableCell>
-            <TableCell>收件人</TableCell>
-            <TableCell>发件人</TableCell>
-            <TableCell align="center">状态</TableCell>
-            <TableCell>发送时间</TableCell>
-            <TableCell align="center">操作</TableCell>
+            <TableCell>{t('common.columns.id')}</TableCell>
+            <TableCell>{t('mail.log.columns.subject')}</TableCell>
+            <TableCell>{t('mail.log.columns.recipient')}</TableCell>
+            <TableCell>{t('mail.log.columns.sender')}</TableCell>
+            <TableCell align="center">{t('common.columns.status')}</TableCell>
+            <TableCell>{t('mail.log.columns.sendTime')}</TableCell>
+            <TableCell align="center">{t('common.columns.actions')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

@@ -11,6 +11,7 @@ import {
   Edit as EditIcon 
 } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { User } from '@/pages/me/type';
 
 interface UserProfileProps {
@@ -19,6 +20,8 @@ interface UserProfileProps {
 }
 
 export default function UserProfile({ user, onEdit }: UserProfileProps) {
+  const t = useTranslation();
+  
   return (
     <Card>
       <CardContent sx={{ textAlign: 'center' }}>
@@ -38,16 +41,16 @@ export default function UserProfile({ user, onEdit }: UserProfileProps) {
         </Typography>
         
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          部门: {user.departmentObj?.label || '未分配'}
+          {t('me.profile.department')}: {user.departmentObj?.label || t('common.unassigned')}
         </Typography>
         
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          角色: {user.roleArr.map((role) => role.label).join(', ') || '未分配'}
+          {t('me.profile.role')}: {user.roleArr.map((role) => role.label).join(', ') || t('common.unassigned')}
         </Typography>
         
         <Box mt={2}>
           <Chip
-            label={user.isEnabled ? '账户正常' : '账户已禁用'}
+            label={user.isEnabled ? t('me.profile.accountNormal') : t('me.profile.accountDisabled')}
             color={user.isEnabled ? 'success' : 'error'}
             variant="outlined"
           />
@@ -60,7 +63,7 @@ export default function UserProfile({ user, onEdit }: UserProfileProps) {
             onClick={onEdit}
             fullWidth
           >
-            编辑信息
+            {t('me.profile.editInfo')}
           </ResponsiveButton>
         </Box>
       </CardContent>

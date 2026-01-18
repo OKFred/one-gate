@@ -1,5 +1,6 @@
 import { useRef, useMemo } from 'react';
 import { PageLayout } from '@/components/Responsive/index';
+import { useTranslation } from '@/hooks/useTranslation';
 import TheFilter, { type TheFilterRef } from './components/TheFilter';
 import TheForm, { type TheFormRef } from './components/TheForm';
 import TheTree, { type TheTreeRef } from './components/TheTree';
@@ -16,13 +17,14 @@ export interface LocalObj {
 }
 
 export default function DepartmentManagement() {
+  const t = useTranslation();
   const treeRef = useRef<TheTreeRef>(null);
   const formRef = useRef<TheFormRef>(null);
   const filterRef = useRef<TheFilterRef>(null);
   const localObj: LocalObj = useMemo(() => ({ treeRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title="部门管理" actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('system.department.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTree ref={localObj.treeRef} localObj={localObj} />

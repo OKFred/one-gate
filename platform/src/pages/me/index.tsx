@@ -9,12 +9,15 @@ import { Refresh as RefreshIcon } from '@mui/icons-material';
 import * as UserApiService from '@/api/system/user';
 import { showGlobalNotification } from '@/components/Notification';
 import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
+import { useTranslation } from '@/hooks/useTranslation';
 import UserProfile from './components/UserProfile';
 import UserDetails from './components/UserDetails';
 import UserEditDialog from './components/UserEditDialog';
-import type { UpdateUserParams, User } from './type';
+import type { User } from './type';
+import type { UpdateUserReq } from '@/api/system/type';
 
 export default function UserCenter() {
+  const t = useTranslation();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -36,7 +39,7 @@ export default function UserCenter() {
     } catch (error) {
       showGlobalNotification({
         type: 'error',
-        message: error instanceof Error ? error.message : '获取用户信息失败',
+        message: error instanceof Error ? error.message : t('me.getUserFailed'),
       });
     } finally {
       setLoading(false);
@@ -55,32 +58,28 @@ export default function UserCenter() {
 
   // 保存用户信息
   const handleSave = useCallback(
-    async (formData: UpdateUserParams) => {
+    async (formData: UpdateUserReq) => {
       if (!currentUser) return;
 
       setLoading(true);
-      if (!currentUser.id || !formData?.departmentId) return;
+      if (!currentUser.id) return;
       try {
-        const updateData: UpdateUserParams = {
+        const updateData: UpdateUserReq = {
           id: currentUser.id,
           username: formData?.username,
-          departmentId: formData?.departmentId,
-          roleIdArr: formData?.roleIdArr,
+          departmentObj: formData?.departmentObj,
+          roleArr: formData?.roleArr,
           isEnabled: formData?.isEnabled || false,
         };
 
-        // 只有输入了新密码才更新密码
-        if (formData.password && formData.password.trim()) {
-          updateData.password = formData.password;
-        }
         await UserApiService.updateFn(updateData);
-        showGlobalNotification({ type: 'success', message: '用户信息更新成功' });
+        showGlobalNotification({ type: 'success', message: t('me.updateSuccess') });
         setEditDialogOpen(false);
         await fetchCurrentUser();
       } catch (error) {
         showGlobalNotification({
           type: 'error',
-          message: error instanceof Error ? error.message : '更新用户信息失败',
+          message: error instanceof Error ? error.message : t('me.updateFailed'),
         });
       } finally {
         setLoading(false);
@@ -110,13 +109,13 @@ export default function UserCenter() {
   // 未找到用户信息
   if (!currentUser) {
     return (
-      <PageLayout title="我的">
+      <PageLayout title={t('me.title')}>
         <Box textAlign="center" p={4}>
           <Alert severity="warning" sx={{ mb: 2 }}>
-            无法获取用户信息
+            {t('me.getUserFailed')}
           </Alert>
           <ResponsiveButton variant="contained" onClick={fetchCurrentUser}>
-            重新加载
+            {t('common.reload')}
           </ResponsiveButton>
         </Box>
       </PageLayout>
@@ -125,7 +124,7 @@ export default function UserCenter() {
 
   return (
     <PageLayout
-      title="我的"
+      title={t('me.title')}
       actions={
         <ResponsiveButton
           variant="outlined"
@@ -133,7 +132,7 @@ export default function UserCenter() {
           onClick={handleRefresh}
           disabled={loading}
         >
-          刷新
+          {t('common.refresh')}
         </ResponsiveButton>
       }
     >

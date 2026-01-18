@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import * as mailAccountAPI from '@/api/mail/account';
 import * as mailTemplateAPI from '@/api/mail/template';
 import * as mailActionAPI from '@/api/mail/action';
@@ -25,6 +26,7 @@ import type { ListMailTemplate } from '../template/type';
 import type { SendMailRequest } from './type';
 
 export default function MailSend() {
+  const t = useTranslation();
   // 邮箱账户列表
   const [mailAccounts, setMailAccounts] = useState<ListMailAccount[]>([]);
   const [accountsLoading, setAccountsLoading] = useState(false);
@@ -219,7 +221,7 @@ export default function MailSend() {
 
       const res = await mailActionAPI.sendFn({ data });
       if (res.data && res.data.ok) {
-        let msg = '邮件发送成功';
+        let msg = t('mail.send.success');
         if (typeof res.data.data === 'string') {
           msg = res.data.data;
         } else if (typeof res.data.data === 'object' && res.data.data !== null) {
@@ -228,7 +230,7 @@ export default function MailSend() {
         showGlobalNotification({ message: msg, type: 'success' });
       } else {
         showGlobalNotification({
-          message: (res.data?.message as string) || '邮件发送失败',
+          message: (res.data?.message as string) || t('mail.send.failed'),
           type: 'error',
         });
       }
@@ -239,7 +241,7 @@ export default function MailSend() {
         'message' in err &&
         typeof (err as Error).message === 'string'
           ? (err as Error).message
-          : '邮件发送失败';
+          : t('mail.send.failed');
       showGlobalNotification({ message: msg, type: 'error' });
     } finally {
       setLoading(false);
@@ -250,17 +252,17 @@ export default function MailSend() {
     <Box sx={{ mx: 'auto', p: 3 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" gutterBottom fontWeight={600}>
-          发送邮件
+          {t('mail.send.title')}
         </Typography>
         <Box component="form" onSubmit={handleSubmit} autoComplete="off">
           <Stack spacing={2}>
             <FormControl fullWidth size="small">
-              <InputLabel id="account-select-label">选择发件账户</InputLabel>
+              <InputLabel id="account-select-label">{t('mail.send.form.selectAccount')}</InputLabel>
               <Select
                 labelId="account-select-label"
                 id="account-select"
                 value={form.senderObj.accountId}
-                label="选择发件账户"
+                label={t('mail.send.form.selectAccount')}
                 onChange={handleAccountSelect}
                 disabled={accountsLoading}
               >
@@ -280,7 +282,7 @@ export default function MailSend() {
             </FormControl>
             {!form.senderObj.accountId && (
               <TextField
-                label="或直接输入发件邮箱"
+                label={t('mail.send.form.customFrom')}
                 value={form.senderObj.mailAddress}
                 onChange={(e) =>
                   handleChange('senderObj', {
@@ -291,18 +293,18 @@ export default function MailSend() {
                 }
                 size="small"
                 fullWidth
-                helperText="如果没有配置的账户，可以直接输入邮箱地址"
+                helperText={t('mail.send.form.customFromHelp')}
               />
             )}
             <Box>
               <Typography fontWeight={500} mb={1}>
-                收件人
+                {t('mail.send.recipients')}
               </Typography>
               <Stack spacing={1}>
                 {form.receiverArr.map((r, i) => (
                   <Stack direction="row" spacing={1} alignItems="center" key={i}>
                     <TextField
-                      placeholder="姓名"
+                      placeholder={t('mail.send.form.recipientName')}
                       value={r.name}
                       onChange={(e) => handleReceiverChange(i, 'name', e.target.value)}
                       required
@@ -310,7 +312,7 @@ export default function MailSend() {
                       sx={{ flex: 1 }}
                     />
                     <TextField
-                      placeholder="邮箱"
+                      placeholder={t('mail.send.form.recipientEmail')}
                       value={r.address}
                       onChange={(e) => handleReceiverChange(i, 'address', e.target.value)}
                       required
@@ -321,7 +323,7 @@ export default function MailSend() {
                       <IconButton
                         color="error"
                         onClick={() => handleRemoveReceiver(i)}
-                        aria-label="移除收件人"
+                        aria-label={t('mail.send.form.removeRecipient')}
                         size="small"
                       >
                         <RemoveCircleOutlineIcon />
@@ -335,24 +337,24 @@ export default function MailSend() {
                   onClick={handleAddReceiver}
                   sx={{ mt: 1, width: 180 }}
                 >
-                  添加收件人
+                  {t('mail.send.addRecipient')}
                 </Button>
               </Stack>
             </Box>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl fullWidth size="small">
-                <InputLabel id="template-select-label">选择邮件模板</InputLabel>
+                <InputLabel id="template-select-label">{t('mail.send.form.selectTemplate')}</InputLabel>
                 <Select
                   labelId="template-select-label"
                   id="template-select"
                   value={form.contentObj.templateId}
-                  label="选择邮件模板"
+                  label={t('mail.send.form.selectTemplate')}
                   onChange={handleTemplateSelect}
                   disabled={templatesLoading}
                 >
                   <MenuItem value="">
                     <Typography variant="body2" color="text.secondary">
-                      不使用模板 - 手动编写内容
+                      {t('mail.send.noTemplate')}
                     </Typography>
                   </MenuItem>
                   {mailTemplates.map((template) => (
@@ -362,8 +364,8 @@ export default function MailSend() {
                           {template.title || template.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          模板名: {template.name} | 创建者: {template.creatorName}
-                          {template.category && ` | 分类: ${template.category}`}
+                          {t('mail.send.templateName')}: {template.name} | {t('mail.send.creator')}: {template.creatorName}
+                          {template.category && ` | ${t('mail.send.category')}: ${template.category}`}
                         </Typography>
                       </Box>
                     </MenuItem>
@@ -371,7 +373,7 @@ export default function MailSend() {
                 </Select>
               </FormControl>
               <TextField
-                label="主题"
+                label={t('mail.send.form.subject')}
                 value={form.contentObj.subject}
                 onChange={(e) => handleSubjectChange(e.target.value)}
                 size="small"
@@ -380,11 +382,11 @@ export default function MailSend() {
             </Stack>
             <Box>
               <Typography fontWeight={500} mb={1}>
-                邮件内容
+                {t('mail.send.form.contentLabel')}
               </Typography>
               {form.contentObj.templateId && (
                 <Typography variant="body2" color="info.main" mb={1}>
-                  已选择模板，内容已自动填充，您可以在此基础上继续编辑
+                  {t('mail.send.templateSelectedInfo')}
                 </Typography>
               )}
               <JoditEditor
@@ -392,8 +394,8 @@ export default function MailSend() {
                 onChange={handleHtmlChange}
                 placeholder={
                   form.contentObj.templateId
-                    ? '模板内容已加载，您可以在此基础上编辑...'
-                    : '请输入邮件内容或选择上方的邮件模板...'
+                    ? t('mail.send.form.content.loaded')
+                    : t('mail.send.form.content.empty')
                 }
                 height={400}
               />
@@ -406,7 +408,7 @@ export default function MailSend() {
               sx={{ mt: 2 }}
               fullWidth
             >
-              {loading ? '发送中...' : '发送'}
+              {loading ? t('mail.send.action.sending') : t('mail.send.action.send')}
             </Button>
           </Stack>
         </Box>

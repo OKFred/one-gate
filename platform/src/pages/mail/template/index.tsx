@@ -8,8 +8,10 @@ import TemplateTable from './components/TemplateTable';
 import TemplateFilter from './components/TemplateFilter';
 import TemplatePreview from './components/TemplatePreview';
 import type { ListMailTemplate, FilterState } from './type';
+import { useTranslation } from '@/hooks/useTranslation';
 
 export default function MailTemplate() {
+  const t = useTranslation();
   const [templates, setTemplates] = useState<ListMailTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
@@ -53,7 +55,7 @@ export default function MailTemplate() {
     } catch (error) {
       console.error('获取模板列表失败:', error);
       showGlobalNotification({
-        message: '获取模板列表失败',
+        message: t('mail.template.fetchFailed'),
         type: 'error',
       });
     } finally {
@@ -117,20 +119,20 @@ export default function MailTemplate() {
       const res = await mailTemplateAPI.deleteFn({ data: { id } });
       if (res.data?.ok) {
         showGlobalNotification({
-          message: '删除成功',
+          message: t('mail.template.deleteSuccess'),
           type: 'success',
         });
         fetchTemplates(filters);
       } else {
         showGlobalNotification({
-          message: res.data?.message || '删除失败',
+          message: res.data?.message || t('mail.template.deleteFailed'),
           type: 'error',
         });
       }
     } catch (error) {
       console.error('删除模板失败:', error);
       showGlobalNotification({
-        message: '删除失败',
+        message: t('mail.template.deleteFailed'),
         type: 'error',
       });
     }
@@ -166,21 +168,21 @@ export default function MailTemplate() {
 
       if (res.data?.ok) {
         showGlobalNotification({
-          message: editId ? '更新成功' : '新增成功',
+          message: editId ? t('mail.template.saveSuccess.update') : t('mail.template.saveSuccess.create'),
           type: 'success',
         });
         handleCancel();
         fetchTemplates(filters);
       } else {
         showGlobalNotification({
-          message: res.data?.message || (editId ? '更新失败' : '新增失败'),
+          message: res.data?.message || (editId ? t('mail.template.saveFailed.update') : t('mail.template.saveFailed.create')),
           type: 'error',
         });
       }
     } catch (error) {
       console.error('保存模板失败:', error);
       showGlobalNotification({
-        message: editId ? '更新失败' : '新增失败',
+        message: editId ? t('mail.template.saveFailed.update') : t('mail.template.saveFailed.create'),
         type: 'error',
       });
     } finally {
@@ -203,10 +205,10 @@ export default function MailTemplate() {
 
   return (
     <PageLayout
-      title="邮件模板管理"
+      title={t('mail.template.title')}
       actions={
         <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-          新增模板
+          {t('common.create')}
         </ResponsiveButton>
       }
     >

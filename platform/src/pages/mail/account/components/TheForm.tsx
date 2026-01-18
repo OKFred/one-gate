@@ -235,7 +235,7 @@ const TheForm = memo(
           }}
         >
           <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
-            {t('mail.account.form.cancel')}
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -244,7 +244,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {t('mail.account.form.save')}
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -24,6 +24,7 @@ import {
 import dayjs from 'dayjs';
 import type { ListMailTemplate } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TemplateTableProps {
   templates: ListMailTemplate[];
@@ -41,6 +42,7 @@ export default function TemplateTable({
   onPreview,
 }: TemplateTableProps) {
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
@@ -143,7 +145,7 @@ export default function TemplateTable({
         ) : (
           <Box sx={{ textAlign: 'center', py: 8 }}>
             <Typography variant="body1" color="text.secondary">
-              暂无邮件模板
+              {t('mail.template.empty')}
             </Typography>
           </Box>
         )}
@@ -158,12 +160,12 @@ export default function TemplateTable({
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
-            <TableCell>模板名称</TableCell>
-            <TableCell>邮件标题</TableCell>
-            <TableCell>内容预览</TableCell>
-            <TableCell>语言/分类</TableCell>
-            <TableCell>创建时间</TableCell>
-            <TableCell align="center">操作</TableCell>
+            <TableCell>{t('mail.template.columns.name')}</TableCell>
+            <TableCell>{t('mail.template.columns.title')}</TableCell>
+            <TableCell>{t('mail.template.columns.contentPreview')}</TableCell>
+            <TableCell>{t('mail.template.columns.langCategory')}</TableCell>
+            <TableCell>{t('mail.template.columns.createTime')}</TableCell>
+            <TableCell align="center">{t('mail.template.columns.actions')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -208,18 +210,18 @@ export default function TemplateTable({
                 <TableCell align="center">
                   <Stack direction="row" spacing={1} justifyContent="center">
                     {onPreview && (
-                      <Tooltip title="预览" arrow>
+                      <Tooltip title={t('table.tooltip.preview')} arrow>
                         <IconButton onClick={() => onPreview(template)} color="info" size="small">
                           <ViewIcon />
                         </IconButton>
                       </Tooltip>
                     )}
-                    <Tooltip title="编辑" arrow>
+                    <Tooltip title={t('table.tooltip.edit')} arrow>
                       <IconButton onClick={() => onEdit(template)} color="primary" size="small">
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="删除" arrow>
+                    <Tooltip title={t('table.tooltip.delete')} arrow>
                       <IconButton
                         onClick={() => template.id && onDelete(template.id)}
                         color="error"

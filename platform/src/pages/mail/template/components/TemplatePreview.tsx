@@ -16,6 +16,7 @@ import { Close as CloseIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { ListMailTemplate } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TemplatePreviewProps {
   open: boolean;
@@ -26,6 +27,7 @@ interface TemplatePreviewProps {
 export default function TemplatePreview({ open, template, onClose }: TemplatePreviewProps) {
   const theme = useTheme();
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
@@ -56,7 +58,7 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
           pb: isMobile ? 1 : 2,
         }}
       >
-        <Box>模板预览</Box>
+        <Box>{t('mail.template.preview.title')}</Box>
         {isMobile && (
           <IconButton edge="end" color="inherit" onClick={onClose} aria-label="close">
             <CloseIcon />
@@ -74,12 +76,12 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
           {/* 模板基本信息 */}
           <Box>
             <Typography variant="h6" gutterBottom>
-              基本信息
+              {t('mail.template.preview.basicInfo')}
             </Typography>
             <Stack spacing={2}>
               <Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  模板ID
+                  {t('mail.template.preview.id')}
                 </Typography>
                 <Typography variant="body1">{template.id}</Typography>
               </Box>
@@ -87,7 +89,7 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    模板名称
+                    {t('mail.template.columns.name')}
                   </Typography>
                   <Typography variant="body1">{template.name || '-'}</Typography>
                 </Box>
@@ -96,13 +98,13 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    创建时间
+                    {t('mail.template.columns.createTime')}
                   </Typography>
                   <Typography variant="body1">{formatDate(template.createTimeUtc)}</Typography>
                 </Box>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    更新时间
+                    {t('mail.template.preview.updateTime')}
                   </Typography>
                   <Typography variant="body1">
                     {formatDate(template.updateTimeUtc || undefined)}
@@ -112,18 +114,18 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
 
               <Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  标签
+                  {t('mail.template.preview.tags')}
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap">
                   {template.langCode && (
-                    <Chip label={`语言: ${template.langCode}`} color="info" size="small" />
+                    <Chip label={`${t('common.language')}: ${template.langCode}`} color="info" size="small" />
                   )}
                   {template.category && (
-                    <Chip label={`分类: ${template.category}`} color="secondary" size="small" />
+                    <Chip label={`${t('common.category')}: ${template.category}`} color="secondary" size="small" />
                   )}
                   {!template.langCode && !template.category && (
                     <Typography variant="body2" color="text.secondary">
-                      无标签
+                      {t('common.noTags')}
                     </Typography>
                   )}
                 </Stack>
@@ -136,7 +138,7 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
           {/* 邮件预览 */}
           <Box>
             <Typography variant="h6" gutterBottom>
-              邮件预览
+              {t('mail.template.preview.mail')}
             </Typography>
             <Box
               sx={{
@@ -156,17 +158,17 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
                 }}
               >
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  主题
+                  {t('mail.send.form.subject')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                  {template.title || '(无主题)'}
+                  {template.title || t('common.noSubject')}
                 </Typography>
               </Box>
 
               {/* 邮件内容 */}
               <Box sx={{ p: 2 }}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  邮件内容
+                  {t('mail.send.form.contentLabel')}
                 </Typography>
                 <Box
                   sx={{
@@ -195,7 +197,7 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
                       color="text.secondary"
                       style={{ fontStyle: 'italic' }}
                     >
-                      (无内容)
+                      {t('common.noContent')}
                     </Typography>
                   )}
                 </Box>
@@ -212,7 +214,7 @@ export default function TemplatePreview({ open, template, onClose }: TemplatePre
         }}
       >
         <Button onClick={onClose} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
-          关闭
+          {t('common.close')}
         </Button>
       </DialogActions>
     </Dialog>

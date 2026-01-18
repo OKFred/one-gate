@@ -19,6 +19,7 @@ import {
   FormControl,
 } from '@mui/material';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 /** 表格列配置 */
 export interface TableColumn<T> {
@@ -58,8 +59,6 @@ export interface ResponsiveListProps<T> {
   onPageChange: (page: number) => void;
   /** 每页数量改变回调 */
   onPageSizeChange?: (pageSize: number) => void;
-  /** 每页数量标签 */
-  pageSizeLabel?: string;
   /** 获取每行的唯一 key */
   keyExtractor: (item: T) => string | number;
   /** 表格列配置（PC端） */
@@ -83,16 +82,18 @@ function ResponsiveListInner<T>({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  pageSizeLabel = '每页条数：',
   keyExtractor,
   columns,
   cardFields,
   cardActions,
-  emptyText = '暂无数据',
+  emptyText,
   extraContent,
 }: ResponsiveListProps<T>) {
   const { isMobile } = useResponsive();
-
+  const t = useTranslation();
+  if (!emptyText) {
+    emptyText = t('common.table.empty');
+  }
   const totalPages = Math.ceil(total / pageSize);
 
   // 加载状态
@@ -132,7 +133,7 @@ function ResponsiveListInner<T>({
         {onPageSizeChange && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              {pageSizeLabel}
+              {t('common.table.pageSizeLabel')}:
             </Typography>
             <FormControl size="small" sx={{ minWidth: 80 }}>
               <Select

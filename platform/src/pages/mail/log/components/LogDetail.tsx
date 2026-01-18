@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import type { ListMailLog } from '../type';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useTranslation } from '@/hooks/useTranslation';
 import dayjs from 'dayjs';
 
 interface LogDetailProps {
@@ -30,6 +31,7 @@ interface LogDetailProps {
 
 export default function LogDetail({ open, log, onClose }: LogDetailProps) {
   const { isMobile } = useResponsive();
+  const t = useTranslation();
 
   const formatDate = (timestamp?: number) => {
     if (!timestamp) return '-';
@@ -54,7 +56,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
         <Box display="flex" alignItems="center" gap={2}>
           <EmailIcon color="primary" />
           <Typography variant="h6" component="span">
-            邮件详情 - ID: {log.id}
+            {t('mail.log.detail.title')}: {log.id}
           </Typography>
         </Box>
       </DialogTitle>
@@ -64,12 +66,12 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
           {/* 发送状态 */}
           <Box>
             <Typography variant="subtitle2" gutterBottom color="text.secondary">
-              发送状态
+              {t('mail.log.detail.sendStatus')}
             </Typography>
             {log.sendStatus ? (
-              <Chip icon={<SuccessIcon />} label="发送成功" color="success" variant="outlined" />
+              <Chip icon={<SuccessIcon />} label={t('mail.log.detail.sendSuccess')} color="success" variant="outlined" />
             ) : (
-              <Chip icon={<ErrorIcon />} label="发送失败" color="error" variant="outlined" />
+              <Chip icon={<ErrorIcon />} label={t('mail.log.detail.sendFailed')} color="error" variant="outlined" />
             )}
           </Box>
 
@@ -78,19 +80,19 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
           {/* 基本信息 */}
           <Box>
             <Typography variant="h6" gutterBottom>
-              基本信息
+              {t('mail.log.detail.basicInfo')}
             </Typography>
             <Stack spacing={2}>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  邮件标题
+                  {t('mail.log.columns.subject')}
                 </Typography>
                 <Typography variant="body1">{log.title || '-'}</Typography>
               </Box>
 
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  收件人
+                  {t('mail.log.columns.recipient')}
                 </Typography>
                 <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                   {log.mailTo || '-'}
@@ -99,7 +101,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
 
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  发件人
+                  {t('mail.log.columns.sender')}
                 </Typography>
                 <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                   {log.mailFrom || '-'}
@@ -114,12 +116,12 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
           <Box>
             <Typography variant="h6" gutterBottom>
               <TimeIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-              时间信息
+              {t('mail.log.detail.timeInfo')}
             </Typography>
             <Stack spacing={2}>
               <Box>
                 <Typography variant="subtitle2" color="text.secondary">
-                  创建时间
+                  {t('common.columns.createTime')}
                 </Typography>
                 <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
               </Box>
@@ -127,7 +129,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
               {log.updateTimeUtc && (
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    更新时间
+                    {t('common.columns.updateTime')}
                   </Typography>
                   <Typography variant="body1">{formatDate(log.updateTimeUtc)}</Typography>
                 </Box>
@@ -142,7 +144,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
               <Box>
                 <Typography variant="h6" gutterBottom>
                   <TemplateIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  模板信息
+                  {t('mail.log.detail.templateInfo')}
                 </Typography>
                 <Stack spacing={2}>
                   {log.templateId && (
@@ -185,7 +187,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
               <Divider />
               <Box>
                 <Typography variant="h6" gutterBottom color="error">
-                  错误信息
+                  {t('mail.log.detail.errorInfo')}
                 </Typography>
                 {log.exceptionCode && (
                   <Alert severity="error" sx={{ mb: 2 }}>
@@ -208,7 +210,7 @@ export default function LogDetail({ open, log, onClose }: LogDetailProps) {
 
       <DialogActions>
         <Button onClick={onClose} color="primary" variant="contained">
-          关闭
+          {t('common.close')}
         </Button>
       </DialogActions>
     </Dialog>

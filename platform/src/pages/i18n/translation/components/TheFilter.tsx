@@ -22,6 +22,7 @@ import {
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { Props } from '../index';
 import type { ListTranslationReq } from '@/api/i18n/type';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
 export interface FilterState {
@@ -42,6 +43,7 @@ export interface TheFilterRef {
 
 const TheFilter = memo(
   forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
+    const t = useTranslation();
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
@@ -143,13 +145,18 @@ const TheFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">搜索与筛选</Typography>
+            <Typography variant="h6">{t('i18n.translation.filter.title')}</Typography>
             {isSearching && (
-              <Chip label="搜索中..." size="small" color="default" variant="outlined" />
+              <Chip
+                label={t('i18n.translation.filter.searching')}
+                size="small"
+                color="default"
+                variant="outlined"
+              />
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={`${filterCount} 个结果`}
+                label={`${filterCount} ${t('i18n.translation.filter.resultsSuffix')}`}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -159,7 +166,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label="清除筛选"
+                label={t('i18n.translation.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -176,8 +183,8 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label="关键字搜索"
-                placeholder="搜索翻译键、翻译值、描述..."
+                label={t('i18n.translation.filter.keywordLabel')}
+                placeholder={t('i18n.translation.filter.keywordPlaceholder')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -193,8 +200,8 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="应用"
-                  placeholder="如：frontend, backend, common"
+                  label={t('i18n.translation.form.application')}
+                  placeholder={t('i18n.translation.form.application.placeholder')}
                   value={filters.application || ''}
                   onChange={(e) => handleFilterChange('application', e.target.value)}
                   size="small"
@@ -202,8 +209,8 @@ const TheFilter = memo(
                 />
 
                 <TextField
-                  label="业务"
-                  placeholder="如：email, order"
+                  label={t('i18n.translation.form.business')}
+                  placeholder={t('i18n.translation.form.business.placeholder')}
                   value={filters.business || ''}
                   onChange={(e) => handleFilterChange('business', e.target.value)}
                   size="small"
@@ -211,8 +218,8 @@ const TheFilter = memo(
                 />
 
                 <TextField
-                  label="语言代码"
-                  placeholder="如：en, zh-CN"
+                  label={t('i18n.translation.form.langCode')}
+                  placeholder={t('i18n.translation.form.langCode.placeholder')}
                   value={filters.langCode || ''}
                   onChange={(e) => handleFilterChange('langCode', e.target.value)}
                   size="small"
@@ -220,7 +227,7 @@ const TheFilter = memo(
                 />
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>启用状态</InputLabel>
+                  <InputLabel>{t('i18n.translation.filter.enabledLabel')}</InputLabel>
                   <Select
                     value={
                       filters.isEnabled === undefined
@@ -229,7 +236,7 @@ const TheFilter = memo(
                           ? 'enabled'
                           : 'disabled'
                     }
-                    label="启用状态"
+                    label={t('i18n.translation.filter.enabledLabel')}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleFilterChange(
@@ -238,39 +245,43 @@ const TheFilter = memo(
                       );
                     }}
                   >
-                    <MenuItem value="all">全部</MenuItem>
-                    <MenuItem value="enabled">已启用</MenuItem>
-                    <MenuItem value="disabled">已禁用</MenuItem>
+                    <MenuItem value="all">{t('i18n.translation.switch.all')}</MenuItem>
+                    <MenuItem value="enabled">{t('i18n.translation.switch.enabled')}</MenuItem>
+                    <MenuItem value="disabled">{t('i18n.translation.switch.disabled')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>排序字段</InputLabel>
+                  <InputLabel>{t('i18n.translation.filter.sortField')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label="排序字段"
+                    label={t('i18n.translation.filter.sortField')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
                     <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="application">应用</MenuItem>
-                    <MenuItem value="business">业务</MenuItem>
-                    <MenuItem value="langCode">语言代码</MenuItem>
-                    <MenuItem value="tKey">翻译键</MenuItem>
-                    <MenuItem value="createTimeUtc">创建时间</MenuItem>
+                    <MenuItem value="application">
+                      {t('i18n.translation.form.application')}
+                    </MenuItem>
+                    <MenuItem value="business">{t('i18n.translation.form.business')}</MenuItem>
+                    <MenuItem value="langCode">{t('i18n.translation.form.langCode')}</MenuItem>
+                    <MenuItem value="tKey">{t('i18n.translation.form.tKey')}</MenuItem>
+                    <MenuItem value="createTimeUtc">
+                      {t('i18n.translation.columns.createTime')}
+                    </MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>排序方式</InputLabel>
+                  <InputLabel>{t('i18n.translation.filter.sortOrder')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label="排序方式"
+                    label={t('i18n.translation.filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">升序</MenuItem>
-                    <MenuItem value="desc">降序</MenuItem>
+                    <MenuItem value="asc">{t('i18n.translation.filter.sort.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('i18n.translation.filter.sort.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
