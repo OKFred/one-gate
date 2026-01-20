@@ -124,7 +124,12 @@ const TheFilter = memo(
             <FilterIcon color="action" />
             <Typography variant="h6">{t('common.filter.title')}</Typography>
             {isSearching && (
-              <Chip label={t('common.filter.searching')} size="small" color="default" variant="outlined" />
+              <Chip
+                label={t('common.filter.searching')}
+                size="small"
+                color="default"
+                variant="outlined"
+              />
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
@@ -155,7 +160,7 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label={t('common.filter.keywordSearch')}
+                label={t('common.filter.keywordLabel')}
                 placeholder={t('system.role.filter.keywordPlaceholder')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
