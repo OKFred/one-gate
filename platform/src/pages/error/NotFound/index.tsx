@@ -4,11 +4,11 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 const NotFound: React.FC = () => {
   const t = useTranslation();
-  
+
   return (
     <div className="flex flex-col items-center">
       <Typography variant="h1" color="primary" gutterBottom>
-        {t('error.notFound.title')}
+        404
       </Typography>
       <Typography variant="h5" color="text.secondary" gutterBottom>
         {t('error.notFound.message')}

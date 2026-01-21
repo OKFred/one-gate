@@ -143,7 +143,7 @@ const TheForm = memo(
       const formData = { ...form };
       // 保证 remark 字段传递（允许为 null）
       if (!('remark' in formData)) {
-        (formData as any).remark = null;
+        formData.remark = null;
       }
 
       if (editId) {
@@ -320,7 +320,7 @@ const TheForm = memo(
                   }}
                 >
                   <Typography color={form.departmentObj ? 'text.primary' : 'text.secondary'}>
-                    {form.departmentObj?.label || t('system.user.form.selectDepartment')}
+                    {form.departmentObj?.label || t('form.select')}
                   </Typography>
                   <ArrowDropDownIcon color="action" />
                 </Paper>
@@ -349,7 +349,9 @@ const TheForm = memo(
                 >
                   <Box sx={{ p: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="subtitle2">{t('system.user.form.selectDepartment')}</Typography>
+                      <Typography variant="subtitle2">
+                        {t('form.select')}
+                      </Typography>
                       {form.departmentObj && (
                         <Button size="small" onClick={handleDepartmentClear}>
                           {t('common.clear')}
@@ -407,8 +409,10 @@ const TheForm = memo(
 
               <TextField
                 label={t('system.user.form.remark')}
-                value={(form as any).remark ?? ''}
-                onChange={(e) => setForm({ ...form, remark: e.target.value ? e.target.value : null } as any)}
+                value={form.remark ?? ''}
+                onChange={(e) =>
+                  setForm({ ...form, remark: e.target.value ? e.target.value : null })
+                }
                 fullWidth
                 multiline
                 rows={3}
@@ -436,7 +440,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {editId ? t('common.update') : t('common.add')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

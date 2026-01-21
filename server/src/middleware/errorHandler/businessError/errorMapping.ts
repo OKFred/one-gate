@@ -9,16 +9,22 @@ export const BusinessErrorCode = {
   PERMISSION_DENIED: "PERMISSION_DENIED",
   /** @description 通用无效参数 */
   NOT_EXIST_OR_DISABLED: "NOT_EXIST_OR_DISABLED",
-  /** @description 唯一键冲突 */
-  DUPLICATE_KEYS: "DUPLICATE_KEYS",
+  /** @description 数据重复 */
+  DUPLICATE_DATA: "DUPLICATE_DATA",
+  /** @description 数据验证失败 */
+  VALIDATION_FAILED: "VALIDATION_FAILED",
   /** @description 功能暂未实现 */
   NOT_YET_IMPLEMENTED: "NOT_YET_IMPLEMENTED",
   /** @description 部门不存在或已被禁用 */
   DEPARTMENT_NOT_EXIST: "DEPARTMENT_NOT_EXIST",
+  /** @description 未知错误 */
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
   /** @description 角色不存在或已被禁用 */
   ROLE_NOT_EXIST: "ROLE_NOT_EXIST",
-  /** @description 数据版本冲突 */
-  DATA_VERSION_CONFLICT: "DATA_VERSION_CONFLICT",
+  /** @description 数据库繁忙或锁定 */
+  DATABASE_BUSY: "DATABASE_BUSY",
+  /** @description 数据库操作错误 */
+  DATABASE_ERROR: "DATABASE_ERROR",
 } as const;
 
 export type BusinessErrorCode =
@@ -51,22 +57,34 @@ export const ERROR_PRESENTATION_MAP: Record<
   },
   PERMISSION_DENIED: {
     status: 403,
-    i18nKey: "common.permission_denied",
+    i18nKey: "errorHandler.forbidden",
   },
   NOT_EXIST_OR_DISABLED: {
     status: 404,
     i18nKey: "i18n.api.notExistOrDisabled",
   },
-  DUPLICATE_KEYS: {
+  DUPLICATE_DATA: {
     status: 409,
-    i18nKey: "i18n.api.duplicateKeys",
+    i18nKey: "i18n.middleware.errorHandler.duplicatedData",
+  },
+  VALIDATION_FAILED: {
+    status: 422,
+    i18nKey: "i18n.middleware.errorHandler.validationFailed",
+  },
+  UNKNOWN_ERROR: {
+    status: 500,
+    i18nKey: "i18n.middleware.errorHandler.unknownError",
   },
   NOT_YET_IMPLEMENTED: {
     status: 501,
-    i18nKey: "i18n.api.system.wechatNotImplemented",
+    i18nKey: "i18n.middleware.errorHandler.notYetImplemented",
   },
-  DATA_VERSION_CONFLICT: {
-    status: 409,
-    i18nKey: "i18n.api.dataVersionConflict",
+  DATABASE_BUSY: {
+    status: 503,
+    i18nKey: "i18n.middleware.errorHandler.databaseBusy",
+  },
+  DATABASE_ERROR: {
+    status: 500,
+    i18nKey: "i18n.middleware.errorHandler.databaseError",
   },
 };

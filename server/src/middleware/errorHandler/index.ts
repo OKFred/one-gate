@@ -2,8 +2,11 @@ import type { App, NodeHonoContext } from "@/types/app.ts";
 import { createTranslator, getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
+import { type ContentfulStatusCode } from "hono/utils/http-status";
+import { StatusCodes } from "http-status-codes";
 import { BusinessError } from "@/middleware/errorHandler/businessError/index";
 import { toHttpException } from "./businessError";
+import { convertSqlErrorToBusinessError } from "./sqlError";
 
 type HTTPExceptionConstructorParams = Required<
   ConstructorParameters<typeof HTTPException>
@@ -19,7 +22,7 @@ export default function errorHandler(app: App) {
         message: t("i18n.middleware.errorHandler.notFound"),
         data: null,
       },
-      { status: 404 }
+      { status: StatusCodes.NOT_FOUND as ContentfulStatusCode }
     );
   });
 
@@ -36,48 +39,22 @@ export default function errorHandler(app: App) {
 
   app.onError((e, c: NodeHonoContext) => {
     const t = getTranslator(c);
-
-    // 业务异常处理
+    const sqlError = convertSqlErrorToBusinessError(e);
+    if (sqlError) {
+      throw toHttpException(sqlError);
+    }
     if (e instanceof BusinessError) {
+      e.message = t(e.message);
       throw toHttpException(e);
     }
     if (e instanceof HTTPException) {
-      const message = e.message
-        ? e.message.startsWith("i18n.")
-          ? t(e.message)
-          : e.message
-        : e.status === 403
-          ? t("i18n.middleware.errorHandler.forbidden")
-          : e.status === 404
-            ? t("i18n.middleware.errorHandler.targetNotExist")
-            : e.status === 422
-              ? t("i18n.middleware.errorHandler.validationFailed")
-              : t("i18n.middleware.errorHandler.undefinedError");
-      if (message === t("i18n.middleware.errorHandler.undefinedError")) {
-        c.var.logger.error(
-          t("i18n.middleware.errorHandler.undefinedError") + ": " + e.stack
-        );
-      }
       return c.json(
         {
           ok: false,
-          message,
+          message: e.message,
           data: e.cause as HTTPExceptionOptions["cause"],
         },
-        {
-          status: e.status,
-        }
-      );
-    }
-    let message = t("i18n.middleware.errorHandler.unknownError");
-    if (e.message?.includes("SQLITE_CONSTRAINT_UNIQUE")) {
-      message = t("i18n.middleware.errorHandler.duplicatedData");
-      return c.json(
-        {
-          ok: false,
-          message,
-        },
-        { status: 409 }
+        { status: e.status as ContentfulStatusCode }
       );
     }
     c.var.logger.error(
@@ -86,10 +63,10 @@ export default function errorHandler(app: App) {
     return c.json(
       {
         ok: false,
-        message,
+        message: t("i18n.middleware.errorHandler.unknownError"),
         data: process.env.NODE_ENV !== "production" ? e.message : null,
       },
-      { status: 500 }
+      { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
     );
   });
 }

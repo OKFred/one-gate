@@ -96,9 +96,7 @@ export const RoleActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
       <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
         <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t('system.role.actions.deleteConfirmMessage').replace('{name}', row.name || '')}
-          </DialogContentText>
+          <DialogContentText>{t('form.actions.deleteConfirmMessage')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>

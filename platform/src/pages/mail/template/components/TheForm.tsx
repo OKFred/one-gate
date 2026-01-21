@@ -162,7 +162,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('mail.template.form.title.edit') : t('mail.template.form.title.add')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -263,7 +263,11 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {loading ? t('common.saving') : editId ? t('common.update') : t('common.create')}
+            {loading
+              ? t('common.saving')
+              : editId
+                ? t('common.actions.update')
+                : t('common.create')}
           </Button>
         </DialogActions>
       </Dialog>

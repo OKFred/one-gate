@@ -52,66 +52,59 @@ export interface RowButtonProps {
  * 账户操作按钮组件（编辑 + 删除）
  * 用于表格/卡片中的行操作
  */
-export const AccountActionButtons = memo(
-  ({ row, formRef, onDeleteSuccess }: RowButtonProps) => {
-    const t = useTranslation();
-    // 删除确认对话框状态
-    const [deleteDialog, setDeleteDialog] = useState(false);
+export const AccountActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowButtonProps) => {
+  const t = useTranslation();
+  // 删除确认对话框状态
+  const [deleteDialog, setDeleteDialog] = useState(false);
 
-    // 处理编辑
-    const handleEdit = useCallback(() => {
-      formRef.current?.onOpen(row);
-    }, [formRef, row]);
+  // 处理编辑
+  const handleEdit = useCallback(() => {
+    formRef.current?.onOpen(row);
+  }, [formRef, row]);
 
-    // 打开删除确认对话框
-    const openDeleteDialog = useCallback(() => {
-      setDeleteDialog(true);
-    }, []);
+  // 打开删除确认对话框
+  const openDeleteDialog = useCallback(() => {
+    setDeleteDialog(true);
+  }, []);
 
-    // 关闭删除确认对话框
-    const closeDeleteDialog = useCallback(() => {
-      setDeleteDialog(false);
-    }, []);
+  // 关闭删除确认对话框
+  const closeDeleteDialog = useCallback(() => {
+    setDeleteDialog(false);
+  }, []);
 
-    // 确认删除
-    const handleConfirmDelete = useCallback(async () => {
-      if (row.id) {
-        await AccountAPI.deleteFn({ data: { id: row.id } });
-        onDeleteSuccess?.();
-      }
-      closeDeleteDialog();
-    }, [row.id, onDeleteSuccess, closeDeleteDialog]);
+  // 确认删除
+  const handleConfirmDelete = useCallback(async () => {
+    if (row.id) {
+      await AccountAPI.deleteFn({ data: { id: row.id } });
+      onDeleteSuccess?.();
+    }
+    closeDeleteDialog();
+  }, [row.id, onDeleteSuccess, closeDeleteDialog]);
 
-    return (
-      <>
-        <Stack direction="row" spacing={1} justifyContent="center">
-          <IconButton onClick={handleEdit} color="primary" size="small">
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={openDeleteDialog} color="error" size="small">
-            <DeleteIcon />
-          </IconButton>
-        </Stack>
+  return (
+    <>
+      <Stack direction="row" spacing={1} justifyContent="center">
+        <IconButton onClick={handleEdit} color="primary" size="small">
+          <EditIcon />
+        </IconButton>
+        <IconButton onClick={openDeleteDialog} color="error" size="small">
+          <DeleteIcon />
+        </IconButton>
+      </Stack>
 
-        {/* 删除确认对话框 */}
-        <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {t('mail.account.actions.deleteConfirmMessage').replace(
-                '{nickname}',
-                row.nickname || '',
-              )}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
-            <Button onClick={handleConfirmDelete} color="error" autoFocus>
-              {t('common.actions.delete')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
-    );
-  },
-);
+      {/* 删除确认对话框 */}
+      <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
+        <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('form.actions.deleteConfirmMessage')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            {t('common.actions.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+});

@@ -156,7 +156,7 @@ const TheFilter = memo(
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={`${filterCount} ${t('i18n.translation.filter.resultsSuffix')}`}
+                label={t('common.filter.results').replace('{count}', filterCount.toString())}
                 size="small"
                 color="primary"
                 variant="outlined"

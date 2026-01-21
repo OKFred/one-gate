@@ -96,9 +96,7 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
       <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
         <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t('system.user.actions.deleteConfirmMessage').replace('{username}', row.username || '')}
-          </DialogContentText>
+          <DialogContentText>{t('form.actions.deleteConfirmMessage')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>

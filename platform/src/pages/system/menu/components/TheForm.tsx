@@ -203,12 +203,12 @@ const TheForm = memo(
               ...submitData,
             },
           });
-          showGlobalNotification({ message: t('system.menu.message.updateSuccess'), type: 'success' });
+          showGlobalNotification({ message: t('common.interact.operationSuccess'), type: 'success' });
         } else {
           await MenuAPI.addFn({
             data: submitData,
           });
-          showGlobalNotification({ message: t('system.menu.message.addSuccess'), type: 'success' });
+          showGlobalNotification({ message: t('common.interact.operationSuccess'), type: 'success' });
         }
 
         // 刷新树形结构

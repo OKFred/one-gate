@@ -19,10 +19,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as DepartmentAPI from '@/api/system/department';
-import type {
-  AddDepartmentReq,
-  ListAllDepartmentRes,
-} from '@/api/system/type';
+import type { AddDepartmentReq, ListAllDepartmentRes } from '@/api/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -122,7 +119,7 @@ const TheForm = memo(
         }
         return null;
       },
-      []
+      [],
     );
 
     // 获取当前部门及其所有子部门的ID（用于避免循环引用）
@@ -152,7 +149,7 @@ const TheForm = memo(
         });
         return result;
       },
-      []
+      [],
     );
 
     // 获取可选的父部门列表
@@ -171,7 +168,14 @@ const TheForm = memo(
       }
 
       return flatList;
-    }, [allDepartments, editingDepartment, buildTree, flattenDepartments, findDepartmentInTree, getDescendantIds]);
+    }, [
+      allDepartments,
+      editingDepartment,
+      buildTree,
+      flattenDepartments,
+      findDepartmentInTree,
+      getDescendantIds,
+    ]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -205,13 +209,13 @@ const TheForm = memo(
           setDialogOpen(false);
         },
       }),
-      [fetchAllDepartments]
+      [fetchAllDepartments],
     );
 
     // 处理表单变化
     const handleFormChange = (
       field: keyof DepartmentFormData,
-      value: string | number | boolean | null
+      value: string | number | boolean | null,
     ) => {
       setFormValues((prev) => ({ ...prev, [field]: value }));
     };
@@ -233,10 +237,16 @@ const TheForm = memo(
 
         if (editingDepartment && formValues.id) {
           await DepartmentAPI.updateFn({ data: { ...submitData, id: formValues.id } });
-          showGlobalNotification({ message: t('system.department.message.updateSuccess'), type: 'success' });
+          showGlobalNotification({
+            message: t('common.interact.operationSuccess'),
+            type: 'success',
+          });
         } else {
           await DepartmentAPI.addFn({ data: submitData });
-          showGlobalNotification({ message: t('system.department.message.addSuccess'), type: 'success' });
+          showGlobalNotification({
+            message: t('common.interact.operationSuccess'),
+            type: 'success',
+          });
         }
 
         // 刷新树形列表
@@ -250,7 +260,6 @@ const TheForm = memo(
         setError('');
       } catch (err) {
         console.error(err);
-        setError(t('system.department.form.operationFailed'));
       } finally {
         setLoading(false);
       }
@@ -264,17 +273,11 @@ const TheForm = memo(
     };
 
     return (
-      <Dialog
-        open={dialogOpen}
-        onClose={handleClose}
-        fullWidth
-        maxWidth="sm"
-        fullScreen={isMobile}
-      >
+      <Dialog open={dialogOpen} onClose={handleClose} fullWidth maxWidth="sm" fullScreen={isMobile}>
         <DialogTitle
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <span>{editingDepartment ? t('system.department.form.title.edit') : t('system.department.form.title.add')}</span>
+          <span>{editingDepartment ? t('common.actions.edit') : t('common.actions.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleClose}>
               <CloseIcon />
@@ -297,7 +300,7 @@ const TheForm = memo(
               autoFocus
             />
             <TextField
-              label={t('system.department.form.description')}
+              label={t('system.department.form.remark')}
               value={formValues.description ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
@@ -319,7 +322,9 @@ const TheForm = memo(
               rows={2}
             />
             <FormControl fullWidth>
-              <InputLabel id="parent-department-label">{t('system.department.form.parentDepartment')}</InputLabel>
+              <InputLabel id="parent-department-label">
+                {t('system.department.form.parentDepartment')}
+              </InputLabel>
               <Select
                 labelId="parent-department-label"
                 label={t('system.department.form.parentDepartment')}
@@ -361,7 +366,7 @@ const TheForm = memo(
         </DialogActions>
       </Dialog>
     );
-  })
+  }),
 );
 
 TheForm.displayName = 'TheForm';

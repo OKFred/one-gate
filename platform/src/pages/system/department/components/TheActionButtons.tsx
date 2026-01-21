@@ -124,7 +124,7 @@ export const TreeNodeActionButtons = memo(
           <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('system.department.actions.deleteConfirmMessage').replace('{name}', node.name!)}
+              {t('form.actions.deleteConfirmMessage')}
             </DialogContentText>
             {hasChildren && (
               <Alert severity="warning" sx={{ mt: 2 }}>

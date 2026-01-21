@@ -121,7 +121,7 @@ const TheFilter = memo(
             )}
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={t('mail.account.filter.results').replace('{count}', filterCount.toString())}
+                label={t('common.filter.results').replace('{count}', filterCount.toString())}
                 size="small"
                 color="primary"
                 variant="outlined"

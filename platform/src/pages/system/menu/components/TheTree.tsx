@@ -128,8 +128,7 @@ const TheTree = memo(
             setFilters(searchFilters);
           }
         } catch (err) {
-          console.error(err);
-          showGlobalNotification({ message: t('system.menu.message.fetchFailed'), type: 'error' });
+          console.error(err); 
         } finally {
           setLoading(false);
         }
@@ -164,10 +163,9 @@ const TheTree = memo(
       try {
         await MenuAPI.deleteFn({ data: { id: menuId } });
         fetchMenus(filters);
-        showGlobalNotification({ message: t('system.menu.message.deleteSuccess'), type: 'success' });
+        showGlobalNotification({ message: t('common.interact.operationSuccess'), type: 'success' });
       } catch (err) {
-        console.error(err);
-        showGlobalNotification({ message: t('system.menu.message.deleteFailed'), type: 'error' });
+        console.error(err); 
       } finally {
         setLoading(false);
       }

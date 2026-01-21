@@ -362,7 +362,7 @@ const TheTable = memo(
                 <TableCell>{t('i18n.translation.form.langCode')}</TableCell>
                 <TableCell>{t('i18n.translation.form.tKey')}</TableCell>
                 <TableCell>{t('i18n.translation.form.tValue')}</TableCell>
-                <TableCell>{t('i18n.translation.form.description')}</TableCell>
+                <TableCell>{t('i18n.translation.form.remark')}</TableCell>
                 <TableCell>{t('i18n.translation.columns.enabledStatus')}</TableCell>
                 <TableCell>{t('i18n.translation.columns.createTime')}</TableCell>
                 <TableCell align="right">{t('i18n.translation.columns.actions')}</TableCell>

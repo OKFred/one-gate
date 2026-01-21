@@ -105,12 +105,12 @@ const TheTemplateSelect = memo(
     return (
       <Box>
         <FormControl fullWidth size="small">
-          <InputLabel id="template-select-label">{t('mail.send.form.selectTemplate')}</InputLabel>
+          <InputLabel id="template-select-label">{t('form.select')}</InputLabel>
           <Select
             labelId="template-select-label"
             id="template-select"
             value={content.templateId}
-            label={t('mail.send.form.selectTemplate')}
+            label={t('form.select')}
             onChange={handleTemplateSelect}
             disabled={loading}
           >

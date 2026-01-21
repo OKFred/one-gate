@@ -155,11 +155,6 @@ const ThePreview = memo(
                         size="small"
                       />
                     )}
-                    {!template.langCode && !template.category && (
-                      <Typography variant="body2" color="text.secondary">
-                        {t('common.noTags')}
-                      </Typography>
-                    )}
                   </Stack>
                 </Box>
               </Stack>
@@ -193,7 +188,7 @@ const ThePreview = memo(
                     {t('mail.send.form.subject')}
                   </Typography>
                   <Typography variant="h6" sx={{ fontWeight: 500 }}>
-                    {template.title || t('common.noSubject')}
+                    {template.title}
                   </Typography>
                 </Box>
 
@@ -214,7 +209,7 @@ const ThePreview = memo(
                       bgcolor: 'background.default',
                     }}
                   >
-                    {template.content ? (
+                    {template.content && (
                       <div
                         dangerouslySetInnerHTML={{ __html: template.content }}
                         style={{
@@ -223,14 +218,6 @@ const ThePreview = memo(
                           lineHeight: theme.typography.body1.lineHeight,
                         }}
                       />
-                    ) : (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        style={{ fontStyle: 'italic' }}
-                      >
-                        {t('common.noContent')}
-                      </Typography>
                     )}
                   </Box>
                 </Box>
