@@ -31,12 +31,10 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('system.menu.form.title.add')}
+      {t('common.actions.add')}
     </Button>
   );
 });
-
-TheActionButtons.displayName = 'TheActionButtons';
 
 // ==================== 菜单树节点操作按钮 ====================
 

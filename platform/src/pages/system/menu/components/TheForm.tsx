@@ -203,12 +203,18 @@ const TheForm = memo(
               ...submitData,
             },
           });
-          showGlobalNotification({ message: t('common.interact.operationSuccess'), type: 'success' });
+          showGlobalNotification({
+            message: t('common.interact.operationSuccess'),
+            type: 'success',
+          });
         } else {
           await MenuAPI.addFn({
             data: submitData,
           });
-          showGlobalNotification({ message: t('common.interact.operationSuccess'), type: 'success' });
+          showGlobalNotification({
+            message: t('common.interact.operationSuccess'),
+            type: 'success',
+          });
         }
 
         // 刷新树形结构
@@ -246,7 +252,7 @@ const TheForm = memo(
         <DialogTitle
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <span>{editingMenu ? t('system.menu.form.title.edit') : t('system.menu.form.title.add')}</span>
+          <span>{editingMenu ? t('common.actions.edit') : t('common.actions.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>
               <CloseIcon />

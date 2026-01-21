@@ -28,41 +28,20 @@ const TheData = memo(
               subject: data.subject,
               html: data.html,
             };
-
-            const res = await mailActionAPI.sendFn({ data: SendMailReq });
-            if (res.data && res.data.ok) {
-              let msg = t('mail.send.success');
-              if (typeof res.data.data === 'string') {
-                msg = res.data.data;
-              } else if (typeof res.data.data === 'object' && res.data.data !== null) {
-                msg = JSON.stringify(res.data.data);
-              }
-              showGlobalNotification({ message: msg, type: 'success' });
-            } else {
-              showGlobalNotification({
-                message: (res.data?.message as string) || t('mail.send.failed'),
-                type: 'error',
-              });
-            }
-          } catch (err) {
-            const msg =
-              err &&
-              typeof err === 'object' &&
-              'message' in err &&
-              typeof (err as Error).message === 'string'
-                ? (err as Error).message
-                : t('mail.send.failed');
-            showGlobalNotification({ message: msg, type: 'error' });
+            await mailActionAPI.sendFn({ data: SendMailReq });
+            showGlobalNotification({
+              message: t('common.interact.operationSuccess'),
+              type: 'success',
+            });
+          } catch (error) {
+            console.warn(error);
           }
         },
       }),
       [t],
     );
-
     return null; // 这是一个无渲染组件
   }),
 );
-
-TheData.displayName = 'TheData';
 
 export default TheData;

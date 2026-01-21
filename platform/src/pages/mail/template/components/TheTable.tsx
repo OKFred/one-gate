@@ -310,7 +310,6 @@ const TheTable = memo(
               </IconButton>
             </>
           )}
-          emptyText={t('mail.template.empty')}
         />
 
         {/* 删除确认对话框 */}

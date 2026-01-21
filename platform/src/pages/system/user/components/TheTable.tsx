@@ -262,7 +262,6 @@ const TheTable = memo(
         cardActions={(row) => (
           <UserActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText={t('system.user.empty')}
       />
     );
   }),

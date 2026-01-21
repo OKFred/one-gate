@@ -1,13 +1,13 @@
 export const BusinessErrorCode = {
   /** @description 存在子节点，请检查后重试 */
   HAS_CHILDREN: "HAS_CHILDREN",
-  /** @description 没有权限操作，比如超级管理员相关的，以及其他权限限制 */
+  /** @description 无效参数 */
   INVALID_PARAMS: "INVALID_PARAMS",
   /** @description 未认证或登录态缺失 */
   NOT_AUTHENTICATED: "NOT_AUTHENTICATED",
-  /** @description 资源不存在或已被禁用 */
+  /** @description 没有权限操作 */
   PERMISSION_DENIED: "PERMISSION_DENIED",
-  /** @description 通用无效参数 */
+  /** @description 资源不存在或已被禁用 */
   NOT_EXIST_OR_DISABLED: "NOT_EXIST_OR_DISABLED",
   /** @description 数据重复 */
   DUPLICATE_DATA: "DUPLICATE_DATA",
@@ -39,21 +39,21 @@ export const ERROR_PRESENTATION_MAP: Record<
   }
 > = {
   HAS_CHILDREN: {
-    i18nKey: "i18n.api.system.hasChildren",
+    i18nKey: "errorHandler.hasChildren",
   },
   DEPARTMENT_NOT_EXIST: {
-    i18nKey: "i18n.api.system.departmentNotExist",
+    i18nKey: "errorHandler.departmentNotExist",
   },
   ROLE_NOT_EXIST: {
-    i18nKey: "i18n.api.system.roleNotExist",
+    i18nKey: "errorHandler.roleNotExist",
   },
   INVALID_PARAMS: {
     status: 400,
-    i18nKey: "common.invalid_params",
+    i18nKey: "errorHandler.invalidParams",
   },
   NOT_AUTHENTICATED: {
     status: 401,
-    i18nKey: "i18n.api.system.notAuthenticated",
+    i18nKey: "errorHandler.notAuthenticated",
   },
   PERMISSION_DENIED: {
     status: 403,
@@ -61,30 +61,30 @@ export const ERROR_PRESENTATION_MAP: Record<
   },
   NOT_EXIST_OR_DISABLED: {
     status: 404,
-    i18nKey: "i18n.api.notExistOrDisabled",
+    i18nKey: "errorHandler.notExistOrDisabled",
   },
   DUPLICATE_DATA: {
     status: 409,
-    i18nKey: "i18n.middleware.errorHandler.duplicatedData",
+    i18nKey: "errorHandler.duplicatedData",
   },
   VALIDATION_FAILED: {
     status: 422,
-    i18nKey: "i18n.middleware.errorHandler.validationFailed",
+    i18nKey: "errorHandler.validationFailed",
   },
   UNKNOWN_ERROR: {
     status: 500,
-    i18nKey: "i18n.middleware.errorHandler.unknownError",
+    i18nKey: "errorHandler.unknownError",
   },
   NOT_YET_IMPLEMENTED: {
     status: 501,
-    i18nKey: "i18n.middleware.errorHandler.notYetImplemented",
+    i18nKey: "errorHandler.notYetImplemented",
   },
   DATABASE_BUSY: {
     status: 503,
-    i18nKey: "i18n.middleware.errorHandler.databaseBusy",
+    i18nKey: "errorHandler.databaseBusy",
   },
   DATABASE_ERROR: {
     status: 500,
-    i18nKey: "i18n.middleware.errorHandler.databaseError",
+    i18nKey: "errorHandler.databaseError",
   },
 };

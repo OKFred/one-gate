@@ -197,7 +197,6 @@ const TheTable = memo(
         cardActions={(row) => (
           <RoleActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText={t('system.role.empty')}
       />
     );
   }),

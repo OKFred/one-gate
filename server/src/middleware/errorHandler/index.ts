@@ -19,7 +19,7 @@ export default function errorHandler(app: App) {
     return c.json(
       {
         ok: false,
-        message: t("i18n.middleware.errorHandler.notFound"),
+        message: t("errorHandler.notFound"),
         data: null,
       },
       { status: StatusCodes.NOT_FOUND as ContentfulStatusCode }
@@ -58,12 +58,12 @@ export default function errorHandler(app: App) {
       );
     }
     c.var.logger.error(
-      t("i18n.middleware.errorHandler.serverError") + ": " + e.stack
+      t("errorHandler.serverError") + ": " + e.stack
     );
     return c.json(
       {
         ok: false,
-        message: t("i18n.middleware.errorHandler.unknownError"),
+        message: t("errorHandler.unknownError"),
         data: process.env.NODE_ENV !== "production" ? e.message : null,
       },
       { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
@@ -82,6 +82,6 @@ process.on("uncaughtException", function (err) {
 process.env.NODE_ENV === "production" &&
   console.log(
     createTranslator(process.env.LOCALE)(
-      "i18n.middleware.errorHandler.serverStarted"
+      "errorHandler.serverStarted"
     )
   );

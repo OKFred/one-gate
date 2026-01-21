@@ -262,7 +262,6 @@ const TheTable = memo(
             <ViewIcon />
           </IconButton>
         )}
-        emptyText={t('mail.log.empty')}
       />
     );
   }),
