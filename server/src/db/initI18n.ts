@@ -199,24 +199,6 @@ export const initialI18nData = [
     description: "Error handler middleware",
     isEnabled: true,
   },
-  {
-    application: "backend",
-    business: "middleware",
-    langCode: "zh-CN",
-    tKey: "doc.notFound",
-    tValue: "接口文档创建失败",
-    description: "文档中间件",
-    isEnabled: true,
-  },
-  {
-    application: "backend",
-    business: "middleware",
-    langCode: "en-US",
-    tKey: "doc.notFound",
-    tValue: "Failed to create API documentation",
-    description: "Documentation middleware",
-    isEnabled: true,
-  },
   // API - 系统相关
   {
     application: "backend",
