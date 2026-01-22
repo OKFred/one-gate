@@ -8,7 +8,7 @@ type Translations = Record<string, string>;
 let translationCache: Record<LangCode, Translations> = {};
 let version = 0;
 const subscribers = new Set<() => void>();
-
+const fallbackLangCode = navigator.languages.includes('zh') ? 'zh-CN' : 'en-US';
 const notify = () => {
   version += 1;
   subscribers.forEach((fn) => {
@@ -22,13 +22,13 @@ const notify = () => {
 
 // 对外暴露的内存操作 API
 export const setTranslations = (langCode: LangCode, map: Translations) => {
-  const lang = langCode || 'zh-CN';
+  const lang = langCode || fallbackLangCode;
   translationCache[lang] = map || {};
   notify();
 };
 
 export const mergeTranslations = (langCode: LangCode, map: Translations) => {
-  const lang = langCode || 'zh-CN';
+  const lang = langCode || fallbackLangCode;
   translationCache[lang] = { ...(translationCache[lang] || {}), ...(map || {}) };
   notify();
 };
@@ -43,7 +43,7 @@ export const clearTranslations = (langCode?: LangCode) => {
 };
 
 export const getTranslations = (langCode?: LangCode): Translations => {
-  const lang = langCode || 'zh-CN';
+  const lang = langCode || fallbackLangCode;
   return translationCache[lang] || {};
 };
 
@@ -53,7 +53,7 @@ export const getTranslations = (langCode?: LangCode): Translations => {
  * @returns 翻译函数，如果找不到文案则原样返回
  */
 export const createTranslator = (langCode?: LangCode) => {
-  const language = langCode || 'zh-CN';
+  const language = langCode || fallbackLangCode;
 
   return (key: string): string => {
     const translations = translationCache[language] || {};
@@ -74,7 +74,7 @@ const getSnapshot = () => version;
  */
 export const useTranslation = () => {
   const userInfo = authUtils.getUserInfo();
-  const langCode = userInfo?.langCode || 'zh-CN';
+  const langCode = userInfo?.langCode || fallbackLangCode;
 
   const tick = useSyncExternalStore(subscribe, getSnapshot);
   const t = useMemo(() => createTranslator(langCode), [langCode, tick]);

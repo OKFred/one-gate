@@ -38,7 +38,6 @@
 - `errorHandler.undefinedError`
 - `errorHandler.unknownError`
 - `errorHandler.validationFailed`
-- `login.sessionExpired`
 - `me.form.newPassword`
 - `menu.home`
 - `menu.i18n`

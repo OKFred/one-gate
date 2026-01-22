@@ -22,7 +22,7 @@ export const createTranslator = (
   const supportedLanguages = getSupportedLanguages();
 
   // 如果没有支持的语言，回退到默认语言
-  const defaultLang = "zh-CN";
+  const defaultLang = process.env.LOCALE;
   const language =
     langCode && supportedLanguages.includes(langCode)
       ? langCode
