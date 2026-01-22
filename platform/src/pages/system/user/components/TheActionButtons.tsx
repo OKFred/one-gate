@@ -87,7 +87,7 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
         <IconButton onClick={handleEdit} color="primary" size="small">
           <EditIcon />
         </IconButton>
-        <IconButton onClick={openDeleteDialog} color="error" size="small">
+        <IconButton onClick={openDeleteDialog} color="error" size="small" disabled={row.id === 1}>
           <DeleteIcon />
         </IconButton>
       </Stack>
