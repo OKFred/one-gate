@@ -11,6 +11,7 @@ import {
   IconButton,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const theme = createTheme();
 
@@ -41,6 +42,7 @@ export const NotificationDialog = ({
   onExited,
 }: NotificationDialogProps) => {
   const [open, setOpen] = useState(true);
+  const t = useTranslation();
 
   const handleAction = (action: 'confirm' | 'cancel' | 'close') => {
     const done = () => {
@@ -61,13 +63,13 @@ export const NotificationDialog = ({
     if (title) return title;
     switch (type) {
       case 'error':
-        return '错误提示';
+        return t('notification.title.error');
       case 'warning':
-        return '警告';
+        return t('notification.title.warning');
       case 'success':
-        return '成功';
+        return t('notification.title.success');
       default:
-        return '提示';
+        return t('notification.title.info');
     }
   };
 
@@ -114,7 +116,7 @@ export const NotificationDialog = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleAction('confirm')} autoFocus>
-            确定
+            {t('common.actions.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

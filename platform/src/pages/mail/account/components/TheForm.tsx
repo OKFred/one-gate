@@ -128,7 +128,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('mail.account.form.title.edit') : t('mail.account.form.title.add')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -212,7 +212,7 @@ const TheForm = memo(
               </Stack>
 
               <TextField
-                label={t('mail.account.columns.remark')}
+                label={t('common.form.remark')}
                 value={form.remark || ''}
                 onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
                 fullWidth

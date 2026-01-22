@@ -303,7 +303,7 @@ async function onUpdate(
   }
   const previousVersion = previousRecord.version;
   if (params.version !== previousVersion) {
-    throw new BusinessError(BusinessErrorCode.DATA_VERSION_CONFLICT);
+    throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
   }
   const currentVersion = previousVersion + 1;
   let updateData = {
@@ -542,7 +542,7 @@ async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
       )
       .limit(1);
     if (existingRecord.length > 0) {
-      throw new BusinessError(BusinessErrorCode.DUPLICATE_KEYS, {
+      throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA, {
         tKey: obj.tKey,
         langCode: obj.langCode,
       });

@@ -19,7 +19,7 @@ import * as MailTemplateAPI from '@/api/mail/template';
 import type { AddMailTemplateReq } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 
 const DEFAULT_FORM: AddMailTemplateReq = {
   name: '',
@@ -86,9 +86,8 @@ const TheForm = memo(
       setLoading(true);
 
       try {
-        let res;
         if (editId) {
-          res = await MailTemplateAPI.updateFn({
+          await MailTemplateAPI.updateFn({
             data: {
               id: editId,
               ...form,
@@ -97,7 +96,7 @@ const TheForm = memo(
             },
           });
         } else {
-          res = await MailTemplateAPI.addFn({
+          await MailTemplateAPI.addFn({
             data: {
               ...form,
               langCode: form.langCode!,
@@ -105,35 +104,15 @@ const TheForm = memo(
             },
           });
         }
-
-        if (res.data?.ok) {
-          showGlobalNotification({
-            message: editId
-              ? t('mail.template.saveSuccess.update')
-              : t('mail.template.saveSuccess.create'),
-            type: 'success',
-          });
-          handleCancel();
-          // 刷新表格数据
-          tableRef.current?.refresh();
-        } else {
-          showGlobalNotification({
-            message:
-              res.data?.message ||
-              (editId
-                ? t('mail.template.saveFailed.update')
-                : t('mail.template.saveFailed.create')),
-            type: 'error',
-          });
-        }
-      } catch (error) {
-        console.error('保存模板失败:', error);
-        showGlobalNotification({
-          message: editId
-            ? t('mail.template.saveFailed.update')
-            : t('mail.template.saveFailed.create'),
-          type: 'error',
+        showSnackbar({
+          message: t('mail.send.form.content.loaded'),
+          type: 'success',
         });
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
       } finally {
         setLoading(false);
       }
@@ -162,7 +141,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('mail.template.form.title.edit') : t('mail.template.form.title.add')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -202,12 +181,12 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('mail.template.form.langCode')}
+                  label={t('i18n.translation.form.langCode')}
                   value={form.langCode}
                   onChange={(e) => setForm({ ...form, langCode: e.target.value })}
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('mail.template.form.langCodePlaceholder')}
+                  placeholder={t('form.pleaseEnter')}
                   helperText={t('mail.template.form.langCodeHelp')}
                 />
                 <TextField
@@ -216,7 +195,7 @@ const TheForm = memo(
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('mail.template.form.categoryPlaceholder')}
+                  placeholder={t('form.pleaseEnter')}
                   helperText={t('mail.template.form.categoryHelp')}
                 />
               </Stack>
@@ -231,7 +210,7 @@ const TheForm = memo(
                 <JoditEditor
                   value={form.content || ''}
                   onChange={(html) => setForm({ ...form, content: html })}
-                  placeholder={t('mail.template.form.contentPlaceholder')}
+                  placeholder={t('form.pleaseEnter')}
                   height={isMobile ? 300 : 450}
                 />
               </Box>
@@ -263,7 +242,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {loading ? t('common.saving') : editId ? t('common.update') : t('common.create')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

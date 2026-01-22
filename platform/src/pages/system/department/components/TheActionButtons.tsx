@@ -32,7 +32,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('system.department.actions.add')}
+      {t('common.actions.add')}
     </Button>
   );
 });
@@ -124,7 +124,7 @@ export const TreeNodeActionButtons = memo(
           <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('system.department.actions.deleteConfirmMessage').replace('{name}', node.name!)}
+              {t('form.actions.deleteConfirmMessage')}
             </DialogContentText>
             {hasChildren && (
               <Alert severity="warning" sx={{ mt: 2 }}>

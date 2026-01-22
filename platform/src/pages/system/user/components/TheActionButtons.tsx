@@ -34,7 +34,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('system.user.actions.add')}
+      {t('common.actions.add')}
     </ResponsiveButton>
   );
 });
@@ -87,7 +87,7 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
         <IconButton onClick={handleEdit} color="primary" size="small">
           <EditIcon />
         </IconButton>
-        <IconButton onClick={openDeleteDialog} color="error" size="small">
+        <IconButton onClick={openDeleteDialog} color="error" size="small" disabled={row.id === 1}>
           <DeleteIcon />
         </IconButton>
       </Stack>
@@ -96,9 +96,7 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
       <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
         <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {t('system.user.actions.deleteConfirmMessage').replace('{username}', row.username || '')}
-          </DialogContentText>
+          <DialogContentText>{t('form.actions.deleteConfirmMessage')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>

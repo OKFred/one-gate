@@ -131,13 +131,13 @@ const TheTable = memo(
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('system.role.columns.name'), render: (row) => row.name },
-      { title: t('common.columns.description'), render: (row) => row.description || '--' },
+      { title: t('common.columns.name'), render: (row) => row.name },
+      { title: t('common.form.remark'), render: (row) => row.description || '--' },
       {
         title: t('common.columns.status'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('common.status.active') : t('common.status.inactive')}
+            label={row.isEnabled ? t('i18n.translation.switch.enabled') : t('i18n.translation.switch.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
@@ -164,7 +164,7 @@ const TheTable = memo(
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.name },
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('common.columns.description'), render: (row) => row.description || '--' },
+      { type: 'content', label: t('common.form.remark'), render: (row) => row.description || '--' },
       {
         type: 'content',
         label: t('common.columns.createTime'),
@@ -174,7 +174,7 @@ const TheTable = memo(
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('common.status.active') : t('common.status.inactive')}
+            label={row.isEnabled ? t('i18n.translation.switch.enabled') : t('i18n.translation.switch.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
@@ -197,7 +197,6 @@ const TheTable = memo(
         cardActions={(row) => (
           <RoleActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText={t('system.role.empty')}
       />
     );
   }),

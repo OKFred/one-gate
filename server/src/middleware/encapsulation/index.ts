@@ -2,7 +2,7 @@ import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
 import { validate } from "@cfworker/json-schema";
 import { HTTPException } from "hono/http-exception";
 import { errorSchema } from "@/middleware/errorHandler/schema";
-import httpStatusCode from "http-status-codes";
+import { StatusCodes } from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
@@ -37,7 +37,7 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = ["/system/auth/login"];
+const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
 
 function routeMaker({
   pathInfo,
@@ -59,7 +59,7 @@ function routeMaker({
     const contentType = c.req.header("content-type");
     if (contentType !== "application/json") {
       throw new HTTPException(
-        httpStatusCode.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
+        StatusCodes.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
         { cause: ["Content-Type must be application/json"] }
       );
     }
@@ -70,7 +70,7 @@ function routeMaker({
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
     if (!valid) {
       throw new HTTPException(
-        httpStatusCode.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
+        StatusCodes.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
         { cause: errors }
       );
     }
@@ -90,7 +90,7 @@ function routeMaker({
     }
     return c.json(
       { ok: true, message: "OK", data: result },
-      httpStatusCode.OK as ContentfulStatusCode
+      StatusCodes.OK as ContentfulStatusCode
     );
   };
 
@@ -107,7 +107,7 @@ function routeMaker({
       },
     },
     responses: {
-      [httpStatusCode.OK as ContentfulStatusCode]: {
+      [StatusCodes.OK as ContentfulStatusCode]: {
         description: "成功",
         content: {
           "application/json": {
@@ -115,10 +115,10 @@ function routeMaker({
           },
         },
       },
-      [httpStatusCode.UNPROCESSABLE_ENTITY]:
-        errorSchema[httpStatusCode.UNPROCESSABLE_ENTITY],
-      [httpStatusCode.INTERNAL_SERVER_ERROR]:
-        errorSchema[httpStatusCode.INTERNAL_SERVER_ERROR],
+      [StatusCodes.UNPROCESSABLE_ENTITY]:
+        errorSchema[StatusCodes.UNPROCESSABLE_ENTITY],
+      [StatusCodes.INTERNAL_SERVER_ERROR]:
+        errorSchema[StatusCodes.INTERNAL_SERVER_ERROR],
     },
   } satisfies RawRouteConfig;
   return { pathObj: newPathObj, controller };

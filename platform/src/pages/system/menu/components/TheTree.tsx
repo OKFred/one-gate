@@ -13,7 +13,7 @@ import * as MenuAPI from '@/api/system/menu';
 import Icon from '@/components/Icon';
 import type { MenuData } from './TheForm';
 import type { Props } from '../index';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
 import { TreeNodeActionButtons } from './TheActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -128,8 +128,7 @@ const TheTree = memo(
             setFilters(searchFilters);
           }
         } catch (err) {
-          console.error(err);
-          showGlobalNotification({ message: t('system.menu.message.fetchFailed'), type: 'error' });
+          console.error(err); 
         } finally {
           setLoading(false);
         }
@@ -164,10 +163,9 @@ const TheTree = memo(
       try {
         await MenuAPI.deleteFn({ data: { id: menuId } });
         fetchMenus(filters);
-        showGlobalNotification({ message: t('system.menu.message.deleteSuccess'), type: 'success' });
+        showSnackbar({ message: t('common.interact.operationSuccess'), type: 'success' });
       } catch (err) {
-        console.error(err);
-        showGlobalNotification({ message: t('system.menu.message.deleteFailed'), type: 'error' });
+        console.error(err); 
       } finally {
         setLoading(false);
       }
@@ -201,7 +199,7 @@ const TheTree = memo(
                 )}
                 {!node.isEnabled && (
                   <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                    {t('system.menu.status.disabled')}
+                    {t('i18n.translation.switch.disabled')}
                   </Typography>
                 )}
               </Typography>
@@ -234,7 +232,7 @@ const TheTree = memo(
           </SimpleTreeView>
         ) : (
           <Typography color="text.secondary" textAlign="center" py={4}>
-            {t('system.menu.empty')}
+            {t('common.noData')}
           </Typography>
         )}
       </Box>

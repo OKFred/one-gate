@@ -9,7 +9,7 @@ import { commonLogin } from '@/api/system/auth';
 import { authUtils } from '@/utils/auth';
 import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
 import { useResponsive } from '@/hooks/useResponsive';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function TheForm() {
@@ -37,7 +37,7 @@ export default function TheForm() {
   // 处理普通登录
   const handleLogin = async () => {
     if (!credentials.username || !credentials.password) {
-      showGlobalNotification({ message: t('login.missingCredentials'), type: 'error' });
+      showSnackbar({ message: t('login.missingCredentials'), type: 'error' });
       return;
     }
 
@@ -60,7 +60,7 @@ export default function TheForm() {
 
   // 处理微信登录
   const handleWechatLogin = async () => {
-    showGlobalNotification({ message: t('login.wechatWIP'), type: 'info' });
+    showSnackbar({ message: t('login.wechatWIP'), type: 'info' });
   };
 
   // 处理回车键登录
@@ -125,7 +125,7 @@ export default function TheForm() {
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
-          {loading ? t('login.signingIn') : t('login.signIn')}
+          {t('login.signIn')}
         </Button>
 
         <Button

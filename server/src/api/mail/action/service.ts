@@ -94,6 +94,7 @@ const sendRes = {
 
 async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
   const obj = c.get("bodyObj") as FromSchema<typeof sendReq>;
+  const userObj = c.get("userObj");
   const { accountId, templateId, receiverArr, subject, html, templateParams } =
     obj;
 
@@ -110,7 +111,7 @@ async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
   let finalTemplateParams: string | undefined = undefined;
 
   if (templateId) {
-    const template = await mailTemplateService.get.service(c);
+    const template = await mailTemplateService.get.service({ id: templateId });
     if (!template) {
       throw new Error("未找到该邮件模板");
     }
@@ -189,7 +190,19 @@ async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
   }
 
   // 5. 记录日志
-  const logId = await mailLogService.add.service(c);
+  const logId = await mailLogService.add.service(
+    {
+      templateId: finalTemplateId,
+      templateParams: finalTemplateParams,
+      title: finalSubject,
+      mailTo: receiverArr.map((r) => r.address).join(", "),
+      mailFrom: accountObj.mailAddress,
+      sendStatus,
+      exceptionCode,
+      exceptionDetails,
+    },
+    userObj
+  );
 
   // 6. 如果发送失败，抛出错误
   if (!sendStatus) {

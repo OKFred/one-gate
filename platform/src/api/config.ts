@@ -6,10 +6,12 @@ import type {
   AxiosResponse,
 } from 'axios';
 import type { paths } from '@/types/openapi'; //由openapi-typescript自动生成的类型
-import { showGlobalNotification } from '@/components/Notification';
+import { showGlobalNotification, showSnackbar } from '@/components/Notification';
 
 // 导入认证工具
 import { authUtils } from '@/utils/auth';
+// 导入翻译函数创建器（非Hook版本，可在拦截器中使用）
+import { createTranslator } from '@/hooks/useTranslation';
 
 export type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
 
@@ -89,7 +91,10 @@ function setupInterceptors(service: AxiosInstance) {
       if (response.status === 200) {
         // 检查响应数据中的 ok 字段
         if (!response.data || response.data?.ok === false) {
-          const errorMessage = response.data.message || '请求失败';
+          // 获取用户语言创建翻译函数
+          const langCode = authUtils.getUserInfo()?.langCode;
+          const t = createTranslator(langCode);
+          const errorMessage = response.data.message || t('gateway.error.requestFailed');
           handleErrorResponse(errorMessage);
           return Promise.reject(response);
         }
@@ -97,13 +102,16 @@ function setupInterceptors(service: AxiosInstance) {
       return response;
     },
     function (error) {
+      // 获取用户语言创建翻译函数
+      const langCode = authUtils.getUserInfo()?.langCode;
+      const t = createTranslator(langCode);
       const status = error.response?.status;
 
       // 401 未授权：清理并跳转登录
       if (status === 401) {
         if (window.location.pathname !== '/login') {
           showGlobalNotification({
-            message: '登录已过期，请重新登录',
+            message: t('gateway.error.sessionExpired'),
             type: 'warning',
             beforeClose: (action, instance, done) => {
               console.log(action, instance);
@@ -113,13 +121,13 @@ function setupInterceptors(service: AxiosInstance) {
             },
           });
         } else {
-          handleErrorResponse('登录失败，请检查用户名和密码');
+          handleErrorResponse(t('gateway.error.loginFailed'));
         }
         return Promise.reject(error);
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(error.message || '网络错误');
+      handleErrorResponse(error.message || t('gateway.error.networkError'));
       return Promise.reject(error);
     },
   );
@@ -127,7 +135,7 @@ function setupInterceptors(service: AxiosInstance) {
 }
 
 function handleErrorResponse(errorMessage: string) {
-  showGlobalNotification({ message: errorMessage, type: 'error' });
+  showSnackbar({ message: errorMessage, type: 'error' });
   console.error(errorMessage);
 }
 

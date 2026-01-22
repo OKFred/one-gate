@@ -173,20 +173,10 @@ const TheTable = memo(
         align: 'center',
         render: (row) =>
           row.sendStatus ? (
-            <Chip
-              icon={<SuccessIcon />}
-              label={t('common.status.success')}
-              color="success"
-              size="small"
-            />
+            <Chip icon={<SuccessIcon />} label={t('status.success')} color="success" size="small" />
           ) : (
-            <Tooltip title={row.exceptionDetails || t('mail.log.sendFailed')}>
-              <Chip
-                icon={<ErrorIcon />}
-                label={t('common.status.failed')}
-                color="error"
-                size="small"
-              />
+            <Tooltip title={row.exceptionDetails || t('status.failure')}>
+              <Chip icon={<ErrorIcon />} label={t('status.failure')} color="error" size="small" />
             </Tooltip>
           ),
       },
@@ -228,19 +218,9 @@ const TheTable = memo(
         type: 'tags',
         render: (row) =>
           row.sendStatus ? (
-            <Chip
-              icon={<SuccessIcon />}
-              label={t('common.status.success')}
-              color="success"
-              size="small"
-            />
+            <Chip icon={<SuccessIcon />} label={t('status.success')} color="success" size="small" />
           ) : (
-            <Chip
-              icon={<ErrorIcon />}
-              label={t('common.status.failed')}
-              color="error"
-              size="small"
-            />
+            <Chip icon={<ErrorIcon />} label={t('status.failure')} color="error" size="small" />
           ),
       },
     ];
@@ -262,7 +242,6 @@ const TheTable = memo(
             <ViewIcon />
           </IconButton>
         )}
-        emptyText={t('mail.log.empty')}
       />
     );
   }),

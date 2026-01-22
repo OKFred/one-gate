@@ -92,7 +92,7 @@ function ResponsiveListInner<T>({
   const { isMobile } = useResponsive();
   const t = useTranslation();
   if (!emptyText) {
-    emptyText = t('common.table.empty');
+    emptyText = t('common.noData');
   }
   const totalPages = Math.ceil(total / pageSize);
 

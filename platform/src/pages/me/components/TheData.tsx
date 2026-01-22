@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import * as UserApiService from '@/api/system/user';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { GetUserRes, UpdateUserReq } from '@/api/system/type';
 import type { Props } from '../index';
@@ -33,17 +33,14 @@ const TheData = memo(
           if (response.data) {
             const userData = response.data.data;
             setCurrentUser(userData);
-            
+
             // 通知各个组件更新数据
             profileRef.current?.updateUser(userData);
             detailsRef.current?.updateUser(userData);
           }
         }
       } catch (error) {
-        showGlobalNotification({
-          type: 'error',
-          message: error instanceof Error ? error.message : t('me.getUserFailed'),
-        });
+        console.warn(error);
       }
     }, [profileRef, detailsRef, t]);
 
@@ -62,14 +59,14 @@ const TheData = memo(
           };
 
           await UserApiService.updateFn({ data: updateData });
-          showGlobalNotification({ type: 'success', message: t('me.updateSuccess') });
+          showSnackbar({
+            type: 'success',
+            message: t('common.interact.operationSuccess'),
+          });
           dialogRef.current?.close();
           await fetchCurrentUser();
         } catch (error) {
-          showGlobalNotification({
-            type: 'error',
-            message: error instanceof Error ? error.message : t('me.updateFailed'),
-          });
+          console.warn(error);
         }
       },
       [currentUser, fetchCurrentUser, dialogRef, t],

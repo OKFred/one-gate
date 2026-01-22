@@ -59,7 +59,7 @@ export async function reloadI18nCache(): Promise<void> {
 export function getTranslation(
   langCode: string,
   key: string,
-  fallbackLangCode = "zh-CN"
+  fallbackLangCode = process.env.LOCALE
 ): string {
   if (!isInitialized) {
     console.warn("⚠️  多语言缓存未初始化，返回原始 key");

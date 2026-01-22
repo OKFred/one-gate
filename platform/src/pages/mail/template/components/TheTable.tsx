@@ -1,5 +1,14 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { Chip, Tooltip, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import {
+  Chip,
+  Tooltip,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -11,7 +20,7 @@ import ResponsiveList, {
 } from '@/components/Responsive/ResponsiveList';
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import type { ListMailTemplateReq, ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -164,25 +173,14 @@ const TheTable = memo(
       if (!deleteId) return;
 
       try {
-        const res = await MailTemplateAPI.deleteFn({ data: { id: deleteId } });
-        if (res.data?.ok) {
-          showGlobalNotification({
-            message: t('mail.template.deleteSuccess'),
-            type: 'success',
-          });
-          fetchTemplates(filters, page);
-        } else {
-          showGlobalNotification({
-            message: res.data?.message || t('mail.template.deleteFailed'),
-            type: 'error',
-          });
-        }
-      } catch (error) {
-        console.error('删除模板失败:', error);
-        showGlobalNotification({
-          message: t('mail.template.deleteFailed'),
-          type: 'error',
+        await MailTemplateAPI.deleteFn({ data: { id: deleteId } });
+        showSnackbar({
+          message: t('common.interact.operationSuccess'),
+          type: 'success',
         });
+        fetchTemplates(filters, page);
+      } catch (error) {
+        console.warn(error);
       } finally {
         setDeleteDialogOpen(false);
         setDeleteId(null);
@@ -261,12 +259,8 @@ const TheTable = memo(
         type: 'tags',
         render: (row) => (
           <>
-            {row.langCode && (
-              <Chip label={row.langCode} color="info" size="small" />
-            )}
-            {row.category && (
-              <Chip label={row.category} color="secondary" size="small" />
-            )}
+            {row.langCode && <Chip label={row.langCode} color="info" size="small" />}
+            {row.category && <Chip label={row.category} color="secondary" size="small" />}
           </>
         ),
       },
@@ -287,18 +281,10 @@ const TheTable = memo(
           cardFields={cardFields}
           cardActions={(row) => (
             <>
-              <IconButton
-                onClick={() => handlePreview(row)}
-                color="info"
-                size="small"
-              >
+              <IconButton onClick={() => handlePreview(row)} color="info" size="small">
                 <ViewIcon />
               </IconButton>
-              <IconButton
-                onClick={() => handleEdit(row)}
-                color="primary"
-                size="small"
-              >
+              <IconButton onClick={() => handleEdit(row)} color="primary" size="small">
                 <EditIcon />
               </IconButton>
               <IconButton
@@ -310,19 +296,16 @@ const TheTable = memo(
               </IconButton>
             </>
           )}
-          emptyText={t('mail.template.empty')}
         />
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-          <DialogTitle>{t('common.confirm')}</DialogTitle>
-          <DialogContent>
-            {t('mail.template.deleteConfirm')}
-          </DialogContent>
+          <DialogTitle>{t('common.actions.confirm')}</DialogTitle>
+          <DialogContent>{t('common.actions.deleteConfirmTitle')}</DialogContent>
           <DialogActions>
             <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
             <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-              {t('common.delete')}
+              {t('common.actions.delete')}
             </Button>
           </DialogActions>
         </Dialog>

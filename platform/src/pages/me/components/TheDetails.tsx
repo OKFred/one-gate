@@ -53,7 +53,7 @@ const TheDetails = memo(
             <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('me.details.userId')}
+                  {t('common.columns.id')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {user.id}
@@ -62,7 +62,7 @@ const TheDetails = memo(
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('me.details.username')}
+                  {t('login.username')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {user.username}

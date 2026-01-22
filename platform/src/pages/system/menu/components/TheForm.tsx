@@ -27,7 +27,7 @@ import * as MenuAPI from '@/api/system/menu';
 import * as RoleAPI from '@/api/system/role';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -203,12 +203,18 @@ const TheForm = memo(
               ...submitData,
             },
           });
-          showGlobalNotification({ message: t('system.menu.message.updateSuccess'), type: 'success' });
+          showSnackbar({
+            message: t('common.interact.operationSuccess'),
+            type: 'success',
+          });
         } else {
           await MenuAPI.addFn({
             data: submitData,
           });
-          showGlobalNotification({ message: t('system.menu.message.addSuccess'), type: 'success' });
+          showSnackbar({
+            message: t('common.interact.operationSuccess'),
+            type: 'success',
+          });
         }
 
         // 刷新树形结构
@@ -221,7 +227,6 @@ const TheForm = memo(
         setEditingMenu(null);
       } catch (err) {
         console.error(err);
-        setError(t('system.menu.form.operationFailed'));
       } finally {
         setLoading(false);
       }
@@ -246,7 +251,7 @@ const TheForm = memo(
         <DialogTitle
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <span>{editingMenu ? t('system.menu.form.title.edit') : t('system.menu.form.title.add')}</span>
+          <span>{editingMenu ? t('common.actions.edit') : t('common.actions.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>
               <CloseIcon />
@@ -366,7 +371,7 @@ const TheForm = memo(
                   onChange={(e) => handleFormChange('isEnabled', e.target.checked)}
                 />
               }
-              label={t('common.form.enabledStatus')}
+              label={t('common.filter.enabledStatus')}
             />
           </Stack>
         </DialogContent>

@@ -82,7 +82,7 @@ const TheDialog = memo(
         <DialogTitle>
           <Box display="flex" alignItems="center">
             <SettingsIcon sx={{ mr: 1 }} />
-            {t('me.edit.title')}
+            {t('common.actions.edit')}
           </Box>
         </DialogTitle>
 
@@ -90,11 +90,11 @@ const TheDialog = memo(
           <Box pt={1}>
             <TextField
               fullWidth
-              label={t('me.edit.username')}
+              label={t('login.username')}
               value={user?.username || ''}
               margin="normal"
               disabled
-              helperText={t('me.edit.usernameHelper')}
+              helperText={t('form.pleaseEnter')}
             />
             <TextField
               fullWidth

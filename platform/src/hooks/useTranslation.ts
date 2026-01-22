@@ -1,51 +1,50 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 import { authUtils } from '@/utils/auth';
-import { indexedDBHelper } from '@/utils/indexedDB';
 
-// 翻译数据缓存
-let translationCache: Record<string, Record<string, string>> = {};
-let isLoaded = false;
-let loadingPromise: Promise<void> | null = null;
+type LangCode = string;
+type Translations = Record<string, string>;
 
-/**
- * 从 IndexedDB 加载翻译数据到缓存
- */
-const loadTranslationsFromDB = async (): Promise<void> => {
-  // 如果已加载，直接返回
-  if (isLoaded) return;
-
-  // 如果正在加载，返回同一个 Promise
-  if (loadingPromise) return loadingPromise;
-
-  // 开始加载
-  loadingPromise = (async () => {
+// 内存中的翻译缓存与订阅机制
+let translationCache: Record<LangCode, Translations> = {};
+let version = 0;
+const subscribers = new Set<() => void>();
+const fallbackLangCode = navigator.languages.includes('zh') ? 'zh-CN' : 'en-US';
+const notify = () => {
+  version += 1;
+  subscribers.forEach((fn) => {
     try {
-      await indexedDBHelper.init();
-      const data = await indexedDBHelper.getTranslationList();
-
-      // 重置缓存
-      translationCache = {};
-
-      // 按语言代码分组
-      data.forEach((item) => {
-        if (!item.langCode) return;
-        if (!translationCache[item.langCode]) {
-          translationCache[item.langCode] = {};
-        }
-        const fullKey = `${item.tKey}`;
-        if (!item.tValue) return;
-        translationCache[item.langCode][fullKey] = item.tValue;
-      });
-
-      isLoaded = true;
-    } catch (error) {
-      console.error('❌ 加载多语言数据失败：', error);
-    } finally {
-      loadingPromise = null;
+      fn();
+    } catch {
+      /* noop */
     }
-  })();
+  });
+};
 
-  return loadingPromise;
+// 对外暴露的内存操作 API
+export const setTranslations = (langCode: LangCode, map: Translations) => {
+  const lang = langCode || fallbackLangCode;
+  translationCache[lang] = map || {};
+  notify();
+};
+
+export const mergeTranslations = (langCode: LangCode, map: Translations) => {
+  const lang = langCode || fallbackLangCode;
+  translationCache[lang] = { ...(translationCache[lang] || {}), ...(map || {}) };
+  notify();
+};
+
+export const clearTranslations = (langCode?: LangCode) => {
+  if (langCode) {
+    delete translationCache[langCode];
+  } else {
+    translationCache = {};
+  }
+  notify();
+};
+
+export const getTranslations = (langCode?: LangCode): Translations => {
+  const lang = langCode || fallbackLangCode;
+  return translationCache[lang] || {};
 };
 
 /**
@@ -53,8 +52,8 @@ const loadTranslationsFromDB = async (): Promise<void> => {
  * @param langCode - 语言代码
  * @returns 翻译函数，如果找不到文案则原样返回
  */
-export const createTranslator = (langCode?: string) => {
-  const language = langCode || 'zh-CN';
+export const createTranslator = (langCode?: LangCode) => {
+  const language = langCode || fallbackLangCode;
 
   return (key: string): string => {
     const translations = translationCache[language] || {};
@@ -62,26 +61,23 @@ export const createTranslator = (langCode?: string) => {
   };
 };
 
+// React 18 推荐的外部状态订阅方式
+const subscribe = (callback: () => void) => {
+  subscribers.add(callback);
+  return () => subscribers.delete(callback);
+};
+const getSnapshot = () => version;
+
 /**
- * 翻译钩子
+ * 翻译钩子：依赖用户语言与内存版本进行更新
  * @returns 翻译函数
  */
 export const useTranslation = () => {
   const userInfo = authUtils.getUserInfo();
-  const langCode = userInfo?.langCode || 'zh-CN';
-  const [isReady, setIsReady] = useState(isLoaded);
+  const langCode = userInfo?.langCode || fallbackLangCode;
 
-  useEffect(() => {
-    if (!isLoaded) {
-      async function init() {
-        await loadTranslationsFromDB();
-        setIsReady(true);
-      }
-      init();
-    }
-  }, []);
-
-  const t = useMemo(() => createTranslator(langCode), [langCode, isReady]);
+  const tick = useSyncExternalStore(subscribe, getSnapshot);
+  const t = useMemo(() => createTranslator(langCode), [langCode, tick]);
 
   return t;
 };

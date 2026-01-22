@@ -150,7 +150,7 @@ const TheFilter = memo(
           <Stack spacing={2} sx={{ mt: 2 }}>
             <TextField
               label={t('common.filter.keyword')}
-              placeholder={t('system.menu.filter.keywordPlaceholder')}
+              placeholder={t('common.filter.keywordLabel')}
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
               fullWidth

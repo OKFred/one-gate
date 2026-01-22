@@ -1,5 +1,6 @@
 import { HTTPException } from "hono/http-exception";
-import { ContentfulStatusCode } from "hono/utils/http-status";
+import { type ContentfulStatusCode } from "hono/utils/http-status";
+import { StatusCodes } from "http-status-codes";
 import { BusinessErrorCode, ERROR_PRESENTATION_MAP } from "./errorMapping";
 export { BusinessErrorCode } from "./errorMapping";
 export class BusinessError extends Error {
@@ -15,15 +16,16 @@ export class BusinessError extends Error {
   }
 }
 
-export function toHttpException(err: BusinessError) {
-  const presentation = ERROR_PRESENTATION_MAP[err.code];
+export function toHttpException(error: BusinessError) {
+  const presentation = ERROR_PRESENTATION_MAP[error.code];
   return new HTTPException(
-    (presentation.status || 200) as ContentfulStatusCode,
+    (presentation.status || StatusCodes.OK) as ContentfulStatusCode,
     {
       message: presentation.i18nKey,
       cause: {
-        code: err.code || undefined,
-        params: err.meta || undefined,
+        error,
+        code: error.code || undefined,
+        params: error.meta || undefined,
       },
     }
   );

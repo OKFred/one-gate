@@ -31,12 +31,10 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('system.menu.form.title.add')}
+      {t('common.actions.add')}
     </Button>
   );
 });
-
-TheActionButtons.displayName = 'TheActionButtons';
 
 // ==================== 菜单树节点操作按钮 ====================
 
@@ -112,10 +110,10 @@ export const TreeNodeActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
+          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('system.menu.actions.deleteConfirmMessage').replace('{name}', node.name!)}
+              {t('form.actions.deleteConfirmMessage')}
               {node.children && node.children.length > 0 && (
                 <>
                   <br />

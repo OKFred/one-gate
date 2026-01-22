@@ -13,7 +13,7 @@ import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as DepartmentAPI from '@/api/system/department';
 import type { DepartmentData } from './TheForm';
 import type { Props } from '../index';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
 import { TreeNodeActionButtons } from './TheActionButtons';
 
@@ -141,7 +141,7 @@ const TheTree = memo(
           }
         } catch (err) {
           console.error(err);
-          showGlobalNotification({ message: '获取部门列表失败', type: 'error' });
+          showSnackbar({ message: '获取部门列表失败', type: 'error' });
         } finally {
           setLoading(false);
         }
@@ -176,10 +176,10 @@ const TheTree = memo(
       try {
         await DepartmentAPI.deleteFn({ data: { id: deptId } });
         fetchDepartments(filters);
-        showGlobalNotification({ message: '部门删除成功', type: 'success' });
+        showSnackbar({ message: '部门删除成功', type: 'success' });
       } catch (err) {
         console.error(err);
-        showGlobalNotification({ message: '删除失败，该部门可能存在子部门或关联数据', type: 'error' });
+        showSnackbar({ message: '删除失败，该部门可能存在子部门或关联数据', type: 'error' });
       } finally {
         setLoading(false);
       }

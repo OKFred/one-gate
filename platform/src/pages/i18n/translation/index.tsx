@@ -4,6 +4,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import TheForm, { type TheFormRef } from './components/TheForm';
 import TheTable, { type TheTableRef } from './components/TheTable';
 import TheFilter, { type TheFilterRef } from './components/TheFilter';
+import { TheActionButtons } from './components/TheActionButtons';
 
 export interface Props {
   localObj: LocalObj;
@@ -22,7 +23,10 @@ export default function ThePage() {
   const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title={t('i18n.translation.title')}>
+    <PageLayout
+      title={t('i18n.translation.title')}
+      actions={<TheActionButtons formRef={formRef} />}
+    >
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />

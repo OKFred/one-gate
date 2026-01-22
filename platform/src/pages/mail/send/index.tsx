@@ -56,7 +56,7 @@ export default function MailSend() {
               sx={{ mt: 2 }}
               fullWidth
             >
-              {loading ? t('mail.send.action.sending') : t('mail.send.action.send')}
+              {t('mail.send.action.send')}
             </Button>
           </Box>
         </Paper>

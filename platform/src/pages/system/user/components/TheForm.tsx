@@ -143,7 +143,7 @@ const TheForm = memo(
       const formData = { ...form };
       // 保证 remark 字段传递（允许为 null）
       if (!('remark' in formData)) {
-        (formData as any).remark = null;
+        formData.remark = null;
       }
 
       if (editId) {
@@ -249,7 +249,7 @@ const TheForm = memo(
             pb: isMobile ? 1 : 2,
           }}
         >
-          <Box>{editId ? t('system.user.form.title.edit') : t('system.user.form.title.add')}</Box>
+          <Box>{editId ? t('common.actions.edit') : t('common.actions.add')}</Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
               <CloseIcon />
@@ -266,7 +266,7 @@ const TheForm = memo(
           <form onSubmit={handleSubmit}>
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <TextField
-                label={t('system.user.form.username')}
+                label={t('login.username')}
                 value={form.username ?? ''}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
                 required
@@ -302,7 +302,7 @@ const TheForm = memo(
 
               <Box>
                 <InputLabel sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
-                  {t('system.user.columns.department')}
+                  {t('me.details.department')}
                 </InputLabel>
                 <Paper
                   variant="outlined"
@@ -320,7 +320,7 @@ const TheForm = memo(
                   }}
                 >
                   <Typography color={form.departmentObj ? 'text.primary' : 'text.secondary'}>
-                    {form.departmentObj?.label || t('system.user.form.selectDepartment')}
+                    {form.departmentObj?.label || t('form.select')}
                   </Typography>
                   <ArrowDropDownIcon color="action" />
                 </Paper>
@@ -349,7 +349,7 @@ const TheForm = memo(
                 >
                   <Box sx={{ p: 2 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="subtitle2">{t('system.user.form.selectDepartment')}</Typography>
+                      <Typography variant="subtitle2">{t('form.select')}</Typography>
                       {form.departmentObj && (
                         <Button size="small" onClick={handleDepartmentClear}>
                           {t('common.clear')}
@@ -368,12 +368,12 @@ const TheForm = memo(
               </Box>
 
               <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('system.user.form.roles')}</InputLabel>
+                <InputLabel>{t('menu.system.role')}</InputLabel>
                 <Select
                   multiple
                   value={selectedRoleValues}
                   onChange={handleRoleChange}
-                  input={<OutlinedInput label={t('system.user.form.roles')} />}
+                  input={<OutlinedInput label={t('menu.system.role')} />}
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((value) => {
@@ -402,13 +402,15 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label={t('system.user.form.enableAccount')}
+                label={t('common.status.enabled')}
               />
 
               <TextField
-                label={t('system.user.form.remark')}
-                value={(form as any).remark ?? ''}
-                onChange={(e) => setForm({ ...form, remark: e.target.value ? e.target.value : null } as any)}
+                label={t('common.form.remark')}
+                value={form.remark ?? ''}
+                onChange={(e) =>
+                  setForm({ ...form, remark: e.target.value ? e.target.value : null })
+                }
                 fullWidth
                 multiline
                 rows={3}
@@ -436,7 +438,7 @@ const TheForm = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {editId ? t('common.update') : t('common.add')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

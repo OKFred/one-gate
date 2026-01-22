@@ -91,12 +91,12 @@ const TheAccountList = memo(
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <FormControl fullWidth size="small">
-          <InputLabel id="account-select-label">{t('mail.send.form.selectAccount')}</InputLabel>
+          <InputLabel id="account-select-label">{t('form.select')}</InputLabel>
           <Select
             labelId="account-select-label"
             id="account-select"
             value={sender.accountId}
-            label={t('mail.send.form.selectAccount')}
+            label={t('form.select')}
             onChange={handleAccountSelect}
             disabled={loading}
           >

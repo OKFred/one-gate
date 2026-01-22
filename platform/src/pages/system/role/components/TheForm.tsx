@@ -83,7 +83,7 @@ const TheForm = memo(
       const formData = { ...form };
       // 保证 remark 字段传递（允许为 null）
       if (!('remark' in formData)) {
-        (formData as any).remark = null;
+        formData.remark = null;
       }
 
       if (editId) {
@@ -119,7 +119,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('system.role.form.title.edit') : t('system.role.form.title.add')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -143,12 +143,12 @@ const TheForm = memo(
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.roleNamePlaceholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <TextField
-                label={t('common.form.roleDescription')}
-                value={form.description ?? ''}
+                label={t('common.form.remark')}
+                value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -159,23 +159,23 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.descriptionPlaceholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <TextField
                 label={t('common.form.remark')}
-                value={(form as any).remark ?? ''}
+                value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
                     remark: hasValue(e.target.value) ? e.target.value : null,
-                  } as any)
+                  })
                 }
                 fullWidth
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.remarkPlaceholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <TextField
@@ -191,7 +191,6 @@ const TheForm = memo(
                 multiline
                 rows={4}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.permissionsPlaceholder')}
                 helperText={t('system.role.form.permissionsHelper')}
               />
 
@@ -203,7 +202,7 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label={t('common.form.enabledStatus')}
+                label={t('common.filter.enabledStatus')}
               />
             </Stack>
           </form>
@@ -219,7 +218,7 @@ const TheForm = memo(
             {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? t('common.actions.save') : t('common.actions.create')}
+            {editId ? t('common.actions.save') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

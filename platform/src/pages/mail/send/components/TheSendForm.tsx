@@ -1,9 +1,9 @@
-import { forwardRef, useImperativeHandle, memo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, memo, useRef, useState } from 'react';
 import { Box, TextField, Typography, Stack } from '@mui/material';
 import JoditEditor from '@/components/JoditEditor/index';
 import TheAccountList, { type TheAccountListRef } from './TheAccountList';
 import TheRecipientList, { type TheRecipientListRef } from './TheRecipientList';
-import TheTemplateSelect, { type TheTemplateSelectRef } from './TheTemplateSelect';
+import TheTemplateSelect from './TheTemplateSelect';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { SendMailReq } from '@/api/mail/type';
@@ -21,7 +21,11 @@ const TheSendForm = memo(
     const t = useTranslation();
     const accountRef = useRef<TheAccountListRef>(null);
     const recipientRef = useRef<TheRecipientListRef>(null);
-    const templateRef = useRef<TheTemplateSelectRef>(null);
+
+    // 邮件内容状态管理
+    const [templateId, setTemplateId] = useState<number | 'none'>('none');
+    const [subject, setSubject] = useState<string>('');
+    const [html, setHtml] = useState<string>('');
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -30,11 +34,6 @@ const TheSendForm = memo(
         getFormData: () => {
           const sender = accountRef.current?.getSender() || { accountId: '', mailAddress: '' };
           const receiverArr = recipientRef.current?.getRecipients() || [];
-          const content = templateRef.current?.getContent() || {
-            templateId: '',
-            subject: '',
-            html: '',
-          };
 
           const data: SendMailReq = {
             accountId: Number(sender.accountId),
@@ -42,14 +41,14 @@ const TheSendForm = memo(
           };
 
           // 条件添加可选字段
-          if (content.templateId) {
-            data.templateId = Number(content.templateId);
+          if (templateId !== 'none') {
+            data.templateId = templateId;
           }
-          if (content.subject) {
-            data.subject = content.subject;
+          if (subject) {
+            data.subject = subject;
           }
-          if (content.html) {
-            data.html = content.html;
+          if (html) {
+            data.html = html;
           }
 
           return data;
@@ -57,14 +56,12 @@ const TheSendForm = memo(
         reset: () => {
           accountRef.current?.setSender({ accountId: '', mailAddress: '' });
           recipientRef.current?.setRecipients([{ name: '', address: '' }]);
-          templateRef.current?.setContent({
-            templateId: '',
-            subject: '',
-            html: '',
-          });
+          setTemplateId('none');
+          setSubject('');
+          setHtml('');
         },
       }),
-      [],
+      [templateId, subject, html],
     );
 
     return (
@@ -79,14 +76,23 @@ const TheSendForm = memo(
         <Box>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
             <Box sx={{ flex: 1 }}>
-              <TheTemplateSelect ref={templateRef} localObj={localObj} />
-            </Box>
-            <Box sx={{ flex: 1 }}>
               <TextField
                 label={t('mail.send.form.subject')}
-                onChange={(e) => templateRef.current?.setContent({ subject: e.target.value })}
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
                 size="small"
                 fullWidth
+              />
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <TheTemplateSelect
+                localObj={localObj}
+                value={templateId !== 'none' ? templateId.toString() : 'none'}
+                onTemplateChange={(id, templateSubject, templateHtml) => {
+                  setTemplateId(id !== undefined ? id : 'none');
+                  setSubject(templateSubject);
+                  setHtml(templateHtml);
+                }}
               />
             </Box>
           </Stack>
@@ -98,9 +104,9 @@ const TheSendForm = memo(
             {t('mail.send.form.contentLabel')}
           </Typography>
           <JoditEditor
-            value={templateRef.current?.getContent().html || ''}
-            onChange={(html) => templateRef.current?.setContent({ html })}
-            placeholder={t('mail.send.form.content.empty')}
+            value={html}
+            onChange={setHtml}
+            placeholder={t('form.pleaseEnter')}
             height={400}
           />
         </Box>

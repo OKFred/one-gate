@@ -140,7 +140,7 @@ const TheTable = memo(
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('mail.account.columns.remark'),
+        title: t('common.form.remark'),
         render: (row) => row.remark || '-',
       },
       {
@@ -164,20 +164,12 @@ const TheTable = memo(
       },
       {
         type: 'content',
-        label: t('mail.account.columns.remark'),
+        label: t('common.form.remark'),
         render: (row) => row.remark || '-',
       },
       {
         type: 'tags',
-        render: (row) => (
-          <>
-            {row.port === 465 ? (
-              <Chip label={t('mail.account.tags.ssl')} color="success" size="small" />
-            ) : (
-              <Chip label={t('mail.account.tags.starttls')} color="info" size="small" />
-            )}
-          </>
-        ),
+        render: (row) => <Chip label={row.port} color="success" size="small" />,
       },
     ];
 
@@ -196,7 +188,6 @@ const TheTable = memo(
         cardActions={(row) => (
           <AccountActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
-        emptyText={t('mail.account.empty')}
       />
     );
   }),

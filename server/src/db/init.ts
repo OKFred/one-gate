@@ -19,7 +19,7 @@ export const SUPER_ADMIN_ROLE_ID = 1;
 const SUPER_ADMIN = {
   username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
   password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
-  langCode: "zh-CN",
+  langCode: process.env.LOCALE,
   roleId: 1, // 超级管理员角色ID
 };
 
