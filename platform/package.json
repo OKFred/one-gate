@@ -7,7 +7,9 @@
     "dev": "vite --mode=development",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "i18n:scan": "node ../scripts/scan-i18n.js",
+    "i18n:scan:json": "node ../scripts/scan-i18n-enhanced.js --json"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
