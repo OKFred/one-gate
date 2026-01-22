@@ -218,7 +218,7 @@ const TheForm = memo(
             {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? t('common.actions.save') : t('common.actions.create')}
+            {editId ? t('common.actions.save') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

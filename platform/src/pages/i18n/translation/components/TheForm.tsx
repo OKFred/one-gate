@@ -367,7 +367,7 @@ const TheForm = memo(
           <Button onClick={handleSubmit} variant="contained" color="primary">
             {editId
               ? t('common.actions.save')
-              : t('common.actions.create')}
+              : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

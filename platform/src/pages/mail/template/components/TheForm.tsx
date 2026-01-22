@@ -242,7 +242,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {editId ? t('common.actions.update') : t('common.actions.create')}
+            {editId ? t('common.actions.update') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

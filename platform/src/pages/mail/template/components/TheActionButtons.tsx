@@ -17,7 +17,7 @@ export const TheActionButtons = memo(({ formRef }: TheActionButtonsProps) => {
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('common.actions.create')}
+      {t('common.actions.add')}
     </ResponsiveButton>
   );
 });

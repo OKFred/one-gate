@@ -348,7 +348,7 @@ const TheTable = memo(
         {/* 操作栏 */}
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('common.actions.create')}
+            {t('common.actions.add')}
           </Button>
         </Box>
 
