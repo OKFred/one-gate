@@ -176,7 +176,7 @@ const TheFilter = memo(
             <Stack spacing={2}>
               <TextField
                 label={t('common.filter.keyword')}
-                placeholder={t('i18n.translation.filter.keywordPlaceholder')}
+                placeholder={t('common.filter.keywordLabel')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -237,7 +237,7 @@ const TheFilter = memo(
                       );
                     }}
                   >
-                    <MenuItem value="all">{t('i18n.translation.switch.all')}</MenuItem>
+                    <MenuItem value="all">{t('common.filter.all')}</MenuItem>
                     <MenuItem value="enabled">{t('i18n.translation.switch.enabled')}</MenuItem>
                     <MenuItem value="disabled">{t('i18n.translation.switch.disabled')}</MenuItem>
                   </Select>
