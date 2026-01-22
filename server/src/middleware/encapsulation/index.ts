@@ -37,7 +37,7 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = ["/system/auth/login"];
+const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
 
 function routeMaker({
   pathInfo,
