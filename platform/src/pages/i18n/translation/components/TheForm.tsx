@@ -209,7 +209,7 @@ const TheForm = memo(
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.translation.form.application.placeholder')}
+                  placeholder={t('i18n.translation.form.application')}
                 />
 
                 <TextField
@@ -220,7 +220,7 @@ const TheForm = memo(
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.translation.form.business.placeholder')}
+                  placeholder={t('i18n.translation.form.business')}
                 />
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -232,7 +232,7 @@ const TheForm = memo(
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.translation.form.langCode.placeholder')}
+                  placeholder={t('i18n.translation.form.langCode')}
                 />
               </Stack>
 
@@ -243,7 +243,7 @@ const TheForm = memo(
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('i18n.translation.form.tKey.placeholder')}
+                placeholder={t('i18n.translation.form.tKey')}
               />
 
               <Box>
@@ -258,7 +258,7 @@ const TheForm = memo(
                     multiline
                     rows={4}
                     size={isMobile ? 'medium' : 'medium'}
-                    placeholder={t('i18n.translation.form.tValue.placeholder')}
+                    placeholder={t('i18n.translation.form.tValue')}
                     sx={{ flex: 1 }}
                   />
                   {checking && (
@@ -313,8 +313,8 @@ const TheForm = memo(
               </Box>
 
               <TextField
-                label={t('i18n.translation.form.remark')}
-                value={form.remark || ''}
+                label={t('common.form.remark')}
+                value={form.description || ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -325,11 +325,11 @@ const TheForm = memo(
                 multiline
                 rows={2}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('i18n.translation.form.remark.placeholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <Stack direction="row" spacing={2} alignItems="center">
-                <Typography variant="body2">{t('i18n.translation.form.enabledLabel')}</Typography>
+                <Typography variant="body2">{t('common.filter.enabledStatus')}</Typography>
                 <Box
                   component="label"
                   sx={{
@@ -366,8 +366,8 @@ const TheForm = memo(
           </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
             {editId
-              ? t('i18n.translation.form.submit.edit')
-              : t('i18n.translation.form.submit.create')}
+              ? t('common.actions.save')
+              : t('common.actions.create')}
           </Button>
         </DialogActions>
       </Dialog>

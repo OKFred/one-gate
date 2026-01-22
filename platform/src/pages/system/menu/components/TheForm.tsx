@@ -227,7 +227,6 @@ const TheForm = memo(
         setEditingMenu(null);
       } catch (err) {
         console.error(err);
-        setError(t('system.menu.form.operationFailed'));
       } finally {
         setLoading(false);
       }
@@ -372,7 +371,7 @@ const TheForm = memo(
                   onChange={(e) => handleFormChange('isEnabled', e.target.checked)}
                 />
               }
-              label={t('common.form.enabledStatus')}
+              label={t('common.filter.enabledStatus')}
             />
           </Stack>
         </DialogContent>

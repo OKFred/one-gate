@@ -327,14 +327,14 @@ const TheTable = memo(
 
           {/* 删除确认对话框 */}
           <Dialog open={deleteDialog.open} onClose={closeDeleteDialog}>
-            <DialogTitle>{t('i18n.translation.delete.confirmTitle')}</DialogTitle>
+            <DialogTitle>{t('form.actions.deleteConfirmMessage')}</DialogTitle>
             <DialogContent>
               <DialogContentText>{t('i18n.translation.delete.confirmText')}</DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
               <Button onClick={handleConfirmDelete} color="error" autoFocus>
-                {t('common.delete')}
+                {t('common.actions.delete')}
               </Button>
             </DialogActions>
           </Dialog>
@@ -348,7 +348,7 @@ const TheTable = memo(
         {/* 操作栏 */}
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-            {t('i18n.translation.form.submit.create')}
+            {t('common.actions.create')}
           </Button>
         </Box>
 
@@ -362,10 +362,10 @@ const TheTable = memo(
                 <TableCell>{t('i18n.translation.form.langCode')}</TableCell>
                 <TableCell>{t('i18n.translation.form.tKey')}</TableCell>
                 <TableCell>{t('i18n.translation.form.tValue')}</TableCell>
-                <TableCell>{t('i18n.translation.form.remark')}</TableCell>
-                <TableCell>{t('i18n.translation.columns.enabledStatus')}</TableCell>
-                <TableCell>{t('i18n.translation.columns.createTime')}</TableCell>
-                <TableCell align="right">{t('i18n.translation.columns.actions')}</TableCell>
+                <TableCell>{t('common.form.remark')}</TableCell>
+                <TableCell>{t('common.filter.enabledStatus')}</TableCell>
+                <TableCell>{t('common.columns.createTime')}</TableCell>
+                <TableCell align="right">{t('common.columns.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -426,7 +426,11 @@ const TheTable = memo(
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={row.isEnabled ? t('i18n.translation.switch.enabled') : t('i18n.translation.switch.disabled')}
+                        label={
+                          row.isEnabled
+                            ? t('i18n.translation.switch.enabled')
+                            : t('i18n.translation.switch.disabled')
+                        }
                         size="small"
                         color={row.isEnabled ? 'success' : 'default'}
                         variant="outlined"
@@ -438,12 +442,12 @@ const TheTable = memo(
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title={t('table.tooltip.edit')}>
+                      <Tooltip title={t('common.actions.edit')}>
                         <IconButton size="small" color="primary" onClick={() => handleEdit(row)}>
                           <EditIcon />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title={t('table.tooltip.delete')}>
+                      <Tooltip title={t('common.actions.delete')}>
                         <IconButton
                           size="small"
                           color="error"

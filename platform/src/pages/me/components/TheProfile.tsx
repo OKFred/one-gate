@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, memo } from 'react';
-import { Card, CardContent, Avatar, Typography, Box, Chip } from '@mui/material';
+import { Card, CardContent, Avatar, Typography, Box } from '@mui/material';
 import { Person as PersonIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -54,23 +54,13 @@ const TheProfile = memo(
           </Typography>
 
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            {t('me.profile.department')}: {user.departmentObj?.label || t('common.unassigned')}
+            {t('me.details.department')}: {user.departmentObj?.label || t('common.unassigned')}
           </Typography>
 
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            {t('me.profile.role')}:{' '}
+            {t('me.details.role')}:{' '}
             {user.roleArr.map((role) => role.label).join(', ') || t('common.unassigned')}
           </Typography>
-
-          <Box mt={2}>
-            <Chip
-              label={
-                user.isEnabled ? t('me.profile.accountNormal') : t('me.profile.accountDisabled')
-              }
-              color={user.isEnabled ? 'success' : 'error'}
-              variant="outlined"
-            />
-          </Box>
 
           <Box mt={2}>
             <ResponsiveButton
@@ -79,7 +69,7 @@ const TheProfile = memo(
               onClick={handleEdit}
               fullWidth
             >
-              {t('me.profile.editInfo')}
+              {t('common.actions.edit')}
             </ResponsiveButton>
           </Box>
         </CardContent>

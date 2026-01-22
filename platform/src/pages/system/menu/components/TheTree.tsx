@@ -199,7 +199,7 @@ const TheTree = memo(
                 )}
                 {!node.isEnabled && (
                   <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                    {t('system.menu.status.disabled')}
+                    {t('i18n.translation.switch.disabled')}
                   </Typography>
                 )}
               </Typography>
@@ -232,7 +232,7 @@ const TheTree = memo(
           </SimpleTreeView>
         ) : (
           <Typography color="text.secondary" textAlign="center" py={4}>
-            {t('system.menu.empty')}
+            {t('common.noData')}
           </Typography>
         )}
       </Box>

@@ -143,11 +143,11 @@ const TheForm = memo(
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.roleNamePlaceholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <TextField
-                label={t('common.form.roleDescription')}
+                label={t('common.form.remark')}
                 value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({
@@ -159,7 +159,7 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.remarkPlaceholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <TextField
@@ -175,7 +175,7 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.remarkPlaceholder')}
+                placeholder={t('form.pleaseEnter')}
               />
 
               <TextField
@@ -191,7 +191,6 @@ const TheForm = memo(
                 multiline
                 rows={4}
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('system.role.form.permissionsPlaceholder')}
                 helperText={t('system.role.form.permissionsHelper')}
               />
 
@@ -203,7 +202,7 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label={t('common.form.enabledStatus')}
+                label={t('common.filter.enabledStatus')}
               />
             </Stack>
           </form>

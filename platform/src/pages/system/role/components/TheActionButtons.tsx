@@ -34,7 +34,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('system.role.actions.add')}
+      {t('common.actions.add')}
     </ResponsiveButton>
   );
 });

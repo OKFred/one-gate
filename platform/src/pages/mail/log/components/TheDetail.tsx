@@ -78,7 +78,7 @@ const TheDetail = memo(
           <Box display="flex" alignItems="center" gap={2}>
             <EmailIcon color="primary" />
             <Typography variant="h6" component="span">
-              {t('mail.log.detail.title')}: {log.id}
+              {t('page.details')}: {log.id}
             </Typography>
           </Box>
         </DialogTitle>
@@ -88,19 +88,19 @@ const TheDetail = memo(
             {/* 发送状态 */}
             <Box>
               <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                {t('mail.log.detail.sendStatus')}
+                {t('system.user.columns.status')}
               </Typography>
               {log.sendStatus ? (
                 <Chip
                   icon={<SuccessIcon />}
-                  label={t('mail.log.detail.sendSuccess')}
+                  label={t('status.success')}
                   color="success"
                   variant="outlined"
                 />
               ) : (
                 <Chip
                   icon={<ErrorIcon />}
-                  label={t('mail.log.detail.sendFailed')}
+                  label={t('status.failure')}
                   color="error"
                   variant="outlined"
                 />
@@ -179,15 +179,6 @@ const TheDetail = memo(
                     {t('mail.log.detail.templateInfo')}
                   </Typography>
                   <Stack spacing={2}>
-                    {log.templateId && (
-                      <Box>
-                        <Typography variant="subtitle2" color="text.secondary">
-                          {t('mail.log.columns.templateId')}
-                        </Typography>
-                        <Typography variant="body1">{log.templateId}</Typography>
-                      </Box>
-                    )}
-
                     {log.templateParams && (
                       <Box>
                         <Typography variant="subtitle2" color="text.secondary">

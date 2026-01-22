@@ -100,7 +100,7 @@ const TheSendForm = memo(
           <JoditEditor
             value={templateRef.current?.getContent().html || ''}
             onChange={(html) => templateRef.current?.setContent({ html })}
-            placeholder={t('mail.send.form.content.empty')}
+            placeholder={t('form.pleaseEnter')}
             height={400}
           />
         </Box>

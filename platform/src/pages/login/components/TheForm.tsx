@@ -125,7 +125,7 @@ export default function TheForm() {
           disabled={loading}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
-          {loading ? t('login.signingIn') : t('login.signIn')}
+          {t('login.signIn')}
         </Button>
 
         <Button

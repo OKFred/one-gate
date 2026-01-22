@@ -212,7 +212,7 @@ const TheForm = memo(
               </Stack>
 
               <TextField
-                label={t('mail.account.columns.remark')}
+                label={t('common.form.remark')}
                 value={form.remark || ''}
                 onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
                 fullWidth

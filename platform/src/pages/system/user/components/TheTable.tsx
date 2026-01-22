@@ -196,9 +196,9 @@ const TheTable = memo(
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('system.user.columns.username'), render: (row) => row.username },
-      { title: t('system.user.columns.department'), render: (row) => getDepartmentName(row.departmentId) },
-      { title: t('system.user.columns.roles'), render: (row) => getRoleNames(row.roleIdArr) },
+      { title: t('login.username'), render: (row) => row.username },
+      { title: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
+      { title: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
       {
         title: t('common.columns.status'),
         render: (row) => (
@@ -227,8 +227,8 @@ const TheTable = memo(
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.username },
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('system.user.columns.department'), render: (row) => getDepartmentName(row.departmentId) },
-      { type: 'content', label: t('system.user.columns.roles'), render: (row) => getRoleNames(row.roleIdArr) },
+      { type: 'content', label: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
+      { type: 'content', label: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
       {
         type: 'content',
         label: t('common.columns.createTime'),

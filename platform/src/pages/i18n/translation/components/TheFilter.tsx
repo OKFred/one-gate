@@ -145,15 +145,7 @@ const TheFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">{t('i18n.translation.filter.title')}</Typography>
-            {isSearching && (
-              <Chip
-                label={t('i18n.translation.filter.searching')}
-                size="small"
-                color="default"
-                variant="outlined"
-              />
-            )}
+            <Typography variant="h6">{t('common.filter.title')}</Typography>
             {!isSearching && filterCount > 0 && (
               <Chip
                 label={t('common.filter.results').replace('{count}', filterCount.toString())}
@@ -183,7 +175,7 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label={t('i18n.translation.filter.keywordLabel')}
+                label={t('common.filter.keyword')}
                 placeholder={t('i18n.translation.filter.keywordPlaceholder')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
@@ -201,7 +193,7 @@ const TheFilter = memo(
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
                   label={t('i18n.translation.form.application')}
-                  placeholder={t('i18n.translation.form.application.placeholder')}
+                  placeholder={t('i18n.translation.form.application')}
                   value={filters.application || ''}
                   onChange={(e) => handleFilterChange('application', e.target.value)}
                   size="small"
@@ -210,7 +202,7 @@ const TheFilter = memo(
 
                 <TextField
                   label={t('i18n.translation.form.business')}
-                  placeholder={t('i18n.translation.form.business.placeholder')}
+                  placeholder={t('i18n.translation.form.business')}
                   value={filters.business || ''}
                   onChange={(e) => handleFilterChange('business', e.target.value)}
                   size="small"
@@ -219,7 +211,7 @@ const TheFilter = memo(
 
                 <TextField
                   label={t('i18n.translation.form.langCode')}
-                  placeholder={t('i18n.translation.form.langCode.placeholder')}
+                  placeholder={t('i18n.translation.form.langCode')}
                   value={filters.langCode || ''}
                   onChange={(e) => handleFilterChange('langCode', e.target.value)}
                   size="small"
@@ -227,7 +219,7 @@ const TheFilter = memo(
                 />
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.translation.filter.enabledLabel')}</InputLabel>
+                  <InputLabel>{t('i18n.translation.switch.enabled')}</InputLabel>
                   <Select
                     value={
                       filters.isEnabled === undefined
@@ -236,7 +228,7 @@ const TheFilter = memo(
                           ? 'enabled'
                           : 'disabled'
                     }
-                    label={t('i18n.translation.filter.enabledLabel')}
+                    label={t('i18n.translation.switch.enabled')}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleFilterChange(
@@ -254,10 +246,10 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.translation.filter.sortField')}</InputLabel>
+                  <InputLabel>{t('common.filter.orderBy')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label={t('i18n.translation.filter.sortField')}
+                    label={t('common.filter.orderBy')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
                     <MenuItem value="id">ID</MenuItem>
@@ -267,21 +259,19 @@ const TheFilter = memo(
                     <MenuItem value="business">{t('i18n.translation.form.business')}</MenuItem>
                     <MenuItem value="langCode">{t('i18n.translation.form.langCode')}</MenuItem>
                     <MenuItem value="tKey">{t('i18n.translation.form.tKey')}</MenuItem>
-                    <MenuItem value="createTimeUtc">
-                      {t('i18n.translation.columns.createTime')}
-                    </MenuItem>
+                    <MenuItem value="createTimeUtc">{t('common.columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.translation.filter.sortOrder')}</InputLabel>
+                  <InputLabel>{t('common.filter.sortOrder')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label={t('i18n.translation.filter.sortOrder')}
+                    label={t('common.filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">{t('i18n.translation.filter.sort.asc')}</MenuItem>
-                    <MenuItem value="desc">{t('i18n.translation.filter.sort.desc')}</MenuItem>
+                    <MenuItem value="asc">{t('common.filter.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('common.filter.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

@@ -222,11 +222,6 @@ const TheForm = memo(
 
     // 提交表单
     const handleSubmit = async () => {
-      if (!formValues.name.trim()) {
-        setError(t('system.department.form.nameRequired'));
-        return;
-      }
-
       setLoading(true);
       try {
         const submitData = {
@@ -300,7 +295,7 @@ const TheForm = memo(
               autoFocus
             />
             <TextField
-              label={t('system.department.form.remark')}
+              label={t('common.form.remark')}
               value={formValues.description ?? ''}
               onChange={(e) => {
                 const value = e.target.value;

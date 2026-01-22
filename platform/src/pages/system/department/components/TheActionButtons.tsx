@@ -32,7 +32,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('system.department.actions.add')}
+      {t('common.actions.add')}
     </Button>
   );
 });

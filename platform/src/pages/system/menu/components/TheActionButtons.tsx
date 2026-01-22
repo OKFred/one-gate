@@ -110,7 +110,7 @@ export const TreeNodeActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
+          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
               {t('form.actions.deleteConfirmMessage')}

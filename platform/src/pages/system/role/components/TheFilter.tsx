@@ -123,14 +123,6 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
             <Typography variant="h6">{t('common.filter.title')}</Typography>
-            {isSearching && (
-              <Chip
-                label={t('common.filter.searching')}
-                size="small"
-                color="default"
-                variant="outlined"
-              />
-            )}
             {!isSearching && filterCount > 0 && (
               <Chip
                 label={t('common.filter.results').replace('{count}', filterCount.toString())}
@@ -161,7 +153,7 @@ const TheFilter = memo(
             <Stack spacing={2}>
               <TextField
                 label={t('common.filter.keywordLabel')}
-                placeholder={t('system.role.filter.keywordPlaceholder')}
+                placeholder={t('common.filter.keywordLabel')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -196,8 +188,8 @@ const TheFilter = memo(
                     label={t('common.filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">{t('common.filter.ascending')}</MenuItem>
-                    <MenuItem value="desc">{t('common.filter.descending')}</MenuItem>
+                    <MenuItem value="asc">{t('common.filter.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('common.filter.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

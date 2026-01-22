@@ -105,7 +105,7 @@ const ThePreview = memo(
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t('mail.template.preview.id')}
+                    {t('common.columns.id')}
                   </Typography>
                   <Typography variant="body1">{template.id}</Typography>
                 </Box>
@@ -122,13 +122,13 @@ const ThePreview = memo(
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {t('mail.template.columns.createTime')}
+                      {t('common.columns.createTime')}
                     </Typography>
                     <Typography variant="body1">{formatDate(template.createTimeUtc)}</Typography>
                   </Box>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {t('mail.template.preview.updateTime')}
+                      {t('common.columns.updateTime')}
                     </Typography>
                     <Typography variant="body1">
                       {formatDate(template.updateTimeUtc || undefined)}

@@ -140,7 +140,7 @@ const TheTable = memo(
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('mail.account.columns.remark'),
+        title: t('common.form.remark'),
         render: (row) => row.remark || '-',
       },
       {
@@ -164,7 +164,7 @@ const TheTable = memo(
       },
       {
         type: 'content',
-        label: t('mail.account.columns.remark'),
+        label: t('common.form.remark'),
         render: (row) => row.remark || '-',
       },
       {
