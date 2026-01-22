@@ -13,7 +13,7 @@ import * as MenuAPI from '@/api/system/menu';
 import Icon from '@/components/Icon';
 import type { MenuData } from './TheForm';
 import type { Props } from '../index';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
 import { TreeNodeActionButtons } from './TheActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -163,7 +163,7 @@ const TheTree = memo(
       try {
         await MenuAPI.deleteFn({ data: { id: menuId } });
         fetchMenus(filters);
-        showGlobalNotification({ message: t('common.interact.operationSuccess'), type: 'success' });
+        showSnackbar({ message: t('common.interact.operationSuccess'), type: 'success' });
       } catch (err) {
         console.error(err); 
       } finally {

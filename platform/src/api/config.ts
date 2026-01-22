@@ -6,7 +6,7 @@ import type {
   AxiosResponse,
 } from 'axios';
 import type { paths } from '@/types/openapi'; //由openapi-typescript自动生成的类型
-import { showGlobalNotification } from '@/components/Notification';
+import { showGlobalNotification, showSnackbar } from '@/components/Notification';
 
 // 导入认证工具
 import { authUtils } from '@/utils/auth';
@@ -127,7 +127,7 @@ function setupInterceptors(service: AxiosInstance) {
 }
 
 function handleErrorResponse(errorMessage: string) {
-  showGlobalNotification({ message: errorMessage, type: 'error' });
+  showSnackbar({ message: errorMessage, type: 'error' });
   console.error(errorMessage);
 }
 

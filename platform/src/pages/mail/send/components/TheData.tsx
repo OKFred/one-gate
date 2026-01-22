@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, memo } from 'react';
 import * as mailActionAPI from '@/api/mail/action';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import type { SendMailReq } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -29,7 +29,7 @@ const TheData = memo(
               html: data.html,
             };
             await mailActionAPI.sendFn({ data: SendMailReq });
-            showGlobalNotification({
+            showSnackbar({
               message: t('common.interact.operationSuccess'),
               type: 'success',
             });

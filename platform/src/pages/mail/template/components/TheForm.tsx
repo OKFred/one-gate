@@ -19,7 +19,7 @@ import * as MailTemplateAPI from '@/api/mail/template';
 import type { AddMailTemplateReq } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 
 const DEFAULT_FORM: AddMailTemplateReq = {
   name: '',
@@ -104,7 +104,7 @@ const TheForm = memo(
             },
           });
         }
-        showGlobalNotification({
+        showSnackbar({
           message: t('mail.send.form.content.loaded'),
           type: 'success',
         });

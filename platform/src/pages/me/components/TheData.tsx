@@ -1,6 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import * as UserApiService from '@/api/system/user';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { GetUserRes, UpdateUserReq } from '@/api/system/type';
 import type { Props } from '../index';
@@ -59,7 +59,7 @@ const TheData = memo(
           };
 
           await UserApiService.updateFn({ data: updateData });
-          showGlobalNotification({
+          showSnackbar({
             type: 'success',
             message: t('common.interact.operationSuccess'),
           });

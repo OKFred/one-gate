@@ -20,7 +20,7 @@ import ResponsiveList, {
 } from '@/components/Responsive/ResponsiveList';
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import type { ListMailTemplateReq, ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -174,7 +174,7 @@ const TheTable = memo(
 
       try {
         await MailTemplateAPI.deleteFn({ data: { id: deleteId } });
-        showGlobalNotification({
+        showSnackbar({
           message: t('common.interact.operationSuccess'),
           type: 'success',
         });

@@ -27,7 +27,7 @@ import * as MenuAPI from '@/api/system/menu';
 import * as RoleAPI from '@/api/system/role';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -203,7 +203,7 @@ const TheForm = memo(
               ...submitData,
             },
           });
-          showGlobalNotification({
+          showSnackbar({
             message: t('common.interact.operationSuccess'),
             type: 'success',
           });
@@ -211,7 +211,7 @@ const TheForm = memo(
           await MenuAPI.addFn({
             data: submitData,
           });
-          showGlobalNotification({
+          showSnackbar({
             message: t('common.interact.operationSuccess'),
             type: 'success',
           });

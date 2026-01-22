@@ -23,7 +23,7 @@ import type { AddDepartmentReq, ListAllDepartmentRes } from '@/api/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
-import { showGlobalNotification } from '@/components/Notification';
+import { showSnackbar } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
 
 // 部门表单数据类型（复用自动生成的类型）
@@ -232,13 +232,13 @@ const TheForm = memo(
 
         if (editingDepartment && formValues.id) {
           await DepartmentAPI.updateFn({ data: { ...submitData, id: formValues.id } });
-          showGlobalNotification({
+          showSnackbar({
             message: t('common.interact.operationSuccess'),
             type: 'success',
           });
         } else {
           await DepartmentAPI.addFn({ data: submitData });
-          showGlobalNotification({
+          showSnackbar({
             message: t('common.interact.operationSuccess'),
             type: 'success',
           });
