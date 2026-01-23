@@ -27,7 +27,7 @@ export const SnackbarNotification = ({
   message,
   type = 'info',
   duration = 3000,
-  position = { vertical: 'top', horizontal: 'center' },
+  position = { vertical: 'bottom', horizontal: 'right' },
   onExited,
 }: SnackbarNotificationProps) => {
   const [open, setOpen] = useState(true);

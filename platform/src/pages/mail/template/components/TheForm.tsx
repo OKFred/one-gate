@@ -104,10 +104,7 @@ const TheForm = memo(
             },
           });
         }
-        showSnackbar({
-          message: t('mail.send.form.content.loaded'),
-          type: 'success',
-        });
+        showSnackbar({ type: 'success', message: t('common.interact.operationSuccess') });
         handleCancel();
         // 刷新表格数据
         tableRef.current?.refresh();
