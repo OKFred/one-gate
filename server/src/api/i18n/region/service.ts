@@ -205,7 +205,9 @@ const addReq = {
   properties: {
     ...RegionAddVO,
   } satisfies Partial<Record<keyof RegionAddVOLike, JSONSchema>>,
-  required: [...RegionAddKeys] as const satisfies RequiredKeys<RegionAddVOLike>[],
+  required: [
+    ...RegionAddKeys,
+  ] as const satisfies RequiredKeys<RegionAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -213,14 +215,12 @@ const addRes = {
 } as const satisfies JSONSchema;
 async function onAdd(
   params: FromSchema<typeof addReq>,
-  userObj: Pick<UserObj, "userId">,
-  options?: { skipVersionCheck?: boolean }
+  userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
   await uniqueCheck(params);
   const addData = {
     ...params,
-    version: params.version ?? 0,
     creatorId,
   };
   const result = await db
@@ -246,7 +246,9 @@ const updateReq = {
   properties: {
     ...RegionUpdateVO,
   },
-  required: [...RegionUpdateKeys] as const satisfies RequiredKeys<RegionUpdateVOLike>[],
+  required: [
+    ...RegionUpdateKeys,
+  ] as const satisfies RequiredKeys<RegionUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
@@ -258,21 +260,15 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await uniqueCheck(params);
+  await uniqueCheck(params, id);
   const previousRecord = await onGet({ id });
   if (!previousRecord) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  const previousVersion = previousRecord.version;
-  if (params.version !== previousVersion) {
-    throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
-  }
-  const currentVersion = previousVersion + 1;
   const updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
-    version: currentVersion,
   };
 
   const res = await db
@@ -302,7 +298,9 @@ const deleteReq = {
   properties: {
     ...IndexVO,
   },
-  required: [...RegionDeleteKeys] as const satisfies RequiredKeys<RegionDeleteVOLike>[],
+  required: [
+    ...RegionDeleteKeys,
+  ] as const satisfies RequiredKeys<RegionDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const deleteRes = {
@@ -338,7 +336,9 @@ const getReq = {
   properties: {
     ...IndexVO,
   },
-  required: [...RegionGetKeys] as const satisfies RequiredKeys<RegionGetVOLike>[],
+  required: [
+    ...RegionGetKeys,
+  ] as const satisfies RequiredKeys<RegionGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
@@ -346,7 +346,9 @@ const getRes = {
   properties: {
     ...RegionVO,
   },
-  required: [...RegionDetailKeys] as const satisfies RequiredKeys<RegionVOLike>[],
+  required: [
+    ...RegionDetailKeys,
+  ] as const satisfies RequiredKeys<RegionVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
@@ -376,7 +378,8 @@ const getApi = {
 } satisfies API;
 
 async function uniqueCheck(
-  obj: FromSchema<typeof updateReq | typeof addReq>
+  obj: FromSchema<typeof updateReq | typeof addReq>,
+  excludeId?: number
 ): Promise<void> {
   const conditions = [] as any[];
   if (hasValue(obj.alpha2Code)) {
@@ -390,15 +393,13 @@ async function uniqueCheck(
   }
   if (conditions.length === 0) return;
 
-  const whereClause = conditions.length === 1 ? conditions[0] : or(...conditions);
+  const whereClause =
+    conditions.length === 1 ? conditions[0] : or(...conditions);
   const records = await db
     .select({ id: regionTable.id })
     .from(regionTable)
     .where(
-      and(
-        whereClause,
-        "id" in obj ? ne(regionTable.id, obj.id) : undefined
-      )
+      and(whereClause, excludeId ? ne(regionTable.id, excludeId) : undefined)
     )
     .limit(1);
   if (records.length > 0) {

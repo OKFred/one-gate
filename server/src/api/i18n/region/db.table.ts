@@ -62,12 +62,6 @@ const RegionBasePO = {
     description: "是否启用",
     examples: [true, false],
   },
-  version: {
-    type: ["integer", "null"],
-    nullable: true,
-    description: "版本号",
-    examples: [0, 1, 2],
-  },
   remark: {
     type: ["string", "null"],
     nullable: true,
@@ -167,7 +161,6 @@ export const regionTable = sqliteTable(
       mode: "boolean",
     }).notNull(),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-    version: integer("version").notNull(),
     remark: text("remark", { length: 500 }),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),
@@ -194,7 +187,6 @@ export async function tableInit() {
       numeric INTEGER NOT NULL,
       iso_3166_independent INTEGER NOT NULL,
       is_enabled INTEGER NOT NULL,
-      version INTEGER NOT NULL,
       remark TEXT,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
