@@ -165,7 +165,7 @@ const TheTable = memo(
       { title: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
         title: t('common.form.remark'),
-        render: (row) => row.description || '-',
+        render: (row) => row.remark || '-',
       },
       {
         title: t('common.filter.enabledStatus'),
@@ -207,7 +207,7 @@ const TheTable = memo(
       {
         type: 'content',
         label: t('common.form.remark'),
-        render: (row) => row.description || '-',
+        render: (row) => row.remark || '-',
       },
       {
         type: 'tags',

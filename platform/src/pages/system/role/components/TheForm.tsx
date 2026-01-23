@@ -30,7 +30,6 @@ export interface RoleFormRef {
 
 const DEFAULT_FORM: AddRoleReq | UpdateRoleReq = {
   name: '',
-  description: null,
   remark: null,
   permissions: null,
   isEnabled: true,
@@ -57,8 +56,7 @@ const TheForm = memo(
             setEditId(role.id!);
             setForm({
               name: role.name,
-              description: role.description,
-              remark: null,
+              remark: role.remark ?? null,
               permissions: role.permissions,
               isEnabled: role.isEnabled,
             });
@@ -142,22 +140,6 @@ const TheForm = memo(
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
                 fullWidth
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('form.pleaseEnter')}
-              />
-
-              <TextField
-                label={t('common.form.remark')}
-                value={form.remark ?? ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={3}
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder={t('form.pleaseEnter')}
               />

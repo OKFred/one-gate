@@ -49,7 +49,7 @@ const DEFAULT_FORM: AddTranslationReq = {
   tKey: '',
   tValue: '',
   valueHash: '',
-  description: null,
+  remark: null,
   isEnabled: true,
 };
 
@@ -124,7 +124,7 @@ const TheForm = memo(
             tValue: row.tValue || '',
             valueHash: row.valueHash || '',
             isEnabled: row.isEnabled,
-            description: row.description || null,
+            remark: row.remark || null,
           });
           setDuplicateInfo(null);
           setOpen(true);
@@ -314,11 +314,11 @@ const TheForm = memo(
 
               <TextField
                 label={t('common.form.remark')}
-                value={form.description || ''}
+                value={form.remark || ''}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    description: hasValue(e.target.value) ? e.target.value : null,
+                    remark: hasValue(e.target.value) ? e.target.value : null,
                   })
                 }
                 fullWidth

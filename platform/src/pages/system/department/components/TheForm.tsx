@@ -48,10 +48,9 @@ export interface TheFormRef {
 
 const DEFAULT_FORM: DepartmentFormData = {
   name: '',
-  description: null,
-  remark: null,
   parentId: null,
   isEnabled: true,
+  remark: null,
 };
 
 // 扁平化部门树，用于下拉选择
@@ -196,10 +195,9 @@ const TheForm = memo(
           setFormValues({
             id: department.id,
             name: department.name ?? '',
-            description: department.description ?? null,
-            remark: null,
             parentId: department.parentId ?? null,
             isEnabled: department.isEnabled ?? true,
+            remark: department.remark ?? null,
           });
           setError('');
           setDialogOpen(true);
@@ -226,7 +224,6 @@ const TheForm = memo(
       try {
         const submitData = {
           ...formValues,
-          description: hasValue(formValues.description) ? formValues.description : null,
           remark: hasValue(formValues.remark) ? formValues.remark : null,
         };
 
@@ -296,17 +293,6 @@ const TheForm = memo(
             />
             <TextField
               label={t('common.form.remark')}
-              value={formValues.description ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleFormChange('description', hasValue(value) ? value : null);
-              }}
-              fullWidth
-              multiline
-              rows={2}
-            />
-            <TextField
-              label={t('common.form.remark')}
               value={formValues.remark ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
@@ -348,6 +334,17 @@ const TheForm = memo(
                 />
               }
               label={t('common.status.enabled')}
+            />
+            <TextField
+              label={t('common.form.remark')}
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
             />
           </Stack>
         </DialogContent>

@@ -3610,10 +3610,10 @@ export interface components {
                      */
                     business: string;
                     /**
-                     * @description 描述信息
+                     * @description 备注说明
                      * @example 欢迎消息的翻译
                      */
-                    description: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
                     /**
                      * @description 是否启用
                      * @example true
@@ -3681,10 +3681,10 @@ export interface components {
              */
             business: string;
             /**
-             * @description 描述信息
+             * @description 备注说明
              * @example 欢迎消息的翻译
              */
-            description: ((string | null) | null) | null;
+            remark: ((string | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
@@ -3749,10 +3749,10 @@ export interface components {
              */
             business?: string;
             /**
-             * @description 描述信息
+             * @description 备注说明
              * @example 欢迎消息的翻译
              */
-            description?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
@@ -3842,10 +3842,10 @@ export interface components {
                  */
                 business: string;
                 /**
-                 * @description 描述信息
+                 * @description 备注说明
                  * @example 欢迎消息的翻译
                  */
-                description: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @example true
@@ -5189,11 +5189,6 @@ export interface components {
                  * @example 技术部
                  */
                 name?: string;
-                /**
-                 * @description 部门描述
-                 * @example 负责技术研发工作
-                 */
-                description?: ((string | null) | null) | null;
                 /** @description 父部门ID，支持部门层级 */
                 parentId?: ((number | null) | null) | null;
                 /** @description 是否启用 */
@@ -5253,11 +5248,6 @@ export interface components {
                      * @example 技术部
                      */
                     name: string;
-                    /**
-                     * @description 部门描述
-                     * @example 负责技术研发工作
-                     */
-                    description: ((string | null) | null) | null;
                     /** @description 父部门ID，支持部门层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 是否启用 */
@@ -5288,11 +5278,6 @@ export interface components {
              * @example 技术部
              */
             name: string;
-            /**
-             * @description 部门描述
-             * @example 负责技术研发工作
-             */
-            description: ((string | null) | null) | null;
             /** @description 父部门ID，支持部门层级 */
             parentId: ((number | null) | null) | null;
             /** @description 是否启用 */
@@ -5336,11 +5321,6 @@ export interface components {
              * @example 技术部
              */
             name?: string;
-            /**
-             * @description 部门描述
-             * @example 负责技术研发工作
-             */
-            description?: ((string | null) | null) | null;
             /** @description 父部门ID，支持部门层级 */
             parentId?: ((number | null) | null) | null;
             /** @description 是否启用 */
@@ -5377,11 +5357,6 @@ export interface components {
                  * @example 技术部
                  */
                 name: string;
-                /**
-                 * @description 部门描述
-                 * @example 负责技术研发工作
-                 */
-                description: ((string | null) | null) | null;
                 /** @description 父部门ID，支持部门层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 是否启用 */
@@ -5422,11 +5397,6 @@ export interface components {
                  * @example 技术部
                  */
                 name: string;
-                /**
-                 * @description 部门描述
-                 * @example 负责技术研发工作
-                 */
-                description: ((string | null) | null) | null;
                 /** @description 父部门ID，支持部门层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 是否启用 */
@@ -5458,11 +5428,6 @@ export interface components {
                      * @example 技术部
                      */
                     name?: string;
-                    /**
-                     * @description 部门描述
-                     * @example 负责技术研发工作
-                     */
-                    description?: ((string | null) | null) | null;
                     /** @description 父部门ID，支持部门层级 */
                     parentId?: ((number | null) | null) | null;
                     /** @description 是否启用 */
@@ -5882,11 +5847,6 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /**
-                 * @description 角色描述
-                 * @example 系统管理员，拥有所有权限
-                 */
-                description?: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
                 /**
@@ -5949,11 +5909,6 @@ export interface components {
                      * @example 管理员
                      */
                     name: string;
-                    /**
-                     * @description 角色描述
-                     * @example 系统管理员，拥有所有权限
-                     */
-                    description: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark: ((string | null) | null) | null;
                     /**
@@ -5987,11 +5942,6 @@ export interface components {
              * @example 管理员
              */
             name: string;
-            /**
-             * @description 角色描述
-             * @example 系统管理员，拥有所有权限
-             */
-            description: ((string | null) | null) | null;
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
             /**
@@ -6022,11 +5972,6 @@ export interface components {
              * @example 管理员
              */
             name?: string;
-            /**
-             * @description 角色描述
-             * @example 系统管理员，拥有所有权限
-             */
-            description?: ((string | null) | null) | null;
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
             /**
@@ -6082,11 +6027,6 @@ export interface components {
                  * @example 管理员
                  */
                 name: string;
-                /**
-                 * @description 角色描述
-                 * @example 系统管理员，拥有所有权限
-                 */
-                description: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
                 /**
