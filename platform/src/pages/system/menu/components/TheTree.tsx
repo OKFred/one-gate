@@ -186,7 +186,7 @@ const TheTree = memo(
                 </Box>
               )}
               <Typography sx={{ flexGrow: 1 }}>
-                {node.name}
+                {t(node.name)}
                 {node.path && (
                   <Typography
                     component="span"
