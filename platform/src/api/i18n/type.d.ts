@@ -1,4 +1,7 @@
 import * as TranslationAPI from '@/api/i18n/translation';
+import * as RegionAPI from '@/api/i18n/region';
+
+// ==================== Translation ====================
 
 // 获取全部翻译列表
 export type ListAllTranslationReq = NonNullable<
@@ -43,3 +46,29 @@ export type CheckDuplicateTranslationReq = NonNullable<
 export type CheckDuplicateTranslationRes = Awaited<
   ReturnType<typeof TranslationAPI.checkDuplicateFn>
 >['data']['data'];
+
+// ==================== Region ====================
+
+// 获取全部地区列表
+export type ListAllRegionReq = NonNullable<Parameters<typeof RegionAPI.listAllFn>[0]['data']>;
+export type ListAllRegionRes = Awaited<ReturnType<typeof RegionAPI.listAllFn>>['data']['data'];
+
+// 获取地区列表
+export type ListRegionReq = NonNullable<Parameters<typeof RegionAPI.listFn>[0]['data']>;
+export type ListRegionRes = Awaited<ReturnType<typeof RegionAPI.listFn>>['data']['data'];
+
+// 获取单个地区
+export type GetRegionReq = NonNullable<Parameters<typeof RegionAPI.getFn>[0]['data']>;
+export type GetRegionRes = Awaited<ReturnType<typeof RegionAPI.getFn>>['data']['data'];
+
+// 添加地区
+export type AddRegionReq = NonNullable<Parameters<typeof RegionAPI.addFn>[0]['data']>;
+export type AddRegionRes = Awaited<ReturnType<typeof RegionAPI.addFn>>['data']['data'];
+
+// 更新地区
+export type UpdateRegionReq = NonNullable<Parameters<typeof RegionAPI.updateFn>[0]['data']>;
+export type UpdateRegionRes = Awaited<ReturnType<typeof RegionAPI.updateFn>>['data']['data'];
+
+// 删除地区
+export type DeleteRegionReq = NonNullable<Parameters<typeof RegionAPI.deleteFn>[0]['data']>;
+export type DeleteRegionRes = Awaited<ReturnType<typeof RegionAPI.deleteFn>>['data']['data'];

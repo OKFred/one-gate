@@ -6,6 +6,8 @@ import { roleTable } from "@/api/system/role/db.table";
 import { menuTable } from "@/api/system/menu/db.table";
 import { initialMenuData } from "@/db/initialMenu";
 import { initialI18nData } from "./initI18n";
+import { initialRegionData } from "./initRegion";
+import { regionTable } from "@/api/i18n/region/db.table";
 import translationService, {
   utils as translationUtils,
 } from "@/api/i18n/translation/service";
@@ -176,6 +178,43 @@ async function initI18n() {
 }
 
 /**
+ * 初始化国家地区数据
+ */
+async function initCountryRegion() {
+  try {
+    const countResult = await db
+      .select({ total: count(regionTable.id).as("total") })
+      .from(regionTable);
+    if (countResult[0]?.total > 0) {
+      console.log("ℹ️  国家地区数据已存在，跳过初始化");
+      return;
+    }
+
+    const mappedData = initialRegionData.map((item) => ({
+      labelZhCN: item.label_zhCN,
+      labelEnUS: item.label_enUS,
+      alpha2Code: item.alpha2Code,
+      alpha3Code: item.alpha3Code,
+      numeric: item.numeric,
+      iso3166Independent: item.ISO3166Independent,
+      isEnabled: true,
+      version: 0,
+      creatorId: SUPER_ADMIN_ID,
+    }));
+
+    const chunkSize = 100;
+    for (let i = 0; i < mappedData.length; i += chunkSize) {
+      const chunk = mappedData.slice(i, i + chunkSize);
+      await db.insert(regionTable).values(chunk);
+    }
+    console.log(`💾 表 i18n_region 初始数据已插入 (${mappedData.length} 条)`);
+  } catch (error) {
+    console.error("❌ 国家地区数据初始化失败:", error);
+    throw error;
+  }
+}
+
+/**
  * 初始化数据库数据
  */
 export async function initDatabase() {
@@ -195,6 +234,9 @@ export async function initDatabase() {
 
     // 5. 加载多语言缓存
     await loadI18nCache();
+
+    // 6. 初始化国家地区
+    await initCountryRegion();
 
     console.log("✅ 数据库初始化完成");
   } catch (error) {

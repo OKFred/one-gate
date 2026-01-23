@@ -4,6 +4,354 @@
  */
 
 export interface paths {
+    "/api/v1/i18n/region/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有国家地区（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取国家地区列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加国家地区 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新国家地区 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除国家地区 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取国家地区详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/i18n/translation/listAll": {
         parameters: {
             query?: never;
@@ -3434,6 +3782,307 @@ export interface components {
             ok: boolean;
             message: string;
             data: Record<string, never>;
+        };
+        I18nRegionListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "labelZhCN" | "labelEnUS" | "alpha2Code" | "alpha3Code" | "numeric" | "createTimeUtc";
+        };
+        I18nRegionListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 中文名称 */
+                labelZhCN?: string;
+                /** @description 英文名称 */
+                labelEnUS?: string;
+                /** @description ISO 3166-1 alpha-2 */
+                alpha2Code?: string;
+                /** @description ISO 3166-1 alpha-3 */
+                alpha3Code?: string;
+                /**
+                 * @description ISO 3166-1 numeric
+                 * @example 156
+                 */
+                numeric?: number;
+                /** @description 是否ISO3166上标为独立主权国家 */
+                iso3166Independent?: boolean;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled?: boolean;
+            }[];
+            message: string;
+        };
+        I18nRegionListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "labelZhCN" | "labelEnUS" | "alpha2Code" | "alpha3Code" | "numeric" | "createTimeUtc";
+        };
+        I18nRegionListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description ISO 3166-1 alpha-2 */
+                    alpha2Code: string;
+                    /** @description ISO 3166-1 alpha-3 */
+                    alpha3Code: string;
+                    /**
+                     * @description ISO 3166-1 numeric
+                     * @example 156
+                     */
+                    numeric: number;
+                    /** @description 中文名称 */
+                    labelZhCN: string;
+                    /** @description 英文名称 */
+                    labelEnUS: string;
+                    /** @description 是否ISO3166上标为独立主权国家 */
+                    iso3166Independent: boolean;
+                    /**
+                     * @description 是否启用
+                     * @example true
+                     * @example false
+                     */
+                    isEnabled: boolean;
+                    /**
+                     * @description 版本号
+                     * @example 0
+                     * @example 1
+                     * @example 2
+                     */
+                    version?: ((number | null) | null) | null;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        I18nRegionAddReq: {
+            /** @description ISO 3166-1 alpha-2 */
+            alpha2Code: string;
+            /** @description ISO 3166-1 alpha-3 */
+            alpha3Code: string;
+            /**
+             * @description ISO 3166-1 numeric
+             * @example 156
+             */
+            numeric: number;
+            /** @description 中文名称 */
+            labelZhCN: string;
+            /** @description 英文名称 */
+            labelEnUS: string;
+            /** @description 是否ISO3166上标为独立主权国家 */
+            iso3166Independent: boolean;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled: boolean;
+            /**
+             * @description 版本号
+             * @example 0
+             * @example 1
+             * @example 2
+             */
+            version?: ((number | null) | null) | null;
+            /** @description 备注 */
+            remark: ((string | null) | null) | null;
+        };
+        I18nRegionAddRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nRegionUpdateReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description ISO 3166-1 alpha-2 */
+            alpha2Code?: string;
+            /** @description ISO 3166-1 alpha-3 */
+            alpha3Code?: string;
+            /**
+             * @description ISO 3166-1 numeric
+             * @example 156
+             */
+            numeric?: number;
+            /** @description 中文名称 */
+            labelZhCN?: string;
+            /** @description 英文名称 */
+            labelEnUS?: string;
+            /** @description 是否ISO3166上标为独立主权国家 */
+            iso3166Independent?: boolean;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /**
+             * @description 版本号
+             * @example 0
+             * @example 1
+             * @example 2
+             */
+            version?: ((number | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        I18nRegionUpdateRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nRegionDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nRegionDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nRegionGetReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nRegionGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description ISO 3166-1 alpha-2 */
+                alpha2Code: string;
+                /** @description ISO 3166-1 alpha-3 */
+                alpha3Code: string;
+                /**
+                 * @description ISO 3166-1 numeric
+                 * @example 156
+                 */
+                numeric: number;
+                /** @description 中文名称 */
+                labelZhCN: string;
+                /** @description 英文名称 */
+                labelEnUS: string;
+                /** @description 是否ISO3166上标为独立主权国家 */
+                iso3166Independent: boolean;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled: boolean;
+                /**
+                 * @description 版本号
+                 * @example 0
+                 * @example 1
+                 * @example 2
+                 */
+                version?: ((number | null) | null) | null;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
         };
         I18nTranslationListAllReq: {
             /** @description 是否降序 */

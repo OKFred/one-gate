@@ -114,13 +114,6 @@ export const TreeNodeActionButtons = memo(
           <DialogContent>
             <DialogContentText>
               {t('form.actions.deleteConfirmMessage')}
-              {node.children && node.children.length > 0 && (
-                <>
-                  <br />
-                  <br />
-                  {t('system.menu.actions.deleteConfirmSubMenu')}
-                </>
-              )}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

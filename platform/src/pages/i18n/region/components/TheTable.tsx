@@ -4,9 +4,9 @@ import ResponsiveList, {
   type TableColumn,
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
-import * as TranslationAPI from '@/api/i18n/translation';
-import { TranslationActionButtons } from './TheActionButtons';
-import type { ListTranslationReq, ListTranslationRes } from '@/api/i18n/type';
+import * as RegionAPI from '@/api/i18n/region';
+import { RegionActionButtons } from './TheActionButtons';
+import type { ListRegionReq, ListRegionRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import type { FilterState } from './TheFilter';
 import dayjs from 'dayjs';
@@ -20,7 +20,7 @@ export interface TheTableRef {
 
 // 表格内部状态
 export interface TableState {
-  list: NonNullable<ListTranslationRes['list']>;
+  list: NonNullable<ListRegionRes['list']>;
   loading: boolean;
   page: number;
   pageSize: number;
@@ -32,9 +32,6 @@ const DEFAULT_FILTERS: FilterState = {
   keyword: '',
   orderBy: 'id',
   descend: false,
-  application: undefined,
-  business: undefined,
-  langCode: undefined,
   isEnabled: undefined,
 };
 
@@ -56,42 +53,32 @@ const TheTable = memo(
     const { list, loading, page, pageSize, total, filters } = state;
 
     // 获取数据的核心函数
-    const fetchTranslations = useCallback(
+    const fetchRegions = useCallback(
       async (searchFilters: FilterState, currentPage: number = 1) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
-          const requestData: ListTranslationReq = {
+          const requestData: ListRegionReq = {
             pageNo: currentPage,
             pageSize: state.pageSize,
             orderBy: searchFilters.orderBy,
-            isEnabled: searchFilters.isEnabled,
             descend: searchFilters.descend,
           };
 
           if (searchFilters.keyword) {
             requestData.keyword = searchFilters.keyword;
           }
-          if (searchFilters.application) {
-            requestData.application = searchFilters.application;
-          }
-          if (searchFilters.business) {
-            requestData.business = searchFilters.business;
-          }
-          if (searchFilters.langCode) {
-            requestData.langCode = searchFilters.langCode;
-          }
           if (searchFilters.isEnabled !== undefined) {
             requestData.isEnabled = searchFilters.isEnabled;
           }
 
-          const res = await TranslationAPI.listFn({ data: requestData });
+          const res = await RegionAPI.listFn({ data: requestData });
           const response = res.data;
-          const translationsList = response?.data?.list || [];
+          const regionsList = response?.data?.list || [];
           const totalCount = response?.data?.total || 0;
 
           setState((prev) => ({
             ...prev,
-            list: translationsList,
+            list: regionsList,
             total: totalCount,
             page: currentPage,
             filters: searchFilters,
@@ -109,13 +96,13 @@ const TheTable = memo(
 
     // 删除成功后的回调
     const handleDeleteSuccess = useCallback(() => {
-      fetchTranslations(filters, page);
-    }, [fetchTranslations, filters, page]);
+      fetchRegions(filters, page);
+    }, [fetchRegions, filters, page]);
 
     // 初始加载
     useEffect(() => {
-      fetchTranslations(DEFAULT_FILTERS, 1);
-    }, [fetchTranslations]);
+      fetchRegions(DEFAULT_FILTERS, 1);
+    }, [fetchRegions]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -124,53 +111,59 @@ const TheTable = memo(
         refresh: (newFilters?: FilterState) => {
           const filtersToUse = newFilters || filters;
           const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
-          fetchTranslations(filtersToUse, pageToUse);
+          fetchRegions(filtersToUse, pageToUse);
         },
       }),
-      [fetchTranslations, filters, page],
+      [fetchRegions, filters, page],
     );
 
     // 处理分页
     const handlePageChange = (newPage: number) => {
-      fetchTranslations(filters, newPage);
+      fetchRegions(filters, newPage);
     };
 
     // 处理每页条数变化
     const handlePageSizeChange = (newPageSize: number) => {
       setState((prev) => ({ ...prev, pageSize: newPageSize }));
       // 重置到第一页并刷新数据
-      fetchTranslations(filters, 1);
+      fetchRegions(filters, 1);
     };
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('i18n.region.form.labelZhCN'), render: (row) => row.labelZhCN },
+      { title: t('i18n.region.form.labelEnUS'), render: (row) => row.labelEnUS },
       {
-        title: t('i18n.translation.form.application'),
+        title: t('i18n.region.form.alpha2Code'),
         render: (row) => (
-          <Chip label={row.application} size="small" color="primary" variant="outlined" />
+          <Chip label={row.alpha2Code} size="small" color="primary" variant="outlined" />
         ),
       },
       {
-        title: t('i18n.translation.form.business'),
+        title: t('i18n.region.form.alpha3Code'),
         render: (row) => (
-          <Chip label={row.business} size="small" color="secondary" variant="outlined" />
+          <Chip label={row.alpha3Code} size="small" color="secondary" variant="outlined" />
         ),
       },
+      { title: t('i18n.region.form.numeric'), render: (row) => row.numeric },
       {
-        title: t('i18n.translation.form.langCode'),
-        render: (row) => <Chip label={row.langCode} size="small" variant="outlined" />,
+        title: t('i18n.region.form.iso3166Independent'),
+        render: (row) => (
+          <Chip
+            label={row.iso3166Independent ? t('common.yes') : t('common.no')}
+            size="small"
+            color={row.iso3166Independent ? 'success' : 'default'}
+            variant="outlined"
+          />
+        ),
       },
-      { title: t('i18n.translation.form.tKey'), render: (row) => row.tKey },
-      { title: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
         title: t('common.filter.enabledStatus'),
         render: (row) => (
           <Chip
             label={
-              row.isEnabled
-                ? t('switch.enabled')
-                : t('i18n.translation.switch.disabled')
+              row.isEnabled ? t('switch.enabled') : t('switch.disabled')
             }
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
@@ -183,39 +176,34 @@ const TheTable = memo(
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('common.form.remark'),
-        render: (row) => row.remark || '-',
-      },
-      {
         title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
-          <TranslationActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
+          <RegionActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         ),
       },
     ];
 
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
-      { type: 'title', render: (row) => row.tKey },
+      { type: 'title', render: (row) => `${row.labelZhCN} / ${row.labelEnUS}` },
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
         type: 'tags',
         render: (row) => (
           <>
-            <Chip label={row.application} size="small" color="primary" variant="outlined" />
-            <Chip label={row.business} size="small" color="secondary" variant="outlined" />
-            <Chip label={row.langCode} size="small" variant="outlined" />
+            <Chip label={row.alpha2Code} size="small" color="primary" variant="outlined" />
+            <Chip label={row.alpha3Code} size="small" color="secondary" variant="outlined" />
+            <Chip label={`#${row.numeric}`} size="small" variant="outlined" />
+            <Chip
+              label={row.iso3166Independent ? t('common.yes') : t('common.no')}
+              size="small"
+              color={row.iso3166Independent ? 'success' : 'default'}
+              variant="outlined"
+            />
             <Chip
               label={
-                row.isEnabled
-                  ? t('switch.enabled')
-                  : t('i18n.translation.switch.disabled')
+                row.isEnabled ? t('switch.enabled') : t('switch.disabled')
               }
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
@@ -223,11 +211,6 @@ const TheTable = memo(
             />
           </>
         ),
-      },
-      {
-        type: 'content',
-        label: t('common.form.remark'),
-        render: (row) => row.remark || '-',
       },
     ];
 
@@ -244,11 +227,7 @@ const TheTable = memo(
         columns={columns}
         cardFields={cardFields}
         cardActions={(row) => (
-          <TranslationActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
+          <RegionActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
         )}
       />
     );

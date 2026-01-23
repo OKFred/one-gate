@@ -330,7 +330,7 @@ const TheForm = memo(
                   />
                   <Typography variant="body2" sx={{ ml: 1 }}>
                     {form.isEnabled
-                      ? t('i18n.translation.switch.enabled')
+                      ? t('switch.enabled')
                       : t('i18n.translation.switch.disabled')}
                   </Typography>
                 </Box>

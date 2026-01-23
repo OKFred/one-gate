@@ -119,7 +119,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label={t('common.filter.clearFilters')}
+                label={t('common.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}

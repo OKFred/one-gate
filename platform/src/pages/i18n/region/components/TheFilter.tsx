@@ -21,24 +21,25 @@ import {
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { Props } from '../index';
-import type { ListRoleReq } from '@/api/system/type';
+import type { ListRegionReq } from '@/api/i18n/type';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
 export interface FilterState {
   keyword: string;
-  orderBy: NonNullable<ListRoleReq['orderBy']>;
+  orderBy: NonNullable<ListRegionReq['orderBy']>;
   descend: boolean;
+  isEnabled?: boolean;
 }
 
 // 暴露给父组件的方法
-export interface RoleFilterRef {
+export interface TheFilterRef {
   /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
 }
 
 const TheFilter = memo(
-  forwardRef<RoleFilterRef, Props>(({ localObj }, ref) => {
+  forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const t = useTranslation();
     const { tableRef } = localObj;
     const [expanded, setExpanded] = useState(true);
@@ -49,6 +50,7 @@ const TheFilter = memo(
       keyword: '',
       orderBy: 'id',
       descend: false,
+      isEnabled: undefined,
     });
 
     // 暴露给父组件的方法
@@ -92,11 +94,14 @@ const TheFilter = memo(
       }
     }, [keywordInput, debouncedSearch, filters.keyword]);
 
-    const handleFilterChange = (key: keyof FilterState, value: string | boolean) => {
+    const handleFilterChange = (key: keyof FilterState, value: string | boolean | undefined) => {
       if (key === 'keyword') {
         setKeywordInput(value as string);
       } else {
-        const newFilters = { ...filters, [key]: value };
+        const newFilters = {
+          ...filters,
+          [key]: typeof value === 'boolean' ? value : value || undefined,
+        };
         setFilters(newFilters);
         refreshTable(newFilters);
       }
@@ -107,6 +112,7 @@ const TheFilter = memo(
         keyword: '',
         orderBy: 'id',
         descend: false,
+        isEnabled: undefined,
       };
       setKeywordInput(''); // 清空输入框
       setFilters(emptyFilters);
@@ -114,7 +120,12 @@ const TheFilter = memo(
     };
 
     const hasActiveFilters = () => {
-      return keywordInput || filters.orderBy !== 'id' || filters.descend;
+      return (
+        keywordInput ||
+        filters.orderBy !== 'id' ||
+        filters.descend ||
+        filters.isEnabled !== undefined
+      );
     };
 
     return (
@@ -152,7 +163,7 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label={t('common.filter.keywordLabel')}
+                label={t('common.filter.keyword')}
                 placeholder={t('common.filter.keywordLabel')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
@@ -169,14 +180,45 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
+                  <InputLabel>{t('switch.enabled')}</InputLabel>
+                  <Select
+                    value={
+                      filters.isEnabled === undefined
+                        ? 'all'
+                        : filters.isEnabled
+                          ? 'enabled'
+                          : 'disabled'
+                    }
+                    label={t('switch.enabled')}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleFilterChange(
+                        'isEnabled',
+                        value === 'all' ? undefined : value === 'enabled',
+                      );
+                    }}
+                  >
+                    <MenuItem value="all">{t('common.filter.all')}</MenuItem>
+                    <MenuItem value="enabled">{t('switch.enabled')}</MenuItem>
+                    <MenuItem value="disabled">{t('switch.disabled')}</MenuItem>
+                  </Select>
+                </FormControl>
+              </Stack>
+
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <FormControl size="small" fullWidth>
                   <InputLabel>{t('common.filter.orderBy')}</InputLabel>
                   <Select
                     value={filters.orderBy}
                     label={t('common.filter.orderBy')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
-                    <MenuItem value="id">{t('common.columns.id')}</MenuItem>
-                    <MenuItem value="name">{t('common.columns.name')}</MenuItem>
+                    <MenuItem value="id">ID</MenuItem>
+                    <MenuItem value="labelZhCN">{t('i18n.region.form.labelZhCN')}</MenuItem>
+                    <MenuItem value="labelEnUS">{t('i18n.region.form.labelEnUS')}</MenuItem>
+                    <MenuItem value="alpha2Code">{t('i18n.region.form.alpha2Code')}</MenuItem>
+                    <MenuItem value="alpha3Code">{t('i18n.region.form.alpha3Code')}</MenuItem>
+                    <MenuItem value="numeric">{t('i18n.region.form.numeric')}</MenuItem>
                     <MenuItem value="createTimeUtc">{t('common.columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
@@ -200,7 +242,5 @@ const TheFilter = memo(
     );
   }),
 );
-
-TheFilter.displayName = 'TheFilter';
 
 export default TheFilter;
