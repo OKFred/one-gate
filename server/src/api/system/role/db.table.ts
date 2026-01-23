@@ -26,13 +26,6 @@ const RoleUniquePO = {
   },
 } as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
 const RoleBasePO = {
-  description: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "角色描述",
-    examples: ["系统管理员，拥有所有权限"],
-    maxLength: 500,
-  },
   remark: {
     type: ["string", "null"],
     nullable: true,
@@ -94,7 +87,6 @@ export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 //----------------- Required Keys ----------------//
 export const RoleAddKeys = [
   "name",
-  "description",
   "remark",
   "permissions",
   "isEnabled",
@@ -128,7 +120,6 @@ export const RoleSortableKeys = [
 export const roleTable = sqliteTable("system_role", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull().unique(),
-  description: text("description"),
   remark: text("remark"),
   permissions: text("permissions"), // JSON array string
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
@@ -145,7 +136,6 @@ export async function tableInit() {
     CREATE TABLE IF NOT EXISTS system_role (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
-      description TEXT,
       remark TEXT,
       permissions TEXT,
       is_enabled INTEGER NOT NULL,

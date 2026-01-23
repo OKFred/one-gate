@@ -63,12 +63,12 @@ const TranslationBasePO = {
     examples: ["email", "order"],
     maxLength: 100,
   },
-  description: {
+  remark: {
     type: ["string", "null"],
     nullable: true,
-    description: "描述信息",
+    description: "备注说明",
     examples: ["欢迎消息的翻译"],
-    maxLength: 500,
+    maxLength: 1000,
   },
   isEnabled: {
     type: "boolean",
@@ -134,7 +134,7 @@ export const TranslationAddKeys = [
   "tKey",
   "tValue",
   "valueHash",
-  "description",
+  "remark",
   "isEnabled",
 ] as const satisfies RequiredKeys<TranslationAddVOLike>[];
 export const TranslationUpdateKeys = [
@@ -173,7 +173,7 @@ export const translationTable = sqliteTable(
     tKey: text("t_key").notNull(),
     tValue: text("t_value").notNull(),
     valueHash: text("value_hash", { length: 64 }).notNull(),
-    description: text("description"),
+    remark: text("remark"),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
     version: integer("version").notNull(),
     creatorId: integer("creator_id").notNull(),
@@ -199,7 +199,7 @@ export async function tableInit() {
       t_key TEXT NOT NULL,
       t_value TEXT NOT NULL,
       value_hash TEXT NOT NULL,
-      description TEXT,
+      remark TEXT,
       is_enabled INTEGER NOT NULL,
       version INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,

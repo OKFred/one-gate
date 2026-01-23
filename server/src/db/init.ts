@@ -26,7 +26,6 @@ const SUPER_ADMIN = {
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
-  description: "系统超级管理员，拥有所有权限",
   permissions: JSON.stringify([
     "system:*",
     "user:*",
@@ -158,7 +157,7 @@ async function initI18n() {
       tValue: item.tValue,
       valueHash,
       version: 0,
-      description: item.description,
+      remark: null,
       isEnabled: item.isEnabled,
     };
     return translationService.add.service(params, userObj, {
