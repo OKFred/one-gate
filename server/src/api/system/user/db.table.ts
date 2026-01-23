@@ -48,7 +48,7 @@ export const UserBasePO = {
     type: ["string", "null"],
     nullable: true,
     description: "备注说明",
-    maxLength: 1000,
+    maxLength: 500,
   },
   departmentId: {
     type: ["number", "null"],
@@ -142,22 +142,9 @@ type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
 export { IndexVO }; // 删改查
 export const UserUniqueVO = UserUniquePO;
 export const UserBaseVO = {
-  langCode: {
-    type: "string",
-    description: "语言代码",
-    examples: ["en-US", "zh-CN"],
-    maxLength: 10,
-  },
-  isEnabled: {
-    type: "boolean",
-    description: "是否启用",
-  },
-  remark: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "备注说明",
-    maxLength: 1000,
-  },
+  langCode: UserBasePO["langCode"],
+  isEnabled: UserBasePO["isEnabled"],
+  remark: UserBasePO["remark"],
   ...UserDepartmentDTO,
   ...UserRoleDTO,
 } as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;

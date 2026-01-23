@@ -293,17 +293,6 @@ const TheForm = memo(
               fullWidth
               helperText={t('system.menu.form.pathHelper')}
             />
-            <TextField
-              label={t('common.form.remark')}
-              value={formValues.remark ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleFormChange('remark', hasValue(value) ? value : null);
-              }}
-              fullWidth
-              multiline
-              rows={2}
-            />
 
             <FormControl fullWidth>
               <InputLabel>{t('system.menu.form.parentMenu')}</InputLabel>
@@ -372,6 +361,19 @@ const TheForm = memo(
                 />
               }
               label={t('common.filter.enabledStatus')}
+            />
+            <TextField
+              label={t('common.form.remark')}
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
+              inputProps={{ maxLength: 500 }}
+              helperText={`${(formValues.remark || '').length}/500`}
             />
           </Stack>
         </DialogContent>

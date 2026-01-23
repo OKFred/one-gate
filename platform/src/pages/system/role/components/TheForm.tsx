@@ -79,10 +79,6 @@ const TheForm = memo(
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       const formData = { ...form };
-      // 保证 remark 字段传递（允许为 null）
-      if (!('remark' in formData)) {
-        formData.remark = null;
-      }
 
       if (editId) {
         await RoleAPI.updateFn({ data: { id: editId, ...formData } as UpdateRoleReq });
@@ -145,22 +141,6 @@ const TheForm = memo(
               />
 
               <TextField
-                label={t('common.form.remark')}
-                value={form.remark ?? ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    remark: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={3}
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('form.pleaseEnter')}
-              />
-
-              <TextField
                 label={t('common.form.permissions')}
                 value={form.permissions ?? ''}
                 onChange={(e) =>
@@ -185,6 +165,24 @@ const TheForm = memo(
                   />
                 }
                 label={t('common.filter.enabledStatus')}
+              />
+
+              <TextField
+                label={t('common.form.remark')}
+                value={form.remark ?? null}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    remark: hasValue(e.target.value) ? e.target.value : null,
+                  })
+                }
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
+                placeholder={t('form.pleaseEnter')}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
               />
             </Stack>
           </form>

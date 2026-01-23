@@ -28,6 +28,7 @@ const DEFAULT_FORM: AddMailTemplateReq = {
   content: '',
   category: '',
   isEnabled: true,
+  remark: null,
 };
 
 // 暴露给父组件的方法
@@ -64,6 +65,7 @@ const TheForm = memo(
               content: template.content || '',
               category: template.category || '',
               isEnabled: template.isEnabled,
+              remark: template.remark ?? null,
             });
           } else {
             setEditId(null);
@@ -93,6 +95,7 @@ const TheForm = memo(
               ...form,
               langCode: form.langCode || undefined,
               category: form.category,
+              remark: form.remark ?? null,
             },
           });
         } else {
@@ -101,6 +104,7 @@ const TheForm = memo(
               ...form,
               langCode: form.langCode!,
               category: form.category || '',
+              remark: form.remark ?? null,
             },
           });
         }
@@ -211,6 +215,19 @@ const TheForm = memo(
                   height={isMobile ? 300 : 450}
                 />
               </Box>
+
+              <TextField
+                label={t('common.form.remark')}
+                value={form.remark || ''}
+                onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
+                fullWidth
+                multiline
+                rows={2}
+                size={isMobile ? 'medium' : 'medium'}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
+                placeholder={t('form.pleaseEnter')}
+              />
             </Stack>
           </form>
         </DialogContent>

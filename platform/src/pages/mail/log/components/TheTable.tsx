@@ -185,6 +185,10 @@ const TheTable = memo(
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
+        title: t('common.form.remark'),
+        render: (row) => row.remark || '-',
+      },
+      {
         title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
@@ -213,6 +217,11 @@ const TheTable = memo(
         type: 'content',
         label: t('mail.log.columns.sendTime'),
         render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        type: 'content',
+        label: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
       {
         type: 'tags',

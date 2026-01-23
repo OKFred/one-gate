@@ -407,7 +407,7 @@ const TheForm = memo(
 
               <TextField
                 label={t('common.form.remark')}
-                value={form.remark ?? ''}
+                value={form.remark ?? null}
                 onChange={(e) =>
                   setForm({ ...form, remark: e.target.value ? e.target.value : null })
                 }
@@ -415,6 +415,8 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
               />
             </Stack>
           </form>

@@ -291,17 +291,6 @@ const TheForm = memo(
               required
               autoFocus
             />
-            <TextField
-              label={t('common.form.remark')}
-              value={formValues.remark ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleFormChange('remark', hasValue(value) ? value : null);
-              }}
-              fullWidth
-              multiline
-              rows={2}
-            />
             <FormControl fullWidth>
               <InputLabel id="parent-department-label">
                 {t('system.department.form.parentDepartment')}
@@ -345,6 +334,8 @@ const TheForm = memo(
               fullWidth
               multiline
               rows={2}
+              inputProps={{ maxLength: 500 }}
+              helperText={`${(formValues.remark || '').length}/500`}
             />
           </Stack>
         </DialogContent>

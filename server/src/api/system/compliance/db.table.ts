@@ -68,7 +68,7 @@ const ComplianceArchiveBasePO = {
     type: ["string", "null"],
     nullable: true,
     description: "备注说明",
-    maxLength: 1000,
+    maxLength: 500,
   },
   restorable: {
     type: "boolean",

@@ -68,7 +68,7 @@ const TranslationBasePO = {
     nullable: true,
     description: "备注说明",
     examples: ["欢迎消息的翻译"],
-    maxLength: 1000,
+    maxLength: 500,
   },
   isEnabled: {
     type: "boolean",

@@ -312,22 +312,6 @@ const TheForm = memo(
                 )}
               </Box>
 
-              <TextField
-                label={t('common.form.remark')}
-                value={form.remark || ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    remark: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={2}
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('form.pleaseEnter')}
-              />
-
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography variant="body2">{t('common.filter.enabledStatus')}</Typography>
                 <Box
@@ -351,6 +335,24 @@ const TheForm = memo(
                   </Typography>
                 </Box>
               </Stack>
+
+              <TextField
+                label={t('common.form.remark')}
+                value={form.remark || ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    remark: hasValue(e.target.value) ? e.target.value : null,
+                  })
+                }
+                fullWidth
+                multiline
+                rows={2}
+                size={isMobile ? 'medium' : 'medium'}
+                placeholder={t('form.pleaseEnter')}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
+              />
             </Stack>
           </form>
         </DialogContent>
@@ -365,9 +367,7 @@ const TheForm = memo(
             {t('common.cancel')}
           </Button>
           <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId
-              ? t('common.actions.save')
-              : t('common.actions.add')}
+            {editId ? t('common.actions.save') : t('common.actions.add')}
           </Button>
         </DialogActions>
       </Dialog>

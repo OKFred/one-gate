@@ -132,7 +132,6 @@ const TheTable = memo(
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
       { title: t('common.columns.name'), render: (row) => row.name },
-      { title: t('common.form.remark'), render: (row) => row.remark || '--' },
       {
         title: t('common.columns.status'),
         render: (row) => (
@@ -151,6 +150,7 @@ const TheTable = memo(
         title: t('common.columns.updateTime'),
         render: (row) => formatTime(row.updateTimeUtc),
       },
+      { title: t('common.form.remark'), render: (row) => row.remark || '--' },
       {
         title: t('common.columns.actions'),
         align: 'center',

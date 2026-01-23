@@ -164,10 +164,6 @@ const TheTable = memo(
       { title: t('i18n.translation.form.tKey'), render: (row) => row.tKey },
       { title: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
-        title: t('common.form.remark'),
-        render: (row) => row.remark || '-',
-      },
-      {
         title: t('common.filter.enabledStatus'),
         render: (row) => (
           <Chip
@@ -185,6 +181,10 @@ const TheTable = memo(
       {
         title: t('common.columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      {
+        title: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
       {
         title: t('common.columns.actions'),
@@ -205,11 +205,6 @@ const TheTable = memo(
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
       { type: 'content', label: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
-        type: 'content',
-        label: t('common.form.remark'),
-        render: (row) => row.remark || '-',
-      },
-      {
         type: 'tags',
         render: (row) => (
           <>
@@ -228,6 +223,11 @@ const TheTable = memo(
             />
           </>
         ),
+      },
+      {
+        type: 'content',
+        label: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
     ];
 
