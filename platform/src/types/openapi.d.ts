@@ -4159,8 +4159,8 @@ export interface components {
                 langCode?: string;
                 /**
                  * @description 本地名称
-                 * @example 简体中文
-                 * @example English
+                 * @example 中文（中国）
+                 * @example English (US)
                  */
                 nativeName?: string;
                 /**
@@ -4231,8 +4231,8 @@ export interface components {
                     langCode: string;
                     /**
                      * @description 本地名称
-                     * @example 简体中文
-                     * @example English
+                     * @example 中文（中国）
+                     * @example English (US)
                      */
                     nativeName: string;
                     /**
@@ -4277,8 +4277,8 @@ export interface components {
             langCode: string;
             /**
              * @description 本地名称
-             * @example 简体中文
-             * @example English
+             * @example 中文（中国）
+             * @example English (US)
              */
             nativeName: string;
             /**
@@ -4320,8 +4320,8 @@ export interface components {
             langCode?: string;
             /**
              * @description 本地名称
-             * @example 简体中文
-             * @example English
+             * @example 中文（中国）
+             * @example English (US)
              */
             nativeName?: string;
             /**
@@ -4388,8 +4388,8 @@ export interface components {
                 langCode: string;
                 /**
                  * @description 本地名称
-                 * @example 简体中文
-                 * @example English
+                 * @example 中文（中国）
+                 * @example English (US)
                  */
                 nativeName: string;
                 /**
@@ -4434,7 +4434,7 @@ export interface components {
              */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "languages" | "createTimeUtc";
+            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
         };
         I18nRegionListAllRes: {
             ok: boolean;
@@ -4465,7 +4465,7 @@ export interface components {
                 /** @description 是否ISO3166独立主权国家 */
                 iso3166Independent?: boolean;
                 /** @description 语言代码列表 */
-                languages?: ((string[] | null) | null) | null;
+                businessLanguages?: ((string[] | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @example true
@@ -4500,7 +4500,7 @@ export interface components {
              */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "languages" | "createTimeUtc";
+            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
         };
         I18nRegionListRes: {
             ok: boolean;
@@ -4540,7 +4540,7 @@ export interface components {
                     /** @description 是否ISO3166独立主权国家 */
                     iso3166Independent: boolean;
                     /** @description 语言代码列表 */
-                    languages: ((string[] | null) | null) | null;
+                    businessLanguages: ((string[] | null) | null) | null;
                     /**
                      * @description 是否启用
                      * @example true
@@ -4589,7 +4589,7 @@ export interface components {
             /** @description 是否ISO3166独立主权国家 */
             iso3166Independent: boolean;
             /** @description 语言代码列表 */
-            languages: ((string[] | null) | null) | null;
+            businessLanguages: ((string[] | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
@@ -4635,7 +4635,7 @@ export interface components {
             /** @description 是否ISO3166独立主权国家 */
             iso3166Independent?: boolean;
             /** @description 语言代码列表 */
-            languages?: ((string[] | null) | null) | null;
+            businessLanguages?: ((string[] | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
@@ -4706,7 +4706,7 @@ export interface components {
                 /** @description 是否ISO3166独立主权国家 */
                 iso3166Independent: boolean;
                 /** @description 语言代码列表 */
-                languages: ((string[] | null) | null) | null;
+                businessLanguages: ((string[] | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @example true

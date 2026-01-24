@@ -230,7 +230,7 @@ async function initCountryRegion() {
       alpha3Code: item.alpha3Code,
       numeric: item.numeric,
       iso3166Independent: item.ISO3166Independent,
-      languages: null,
+      businessLanguages: null,
       isEnabled: true,
       creatorId: SUPER_ADMIN_ID,
     }));

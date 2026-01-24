@@ -86,7 +86,7 @@ const listAllRes = {
       alpha3Code: RegionVO.alpha3Code,
       numeric: RegionVO.numeric,
       iso3166Independent: RegionVO.iso3166Independent,
-      languages: RegionVO.languages,
+      businessLanguages: RegionVO.businessLanguages,
       isEnabled: RegionVO.isEnabled,
     },
     required: [...RegionGetKeys],
@@ -108,7 +108,7 @@ async function onListAll(
       numeric: regionTable.numeric,
       iso3166Independent: regionTable.iso3166Independent,
       isEnabled: regionTable.isEnabled,
-      languages: regionTable.languages,
+      businessLanguages: regionTable.businessLanguages,
     })
     .from(regionTable)
     .where(buildWhereCondition(params))
@@ -219,6 +219,7 @@ async function onAdd(
   await uniqueCheck(params);
   const addData = {
     ...params,
+    labels: params.labels as { [key: string]: string },
     creatorId,
   };
   const result = await db
@@ -263,11 +264,14 @@ async function onUpdate(
   if (!previousRecord) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  const updateData = {
+  const updateData: any = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
+  if (updateData.labels) {
+    updateData.labels = updateData.labels as { [key: string]: string };
+  }
 
   const res = await db
     .update(regionTable)

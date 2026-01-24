@@ -2216,6 +2216,22 @@ export const initialI18nData = [
     tValue: "Is Independent Country / Region in ISO3166",
     isEnabled: true,
   },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.form.businessLanguages",
+    tValue: "业务语言",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.form.businessLanguages",
+    tValue: "Business Languages",
+    isEnabled: true,
+  },
 
   // ===== 通用翻译 - 状态、操作等 =====
   // 状态相关

@@ -12,6 +12,7 @@ import {
   IconButton,
   FormControlLabel,
   Checkbox,
+  Autocomplete,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as RegionAPI from '@/api/i18n/region';
@@ -38,7 +39,7 @@ const DEFAULT_FORM: Omit<AddRegionReq, 'labels'> & { labels: Record<string, stri
   alpha3Code: '',
   numeric: 0,
   iso3166Independent: true,
-  languages: null,
+  businessLanguages: null,
   isEnabled: true,
   remark: '',
 };
@@ -89,7 +90,7 @@ const TheForm = memo(
             alpha3Code: row.alpha3Code || '',
             numeric: row.numeric || 0,
             iso3166Independent: row.iso3166Independent ?? true,
-            languages: row.languages,
+            businessLanguages: row.businessLanguages,
             isEnabled: row.isEnabled,
             remark: row.remark || '',
           });
@@ -242,6 +243,31 @@ const TheForm = memo(
                   label={t('switch.enabled')}
                 />
               </Stack>
+
+              <Autocomplete
+                multiple
+                options={enabledLanguages.map((lang) => lang.langCode || '')}
+                value={form.businessLanguages || []}
+                onChange={(_, newValue) => {
+                  setForm({
+                    ...form,
+                    businessLanguages: newValue.length > 0 ? newValue : null,
+                  });
+                }}
+                getOptionLabel={(option) => {
+                  const lang = enabledLanguages.find((l) => l.langCode === option);
+                  return lang ? `${lang.nativeName || option} (${option})` : option;
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('i18n.region.form.businessLanguages')}
+                    placeholder={t('form.pleaseSelect')}
+                    size={isMobile ? 'medium' : 'medium'}
+                  />
+                )}
+                fullWidth
+              />
               <TextField
                 label={t('common.form.remark')}
                 value={form.remark || ''}

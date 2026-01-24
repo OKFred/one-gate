@@ -40,6 +40,7 @@ const RegionUniquePO = {
     type: "integer",
     description: "ISO 3166-1 numeric",
     examples: [156],
+    maximum: 99999,
   },
 } as const satisfies Partial<Record<keyof RegionPOLike, JSONSchema>>;
 const RegionBasePO = {
@@ -69,14 +70,14 @@ const RegionBasePO = {
     type: "boolean",
     description: "是否ISO3166独立主权国家",
   },
-  languages: {
+  businessLanguages: {
     type: ["array", "null"],
     nullable: true,
     description: "语言代码列表",
     items: {
       type: "string",
       maxLength: 10,
-      examples: ["zh_CN", "en_US"],
+      examples: ["zh-CN", "en-US"],
     },
     uniqueItems: true,
   },
@@ -140,7 +141,7 @@ export const RegionAddKeys = [
   "alpha3Code",
   "numeric",
   "iso3166Independent",
-  "languages",
+  "businessLanguages",
   "isEnabled",
   "remark",
 ] as const satisfies RequiredKeys<RegionAddVOLike>[];
@@ -169,7 +170,7 @@ export const RegionSortableKeys = [
   "numeric",
   "iso3166Independent",
   "isEnabled",
-  "languages",
+  "businessLanguages",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<RegionPOLike>[];
 
@@ -184,7 +185,9 @@ export const regionTable = sqliteTable(
     iso3166Independent: integer("iso_3166_independent", {
       mode: "boolean",
     }).notNull(),
-    languages: text("languages", { mode: "json" }).$type<string[]>(),
+    businessLanguages: text("business_languages", { mode: "json" }).$type<
+      string[]
+    >(),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
     remark: text("remark", { length: 500 }),
     creatorId: integer("creator_id").notNull(),
@@ -210,7 +213,7 @@ export async function tableInit() {
       alpha3_code TEXT NOT NULL,
       numeric INTEGER NOT NULL,
       iso_3166_independent INTEGER NOT NULL,
-      languages TEXT,
+      business_languages TEXT,
       is_enabled INTEGER NOT NULL,
       remark TEXT,
       creator_id INTEGER NOT NULL,

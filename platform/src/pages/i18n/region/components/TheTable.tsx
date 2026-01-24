@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { Chip } from '@mui/material';
+import { Chip, Box } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -165,6 +165,28 @@ const TheTable = memo(
         ),
       },
       {
+        title: t('i18n.region.form.businessLanguages'),
+        render: (row) => (
+          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+            {row.businessLanguages && row.businessLanguages.length > 0 ? (
+              row.businessLanguages.map((langCode) => {
+                const lang = enabledLanguages.find((l) => l.langCode === langCode);
+                return (
+                  <Chip
+                    key={langCode}
+                    label={lang?.nativeName || langCode}
+                    size="small"
+                    variant="outlined"
+                  />
+                );
+              })
+            ) : (
+              <span style={{ color: '#999' }}>-</span>
+            )}
+          </Box>
+        ),
+      },
+      {
         title: t('common.filter.enabledStatus'),
         render: (row) => (
           <Chip
@@ -227,6 +249,22 @@ const TheTable = memo(
               color={row.iso3166Independent ? 'success' : 'default'}
               variant="outlined"
             />
+            {row.businessLanguages && row.businessLanguages.length > 0 && (
+              <>
+                {row.businessLanguages.map((langCode) => {
+                  const lang = enabledLanguages.find((l) => l.langCode === langCode);
+                  return (
+                    <Chip
+                      key={langCode}
+                      label={lang?.nativeName || langCode}
+                      size="small"
+                      color="info"
+                      variant="outlined"
+                    />
+                  );
+                })}
+              </>
+            )}
             <Chip
               label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
               size="small"
