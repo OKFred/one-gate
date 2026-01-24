@@ -51,6 +51,7 @@ const TheForm = memo(
     const [editId, setEditId] = useState<number | null>(null);
     const [form, setForm] = useState<AddMailAccountReq>(DEFAULT_FORM);
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -88,21 +89,29 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      const base64Password = globalThis.btoa(form.password); // 防小白
-      const formData = {
-        ...form,
-        password: base64Password,
-        port: form.port,
-      };
+      setLoading(true);
 
-      if (editId) {
-        await AccountAPI.updateFn({ data: { id: editId, ...formData } });
-      } else {
-        await AccountAPI.addFn({ data: formData });
+      try {
+        const base64Password = globalThis.btoa(form.password); // 防小白
+        const formData = {
+          ...form,
+          password: base64Password,
+          port: form.port,
+        };
+
+        if (editId) {
+          await AccountAPI.updateFn({ data: { id: editId, ...formData } });
+        } else {
+          await AccountAPI.addFn({ data: formData });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     return (
@@ -234,7 +243,12 @@ const TheForm = memo(
             gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -243,6 +257,7 @@ const TheForm = memo(
             color="primary"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
           >
             {t('common.actions.save')}
           </Button>

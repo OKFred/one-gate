@@ -74,6 +74,7 @@ const TheForm = memo(
     const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
     const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const [loading, setLoading] = useState(false);
 
     // 加载用户信息
     useEffect(() => {
@@ -149,27 +150,35 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      const formData = { ...form };
-      // 保证 remark 字段传递（允许为 null）
-      if (!('remark' in formData)) {
-        formData.remark = null;
-      }
+      setLoading(true);
 
-      if (editId) {
-        // 编辑用户
-        const updateData = { id: editId, ...formData };
-        await UserAPI.updateFn({
-          data: updateData as UpdateUserReq,
-        });
-      } else {
-        // 添加用户
-        await UserAPI.addFn({
-          data: formData as AddUserReq,
-        });
+      try {
+        const formData = { ...form };
+        // 保证 remark 字段传递（允许为 null）
+        if (!('remark' in formData)) {
+          formData.remark = null;
+        }
+
+        if (editId) {
+          // 编辑用户
+          const updateData = { id: editId, ...formData };
+          await UserAPI.updateFn({
+            data: updateData as UpdateUserReq,
+          });
+        } else {
+          // 添加用户
+          await UserAPI.addFn({
+            data: formData as AddUserReq,
+          });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     // 处理角色多选变化
@@ -258,7 +267,9 @@ const TheForm = memo(
             pb: isMobile ? 1 : 2,
           }}
         >
-          <Box>{editId ? t('common.actions.edit') : t('common.actions.add')}</Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {editId ? t('common.actions.update') : t('common.actions.add')}
+          </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
               <CloseIcon />
@@ -499,7 +510,12 @@ const TheForm = memo(
             gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -508,8 +524,9 @@ const TheForm = memo(
             color="primary"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
           >
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

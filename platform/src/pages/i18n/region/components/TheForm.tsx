@@ -57,6 +57,7 @@ const TheForm = memo(
     const [form, setForm] = useState<
       Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> }
     >(DEFAULT_FORM);
+    const [loading, setLoading] = useState(false);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -111,15 +112,22 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      setLoading(true);
 
-      if (editId) {
-        await RegionAPI.updateFn({ data: { id: editId, ...form } });
-      } else {
-        await RegionAPI.addFn({ data: form });
+      try {
+        if (editId) {
+          await RegionAPI.updateFn({ data: { id: editId, ...form } });
+        } else {
+          await RegionAPI.addFn({ data: form });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     return (
@@ -292,14 +300,28 @@ const TheForm = memo(
         <DialogActions
           sx={{
             px: isMobile ? 2 : 3,
-            py: isMobile ? 2 : 1.5,
+            py: isMobile ? 2 : 2,
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} color="inherit">
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? t('common.actions.save') : t('common.actions.add')}
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

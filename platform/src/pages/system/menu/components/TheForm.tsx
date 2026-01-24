@@ -10,7 +10,6 @@ import {
   Box,
   IconButton,
   Alert,
-  CircularProgress,
   FormControlLabel,
   Switch,
   FormControl,
@@ -378,12 +377,31 @@ const TheForm = memo(
           </Stack>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleCloseDialog} disabled={loading}>
+        <DialogActions
+          sx={{
+            px: isMobile ? 2 : 3,
+            py: isMobile ? 2 : 2,
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            gap: isMobile ? 1 : 0,
+          }}
+        >
+          <Button
+            onClick={handleCloseDialog}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={20} /> : t('common.actions.save')}
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

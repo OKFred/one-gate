@@ -66,6 +66,7 @@ const TheForm = memo(
     const [form, setForm] = useState<AddTranslationReq>(DEFAULT_FORM);
     const [duplicateInfo, setDuplicateInfo] = useState<CheckDuplicateTranslationRes | null>(null);
     const [checking, setChecking] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // SHA256 哈希计算
     const calculateSHA256 = useCallback(async (text: string): Promise<string> => {
@@ -145,19 +146,26 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      setLoading(true);
 
-      // 前端计算 hash，后端会再次验证
-      const hash = await calculateSHA256(form.tValue);
-      const formData = { ...form, valueHash: hash };
+      try {
+        // 前端计算 hash，后端会再次验证
+        const hash = await calculateSHA256(form.tValue);
+        const formData = { ...form, valueHash: hash };
 
-      if (editId) {
-        await TranslationAPI.updateFn({ data: { id: editId, ...formData } });
-      } else {
-        await TranslationAPI.addFn({ data: formData });
+        if (editId) {
+          await TranslationAPI.updateFn({ data: { id: editId, ...formData } });
+        } else {
+          await TranslationAPI.addFn({ data: formData });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     return (
@@ -360,14 +368,28 @@ const TheForm = memo(
         <DialogActions
           sx={{
             px: isMobile ? 2 : 3,
-            py: isMobile ? 2 : 1.5,
+            py: isMobile ? 2 : 2,
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} color="inherit">
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? t('common.actions.save') : t('common.actions.add')}
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

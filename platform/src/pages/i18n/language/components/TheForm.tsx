@@ -46,6 +46,7 @@ const TheForm = memo(
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
     const [form, setForm] = useState<AddLanguageReq>(DEFAULT_FORM);
+    const [loading, setLoading] = useState(false);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -79,18 +80,26 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      const formData = {
-        ...form,
-      };
+      setLoading(true);
 
-      if (editId) {
-        await LanguageAPI.updateFn({ data: { id: editId, ...formData } });
-      } else {
-        await LanguageAPI.addFn({ data: formData });
+      try {
+        const formData = {
+          ...form,
+        };
+
+        if (editId) {
+          await LanguageAPI.updateFn({ data: { id: editId, ...formData } });
+        } else {
+          await LanguageAPI.addFn({ data: formData });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     return (
@@ -198,7 +207,12 @@ const TheForm = memo(
             gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -207,6 +221,7 @@ const TheForm = memo(
             color="primary"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
           >
             {t('common.actions.save')}
           </Button>
