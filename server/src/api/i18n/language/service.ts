@@ -1,24 +1,24 @@
 import db from "@/db/index";
 import {
-  regionTable,
+  languageTable,
   IndexVO,
-  RegionVO,
-  RegionListVO,
-  RegionAddVO,
-  RegionUpdateVO,
-  RegionListKeys,
-  RegionDetailKeys,
-  RegionGetKeys,
-  RegionDeleteKeys,
-  RegionAddKeys,
-  RegionUpdateKeys,
-  RegionSortableKeys,
-  type RegionPOLike,
-  type RegionVOLike,
-  type RegionAddVOLike,
-  type RegionUpdateVOLike,
-  type RegionDeleteVOLike,
-  type RegionGetVOLike,
+  LanguageVO,
+  LanguageListVO,
+  LanguageAddVO,
+  LanguageUpdateVO,
+  LanguageListKeys,
+  LanguageDetailKeys,
+  LanguageGetKeys,
+  LanguageDeleteKeys,
+  LanguageAddKeys,
+  LanguageUpdateKeys,
+  LanguageSortableKeys,
+  type LanguagePOLike,
+  type LanguageVOLike,
+  type LanguageAddVOLike,
+  type LanguageUpdateVOLike,
+  type LanguageDeleteVOLike,
+  type LanguageGetVOLike,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -50,13 +50,13 @@ const buildWhereCondition = ({
   if (hasValue(keyword)) {
     conditions.push(
       or(
-        like(regionTable.alpha2Code, `%${keyword}%`),
-        like(regionTable.alpha3Code, `%${keyword}%`)
+        like(languageTable.langCode, `%${keyword}%`),
+        like(languageTable.nativeName, `%${keyword}%`)
       )
     );
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(regionTable.isEnabled, isEnabled));
+    conditions.push(eq(languageTable.isEnabled, isEnabled));
   }
   return conditions.length > 0
     ? conditions.length === 1
@@ -69,8 +69,8 @@ const listAllReq = {
   type: "object",
   properties: {
     ...listAllReqBase,
-    isEnabled: RegionVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof RegionPOLike)[]>(RegionSortableKeys),
+    isEnabled: LanguageVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -81,36 +81,30 @@ const listAllRes = {
     type: "object",
     properties: {
       id: IndexVO.id,
-      labels: RegionVO.labels,
-      alpha2Code: RegionVO.alpha2Code,
-      alpha3Code: RegionVO.alpha3Code,
-      numeric: RegionVO.numeric,
-      iso3166Independent: RegionVO.iso3166Independent,
-      languages: RegionVO.languages,
-      isEnabled: RegionVO.isEnabled,
+      langCode: LanguageVO.langCode,
+      nativeName: LanguageVO.nativeName,
+      isEnabled: LanguageVO.isEnabled,
+      sortOrder: LanguageVO.sortOrder,
     },
-    required: [...RegionGetKeys],
+    required: [...LanguageGetKeys],
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = regionTable[orderBy] || regionTable.id;
+  const { orderBy = "sortOrder", descend = false } = params;
+  const orderField = languageTable[orderBy] || languageTable.sortOrder;
   const maxLimit = 100_000;
   const rows = await db
     .select({
-      id: regionTable.id,
-      labels: regionTable.labels,
-      alpha2Code: regionTable.alpha2Code,
-      alpha3Code: regionTable.alpha3Code,
-      numeric: regionTable.numeric,
-      iso3166Independent: regionTable.iso3166Independent,
-      isEnabled: regionTable.isEnabled,
-      languages: regionTable.languages,
+      id: languageTable.id,
+      langCode: languageTable.langCode,
+      nativeName: languageTable.nativeName,
+      isEnabled: languageTable.isEnabled,
+      sortOrder: languageTable.sortOrder,
     })
-    .from(regionTable)
+    .from(languageTable)
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(maxLimit);
@@ -122,7 +116,7 @@ const listAllApi = {
   pathInfo: {
     path: "/listAll",
     method: "post",
-    summary: "获取所有国家地区（不分页）",
+    summary: "获取所有语言（不分页）",
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
@@ -132,32 +126,37 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    isEnabled: RegionVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof RegionPOLike)[]>(RegionSortableKeys),
+    isEnabled: LanguageVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof LanguagePOLike)[]>(LanguageSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<RegionPOLike>[]>(
+  ...listResponseWrapper<RequiredKeys<LanguagePOLike>[]>(
     {
-      ...RegionListVO,
+      ...LanguageListVO,
     },
-    [...RegionListKeys]
+    [...LanguageListKeys]
   ),
 } as const satisfies JSONSchema;
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
+  const {
+    orderBy = "sortOrder",
+    descend = false,
+    pageNo = 1,
+    pageSize = 10,
+  } = params;
   const offset = (pageNo - 1) * pageSize;
-  const orderField = regionTable[orderBy] || regionTable.id;
+  const orderField = languageTable[orderBy] || languageTable.sortOrder;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   const countResult = await db
-    .select({ total: count(regionTable.id).as("total") })
-    .from(regionTable)
+    .select({ total: count(languageTable.id).as("total") })
+    .from(languageTable)
     .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
@@ -172,7 +171,7 @@ async function onList(
 
   const rows = await db
     .select()
-    .from(regionTable)
+    .from(languageTable)
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
@@ -192,7 +191,7 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: "获取国家地区列表",
+    summary: "获取语言列表",
   } as const,
   adapter: bodyAdapter,
   service: onList,
@@ -201,11 +200,11 @@ const listApi = {
 const addReq = {
   type: "object",
   properties: {
-    ...RegionAddVO,
-  } satisfies Partial<Record<keyof RegionAddVOLike, JSONSchema>>,
+    ...LanguageAddVO,
+  } satisfies Partial<Record<keyof LanguageAddVOLike, JSONSchema>>,
   required: [
-    ...RegionAddKeys,
-  ] as const satisfies RequiredKeys<RegionAddVOLike>[],
+    ...LanguageAddKeys,
+  ] as const satisfies RequiredKeys<LanguageAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -217,14 +216,15 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
   await uniqueCheck(params);
+
   const addData = {
     ...params,
     creatorId,
   };
   const result = await db
-    .insert(regionTable)
+    .insert(languageTable)
     .values(addData)
-    .returning({ id: regionTable.id });
+    .returning({ id: languageTable.id });
   return result[0]?.id ?? null;
 }
 const addApi = {
@@ -233,7 +233,7 @@ const addApi = {
   pathInfo: {
     path: "/add",
     method: "post",
-    summary: "添加国家地区",
+    summary: "添加语言",
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
@@ -242,11 +242,11 @@ const addApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...RegionUpdateVO,
+    ...LanguageUpdateVO,
   },
   required: [
-    ...RegionUpdateKeys,
-  ] as const satisfies RequiredKeys<RegionUpdateVOLike>[],
+    ...LanguageUpdateKeys,
+  ] as const satisfies RequiredKeys<LanguageUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
@@ -258,7 +258,7 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await uniqueCheck(params, id);
+  await uniqueCheck(params);
   const previousRecord = await onGet({ id });
   if (!previousRecord) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
@@ -270,10 +270,10 @@ async function onUpdate(
   };
 
   const res = await db
-    .update(regionTable)
+    .update(languageTable)
     .set(updateData)
-    .where(eq(regionTable.id, id))
-    .returning({ id: regionTable.id });
+    .where(eq(languageTable.id, id))
+    .returning({ id: languageTable.id });
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -285,7 +285,7 @@ const updateApi = {
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: "更新国家地区",
+    summary: "更新语言",
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
@@ -297,8 +297,8 @@ const deleteReq = {
     ...IndexVO,
   },
   required: [
-    ...RegionDeleteKeys,
-  ] as const satisfies RequiredKeys<RegionDeleteVOLike>[],
+    ...LanguageDeleteKeys,
+  ] as const satisfies RequiredKeys<LanguageDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const deleteRes = {
@@ -309,9 +309,9 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
   const result = await db
-    .delete(regionTable)
-    .where(eq(regionTable.id, id))
-    .returning({ id: regionTable.id });
+    .delete(languageTable)
+    .where(eq(languageTable.id, id))
+    .returning({ id: languageTable.id });
   if (!result || result.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -323,7 +323,7 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: "删除国家地区",
+    summary: "删除语言",
   } as const,
   adapter: bodyAdapter,
   service: onDelete,
@@ -335,18 +335,18 @@ const getReq = {
     ...IndexVO,
   },
   required: [
-    ...RegionGetKeys,
-  ] as const satisfies RequiredKeys<RegionGetVOLike>[],
+    ...LanguageGetKeys,
+  ] as const satisfies RequiredKeys<LanguageGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
   type: "object",
   properties: {
-    ...RegionVO,
+    ...LanguageVO,
   },
   required: [
-    ...RegionDetailKeys,
-  ] as const satisfies RequiredKeys<RegionVOLike>[],
+    ...LanguageDetailKeys,
+  ] as const satisfies RequiredKeys<LanguageVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
@@ -355,8 +355,8 @@ async function onGet(
   const { id } = params;
   const rows = await db
     .select()
-    .from(regionTable)
-    .where(eq(regionTable.id, id))
+    .from(languageTable)
+    .where(eq(languageTable.id, id))
     .limit(1);
   if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
@@ -369,39 +369,29 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: "获取国家地区详情",
+    summary: "获取语言详情",
   } as const,
   adapter: bodyAdapter,
   service: onGet,
 } satisfies API;
 
 async function uniqueCheck(
-  obj: FromSchema<typeof updateReq | typeof addReq>,
-  excludeId?: number
+  obj: FromSchema<typeof updateReq | typeof addReq>
 ): Promise<void> {
-  const conditions = [] as any[];
-  if (hasValue(obj.alpha2Code)) {
-    conditions.push(eq(regionTable.alpha2Code, obj.alpha2Code));
-  }
-  if (hasValue(obj.alpha3Code)) {
-    conditions.push(eq(regionTable.alpha3Code, obj.alpha3Code));
-  }
-  if (hasValue(obj.numeric)) {
-    conditions.push(eq(regionTable.numeric, obj.numeric));
-  }
-  if (conditions.length === 0) return;
-
-  const whereClause =
-    conditions.length === 1 ? conditions[0] : or(...conditions);
-  const records = await db
-    .select({ id: regionTable.id })
-    .from(regionTable)
-    .where(
-      and(whereClause, excludeId ? ne(regionTable.id, excludeId) : undefined)
-    )
-    .limit(1);
-  if (records.length > 0) {
-    throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
+  if (hasValue(obj.langCode)) {
+    const records = await db
+      .select({ id: languageTable.id })
+      .from(languageTable)
+      .where(
+        and(
+          eq(languageTable.langCode, obj.langCode),
+          "id" in obj ? ne(languageTable.id, obj.id) : undefined
+        )
+      )
+      .limit(1);
+    if (records.length > 0) {
+      throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
+    }
   }
 }
 

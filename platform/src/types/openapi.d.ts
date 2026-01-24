@@ -4,6 +4,354 @@
  */
 
 export interface paths {
+    "/api/v1/i18n/language/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有语言（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取语言列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加语言 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新语言 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除语言 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取语言详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/i18n/region/listAll": {
         parameters: {
             query?: never;
@@ -3783,6 +4131,299 @@ export interface components {
             message: string;
             data: Record<string, never>;
         };
+        I18nLanguageListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
+        };
+        I18nLanguageListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 语言代码
+                 * @example zh-CN
+                 * @example en-US
+                 */
+                langCode?: string;
+                /**
+                 * @description 本地名称
+                 * @example 简体中文
+                 * @example English
+                 */
+                nativeName?: string;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled?: boolean;
+                /**
+                 * @description 排序
+                 * @example 1
+                 * @example 2
+                 * @example 3
+                 */
+                sortOrder?: number;
+            }[];
+            message: string;
+        };
+        I18nLanguageListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
+        };
+        I18nLanguageListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 语言代码
+                     * @example zh-CN
+                     * @example en-US
+                     */
+                    langCode: string;
+                    /**
+                     * @description 本地名称
+                     * @example 简体中文
+                     * @example English
+                     */
+                    nativeName: string;
+                    /**
+                     * @description 是否启用
+                     * @example true
+                     * @example false
+                     */
+                    isEnabled: boolean;
+                    /**
+                     * @description 排序
+                     * @example 1
+                     * @example 2
+                     * @example 3
+                     */
+                    sortOrder: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        I18nLanguageAddReq: {
+            /**
+             * @description 语言代码
+             * @example zh-CN
+             * @example en-US
+             */
+            langCode: string;
+            /**
+             * @description 本地名称
+             * @example 简体中文
+             * @example English
+             */
+            nativeName: string;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled: boolean;
+            /**
+             * @description 排序
+             * @example 1
+             * @example 2
+             * @example 3
+             */
+            sortOrder: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        I18nLanguageAddRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nLanguageUpdateReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 语言代码
+             * @example zh-CN
+             * @example en-US
+             */
+            langCode?: string;
+            /**
+             * @description 本地名称
+             * @example 简体中文
+             * @example English
+             */
+            nativeName?: string;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /**
+             * @description 排序
+             * @example 1
+             * @example 2
+             * @example 3
+             */
+            sortOrder?: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        I18nLanguageUpdateRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nLanguageDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nLanguageDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nLanguageGetReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nLanguageGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 语言代码
+                 * @example zh-CN
+                 * @example en-US
+                 */
+                langCode: string;
+                /**
+                 * @description 本地名称
+                 * @example 简体中文
+                 * @example English
+                 */
+                nativeName: string;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled: boolean;
+                /**
+                 * @description 排序
+                 * @example 1
+                 * @example 2
+                 * @example 3
+                 */
+                sortOrder: number;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
         I18nRegionListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
@@ -3793,7 +4434,7 @@ export interface components {
              */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "labelZhCN" | "labelEnUS" | "alpha2Code" | "alpha3Code" | "numeric" | "createTimeUtc";
+            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "languages" | "createTimeUtc";
         };
         I18nRegionListAllRes: {
             ok: boolean;
@@ -3803,10 +4444,13 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /** @description 中文名称 */
-                labelZhCN?: string;
-                /** @description 英文名称 */
-                labelEnUS?: string;
+                /** @description 语言对象 */
+                labels?: {
+                    /** @description 中文简体 */
+                    zh_CN?: string;
+                    /** @description 英文美国 */
+                    en_US?: string;
+                };
                 /** @description ISO 3166-1 alpha-2 */
                 alpha2Code?: string;
                 /** @description ISO 3166-1 alpha-3 */
@@ -3818,6 +4462,8 @@ export interface components {
                 numeric?: number;
                 /** @description 是否ISO3166上标为独立主权国家 */
                 iso3166Independent?: boolean;
+                /** @description 语言代码列表 */
+                languages?: ((string[] | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @example true
@@ -3852,7 +4498,7 @@ export interface components {
              */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "labelZhCN" | "labelEnUS" | "alpha2Code" | "alpha3Code" | "numeric" | "createTimeUtc";
+            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "languages" | "createTimeUtc";
         };
         I18nRegionListRes: {
             ok: boolean;
@@ -3880,25 +4526,23 @@ export interface components {
                      * @example 156
                      */
                     numeric: number;
-                    /** @description 中文名称 */
-                    labelZhCN: string;
-                    /** @description 英文名称 */
-                    labelEnUS: string;
+                    /** @description 语言对象 */
+                    labels: {
+                        /** @description 中文简体 */
+                        zh_CN?: string;
+                        /** @description 英文美国 */
+                        en_US?: string;
+                    };
                     /** @description 是否ISO3166上标为独立主权国家 */
                     iso3166Independent: boolean;
+                    /** @description 语言代码列表 */
+                    languages: ((string[] | null) | null) | null;
                     /**
                      * @description 是否启用
                      * @example true
                      * @example false
                      */
                     isEnabled: boolean;
-                    /**
-                     * @description 版本号
-                     * @example 0
-                     * @example 1
-                     * @example 2
-                     */
-                    version?: ((number | null) | null) | null;
                     /** @description 备注 */
                     remark: ((string | null) | null) | null;
                     /** @description 创建者ID */
@@ -3929,25 +4573,23 @@ export interface components {
              * @example 156
              */
             numeric: number;
-            /** @description 中文名称 */
-            labelZhCN: string;
-            /** @description 英文名称 */
-            labelEnUS: string;
+            /** @description 语言对象 */
+            labels: {
+                /** @description 中文简体 */
+                zh_CN?: string;
+                /** @description 英文美国 */
+                en_US?: string;
+            };
             /** @description 是否ISO3166上标为独立主权国家 */
             iso3166Independent: boolean;
+            /** @description 语言代码列表 */
+            languages: ((string[] | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
              * @example false
              */
             isEnabled: boolean;
-            /**
-             * @description 版本号
-             * @example 0
-             * @example 1
-             * @example 2
-             */
-            version?: ((number | null) | null) | null;
             /** @description 备注 */
             remark: ((string | null) | null) | null;
         };
@@ -3975,25 +4617,23 @@ export interface components {
              * @example 156
              */
             numeric?: number;
-            /** @description 中文名称 */
-            labelZhCN?: string;
-            /** @description 英文名称 */
-            labelEnUS?: string;
+            /** @description 语言对象 */
+            labels?: {
+                /** @description 中文简体 */
+                zh_CN?: string;
+                /** @description 英文美国 */
+                en_US?: string;
+            };
             /** @description 是否ISO3166上标为独立主权国家 */
             iso3166Independent?: boolean;
+            /** @description 语言代码列表 */
+            languages?: ((string[] | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
              * @example false
              */
             isEnabled?: boolean;
-            /**
-             * @description 版本号
-             * @example 0
-             * @example 1
-             * @example 2
-             */
-            version?: ((number | null) | null) | null;
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
@@ -4046,25 +4686,23 @@ export interface components {
                  * @example 156
                  */
                 numeric: number;
-                /** @description 中文名称 */
-                labelZhCN: string;
-                /** @description 英文名称 */
-                labelEnUS: string;
+                /** @description 语言对象 */
+                labels: {
+                    /** @description 中文简体 */
+                    zh_CN?: string;
+                    /** @description 英文美国 */
+                    en_US?: string;
+                };
                 /** @description 是否ISO3166上标为独立主权国家 */
                 iso3166Independent: boolean;
+                /** @description 语言代码列表 */
+                languages: ((string[] | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @example true
                  * @example false
                  */
                 isEnabled: boolean;
-                /**
-                 * @description 版本号
-                 * @example 0
-                 * @example 1
-                 * @example 2
-                 */
-                version?: ((number | null) | null) | null;
                 /** @description 备注 */
                 remark: ((string | null) | null) | null;
                 /** @description 创建者ID */
@@ -4269,13 +4907,6 @@ export interface components {
                      * @example false
                      */
                     isEnabled: boolean;
-                    /**
-                     * @description 版本号
-                     * @example 0
-                     * @example 1
-                     * @example 2
-                     */
-                    version?: ((number | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -4340,13 +4971,6 @@ export interface components {
              * @example false
              */
             isEnabled: boolean;
-            /**
-             * @description 版本号
-             * @example 0
-             * @example 1
-             * @example 2
-             */
-            version?: ((number | null) | null) | null;
         };
         I18nTranslationAddRes: {
             ok: boolean;
@@ -4408,13 +5032,6 @@ export interface components {
              * @example false
              */
             isEnabled?: boolean;
-            /**
-             * @description 版本号
-             * @example 0
-             * @example 1
-             * @example 2
-             */
-            version?: ((number | null) | null) | null;
         };
         I18nTranslationUpdateRes: {
             ok: boolean;
@@ -4501,13 +5118,6 @@ export interface components {
                  * @example false
                  */
                 isEnabled: boolean;
-                /**
-                 * @description 版本号
-                 * @example 0
-                 * @example 1
-                 * @example 2
-                 */
-                version?: ((number | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**

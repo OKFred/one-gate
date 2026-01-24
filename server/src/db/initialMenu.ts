@@ -101,20 +101,28 @@ export const initialMenuData = [
   },
   {
     id: 14,
-    name: "menu.i18n.translation",
-    icon: "material-symbols:font-download",
-    path: "/i18n/translation",
+    name: "menu.i18n.language",
+    icon: "material-symbols:language-international",
+    path: "/i18n/language",
     parentId: 13,
     sort: 1,
   },
   {
     id: 15,
+    name: "menu.i18n.translation",
+    icon: "material-symbols:translate",
+    path: "/i18n/translation",
+    parentId: 13,
+    sort: 2,
+  },
+  {
+    id: 16,
     name: "menu.i18n.region",
     icon: "material-symbols:public",
     path: "/i18n/region",
     parentId: 13,
-    sort: 2,
-  }
+    sort: 3,
+  },
 ] as menuLike[];
 
 type menuLike = {

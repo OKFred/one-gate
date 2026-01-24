@@ -2152,7 +2152,7 @@ export const initialI18nData = [
     tKey: "i18n.region.form.labelZhCN",
     tValue: "Chinese Name",
     isEnabled: true,
-  },
+  },/* 
   {
     application: "frontend",
     business: "i18n.region",
@@ -2168,7 +2168,7 @@ export const initialI18nData = [
     tKey: "i18n.region.form.labelEnUS",
     tValue: "English Name",
     isEnabled: true,
-  },
+  }, */
   {
     application: "frontend",
     business: "i18n.region",
@@ -2333,7 +2333,57 @@ export const initialI18nData = [
     tValue: "Actions",
     isEnabled: true,
   },
-  // 操作按钮
+
+  // ========== i18n-语言管理 前端界面 ==========
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "zh-CN",
+    tKey: "i18n.language.title",
+    tValue: "语言管理",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "en-US",
+    tKey: "i18n.language.title",
+    tValue: "Language Management",
+    isEnabled: true,
+  },
+  // 表单字段
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "zh-CN",
+    tKey: "i18n.language.form.langCode",
+    tValue: "语言代码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "en-US",
+    tKey: "i18n.language.form.langCode",
+    tValue: "Language Code",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "zh-CN",
+    tKey: "i18n.language.form.nativeName",
+    tValue: "本地名称",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "en-US",
+    tKey: "i18n.language.form.nativeName",
+    tValue: "Native Name",
+    isEnabled: true,
+  },
   {
     application: "frontend",
     business: "common",

@@ -43,19 +43,37 @@ const RegionUniquePO = {
   },
 } as const satisfies Partial<Record<keyof RegionPOLike, JSONSchema>>;
 const RegionBasePO = {
-  labelZhCN: {
-    type: "string",
-    description: "中文名称",
-    maxLength: 100,
-  },
-  labelEnUS: {
-    type: "string",
-    description: "英文名称",
-    maxLength: 150,
+  labels: {
+    type: "object",
+    description: "语言对象",
+    properties: {
+      zh_CN: {
+        type: "string",
+        description: "中文简体",
+        maxLength: 100,
+      },
+      en_US: {
+        type: "string",
+        description: "英文美国",
+        maxLength: 150,
+      },
+    },
+    additionalProperties: false,
   },
   iso3166Independent: {
     type: "boolean",
     description: "是否ISO3166上标为独立主权国家",
+  },
+  languages: {
+    type: ["array", "null"],
+    nullable: true,
+    description: "语言代码列表",
+    items: {
+      type: "string",
+      maxLength: 10,
+      examples: ["zh_CN", "en_US"],
+    },
+    uniqueItems: true,
   },
   isEnabled: {
     type: "boolean",
@@ -112,12 +130,12 @@ export type RegionGetVOLike = Pick<RegionVOLike, IndexKeyLike>;
 
 //----------------- Required Keys ----------------//
 export const RegionAddKeys = [
-  "labelZhCN",
-  "labelEnUS",
+  "labels",
   "alpha2Code",
   "alpha3Code",
   "numeric",
   "iso3166Independent",
+  "languages",
   "isEnabled",
   "remark",
 ] as const satisfies RequiredKeys<RegionAddVOLike>[];
@@ -140,11 +158,13 @@ export const RegionListKeys = RegionBaseKeys;
 export const RegionDetailKeys = RegionBaseKeys;
 export const RegionSortableKeys = [
   "id",
-  "labelZhCN",
-  "labelEnUS",
+  "labels",
   "alpha2Code",
   "alpha3Code",
   "numeric",
+  "iso3166Independent",
+  "isEnabled",
+  "languages",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<RegionPOLike>[];
 
@@ -152,14 +172,14 @@ export const regionTable = sqliteTable(
   "i18n_region",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    labelZhCN: text("label_zh_cn", { length: 100 }).notNull(),
-    labelEnUS: text("label_en_us", { length: 150 }).notNull(),
+    labels: text("labels", { mode: "json" }).$type<{ [key: string]: string }>(),
     alpha2Code: text("alpha2_code", { length: 2 }).notNull(),
     alpha3Code: text("alpha3_code", { length: 3 }).notNull(),
     numeric: integer("numeric").notNull(),
     iso3166Independent: integer("iso_3166_independent", {
       mode: "boolean",
     }).notNull(),
+    languages: text("languages", { mode: "json" }).$type<string[]>(),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
     remark: text("remark", { length: 500 }),
     creatorId: integer("creator_id").notNull(),
@@ -180,12 +200,12 @@ export async function tableInit() {
   await db.run(`
     CREATE TABLE IF NOT EXISTS i18n_region (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      label_zh_cn TEXT NOT NULL,
-      label_en_us TEXT NOT NULL,
+      labels TEXT NOT NULL,
       alpha2_code TEXT NOT NULL,
       alpha3_code TEXT NOT NULL,
       numeric INTEGER NOT NULL,
       iso_3166_independent INTEGER NOT NULL,
+      languages TEXT,
       is_enabled INTEGER NOT NULL,
       remark TEXT,
       creator_id INTEGER NOT NULL,
