@@ -6,18 +6,11 @@ import ResponsiveList, {
 } from '@/components/Responsive/ResponsiveList';
 import * as LanguageAPI from '@/api/i18n/language';
 import { LanguageActionButtons } from './TheActionButtons';
-import type { ListLanguageReq, ListLanguageRes } from '@/api/i18n/type';
+import type { ListLanguageRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListLanguageReq['orderBy']>;
-  descend: boolean;
-  isEnabled?: boolean;
-}
+import type { FilterState } from './TheFilter';
 
 // 表格内部状态
 export interface TableState {

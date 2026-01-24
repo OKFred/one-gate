@@ -21,16 +21,10 @@ import ResponsiveList, {
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
 import { showSnackbar } from '@/components/Notification';
-import type { ListMailTemplateReq, ListMailTemplateRes } from '@/api/mail/type';
+import type { ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListMailTemplateReq['orderBy']>;
-  descend: boolean;
-}
+import type { FilterState } from './TheFilter';
 
 // 表格内部状态
 export interface TableState {

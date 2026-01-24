@@ -20,9 +20,17 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
-import type { FilterState } from './TheTable';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { ListLanguageReq } from '@/api/i18n/type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListLanguageReq['orderBy']>;
+  descend: boolean;
+  isEnabled?: boolean;
+}
 
 // 暴露给父组件的方法
 export interface TheFilterRef {
