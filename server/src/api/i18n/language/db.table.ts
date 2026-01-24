@@ -36,7 +36,7 @@ const LanguageBasePO = {
   nativeName: {
     type: "string",
     description: "本地名称",
-    examples: ["简体中文", "English"],
+    examples: ["中文（中国）", "English (US)"],
     maxLength: 50,
   },
   isEnabled: {

@@ -58,6 +58,11 @@ const RegionBasePO = {
         maxLength: 150,
       },
     },
+    propertyNames: {
+      type: "string",
+      maxLength: 10,
+      pattern: "^[a-z]{2}-[A-Z]{2}$",
+    },
     additionalProperties: true,
   },
   iso3166Independent: {
