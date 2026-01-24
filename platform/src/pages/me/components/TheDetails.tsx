@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, memo } from 'react';
 import { Card, CardContent, Typography, Box, Chip, Paper } from '@mui/material';
-import { AccountBox as AccountBoxIcon } from '@mui/icons-material';
+import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
+import { ResponsiveButton } from '@/components/Responsive/index';
 import type { GetUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
@@ -13,7 +14,8 @@ export interface TheDetailsRef {
 }
 
 const TheDetails = memo(
-  forwardRef<TheDetailsRef, Props>((_, ref) => {
+  forwardRef<TheDetailsRef, Props>(({ localObj }, ref) => {
+    const { dataRef } = localObj;
     const t = useTranslation();
     const [user, setUser] = useState<GetUserRes | null>(null);
 
@@ -28,6 +30,10 @@ const TheDetails = memo(
       [],
     );
 
+    const handleEdit = () => {
+      dataRef.current?.openEditDialog();
+    };
+
     if (!user) return null;
 
     return (
@@ -38,6 +44,9 @@ const TheDetails = memo(
               <AccountBoxIcon sx={{ mr: 1 }} />
               <Typography variant="h6">{t('me.details.title')}</Typography>
             </Box>
+            <ResponsiveButton variant="contained" startIcon={<EditIcon />} onClick={handleEdit}>
+              {t('me.changePassword.title')}
+            </ResponsiveButton>
           </Box>
 
           <Paper variant="outlined" sx={{ p: 2 }}>

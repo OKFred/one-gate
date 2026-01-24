@@ -19,7 +19,7 @@ import type { GetUserRes, UpdateUserReq } from '@/api/system/type';
 import type { Props } from '../index';
 
 // 暴露给父组件的方法
-export interface TheDialogRef {
+export interface ThePasswordDialogRef {
   /** 打开对话框 */
   open: (user: GetUserRes) => void;
   /** 关闭对话框 */
@@ -28,8 +28,8 @@ export interface TheDialogRef {
   setSaveHandler: (handler: (formData: UpdateUserReq) => void) => void;
 }
 
-const TheDialog = memo(
-  forwardRef<TheDialogRef, Props>((_, ref) => {
+const ThePasswordDialog = memo(
+  forwardRef<ThePasswordDialogRef, Props>((_, ref) => {
     const t = useTranslation();
     const [open, setOpen] = useState(false);
     const [user, setUser] = useState<GetUserRes | null>(null);
@@ -82,7 +82,7 @@ const TheDialog = memo(
         <DialogTitle>
           <Box display="flex" alignItems="center">
             <SettingsIcon sx={{ mr: 1 }} />
-            {t('common.actions.edit')}
+            {t('me.changePassword.title')}
           </Box>
         </DialogTitle>
 
@@ -90,10 +90,15 @@ const TheDialog = memo(
           <Box pt={1}>
             <TextField
               fullWidth
+              label={t('me.form.currentPassword')}
+              type="password"
+              margin="normal"
+            />
+            <TextField
+              fullWidth
               label={t('me.edit.newPassword')}
               type={showPassword ? 'text' : 'password'}
               margin="normal"
-              helperText={t('me.edit.passwordHelper')}
               slotProps={{
                 input: {
                   endAdornment: (
@@ -123,6 +128,6 @@ const TheDialog = memo(
   }),
 );
 
-TheDialog.displayName = 'TheDialog';
+ThePasswordDialog.displayName = 'ThePasswordDialog';
 
-export default TheDialog;
+export default ThePasswordDialog;

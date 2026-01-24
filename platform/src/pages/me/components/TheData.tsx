@@ -17,7 +17,7 @@ export interface TheDataRef {
 
 const TheData = memo(
   forwardRef<TheDataRef, Props>(({ localObj }, ref) => {
-    const { profileRef, detailsRef, dialogRef } = localObj;
+    const { profileRef, detailsRef, passwordDialogRef } = localObj;
     const t = useTranslation();
     const [currentUser, setCurrentUser] = useState<GetUserRes | null>(null);
 
@@ -63,21 +63,21 @@ const TheData = memo(
             type: 'success',
             message: t('common.interact.operationSuccess'),
           });
-          dialogRef.current?.close();
+          passwordDialogRef.current?.close();
           await fetchCurrentUser();
         } catch (error) {
           console.warn(error);
         }
       },
-      [currentUser, fetchCurrentUser, dialogRef, t],
+      [currentUser, fetchCurrentUser, passwordDialogRef, t],
     );
 
     // 打开编辑对话框
     const openEditDialog = useCallback(() => {
       if (currentUser) {
-        dialogRef.current?.open(currentUser);
+        passwordDialogRef.current?.open(currentUser);
       }
-    }, [currentUser, dialogRef]);
+    }, [currentUser, passwordDialogRef]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -97,10 +97,10 @@ const TheData = memo(
 
     // 设置对话框的保存回调
     useEffect(() => {
-      if (dialogRef.current) {
-        dialogRef.current.setSaveHandler(handleSave);
+      if (passwordDialogRef.current) {
+        passwordDialogRef.current.setSaveHandler(handleSave);
       }
-    }, [dialogRef, handleSave]);
+    }, [passwordDialogRef, handleSave]);
 
     return null; // 这是一个无渲染组件
   }),

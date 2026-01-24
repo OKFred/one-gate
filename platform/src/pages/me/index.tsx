@@ -10,7 +10,7 @@ import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheProfile, { type TheProfileRef } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
-import TheDialog, { type TheDialogRef } from './components/TheDialog';
+import ThePasswordDialog, { type ThePasswordDialogRef } from './components/ThePasswordDialog';
 import TheData, { type TheDataRef } from './components/TheData';
 
 export interface Props {
@@ -21,7 +21,7 @@ export interface LocalObj {
   dataRef: React.RefObject<TheDataRef | null>;
   profileRef: React.RefObject<TheProfileRef | null>;
   detailsRef: React.RefObject<TheDetailsRef | null>;
-  dialogRef: React.RefObject<TheDialogRef | null>;
+  passwordDialogRef: React.RefObject<ThePasswordDialogRef | null>;
 }
 
 export default function UserCenter() {
@@ -29,8 +29,8 @@ export default function UserCenter() {
   const dataRef = useRef<TheDataRef>(null);
   const profileRef = useRef<TheProfileRef>(null);
   const detailsRef = useRef<TheDetailsRef>(null);
-  const dialogRef = useRef<TheDialogRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ dataRef, profileRef, detailsRef, dialogRef }), []);
+  const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
+  const localObj: LocalObj = useMemo(() => ({ dataRef, profileRef, detailsRef, passwordDialogRef }), []);
 
   return (
     <PageLayout
@@ -62,7 +62,7 @@ export default function UserCenter() {
       </Box>
 
       {/* 编辑用户信息对话框 */}
-      <TheDialog ref={dialogRef} localObj={localObj} />
+      <ThePasswordDialog ref={passwordDialogRef} localObj={localObj} />
     </PageLayout>
   );
 }
