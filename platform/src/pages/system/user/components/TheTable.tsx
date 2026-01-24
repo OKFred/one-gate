@@ -38,7 +38,7 @@ const DEFAULT_FILTERS: FilterState = {
 
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
-    const { formRef, filterRef, enabledRegions } = localObj;
+    const { formRef, filterRef, enabledRegions, enabledLanguages } = localObj;
     const t = useTranslation();
 
     // 整合所有表格相关状态
@@ -133,6 +133,16 @@ const TheTable = memo(
       [enabledRegions],
     );
 
+    // 根据语言代码获取语言名称
+    const getLanguageName = useCallback(
+      (langCode: string | null | undefined): string => {
+        if (!langCode) return '--';
+        const language = enabledLanguages.find((l) => l.langCode === langCode);
+        return language?.nativeName || langCode;
+      },
+      [enabledLanguages],
+    );
+
     // 获取数据的核心函数
     const fetchUsers = useCallback(
       async (searchFilters: FilterState, currentPage: number = 1) => {
@@ -211,6 +221,7 @@ const TheTable = memo(
       { title: t('me.details.region'), render: (row) => getRegionName(row.regionId) },
       { title: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
       { title: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
+      { title: t('common.language'), render: (row) => getLanguageName(row.langCode) },
       {
         title: t('common.columns.status'),
         render: (row) => (
@@ -253,6 +264,11 @@ const TheTable = memo(
         type: 'content',
         label: t('me.details.role'),
         render: (row) => getRoleNames(row.roleIdArr),
+      },
+      {
+        type: 'content',
+        label: t('common.language'),
+        render: (row) => getLanguageName(row.langCode),
       },
       {
         type: 'content',

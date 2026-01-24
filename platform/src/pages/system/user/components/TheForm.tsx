@@ -61,7 +61,7 @@ const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(function TheForm({ localObj }, ref) {
     const t = useTranslation();
-    const { tableRef, enabledRegions } = localObj;
+    const { tableRef, enabledRegions, enabledLanguages } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
 
@@ -412,6 +412,27 @@ const TheForm = memo(
                       </MenuItem>
                     );
                   })}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
+                <InputLabel>{t('common.language')}</InputLabel>
+                <Select
+                  value={form.langCode || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setForm({ ...form, langCode: value || '' });
+                  }}
+                  label={t('common.language')}
+                >
+                  <MenuItem value="">
+                    <em>{t('form.select')}</em>
+                  </MenuItem>
+                  {enabledLanguages.map((language) => (
+                    <MenuItem key={language.langCode} value={language.langCode}>
+                      {language.nativeName}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 

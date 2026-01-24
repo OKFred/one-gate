@@ -6,7 +6,8 @@ import TheTable, { type TheTableRef } from './components/TheTable';
 import TheFilter, { type TheFilterRef } from './components/TheFilter';
 import { TheActionButtons } from './components/TheActionButtons';
 import * as RegionAPI from '@/api/i18n/region';
-import type { ListAllRegionRes } from '@/api/i18n/type';
+import * as LanguageAPI from '@/api/i18n/language';
+import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/i18n/type';
 
 export interface Props {
   localObj: LocalObj;
@@ -16,6 +17,7 @@ export interface LocalObj {
   formRef: React.RefObject<TheFormRef | null>;
   filterRef: React.RefObject<TheFilterRef | null>;
   enabledRegions: ListAllRegionRes;
+  enabledLanguages: ListAllLanguageRes;
 }
 
 export default function UserManagement() {
@@ -24,10 +26,11 @@ export default function UserManagement() {
   const formRef = useRef<TheFormRef>(null);
   const filterRef = useRef<TheFilterRef>(null);
   const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
+  const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
   
   const localObj: LocalObj = useMemo(
-    () => ({ tableRef, formRef, filterRef, enabledRegions }),
-    [enabledRegions]
+    () => ({ tableRef, formRef, filterRef, enabledRegions, enabledLanguages }),
+    [enabledRegions, enabledLanguages]
   );
 
   // 获取启用的地区列表
@@ -41,6 +44,19 @@ export default function UserManagement() {
       }
     };
     fetchRegions();
+  }, []);
+
+  // 获取启用的语言列表
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const res = await LanguageAPI.listAllFn({ data: { isEnabled: true } });
+        setEnabledLanguages(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch languages:', error);
+      }
+    };
+    fetchLanguages();
   }, []);
 
   return (
