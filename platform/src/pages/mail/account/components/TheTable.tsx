@@ -6,17 +6,11 @@ import ResponsiveList, {
 } from '@/components/Responsive/ResponsiveList';
 import * as AccountAPI from '@/api/mail/account';
 import { AccountActionButtons } from './TheActionButtons';
-import type { ListMailAccountReq, ListMailAccountRes } from '@/api/mail/type';
+import type { ListMailAccountRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListMailAccountReq['orderBy']>;
-  descend: boolean;
-}
+import type { FilterState } from './TheFilter';
 
 // 表格内部状态
 export interface TableState {

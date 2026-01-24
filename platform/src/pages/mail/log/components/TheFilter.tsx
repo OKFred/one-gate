@@ -21,8 +21,15 @@ import {
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { FilterState } from './TheTable';
 import type { Props } from '../index';
+import type { ListMailLogReq } from '@/api/mail/type';
+
+// 筛选状态类型
+export interface FilterState {
+  keyword: string;
+  orderBy: NonNullable<ListMailLogReq['orderBy']>;
+  descend: boolean;
+}
 
 // 暴露给父组件的方法
 export interface TheFilterRef {
@@ -119,7 +126,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label={t('common.filter.clearFilters')}
+                label={t('common.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}

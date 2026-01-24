@@ -9,7 +9,6 @@ import {
   Stack,
   IconButton,
   Alert,
-  CircularProgress,
   FormControlLabel,
   Switch,
   FormControl,
@@ -48,10 +47,9 @@ export interface TheFormRef {
 
 const DEFAULT_FORM: DepartmentFormData = {
   name: '',
-  description: null,
-  remark: null,
   parentId: null,
   isEnabled: true,
+  remark: null,
 };
 
 // 扁平化部门树，用于下拉选择
@@ -196,10 +194,9 @@ const TheForm = memo(
           setFormValues({
             id: department.id,
             name: department.name ?? '',
-            description: department.description ?? null,
-            remark: null,
             parentId: department.parentId ?? null,
             isEnabled: department.isEnabled ?? true,
+            remark: department.remark ?? null,
           });
           setError('');
           setDialogOpen(true);
@@ -226,7 +223,6 @@ const TheForm = memo(
       try {
         const submitData = {
           ...formValues,
-          description: hasValue(formValues.description) ? formValues.description : null,
           remark: hasValue(formValues.remark) ? formValues.remark : null,
         };
 
@@ -294,28 +290,6 @@ const TheForm = memo(
               required
               autoFocus
             />
-            <TextField
-              label={t('common.form.remark')}
-              value={formValues.description ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleFormChange('description', hasValue(value) ? value : null);
-              }}
-              fullWidth
-              multiline
-              rows={2}
-            />
-            <TextField
-              label={t('common.form.remark')}
-              value={formValues.remark ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                handleFormChange('remark', hasValue(value) ? value : null);
-              }}
-              fullWidth
-              multiline
-              rows={2}
-            />
             <FormControl fullWidth>
               <InputLabel id="parent-department-label">
                 {t('system.department.form.parentDepartment')}
@@ -349,14 +323,46 @@ const TheForm = memo(
               }
               label={t('common.status.enabled')}
             />
+            <TextField
+              label={t('common.form.remark')}
+              value={formValues.remark ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                handleFormChange('remark', hasValue(value) ? value : null);
+              }}
+              fullWidth
+              multiline
+              rows={2}
+              inputProps={{ maxLength: 500 }}
+              helperText={`${(formValues.remark || '').length}/500`}
+            />
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleClose} disabled={loading}>
+        <DialogActions
+          sx={{
+            px: isMobile ? 2 : 3,
+            py: isMobile ? 2 : 2,
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            gap: isMobile ? 1 : 0,
+          }}
+        >
+          <Button
+            onClick={handleClose}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={20} /> : t('common.actions.save')}
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

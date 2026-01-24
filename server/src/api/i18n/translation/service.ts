@@ -248,7 +248,6 @@ async function onAdd(
   await uniqueCheck(params);
   const addData = {
     ...params,
-    version: params.version ?? 0,
     creatorId,
   };
   const result = await db
@@ -296,21 +295,15 @@ async function onUpdate(
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
   // 检查 tKey 是否与其他记录冲突
-  await uniqueCheck(params);
+  await uniqueCheck(params, id);
   const previousRecord = await onGet({ id });
   if (!previousRecord) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  const previousVersion = previousRecord.version;
-  if (params.version !== previousVersion) {
-    throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
-  }
-  const currentVersion = previousVersion + 1;
   let updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
-    version: currentVersion,
   };
 
   const res = await db
@@ -528,7 +521,10 @@ const checkDuplicateApi = {
   service: onCheckDuplicate,
 } satisfies API;
 
-async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
+async function uniqueCheck(
+  obj: FromSchema<typeof updateReq | typeof addReq>,
+  excludeId?: number
+) {
   if (hasValue(obj.tKey)) {
     const existingRecord = await db
       .select({ id: translationTable.id })
@@ -537,7 +533,7 @@ async function uniqueCheck(obj: FromSchema<typeof updateReq | typeof addReq>) {
         and(
           eq(translationTable.tKey, obj.tKey),
           eq(translationTable.langCode, obj.langCode),
-          "id" in obj ? ne(translationTable.id, obj.id) : undefined
+          excludeId ? ne(translationTable.id, excludeId) : undefined
         )
       )
       .limit(1);

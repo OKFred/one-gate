@@ -164,17 +164,13 @@ const TheTable = memo(
       { title: t('i18n.translation.form.tKey'), render: (row) => row.tKey },
       { title: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
-        title: t('common.form.remark'),
-        render: (row) => row.description || '-',
-      },
-      {
         title: t('common.filter.enabledStatus'),
         render: (row) => (
           <Chip
             label={
               row.isEnabled
-                ? t('i18n.translation.switch.enabled')
-                : t('i18n.translation.switch.disabled')
+                ? t('switch.enabled')
+                : t('switch.disabled')
             }
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
@@ -185,6 +181,10 @@ const TheTable = memo(
       {
         title: t('common.columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
+      },
+      {
+        title: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
       {
         title: t('common.columns.actions'),
@@ -205,11 +205,6 @@ const TheTable = memo(
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
       { type: 'content', label: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
       {
-        type: 'content',
-        label: t('common.form.remark'),
-        render: (row) => row.description || '-',
-      },
-      {
         type: 'tags',
         render: (row) => (
           <>
@@ -219,8 +214,8 @@ const TheTable = memo(
             <Chip
               label={
                 row.isEnabled
-                  ? t('i18n.translation.switch.enabled')
-                  : t('i18n.translation.switch.disabled')
+                  ? t('switch.enabled')
+                  : t('switch.disabled')
               }
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
@@ -228,6 +223,11 @@ const TheTable = memo(
             />
           </>
         ),
+      },
+      {
+        type: 'content',
+        label: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
     ];
 

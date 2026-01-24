@@ -232,7 +232,13 @@ const ThePreview = memo(
             py: isMobile ? 2 : 2,
           }}
         >
-          <Button onClick={handleClose} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
+          <Button
+            onClick={handleClose}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+          >
             {t('common.close')}
           </Button>
         </DialogActions>

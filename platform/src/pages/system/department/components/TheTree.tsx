@@ -79,8 +79,8 @@ const TheTree = memo(
           const matchesKeyword =
             !searchFilters.keyword ||
             dept.name?.toLowerCase().includes(searchFilters.keyword.toLowerCase()) ||
-            (dept.description &&
-              dept.description.toLowerCase().includes(searchFilters.keyword.toLowerCase()));
+            (dept.remark &&
+              dept.remark.toLowerCase().includes(searchFilters.keyword.toLowerCase()));
 
           // 检查当前部门是否匹配启用状态
           const matchesEnabled =
@@ -198,14 +198,14 @@ const TheTree = memo(
                 <ApartmentIcon sx={{ mr: 1, fontSize: 20, color: 'text.secondary' }} />
                 <Typography sx={{ flexGrow: 1 }}>
                   {node.name}
-                  {node.description && (
+                  {node.remark && (
                     <Typography
                       component="span"
                       variant="body2"
                       color="text.secondary"
                       sx={{ ml: 1 }}
                     >
-                      ({node.description})
+                      ({node.remark})
                     </Typography>
                   )}
                   {!node.isEnabled && (

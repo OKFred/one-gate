@@ -99,7 +99,6 @@ async function onListAll(
     .select({
       id: departmentTable.id,
       name: departmentTable.name,
-      description: departmentTable.description,
       remark: departmentTable.remark,
       parentId: departmentTable.parentId,
       isEnabled: departmentTable.isEnabled,
@@ -211,7 +210,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { name, description, remark, parentId, isEnabled = true } = params;
+  const { name, remark, parentId, isEnabled = true } = params;
   // 如果有父部门，检查父部门是否存在
   if (hasValue(parentId)) {
     const parent = await db
@@ -228,7 +227,6 @@ async function onAdd(
     .insert(departmentTable)
     .values({
       name,
-      description,
       remark,
       parentId,
       isEnabled,

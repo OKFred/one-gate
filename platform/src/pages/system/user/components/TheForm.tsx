@@ -39,6 +39,7 @@ import type { AddUserReq, UpdateUserReq, TreeDepartmentRes } from '@/api/system/
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
+import { authUtils, type UserInfo } from '@/utils/auth';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -49,6 +50,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
   username: '',
   password: '',
+  regionObj: null,
   departmentObj: null,
   roleArr: [],
   langCode: '',
@@ -59,7 +61,7 @@ const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(function TheForm({ localObj }, ref) {
     const t = useTranslation();
-    const { tableRef } = localObj;
+    const { tableRef, enabledRegions, enabledLanguages } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
 
@@ -71,6 +73,14 @@ const TheForm = memo(
     const [departmentAnchorEl, setDepartmentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
     const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    // 加载用户信息
+    useEffect(() => {
+      const user = authUtils.getUserInfo();
+      setUserInfo(user);
+    }, []);
 
     // 获取角色和部门数据
     useEffect(() => {
@@ -140,27 +150,35 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      const formData = { ...form };
-      // 保证 remark 字段传递（允许为 null）
-      if (!('remark' in formData)) {
-        formData.remark = null;
-      }
+      setLoading(true);
 
-      if (editId) {
-        // 编辑用户
-        const updateData = { id: editId, ...formData };
-        await UserAPI.updateFn({
-          data: updateData as UpdateUserReq,
-        });
-      } else {
-        // 添加用户
-        await UserAPI.addFn({
-          data: formData as AddUserReq,
-        });
+      try {
+        const formData = { ...form };
+        // 保证 remark 字段传递（允许为 null）
+        if (!('remark' in formData)) {
+          formData.remark = null;
+        }
+
+        if (editId) {
+          // 编辑用户
+          const updateData = { id: editId, ...formData };
+          await UserAPI.updateFn({
+            data: updateData as UpdateUserReq,
+          });
+        } else {
+          // 添加用户
+          await UserAPI.addFn({
+            data: formData as AddUserReq,
+          });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     // 处理角色多选变化
@@ -249,7 +267,9 @@ const TheForm = memo(
             pb: isMobile ? 1 : 2,
           }}
         >
-          <Box>{editId ? t('common.actions.edit') : t('common.actions.add')}</Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {editId ? t('common.actions.update') : t('common.actions.add')}
+          </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
               <CloseIcon />
@@ -367,6 +387,66 @@ const TheForm = memo(
                 </Popover>
               </Box>
 
+              <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
+                <InputLabel>{t('me.details.region')}</InputLabel>
+                <Select
+                  value={form.regionObj?.value || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value) {
+                      const region = enabledRegions.find((r) => r.id === value);
+                      setForm({
+                        ...form,
+                        regionObj: region
+                          ? {
+                              value: region.id,
+                              label: region.alpha2Code || '',
+                            }
+                          : null,
+                      });
+                    } else {
+                      setForm({ ...form, regionObj: null });
+                    }
+                  }}
+                  label={t('me.details.region')}
+                >
+                  <MenuItem value="">
+                    <em>{t('form.select')}</em>
+                  </MenuItem>
+                  {enabledRegions.map((region) => {
+                    const labels = region.labels as Record<string, string> | undefined;
+                    const displayName =
+                      labels?.[userInfo?.langCode || ''] || region.alpha2Code || '';
+                    return (
+                      <MenuItem key={region.id} value={region.id}>
+                        {displayName} ({region.alpha2Code})
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
+                <InputLabel>{t('common.language')}</InputLabel>
+                <Select
+                  value={form.langCode || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setForm({ ...form, langCode: value || '' });
+                  }}
+                  label={t('common.language')}
+                >
+                  <MenuItem value="">
+                    <em>{t('form.select')}</em>
+                  </MenuItem>
+                  {enabledLanguages.map((language) => (
+                    <MenuItem key={language.langCode} value={language.langCode}>
+                      {language.nativeName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
               <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
                 <InputLabel>{t('menu.system.role')}</InputLabel>
                 <Select
@@ -415,6 +495,8 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
               />
             </Stack>
           </form>
@@ -428,7 +510,12 @@ const TheForm = memo(
             gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} fullWidth={isMobile} size={isMobile ? 'large' : 'medium'}>
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
           <Button
@@ -437,8 +524,9 @@ const TheForm = memo(
             color="primary"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
           >
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

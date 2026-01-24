@@ -7,7 +7,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.databaseBusy",
     tValue: "数据库繁忙或锁定",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -16,7 +15,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.databaseBusy",
     tValue: "Database busy or locked",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -25,7 +23,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.databaseError",
     tValue: "数据库操作错误",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -34,7 +31,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.databaseError",
     tValue: "Database operation error",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -43,7 +39,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.notFound",
     tValue: "未找到请求的资源",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -52,7 +47,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.notFound",
     tValue: "Resource not found",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -61,7 +55,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.targetNotExist",
     tValue: "目标不存在",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -70,7 +63,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.targetNotExist",
     tValue: "Target does not exist",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -79,7 +71,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.forbidden",
     tValue: "禁止访问",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -88,7 +79,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.forbidden",
     tValue: "Access forbidden",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -97,7 +87,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.validationFailed",
     tValue: "请求校验失败",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -106,7 +95,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.validationFailed",
     tValue: "Request validation failed",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -115,7 +103,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.serverError",
     tValue: "服务器异常",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -124,7 +111,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.serverError",
     tValue: "Server error",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -133,7 +119,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.unknownError",
     tValue: "未知异常",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -142,7 +127,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.unknownError",
     tValue: "Unknown error",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -151,7 +135,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.undefinedError",
     tValue: "未定义的错误类型",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -160,7 +143,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.undefinedError",
     tValue: "Undefined error type",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -169,7 +151,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.duplicatedData",
     tValue: "数据重复",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -178,7 +159,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.duplicatedData",
     tValue: "Duplicated data",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   {
@@ -187,7 +167,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.serverStarted",
     tValue: "服务器已启动",
-    description: "错误处理中间件",
     isEnabled: true,
   },
   {
@@ -196,7 +175,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.serverStarted",
     tValue: "Server started",
-    description: "Error handler middleware",
     isEnabled: true,
   },
   // API - 系统相关
@@ -206,7 +184,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.invalidParams",
     tValue: "无效的参数",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -215,7 +192,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.invalidParams",
     tValue: "Invalid parameters",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -224,7 +200,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.departmentNotExist",
     tValue: "部门不存在或已被禁用",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -233,7 +208,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.departmentNotExist",
     tValue: "Department does not exist or has been disabled",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -242,7 +216,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.roleNotExist",
     tValue: "角色不存在或已被禁用",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -251,7 +224,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.roleNotExist",
     tValue: "Role does not exist or has been disabled",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -260,7 +232,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.hasChildren",
     tValue: "存在子节点，请检查后重试",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -269,7 +240,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.hasChildren",
     tValue: "Child nodes exist, please check and try again",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -278,7 +248,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.notAuthenticated",
     tValue: "token无效或已过期",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -287,7 +256,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.notAuthenticated",
     tValue: "Token is invalid or expired",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -296,7 +264,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.notAuthenticated",
     tValue: "用户未认证",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -305,7 +272,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.notAuthenticated",
     tValue: "User not authenticated",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -314,7 +280,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.notExistOrDisabled",
     tValue: "数据不存在或已被禁用",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -323,7 +288,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.notExistOrDisabled",
     tValue: "Data does not exist or has been disabled",
-    description: "System API",
     isEnabled: true,
   },
   {
@@ -332,7 +296,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "errorHandler.notYetImplemented",
     tValue: "功能暂未实现",
-    description: "系统API",
     isEnabled: true,
   },
   {
@@ -341,7 +304,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "errorHandler.notYetImplemented",
     tValue: "Feature not yet implemented",
-    description: "System API",
     isEnabled: true,
   },
   // ========== 前端邮件模块多语言 ==========
@@ -351,7 +313,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.title",
     tValue: "邮件账户管理",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -360,7 +321,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.title",
     tValue: "Mail Account Management",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -369,7 +329,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.columns.nickname",
     tValue: "昵称",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -378,7 +337,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.columns.nickname",
     tValue: "Nickname",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -387,7 +345,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.columns.email",
     tValue: "邮箱",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -396,7 +353,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.columns.email",
     tValue: "Email",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -405,7 +361,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.columns.host",
     tValue: "主机",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -414,7 +369,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.columns.host",
     tValue: "Host",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -423,7 +377,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.columns.port",
     tValue: "端口",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -432,7 +385,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.columns.port",
     tValue: "Port",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -441,7 +393,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.form.nickname",
     tValue: "昵称",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -450,7 +401,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.form.nickname",
     tValue: "Nickname",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -459,7 +409,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.form.email",
     tValue: "邮箱地址",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -468,7 +417,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.form.email",
     tValue: "Email Address",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -477,7 +425,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.form.host",
     tValue: "SMTP服务器",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -486,7 +433,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.form.host",
     tValue: "SMTP Server",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -495,7 +441,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.form.port",
     tValue: "端口",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -504,7 +449,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.form.port",
     tValue: "Port",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -513,7 +457,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.account.form.password",
     tValue: "密码",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -522,7 +465,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.account.form.password",
     tValue: "Password",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -531,7 +473,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "form.actions.deleteConfirmMessage",
     tValue: "确定要删除吗？此操作不可撤销。",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -540,7 +481,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "form.actions.deleteConfirmMessage",
     tValue: "Are you sure you want to delete it? This action cannot be undone.",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -549,7 +489,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.results",
     tValue: "{count} 个结果",
-    description: "需求20260115",
     isEnabled: true,
   },
   {
@@ -558,7 +497,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.results",
     tValue: "{count} results",
-    description: "需求20260115",
     isEnabled: true,
   },
   // ========== 前端菜单多语言 ==========
@@ -568,7 +506,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.home",
     tValue: "主页",
-    description: "菜单-主页",
     isEnabled: true,
   },
   {
@@ -577,7 +514,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.home",
     tValue: "Home",
-    description: "Menu-Home",
     isEnabled: true,
   },
   {
@@ -586,7 +522,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.me",
     tValue: "我的",
-    description: "菜单-我的",
     isEnabled: true,
   },
   {
@@ -595,7 +530,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.me",
     tValue: "Profile",
-    description: "Menu-Profile",
     isEnabled: true,
   },
   {
@@ -604,7 +538,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.mail",
     tValue: "邮件管理",
-    description: "菜单-邮件管理",
     isEnabled: true,
   },
   {
@@ -613,7 +546,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.mail",
     tValue: "Mail Management",
-    description: "Menu-Mail Management",
     isEnabled: true,
   },
   {
@@ -622,7 +554,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.mail.template",
     tValue: "模板",
-    description: "菜单-邮件模板",
     isEnabled: true,
   },
   {
@@ -631,7 +562,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.mail.template",
     tValue: "Templates",
-    description: "Menu-Mail Templates",
     isEnabled: true,
   },
   {
@@ -640,7 +570,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.mail.log",
     tValue: "日志",
-    description: "菜单-邮件日志",
     isEnabled: true,
   },
   {
@@ -649,7 +578,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.mail.log",
     tValue: "Logs",
-    description: "Menu-Mail Logs",
     isEnabled: true,
   },
   {
@@ -658,7 +586,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.mail.send",
     tValue: "发送",
-    description: "菜单-邮件发送",
     isEnabled: true,
   },
   {
@@ -667,7 +594,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.mail.send",
     tValue: "Send",
-    description: "Menu-Send Mail",
     isEnabled: true,
   },
   {
@@ -676,7 +602,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.mail.account",
     tValue: "账户",
-    description: "菜单-邮件账户",
     isEnabled: true,
   },
   {
@@ -685,7 +610,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.mail.account",
     tValue: "Accounts",
-    description: "Menu-Mail Accounts",
     isEnabled: true,
   },
   {
@@ -694,7 +618,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.system",
     tValue: "系统管理",
-    description: "菜单-系统管理",
     isEnabled: true,
   },
   {
@@ -703,7 +626,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.system",
     tValue: "System",
-    description: "Menu-System",
     isEnabled: true,
   },
   {
@@ -712,7 +634,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.system.role",
     tValue: "角色",
-    description: "菜单-角色管理",
     isEnabled: true,
   },
   {
@@ -721,7 +642,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.system.role",
     tValue: "Roles",
-    description: "Menu-Role Management",
     isEnabled: true,
   },
   {
@@ -730,7 +650,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.system.user",
     tValue: "用户",
-    description: "菜单-用户管理",
     isEnabled: true,
   },
   {
@@ -739,7 +658,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.system.user",
     tValue: "Users",
-    description: "Menu-User Management",
     isEnabled: true,
   },
   {
@@ -748,7 +666,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.system.department",
     tValue: "部门",
-    description: "菜单-部门管理",
     isEnabled: true,
   },
   {
@@ -757,7 +674,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.system.department",
     tValue: "Departments",
-    description: "Menu-Department Management",
     isEnabled: true,
   },
   {
@@ -766,7 +682,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.system.menu",
     tValue: "菜单",
-    description: "菜单-菜单管理",
     isEnabled: true,
   },
   {
@@ -775,7 +690,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.system.menu",
     tValue: "Menus",
-    description: "Menu-Menu Management",
     isEnabled: true,
   },
   {
@@ -784,7 +698,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.i18n",
     tValue: "国际化",
-    description: "菜单-国际化",
     isEnabled: true,
   },
   {
@@ -793,7 +706,22 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.i18n",
     tValue: "Internationalization",
-    description: "Menu-I18n",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "menu",
+    langCode: "zh-CN",
+    tKey: "menu.i18n.language",
+    tValue: "语言",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "menu",
+    langCode: "en-US",
+    tKey: "menu.i18n.language",
+    tValue: "Languages",
     isEnabled: true,
   },
   {
@@ -802,7 +730,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.i18n.translation",
     tValue: "翻译",
-    description: "菜单-翻译管理",
     isEnabled: true,
   },
   {
@@ -811,7 +738,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.i18n.translation",
     tValue: "Translations",
-    description: "Menu-Translation Management",
     isEnabled: true,
   },
   {
@@ -820,7 +746,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "menu.i18n.region",
     tValue: "国家地区",
-    description: "菜单-国家地区管理",
     isEnabled: true,
   },
   {
@@ -829,7 +754,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "menu.i18n.region",
     tValue: "Regions",
-    description: "Menu-Region Management",
     isEnabled: true,
   },
   // ========== 前端 Topbar 多语言 ==========
@@ -839,7 +763,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "topbar.title",
     tValue: "条条大道通罗马",
-    description: "顶部标题",
     isEnabled: true,
   },
   {
@@ -848,7 +771,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "topbar.title",
     tValue: "All roads lead to Rome",
-    description: "Topbar title",
     isEnabled: true,
   },
   {
@@ -857,7 +779,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "topbar.profile",
     tValue: "个人设置",
-    description: "个人设置",
     isEnabled: true,
   },
   {
@@ -866,7 +787,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "topbar.profile",
     tValue: "Profile",
-    description: "Profile",
     isEnabled: true,
   },
   {
@@ -875,7 +795,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "topbar.logout",
     tValue: "退出登录",
-    description: "退出登录",
     isEnabled: true,
   },
   {
@@ -884,7 +803,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "topbar.logout",
     tValue: "Log out",
-    description: "Log out",
     isEnabled: true,
   },
   {
@@ -893,7 +811,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "topbar.notLoggedIn",
     tValue: "未登录",
-    description: "未登录占位",
     isEnabled: true,
   },
   {
@@ -902,7 +819,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "topbar.notLoggedIn",
     tValue: "Not signed in",
-    description: "Not signed in",
     isEnabled: true,
   },
   // ========== 前端 登录 页面 ==========
@@ -912,7 +828,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.username",
     tValue: "用户名",
-    description: "登录-用户名标签",
     isEnabled: true,
   },
   {
@@ -921,7 +836,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.username",
     tValue: "Username",
-    description: "Login-username label",
     isEnabled: true,
   },
   {
@@ -930,7 +844,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.password",
     tValue: "密码",
-    description: "登录-密码标签",
     isEnabled: true,
   },
   {
@@ -939,7 +852,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.password",
     tValue: "Password",
-    description: "Login-password label",
     isEnabled: true,
   },
   {
@@ -948,7 +860,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.missingCredentials",
     tValue: "请输入用户名和密码",
-    description: "登录-校验提示",
     isEnabled: true,
   },
   {
@@ -957,7 +868,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.missingCredentials",
     tValue: "Please enter username and password",
-    description: "Login-validation message",
     isEnabled: true,
   },
   {
@@ -966,7 +876,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "form.pleaseEnter",
     tValue: "请输入",
-    description: "通用-请输入",
     isEnabled: true,
   },
   {
@@ -975,7 +884,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "form.pleaseEnter",
     tValue: "Please enter",
-    description: "Common-please enter",
     isEnabled: true,
   },
   {
@@ -984,7 +892,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.signIn",
     tValue: "登录",
-    description: "登录-按钮",
     isEnabled: true,
   },
   {
@@ -993,7 +900,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.signIn",
     tValue: "Sign in",
-    description: "Login-button",
     isEnabled: true,
   },
   {
@@ -1002,7 +908,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.wechatSignIn",
     tValue: "微信登录",
-    description: "登录-微信按钮",
     isEnabled: true,
   },
   {
@@ -1011,7 +916,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.wechatSignIn",
     tValue: "WeChat Sign in",
-    description: "Login-wechat button",
     isEnabled: true,
   },
   {
@@ -1020,7 +924,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.wechatWIP",
     tValue: "微信登录功能正在开发中...",
-    description: "登录-微信开发提示",
     isEnabled: true,
   },
   {
@@ -1029,7 +932,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.wechatWIP",
     tValue: "WeChat sign-in is under development...",
-    description: "Login-wechat wip notice",
     isEnabled: true,
   },
   {
@@ -1038,7 +940,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "login.forgotPassword",
     tValue: "忘记密码？",
-    description: "登录-忘记密码",
     isEnabled: true,
   },
   {
@@ -1047,7 +948,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "login.forgotPassword",
     tValue: "Forgot password?",
-    description: "Login-forgot password",
     isEnabled: true,
   },
   // ========== 前端 首页 ==========
@@ -1057,7 +957,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.title",
     tValue: "欢迎使用",
-    description: "首页-标题",
     isEnabled: true,
   },
   {
@@ -1066,7 +965,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.title",
     tValue: "Welcome",
-    description: "Home-title",
     isEnabled: true,
   },
   {
@@ -1075,7 +973,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.subtitle",
     tValue: "一站式信息管理解决方案",
-    description: "首页-副标题",
     isEnabled: true,
   },
   {
@@ -1084,7 +981,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.subtitle",
     tValue: "All-in-one information management solution",
-    description: "Home-subtitle",
     isEnabled: true,
   },
   {
@@ -1093,7 +989,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.stats.accounts",
     tValue: "邮件账户",
-    description: "首页-统计-账户",
     isEnabled: true,
   },
   {
@@ -1102,7 +997,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.stats.accounts",
     tValue: "Mail Accounts",
-    description: "Home-stats-accounts",
     isEnabled: true,
   },
   {
@@ -1111,7 +1005,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.stats.templates",
     tValue: "邮件模板",
-    description: "首页-统计-模板",
     isEnabled: true,
   },
   {
@@ -1120,7 +1013,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.stats.templates",
     tValue: "Mail Templates",
-    description: "Home-stats-templates",
     isEnabled: true,
   },
   {
@@ -1129,7 +1021,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.stats.todaySent",
     tValue: "今日发送",
-    description: "首页-统计-今日发送",
     isEnabled: true,
   },
   {
@@ -1138,7 +1029,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.stats.todaySent",
     tValue: "Sent Today",
-    description: "Home-stats-todaySent",
     isEnabled: true,
   },
   {
@@ -1147,7 +1037,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.quickStart.title",
     tValue: "快速开始",
-    description: "首页-快速开始-标题",
     isEnabled: true,
   },
   {
@@ -1156,7 +1045,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.quickStart.title",
     tValue: "Quick Start",
-    description: "Home-quickstart-title",
     isEnabled: true,
   },
   {
@@ -1165,7 +1053,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.quickStart.configureAccounts",
     tValue: "🔧 配置邮件账户：在邮件账户管理中添加您的SMTP配置",
-    description: "首页-快速开始-配置账户",
     isEnabled: true,
   },
   {
@@ -1174,7 +1061,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.quickStart.configureAccounts",
     tValue: "🔧 Configure accounts: Add your SMTP settings in Mail Accounts",
-    description: "Home-quickstart-configure-accounts",
     isEnabled: true,
   },
   {
@@ -1183,7 +1069,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.quickStart.createTemplate",
     tValue: "📝 创建邮件模板：设计可重复使用的邮件模板",
-    description: "首页-快速开始-创建模板",
     isEnabled: true,
   },
   {
@@ -1192,7 +1077,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.quickStart.createTemplate",
     tValue: "📝 Create templates: Design reusable mail templates",
-    description: "Home-quickstart-create-template",
     isEnabled: true,
   },
   {
@@ -1201,7 +1085,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.quickStart.sendMail",
     tValue: "📧 发送邮件：使用模板快速发送邮件",
-    description: "首页-快速开始-发送邮件",
     isEnabled: true,
   },
   {
@@ -1210,7 +1093,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.quickStart.sendMail",
     tValue: "📧 Send mail: Quickly send using templates",
-    description: "Home-quickstart-send-mail",
     isEnabled: true,
   },
   {
@@ -1219,7 +1101,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "home.quickStart.viewLogs",
     tValue: "📊 查看日志：监控邮件发送状态和历史记录",
-    description: "首页-快速开始-查看日志",
     isEnabled: true,
   },
   {
@@ -1228,7 +1109,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "home.quickStart.viewLogs",
     tValue: "📊 View logs: Monitor mail send status and history",
-    description: "Home-quickstart-view-logs",
     isEnabled: true,
   },
   // ========== 前端 个人中心 ==========
@@ -1238,7 +1118,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.title",
     tValue: "我的",
-    description: "个人中心-标题",
     isEnabled: true,
   },
   {
@@ -1247,7 +1126,39 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.title",
     tValue: "My Profile",
-    description: "Me-title",
+    isEnabled: true,
+  },
+  // 修改密码
+  {
+    application: "frontend",
+    business: "me",
+    langCode: "zh-CN",
+    tKey: "me.changePassword.title",
+    tValue: "修改密码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "me",
+    langCode: "en-US",
+    tKey: "me.changePassword.title",
+    tValue: "Change Password",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "me",
+    langCode: "zh-CN",
+    tKey: "me.form.currentPassword",
+    tValue: "当前密码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "me",
+    langCode: "en-US",
+    tKey: "me.form.currentPassword",
+    tValue: "Current Password",
     isEnabled: true,
   },
   {
@@ -1256,7 +1167,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.form.newPassword",
     tValue: "新密码",
-    description: "个人中心-表单-新密码",
     isEnabled: true,
   },
   {
@@ -1265,7 +1175,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.form.newPassword",
     tValue: "New Password",
-    description: "Me-form-newPassword",
     isEnabled: true,
   },
   // ========== 前端 邮件发送 ==========
@@ -1275,7 +1184,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "form.select",
     tValue: "请选择",
-    description: "通用-请选择占位",
     isEnabled: true,
   },
   {
@@ -1284,7 +1192,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "form.select",
     tValue: "Select",
-    description: "Common-select",
     isEnabled: true,
   },
   {
@@ -1293,7 +1200,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "status.success",
     tValue: "成功",
-    description: "状态-成功",
     isEnabled: true,
   },
   {
@@ -1302,7 +1208,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "status.success",
     tValue: "Success",
-    description: "Status-success",
     isEnabled: true,
   },
   {
@@ -1311,7 +1216,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "status.failure",
     tValue: "失败",
-    description: "状态-失败",
     isEnabled: true,
   },
   {
@@ -1320,7 +1224,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "status.failure",
     tValue: "Failure",
-    description: "Status-failure",
     isEnabled: true,
   },
   {
@@ -1329,7 +1232,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.customFrom",
     tValue: "或直接输入发件邮箱",
-    description: "邮件发送-自定义发件邮箱标签",
     isEnabled: true,
   },
   {
@@ -1338,7 +1240,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.customFrom",
     tValue: "Or input sender email directly",
-    description: "Mail send-custom from label",
     isEnabled: true,
   },
   {
@@ -1347,7 +1248,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.customFromHelp",
     tValue: "如果没有配置的账户，可以直接输入邮箱地址",
-    description: "邮件发送-自定义发件邮箱帮助文案",
     isEnabled: true,
   },
   {
@@ -1356,7 +1256,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.customFromHelp",
     tValue: "If no account configured, you can input email directly",
-    description: "Mail send-custom from help",
     isEnabled: true,
   },
   {
@@ -1365,7 +1264,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.recipientName",
     tValue: "姓名",
-    description: "邮件发送-收件人姓名占位",
     isEnabled: true,
   },
   {
@@ -1374,7 +1272,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.recipientName",
     tValue: "Name",
-    description: "Mail send-recipient name",
     isEnabled: true,
   },
   {
@@ -1383,7 +1280,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.recipientEmail",
     tValue: "邮箱",
-    description: "邮件发送-收件人邮箱占位",
     isEnabled: true,
   },
   {
@@ -1392,7 +1288,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.recipientEmail",
     tValue: "Email",
-    description: "Mail send-recipient email",
     isEnabled: true,
   },
   {
@@ -1401,7 +1296,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.removeRecipient",
     tValue: "移除收件人",
-    description: "邮件发送-移除收件人 aria",
     isEnabled: true,
   },
   {
@@ -1410,7 +1304,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.removeRecipient",
     tValue: "Remove recipient",
-    description: "Mail send-remove recipient aria",
     isEnabled: true,
   },
   {
@@ -1419,7 +1312,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.subject",
     tValue: "主题",
-    description: "邮件发送-主题标签",
     isEnabled: true,
   },
   {
@@ -1428,7 +1320,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.subject",
     tValue: "Subject",
-    description: "Mail send-subject label",
     isEnabled: true,
   },
   {
@@ -1437,7 +1328,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.content.loaded",
     tValue: "模板内容已加载，您可以在此基础上编辑...",
-    description: "邮件发送-内容占位-已加载",
     isEnabled: true,
   },
   {
@@ -1446,7 +1336,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.content.loaded",
     tValue: "Template content loaded, you can edit it...",
-    description: "Mail send-content ",
     isEnabled: true,
   },
   {
@@ -1455,7 +1344,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.action.send",
     tValue: "发送",
-    description: "邮件发送-发送按钮",
     isEnabled: true,
   },
   {
@@ -1464,7 +1352,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.action.send",
     tValue: "Send",
-    description: "Mail send-send button",
     isEnabled: true,
   },
   // ========== 前端 邮件模板 ==========
@@ -1474,7 +1361,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.title",
     tValue: "邮件模板管理",
-    description: "模板-页面标题",
     isEnabled: true,
   },
   {
@@ -1483,7 +1369,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.title",
     tValue: "Mail Template Management",
-    description: "Template-page title",
     isEnabled: true,
   },
   // 通用操作按钮
@@ -1493,7 +1378,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.refresh",
     tValue: "刷新",
-    description: "通用-刷新",
     isEnabled: true,
   },
   {
@@ -1502,7 +1386,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.refresh",
     tValue: "Refresh",
-    description: "Common-refresh",
     isEnabled: true,
   },
   // ========== 系统-用户管理 ==========
@@ -1512,7 +1395,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.user.title",
     tValue: "用户管理",
-    description: "用户管理-页面标题",
     isEnabled: true,
   },
   {
@@ -1521,7 +1403,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.user.title",
     tValue: "User Management",
-    description: "System user-page title",
     isEnabled: true,
   },
   {
@@ -1530,7 +1411,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.user.columns.status",
     tValue: "状态",
-    description: "用户管理-列-状态",
     isEnabled: true,
   },
   {
@@ -1539,7 +1419,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.user.columns.status",
     tValue: "Status",
-    description: "System user-column-status",
     isEnabled: true,
   },
   // 表单
@@ -1549,7 +1428,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.user.form.password",
     tValue: "密码",
-    description: "用户管理-表单-密码",
     isEnabled: true,
   },
   {
@@ -1558,7 +1436,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.user.form.password",
     tValue: "Password",
-    description: "System user-form password",
     isEnabled: true,
   },
   // ========== 系统-部门管理 ==========
@@ -1568,7 +1445,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.title",
     tValue: "部门管理",
-    description: "部门管理-页面标题",
     isEnabled: true,
   },
   {
@@ -1577,7 +1453,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.title",
     tValue: "Department Management",
-    description: "System department-page title",
     isEnabled: true,
   },
   // 通知与错误
@@ -1587,7 +1462,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.form.name",
     tValue: "名称",
-    description: "部门-表单-名称",
     isEnabled: true,
   },
   {
@@ -1596,7 +1470,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.form.name",
     tValue: "Name",
-    description: "Department-form name",
     isEnabled: true,
   },
   // ========== i18n-翻译管理 前端界面 ==========
@@ -1605,8 +1478,7 @@ export const initialI18nData = [
     business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "i18n.translation.title",
-    tValue: "多语言管理",
-    description: "翻译管理-页面标题",
+    tValue: "翻译管理",
     isEnabled: true,
   },
   {
@@ -1614,8 +1486,7 @@ export const initialI18nData = [
     business: "i18n.translation",
     langCode: "en-US",
     tKey: "i18n.translation.title",
-    tValue: "I18n Management",
-    description: "Translation-page title",
+    tValue: "Translation Management",
     isEnabled: true,
   },
   // 表单字段
@@ -1625,7 +1496,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.form.application",
     tValue: "应用",
-    description: "翻译管理-表单-应用",
     isEnabled: true,
   },
   {
@@ -1634,7 +1504,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.form.application",
     tValue: "Application",
-    description: "Translation-form application",
     isEnabled: true,
   },
   {
@@ -1643,7 +1512,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.form.business",
     tValue: "业务",
-    description: "翻译管理-表单-业务",
     isEnabled: true,
   },
   {
@@ -1652,7 +1520,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.form.business",
     tValue: "Business",
-    description: "Translation-form business",
     isEnabled: true,
   },
   {
@@ -1661,7 +1528,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.form.langCode",
     tValue: "语言代码",
-    description: "翻译管理-表单-语言代码",
     isEnabled: true,
   },
   {
@@ -1670,7 +1536,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.form.langCode",
     tValue: "Language Code",
-    description: "Translation-form langCode",
     isEnabled: true,
   },
   {
@@ -1679,7 +1544,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.form.tKey",
     tValue: "翻译键",
-    description: "翻译管理-表单-翻译键",
     isEnabled: true,
   },
   {
@@ -1688,7 +1552,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.form.tKey",
     tValue: "Translation Key",
-    description: "Translation-form key",
     isEnabled: true,
   },
   {
@@ -1697,7 +1560,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.form.tValue",
     tValue: "翻译值",
-    description: "翻译管理-表单-翻译值",
     isEnabled: true,
   },
   {
@@ -1706,54 +1568,47 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.form.tValue",
     tValue: "Translation Value",
-    description: "Translation-form value",
     isEnabled: true,
   },
   // 开关显示
   {
     application: "frontend",
-    business: "i18n.translation",
+    business: "form",
     langCode: "zh-CN",
-    tKey: "i18n.translation.switch.enabled",
+    tKey: "switch.enabled",
     tValue: "已启用",
-    description: "翻译管理-开关-已启用",
     isEnabled: true,
   },
   {
     application: "frontend",
-    business: "i18n.translation",
+    business: "form",
     langCode: "en-US",
-    tKey: "i18n.translation.switch.enabled",
+    tKey: "switch.enabled",
     tValue: "Enabled",
-    description: "Translation-switch enabled",
     isEnabled: true,
   },
   {
     application: "frontend",
-    business: "i18n.translation",
+    business: "form",
     langCode: "zh-CN",
-    tKey: "i18n.translation.switch.disabled",
+    tKey: "switch.disabled",
     tValue: "已禁用",
-    description: "翻译管理-开关-已禁用",
     isEnabled: true,
   },
   {
     application: "frontend",
-    business: "i18n.translation",
+    business: "form",
     langCode: "en-US",
-    tKey: "i18n.translation.switch.disabled",
+    tKey: "switch.disabled",
     tValue: "Disabled",
-    description: "Translation-switch disabled",
     isEnabled: true,
   },
-  // ===== Common additions =====
   {
     application: "frontend",
     business: "common",
     langCode: "zh-CN",
     tKey: "common.cancel",
     tValue: "取消",
-    description: "Common-cancel",
     isEnabled: true,
   },
   {
@@ -1762,7 +1617,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.cancel",
     tValue: "Cancel",
-    description: "Common-cancel",
     isEnabled: true,
   },
   {
@@ -1771,7 +1625,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.actions.update",
     tValue: "更新",
-    description: "Common-update",
     isEnabled: true,
   },
   {
@@ -1780,7 +1633,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.update",
     tValue: "Update",
-    description: "Common-update",
     isEnabled: true,
   },
   {
@@ -1789,7 +1641,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.clear",
     tValue: "清除",
-    description: "Common-clear",
     isEnabled: true,
   },
   {
@@ -1798,7 +1649,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.clear",
     tValue: "Clear",
-    description: "Common-clear",
     isEnabled: true,
   },
   {
@@ -1807,7 +1657,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.table.pageSizeLabel",
     tValue: "每页条数",
-    description: "Common-table page size label",
     isEnabled: true,
   },
   {
@@ -1816,7 +1665,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.table.pageSizeLabel",
     tValue: "Items per page",
-    description: "Common-table page size label",
     isEnabled: true,
   },
   {
@@ -1825,7 +1673,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.noData",
     tValue: "暂无数据",
-    description: "Common-no data",
     isEnabled: true,
   },
   {
@@ -1834,7 +1681,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.noData",
     tValue: "No data",
-    description: "Common-no data",
     isEnabled: true,
   },
   {
@@ -1843,7 +1689,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.language",
     tValue: "语言",
-    description: "Common-language",
     isEnabled: true,
   },
   {
@@ -1852,7 +1697,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.language",
     tValue: "Language",
-    description: "Common-language",
     isEnabled: true,
   },
   {
@@ -1861,7 +1705,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.category",
     tValue: "分类",
-    description: "Common-category",
     isEnabled: true,
   },
   {
@@ -1870,7 +1713,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.category",
     tValue: "Category",
-    description: "Common-category",
     isEnabled: true,
   },
   {
@@ -1879,7 +1721,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.close",
     tValue: "关闭",
-    description: "Common-close",
     isEnabled: true,
   },
   {
@@ -1888,7 +1729,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.close",
     tValue: "Close",
-    description: "Common-close",
     isEnabled: true,
   },
 
@@ -1899,7 +1739,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.title",
     tValue: "发送邮件",
-    description: "Mail send-title",
     isEnabled: true,
   },
   {
@@ -1908,7 +1747,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.title",
     tValue: "Send Mail",
-    description: "Mail send-title",
     isEnabled: true,
   },
   {
@@ -1917,7 +1755,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.recipients",
     tValue: "收件人",
-    description: "Mail send-recipients",
     isEnabled: true,
   },
   {
@@ -1926,7 +1763,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.recipients",
     tValue: "Recipients",
-    description: "Mail send-recipients",
     isEnabled: true,
   },
   {
@@ -1935,7 +1771,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.addRecipient",
     tValue: "添加收件人",
-    description: "Mail send-add recipient",
     isEnabled: true,
   },
   {
@@ -1944,7 +1779,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.addRecipient",
     tValue: "Add recipient",
-    description: "Mail send-add recipient",
     isEnabled: true,
   },
   {
@@ -1953,7 +1787,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.noTemplate",
     tValue: "不使用模板 - 手动编写内容",
-    description: "Mail send-no template option",
     isEnabled: true,
   },
   {
@@ -1962,7 +1795,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.noTemplate",
     tValue: "No template - write content manually",
-    description: "Mail send-no template option",
     isEnabled: true,
   },
   {
@@ -1971,7 +1803,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.templateName",
     tValue: "模板名",
-    description: "Mail send-template name label",
     isEnabled: true,
   },
   {
@@ -1980,7 +1811,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.templateName",
     tValue: "Template",
-    description: "Mail send-template name label",
     isEnabled: true,
   },
   {
@@ -1989,7 +1819,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.creator",
     tValue: "创建者",
-    description: "Mail send-creator label",
     isEnabled: true,
   },
   {
@@ -1998,7 +1827,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.creator",
     tValue: "Creator",
-    description: "Mail send-creator label",
     isEnabled: true,
   },
   {
@@ -2007,7 +1835,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.category",
     tValue: "分类",
-    description: "Mail send-category label",
     isEnabled: true,
   },
   {
@@ -2016,7 +1843,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.category",
     tValue: "Category",
-    description: "Mail send-category label",
     isEnabled: true,
   },
   {
@@ -2025,7 +1851,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.send.form.contentLabel",
     tValue: "邮件内容",
-    description: "Mail send-content label",
     isEnabled: true,
   },
   {
@@ -2034,7 +1859,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.send.form.contentLabel",
     tValue: "Mail Content",
-    description: "Mail send-content label",
     isEnabled: true,
   },
   // ===== Mail.Template additions =====
@@ -2044,7 +1868,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.name",
     tValue: "模板名称",
-    description: "Template-form name",
     isEnabled: true,
   },
   {
@@ -2053,7 +1876,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.name",
     tValue: "Template Name",
-    description: "Template-form name",
     isEnabled: true,
   },
   {
@@ -2062,7 +1884,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.nameHelp",
     tValue: "邮件模板的唯一标识名称",
-    description: "Template-form name help",
     isEnabled: true,
   },
   {
@@ -2071,7 +1892,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.nameHelp",
     tValue: "Unique identifier for the template",
-    description: "Template-form name help",
     isEnabled: true,
   },
   {
@@ -2080,7 +1900,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.title",
     tValue: "邮件标题",
-    description: "Template-form title field",
     isEnabled: true,
   },
   {
@@ -2089,7 +1908,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.title",
     tValue: "Mail Subject",
-    description: "Template-form title field",
     isEnabled: true,
   },
   {
@@ -2098,7 +1916,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.titleHelp",
     tValue: "邮件的主题行",
-    description: "Template-form title help",
     isEnabled: true,
   },
   {
@@ -2107,7 +1924,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.titleHelp",
     tValue: "Subject line of the mail",
-    description: "Template-form title help",
     isEnabled: true,
   },
   {
@@ -2116,7 +1932,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.langCodeHelp",
     tValue: "模板使用的语言代码（可选）",
-    description: "Template-form langCode help",
     isEnabled: true,
   },
   {
@@ -2125,7 +1940,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.langCodeHelp",
     tValue: "Language code for the template (optional)",
-    description: "Template-form langCode help",
     isEnabled: true,
   },
   {
@@ -2134,7 +1948,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.category",
     tValue: "模板分类",
-    description: "Template-form category",
     isEnabled: true,
   },
   {
@@ -2143,7 +1956,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.category",
     tValue: "Template Category",
-    description: "Template-form category",
     isEnabled: true,
   },
   {
@@ -2152,7 +1964,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.categoryHelp",
     tValue: "模板的分类标签（可选）",
-    description: "Template-form category help",
     isEnabled: true,
   },
   {
@@ -2161,7 +1972,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.categoryHelp",
     tValue: "Category tag for the template (optional)",
-    description: "Template-form category help",
     isEnabled: true,
   },
   {
@@ -2170,7 +1980,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.contentLabel",
     tValue: "邮件内容",
-    description: "Template-form content label",
     isEnabled: true,
   },
   {
@@ -2179,7 +1988,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.contentLabel",
     tValue: "Mail Content",
-    description: "Template-form content label",
     isEnabled: true,
   },
   {
@@ -2188,7 +1996,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.form.contentHelp",
     tValue: "使用富文本编辑器编写邮件模板内容，支持HTML格式",
-    description: "Template-form content help",
     isEnabled: true,
   },
   {
@@ -2197,7 +2004,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.form.contentHelp",
     tValue: "Use the rich text editor; HTML supported",
-    description: "Template-form content help",
     isEnabled: true,
   },
   {
@@ -2206,7 +2012,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.columns.name",
     tValue: "模板名称",
-    description: "Template-column name",
     isEnabled: true,
   },
   {
@@ -2215,7 +2020,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.columns.name",
     tValue: "Template Name",
-    description: "Template-column name",
     isEnabled: true,
   },
   {
@@ -2224,7 +2028,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.columns.title",
     tValue: "邮件标题",
-    description: "Template-column title",
     isEnabled: true,
   },
   {
@@ -2233,7 +2036,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.columns.title",
     tValue: "Mail Subject",
-    description: "Template-column title",
     isEnabled: true,
   },
   {
@@ -2242,7 +2044,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.columns.contentPreview",
     tValue: "内容预览",
-    description: "Template-column content preview",
     isEnabled: true,
   },
   {
@@ -2251,7 +2052,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.columns.contentPreview",
     tValue: "Content Preview",
-    description: "Template-column content preview",
     isEnabled: true,
   },
   {
@@ -2260,7 +2060,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.preview.title",
     tValue: "模板预览",
-    description: "Template-preview title",
     isEnabled: true,
   },
   {
@@ -2269,7 +2068,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.preview.title",
     tValue: "Template Preview",
-    description: "Template-preview title",
     isEnabled: true,
   },
   {
@@ -2278,7 +2076,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.preview.basicInfo",
     tValue: "基本信息",
-    description: "Template-preview basic info",
     isEnabled: true,
   },
   {
@@ -2287,7 +2084,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.preview.basicInfo",
     tValue: "Basic Info",
-    description: "Template-preview basic info",
     isEnabled: true,
   },
   {
@@ -2296,7 +2092,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.preview.tags",
     tValue: "标签",
-    description: "Template-preview tags",
     isEnabled: true,
   },
   {
@@ -2305,7 +2100,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.preview.tags",
     tValue: "Tags",
-    description: "Template-preview tags",
     isEnabled: true,
   },
   {
@@ -2314,7 +2108,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.template.preview.mail",
     tValue: "邮件预览",
-    description: "Template-preview mail",
     isEnabled: true,
   },
   {
@@ -2323,45 +2116,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.template.preview.mail",
     tValue: "Mail Preview",
-    description: "Template-preview mail",
-    isEnabled: true,
-  },
-
-  {
-    application: "frontend",
-    business: "i18n.translation",
-    langCode: "zh-CN",
-    tKey: "i18n.translation.filter.clear",
-    tValue: "清除筛选",
-    description: "Translation-filter clear",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "i18n.translation",
-    langCode: "en-US",
-    tKey: "i18n.translation.filter.clear",
-    tValue: "Clear filters",
-    description: "Translation-filter clear",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "i18n.translation",
-    langCode: "zh-CN",
-    tKey: "i18n.translation.delete.confirmText",
-    tValue: "确定要删除该翻译吗？此操作无法撤销。",
-    description: "Translation-delete confirm text",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "i18n.translation",
-    langCode: "en-US",
-    tKey: "i18n.translation.delete.confirmText",
-    tValue:
-      "Are you sure to delete this translation? This action cannot be undone.",
-    description: "Translation-delete confirm text",
     isEnabled: true,
   },
   {
@@ -2370,7 +2124,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.duplicate.foundPrefix",
     tValue: "发现",
-    description: "Translation-duplicate found prefix",
     isEnabled: true,
   },
   {
@@ -2379,7 +2132,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.duplicate.foundPrefix",
     tValue: "Found",
-    description: "Translation-duplicate found prefix",
     isEnabled: true,
   },
   {
@@ -2388,7 +2140,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.duplicate.foundSuffix",
     tValue: "个相同的翻译文案：",
-    description: "Translation-duplicate found suffix",
     isEnabled: true,
   },
   {
@@ -2397,7 +2148,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "i18n.translation.duplicate.foundSuffix",
     tValue: "duplicated translation(s):",
-    description: "Translation-duplicate found suffix",
     isEnabled: true,
   },
   {
@@ -2406,7 +2156,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "i18n.translation.duplicate.suggestion",
     tValue: "💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键",
-    description: "Translation-duplicate suggestion",
     isEnabled: true,
   },
   {
@@ -2416,7 +2165,104 @@ export const initialI18nData = [
     tKey: "i18n.translation.duplicate.suggestion",
     tValue:
       "Tip: Consider reusing an existing key instead of adding a new translation.",
-    description: "Translation-duplicate suggestion",
+    isEnabled: true,
+  },
+
+  // ========== i18n-地区管理 前端界面 ==========
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.title",
+    tValue: "国家地区管理",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.title",
+    tValue: "Region Management",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.form.alpha2Code",
+    tValue: "ISO两位代码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.form.alpha2Code",
+    tValue: "ISO 3166-1 alpha-2",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.form.alpha3Code",
+    tValue: "ISO三位代码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.form.alpha3Code",
+    tValue: "ISO 3166-1 alpha-3",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.form.numeric",
+    tValue: "数字代码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.form.numeric",
+    tValue: "Numeric Code",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.form.iso3166Independent",
+    tValue: "是否ISO3166独立主权国家",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.form.iso3166Independent",
+    tValue: "Is Independent Country / Region in ISO3166",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "zh-CN",
+    tKey: "i18n.region.form.businessLanguages",
+    tValue: "业务语言",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.region",
+    langCode: "en-US",
+    tKey: "i18n.region.form.businessLanguages",
+    tValue: "Business Languages",
     isEnabled: true,
   },
 
@@ -2428,7 +2274,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.status.enabled",
     tValue: "启用",
-    description: "Common-status enabled",
     isEnabled: true,
   },
   {
@@ -2437,7 +2282,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.status.enabled",
     tValue: "Enabled",
-    description: "Common-status enabled",
     isEnabled: true,
   },
   // 列名通用
@@ -2447,7 +2291,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.columns.id",
     tValue: "ID",
-    description: "Common-columns id",
     isEnabled: true,
   },
   {
@@ -2456,7 +2299,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.columns.id",
     tValue: "ID",
-    description: "Common-columns id",
     isEnabled: true,
   },
   {
@@ -2465,7 +2307,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.columns.status",
     tValue: "状态",
-    description: "Common-columns status",
     isEnabled: true,
   },
   {
@@ -2474,7 +2315,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.columns.status",
     tValue: "Status",
-    description: "Common-columns status",
     isEnabled: true,
   },
   {
@@ -2483,7 +2323,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.columns.createTime",
     tValue: "创建时间",
-    description: "Common-columns create time",
     isEnabled: true,
   },
   {
@@ -2492,7 +2331,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.columns.createTime",
     tValue: "Create Time",
-    description: "Common-columns create time",
     isEnabled: true,
   },
   {
@@ -2501,7 +2339,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.columns.updateTime",
     tValue: "更新时间",
-    description: "Common-columns update time",
     isEnabled: true,
   },
   {
@@ -2510,7 +2347,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.columns.updateTime",
     tValue: "Update Time",
-    description: "Common-columns update time",
     isEnabled: true,
   },
   {
@@ -2519,7 +2355,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.columns.actions",
     tValue: "操作",
-    description: "Common-columns actions",
     isEnabled: true,
   },
   {
@@ -2528,17 +2363,65 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.columns.actions",
     tValue: "Actions",
-    description: "Common-columns actions",
     isEnabled: true,
   },
-  // 操作按钮
+
+  // ========== i18n-语言管理 前端界面 ==========
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "zh-CN",
+    tKey: "i18n.language.title",
+    tValue: "语言管理",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "en-US",
+    tKey: "i18n.language.title",
+    tValue: "Language Management",
+    isEnabled: true,
+  },
+  // 表单字段
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "zh-CN",
+    tKey: "i18n.language.form.langCode",
+    tValue: "语言代码",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "en-US",
+    tKey: "i18n.language.form.langCode",
+    tValue: "Language Code",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "zh-CN",
+    tKey: "i18n.language.form.nativeName",
+    tValue: "本地名称",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "i18n.language",
+    langCode: "en-US",
+    tKey: "i18n.language.form.nativeName",
+    tValue: "Native Name",
+    isEnabled: true,
+  },
   {
     application: "frontend",
     business: "common",
     langCode: "zh-CN",
     tKey: "common.actions.add",
     tValue: "新增",
-    description: "Common-actions add",
     isEnabled: true,
   },
   {
@@ -2547,7 +2430,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.add",
     tValue: "Add",
-    description: "Common-actions add",
     isEnabled: true,
   },
   {
@@ -2556,7 +2438,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.actions.edit",
     tValue: "编辑",
-    description: "Common-actions edit",
     isEnabled: true,
   },
   {
@@ -2565,7 +2446,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.edit",
     tValue: "Edit",
-    description: "Common-actions edit",
     isEnabled: true,
   },
   {
@@ -2574,7 +2454,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.actions.delete",
     tValue: "删除",
-    description: "Common-actions delete",
     isEnabled: true,
   },
   {
@@ -2583,7 +2462,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.delete",
     tValue: "Delete",
-    description: "Common-actions delete",
     isEnabled: true,
   },
   {
@@ -2592,7 +2470,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.actions.save",
     tValue: "保存",
-    description: "Common-actions save",
     isEnabled: true,
   },
   {
@@ -2601,7 +2478,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.save",
     tValue: "Save",
-    description: "Common-actions save",
     isEnabled: true,
   },
   {
@@ -2610,7 +2486,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.actions.confirm",
     tValue: "确定",
-    description: "Common-actions confirm",
     isEnabled: true,
   },
   {
@@ -2619,7 +2494,38 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.confirm",
     tValue: "Confirm",
-    description: "Common-actions confirm",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "common",
+    langCode: "zh-CN",
+    tKey: "common.yes",
+    tValue: "是",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "common",
+    langCode: "en-US",
+    tKey: "common.yes",
+    tValue: "Yes",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "common",
+    langCode: "zh-CN",
+    tKey: "common.no",
+    tValue: "否",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "common",
+    langCode: "en-US",
+    tKey: "common.no",
+    tValue: "No",
     isEnabled: true,
   },
   {
@@ -2628,7 +2534,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.actions.deleteConfirmTitle",
     tValue: "确认删除",
-    description: "Common-delete confirm title",
     isEnabled: true,
   },
   {
@@ -2637,7 +2542,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.actions.deleteConfirmTitle",
     tValue: "Confirm Delete",
-    description: "Common-delete confirm title",
     isEnabled: true,
   },
   // 筛选相关
@@ -2647,7 +2551,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.title",
     tValue: "搜索与筛选",
-    description: "Common-filter title",
     isEnabled: true,
   },
   {
@@ -2656,7 +2559,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.title",
     tValue: "Search & Filter",
-    description: "Common-filter title",
     isEnabled: true,
   },
   {
@@ -2665,7 +2567,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.clear",
     tValue: "清除筛选",
-    description: "Common-filter clear",
     isEnabled: true,
   },
   {
@@ -2674,7 +2575,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.clear",
     tValue: "Clear Filters",
-    description: "Common-filter clear",
     isEnabled: true,
   },
   {
@@ -2683,7 +2583,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.keywordLabel",
     tValue: "关键字搜索",
-    description: "Common-filter keyword label",
     isEnabled: true,
   },
   {
@@ -2692,7 +2591,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.keywordLabel",
     tValue: "Keyword Search",
-    description: "Common-filter keyword label",
     isEnabled: true,
   },
   {
@@ -2701,7 +2599,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.orderBy",
     tValue: "排序字段",
-    description: "Common-filter order by",
     isEnabled: true,
   },
   {
@@ -2710,7 +2607,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.orderBy",
     tValue: "Sort By",
-    description: "Common-filter order by",
     isEnabled: true,
   },
   {
@@ -2719,7 +2615,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.sortOrder",
     tValue: "排序方式",
-    description: "Common-filter sort order",
     isEnabled: true,
   },
   {
@@ -2728,7 +2623,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.sortOrder",
     tValue: "Sort Order",
-    description: "Common-filter sort order",
     isEnabled: true,
   },
   {
@@ -2737,7 +2631,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.asc",
     tValue: "升序",
-    description: "Common-filter ascending",
     isEnabled: true,
   },
   {
@@ -2746,7 +2639,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.asc",
     tValue: "Ascending",
-    description: "Common-filter ascending",
     isEnabled: true,
   },
   {
@@ -2755,7 +2647,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.desc",
     tValue: "降序",
-    description: "Common-filter descending",
     isEnabled: true,
   },
   {
@@ -2764,7 +2655,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.desc",
     tValue: "Descending",
-    description: "Common-filter descending",
     isEnabled: true,
   },
   {
@@ -2773,7 +2663,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.unassigned",
     tValue: "未分配",
-    description: "Common-unassigned",
     isEnabled: true,
   },
   {
@@ -2782,7 +2671,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.unassigned",
     tValue: "Unassigned",
-    description: "Common-unassigned",
     isEnabled: true,
   },
   {
@@ -2791,7 +2679,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.refresh",
     tValue: "刷新",
-    description: "Common-refresh button",
     isEnabled: true,
   },
   {
@@ -2800,7 +2687,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.refresh",
     tValue: "Refresh",
-    description: "Common-refresh button",
     isEnabled: true,
   },
   {
@@ -2809,7 +2695,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.close",
     tValue: "关闭",
-    description: "Common-close button",
     isEnabled: true,
   },
   {
@@ -2818,7 +2703,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.close",
     tValue: "Close",
-    description: "Common-close button",
     isEnabled: true,
   },
 
@@ -2829,7 +2713,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.edit.newPassword",
     tValue: "新密码",
-    description: "Me-edit new password",
     isEnabled: true,
   },
   {
@@ -2838,25 +2721,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.edit.newPassword",
     tValue: "New Password",
-    description: "Me-edit new password",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "me",
-    langCode: "zh-CN",
-    tKey: "me.edit.passwordHelper",
-    tValue: "留空则不修改密码",
-    description: "Me-edit password helper text",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "me",
-    langCode: "en-US",
-    tKey: "me.edit.passwordHelper",
-    tValue: "Leave blank to keep current password",
-    description: "Me-edit password helper text",
     isEnabled: true,
   },
   {
@@ -2865,7 +2729,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.details.title",
     tValue: "个人信息",
-    description: "Me-details title",
     isEnabled: true,
   },
   {
@@ -2874,7 +2737,22 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.details.title",
     tValue: "Personal Information",
-    description: "Me-details title",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "me",
+    langCode: "zh-CN",
+    tKey: "me.details.region",
+    tValue: "国家/地区",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "me",
+    langCode: "en-US",
+    tKey: "me.details.region",
+    tValue: "Country/Region",
     isEnabled: true,
   },
   {
@@ -2883,7 +2761,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.details.department",
     tValue: "部门",
-    description: "Me-details department",
     isEnabled: true,
   },
   {
@@ -2892,7 +2769,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.details.department",
     tValue: "Department",
-    description: "Me-details department",
     isEnabled: true,
   },
   {
@@ -2901,7 +2777,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.details.role",
     tValue: "角色",
-    description: "Me-details role",
     isEnabled: true,
   },
   {
@@ -2910,7 +2785,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.details.role",
     tValue: "Role",
-    description: "Me-details role",
     isEnabled: true,
   },
   {
@@ -2919,7 +2793,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "me.details.accountStatus",
     tValue: "账户状态",
-    description: "Me-details account status",
     isEnabled: true,
   },
   {
@@ -2928,7 +2801,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "me.details.accountStatus",
     tValue: "Account Status",
-    description: "Me-details account status",
     isEnabled: true,
   },
   {
@@ -2937,7 +2809,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.status.disabled",
     tValue: "禁用",
-    description: "Common-status disabled short",
     isEnabled: true,
   },
   {
@@ -2946,7 +2817,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.status.disabled",
     tValue: "Disabled",
-    description: "Common-status disabled short",
     isEnabled: true,
   },
   {
@@ -2955,7 +2825,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.columns.name",
     tValue: "名称",
-    description: "Common-column name",
     isEnabled: true,
   },
   {
@@ -2964,7 +2833,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.columns.name",
     tValue: "Name",
-    description: "Common-column name",
     isEnabled: true,
   },
   {
@@ -2973,7 +2841,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.form.roleName",
     tValue: "角色名称",
-    description: "Common-form role name",
     isEnabled: true,
   },
   {
@@ -2982,7 +2849,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.form.roleName",
     tValue: "Role Name",
-    description: "Common-form role name",
     isEnabled: true,
   },
   {
@@ -2991,7 +2857,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.form.remark",
     tValue: "备注",
-    description: "Common-form remark",
     isEnabled: true,
   },
   {
@@ -3000,7 +2865,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.form.remark",
     tValue: "Remark",
-    description: "Common-form remark",
     isEnabled: true,
   },
   {
@@ -3009,7 +2873,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.form.permissions",
     tValue: "权限列表",
-    description: "Common-form permissions",
     isEnabled: true,
   },
   {
@@ -3018,7 +2881,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.form.permissions",
     tValue: "Permissions",
-    description: "Common-form permissions",
     isEnabled: true,
   },
   {
@@ -3027,7 +2889,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.keyword",
     tValue: "关键词",
-    description: "Common-filter keyword",
     isEnabled: true,
   },
   {
@@ -3036,7 +2897,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.keyword",
     tValue: "Keyword",
-    description: "Common-filter keyword",
     isEnabled: true,
   },
   {
@@ -3045,7 +2905,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.enabledStatus",
     tValue: "启用状态",
-    description: "Common-filter enabled status",
     isEnabled: true,
   },
   {
@@ -3054,7 +2913,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.enabledStatus",
     tValue: "Enabled Status",
-    description: "Common-filter enabled status",
     isEnabled: true,
   },
   {
@@ -3063,7 +2921,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.all",
     tValue: "全部",
-    description: "Common-filter all",
     isEnabled: true,
   },
   {
@@ -3072,7 +2929,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.all",
     tValue: "All",
-    description: "Common-filter all",
     isEnabled: true,
   },
   {
@@ -3081,7 +2937,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.filter.condition",
     tValue: "筛选条件",
-    description: "Common-filter condition",
     isEnabled: true,
   },
   {
@@ -3090,7 +2945,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.filter.condition",
     tValue: "Filter Conditions",
-    description: "Common-filter condition",
     isEnabled: true,
   },
   {
@@ -3099,7 +2953,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.role.form.permissionsHelper",
     tValue: "权限列表为JSON数组格式",
-    description: "Role-form permissions helper",
     isEnabled: true,
   },
   {
@@ -3108,7 +2961,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.role.form.permissionsHelper",
     tValue: "Permissions list in JSON array format",
-    description: "Role-form permissions helper",
     isEnabled: true,
   },
   {
@@ -3117,7 +2969,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.interact.operationSuccess",
     tValue: "操作成功",
-    description: "operation success",
     isEnabled: true,
   },
   {
@@ -3126,7 +2977,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.interact.operationSuccess",
     tValue: "Operation successful",
-    description: "operation success",
     isEnabled: true,
   },
   {
@@ -3135,7 +2985,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.actions.addSubMenu",
     tValue: "添加子菜单",
-    description: "Menu-action add sub menu",
     isEnabled: true,
   },
   {
@@ -3144,26 +2993,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.actions.addSubMenu",
     tValue: "Add Sub-menu",
-    description: "Menu-action add sub menu",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "system.menu",
-    langCode: "zh-CN",
-    tKey: "system.menu.actions.deleteConfirmSubMenu",
-    tValue: "该菜单存在子菜单，删除后子菜单也将被删除。",
-    description: "Menu-action delete confirm sub-menu",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "system.menu",
-    langCode: "en-US",
-    tKey: "system.menu.actions.deleteConfirmSubMenu",
-    tValue:
-      "This menu has sub-menus. Deleting it will also delete all sub-menus.",
-    description: "Menu-action delete confirm sub-menu",
     isEnabled: true,
   },
   {
@@ -3172,7 +3001,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.menuName",
     tValue: "菜单名称",
-    description: "Menu-form menu name",
     isEnabled: true,
   },
   {
@@ -3181,7 +3009,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.menuName",
     tValue: "Menu Name",
-    description: "Menu-form menu name",
     isEnabled: true,
   },
   {
@@ -3190,7 +3017,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.customIcon",
     tValue: "自定义图标 (Iconify格式)",
-    description: "Menu-form custom icon",
     isEnabled: true,
   },
   {
@@ -3199,7 +3025,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.customIcon",
     tValue: "Custom Icon (Iconify Format)",
-    description: "Menu-form custom icon",
     isEnabled: true,
   },
   {
@@ -3208,7 +3033,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.iconHelper",
     tValue: "例如: material-symbols:home",
-    description: "Menu-form icon helper",
     isEnabled: true,
   },
   {
@@ -3217,7 +3041,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.iconHelper",
     tValue: "e.g., material-symbols:home",
-    description: "Menu-form icon helper",
     isEnabled: true,
   },
   {
@@ -3226,7 +3049,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.routePath",
     tValue: "路由路径",
-    description: "Menu-form route path",
     isEnabled: true,
   },
   {
@@ -3235,7 +3057,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.routePath",
     tValue: "Route Path",
-    description: "Menu-form route path",
     isEnabled: true,
   },
   {
@@ -3244,7 +3065,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.pathHelper",
     tValue: "例如: /system/menu",
-    description: "Menu-form path helper",
     isEnabled: true,
   },
   {
@@ -3253,7 +3073,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.pathHelper",
     tValue: "e.g., /system/menu",
-    description: "Menu-form path helper",
     isEnabled: true,
   },
   {
@@ -3262,7 +3081,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.parentMenu",
     tValue: "父菜单",
-    description: "Menu-form parent menu",
     isEnabled: true,
   },
   {
@@ -3271,7 +3089,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.parentMenu",
     tValue: "Parent Menu",
-    description: "Menu-form parent menu",
     isEnabled: true,
   },
   {
@@ -3280,7 +3097,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.topLevelMenu",
     tValue: "无 (顶级菜单)",
-    description: "Menu-form top level menu",
     isEnabled: true,
   },
   {
@@ -3289,7 +3105,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.topLevelMenu",
     tValue: "None (Top Level)",
-    description: "Menu-form top level menu",
     isEnabled: true,
   },
   {
@@ -3298,7 +3113,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.sort",
     tValue: "排序",
-    description: "Menu-form sort",
     isEnabled: true,
   },
   {
@@ -3307,7 +3121,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.sort",
     tValue: "Sort",
-    description: "Menu-form sort",
     isEnabled: true,
   },
   {
@@ -3316,7 +3129,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.sortHelper",
     tValue: "数字越小越靠前",
-    description: "Menu-form sort helper",
     isEnabled: true,
   },
   {
@@ -3325,7 +3137,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.sortHelper",
     tValue: "Smaller numbers come first",
-    description: "Menu-form sort helper",
     isEnabled: true,
   },
   {
@@ -3334,7 +3145,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.visibleRoles",
     tValue: "可见角色",
-    description: "Menu-form visible roles",
     isEnabled: true,
   },
   {
@@ -3343,7 +3153,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.visibleRoles",
     tValue: "Visible Roles",
-    description: "Menu-form visible roles",
     isEnabled: true,
   },
   {
@@ -3352,7 +3161,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.allRolesVisible",
     tValue: "留空表示所有角色可见",
-    description: "Menu-form all roles visible",
     isEnabled: true,
   },
   {
@@ -3361,7 +3169,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.allRolesVisible",
     tValue: "Leave blank to show for all roles",
-    description: "Menu-form all roles visible",
     isEnabled: true,
   },
   {
@@ -3370,7 +3177,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.form.menuNameRequired",
     tValue: "菜单名称不能为空",
-    description: "Menu-form menu name required",
     isEnabled: true,
   },
   {
@@ -3379,7 +3185,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.form.menuNameRequired",
     tValue: "Menu name is required",
-    description: "Menu-form menu name required",
     isEnabled: true,
   },
   {
@@ -3388,7 +3193,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.form.name",
     tValue: "名称",
-    description: "Department-form name",
     isEnabled: true,
   },
   {
@@ -3397,7 +3201,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.form.name",
     tValue: "Name",
-    description: "Department-form name",
     isEnabled: true,
   },
   {
@@ -3406,7 +3209,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.form.parentDepartment",
     tValue: "上级部门",
-    description: "Department-form parent department",
     isEnabled: true,
   },
   {
@@ -3415,7 +3217,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.form.parentDepartment",
     tValue: "Parent Department",
-    description: "Department-form parent department",
     isEnabled: true,
   },
   {
@@ -3424,7 +3225,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.form.topLevelDepartment",
     tValue: "无（顶级部门）",
-    description: "Department-form top level",
     isEnabled: true,
   },
   {
@@ -3433,7 +3233,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.form.topLevelDepartment",
     tValue: "None (Top Level)",
-    description: "Department-form top level",
     isEnabled: true,
   },
   {
@@ -3442,7 +3241,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "common.form.required",
     tValue: "该项为必填项",
-    description: "form required",
     isEnabled: true,
   },
   {
@@ -3451,25 +3249,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "common.form.required",
     tValue: "This field is required",
-    description: "form required",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "common",
-    langCode: "zh-CN",
-    tKey: "common.filter.clearFilters",
-    tValue: "清除筛选",
-    description: "Common-filter clear filters",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "common",
-    langCode: "en-US",
-    tKey: "common.filter.clearFilters",
-    tValue: "Clear Filters",
-    description: "Common-filter clear filters",
     isEnabled: true,
   },
   {
@@ -3478,7 +3257,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.templateParams",
     tValue: "模板参数",
-    description: "Mail log detail-template params",
     isEnabled: true,
   },
   {
@@ -3487,7 +3265,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.templateParams",
     tValue: "Template Parameters",
-    description: "Mail log detail-template params",
     isEnabled: true,
   },
   {
@@ -3496,7 +3273,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.errorCode",
     tValue: "错误代码",
-    description: "Mail log detail-error code",
     isEnabled: true,
   },
   {
@@ -3505,7 +3281,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.errorCode",
     tValue: "Error Code",
-    description: "Mail log detail-error code",
     isEnabled: true,
   },
   {
@@ -3514,7 +3289,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "page.details",
     tValue: "详情",
-    description: "Page details",
     isEnabled: true,
   },
   {
@@ -3523,7 +3297,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "page.details",
     tValue: "Details",
-    description: "Page details",
     isEnabled: true,
   },
 
@@ -3533,7 +3306,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.errorDetails",
     tValue: "错误详情",
-    description: "Mail log detail-error details",
     isEnabled: true,
   },
   {
@@ -3542,7 +3314,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.errorDetails",
     tValue: "Error Details",
-    description: "Mail log detail-error details",
     isEnabled: true,
   },
 
@@ -3553,7 +3324,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.title",
     tValue: "邮件发送日志",
-    description: "Mail log-title",
     isEnabled: true,
   },
   {
@@ -3562,7 +3332,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.title",
     tValue: "Mail Send Log",
-    description: "Mail log-title",
     isEnabled: true,
   },
   {
@@ -3571,7 +3340,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.basicInfo",
     tValue: "基本信息",
-    description: "Mail log-detail basic info",
     isEnabled: true,
   },
   {
@@ -3580,7 +3348,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.basicInfo",
     tValue: "Basic Information",
-    description: "Mail log-detail basic info",
     isEnabled: true,
   },
   {
@@ -3589,7 +3356,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.timeInfo",
     tValue: "时间信息",
-    description: "Mail log-detail time info",
     isEnabled: true,
   },
   {
@@ -3598,7 +3364,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.timeInfo",
     tValue: "Time Information",
-    description: "Mail log-detail time info",
     isEnabled: true,
   },
   {
@@ -3607,7 +3372,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.templateInfo",
     tValue: "模板信息",
-    description: "Mail log-detail template info",
     isEnabled: true,
   },
   {
@@ -3616,7 +3380,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.templateInfo",
     tValue: "Template Information",
-    description: "Mail log-detail template info",
     isEnabled: true,
   },
   {
@@ -3625,7 +3388,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.detail.errorInfo",
     tValue: "错误信息",
-    description: "Mail log-detail error info",
     isEnabled: true,
   },
   {
@@ -3634,7 +3396,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.detail.errorInfo",
     tValue: "Error Information",
-    description: "Mail log-detail error info",
     isEnabled: true,
   },
   {
@@ -3643,7 +3404,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.columns.subject",
     tValue: "标题",
-    description: "Mail log-column subject",
     isEnabled: true,
   },
   {
@@ -3652,7 +3412,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.columns.subject",
     tValue: "Subject",
-    description: "Mail log-column subject",
     isEnabled: true,
   },
   {
@@ -3661,7 +3420,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.columns.recipient",
     tValue: "收件人",
-    description: "Mail log-column recipient",
     isEnabled: true,
   },
   {
@@ -3670,7 +3428,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.columns.recipient",
     tValue: "Recipient",
-    description: "Mail log-column recipient",
     isEnabled: true,
   },
   {
@@ -3679,7 +3436,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.columns.sender",
     tValue: "发件人",
-    description: "Mail log-column sender",
     isEnabled: true,
   },
   {
@@ -3688,7 +3444,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.columns.sender",
     tValue: "Sender",
-    description: "Mail log-column sender",
     isEnabled: true,
   },
   {
@@ -3697,7 +3452,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "mail.log.columns.sendTime",
     tValue: "发送时间",
-    description: "Mail log-column send time",
     isEnabled: true,
   },
   {
@@ -3706,7 +3460,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "mail.log.columns.sendTime",
     tValue: "Send Time",
-    description: "Mail log-column send time",
     isEnabled: true,
   },
   // ===== System.Department 部门管理翻译 =====
@@ -3716,7 +3469,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.title",
     tValue: "部门管理",
-    description: "Department-title",
     isEnabled: true,
   },
   {
@@ -3725,7 +3477,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.title",
     tValue: "Department Management",
-    description: "Department-title",
     isEnabled: true,
   },
   {
@@ -3734,7 +3485,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.department.actions.addChild",
     tValue: "添加子部门",
-    description: "Department-action add child",
     isEnabled: true,
   },
   {
@@ -3743,7 +3493,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.department.actions.addChild",
     tValue: "Add Sub-Department",
-    description: "Department-action add child",
     isEnabled: true,
   },
   // ===== System.Menu 菜单管理翻译 =====
@@ -3753,7 +3502,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.menu.title",
     tValue: "菜单管理",
-    description: "Menu-title",
     isEnabled: true,
   },
   {
@@ -3762,7 +3510,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.menu.title",
     tValue: "Menu Management",
-    description: "Menu-title",
     isEnabled: true,
   },
   // ===== Error 错误页面翻译 =====
@@ -3772,7 +3519,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "error.notFound.message",
     tValue: "页面未找到",
-    description: "Error-not found message",
     isEnabled: true,
   },
   {
@@ -3781,7 +3527,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "error.notFound.message",
     tValue: "Page Not Found",
-    description: "Error-not found message",
     isEnabled: true,
   },
   {
@@ -3790,7 +3535,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "error.notFound.backHome",
     tValue: "返回首页",
-    description: "Error-not found back home",
     isEnabled: true,
   },
   {
@@ -3799,7 +3543,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "error.notFound.backHome",
     tValue: "Back to Home",
-    description: "Error-not found back home",
     isEnabled: true,
   },
 
@@ -3810,7 +3553,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "system.role.title",
     tValue: "角色管理",
-    description: "Role-page title",
     isEnabled: true,
   },
   {
@@ -3819,7 +3561,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "system.role.title",
     tValue: "Role Management",
-    description: "Role-page title",
     isEnabled: true,
   },
   // ========== 前端通知组件多语言 ==========
@@ -3829,7 +3570,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "notification.title.error",
     tValue: "错误提示",
-    description: "通知-标题-错误",
     isEnabled: true,
   },
   {
@@ -3838,7 +3578,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "notification.title.error",
     tValue: "Error",
-    description: "Notification-title error",
     isEnabled: true,
   },
   {
@@ -3847,7 +3586,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "notification.title.warning",
     tValue: "警告",
-    description: "通知-标题-警告",
     isEnabled: true,
   },
   {
@@ -3856,7 +3594,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "notification.title.warning",
     tValue: "Warning",
-    description: "Notification-title warning",
     isEnabled: true,
   },
   {
@@ -3865,7 +3602,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "notification.title.success",
     tValue: "成功",
-    description: "通知-标题-成功",
     isEnabled: true,
   },
   {
@@ -3874,7 +3610,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "notification.title.success",
     tValue: "Success",
-    description: "Notification-title success",
     isEnabled: true,
   },
   {
@@ -3883,7 +3618,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "notification.title.info",
     tValue: "提示",
-    description: "通知-标题-信息",
     isEnabled: true,
   },
   {
@@ -3892,7 +3626,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "notification.title.info",
     tValue: "Info",
-    description: "Notification-title info",
     isEnabled: true,
   },
   // ========== 前端网关错误提示多语言 ==========
@@ -3902,7 +3635,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "gateway.error.requestFailed",
     tValue: "请求失败",
-    description: "网关-通用请求失败",
     isEnabled: true,
   },
   {
@@ -3911,7 +3643,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "gateway.error.requestFailed",
     tValue: "Request failed",
-    description: "Gateway-request failed",
     isEnabled: true,
   },
   {
@@ -3920,7 +3651,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "gateway.error.sessionExpired",
     tValue: "登录已过期，请重新登录",
-    description: "网关-登录过期",
     isEnabled: true,
   },
   {
@@ -3929,7 +3659,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "gateway.error.sessionExpired",
     tValue: "Session expired, please login again",
-    description: "Gateway-session expired",
     isEnabled: true,
   },
   {
@@ -3938,7 +3667,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "gateway.error.loginFailed",
     tValue: "登录失败，请检查用户名和密码",
-    description: "网关-登录失败",
     isEnabled: true,
   },
   {
@@ -3947,7 +3675,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "gateway.error.loginFailed",
     tValue: "Login failed, please check username and password",
-    description: "Gateway-login failed",
     isEnabled: true,
   },
   {
@@ -3956,7 +3683,6 @@ export const initialI18nData = [
     langCode: "zh-CN",
     tKey: "gateway.error.networkError",
     tValue: "网络错误",
-    description: "网关-网络错误",
     isEnabled: true,
   },
   {
@@ -3965,7 +3691,6 @@ export const initialI18nData = [
     langCode: "en-US",
     tKey: "gateway.error.networkError",
     tValue: "Network error",
-    description: "Gateway-network error",
     isEnabled: true,
   },
 ];

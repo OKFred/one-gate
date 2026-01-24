@@ -24,13 +24,6 @@ const DepartmentBasePO = {
     examples: ["技术部"],
     maxLength: 100,
   },
-  description: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "部门描述",
-    examples: ["负责技术研发工作"],
-    maxLength: 500,
-  },
   parentId: {
     type: ["number", "null"],
     nullable: true,
@@ -45,7 +38,7 @@ const DepartmentBasePO = {
     type: ["string", "null"],
     nullable: true,
     description: "备注说明",
-    maxLength: 1000,
+    maxLength: 500,
   },
 } as const satisfies Partial<Record<keyof DepartmentPOLike, JSONSchema>>;
 const DepartmentPO = {
@@ -89,7 +82,6 @@ export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 //----------------- Required Keys ----------------//
 export const DepartmentAddKeys = [
   "name",
-  "description",
   "parentId",
   "isEnabled",
   "remark",
@@ -121,7 +113,6 @@ export const DepartmentSortableKeys = [
 export const departmentTable = sqliteTable("system_department", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull().unique(),
-  description: text("description"),
   parentId: integer("parent_id"),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
@@ -138,7 +129,6 @@ export async function tableInit() {
     CREATE TABLE IF NOT EXISTS system_department (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
-      description TEXT,
       parent_id INTEGER,
       remark TEXT,
       is_enabled INTEGER NOT NULL,

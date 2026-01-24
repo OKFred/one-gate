@@ -158,7 +158,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label={t('i18n.translation.filter.clear')}
+                label={t('common.filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -219,7 +219,7 @@ const TheFilter = memo(
                 />
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.translation.switch.enabled')}</InputLabel>
+                  <InputLabel>{t('switch.enabled')}</InputLabel>
                   <Select
                     value={
                       filters.isEnabled === undefined
@@ -228,7 +228,7 @@ const TheFilter = memo(
                           ? 'enabled'
                           : 'disabled'
                     }
-                    label={t('i18n.translation.switch.enabled')}
+                    label={t('switch.enabled')}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleFilterChange(
@@ -238,8 +238,8 @@ const TheFilter = memo(
                     }}
                   >
                     <MenuItem value="all">{t('common.filter.all')}</MenuItem>
-                    <MenuItem value="enabled">{t('i18n.translation.switch.enabled')}</MenuItem>
-                    <MenuItem value="disabled">{t('i18n.translation.switch.disabled')}</MenuItem>
+                    <MenuItem value="enabled">{t('switch.enabled')}</MenuItem>
+                    <MenuItem value="disabled">{t('switch.disabled')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

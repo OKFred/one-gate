@@ -21,16 +21,10 @@ import ResponsiveList, {
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
 import { showSnackbar } from '@/components/Notification';
-import type { ListMailTemplateReq, ListMailTemplateRes } from '@/api/mail/type';
+import type { ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListMailTemplateReq['orderBy']>;
-  descend: boolean;
-}
+import type { FilterState } from './TheFilter';
 
 // 表格内部状态
 export interface TableState {
@@ -51,7 +45,7 @@ export interface TheTableRef {
 const DEFAULT_FILTERS: FilterState = {
   keyword: '',
   orderBy: 'id',
-  descend: false,
+  descend: true,
 };
 
 const TheTable = memo(
@@ -215,6 +209,10 @@ const TheTable = memo(
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
+        title: t('common.form.remark'),
+        render: (row) => row.remark || '-',
+      },
+      {
         title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
@@ -254,6 +252,11 @@ const TheTable = memo(
         type: 'content',
         label: t('common.columns.createTime'),
         render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        type: 'content',
+        label: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
       {
         type: 'tags',

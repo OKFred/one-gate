@@ -33,12 +33,12 @@ export interface TheTableRef {
 const DEFAULT_FILTERS: FilterState = {
   keyword: '',
   orderBy: 'id',
-  descend: true,
+  descend: false,
 };
 
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
-    const { formRef, filterRef } = localObj;
+    const { formRef, filterRef, enabledRegions, enabledLanguages } = localObj;
     const t = useTranslation();
 
     // 整合所有表格相关状态
@@ -122,6 +122,27 @@ const TheTable = memo(
       [roleOptions],
     );
 
+    // 根据地区ID获取地区名称
+    const getRegionName = useCallback(
+      (regionId: number | null | undefined): string => {
+        if (!regionId) return '--';
+        const region = enabledRegions.find((r) => r.id === regionId);
+        if (!region) return '--';
+        return region.alpha2Code || '--';
+      },
+      [enabledRegions],
+    );
+
+    // 根据语言代码获取语言名称
+    const getLanguageName = useCallback(
+      (langCode: string | null | undefined): string => {
+        if (!langCode) return '--';
+        const language = enabledLanguages.find((l) => l.langCode === langCode);
+        return language?.nativeName || langCode;
+      },
+      [enabledLanguages],
+    );
+
     // 获取数据的核心函数
     const fetchUsers = useCallback(
       async (searchFilters: FilterState, currentPage: number = 1) => {
@@ -199,6 +220,8 @@ const TheTable = memo(
       { title: t('login.username'), render: (row) => row.username },
       { title: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
       { title: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
+      { title: t('common.language'), render: (row) => getLanguageName(row.langCode) },
+      { title: t('me.details.region'), render: (row) => getRegionName(row.regionId) },
       {
         title: t('common.columns.status'),
         render: (row) => (
@@ -227,8 +250,26 @@ const TheTable = memo(
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.username },
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
-      { type: 'content', label: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
+      {
+        type: 'content',
+        label: t('me.details.department'),
+        render: (row) => getDepartmentName(row.departmentId),
+      },
+      {
+        type: 'content',
+        label: t('me.details.role'),
+        render: (row) => getRoleNames(row.roleIdArr),
+      },
+      {
+        type: 'content',
+        label: t('common.language'),
+        render: (row) => getLanguageName(row.langCode),
+      },
+      {
+        type: 'content',
+        label: t('me.details.region'),
+        render: (row) => getRegionName(row.regionId),
+      },
       {
         type: 'content',
         label: t('common.columns.createTime'),

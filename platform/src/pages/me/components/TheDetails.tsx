@@ -31,7 +31,7 @@ const TheDetails = memo(
     );
 
     const handleEdit = () => {
-      dataRef.current?.openEditDialog();
+      dataRef.current?.openEditInfoDialog();
     };
 
     if (!user) return null;
@@ -75,6 +75,15 @@ const TheDetails = memo(
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {user.departmentObj?.label || t('common.unassigned')}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  {t('me.details.region')}
+                </Typography>
+                <Typography variant="body1" gutterBottom>
+                  {user.regionObj?.label || t('common.unassigned')}
                 </Typography>
               </Box>
 

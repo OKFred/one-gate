@@ -30,7 +30,6 @@ export interface RoleFormRef {
 
 const DEFAULT_FORM: AddRoleReq | UpdateRoleReq = {
   name: '',
-  description: null,
   remark: null,
   permissions: null,
   isEnabled: true,
@@ -47,6 +46,7 @@ const TheForm = memo(
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
     const [form, setForm] = useState<AddRoleReq | UpdateRoleReq>(DEFAULT_FORM);
+    const [loading, setLoading] = useState(false);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -57,8 +57,7 @@ const TheForm = memo(
             setEditId(role.id!);
             setForm({
               name: role.name,
-              description: role.description,
-              remark: null,
+              remark: role.remark ?? null,
               permissions: role.permissions,
               isEnabled: role.isEnabled,
             });
@@ -80,20 +79,24 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      const formData = { ...form };
-      // 保证 remark 字段传递（允许为 null）
-      if (!('remark' in formData)) {
-        formData.remark = null;
-      }
+      setLoading(true);
 
-      if (editId) {
-        await RoleAPI.updateFn({ data: { id: editId, ...formData } as UpdateRoleReq });
-      } else {
-        await RoleAPI.addFn({ data: formData as AddRoleReq });
+      try {
+        const formData = { ...form };
+
+        if (editId) {
+          await RoleAPI.updateFn({ data: { id: editId, ...formData } as UpdateRoleReq });
+        } else {
+          await RoleAPI.addFn({ data: formData as AddRoleReq });
+        }
+        handleCancel();
+        // 刷新表格数据
+        tableRef.current?.refresh();
+      } catch (error) {
+        console.warn(error);
+      } finally {
+        setLoading(false);
       }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
     };
 
     return (
@@ -147,38 +150,6 @@ const TheForm = memo(
               />
 
               <TextField
-                label={t('common.form.remark')}
-                value={form.remark ?? ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    description: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={3}
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('form.pleaseEnter')}
-              />
-
-              <TextField
-                label={t('common.form.remark')}
-                value={form.remark ?? ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    remark: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={3}
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('form.pleaseEnter')}
-              />
-
-              <TextField
                 label={t('common.form.permissions')}
                 value={form.permissions ?? ''}
                 onChange={(e) =>
@@ -204,6 +175,24 @@ const TheForm = memo(
                 }
                 label={t('common.filter.enabledStatus')}
               />
+
+              <TextField
+                label={t('common.form.remark')}
+                value={form.remark ?? ''}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    remark: hasValue(e.target.value) ? e.target.value : null,
+                  })
+                }
+                fullWidth
+                multiline
+                rows={3}
+                size={isMobile ? 'medium' : 'medium'}
+                placeholder={t('form.pleaseEnter')}
+                inputProps={{ maxLength: 500 }}
+                helperText={`${(form.remark || '').length}/500`}
+              />
             </Stack>
           </form>
         </DialogContent>
@@ -211,14 +200,28 @@ const TheForm = memo(
         <DialogActions
           sx={{
             px: isMobile ? 2 : 3,
-            py: isMobile ? 2 : 1.5,
+            py: isMobile ? 2 : 2,
+            flexDirection: isMobile ? 'column-reverse' : 'row',
+            gap: isMobile ? 1 : 0,
           }}
         >
-          <Button onClick={handleCancel} color="inherit">
+          <Button
+            onClick={handleCancel}
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit} variant="contained" color="primary">
-            {editId ? t('common.actions.save') : t('common.actions.add')}
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
+            {t('common.actions.save')}
           </Button>
         </DialogActions>
       </Dialog>

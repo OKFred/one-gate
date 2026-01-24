@@ -12,6 +12,7 @@ import * as MailTemplateAPI from '@/api/mail/template';
 import type { ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
+import { showSnackbar } from '@/components/Notification';
 
 interface TheTemplateSelectProps extends Props {
   value: string;
@@ -52,6 +53,7 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
       const templateSubject = selectedTemplate.title || '';
       const templateHtml = selectedTemplate.content || '';
       onTemplateChange(selectedTemplateId, templateSubject, templateHtml);
+      showSnackbar({ type: 'success', message: t('mail.send.form.content.loaded') });
     } else {
       // 清除模板选择时，也清除内容
       onTemplateChange(undefined, '', '');

@@ -1,16 +1,11 @@
-/**
- * 用户中心页面 - 响应式设计
- * 展示当前用户的个人信息，支持编辑更新
- */
-
 import { useRef, useMemo } from 'react';
 import { Box } from '@mui/material';
-import { Refresh as RefreshIcon } from '@mui/icons-material';
-import { PageLayout, ResponsiveButton } from '@/components/Responsive/index';
+import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheProfile, { type TheProfileRef } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
-import TheDialog, { type TheDialogRef } from './components/TheDialog';
+import ThePasswordDialog, { type ThePasswordDialogRef } from './components/ThePasswordDialog';
+import TheEditDialog, { type TheEditDialogRef } from './components/TheEditDialog';
 import TheData, { type TheDataRef } from './components/TheData';
 
 export interface Props {
@@ -21,7 +16,8 @@ export interface LocalObj {
   dataRef: React.RefObject<TheDataRef | null>;
   profileRef: React.RefObject<TheProfileRef | null>;
   detailsRef: React.RefObject<TheDetailsRef | null>;
-  dialogRef: React.RefObject<TheDialogRef | null>;
+  passwordDialogRef: React.RefObject<ThePasswordDialogRef | null>;
+  editDialogRef: React.RefObject<TheEditDialogRef | null>;
 }
 
 export default function UserCenter() {
@@ -29,22 +25,15 @@ export default function UserCenter() {
   const dataRef = useRef<TheDataRef>(null);
   const profileRef = useRef<TheProfileRef>(null);
   const detailsRef = useRef<TheDetailsRef>(null);
-  const dialogRef = useRef<TheDialogRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ dataRef, profileRef, detailsRef, dialogRef }), []);
+  const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
+  const editDialogRef = useRef<TheEditDialogRef>(null);
+  const localObj: LocalObj = useMemo(
+    () => ({ dataRef, profileRef, detailsRef, passwordDialogRef, editDialogRef }),
+    [],
+  );
 
   return (
-    <PageLayout
-      title={t('me.title')}
-      actions={
-        <ResponsiveButton
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={() => dataRef.current?.refresh()}
-        >
-          {t('common.refresh')}
-        </ResponsiveButton>
-      }
-    >
+    <PageLayout title={t('me.title')}>
       {/* 数据管理组件 */}
       <TheData ref={dataRef} localObj={localObj} />
 
@@ -62,7 +51,8 @@ export default function UserCenter() {
       </Box>
 
       {/* 编辑用户信息对话框 */}
-      <TheDialog ref={dialogRef} localObj={localObj} />
+      <ThePasswordDialog ref={passwordDialogRef} localObj={localObj} />
+      <TheEditDialog ref={editDialogRef} localObj={localObj} />
     </PageLayout>
   );
 }

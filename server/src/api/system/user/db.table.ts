@@ -48,7 +48,14 @@ export const UserBasePO = {
     type: ["string", "null"],
     nullable: true,
     description: "备注说明",
-    maxLength: 1000,
+    maxLength: 500,
+  },
+  regionId: {
+    type: ["number", "null"],
+    nullable: true,
+    description: "国家地区ID",
+    examples: [1],
+    minimum: 1,
   },
   departmentId: {
     type: ["number", "null"],
@@ -84,6 +91,29 @@ type UserUpdatePOLike = Partial<
 // type UserDeletePOLike = Pick<UserPOLike, IndexKeyLike>;
 
 //----------------- DTO ----------------//
+const UserRegionDTO = {
+  regionObj: {
+    type: ["object", "null"],
+    nullable: true,
+    description: "国家地区对象",
+    properties: {
+      value: {
+        type: "number",
+        description: "国家地区ID",
+        examples: [1],
+        minimum: 1,
+      },
+      label: {
+        type: "string",
+        description: "国家地区二位编码",
+        examples: ["CN"],
+        maxLength: 100,
+      },
+    },
+    required: ["value", "label"],
+    additionalProperties: false,
+  },
+} as const satisfies Partial<Record<string, JSONSchema>>;
 const UserDepartmentDTO = {
   departmentObj: {
     type: ["object", "null"],
@@ -133,31 +163,20 @@ const UserRoleDTO = {
   },
 } as const satisfies Partial<Record<string, JSONSchema>>;
 type UserDTOLike = {
+  regionObj: FromSchema<(typeof UserRegionDTO)["regionObj"]> | null;
   departmentObj: FromSchema<(typeof UserDepartmentDTO)["departmentObj"]> | null;
   roleArr: FromSchema<(typeof UserRoleDTO)["roleArr"]>;
 };
-type UserDTOMapKeyLike = "departmentId" | "roleIdArr";
+type UserDTOMapKeyLike = "regionId" | "departmentId" | "roleIdArr";
 
 //----------------- VO ----------------//
 export { IndexVO }; // 删改查
 export const UserUniqueVO = UserUniquePO;
 export const UserBaseVO = {
-  langCode: {
-    type: "string",
-    description: "语言代码",
-    examples: ["en-US", "zh-CN"],
-    maxLength: 10,
-  },
-  isEnabled: {
-    type: "boolean",
-    description: "是否启用",
-  },
-  remark: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "备注说明",
-    maxLength: 1000,
-  },
+  langCode: UserBasePO["langCode"],
+  isEnabled: UserBasePO["isEnabled"],
+  remark: UserBasePO["remark"],
+  ...UserRegionDTO,
   ...UserDepartmentDTO,
   ...UserRoleDTO,
 } as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>;
@@ -201,6 +220,7 @@ export const UserAddKeys = [
   "langCode",
   "isEnabled",
   "remark",
+  "regionObj",
   "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserAddVOLike>[];
@@ -222,11 +242,13 @@ const UserBaseKeys = [
 ] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
 export const UserListKeys = [
   ...UserBaseKeys,
+  "regionId",
   "departmentId",
   "roleIdArr",
 ] as const satisfies RequiredKeys<Omit<UserPOLike, "password">>[];
 export const UserDetailKeys = [
   ...UserBaseKeys,
+  "regionObj",
   "departmentObj",
   "roleArr",
 ] as const satisfies RequiredKeys<UserVOLike>[];
@@ -237,6 +259,7 @@ export const UserSortableKeys = [
   "id",
   "username",
   "langCode",
+  "regionId",
   "departmentId",
   "isEnabled",
   "createTimeUtc",
@@ -249,6 +272,7 @@ export const userTable = sqliteTable("system_user", {
   password: text("password").notNull(),
   langCode: text("lang_code").notNull(),
   remark: text("remark"),
+  regionId: integer("region_id"),
   departmentId: integer("department_id"),
   roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>().notNull(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
@@ -268,6 +292,7 @@ export async function tableInit() {
             password TEXT NOT NULL,
             lang_code TEXT NOT NULL,
             remark TEXT,
+            region_id INTEGER,
             department_id INTEGER,
             role_id_arr TEXT NOT NULL,
             is_enabled INTEGER NOT NULL,

@@ -6,6 +6,10 @@ import { roleTable } from "@/api/system/role/db.table";
 import { menuTable } from "@/api/system/menu/db.table";
 import { initialMenuData } from "@/db/initialMenu";
 import { initialI18nData } from "./initI18n";
+import { initialRegionData } from "./initRegion";
+import { initialLanguageData } from "./initLanguage";
+import { regionTable } from "@/api/i18n/region/db.table";
+import { languageTable } from "@/api/i18n/language/db.table";
 import translationService, {
   utils as translationUtils,
 } from "@/api/i18n/translation/service";
@@ -26,7 +30,6 @@ const SUPER_ADMIN = {
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
-  description: "系统超级管理员，拥有所有权限",
   permissions: JSON.stringify([
     "system:*",
     "user:*",
@@ -145,7 +148,7 @@ async function initMenu() {
 /**
  * 初始化多语言数据
  */
-async function initI18n() {
+async function initTranslation() {
   const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
   const promises = initialI18nData.map(async (item) => {
     // 计算 hash 值
@@ -157,8 +160,7 @@ async function initI18n() {
       tKey: item.tKey,
       tValue: item.tValue,
       valueHash,
-      version: 0,
-      description: item.description,
+      remark: null,
       isEnabled: item.isEnabled,
     };
     return translationService.add.service(params, userObj, {
@@ -177,6 +179,75 @@ async function initI18n() {
 }
 
 /**
+ * 初始化语言数据
+ */
+async function initLanguage() {
+  try {
+    const countResult = await db
+      .select({ total: count(languageTable.id).as("total") })
+      .from(languageTable);
+    if (countResult[0]?.total > 0) {
+      console.log("ℹ️  语言数据已存在，跳过初始化");
+      return;
+    }
+
+    const mappedData = initialLanguageData.map((item) => ({
+      langCode: item.langCode,
+      nativeName: item.nativeName,
+      isEnabled: item.isEnabled,
+      sortOrder: item.sortOrder,
+      remark: null,
+      creatorId: SUPER_ADMIN_ID,
+    }));
+
+    await db.insert(languageTable).values(mappedData);
+    console.log(`💾 表 i18n_language 初始数据已插入 (${mappedData.length} 条)`);
+  } catch (error) {
+    console.error("❌ 语言数据初始化失败:", error);
+    throw error;
+  }
+}
+
+/**
+ * 初始化国家地区数据
+ */
+async function initCountryRegion() {
+  try {
+    const countResult = await db
+      .select({ total: count(regionTable.id).as("total") })
+      .from(regionTable);
+    if (countResult[0]?.total > 0) {
+      console.log("ℹ️  国家地区数据已存在，跳过初始化");
+      return;
+    }
+
+    const mappedData = initialRegionData.map((item) => ({
+      labels: {
+        "zh-CN": item.label_zhCN,
+        "en-US": item.label_enUS,
+      },
+      alpha2Code: item.alpha2Code,
+      alpha3Code: item.alpha3Code,
+      numeric: item.numeric,
+      iso3166Independent: item.ISO3166Independent,
+      businessLanguages: null,
+      isEnabled: true,
+      creatorId: SUPER_ADMIN_ID,
+    }));
+
+    const chunkSize = 100;
+    for (let i = 0; i < mappedData.length; i += chunkSize) {
+      const chunk = mappedData.slice(i, i + chunkSize);
+      await db.insert(regionTable).values(chunk);
+    }
+    console.log(`💾 表 i18n_region 初始数据已插入 (${mappedData.length} 条)`);
+  } catch (error) {
+    console.error("❌ 国家地区数据初始化失败:", error);
+    throw error;
+  }
+}
+
+/**
  * 初始化数据库数据
  */
 export async function initDatabase() {
@@ -191,11 +262,17 @@ export async function initDatabase() {
     // 3. 初始化菜单
     await initMenu();
 
-    // 4. 初始化多语言
-    await initI18n();
+    // 4. 初始化语言
+    await initLanguage();
 
-    // 5. 加载多语言缓存
+    // 5. 初始化多语言
+    await initTranslation();
+
+    // 6. 加载多语言缓存
     await loadI18nCache();
+
+    // 7. 初始化国家地区
+    await initCountryRegion();
 
     console.log("✅ 数据库初始化完成");
   } catch (error) {

@@ -26,6 +26,7 @@ import {
 } from "./db.table";
 import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
+import regionService, { utils as regionUtils } from "@/api/i18n/region/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
@@ -224,13 +225,15 @@ async function onAdd(
     remark,
     roleArr,
     departmentObj,
+    regionObj,
     isEnabled,
   } = params;
   const departmentId = departmentObj ? departmentObj.value : null;
+  const regionId = regionObj ? regionObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
-
-  await departmentUtils.verifyDepartment(departmentId);
+  if (departmentId) await departmentUtils.verifyDepartment(departmentId);
+  if (regionId) await regionUtils.verifyRegion(regionId);
   await roleUtils.verifyRoles(roleIdArr);
 
   // 插入用户数据
@@ -242,6 +245,7 @@ async function onAdd(
       langCode,
       remark,
       departmentId,
+      regionId,
       roleIdArr,
       isEnabled,
       creatorId,
@@ -282,7 +286,7 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, departmentObj, roleArr, ...rest } = params;
+  const { id, departmentObj, regionObj, roleArr, ...rest } = params;
   const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
@@ -290,15 +294,24 @@ async function onUpdate(
     updateTimeUtc: getCurrentTimestampUtcSql(),
     password: undefined,
     departmentId: undefined,
+    regionId: undefined,
     roleIdArr: undefined,
     isEnabled: undefined,
   };
   if (departmentObj !== undefined) {
     const departmentId = departmentObj ? departmentObj.value : null;
-    await departmentUtils.verifyDepartment(departmentId);
+    if (departmentId) await departmentUtils.verifyDepartment(departmentId);
     updateData = {
       ...updateData,
       departmentId,
+    };
+  }
+  if (regionObj !== undefined) {
+    const regionId = regionObj ? regionObj.value : null;
+    if (regionId) await regionUtils.verifyRegion(regionId);
+    updateData = {
+      ...updateData,
+      regionId,
     };
   }
   if (roleArr !== undefined) {
@@ -407,14 +420,16 @@ async function onGet(
   if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
-  const { password, departmentId, roleIdArr, ...rest } = rows[0];
-  const { departmentObj, roleArr } = await getDepartmentAndRoles(
+  const { password, departmentId, regionId, roleIdArr, ...rest } = rows[0];
+  const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
-    roleIdArr
-  );
+    regionId,
+    roleIdArr,
+  });
   return {
     ...rest,
     departmentObj,
+    regionObj,
     roleArr,
   };
 }
@@ -558,22 +573,29 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
   const userObj = userArr[0];
-  const { departmentId, roleIdArr, ...rest } = userObj;
-  const { departmentObj, roleArr } = await getDepartmentAndRoles(
+  const { departmentId, regionId, roleIdArr, ...rest } = userObj;
+  const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
-    roleIdArr
-  );
+    regionId,
+    roleIdArr,
+  });
   return {
     ...rest,
     departmentObj,
+    regionObj,
     roleArr,
   };
 }
 
-async function getDepartmentAndRoles(
-  departmentId: number | null,
-  roleIdArr: number[]
-) {
+async function getDTOs({
+  departmentId,
+  regionId,
+  roleIdArr,
+}: {
+  departmentId: number | null;
+  regionId: number | null;
+  roleIdArr: number[];
+}) {
   const departmentObj =
     departmentId === null
       ? null
@@ -584,7 +606,24 @@ async function getDepartmentAndRoles(
         };
   const roleArr =
     roleIdArr.length > 0 ? await roleUtils.getRolesByIds(roleIdArr) : [];
-  return { departmentObj, roleArr };
+  const regionObj = await getRegionObj(regionId);
+  return { regionObj, departmentObj, roleArr };
+}
+
+async function getRegionObj(
+  regionId: number | null
+): Promise<{ value: number; label: string } | null> {
+  if (regionId === null) return null;
+  try {
+    const regionData = await regionService.get.service({ id: regionId });
+    if (!regionData) return null;
+    return {
+      value: regionId,
+      label: regionData.alpha2Code,
+    };
+  } catch (error) {
+    return null;
+  }
 }
 
 export const utils = {

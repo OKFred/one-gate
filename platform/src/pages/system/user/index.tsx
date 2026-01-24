@@ -1,10 +1,13 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useState, useEffect } from 'react';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheForm, { type TheFormRef } from './components/TheForm';
 import TheTable, { type TheTableRef } from './components/TheTable';
 import TheFilter, { type TheFilterRef } from './components/TheFilter';
 import { TheActionButtons } from './components/TheActionButtons';
+import * as RegionAPI from '@/api/i18n/region';
+import * as LanguageAPI from '@/api/i18n/language';
+import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/i18n/type';
 
 export interface Props {
   localObj: LocalObj;
@@ -13,6 +16,8 @@ export interface LocalObj {
   tableRef: React.RefObject<TheTableRef | null>;
   formRef: React.RefObject<TheFormRef | null>;
   filterRef: React.RefObject<TheFilterRef | null>;
+  enabledRegions: ListAllRegionRes;
+  enabledLanguages: ListAllLanguageRes;
 }
 
 export default function UserManagement() {
@@ -20,7 +25,39 @@ export default function UserManagement() {
   const tableRef = useRef<TheTableRef>(null);
   const formRef = useRef<TheFormRef>(null);
   const filterRef = useRef<TheFilterRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
+  const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
+  const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
+  
+  const localObj: LocalObj = useMemo(
+    () => ({ tableRef, formRef, filterRef, enabledRegions, enabledLanguages }),
+    [enabledRegions, enabledLanguages]
+  );
+
+  // 获取启用的地区列表
+  useEffect(() => {
+    const fetchRegions = async () => {
+      try {
+        const res = await RegionAPI.listAllFn({ data: { isEnabled: true } });
+        setEnabledRegions(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch regions:', error);
+      }
+    };
+    fetchRegions();
+  }, []);
+
+  // 获取启用的语言列表
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const res = await LanguageAPI.listAllFn({ data: { isEnabled: true } });
+        setEnabledLanguages(res.data.data || []);
+      } catch (error) {
+        console.error('Failed to fetch languages:', error);
+      }
+    };
+    fetchLanguages();
+  }, []);
 
   return (
     <PageLayout title={t('system.user.title')} actions={<TheActionButtons formRef={formRef} />}>

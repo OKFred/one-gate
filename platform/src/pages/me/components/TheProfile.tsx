@@ -30,7 +30,7 @@ const TheProfile = memo(
     );
 
     const handleEdit = () => {
-      dataRef.current?.openEditDialog();
+      dataRef.current?.openPasswordDialog();
     };
 
     if (!user) return null;
@@ -52,16 +52,6 @@ const TheProfile = memo(
           <Typography variant="h5" gutterBottom>
             {user.username}
           </Typography>
-
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            {t('me.details.department')}: {user.departmentObj?.label || t('common.unassigned')}
-          </Typography>
-
-          <Typography variant="body2" color="text.secondary" gutterBottom>
-            {t('me.details.role')}:{' '}
-            {user.roleArr.map((role) => role.label).join(', ') || t('common.unassigned')}
-          </Typography>
-
           <Box mt={2}>
             <ResponsiveButton
               variant="outlined"
@@ -69,7 +59,7 @@ const TheProfile = memo(
               onClick={handleEdit}
               fullWidth
             >
-              {t('common.actions.edit')}
+              {t('me.changePassword.title')}
             </ResponsiveButton>
           </Box>
         </CardContent>

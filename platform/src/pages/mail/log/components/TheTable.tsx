@@ -11,16 +11,10 @@ import ResponsiveList, {
 } from '@/components/Responsive/ResponsiveList';
 import dayjs from 'dayjs';
 import * as mailLogAPI from '@/api/mail/log';
-import type { ListMailLogReq, ListMailLogRes } from '@/api/mail/type';
+import type { ListMailLogRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
-
-// 筛选状态类型
-export interface FilterState {
-  keyword: string;
-  orderBy: NonNullable<ListMailLogReq['orderBy']>;
-  descend: boolean;
-}
+import type { FilterState } from './TheFilter';
 
 // 表格内部状态
 export interface TableState {
@@ -185,6 +179,10 @@ const TheTable = memo(
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
+        title: t('common.form.remark'),
+        render: (row) => row.remark || '-',
+      },
+      {
         title: t('common.columns.actions'),
         align: 'center',
         render: (row) => (
@@ -213,6 +211,11 @@ const TheTable = memo(
         type: 'content',
         label: t('mail.log.columns.sendTime'),
         render: (row) => formatDate(row.createTimeUtc),
+      },
+      {
+        type: 'content',
+        label: t('common.form.remark'),
+        render: (row) => row.remark || '-',
       },
       {
         type: 'tags',

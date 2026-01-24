@@ -4,6 +4,702 @@
  */
 
 export interface paths {
+    "/api/v1/i18n/language/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有语言（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取语言列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加语言 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新语言 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除语言 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/language/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取语言详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nLanguageGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nLanguageGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有国家地区（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取国家地区列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加国家地区 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新国家地区 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除国家地区 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/i18n/region/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取国家地区详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["I18nRegionGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["I18nRegionGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/i18n/translation/listAll": {
         parameters: {
             query?: never;
@@ -3435,6 +4131,607 @@ export interface components {
             message: string;
             data: Record<string, never>;
         };
+        I18nLanguageListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
+        };
+        I18nLanguageListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 语言代码
+                 * @example zh-CN
+                 * @example en-US
+                 */
+                langCode?: string;
+                /**
+                 * @description 本地名称
+                 * @example 中文（中国）
+                 * @example English (US)
+                 */
+                nativeName?: string;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled?: boolean;
+                /**
+                 * @description 排序
+                 * @example 1
+                 * @example 2
+                 * @example 3
+                 */
+                sortOrder?: number;
+            }[];
+            message: string;
+        };
+        I18nLanguageListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
+        };
+        I18nLanguageListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 语言代码
+                     * @example zh-CN
+                     * @example en-US
+                     */
+                    langCode: string;
+                    /**
+                     * @description 本地名称
+                     * @example 中文（中国）
+                     * @example English (US)
+                     */
+                    nativeName: string;
+                    /**
+                     * @description 是否启用
+                     * @example true
+                     * @example false
+                     */
+                    isEnabled: boolean;
+                    /**
+                     * @description 排序
+                     * @example 1
+                     * @example 2
+                     * @example 3
+                     */
+                    sortOrder: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        I18nLanguageAddReq: {
+            /**
+             * @description 语言代码
+             * @example zh-CN
+             * @example en-US
+             */
+            langCode: string;
+            /**
+             * @description 本地名称
+             * @example 中文（中国）
+             * @example English (US)
+             */
+            nativeName: string;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled: boolean;
+            /**
+             * @description 排序
+             * @example 1
+             * @example 2
+             * @example 3
+             */
+            sortOrder: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        I18nLanguageAddRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nLanguageUpdateReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 语言代码
+             * @example zh-CN
+             * @example en-US
+             */
+            langCode?: string;
+            /**
+             * @description 本地名称
+             * @example 中文（中国）
+             * @example English (US)
+             */
+            nativeName?: string;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /**
+             * @description 排序
+             * @example 1
+             * @example 2
+             * @example 3
+             */
+            sortOrder?: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        I18nLanguageUpdateRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nLanguageDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nLanguageDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nLanguageGetReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nLanguageGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 语言代码
+                 * @example zh-CN
+                 * @example en-US
+                 */
+                langCode: string;
+                /**
+                 * @description 本地名称
+                 * @example 中文（中国）
+                 * @example English (US)
+                 */
+                nativeName: string;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled: boolean;
+                /**
+                 * @description 排序
+                 * @example 1
+                 * @example 2
+                 * @example 3
+                 */
+                sortOrder: number;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        I18nRegionListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
+        };
+        I18nRegionListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 语言对象 */
+                labels?: {
+                    /** @description 中文（中国） */
+                    "zh-CN"?: string;
+                    /** @description 英语（美国） */
+                    "en-US"?: string;
+                } & {
+                    [key: string]: unknown;
+                };
+                /** @description ISO 3166-1 alpha-2 */
+                alpha2Code?: string;
+                /** @description ISO 3166-1 alpha-3 */
+                alpha3Code?: string;
+                /**
+                 * @description ISO 3166-1 numeric
+                 * @example 156
+                 */
+                numeric?: number;
+                /** @description 是否ISO3166独立主权国家 */
+                iso3166Independent?: boolean;
+                /** @description 语言代码列表 */
+                businessLanguages?: ((string[] | null) | null) | null;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled?: boolean;
+            }[];
+            message: string;
+        };
+        I18nRegionListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
+        };
+        I18nRegionListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description ISO 3166-1 alpha-2 */
+                    alpha2Code: string;
+                    /** @description ISO 3166-1 alpha-3 */
+                    alpha3Code: string;
+                    /**
+                     * @description ISO 3166-1 numeric
+                     * @example 156
+                     */
+                    numeric: number;
+                    /** @description 语言对象 */
+                    labels: {
+                        /** @description 中文（中国） */
+                        "zh-CN"?: string;
+                        /** @description 英语（美国） */
+                        "en-US"?: string;
+                    } & {
+                        [key: string]: unknown;
+                    };
+                    /** @description 是否ISO3166独立主权国家 */
+                    iso3166Independent: boolean;
+                    /** @description 语言代码列表 */
+                    businessLanguages: ((string[] | null) | null) | null;
+                    /**
+                     * @description 是否启用
+                     * @example true
+                     * @example false
+                     */
+                    isEnabled: boolean;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        I18nRegionAddReq: {
+            /** @description ISO 3166-1 alpha-2 */
+            alpha2Code: string;
+            /** @description ISO 3166-1 alpha-3 */
+            alpha3Code: string;
+            /**
+             * @description ISO 3166-1 numeric
+             * @example 156
+             */
+            numeric: number;
+            /** @description 语言对象 */
+            labels: {
+                /** @description 中文（中国） */
+                "zh-CN"?: string;
+                /** @description 英语（美国） */
+                "en-US"?: string;
+            } & {
+                [key: string]: unknown;
+            };
+            /** @description 是否ISO3166独立主权国家 */
+            iso3166Independent: boolean;
+            /** @description 语言代码列表 */
+            businessLanguages: ((string[] | null) | null) | null;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled: boolean;
+            /** @description 备注 */
+            remark: ((string | null) | null) | null;
+        };
+        I18nRegionAddRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nRegionUpdateReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description ISO 3166-1 alpha-2 */
+            alpha2Code?: string;
+            /** @description ISO 3166-1 alpha-3 */
+            alpha3Code?: string;
+            /**
+             * @description ISO 3166-1 numeric
+             * @example 156
+             */
+            numeric?: number;
+            /** @description 语言对象 */
+            labels?: {
+                /** @description 中文（中国） */
+                "zh-CN"?: string;
+                /** @description 英语（美国） */
+                "en-US"?: string;
+            } & {
+                [key: string]: unknown;
+            };
+            /** @description 是否ISO3166独立主权国家 */
+            iso3166Independent?: boolean;
+            /** @description 语言代码列表 */
+            businessLanguages?: ((string[] | null) | null) | null;
+            /**
+             * @description 是否启用
+             * @example true
+             * @example false
+             */
+            isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        I18nRegionUpdateRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nRegionDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nRegionDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        I18nRegionGetReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        I18nRegionGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description ISO 3166-1 alpha-2 */
+                alpha2Code: string;
+                /** @description ISO 3166-1 alpha-3 */
+                alpha3Code: string;
+                /**
+                 * @description ISO 3166-1 numeric
+                 * @example 156
+                 */
+                numeric: number;
+                /** @description 语言对象 */
+                labels: {
+                    /** @description 中文（中国） */
+                    "zh-CN"?: string;
+                    /** @description 英语（美国） */
+                    "en-US"?: string;
+                } & {
+                    [key: string]: unknown;
+                };
+                /** @description 是否ISO3166独立主权国家 */
+                iso3166Independent: boolean;
+                /** @description 语言代码列表 */
+                businessLanguages: ((string[] | null) | null) | null;
+                /**
+                 * @description 是否启用
+                 * @example true
+                 * @example false
+                 */
+                isEnabled: boolean;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
         I18nTranslationListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
@@ -3610,23 +4907,16 @@ export interface components {
                      */
                     business: string;
                     /**
-                     * @description 描述信息
+                     * @description 备注说明
                      * @example 欢迎消息的翻译
                      */
-                    description: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
                     /**
                      * @description 是否启用
                      * @example true
                      * @example false
                      */
                     isEnabled: boolean;
-                    /**
-                     * @description 版本号
-                     * @example 0
-                     * @example 1
-                     * @example 2
-                     */
-                    version?: ((number | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -3681,23 +4971,16 @@ export interface components {
              */
             business: string;
             /**
-             * @description 描述信息
+             * @description 备注说明
              * @example 欢迎消息的翻译
              */
-            description: ((string | null) | null) | null;
+            remark: ((string | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
              * @example false
              */
             isEnabled: boolean;
-            /**
-             * @description 版本号
-             * @example 0
-             * @example 1
-             * @example 2
-             */
-            version?: ((number | null) | null) | null;
         };
         I18nTranslationAddRes: {
             ok: boolean;
@@ -3749,23 +5032,16 @@ export interface components {
              */
             business?: string;
             /**
-             * @description 描述信息
+             * @description 备注说明
              * @example 欢迎消息的翻译
              */
-            description?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
             /**
              * @description 是否启用
              * @example true
              * @example false
              */
             isEnabled?: boolean;
-            /**
-             * @description 版本号
-             * @example 0
-             * @example 1
-             * @example 2
-             */
-            version?: ((number | null) | null) | null;
         };
         I18nTranslationUpdateRes: {
             ok: boolean;
@@ -3842,23 +5118,16 @@ export interface components {
                  */
                 business: string;
                 /**
-                 * @description 描述信息
+                 * @description 备注说明
                  * @example 欢迎消息的翻译
                  */
-                description: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
                 /**
                  * @description 是否启用
                  * @example true
                  * @example false
                  */
                 isEnabled: boolean;
-                /**
-                 * @description 版本号
-                 * @example 0
-                 * @example 1
-                 * @example 2
-                 */
-                version?: ((number | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**
@@ -4958,6 +6227,19 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /** @description 国家地区对象 */
+                    regionObj: (({
+                        /**
+                         * @description 国家地区ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 国家地区二位编码
+                         * @example CN
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -5040,6 +6322,19 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /** @description 国家地区对象 */
+                    regionObj: (({
+                        /**
+                         * @description 国家地区ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 国家地区二位编码
+                         * @example CN
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -5124,6 +6419,19 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /** @description 国家地区对象 */
+                    regionObj: (({
+                        /**
+                         * @description 国家地区ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 国家地区二位编码
+                         * @example CN
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -5189,11 +6497,6 @@ export interface components {
                  * @example 技术部
                  */
                 name?: string;
-                /**
-                 * @description 部门描述
-                 * @example 负责技术研发工作
-                 */
-                description?: ((string | null) | null) | null;
                 /** @description 父部门ID，支持部门层级 */
                 parentId?: ((number | null) | null) | null;
                 /** @description 是否启用 */
@@ -5253,11 +6556,6 @@ export interface components {
                      * @example 技术部
                      */
                     name: string;
-                    /**
-                     * @description 部门描述
-                     * @example 负责技术研发工作
-                     */
-                    description: ((string | null) | null) | null;
                     /** @description 父部门ID，支持部门层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 是否启用 */
@@ -5288,11 +6586,6 @@ export interface components {
              * @example 技术部
              */
             name: string;
-            /**
-             * @description 部门描述
-             * @example 负责技术研发工作
-             */
-            description: ((string | null) | null) | null;
             /** @description 父部门ID，支持部门层级 */
             parentId: ((number | null) | null) | null;
             /** @description 是否启用 */
@@ -5336,11 +6629,6 @@ export interface components {
              * @example 技术部
              */
             name?: string;
-            /**
-             * @description 部门描述
-             * @example 负责技术研发工作
-             */
-            description?: ((string | null) | null) | null;
             /** @description 父部门ID，支持部门层级 */
             parentId?: ((number | null) | null) | null;
             /** @description 是否启用 */
@@ -5377,11 +6665,6 @@ export interface components {
                  * @example 技术部
                  */
                 name: string;
-                /**
-                 * @description 部门描述
-                 * @example 负责技术研发工作
-                 */
-                description: ((string | null) | null) | null;
                 /** @description 父部门ID，支持部门层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 是否启用 */
@@ -5422,11 +6705,6 @@ export interface components {
                  * @example 技术部
                  */
                 name: string;
-                /**
-                 * @description 部门描述
-                 * @example 负责技术研发工作
-                 */
-                description: ((string | null) | null) | null;
                 /** @description 父部门ID，支持部门层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 是否启用 */
@@ -5458,11 +6736,6 @@ export interface components {
                      * @example 技术部
                      */
                     name?: string;
-                    /**
-                     * @description 部门描述
-                     * @example 负责技术研发工作
-                     */
-                    description?: ((string | null) | null) | null;
                     /** @description 父部门ID，支持部门层级 */
                     parentId?: ((number | null) | null) | null;
                     /** @description 是否启用 */
@@ -5882,11 +7155,6 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /**
-                 * @description 角色描述
-                 * @example 系统管理员，拥有所有权限
-                 */
-                description?: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
                 /**
@@ -5949,11 +7217,6 @@ export interface components {
                      * @example 管理员
                      */
                     name: string;
-                    /**
-                     * @description 角色描述
-                     * @example 系统管理员，拥有所有权限
-                     */
-                    description: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark: ((string | null) | null) | null;
                     /**
@@ -5987,11 +7250,6 @@ export interface components {
              * @example 管理员
              */
             name: string;
-            /**
-             * @description 角色描述
-             * @example 系统管理员，拥有所有权限
-             */
-            description: ((string | null) | null) | null;
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
             /**
@@ -6022,11 +7280,6 @@ export interface components {
              * @example 管理员
              */
             name?: string;
-            /**
-             * @description 角色描述
-             * @example 系统管理员，拥有所有权限
-             */
-            description?: ((string | null) | null) | null;
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
             /**
@@ -6082,11 +7335,6 @@ export interface components {
                  * @example 管理员
                  */
                 name: string;
-                /**
-                 * @description 角色描述
-                 * @example 系统管理员，拥有所有权限
-                 */
-                description: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
                 /**
@@ -6119,7 +7367,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
         SystemUserListAllRes: {
             ok: boolean;
@@ -6144,6 +7392,11 @@ export interface components {
                 isEnabled?: boolean;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                regionId?: ((number | null) | null) | null;
                 /**
                  * @description 部门ID
                  * @example 1
@@ -6175,7 +7428,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
         SystemUserListRes: {
             ok: boolean;
@@ -6209,6 +7462,11 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /**
+                     * @description 国家地区ID
+                     * @example 1
+                     */
+                    regionId: ((number | null) | null) | null;
                     /**
                      * @description 部门ID
                      * @example 1
@@ -6255,6 +7513,19 @@ export interface components {
             isEnabled: boolean;
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
+            /** @description 国家地区对象 */
+            regionObj: (({
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 国家地区二位编码
+                 * @example CN
+                 */
+                label: string;
+            } | null) | null) | null;
             /** @description 部门对象 */
             departmentObj: (({
                 /**
@@ -6312,6 +7583,19 @@ export interface components {
             isEnabled?: boolean;
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
+            /** @description 国家地区对象 */
+            regionObj?: (({
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 国家地区二位编码
+                 * @example CN
+                 */
+                label: string;
+            } | null) | null) | null;
             /** @description 部门对象 */
             departmentObj?: (({
                 /**
@@ -6394,6 +7678,19 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
+                /** @description 国家地区对象 */
+                regionObj: (({
+                    /**
+                     * @description 国家地区ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 国家地区二位编码
+                     * @example CN
+                     */
+                    label: string;
+                } | null) | null) | null;
                 /** @description 部门对象 */
                 departmentObj: (({
                     /**
