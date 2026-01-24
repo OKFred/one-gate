@@ -409,6 +409,22 @@ async function uniqueCheck(
   }
 }
 
+/** 验证国家地区是否存在且可用*/
+async function verifyRegion(regionId: number): Promise<void> {
+  try {
+    const regionData = await onGet({ id: regionId });
+    if (!regionData || !regionData.isEnabled) {
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+    }
+  } catch (error) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+}
+
+export const utils = {
+  verifyRegion,
+};
+
 export default {
   listAll: listAllApi,
   list: listApi,

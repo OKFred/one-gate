@@ -161,10 +161,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             <Avatar sx={{ mr: 1 }}>{getUserAvatar()}</Avatar>
             <Box>
               <Typography variant="subtitle2">{userInfo?.username}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {userInfo?.departmentObj?.label} ·{' '}
-                {userInfo?.roleArr.map((role) => role.label).join(',')}
-              </Typography>
             </Box>
           </MenuItem>
           <Divider />

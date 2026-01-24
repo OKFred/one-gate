@@ -11,13 +11,15 @@ export interface TheDataRef {
   refresh: () => void;
   /** 获取当前用户 */
   getUser: () => GetUserRes | null;
-  /** 打开编辑对话框 */
-  openEditDialog: () => void;
+  /** 打开修改密码对话框 */
+  openPasswordDialog: () => void;
+  /** 打开修改信息对话框 */
+  openEditInfoDialog: () => void;
 }
 
 const TheData = memo(
   forwardRef<TheDataRef, Props>(({ localObj }, ref) => {
-    const { profileRef, detailsRef, passwordDialogRef } = localObj;
+    const { profileRef, detailsRef, passwordDialogRef, editDialogRef } = localObj;
     const t = useTranslation();
     const [currentUser, setCurrentUser] = useState<GetUserRes | null>(null);
 
@@ -42,7 +44,7 @@ const TheData = memo(
       } catch (error) {
         console.warn(error);
       }
-    }, [profileRef, detailsRef, t]);
+    }, [profileRef, detailsRef]);
 
     // 保存用户信息
     const handleSave = useCallback(
@@ -53,6 +55,7 @@ const TheData = memo(
           const updateData: UpdateUserReq = {
             id: currentUser.id,
             username: formData?.username,
+            regionObj: formData?.regionObj,
             departmentObj: formData?.departmentObj,
             roleArr: formData?.roleArr,
             isEnabled: formData?.isEnabled || false,
@@ -64,20 +67,28 @@ const TheData = memo(
             message: t('common.interact.operationSuccess'),
           });
           passwordDialogRef.current?.close();
+          editDialogRef.current?.close();
           await fetchCurrentUser();
         } catch (error) {
           console.warn(error);
         }
       },
-      [currentUser, fetchCurrentUser, passwordDialogRef, t],
+      [currentUser, fetchCurrentUser, passwordDialogRef, editDialogRef, t],
     );
 
     // 打开编辑对话框
-    const openEditDialog = useCallback(() => {
+    const openPasswordDialog = useCallback(() => {
       if (currentUser) {
         passwordDialogRef.current?.open(currentUser);
       }
     }, [currentUser, passwordDialogRef]);
+
+    // 打开编辑对话框
+    const openEditInfoDialog = useCallback(() => {
+      if (currentUser) {
+        editDialogRef.current?.open(currentUser);
+      }
+    }, [currentUser, editDialogRef]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -85,9 +96,10 @@ const TheData = memo(
       () => ({
         refresh: fetchCurrentUser,
         getUser: () => currentUser,
-        openEditDialog,
+        openPasswordDialog,
+        openEditInfoDialog,
       }),
-      [fetchCurrentUser, currentUser, openEditDialog],
+      [fetchCurrentUser, currentUser, openPasswordDialog, openEditInfoDialog],
     );
 
     // 初始化加载
@@ -100,7 +112,10 @@ const TheData = memo(
       if (passwordDialogRef.current) {
         passwordDialogRef.current.setSaveHandler(handleSave);
       }
-    }, [passwordDialogRef, handleSave]);
+      if (editDialogRef.current) {
+        editDialogRef.current.setSaveHandler(handleSave);
+      }
+    }, [passwordDialogRef, editDialogRef, handleSave]);
 
     return null; // 这是一个无渲染组件
   }),

@@ -8,6 +8,10 @@ export type UserObj = {
   username: string;
   langCode: string;
   isEnabled: boolean;
+  regionObj: {
+    value: number;
+    label: string;
+  } | null;
   departmentObj: {
     value: number;
     label: string;
@@ -16,7 +20,7 @@ export type UserObj = {
     value: number;
     label: string;
   }[];
-}
+};
 export type RawRouteConfig = RouteConfig & {
   method: Exclude<RouteConfig["method"], "head" | "trace">;
   request?: {

@@ -11,6 +11,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import TheProfile, { type TheProfileRef } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
 import ThePasswordDialog, { type ThePasswordDialogRef } from './components/ThePasswordDialog';
+import TheEditDialog, { type TheEditDialogRef } from './components/TheEditDialog';
 import TheData, { type TheDataRef } from './components/TheData';
 
 export interface Props {
@@ -22,6 +23,7 @@ export interface LocalObj {
   profileRef: React.RefObject<TheProfileRef | null>;
   detailsRef: React.RefObject<TheDetailsRef | null>;
   passwordDialogRef: React.RefObject<ThePasswordDialogRef | null>;
+  editDialogRef: React.RefObject<TheEditDialogRef | null>;
 }
 
 export default function UserCenter() {
@@ -30,7 +32,8 @@ export default function UserCenter() {
   const profileRef = useRef<TheProfileRef>(null);
   const detailsRef = useRef<TheDetailsRef>(null);
   const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ dataRef, profileRef, detailsRef, passwordDialogRef }), []);
+  const editDialogRef = useRef<TheEditDialogRef>(null);
+  const localObj: LocalObj = useMemo(() => ({ dataRef, profileRef, detailsRef, passwordDialogRef, editDialogRef }), []);
 
   return (
     <PageLayout
@@ -63,6 +66,7 @@ export default function UserCenter() {
 
       {/* 编辑用户信息对话框 */}
       <ThePasswordDialog ref={passwordDialogRef} localObj={localObj} />
+      <TheEditDialog ref={editDialogRef} localObj={localObj} />
     </PageLayout>
   );
 }

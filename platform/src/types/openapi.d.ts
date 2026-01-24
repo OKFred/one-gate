@@ -6227,6 +6227,19 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /** @description 国家地区对象 */
+                    regionObj: (({
+                        /**
+                         * @description 国家地区ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 国家地区二位编码
+                         * @example CN
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -6309,6 +6322,19 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /** @description 国家地区对象 */
+                    regionObj: (({
+                        /**
+                         * @description 国家地区ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 国家地区二位编码
+                         * @example CN
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -6393,6 +6419,19 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /** @description 国家地区对象 */
+                    regionObj: (({
+                        /**
+                         * @description 国家地区ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 国家地区二位编码
+                         * @example CN
+                         */
+                        label: string;
+                    } | null) | null) | null;
                     /** @description 部门对象 */
                     departmentObj: (({
                         /**
@@ -7328,7 +7367,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
         SystemUserListAllRes: {
             ok: boolean;
@@ -7353,6 +7392,11 @@ export interface components {
                 isEnabled?: boolean;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                regionId?: ((number | null) | null) | null;
                 /**
                  * @description 部门ID
                  * @example 1
@@ -7384,7 +7428,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "username" | "langCode" | "departmentId" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
         SystemUserListRes: {
             ok: boolean;
@@ -7418,6 +7462,11 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
+                    /**
+                     * @description 国家地区ID
+                     * @example 1
+                     */
+                    regionId: ((number | null) | null) | null;
                     /**
                      * @description 部门ID
                      * @example 1
@@ -7464,6 +7513,19 @@ export interface components {
             isEnabled: boolean;
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
+            /** @description 国家地区对象 */
+            regionObj: (({
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 国家地区二位编码
+                 * @example CN
+                 */
+                label: string;
+            } | null) | null) | null;
             /** @description 部门对象 */
             departmentObj: (({
                 /**
@@ -7521,6 +7583,19 @@ export interface components {
             isEnabled?: boolean;
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
+            /** @description 国家地区对象 */
+            regionObj?: (({
+                /**
+                 * @description 国家地区ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 国家地区二位编码
+                 * @example CN
+                 */
+                label: string;
+            } | null) | null) | null;
             /** @description 部门对象 */
             departmentObj?: (({
                 /**
@@ -7603,6 +7678,19 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
+                /** @description 国家地区对象 */
+                regionObj: (({
+                    /**
+                     * @description 国家地区ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 国家地区二位编码
+                     * @example CN
+                     */
+                    label: string;
+                } | null) | null) | null;
                 /** @description 部门对象 */
                 departmentObj: (({
                     /**

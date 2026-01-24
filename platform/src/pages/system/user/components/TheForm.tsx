@@ -49,6 +49,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
   username: '',
   password: '',
+  regionObj: null,
   departmentObj: null,
   roleArr: [],
   langCode: '',
@@ -59,7 +60,7 @@ const DEFAULT_FORM: AddUserReq | UpdateUserReq = {
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(function TheForm({ localObj }, ref) {
     const t = useTranslation();
-    const { tableRef } = localObj;
+    const { tableRef, enabledRegions } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
 
@@ -367,6 +368,40 @@ const TheForm = memo(
                 </Popover>
               </Box>
 
+              <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
+                <InputLabel>{t('me.details.region')}</InputLabel>
+                <Select
+                  value={form.regionObj?.value || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value) {
+                      const region = enabledRegions.find((r) => r.id === value);
+                      setForm({
+                        ...form,
+                        regionObj: region
+                          ? {
+                              value: region.id,
+                              label: region.alpha2Code || '',
+                            }
+                          : null,
+                      });
+                    } else {
+                      setForm({ ...form, regionObj: null });
+                    }
+                  }}
+                  label={t('me.details.region')}
+                >
+                  <MenuItem value="">
+                    <em>{t('form.select')}</em>
+                  </MenuItem>
+                  {enabledRegions.map((region) => (
+                    <MenuItem key={region.id} value={region.id}>
+                      {region.alpha2Code}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
               <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
                 <InputLabel>{t('menu.system.role')}</InputLabel>
                 <Select
@@ -407,7 +442,7 @@ const TheForm = memo(
 
               <TextField
                 label={t('common.form.remark')}
-                value={form.remark ?? null}
+                value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({ ...form, remark: e.target.value ? e.target.value : null })
                 }
