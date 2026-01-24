@@ -2136,39 +2136,6 @@ export const initialI18nData = [
     tValue: "Region Management",
     isEnabled: true,
   },
-  // 表单字段
-  {
-    application: "frontend",
-    business: "i18n.region",
-    langCode: "zh-CN",
-    tKey: "i18n.region.form.labelZhCN",
-    tValue: "中文名称",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "i18n.region",
-    langCode: "en-US",
-    tKey: "i18n.region.form.labelZhCN",
-    tValue: "Chinese Name",
-    isEnabled: true,
-  },/* 
-  {
-    application: "frontend",
-    business: "i18n.region",
-    langCode: "zh-CN",
-    tKey: "i18n.region.form.labelEnUS",
-    tValue: "英文名称",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "i18n.region",
-    langCode: "en-US",
-    tKey: "i18n.region.form.labelEnUS",
-    tValue: "English Name",
-    isEnabled: true,
-  }, */
   {
     application: "frontend",
     business: "i18n.region",

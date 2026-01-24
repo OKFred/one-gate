@@ -37,7 +37,7 @@ const DEFAULT_FILTERS: FilterState = {
 
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
-    const { formRef, filterRef } = localObj;
+    const { formRef, filterRef, enabledLanguages } = localObj;
     const t = useTranslation();
 
     // 整合所有表格相关状态
@@ -132,8 +132,14 @@ const TheTable = memo(
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('i18n.region.form.labelZhCN'), render: (row) => row.labelZhCN },
-      { title: t('i18n.region.form.labelEnUS'), render: (row) => row.labelEnUS },
+      // 动态添加语言列
+      ...enabledLanguages
+        .filter((lang) => lang.langCode)
+        .map((lang) => ({
+          title: lang.nativeName || lang.langCode || '',
+          render: (row: TableState['list'][0]) =>
+            (row.labels as Record<string, string | undefined>)?.[lang.langCode!] || '-',
+        })),
       {
         title: t('i18n.region.form.alpha2Code'),
         render: (row) => (
@@ -162,9 +168,7 @@ const TheTable = memo(
         title: t('common.filter.enabledStatus'),
         render: (row) => (
           <Chip
-            label={
-              row.isEnabled ? t('switch.enabled') : t('switch.disabled')
-            }
+            label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
             variant="outlined"
@@ -186,8 +190,30 @@ const TheTable = memo(
 
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
-      { type: 'title', render: (row) => `${row.labelZhCN} / ${row.labelEnUS}` },
+      {
+        type: 'title',
+        render: (row) => {
+          // 显示第一个语言的标签
+          const firstLang = enabledLanguages[0];
+          if (firstLang?.langCode) {
+            return (
+              (row.labels as Record<string, string | undefined>)?.[firstLang.langCode] ||
+              row.alpha2Code
+            );
+          }
+          return row.alpha2Code;
+        },
+      },
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      // 动态添加语言字段
+      ...enabledLanguages
+        .filter((lang) => lang.langCode)
+        .map((lang) => ({
+          type: 'content' as const,
+          label: lang.nativeName || lang.langCode || '',
+          render: (row: TableState['list'][0]) =>
+            (row.labels as Record<string, string | undefined>)?.[lang.langCode!] || '-',
+        })),
       {
         type: 'tags',
         render: (row) => (
@@ -202,9 +228,7 @@ const TheTable = memo(
               variant="outlined"
             />
             <Chip
-              label={
-                row.isEnabled ? t('switch.enabled') : t('switch.disabled')
-              }
+              label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
               variant="outlined"

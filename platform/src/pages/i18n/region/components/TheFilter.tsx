@@ -214,8 +214,6 @@ const TheFilter = memo(
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
                     <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="labelZhCN">{t('i18n.region.form.labelZhCN')}</MenuItem>
-                    <MenuItem value="labelEnUS">{t('i18n.region.form.labelEnUS')}</MenuItem>
                     <MenuItem value="alpha2Code">{t('i18n.region.form.alpha2Code')}</MenuItem>
                     <MenuItem value="alpha3Code">{t('i18n.region.form.alpha3Code')}</MenuItem>
                     <MenuItem value="numeric">{t('i18n.region.form.numeric')}</MenuItem>

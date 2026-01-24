@@ -32,13 +32,13 @@ export interface TheFormRef {
   close: () => void;
 }
 
-const DEFAULT_FORM: AddRegionReq = {
-  labelZhCN: '',
-  labelEnUS: '',
+const DEFAULT_FORM: Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> } = {
+  labels: {},
   alpha2Code: '',
   alpha3Code: '',
   numeric: 0,
   iso3166Independent: true,
+  languages: null,
   isEnabled: true,
   remark: '',
 };
@@ -46,14 +46,16 @@ const DEFAULT_FORM: AddRegionReq = {
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
     const t = useTranslation();
-    const { tableRef } = localObj;
+    const { tableRef, enabledLanguages } = localObj;
     const theme = useTheme();
     const { isMobile } = useResponsive();
 
     // 内部状态管理
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<AddRegionReq>(DEFAULT_FORM);
+    const [form, setForm] = useState<
+      Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> }
+    >(DEFAULT_FORM);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -61,18 +63,33 @@ const TheForm = memo(
       () => ({
         openAdd: () => {
           setEditId(null);
-          setForm(DEFAULT_FORM);
+          // 初始化labels，为每个启用的语言创建空字符串
+          const initialLabels: Record<string, string> = {};
+          enabledLanguages.forEach((lang) => {
+            if (lang.langCode) {
+              initialLabels[lang.langCode] = '';
+            }
+          });
+          setForm({ ...DEFAULT_FORM, labels: initialLabels });
           setOpen(true);
         },
         openEdit: (row: TableState['list'][0]) => {
           setEditId(row.id!);
+          // 确保labels包含所有启用的语言
+          const labels: Record<string, string> = {};
+          enabledLanguages.forEach((lang) => {
+            if (lang.langCode) {
+              labels[lang.langCode] =
+                (row.labels as Record<string, string | undefined>)?.[lang.langCode] || '';
+            }
+          });
           setForm({
-            labelZhCN: row.labelZhCN || '',
-            labelEnUS: row.labelEnUS || '',
+            labels,
             alpha2Code: row.alpha2Code || '',
             alpha3Code: row.alpha3Code || '',
             numeric: row.numeric || 0,
             iso3166Independent: row.iso3166Independent ?? true,
+            languages: row.languages,
             isEnabled: row.isEnabled,
             remark: row.remark || '',
           });
@@ -82,7 +99,7 @@ const TheForm = memo(
           handleCancel();
         },
       }),
-      [],
+      [enabledLanguages],
     );
 
     const handleCancel = () => {
@@ -144,27 +161,29 @@ const TheForm = memo(
         >
           <form onSubmit={handleSubmit}>
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
-                  label={t('i18n.region.form.labelZhCN')}
-                  value={form.labelZhCN}
-                  onChange={(e) => setForm({ ...form, labelZhCN: e.target.value })}
-                  required
-                  fullWidth
-                  size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.region.form.labelZhCN')}
-                />
-
-                <TextField
-                  label={t('i18n.region.form.labelEnUS')}
-                  value={form.labelEnUS}
-                  onChange={(e) => setForm({ ...form, labelEnUS: e.target.value })}
-                  required
-                  fullWidth
-                  size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.region.form.labelEnUS')}
-                />
-              </Stack>
+              {/* 动态语言字段 */}
+              {enabledLanguages.map((lang) => {
+                if (!lang.langCode) return null;
+                const langCode = lang.langCode;
+                return (
+                  <TextField
+                    key={langCode}
+                    label={lang.nativeName || langCode}
+                    value={form.labels[langCode] || ''}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        labels: { ...form.labels, [langCode]: e.target.value },
+                      })
+                    }
+                    required
+                    fullWidth
+                    size={isMobile ? 'medium' : 'medium'}
+                    placeholder={lang.nativeName || langCode}
+                    helperText={`${t('i18n.region.form.labelHelp')} (${langCode})`}
+                  />
+                );
+              })}
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField

@@ -223,8 +223,8 @@ async function initCountryRegion() {
 
     const mappedData = initialRegionData.map((item) => ({
       labels: {
-        zh_CN: item.label_zhCN,
-        en_US: item.label_enUS,
+        "zh-CN": item.label_zhCN,
+        "en-US": item.label_enUS,
       },
       alpha2Code: item.alpha2Code,
       alpha3Code: item.alpha3Code,
