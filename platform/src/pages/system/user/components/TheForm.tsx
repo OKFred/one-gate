@@ -39,6 +39,7 @@ import type { AddUserReq, UpdateUserReq, TreeDepartmentRes } from '@/api/system/
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
+import { authUtils, type UserInfo } from '@/utils/auth';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -72,6 +73,13 @@ const TheForm = memo(
     const [departmentAnchorEl, setDepartmentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
     const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+    // 加载用户信息
+    useEffect(() => {
+      const user = authUtils.getUserInfo();
+      setUserInfo(user);
+    }, []);
 
     // 获取角色和部门数据
     useEffect(() => {
@@ -394,11 +402,16 @@ const TheForm = memo(
                   <MenuItem value="">
                     <em>{t('form.select')}</em>
                   </MenuItem>
-                  {enabledRegions.map((region) => (
-                    <MenuItem key={region.id} value={region.id}>
-                      {region.alpha2Code}
-                    </MenuItem>
-                  ))}
+                  {enabledRegions.map((region) => {
+                    const labels = region.labels as Record<string, string> | undefined;
+                    const displayName =
+                      labels?.[userInfo?.langCode || ''] || region.alpha2Code || '';
+                    return (
+                      <MenuItem key={region.id} value={region.id}>
+                        {displayName} ({region.alpha2Code})
+                      </MenuItem>
+                    );
+                  })}
                 </Select>
               </FormControl>
 

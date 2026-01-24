@@ -19,6 +19,7 @@ import type { GetUserRes, UpdateUserReq } from '@/api/system/type';
 import type { ListAllRegionRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
+import { authUtils, type UserInfo } from '@/utils/auth';
 
 // 暴露给父组件的方法
 export interface TheEditDialogRef {
@@ -41,6 +42,13 @@ const TheEditDialog = memo(
     const [saveHandler, setSaveHandler] = useState<((formData: UpdateUserReq) => void) | null>(
       null,
     );
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+    // 加载用户信息
+    useEffect(() => {
+      const user = authUtils.getUserInfo();
+      setUserInfo(user);
+    }, []);
 
     // 获取启用的地区列表
     useEffect(() => {
@@ -132,8 +140,7 @@ const TheEditDialog = memo(
                 </MenuItem>
                 {enabledRegions.map((region) => {
                   const labels = region.labels as Record<string, string> | undefined;
-                  const displayName =
-                    labels?.['zh-CN'] || labels?.['en-US'] || region.alpha2Code || '';
+                  const displayName = labels?.[userInfo?.langCode || ''] || region.alpha2Code || '';
                   return (
                     <MenuItem key={region.id} value={region.id}>
                       {displayName} ({region.alpha2Code})
