@@ -135,13 +135,12 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.language.form.code')}
+                  label={t('i18n.language.form.langCode')}
                   value={form.langCode}
                   onChange={(e) => setForm({ ...form, langCode: e.target.value })}
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  helperText={t('i18n.language.form.codeHelp')}
                 />
                 <TextField
                   label={t('i18n.language.form.nativeName')}
@@ -150,13 +149,12 @@ const TheForm = memo(
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  helperText={t('i18n.language.form.nativeNameHelp')}
                 />
               </Stack>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.language.form.sortOrder')}
+                  label={t('system.menu.form.sort')}
                   type="number"
                   value={form.sortOrder}
                   onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
@@ -164,21 +162,19 @@ const TheForm = memo(
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
                   inputProps={{ min: 1 }}
-                  helperText={t('i18n.language.form.sortOrderHelp')}
                 />
-                <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={form.isEnabled}
-                        onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
-                      />
-                    }
-                    label={t('i18n.language.form.isEnabled')}
-                  />
-                </Box>
               </Stack>
-
+              <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={form.isEnabled}
+                      onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
+                    />
+                  }
+                  label={t('common.filter.enabledStatus')}
+                />
+              </Box>
               <TextField
                 label={t('common.form.remark')}
                 value={form.remark || ''}

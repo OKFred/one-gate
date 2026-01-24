@@ -172,7 +172,7 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('i18n.language.columns.isEnabled')}</InputLabel>
+                  <InputLabel>{t('common.filter.enabledStatus')}</InputLabel>
                   <Select
                     value={
                       filters.isEnabled === undefined
@@ -181,7 +181,7 @@ const TheFilter = memo(
                           ? 'enabled'
                           : 'disabled'
                     }
-                    label={t('i18n.language.columns.isEnabled')}
+                    label={t('common.filter.enabledStatus')}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleFilterChange(

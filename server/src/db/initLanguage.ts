@@ -7,7 +7,7 @@ export const initialLanguageData = [
   },
   {
     langCode: "en-US",
-    nativeName: "English",
+    nativeName: "English (US)",
     isEnabled: true,
     sortOrder: 2,
   },

@@ -134,11 +134,11 @@ const TheTable = memo(
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('i18n.language.columns.code'), render: (row) => row.langCode },
-      { title: t('i18n.language.columns.nativeName'), render: (row) => row.nativeName || '-' },
-      { title: t('i18n.language.columns.sortOrder'), render: (row) => row.sortOrder },
+      { title: t('i18n.language.form.langCode'), render: (row) => row.langCode },
+      { title: t('i18n.language.form.nativeName'), render: (row) => row.nativeName || '-' },
+      { title: t('common.filter.sortOrder'), render: (row) => row.sortOrder },
       {
-        title: t('i18n.language.columns.isEnabled'),
+        title: t('common.filter.enabledStatus'),
         render: (row) => (
           <Chip
             label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
@@ -172,10 +172,10 @@ const TheTable = memo(
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.nativeName },
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('i18n.language.columns.code'), render: (row) => row.langCode },
+      { type: 'content', label: t('i18n.language.form.langCode'), render: (row) => row.langCode },
       {
         type: 'content',
-        label: t('i18n.language.columns.sortOrder'),
+        label: t('common.filter.sortOrder'),
         render: (row) => row.sortOrder,
       },
       {

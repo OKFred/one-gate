@@ -47,22 +47,22 @@ const RegionBasePO = {
     type: "object",
     description: "语言对象",
     properties: {
-      zh_CN: {
+      "zh-CN": {
         type: "string",
-        description: "中文简体",
+        description: "中文（中国）",
         maxLength: 100,
       },
-      en_US: {
+      "en-US": {
         type: "string",
-        description: "英文美国",
+        description: "英语（美国）",
         maxLength: 150,
       },
     },
-    additionalProperties: false,
+    additionalProperties: true,
   },
   iso3166Independent: {
     type: "boolean",
-    description: "是否ISO3166上标为独立主权国家",
+    description: "是否ISO3166独立主权国家",
   },
   languages: {
     type: ["array", "null"],

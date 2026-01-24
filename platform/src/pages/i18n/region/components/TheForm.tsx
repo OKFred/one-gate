@@ -180,7 +180,7 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder={lang.nativeName || langCode}
-                    helperText={`${t('i18n.region.form.labelHelp')} (${langCode})`}
+                    helperText={`(${langCode})`}
                   />
                 );
               })}

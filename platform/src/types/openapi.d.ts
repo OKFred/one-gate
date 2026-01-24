@@ -4446,10 +4446,12 @@ export interface components {
                 id: number;
                 /** @description 语言对象 */
                 labels?: {
-                    /** @description 中文简体 */
-                    zh_CN?: string;
-                    /** @description 英文美国 */
-                    en_US?: string;
+                    /** @description 中文（中国） */
+                    "zh-CN"?: string;
+                    /** @description 英语（美国） */
+                    "en-US"?: string;
+                } & {
+                    [key: string]: unknown;
                 };
                 /** @description ISO 3166-1 alpha-2 */
                 alpha2Code?: string;
@@ -4460,7 +4462,7 @@ export interface components {
                  * @example 156
                  */
                 numeric?: number;
-                /** @description 是否ISO3166上标为独立主权国家 */
+                /** @description 是否ISO3166独立主权国家 */
                 iso3166Independent?: boolean;
                 /** @description 语言代码列表 */
                 languages?: ((string[] | null) | null) | null;
@@ -4528,12 +4530,14 @@ export interface components {
                     numeric: number;
                     /** @description 语言对象 */
                     labels: {
-                        /** @description 中文简体 */
-                        zh_CN?: string;
-                        /** @description 英文美国 */
-                        en_US?: string;
+                        /** @description 中文（中国） */
+                        "zh-CN"?: string;
+                        /** @description 英语（美国） */
+                        "en-US"?: string;
+                    } & {
+                        [key: string]: unknown;
                     };
-                    /** @description 是否ISO3166上标为独立主权国家 */
+                    /** @description 是否ISO3166独立主权国家 */
                     iso3166Independent: boolean;
                     /** @description 语言代码列表 */
                     languages: ((string[] | null) | null) | null;
@@ -4575,12 +4579,14 @@ export interface components {
             numeric: number;
             /** @description 语言对象 */
             labels: {
-                /** @description 中文简体 */
-                zh_CN?: string;
-                /** @description 英文美国 */
-                en_US?: string;
+                /** @description 中文（中国） */
+                "zh-CN"?: string;
+                /** @description 英语（美国） */
+                "en-US"?: string;
+            } & {
+                [key: string]: unknown;
             };
-            /** @description 是否ISO3166上标为独立主权国家 */
+            /** @description 是否ISO3166独立主权国家 */
             iso3166Independent: boolean;
             /** @description 语言代码列表 */
             languages: ((string[] | null) | null) | null;
@@ -4619,12 +4625,14 @@ export interface components {
             numeric?: number;
             /** @description 语言对象 */
             labels?: {
-                /** @description 中文简体 */
-                zh_CN?: string;
-                /** @description 英文美国 */
-                en_US?: string;
+                /** @description 中文（中国） */
+                "zh-CN"?: string;
+                /** @description 英语（美国） */
+                "en-US"?: string;
+            } & {
+                [key: string]: unknown;
             };
-            /** @description 是否ISO3166上标为独立主权国家 */
+            /** @description 是否ISO3166独立主权国家 */
             iso3166Independent?: boolean;
             /** @description 语言代码列表 */
             languages?: ((string[] | null) | null) | null;
@@ -4688,12 +4696,14 @@ export interface components {
                 numeric: number;
                 /** @description 语言对象 */
                 labels: {
-                    /** @description 中文简体 */
-                    zh_CN?: string;
-                    /** @description 英文美国 */
-                    en_US?: string;
+                    /** @description 中文（中国） */
+                    "zh-CN"?: string;
+                    /** @description 英语（美国） */
+                    "en-US"?: string;
+                } & {
+                    [key: string]: unknown;
                 };
-                /** @description 是否ISO3166上标为独立主权国家 */
+                /** @description 是否ISO3166独立主权国家 */
                 iso3166Independent: boolean;
                 /** @description 语言代码列表 */
                 languages: ((string[] | null) | null) | null;
