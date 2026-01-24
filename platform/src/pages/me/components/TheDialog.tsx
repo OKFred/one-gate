@@ -90,14 +90,6 @@ const TheDialog = memo(
           <Box pt={1}>
             <TextField
               fullWidth
-              label={t('login.username')}
-              value={user?.username || ''}
-              margin="normal"
-              disabled
-              helperText={t('form.pleaseEnter')}
-            />
-            <TextField
-              fullWidth
               label={t('me.edit.newPassword')}
               type={showPassword ? 'text' : 'password'}
               margin="normal"
