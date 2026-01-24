@@ -175,13 +175,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={handleClose}>
-            <Avatar sx={{ mr: 1 }}>{getUserAvatar()}</Avatar>
-            <Box>
-              <Typography variant="subtitle2">{userInfo?.username}</Typography>
-            </Box>
-          </MenuItem>
-          <Divider />
           <MenuItem onClick={handleProfile}>
             <ListItemIcon>
               <AccountCircle fontSize="small" />

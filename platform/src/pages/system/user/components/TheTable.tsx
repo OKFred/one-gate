@@ -33,7 +33,7 @@ export interface TheTableRef {
 const DEFAULT_FILTERS: FilterState = {
   keyword: '',
   orderBy: 'id',
-  descend: true,
+  descend: false,
 };
 
 const TheTable = memo(
@@ -218,10 +218,10 @@ const TheTable = memo(
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('common.columns.id'), render: (row) => row.id },
       { title: t('login.username'), render: (row) => row.username },
-      { title: t('me.details.region'), render: (row) => getRegionName(row.regionId) },
       { title: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
       { title: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
       { title: t('common.language'), render: (row) => getLanguageName(row.langCode) },
+      { title: t('me.details.region'), render: (row) => getRegionName(row.regionId) },
       {
         title: t('common.columns.status'),
         render: (row) => (
@@ -252,11 +252,6 @@ const TheTable = memo(
       { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
       {
         type: 'content',
-        label: t('me.details.region'),
-        render: (row) => getRegionName(row.regionId),
-      },
-      {
-        type: 'content',
         label: t('me.details.department'),
         render: (row) => getDepartmentName(row.departmentId),
       },
@@ -269,6 +264,11 @@ const TheTable = memo(
         type: 'content',
         label: t('common.language'),
         render: (row) => getLanguageName(row.langCode),
+      },
+      {
+        type: 'content',
+        label: t('me.details.region'),
+        render: (row) => getRegionName(row.regionId),
       },
       {
         type: 'content',
