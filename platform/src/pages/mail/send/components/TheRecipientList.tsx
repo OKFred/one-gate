@@ -1,14 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, memo } from 'react';
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  IconButton,
-  Stack,
-} from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Box, TextField, Typography, IconButton, Stack } from '@mui/material';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -31,9 +24,7 @@ const TheRecipientList = memo(
     const [recipients, setRecipients] = useState<Recipient[]>([{ name: '', address: '' }]);
 
     const handleRecipientChange = (idx: number, key: string, value: string) => {
-      setRecipients((prev) =>
-        prev.map((r, i) => (i === idx ? { ...r, [key]: value } : r)),
-      );
+      setRecipients((prev) => prev.map((r, i) => (i === idx ? { ...r, [key]: value } : r)));
     };
 
     const handleAddRecipient = () => {
@@ -88,16 +79,16 @@ const TheRecipientList = memo(
                   <RemoveCircleOutlineIcon />
                 </IconButton>
               )}
+              <IconButton
+                color="success"
+                onClick={() => handleAddRecipient()}
+                aria-label={t('mail.send.form.addRecipient')}
+                size="small"
+              >
+                <AddCircleOutlineIcon />
+              </IconButton>
             </Stack>
           ))}
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={handleAddRecipient}
-            sx={{ mt: 1, width: 180 }}
-          >
-            {t('mail.send.addRecipient')}
-          </Button>
         </Stack>
       </Box>
     );
