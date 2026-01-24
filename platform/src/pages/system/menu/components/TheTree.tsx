@@ -199,7 +199,7 @@ const TheTree = memo(
                 )}
                 {!node.isEnabled && (
                   <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                    {t('i18n.translation.switch.disabled')}
+                    {t('switch.disabled')}
                   </Typography>
                 )}
               </Typography>

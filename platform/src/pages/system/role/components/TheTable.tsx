@@ -136,7 +136,7 @@ const TheTable = memo(
         title: t('common.columns.status'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('switch.enabled') : t('i18n.translation.switch.disabled')}
+            label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
@@ -174,7 +174,7 @@ const TheTable = memo(
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('switch.enabled') : t('i18n.translation.switch.disabled')}
+            label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />

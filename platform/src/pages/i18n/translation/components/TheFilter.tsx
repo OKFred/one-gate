@@ -239,7 +239,7 @@ const TheFilter = memo(
                   >
                     <MenuItem value="all">{t('common.filter.all')}</MenuItem>
                     <MenuItem value="enabled">{t('switch.enabled')}</MenuItem>
-                    <MenuItem value="disabled">{t('i18n.translation.switch.disabled')}</MenuItem>
+                    <MenuItem value="disabled">{t('switch.disabled')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

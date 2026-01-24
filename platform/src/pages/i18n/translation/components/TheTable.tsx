@@ -170,7 +170,7 @@ const TheTable = memo(
             label={
               row.isEnabled
                 ? t('switch.enabled')
-                : t('i18n.translation.switch.disabled')
+                : t('switch.disabled')
             }
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
@@ -215,7 +215,7 @@ const TheTable = memo(
               label={
                 row.isEnabled
                   ? t('switch.enabled')
-                  : t('i18n.translation.switch.disabled')
+                  : t('switch.disabled')
               }
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
