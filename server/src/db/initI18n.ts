@@ -1445,7 +1445,7 @@ export const initialI18nData = [
     business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "i18n.translation.title",
-    tValue: "多语言管理",
+    tValue: "翻译管理",
     isEnabled: true,
   },
   {
@@ -1453,7 +1453,7 @@ export const initialI18nData = [
     business: "i18n.translation",
     langCode: "en-US",
     tKey: "i18n.translation.title",
-    tValue: "I18n Management",
+    tValue: "Translation Management",
     isEnabled: true,
   },
   // 表单字段
