@@ -7,8 +7,6 @@ import type { Props } from '../index';
 
 // 暴露给父组件的方法
 export interface TheDataRef {
-  /** 刷新用户数据 */
-  refresh: () => void;
   /** 获取当前用户 */
   getUser: () => GetUserRes | null;
   /** 打开修改密码对话框 */
@@ -94,12 +92,11 @@ const TheData = memo(
     useImperativeHandle(
       ref,
       () => ({
-        refresh: fetchCurrentUser,
         getUser: () => currentUser,
         openPasswordDialog,
         openEditInfoDialog,
       }),
-      [fetchCurrentUser, currentUser, openPasswordDialog, openEditInfoDialog],
+      [currentUser, openPasswordDialog, openEditInfoDialog],
     );
 
     // 初始化加载
