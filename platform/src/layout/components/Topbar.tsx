@@ -16,7 +16,9 @@ import LanguageIcon from '@mui/icons-material/Language';
 import { authUtils, type UserInfo } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 import * as UserApiService from '@/api/system/user';
+import * as LanguageApiService from '@/api/i18n/language';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { ListAllLanguageRes } from '@/api/i18n/type';
 
 interface TopbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,6 +26,7 @@ interface TopbarProps {
 
 const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
@@ -33,6 +36,21 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   useEffect(() => {
     const user = authUtils.getUserInfo();
     setUserInfo(user);
+  }, []);
+
+  // 加载语言列表
+  useEffect(() => {
+    const loadLanguages = async () => {
+      try {
+        const response = await LanguageApiService.listAllFn({
+          data: { isEnabled: true },
+        });
+        setLanguages(response.data.data);
+      } catch (error) {
+        console.error('Failed to load languages:', error);
+      }
+    };
+    loadLanguages();
   }, []);
 
   // 处理用户菜单点击
@@ -50,10 +68,10 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   };
 
   // 处理语言切换
-  const handleChangeLanguage = async (newLang: string) => {
+  const handleChangeLanguage = async (langCode: string) => {
     if (!userInfo) return;
     try {
-      await UserApiService.updateLangCodeFn({ data: { langCode: newLang } });
+      await UserApiService.updateLangCodeFn({ data: { langCode } });
       // 刷新页面以应用新语言
       window.location.reload();
     } catch (error) {
@@ -171,18 +189,17 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
             {t('topbar.profile')}
           </MenuItem>
           <Divider />
-          <MenuItem onClick={() => handleChangeLanguage('zh-CN')}>
-            <ListItemIcon>
-              <LanguageIcon fontSize="small" />
-            </ListItemIcon>
-            简体中文 {userInfo?.langCode === 'zh-CN' && '✓'}
-          </MenuItem>
-          <MenuItem onClick={() => handleChangeLanguage('en-US')}>
-            <ListItemIcon>
-              <LanguageIcon fontSize="small" />
-            </ListItemIcon>
-            English {userInfo?.langCode === 'en-US' && '✓'}
-          </MenuItem>
+          {languages.map((language) => (
+            <MenuItem
+              key={language.langCode}
+              onClick={() => handleChangeLanguage(language.langCode!)}
+            >
+              <ListItemIcon>
+                <LanguageIcon fontSize="small" />
+              </ListItemIcon>
+              {language.nativeName} {userInfo?.langCode === language.langCode && '✓'}
+            </MenuItem>
+          ))}
           <Divider />
           <MenuItem onClick={handleLogout}>
             <ListItemIcon>

@@ -169,7 +169,7 @@ const TheForm = memo(
 
               <TextField
                 label={t('common.form.remark')}
-                value={form.remark ?? null}
+                value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({
                     ...form,

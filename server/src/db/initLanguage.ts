@@ -1,7 +1,7 @@
 export const initialLanguageData = [
   {
     langCode: "zh-CN",
-    nativeName: "简体中文",
+    nativeName: "中文（中国）",
     isEnabled: true,
     sortOrder: 1,
   },
