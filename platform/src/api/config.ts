@@ -116,7 +116,9 @@ function setupInterceptors(service: AxiosInstance) {
             beforeClose: (action, instance, done) => {
               console.log(action, instance);
               authUtils.logout();
-              window.location.href = '/login';
+              if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+              }
               done();
             },
           });
