@@ -1,4 +1,4 @@
-export const initialI18nData = [
+export const initialTranslationData = [
   // ========== 后端系统多语言 ==========
   // 中间件 - 错误处理
   {

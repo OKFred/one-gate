@@ -5,7 +5,7 @@ import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
 import { menuTable } from "@/api/system/menu/db.table";
 import { initialMenuData } from "@/db/initialMenu";
-import { initialI18nData } from "./initI18n";
+import { initialTranslationData } from "./initTranslation";
 import { initialRegionData } from "./initRegion";
 import { initialLanguageData } from "./initLanguage";
 import { regionTable } from "@/api/i18n/region/db.table";
@@ -13,7 +13,7 @@ import { languageTable } from "@/api/i18n/language/db.table";
 import translationService, {
   utils as translationUtils,
 } from "@/api/i18n/translation/service";
-import { loadI18nCache } from "@/utils/i18n";
+import { loadTranslationCache } from "@/utils/i18n";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -150,7 +150,7 @@ async function initMenu() {
  */
 async function initTranslation() {
   const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
-  const promises = initialI18nData.map(async (item) => {
+  const promises = initialTranslationData.map(async (item) => {
     // 计算 hash 值
     const valueHash = await translationUtils.calculateSHA256(item.tValue);
     const params = {
@@ -172,7 +172,7 @@ async function initTranslation() {
   const successCount = addResults.filter(
     (res) => res.status === "fulfilled"
   ).length;
-  const totalCount = initialI18nData.length;
+  const totalCount = initialTranslationData.length;
   console.log(
     `🌐 多语言数据初始化完成: ${successCount}/${totalCount} 条记录已添加`
   );
@@ -269,7 +269,7 @@ export async function initDatabase() {
     await initTranslation();
 
     // 6. 加载多语言缓存
-    await loadI18nCache();
+    await loadTranslationCache();
 
     // 7. 初始化国家地区
     await initCountryRegion();
