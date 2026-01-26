@@ -8,7 +8,7 @@ type Translations = Record<string, string>;
 let translationCache: Record<LangCode, Translations> = {};
 let version = 0;
 const subscribers = new Set<() => void>();
-const fallbackLangCode = navigator.languages.includes('zh') ? 'zh-CN' : 'en-US';
+const fallbackLangCode = navigator.languages.some((str) => str.includes('zh')) ? 'zh-CN' : 'en-US';
 const notify = () => {
   version += 1;
   subscribers.forEach((fn) => {
