@@ -48,13 +48,13 @@ const TheRecipientList = memo(
     return (
       <Box>
         <Typography fontWeight={500} mb={1}>
-          {t('mail.send.recipients')}
+          {t('send.recipients')}
         </Typography>
         <Stack spacing={1}>
           {recipients.map((r, i) => (
             <Stack direction="row" spacing={1} alignItems="center" key={i}>
               <TextField
-                placeholder={t('mail.send.form.recipientName')}
+                placeholder={t('send.dialog.recipientName')}
                 value={r.name}
                 onChange={(e) => handleRecipientChange(i, 'name', e.target.value)}
                 required
@@ -62,7 +62,7 @@ const TheRecipientList = memo(
                 sx={{ flex: 1 }}
               />
               <TextField
-                placeholder={t('mail.send.form.recipientEmail')}
+                placeholder={t('send.dialog.recipientEmail')}
                 value={r.address}
                 onChange={(e) => handleRecipientChange(i, 'address', e.target.value)}
                 required
@@ -73,7 +73,7 @@ const TheRecipientList = memo(
                 <IconButton
                   color="error"
                   onClick={() => handleRemoveRecipient(i)}
-                  aria-label={t('mail.send.form.removeRecipient')}
+                  aria-label={t('send.dialog.removeRecipient')}
                   size="small"
                 >
                   <RemoveCircleOutlineIcon />
@@ -82,7 +82,7 @@ const TheRecipientList = memo(
               <IconButton
                 color="success"
                 onClick={() => handleAddRecipient()}
-                aria-label={t('mail.send.form.addRecipient')}
+                aria-label={t('send.dialog.addRecipient')}
                 size="small"
               >
                 <AddCircleOutlineIcon />

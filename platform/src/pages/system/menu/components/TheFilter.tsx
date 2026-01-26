@@ -139,7 +139,7 @@ const TheFilter = memo(
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FilterIcon fontSize="small" />
-            <span>{t('common.filter.condition')}</span>
+            <span>{t('filter.condition')}</span>
           </Box>
           <IconButton size="small" onClick={() => setExpanded(!expanded)}>
             {expanded ? <ExpandLess /> : <ExpandMore />}
@@ -149,8 +149,8 @@ const TheFilter = memo(
         <Collapse in={expanded} timeout="auto">
           <Stack spacing={2} sx={{ mt: 2 }}>
             <TextField
-              label={t('common.filter.keyword')}
-              placeholder={t('common.filter.keywordLabel')}
+              label={t('filter.keyword')}
+              placeholder={t('filter.keywordLabel')}
               value={keywordInput}
               onChange={(e) => setKeywordInput(e.target.value)}
               fullWidth
@@ -165,15 +165,15 @@ const TheFilter = memo(
             />
 
             <FormControl size="small" fullWidth>
-              <InputLabel>{t('common.filter.enabledStatus')}</InputLabel>
+              <InputLabel>{t('filter.enabledStatus')}</InputLabel>
               <Select
                 value={isEnabledFilter}
-                label={t('common.filter.enabledStatus')}
+                label={t('filter.enabledStatus')}
                 onChange={(e) => handleEnabledChange(e.target.value)}
               >
-                <MenuItem value="all">{t('common.filter.all')}</MenuItem>
-                <MenuItem value="enabled">{t('common.status.enabled')}</MenuItem>
-                <MenuItem value="disabled">{t('common.status.disabled')}</MenuItem>
+                <MenuItem value="all">{t('filter.all')}</MenuItem>
+                <MenuItem value="enabled">{t('status.enabled')}</MenuItem>
+                <MenuItem value="disabled">{t('status.disabled')}</MenuItem>
               </Select>
             </FormControl>
           </Stack>

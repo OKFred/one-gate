@@ -31,7 +31,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('common.actions.add')}
+      {t('dialog.add')}
     </Button>
   );
 });
@@ -96,30 +96,30 @@ export const TreeNodeActionButtons = memo(
           <IconButton
             size="small"
             onClick={handleAddChild}
-            title={t('system.menu.actions.addSubMenu')}
+            title={t('menu.dialog.addSubMenu')}
           >
             <AddIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={handleEdit} title={t('common.actions.edit')}>
+          <IconButton size="small" onClick={handleEdit} title={t('dialog.edit')}>
             <EditIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={openDeleteDialog} title={t('common.actions.delete')}>
+          <IconButton size="small" onClick={openDeleteDialog} title={t('dialog.delete')}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Box>
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
+          <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('form.actions.deleteConfirmMessage')}
+              {t('table.deleteConfirm')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
+            <Button onClick={closeDeleteDialog}>{t('dialog.cancel')}</Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus>
-              {t('common.actions.delete')}
+              {t('dialog.delete')}
             </Button>
           </DialogActions>
         </Dialog>

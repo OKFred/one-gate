@@ -23,7 +23,7 @@ export default function MailLogPage() {
   const t = useTranslation();
 
   return (
-    <PageLayout title={t('mail.log.title')} actions={<TheActionButtons tableRef={tableRef} />}>
+    <PageLayout title={t('log.title')} actions={<TheActionButtons tableRef={tableRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />
       <TheDetail ref={localObj.detailRef} localObj={localObj} />

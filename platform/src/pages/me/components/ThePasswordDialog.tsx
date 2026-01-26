@@ -90,13 +90,13 @@ const ThePasswordDialog = memo(
           <Box pt={1}>
             <TextField
               fullWidth
-              label={t('me.form.currentPassword')}
+              label={t('me.table.currentPassword')}
               type="password"
               margin="normal"
             />
             <TextField
               fullWidth
-              label={t('me.edit.newPassword')}
+              label={t('me.table.newPassword')}
               type={showPassword ? 'text' : 'password'}
               margin="normal"
               slotProps={{
@@ -118,9 +118,9 @@ const ThePasswordDialog = memo(
         </DialogContent>
 
         <DialogActions>
-          <ResponsiveButton onClick={handleClose}>{t('common.cancel')}</ResponsiveButton>
+          <ResponsiveButton onClick={handleClose}>{t('dialog.cancel')}</ResponsiveButton>
           <ResponsiveButton onClick={handleSave} variant="contained">
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </ResponsiveButton>
         </DialogActions>
       </Dialog>

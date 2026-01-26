@@ -32,7 +32,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('common.actions.add')}
+      {t('dialog.add')}
     </Button>
   );
 });
@@ -102,17 +102,17 @@ export const TreeNodeActionButtons = memo(
           <IconButton
             size="small"
             onClick={handleAddChild}
-            title={t('system.department.actions.addChild')}
+            title={t('department.dialog.addChild')}
           >
             <AddIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={handleEdit} title={t('common.actions.edit')}>
+          <IconButton size="small" onClick={handleEdit} title={t('dialog.edit')}>
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
             onClick={openDeleteDialog}
-            title={t('common.actions.delete')}
+            title={t('dialog.delete')}
             disabled={hasChildren}
           >
             <DeleteIcon fontSize="small" />
@@ -121,10 +121,10 @@ export const TreeNodeActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
+          <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              {t('form.actions.deleteConfirmMessage')}
+              {t('table.deleteConfirm')}
             </DialogContentText>
             {hasChildren && (
               <Alert severity="warning" sx={{ mt: 2 }}>
@@ -133,9 +133,9 @@ export const TreeNodeActionButtons = memo(
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
+            <Button onClick={closeDeleteDialog}>{t('dialog.cancel')}</Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus disabled={hasChildren}>
-              {t('common.actions.delete')}
+              {t('dialog.delete')}
             </Button>
           </DialogActions>
         </Dialog>

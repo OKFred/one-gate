@@ -107,14 +107,14 @@ const TheEditDialog = memo(
         <DialogTitle>
           <Box display="flex" alignItems="center">
             <EditIcon sx={{ mr: 1 }} />
-            {t('common.actions.edit')}
+            {t('dialog.edit')}
           </Box>
         </DialogTitle>
 
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 2 }}>
             <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
-              <InputLabel>{t('me.details.region')}</InputLabel>
+              <InputLabel>{t('me.region')}</InputLabel>
               <Select
                 value={regionObj?.value || ''}
                 onChange={(e) => {
@@ -133,7 +133,7 @@ const TheEditDialog = memo(
                     setRegionObj(null);
                   }
                 }}
-                label={t('me.details.region')}
+                label={t('me.region')}
               >
                 <MenuItem value="">
                   <em>{t('form.select')}</em>
@@ -153,9 +153,9 @@ const TheEditDialog = memo(
         </DialogContent>
 
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <ResponsiveButton onClick={handleClose}>{t('common.cancel')}</ResponsiveButton>
+          <ResponsiveButton onClick={handleClose}>{t('dialog.cancel')}</ResponsiveButton>
           <ResponsiveButton onClick={handleSave} variant="contained">
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </ResponsiveButton>
         </DialogActions>
       </Dialog>

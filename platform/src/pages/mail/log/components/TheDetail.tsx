@@ -78,7 +78,7 @@ const TheDetail = memo(
           <Box display="flex" alignItems="center" gap={2}>
             <EmailIcon color="primary" />
             <Typography variant="h6" component="span">
-              {t('page.details')}: {log.id}
+              {t('page.details')}
             </Typography>
           </Box>
         </DialogTitle>
@@ -88,7 +88,7 @@ const TheDetail = memo(
             {/* 发送状态 */}
             <Box>
               <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                {t('system.user.columns.status')}
+                {t('columns.status')}
               </Typography>
               {log.sendStatus ? (
                 <Chip
@@ -112,19 +112,19 @@ const TheDetail = memo(
             {/* 基本信息 */}
             <Box>
               <Typography variant="h6" gutterBottom>
-                {t('mail.log.detail.basicInfo')}
+                {t('log.table.basicInfo')}
               </Typography>
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    {t('mail.log.columns.subject')}
+                    {t('log.table.subject')}
                   </Typography>
                   <Typography variant="body1">{log.title || '-'}</Typography>
                 </Box>
 
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    {t('mail.log.columns.recipient')}
+                    {t('log.table.recipient')}
                   </Typography>
                   <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                     {log.mailTo || '-'}
@@ -133,7 +133,7 @@ const TheDetail = memo(
 
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    {t('mail.log.columns.sender')}
+                    {t('log.table.sender')}
                   </Typography>
                   <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
                     {log.mailFrom || '-'}
@@ -148,12 +148,12 @@ const TheDetail = memo(
             <Box>
               <Typography variant="h6" gutterBottom>
                 <TimeIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                {t('mail.log.detail.timeInfo')}
+                {t('log.table.timeInfo')}
               </Typography>
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
-                    {t('common.columns.createTime')}
+                    {t('columns.createTime')}
                   </Typography>
                   <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
                 </Box>
@@ -161,7 +161,7 @@ const TheDetail = memo(
                 {log.updateTimeUtc && (
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary">
-                      {t('common.columns.updateTime')}
+                      {t('columns.updateTime')}
                     </Typography>
                     <Typography variant="body1">{formatDate(log.updateTimeUtc)}</Typography>
                   </Box>
@@ -176,13 +176,13 @@ const TheDetail = memo(
                 <Box>
                   <Typography variant="h6" gutterBottom>
                     <TemplateIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                    {t('mail.log.detail.templateInfo')}
+                    {t('log.table.templateInfo')}
                   </Typography>
                   <Stack spacing={2}>
                     {log.templateParams && (
                       <Box>
                         <Typography variant="subtitle2" color="text.secondary">
-                          {t('mail.log.detail.templateParams')}
+                          {t('log.table.templateParams')}
                         </Typography>
                         <Box
                           component="pre"
@@ -210,11 +210,11 @@ const TheDetail = memo(
                 <Divider />
                 <Box>
                   <Typography variant="h6" gutterBottom color="error">
-                    {t('mail.log.detail.errorInfo')}
+                    {t('log.table.errorInfo')}
                   </Typography>
                   {log.exceptionCode && (
                     <Alert severity="error" sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2">{t('mail.log.detail.errorCode')}</Typography>
+                      <Typography variant="subtitle2">{t('log.table.errorCode')}</Typography>
                       <Typography variant="body2">{log.exceptionCode}</Typography>
                     </Alert>
                   )}
@@ -222,7 +222,7 @@ const TheDetail = memo(
                   {log.exceptionDetails && (
                     <Alert severity="error">
                       <Typography variant="subtitle2">
-                        {t('mail.log.detail.errorDetails')}
+                        {t('log.table.errorDetails')}
                       </Typography>
                       <Typography variant="body2">{log.exceptionDetails}</Typography>
                     </Alert>
@@ -235,7 +235,7 @@ const TheDetail = memo(
 
         <DialogActions>
           <Button onClick={handleClose} color="primary" variant="contained">
-            {t('common.close')}
+            {t('dialog.close')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -116,12 +116,12 @@ const TheAccountList = memo(
         </FormControl>
         {!sender.accountId && (
           <TextField
-            label={t('mail.send.form.customFrom')}
+            label={t('send.dialog.customFrom')}
             value={sender.mailAddress}
             onChange={(e) => handleMailAddressChange(e.target.value)}
             size="small"
             fullWidth
-            helperText={t('mail.send.form.customFromHelp')}
+            helperText={t('send.dialog.customFromHelp')}
           />
         )}
       </Box>

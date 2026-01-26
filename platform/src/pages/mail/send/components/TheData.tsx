@@ -30,7 +30,7 @@ const TheData = memo(
             };
             await mailActionAPI.sendFn({ data: SendMailReq });
             showSnackbar({
-              message: t('common.interact.operationSuccess'),
+              message: t('dialog.operationSuccess'),
               type: 'success',
             });
           } catch (error) {

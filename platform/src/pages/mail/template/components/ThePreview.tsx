@@ -82,7 +82,7 @@ const ThePreview = memo(
             pb: isMobile ? 1 : 2,
           }}
         >
-          <Box>{t('mail.template.preview.title')}</Box>
+          <Box>{t('dialog.title.preview')}</Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleClose} aria-label="close">
               <CloseIcon />
@@ -100,12 +100,12 @@ const ThePreview = memo(
             {/* 模板基本信息 */}
             <Box>
               <Typography variant="h6" gutterBottom>
-                {t('mail.template.preview.basicInfo')}
+                {t('template.preview.basicInfo')}
               </Typography>
               <Stack spacing={2}>
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t('common.columns.id')}
+                    {t('columns.id')}
                   </Typography>
                   <Typography variant="body1">{template.id}</Typography>
                 </Box>
@@ -113,7 +113,7 @@ const ThePreview = memo(
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {t('mail.template.columns.name')}
+                      {t('template.table.name')}
                     </Typography>
                     <Typography variant="body1">{template.name || '-'}</Typography>
                   </Box>
@@ -122,13 +122,13 @@ const ThePreview = memo(
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {t('common.columns.createTime')}
+                      {t('columns.createTime')}
                     </Typography>
                     <Typography variant="body1">{formatDate(template.createTimeUtc)}</Typography>
                   </Box>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
-                      {t('common.columns.updateTime')}
+                      {t('columns.updateTime')}
                     </Typography>
                     <Typography variant="body1">
                       {formatDate(template.updateTimeUtc || undefined)}
@@ -138,19 +138,19 @@ const ThePreview = memo(
 
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t('mail.template.preview.tags')}
+                    {t('template.preview.tags')}
                   </Typography>
                   <Stack direction="row" spacing={1} flexWrap="wrap">
                     {template.langCode && (
                       <Chip
-                        label={`${t('common.language')}: ${template.langCode}`}
+                        label={`${t('column.language')}: ${template.langCode}`}
                         color="info"
                         size="small"
                       />
                     )}
                     {template.category && (
                       <Chip
-                        label={`${t('common.category')}: ${template.category}`}
+                        label={`${t('column.category')}: ${template.category}`}
                         color="secondary"
                         size="small"
                       />
@@ -165,7 +165,7 @@ const ThePreview = memo(
             {/* 邮件预览 */}
             <Box>
               <Typography variant="h6" gutterBottom>
-                {t('mail.template.preview.mail')}
+                {t('dialog.title.preview')}
               </Typography>
               <Box
                 sx={{
@@ -185,7 +185,7 @@ const ThePreview = memo(
                   }}
                 >
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t('mail.send.form.subject')}
+                    {t('send.dialog.subject')}
                   </Typography>
                   <Typography variant="h6" sx={{ fontWeight: 500 }}>
                     {template.title}
@@ -195,7 +195,7 @@ const ThePreview = memo(
                 {/* 邮件内容 */}
                 <Box sx={{ p: 2 }}>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t('mail.send.form.contentLabel')}
+                    {t('send.dialog.contentLabel')}
                   </Typography>
                   <Box
                     sx={{
@@ -239,7 +239,7 @@ const ThePreview = memo(
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
           >
-            {t('common.close')}
+            {t('dialog.close')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -92,7 +92,7 @@ function ResponsiveListInner<T>({
   const { isMobile } = useResponsive();
   const t = useTranslation();
   if (!emptyText) {
-    emptyText = t('common.noData');
+    emptyText = t('column.noData');
   }
   const totalPages = Math.ceil(total / pageSize);
 
@@ -133,7 +133,7 @@ function ResponsiveListInner<T>({
         {onPageSizeChange && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              {t('common.table.pageSizeLabel')}:
+              {t('table.pageSizeLabel')}:
             </Typography>
             <FormControl size="small" sx={{ minWidth: 80 }}>
               <Select

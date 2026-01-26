@@ -26,7 +26,7 @@ export default function MailTemplatePage() {
   const t = useTranslation();
 
   return (
-    <PageLayout title={t('mail.template.title')} actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('template.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <ThePreview ref={localObj.previewRef} localObj={localObj} />

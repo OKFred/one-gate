@@ -131,7 +131,7 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('columns.id'), render: (row) => row.id },
       // 动态添加语言列
       ...enabledLanguages
         .filter((lang) => lang.langCode)
@@ -141,23 +141,23 @@ const TheTable = memo(
             (row.labels as Record<string, string | undefined>)?.[lang.langCode!] || '-',
         })),
       {
-        title: t('i18n.region.form.alpha2Code'),
+        title: t('region.table.alpha2Code'),
         render: (row) => (
           <Chip label={row.alpha2Code} size="small" color="primary" variant="outlined" />
         ),
       },
       {
-        title: t('i18n.region.form.alpha3Code'),
+        title: t('region.table.alpha3Code'),
         render: (row) => (
           <Chip label={row.alpha3Code} size="small" color="secondary" variant="outlined" />
         ),
       },
-      { title: t('i18n.region.form.numeric'), render: (row) => row.numeric },
+      { title: t('region.table.numeric'), render: (row) => row.numeric },
       {
-        title: t('i18n.region.form.iso3166Independent'),
+        title: t('region.table.iso3166Independent'),
         render: (row) => (
           <Chip
-            label={row.iso3166Independent ? t('common.yes') : t('common.no')}
+            label={row.iso3166Independent ? t('column.yes') : t('column.no')}
             size="small"
             color={row.iso3166Independent ? 'success' : 'default'}
             variant="outlined"
@@ -165,7 +165,7 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('i18n.region.form.businessLanguages'),
+        title: t('region.table.businessLanguages'),
         render: (row) => (
           <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
             {row.businessLanguages && row.businessLanguages.length > 0 ? (
@@ -187,10 +187,10 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('common.filter.enabledStatus'),
+        title: t('filter.enabledStatus'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
             variant="outlined"
@@ -198,11 +198,11 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <RegionActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
@@ -226,7 +226,7 @@ const TheTable = memo(
           return row.alpha2Code;
         },
       },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
       // 动态添加语言字段
       ...enabledLanguages
         .filter((lang) => lang.langCode)
@@ -244,7 +244,7 @@ const TheTable = memo(
             <Chip label={row.alpha3Code} size="small" color="secondary" variant="outlined" />
             <Chip label={`#${row.numeric}`} size="small" variant="outlined" />
             <Chip
-              label={row.iso3166Independent ? t('common.yes') : t('common.no')}
+              label={row.iso3166Independent ? t('column.yes') : t('column.no')}
               size="small"
               color={row.iso3166Independent ? 'success' : 'default'}
               variant="outlined"
@@ -266,7 +266,7 @@ const TheTable = memo(
               </>
             )}
             <Chip
-              label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
+              label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
               variant="outlined"

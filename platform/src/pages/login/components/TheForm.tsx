@@ -37,7 +37,7 @@ export default function TheForm() {
   // 处理普通登录
   const handleLogin = async () => {
     if (!credentials.username || !credentials.password) {
-      showSnackbar({ message: t('login.missingCredentials'), type: 'error' });
+      showSnackbar({ message: t('form.missingCredentials'), type: 'error' });
       return;
     }
 

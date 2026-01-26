@@ -24,7 +24,7 @@ export default function ThePage() {
   const localObj: LocalObj = useMemo(() => ({ treeRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title={t('system.menu.title')} actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('menu.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTree ref={localObj.treeRef} localObj={localObj} />

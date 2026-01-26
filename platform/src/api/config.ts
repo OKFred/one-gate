@@ -94,7 +94,7 @@ function setupInterceptors(service: AxiosInstance) {
           // 获取用户语言创建翻译函数
           const langCode = authUtils.getUserInfo()?.langCode;
           const t = createTranslator(langCode);
-          const errorMessage = response.data.message || t('gateway.error.requestFailed');
+          const errorMessage = response.data.message || t('error.requestFailed');
           handleErrorResponse(errorMessage);
           return Promise.reject(response);
         }
@@ -111,7 +111,7 @@ function setupInterceptors(service: AxiosInstance) {
       if (status === 401) {
         if (window.location.pathname !== '/login') {
           showGlobalNotification({
-            message: t('gateway.error.sessionExpired'),
+            message: t('error.sessionExpired'),
             type: 'warning',
             beforeClose: (action, instance, done) => {
               console.log(action, instance);
@@ -123,13 +123,13 @@ function setupInterceptors(service: AxiosInstance) {
             },
           });
         } else {
-          handleErrorResponse(t('gateway.error.loginFailed'));
+          handleErrorResponse(t('error.loginFailed'));
         }
         return Promise.reject(error);
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(error.message || t('gateway.error.networkError'));
+      handleErrorResponse(error.message || t('error.networkError'));
       return Promise.reject(error);
     },
   );

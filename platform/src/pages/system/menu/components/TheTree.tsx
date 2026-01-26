@@ -163,7 +163,7 @@ const TheTree = memo(
       try {
         await MenuAPI.deleteFn({ data: { id: menuId } });
         fetchMenus(filters);
-        showSnackbar({ message: t('common.interact.operationSuccess'), type: 'success' });
+        showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
       } catch (err) {
         console.error(err); 
       } finally {
@@ -199,7 +199,7 @@ const TheTree = memo(
                 )}
                 {!node.isEnabled && (
                   <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                    {t('switch.disabled')}
+                    {t('status.disabled')}
                   </Typography>
                 )}
               </Typography>
@@ -232,7 +232,7 @@ const TheTree = memo(
           </SimpleTreeView>
         ) : (
           <Typography color="text.secondary" textAlign="center" py={4}>
-            {t('common.noData')}
+            {t('column.noData')}
           </Typography>
         )}
       </Box>

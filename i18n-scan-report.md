@@ -19,7 +19,7 @@
 
 共 36 个：
 
-- `common.form.required`
+- `dialog.required`
 - `errorHandler.databaseBusy`
 - `errorHandler.databaseError`
 - `errorHandler.departmentNotExist`
@@ -38,11 +38,10 @@
 - `errorHandler.undefinedError`
 - `errorHandler.unknownError`
 - `errorHandler.validationFailed`
-- `me.form.newPassword`
 - `menu.home`
 - `menu.i18n`
 - `menu.i18n.region`
-- `menu.i18n.translation`
+- `menu.translation`
 - `menu.mail`
 - `menu.mail.account`
 - `menu.mail.log`
@@ -51,5 +50,5 @@
 - `menu.me`
 - `menu.system`
 - `menu.system.department`
-- `menu.system.menu`
-- `menu.system.user`
+- `menu.menu`
+- `menu.user`

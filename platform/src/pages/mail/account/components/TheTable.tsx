@@ -124,21 +124,21 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('mail.account.columns.nickname'), render: (row) => row.nickname },
-      { title: t('mail.account.columns.email'), render: (row) => row.mailAddress },
-      { title: t('mail.account.columns.host'), render: (row) => row.host },
-      { title: t('mail.account.columns.port'), render: (row) => row.port },
+      { title: t('columns.id'), render: (row) => row.id },
+      { title: t('account.table.nickname'), render: (row) => row.nickname },
+      { title: t('account.table.email'), render: (row) => row.mailAddress },
+      { title: t('account.table.host'), render: (row) => row.host },
+      { title: t('account.table.port'), render: (row) => row.port },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('common.form.remark'),
+        title: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <AccountActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
@@ -149,16 +149,16 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.nickname },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('mail.account.columns.email'), render: (row) => row.mailAddress },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('account.table.email'), render: (row) => row.mailAddress },
       {
         type: 'content',
-        label: t('mail.account.columns.host') + ':' + t('mail.account.columns.port'),
+        label: t('account.table.host') + ':' + t('account.table.port'),
         render: (row) => `${row.host}:${row.port}`,
       },
       {
         type: 'content',
-        label: t('common.form.remark'),
+        label: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {

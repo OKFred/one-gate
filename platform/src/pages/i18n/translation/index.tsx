@@ -24,7 +24,7 @@ export default function ThePage() {
 
   return (
     <PageLayout
-      title={t('i18n.translation.title')}
+      title={t('translation.title')}
       actions={<TheActionButtons formRef={formRef} />}
     >
       <TheFilter ref={localObj.filterRef} localObj={localObj} />

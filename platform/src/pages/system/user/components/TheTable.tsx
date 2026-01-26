@@ -216,29 +216,29 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('columns.id'), render: (row) => row.id },
       { title: t('login.username'), render: (row) => row.username },
-      { title: t('me.details.department'), render: (row) => getDepartmentName(row.departmentId) },
-      { title: t('me.details.role'), render: (row) => getRoleNames(row.roleIdArr) },
-      { title: t('common.language'), render: (row) => getLanguageName(row.langCode) },
-      { title: t('me.details.region'), render: (row) => getRegionName(row.regionId) },
+      { title: t('me.department'), render: (row) => getDepartmentName(row.departmentId) },
+      { title: t('me.role'), render: (row) => getRoleNames(row.roleIdArr) },
+      { title: t('column.language'), render: (row) => getLanguageName(row.langCode) },
+      { title: t('me.region'), render: (row) => getRegionName(row.regionId) },
       {
-        title: t('common.columns.status'),
+        title: t('columns.status'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             color={row.isEnabled ? 'success' : 'error'}
             size="small"
           />
         ),
       },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) =>
           row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <UserActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
@@ -249,30 +249,30 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.username },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
       {
         type: 'content',
-        label: t('me.details.department'),
+        label: t('me.department'),
         render: (row) => getDepartmentName(row.departmentId),
       },
       {
         type: 'content',
-        label: t('me.details.role'),
+        label: t('me.role'),
         render: (row) => getRoleNames(row.roleIdArr),
       },
       {
         type: 'content',
-        label: t('common.language'),
+        label: t('column.language'),
         render: (row) => getLanguageName(row.langCode),
       },
       {
         type: 'content',
-        label: t('me.details.region'),
+        label: t('me.region'),
         render: (row) => getRegionName(row.regionId),
       },
       {
         type: 'content',
-        label: t('common.columns.createTime'),
+        label: t('columns.createTime'),
         render: (row) =>
           row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
       },
@@ -280,7 +280,7 @@ const TheTable = memo(
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             color={row.isEnabled ? 'success' : 'error'}
             size="small"
           />

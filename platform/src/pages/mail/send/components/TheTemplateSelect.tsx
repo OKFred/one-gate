@@ -53,7 +53,7 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
       const templateSubject = selectedTemplate.title || '';
       const templateHtml = selectedTemplate.content || '';
       onTemplateChange(selectedTemplateId, templateSubject, templateHtml);
-      showSnackbar({ type: 'success', message: t('mail.send.form.content.loaded') });
+      showSnackbar({ type: 'success', message: t('send.dialog.contentLoaded') });
     } else {
       // 清除模板选择时，也清除内容
       onTemplateChange(undefined, '', '');
@@ -74,7 +74,7 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
         >
           <MenuItem value="none">
             <Typography variant="body2" color="text.secondary">
-              {t('mail.send.noTemplate')}
+              {t('send.noTemplate')}
             </Typography>
           </MenuItem>
           {templates.map((template) => (
@@ -84,9 +84,9 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
                   {template.title || template.name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {t('mail.send.templateName')}: {template.name} | {t('mail.send.creator')}:{' '}
+                  {t('send.templateName')}: {template.name} | {t('send.creator')}:{' '}
                   {template.creatorId}
-                  {template.category && ` | ${t('mail.send.category')}: ${template.category}`}
+                  {template.category && ` | ${t('send.category')}: ${template.category}`}
                 </Typography>
               </Box>
             </MenuItem>

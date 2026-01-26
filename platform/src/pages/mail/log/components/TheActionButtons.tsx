@@ -17,7 +17,7 @@ export const TheActionButtons = memo(({ tableRef }: TheActionButtonsProps) => {
 
   return (
     <ResponsiveButton variant="outlined" startIcon={<RefreshIcon />} onClick={handleRefresh}>
-      {t('common.refresh')}
+      {t('table.refresh')}
     </ResponsiveButton>
   );
 });

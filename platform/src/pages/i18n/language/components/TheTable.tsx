@@ -126,30 +126,30 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('i18n.language.form.langCode'), render: (row) => row.langCode },
-      { title: t('i18n.language.form.nativeName'), render: (row) => row.nativeName || '-' },
-      { title: t('common.filter.sortOrder'), render: (row) => row.sortOrder },
+      { title: t('columns.id'), render: (row) => row.id },
+      { title: t('language.table.langCode'), render: (row) => row.langCode },
+      { title: t('language.table.nativeName'), render: (row) => row.nativeName || '-' },
+      { title: t('filter.sortOrder'), render: (row) => row.sortOrder },
       {
-        title: t('common.filter.enabledStatus'),
+        title: t('filter.enabledStatus'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
         ),
       },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('common.form.remark'),
+        title: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <LanguageActionButtons
@@ -164,23 +164,23 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.nativeName },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('i18n.language.form.langCode'), render: (row) => row.langCode },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('language.table.langCode'), render: (row) => row.langCode },
       {
         type: 'content',
-        label: t('common.filter.sortOrder'),
+        label: t('filter.sortOrder'),
         render: (row) => row.sortOrder,
       },
       {
         type: 'content',
-        label: t('common.form.remark'),
+        label: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />

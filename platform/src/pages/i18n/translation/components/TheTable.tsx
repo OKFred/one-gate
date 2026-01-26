@@ -144,33 +144,33 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('columns.id'), render: (row) => row.id },
       {
-        title: t('i18n.translation.form.application'),
+        title: t('translation.table.application'),
         render: (row) => (
           <Chip label={row.application} size="small" color="primary" variant="outlined" />
         ),
       },
       {
-        title: t('i18n.translation.form.business'),
+        title: t('translation.table.business'),
         render: (row) => (
           <Chip label={row.business} size="small" color="secondary" variant="outlined" />
         ),
       },
       {
-        title: t('i18n.translation.form.langCode'),
+        title: t('translation.table.langCode'),
         render: (row) => <Chip label={row.langCode} size="small" variant="outlined" />,
       },
-      { title: t('i18n.translation.form.tKey'), render: (row) => row.tKey },
-      { title: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
+      { title: t('translation.table.tKey'), render: (row) => row.tKey },
+      { title: t('translation.table.tValue'), render: (row) => row.tValue },
       {
-        title: t('common.filter.enabledStatus'),
+        title: t('filter.enabledStatus'),
         render: (row) => (
           <Chip
             label={
               row.isEnabled
-                ? t('switch.enabled')
-                : t('switch.disabled')
+                ? t('status.enabled')
+                : t('status.disabled')
             }
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
@@ -179,15 +179,15 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
       },
       {
-        title: t('common.form.remark'),
+        title: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <TranslationActionButtons
@@ -202,8 +202,8 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.tKey },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('i18n.translation.form.tValue'), render: (row) => row.tValue },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('translation.table.tValue'), render: (row) => row.tValue },
       {
         type: 'tags',
         render: (row) => (
@@ -214,8 +214,8 @@ const TheTable = memo(
             <Chip
               label={
                 row.isEnabled
-                  ? t('switch.enabled')
-                  : t('switch.disabled')
+                  ? t('status.enabled')
+                  : t('status.disabled')
               }
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
@@ -226,7 +226,7 @@ const TheTable = memo(
       },
       {
         type: 'content',
-        label: t('common.form.remark'),
+        label: t('column.remark'),
         render: (row) => row.remark || '-',
       },
     ];

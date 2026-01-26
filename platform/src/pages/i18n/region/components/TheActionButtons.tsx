@@ -30,7 +30,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('common.actions.add')}
+      {t('dialog.add')}
     </ResponsiveButton>
   );
 });
@@ -86,14 +86,14 @@ export const RegionActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowB
 
       {/* 删除确认对话框 */}
       <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-        <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
+        <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{t('form.actions.deleteConfirmMessage')}</DialogContentText>
+          <DialogContentText>{t('table.deleteConfirm')}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
+          <Button onClick={closeDeleteDialog}>{t('dialog.cancel')}</Button>
           <Button onClick={handleConfirmDelete} color="error" autoFocus>
-            {t('common.actions.delete')}
+            {t('dialog.delete')}
           </Button>
         </DialogActions>
       </Dialog>

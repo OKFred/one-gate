@@ -63,13 +63,13 @@ export const NotificationDialog = ({
     if (title) return title;
     switch (type) {
       case 'error':
-        return t('notification.title.error');
+        return t('dialog.titie.error');
       case 'warning':
-        return t('notification.title.warning');
+        return t('dialog.titie.warning');
       case 'success':
-        return t('notification.title.success');
+        return t('dialog.titie.success');
       default:
-        return t('notification.title.info');
+        return t('dialog.titie.info');
     }
   };
 
@@ -116,7 +116,7 @@ export const NotificationDialog = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={() => handleAction('confirm')} autoFocus>
-            {t('common.actions.confirm')}
+            {t('dialog.confirm')}
           </Button>
         </DialogActions>
       </Dialog>

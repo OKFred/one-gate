@@ -42,10 +42,10 @@ const TheDetails = memo(
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Box display="flex" alignItems="center">
               <AccountBoxIcon sx={{ mr: 1 }} />
-              <Typography variant="h6">{t('me.details.title')}</Typography>
+              <Typography variant="h6">{t('me.subtitle')}</Typography>
             </Box>
             <ResponsiveButton variant="contained" startIcon={<EditIcon />} onClick={handleEdit}>
-              {t('common.actions.edit')}
+              {t('dialog.edit')}
             </ResponsiveButton>
           </Box>
 
@@ -53,7 +53,7 @@ const TheDetails = memo(
             <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('common.columns.id')}
+                  {t('columns.id')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {user.id}
@@ -71,37 +71,37 @@ const TheDetails = memo(
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('me.details.department')}
+                  {t('me.department')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {user.departmentObj?.label || t('common.unassigned')}
+                  {user.departmentObj?.label || t('column.unassigned')}
                 </Typography>
               </Box>
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('me.details.region')}
+                  {t('me.region')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {user.regionObj?.label || t('common.unassigned')}
+                  {user.regionObj?.label || t('column.unassigned')}
                 </Typography>
               </Box>
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('me.details.role')}
+                  {t('me.role')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                  {user.roleArr.map((role) => role.label).join(', ') || t('common.unassigned')}
+                  {user.roleArr.map((role) => role.label).join(', ') || t('column.unassigned')}
                 </Typography>
               </Box>
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('me.details.accountStatus')}
+                  {t('me.accountStatus')}
                 </Typography>
                 <Chip
-                  label={user.isEnabled ? t('common.status.enabled') : t('common.status.disabled')}
+                  label={user.isEnabled ? t('status.enabled') : t('status.disabled')}
                   color={user.isEnabled ? 'success' : 'error'}
                   size="small"
                 />
@@ -109,23 +109,23 @@ const TheDetails = memo(
 
               <Box>
                 <Typography variant="body2" color="text.secondary">
-                  {t('common.columns.createTime')}
+                  {t('columns.createTime')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {user.createTimeUtc
                     ? dayjs(user.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                    : t('common.noData')}
+                    : t('column.noData')}
                 </Typography>
               </Box>
 
               <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
                 <Typography variant="body2" color="text.secondary">
-                  {t('common.columns.updateTime')}
+                  {t('columns.updateTime')}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
                   {user.updateTimeUtc
                     ? dayjs(user.updateTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                    : t('common.noData')}
+                    : t('column.noData')}
                 </Typography>
               </Box>
             </Box>

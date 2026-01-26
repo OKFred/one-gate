@@ -62,7 +62,7 @@ const TheData = memo(
           await UserApiService.updateFn({ data: updateData });
           showSnackbar({
             type: 'success',
-            message: t('common.interact.operationSuccess'),
+            message: t('dialog.operationSuccess'),
           });
           passwordDialogRef.current?.close();
           editDialogRef.current?.close();
