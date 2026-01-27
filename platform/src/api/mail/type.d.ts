@@ -3,6 +3,10 @@ import * as TemplateAPI from '@/api/mail/template';
 import * as LogAPI from '@/api/mail/log';
 import * as ActionAPI from '@/api/mail/action';
 
+// 获取所有邮件模板
+export type ListAllMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.listAllFn>[0]['data']>;
+export type ListAllMailTemplateRes = Awaited<ReturnType<typeof TemplateAPI.listAllFn>>['data']['data'];
+
 // 获取邮件账户列表
 export type ListMailAccountReq = NonNullable<Parameters<typeof AccountAPI.listFn>[0]['data']>;
 export type ListMailAccountRes = Awaited<ReturnType<typeof AccountAPI.listFn>>['data']['data'];
