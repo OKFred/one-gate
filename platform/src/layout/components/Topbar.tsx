@@ -72,6 +72,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     if (!userInfo) return;
     try {
       await AuthAPI.updateLangCodeFn({ data: { langCode } });
+      authUtils.setUserInfo({ ...userInfo, langCode }); // 更新本地存储的语言代码，否则前后端会不一致
       // 刷新页面以应用新语言
       window.location.reload();
     } catch (error) {
