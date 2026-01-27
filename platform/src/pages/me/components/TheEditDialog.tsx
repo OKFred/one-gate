@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle, memo, useEffect } from 'react';
+import { useState, forwardRef, useImperativeHandle, memo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -14,13 +14,12 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
-import * as RegionAPI from '@/api/i18n/region';
 import * as AuthAPI from '@/api/system/auth';
 import { showSnackbar } from '@/components/Notification';
 import type { GetUserRes, UpdateProfileReq } from '@/api/system/type';
-import type { ListAllRegionRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
+import type { ListAllRegionRes } from '@/api/i18n/type';
 
 // 暴露给父组件的方法
 export interface TheEditDialogRef {
@@ -39,20 +38,7 @@ const TheEditDialog = memo(
     const [user, setUser] = useState<GetUserRes | null>(null);
     const [regionObj, setRegionObj] = useState<{ value: number; label: string } | null>(null);
     const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
-
-    // 获取启用的地区列表
-    useEffect(() => {
-      const fetchRegions = async () => {
-        try {
-          const res = await RegionAPI.listAllFn({ data: { isEnabled: true } });
-          setEnabledRegions(res.data.data || []);
-        } catch (error) {
-          console.error('Failed to fetch regions:', error);
-        }
-      };
-      fetchRegions();
-    }, []);
-
+    
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
@@ -60,13 +46,15 @@ const TheEditDialog = memo(
         open: (userData: GetUserRes) => {
           setUser(userData);
           setRegionObj(userData.regionObj || null);
+          const latestRegions = localObj.detailsRef.current?.enabledRegions || [];
+          setEnabledRegions(latestRegions);
           setOpen(true);
         },
         close: () => {
           setOpen(false);
         },
       }),
-      [],
+      [localObj.detailsRef],
     );
 
     // 处理保存

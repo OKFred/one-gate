@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, memo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useState, memo, useRef, useEffect } from 'react';
 import { Card, CardContent, Typography, Box, Chip, Paper } from '@mui/material';
 import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
@@ -7,11 +7,15 @@ import type { Props } from '../index';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheEditDialog, { type TheEditDialogRef } from './TheEditDialog';
+import * as RegionAPI from '@/api/i18n/region';
+import type { ListAllRegionRes } from '@/api/i18n/type';
 
 // 暴露给父组件的方法
 export interface TheDetailsRef {
   /** 更新用户数据 */
   updateUser: (user: GetUserRes | null) => void;
+  /** 启用的地区列表 */
+  enabledRegions: ListAllRegionRes;
 }
 
 const TheDetails = memo(
@@ -19,6 +23,7 @@ const TheDetails = memo(
     const t = useTranslation();
     const [user, setUser] = useState<GetUserRes | null>(null);
     const editDialogRef = useRef<TheEditDialogRef>(null);
+    const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -27,9 +32,22 @@ const TheDetails = memo(
         updateUser: (userData: GetUserRes | null) => {
           setUser(userData);
         },
+        enabledRegions,
       }),
-      [],
+      [enabledRegions],
     );
+    // 获取启用的地区列表
+    useEffect(() => {
+      const fetchRegions = async () => {
+        try {
+          const res = await RegionAPI.listAllFn({ data: { isEnabled: true } });
+          setEnabledRegions(res.data.data || []);
+        } catch (error) {
+          console.error('Failed to fetch regions:', error);
+        }
+      };
+      fetchRegions();
+    }, []);
 
     const handleEdit = () => {
       editDialogRef.current?.open(user!);
@@ -76,7 +94,11 @@ const TheDetails = memo(
                     {t('me.region')}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {user.regionObj?.label || t('column.unassigned')}
+                    {String(
+                      user.regionObj?.value &&
+                        enabledRegions?.find((region) => region.id === user.regionObj?.value)
+                          ?.labels?.[user.langCode],
+                    ) || t('column.unassigned')}
                   </Typography>
                 </Box>
 
