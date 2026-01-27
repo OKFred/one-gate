@@ -99,7 +99,9 @@ export const LanguageActionButtons = memo(({ row, formRef, onDeleteSuccess }: Ro
           <DialogContentText>{t('table.deleteConfirm')}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>{t('dialog.cancel')}</Button>
+          <Button onClick={closeDeleteDialog} variant="outlined">
+            {t('dialog.cancel')}
+          </Button>
           <Button onClick={handleConfirmDelete} color="error" autoFocus>
             {t('dialog.delete')}
           </Button>

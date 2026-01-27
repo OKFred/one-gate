@@ -306,7 +306,9 @@ const TheTable = memo(
           <DialogTitle>{t('dialog.confirm')}</DialogTitle>
           <DialogContent>{t('dialog.deleteConfirmTitle')}</DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>{t('dialog.cancel')}</Button>
+            <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+              {t('dialog.cancel')}
+            </Button>
             <Button onClick={handleDeleteConfirm} color="error" variant="contained">
               {t('dialog.delete')}
             </Button>

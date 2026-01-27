@@ -387,6 +387,7 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCloseDialog}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}

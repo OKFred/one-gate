@@ -8,7 +8,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Alert,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -99,11 +98,7 @@ export const TreeNodeActionButtons = memo(
     return (
       <>
         <Box sx={{ display: 'flex', gap: 0.5 }}>
-          <IconButton
-            size="small"
-            onClick={handleAddChild}
-            title={t('department.dialog.addChild')}
-          >
+          <IconButton size="small" onClick={handleAddChild} title={t('department.dialog.addChild')}>
             <AddIcon fontSize="small" />
           </IconButton>
           <IconButton size="small" onClick={handleEdit} title={t('dialog.edit')}>
@@ -123,17 +118,12 @@ export const TreeNodeActionButtons = memo(
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
           <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              {t('table.deleteConfirm')}
-            </DialogContentText>
-            {hasChildren && (
-              <Alert severity="warning" sx={{ mt: 2 }}>
-                该部门存在子部门，请先删除子部门后再删除该部门。
-              </Alert>
-            )}
+            <DialogContentText>{t('table.deleteConfirm')}</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>{t('dialog.cancel')}</Button>
+            <Button onClick={closeDeleteDialog} variant="outlined">
+              {t('dialog.cancel')}
+            </Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus disabled={hasChildren}>
               {t('dialog.delete')}
             </Button>
