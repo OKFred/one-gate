@@ -69,7 +69,10 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
 
   // 处理语言切换
   const handleChangeLanguage = async (langCode: string) => {
-    if (!userInfo) return;
+    if (!userInfo || userInfo.langCode === langCode) {
+      handleClose();
+      return;
+    }
     try {
       await AuthAPI.updateLangCodeFn({ data: { langCode } });
       authUtils.setUserInfo({ ...userInfo, langCode }); // 更新本地存储的语言代码，否则前后端会不一致

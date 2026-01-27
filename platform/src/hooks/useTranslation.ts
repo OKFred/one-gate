@@ -75,9 +75,8 @@ const getSnapshot = () => version;
 export const useTranslation = () => {
   const userInfo = authUtils.getUserInfo();
   const langCode = userInfo?.langCode || fallbackLangCode;
-
-  const tick = useSyncExternalStore(subscribe, getSnapshot);
-  const t = useMemo(() => createTranslator(langCode), [langCode, tick]);
+  useSyncExternalStore(subscribe, getSnapshot);
+  const t = useMemo(() => createTranslator(langCode), [langCode]);
 
   return t;
 };
