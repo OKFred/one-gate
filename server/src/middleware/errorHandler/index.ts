@@ -44,22 +44,19 @@ export default function errorHandler(app: App) {
       throw toHttpException(sqlError);
     }
     if (e instanceof BusinessError) {
-      e.message = t(e.message);
       throw toHttpException(e);
     }
     if (e instanceof HTTPException) {
       return c.json(
         {
           ok: false,
-          message: e.message,
+          message: t(e.message),
           data: e.cause as HTTPExceptionOptions["cause"],
         },
         { status: e.status as ContentfulStatusCode }
       );
     }
-    c.var.logger.error(
-      t("errorHandler.serverError") + ": " + e.stack
-    );
+    c.var.logger.error(t("errorHandler.serverError") + ": " + e.stack);
     return c.json(
       {
         ok: false,
@@ -81,7 +78,5 @@ process.on("uncaughtException", function (err) {
 
 process.env.NODE_ENV === "production" &&
   console.log(
-    createTranslator(process.env.LOCALE)(
-      "errorHandler.serverStarted"
-    )
+    createTranslator(process.env.LOCALE)("errorHandler.serverStarted")
   );

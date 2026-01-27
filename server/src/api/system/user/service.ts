@@ -27,6 +27,7 @@ import {
 import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
 import regionService, { utils as regionUtils } from "@/api/i18n/region/service";
+import { utils as languageUtils } from "@/api/i18n/language/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
@@ -286,7 +287,7 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, departmentObj, regionObj, roleArr, ...rest } = params;
+  const { id, departmentObj, regionObj, roleArr, langCode, ...rest } = params;
   const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
@@ -297,7 +298,15 @@ async function onUpdate(
     regionId: undefined,
     roleIdArr: undefined,
     isEnabled: undefined,
+    langCode: undefined,
   };
+  if (langCode !== undefined) {
+    await languageUtils.verifyLangCode(langCode);
+    updateData = {
+      ...updateData,
+      langCode,
+    };
+  }
   if (departmentObj !== undefined) {
     const departmentId = departmentObj ? departmentObj.value : null;
     if (departmentId) await departmentUtils.verifyDepartment(departmentId);
@@ -445,95 +454,6 @@ const getApi = {
   service: onGet,
 } satisfies API;
 
-const updateLangCodeReq = {
-  type: "object",
-  properties: {
-    langCode: UserVO.langCode,
-  },
-  required: ["langCode"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const updateLangCodeRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-async function onUpdateLangCode(
-  params: FromSchema<typeof updateLangCodeReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof updateLangCodeRes> | null> {
-  const { userId: id } = userObj;
-  const { userId: updaterId } = userObj;
-  const { langCode } = params;
-  const res = await db
-    .update(userTable)
-    .set({
-      langCode,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(userTable.id, id))
-    .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
-}
-const updateLangCodeApi = {
-  req: updateLangCodeReq,
-  res: updateLangCodeRes,
-  pathInfo: {
-    path: "/updateLangCode",
-    method: "post",
-    summary: "更新用户语言",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdateLangCode,
-} satisfies API;
-
-const updatePasswordReq = {
-  type: "object",
-  properties: {
-    password: UserAddVO.password,
-  },
-  required: ["password"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const updatePasswordRes = {
-  ...IndexVO["id"],
-} as const satisfies JSONSchema;
-async function onUpdatePassword(
-  params: FromSchema<typeof updatePasswordReq>,
-  userObj: UserObj
-): Promise<FromSchema<typeof updatePasswordRes> | null> {
-  const { userId: id } = userObj;
-  const { userId: updaterId } = userObj;
-  const { password: base64Password } = params;
-  const password = await convertPassword(base64Password);
-  const res = await db
-    .update(userTable)
-    .set({
-      password,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(userTable.id, id))
-    .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
-}
-const updatePasswordApi = {
-  req: updatePasswordReq,
-  res: updatePasswordRes,
-  pathInfo: {
-    path: "/updatePassword",
-    method: "post",
-    summary: "更新用户密码",
-  } as const,
-  adapter: bodyUserAdapter,
-  service: onUpdatePassword,
-} satisfies API;
-
 async function convertPassword(base64Password: string): Promise<string> {
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
   const hashedPassword = await bcrypt.hash(plainPassword, SALT_ROUNDS);
@@ -561,6 +481,26 @@ async function verifyUsernameAndPassword({
       ...rest,
     },
   };
+}
+
+async function updatePassword(
+  { id, newHashedPassword },
+  userObj: UserObj
+): Promise<number> {
+  const { userId: updaterId } = userObj;
+  const res = await db
+    .update(userTable)
+    .set({
+      password: newHashedPassword,
+      updaterId,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
+    })
+    .where(eq(userTable.id, id))
+    .returning({ id: userTable.id });
+  if (res?.length === 0) {
+    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
+  }
+  return res[0].id;
 }
 
 async function getUserObjByName(username: string): Promise<UserVOLike | null> {
@@ -630,6 +570,7 @@ export const utils = {
   getUserObjByName,
   convertPassword,
   verifyUsernameAndPassword,
+  updatePassword,
 };
 
 export default {
@@ -639,6 +580,4 @@ export default {
   update: updateApi,
   delete: deleteApi,
   get: getApi,
-  updatePassword: updatePasswordApi,
-  updateLangCode: updateLangCodeApi,
 };

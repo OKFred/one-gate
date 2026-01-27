@@ -1,8 +1,9 @@
 import userService, { utils as userUtils } from "@/api/system/user/service";
+import { utils as regionUtils } from "@/api/i18n/region/service";
 import { tokenUtils } from "@/utils/token";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj } from "@/types/app";
-import { UserDetailKeys, UserVO } from "../user/db.table";
+import { IndexVO, UserAddVO, UserDetailKeys, UserVO } from "../user/db.table";
 import {
   bodyAdapter,
   bodyUserAdapter,
@@ -71,7 +72,7 @@ async function onLogin(
     !verifyResult.userObj ||
     !verifyResult.userObj.isEnabled
   )
-    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+    throw new BusinessError(BusinessErrorCode.LOGIN_FAILED);
   const userObj = verifyResult.userObj;
   const { id, ...rest } = userObj;
   // 生成token
@@ -169,7 +170,6 @@ const refreshTokenReq = {
   required: ["token"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const refreshTokenRes = {
   type: "object",
   properties: {
@@ -182,21 +182,14 @@ const refreshTokenRes = {
   required: ["token"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onRefreshToken(
   params: FromSchema<typeof refreshTokenReq>
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
   const { token } = params;
   const newToken = tokenUtils.refreshToken(token);
-  if (!newToken) {
-    return null;
-  }
-
-  return {
-    token: newToken,
-  };
+  if (!newToken) throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  return { token: newToken };
 }
-
 const refreshTokenApi = {
   req: refreshTokenReq,
   res: refreshTokenRes,
@@ -215,7 +208,6 @@ const profileReq = {
   properties: {},
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const profileRes = {
   type: "object",
   properties: {
@@ -231,7 +223,6 @@ const profileRes = {
   required: ["userObj"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onProfile(
   _params: FromSchema<typeof profileReq>,
   userObj: UserObj
@@ -240,7 +231,6 @@ async function onProfile(
   const userDataObj = await userService.get.service({ id: userId });
   return { userObj: userDataObj };
 }
-
 const profileApi = {
   req: profileReq,
   res: profileRes,
@@ -253,9 +243,133 @@ const profileApi = {
   service: onProfile,
 } satisfies API;
 
+const updateProfileReq = {
+  type: "object",
+  properties: {
+    /* 当前仅支持更新用户国家/地区 */
+    regionObj: UserVO.regionObj,
+  },
+  required: [] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updateProfileRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onUpdateProfile(
+  params: FromSchema<typeof updateProfileReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updateProfileRes> | null> {
+  const { userId: id } = userObj;
+  const { regionObj } = params;
+  const regionId = regionObj ? regionObj.value : null;
+  if (regionId) await regionUtils.verifyRegion(regionId);
+  const res = await userService.update.service({ id, regionObj }, userObj);
+  return res;
+}
+const updateProfileApi = {
+  req: updateProfileReq,
+  res: updateProfileRes,
+  pathInfo: {
+    path: "/updateProfile",
+    method: "post",
+    summary: "更新当前用户信息",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onUpdateProfile,
+} satisfies API;
+
+/* 为什么“更新用户信息”和“更新用户语言”不适合强行复用？
+1️⃣ 权限语义完全不同（这是最关键的）
+2️⃣ 审计 & 合规视角：语言 ≠ 用户资料
+3️⃣ 频率 & 调用来源完全不一样 */
+const updateLangCodeReq = {
+  type: "object",
+  properties: {
+    langCode: UserVO.langCode,
+  },
+  required: ["langCode"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updateLangCodeRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onUpdateLangCode(
+  params: FromSchema<typeof updateLangCodeReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updateLangCodeRes> | null> {
+  const { userId: id } = userObj;
+  const { langCode } = params;
+  const updateData = { id, langCode };
+  const res = await userService.update.service(updateData, userObj);
+  return res;
+}
+const updateLangCodeApi = {
+  req: updateLangCodeReq,
+  res: updateLangCodeRes,
+  pathInfo: {
+    path: "/updateLangCode",
+    method: "post",
+    summary: "更新用户语言",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onUpdateLangCode,
+} satisfies API;
+
+// 更新用户密码
+const updatePasswordReq = {
+  type: "object",
+  properties: {
+    oldPassword: { ...UserAddVO.password, description: "旧密码" },
+    newPassword: { ...UserAddVO.password, description: "新密码" },
+  },
+  required: ["oldPassword", "newPassword"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updatePasswordRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onUpdatePassword(
+  params: FromSchema<typeof updatePasswordReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updatePasswordRes> | null> {
+  const { userId: id, username } = userObj;
+  const { oldPassword: oldBase64Password, newPassword: newBase64Password } =
+    params;
+  const oldPlainPassword = Buffer.from(oldBase64Password, "base64").toString(
+    "utf-8"
+  );
+  const verifyResult = await userUtils.verifyUsernameAndPassword({
+    username,
+    password: oldPlainPassword,
+  });
+  if (!verifyResult.valid) {
+    throw new BusinessError(BusinessErrorCode.WRONG_PASSWORD);
+  }
+  const newHashedPassword = await userUtils.convertPassword(newBase64Password);
+  const res = await userUtils.updatePassword(
+    { id, newHashedPassword },
+    userObj
+  );
+  return res;
+}
+const updatePasswordApi = {
+  req: updatePasswordReq,
+  res: updatePasswordRes,
+  pathInfo: {
+    path: "/updatePassword",
+    method: "post",
+    summary: "更新用户密码",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onUpdatePassword,
+} satisfies API;
+
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
   refresh: refreshTokenApi,
   profile: profileApi,
+  updateProfile: updateProfileApi,
+  updateLangCode: updateLangCodeApi,
+  updatePassword: updatePasswordApi,
 };

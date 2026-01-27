@@ -29,8 +29,7 @@ const UserPasswordPO = {
   password: {
     type: "string",
     description: "密码",
-    examples: ["pass"],
-    maxLength: 100,
+    examples: ["QWRtaW5AM=="],
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
 export const UserBasePO = {

@@ -10,16 +10,17 @@ import {
   Select,
   MenuItem,
   Stack,
+  Button,
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
-import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as RegionAPI from '@/api/i18n/region';
-import type { GetUserRes, UpdateUserReq } from '@/api/system/type';
+import * as AuthAPI from '@/api/system/auth';
+import { showSnackbar } from '@/components/Notification';
+import type { GetUserRes, updateProfileReq } from '@/api/system/type';
 import type { ListAllRegionRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
-import { authUtils, type UserInfo } from '@/utils/auth';
 
 // 暴露给父组件的方法
 export interface TheEditDialogRef {
@@ -27,28 +28,17 @@ export interface TheEditDialogRef {
   open: (user: GetUserRes) => void;
   /** 关闭对话框 */
   close: () => void;
-  /** 设置保存回调 */
-  setSaveHandler: (handler: (formData: UpdateUserReq) => void) => void;
 }
 
 const TheEditDialog = memo(
-  forwardRef<TheEditDialogRef, Props>((_, ref) => {
+  forwardRef<TheEditDialogRef, Props>(({ localObj }, ref) => {
     const t = useTranslation();
     const { isMobile } = useResponsive();
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [user, setUser] = useState<GetUserRes | null>(null);
     const [regionObj, setRegionObj] = useState<{ value: number; label: string } | null>(null);
     const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
-    const [saveHandler, setSaveHandler] = useState<((formData: UpdateUserReq) => void) | null>(
-      null,
-    );
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-
-    // 加载用户信息
-    useEffect(() => {
-      const user = authUtils.getUserInfo();
-      setUserInfo(user);
-    }, []);
 
     // 获取启用的地区列表
     useEffect(() => {
@@ -75,25 +65,28 @@ const TheEditDialog = memo(
         close: () => {
           setOpen(false);
         },
-        setSaveHandler: (handler: (formData: UpdateUserReq) => void) => {
-          setSaveHandler(() => handler);
-        },
       }),
       [],
     );
 
     // 处理保存
-    const handleSave = () => {
-      if (saveHandler && user) {
-        const formData: UpdateUserReq = {
-          id: user.id,
-          username: user.username,
+    const handleSave = async () => {
+      if (!user?.id) return;
+      setLoading(true);
+      try {
+        const updateData: updateProfileReq = {
           regionObj: regionObj,
-          departmentObj: user.departmentObj,
-          roleArr: user.roleArr,
-          isEnabled: user.isEnabled,
         };
-        saveHandler(formData);
+        await AuthAPI.updateProfileFn({ data: { ...updateData } });
+        showSnackbar({ type: 'success', message: t('dialog.operationSuccess') });
+        setOpen(false);
+
+        // 通知index刷新数据
+        localObj.onRefresh();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -140,7 +133,7 @@ const TheEditDialog = memo(
                 </MenuItem>
                 {enabledRegions.map((region) => {
                   const labels = region.labels as Record<string, string> | undefined;
-                  const displayName = labels?.[userInfo?.langCode || ''] || region.alpha2Code || '';
+                  const displayName = labels?.[user?.langCode || ''] || region.alpha2Code || '';
                   return (
                     <MenuItem key={region.id} value={region.id}>
                       {displayName} ({region.alpha2Code})
@@ -153,10 +146,24 @@ const TheEditDialog = memo(
         </DialogContent>
 
         <DialogActions sx={{ px: 3, py: 2 }}>
-          <ResponsiveButton onClick={handleClose}>{t('dialog.cancel')}</ResponsiveButton>
-          <ResponsiveButton onClick={handleSave} variant="contained">
+          <Button
+            onClick={handleClose}
+            variant="outlined"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
+            {t('dialog.cancel')}
+          </Button>
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            fullWidth={isMobile}
+            size={isMobile ? 'large' : 'medium'}
+            disabled={loading}
+          >
             {t('dialog.save')}
-          </ResponsiveButton>
+          </Button>
         </DialogActions>
       </Dialog>
     );

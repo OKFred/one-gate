@@ -3,6 +3,10 @@ export const BusinessErrorCode = {
   HAS_CHILDREN: "HAS_CHILDREN",
   /** @description 无效参数 */
   INVALID_PARAMS: "INVALID_PARAMS",
+  /** @description 登录失败，用户名或密码错误 */
+  LOGIN_FAILED: "LOGIN_FAILED",
+  /** @description 密码错误 */
+  WRONG_PASSWORD: "WRONG_PASSWORD",
   /** @description 未认证或登录态缺失 */
   NOT_AUTHENTICATED: "NOT_AUTHENTICATED",
   /** @description 没有权限操作 */
@@ -46,6 +50,12 @@ export const ERROR_PRESENTATION_MAP: Record<
   },
   ROLE_NOT_EXIST: {
     i18nKey: "errorHandler.roleNotExist",
+  },
+  LOGIN_FAILED: {
+    i18nKey: "errorHandler.loginFailed",
+  },
+  WRONG_PASSWORD: {
+    i18nKey: "errorHandler.wrongPassword",
   },
   INVALID_PARAMS: {
     status: 400,

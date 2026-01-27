@@ -123,7 +123,7 @@ function setupInterceptors(service: AxiosInstance) {
             },
           });
         } else {
-          handleErrorResponse(t('error.loginFailed'));
+          console.log('当前已在登录页，无需重复跳转');
         }
         return Promise.reject(error);
       }

@@ -60,13 +60,3 @@ export const deleteFn = (
     ...axiosConfig,
   });
 };
-
-export const updateLangCodeFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/user/updateLangCode', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/system/user/updateLangCode',
-    method: 'post',
-    ...axiosConfig,
-  });
-};

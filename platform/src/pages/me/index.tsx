@@ -1,43 +1,52 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useCallback, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheProfile, { type TheProfileRef } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
-import ThePasswordDialog, { type ThePasswordDialogRef } from './components/ThePasswordDialog';
-import TheEditDialog, { type TheEditDialogRef } from './components/TheEditDialog';
-import TheData, { type TheDataRef } from './components/TheData';
-
+import * as AuthApi from '@/api/system/auth';
 export interface Props {
   localObj: LocalObj;
 }
 
 export interface LocalObj {
-  dataRef: React.RefObject<TheDataRef | null>;
   profileRef: React.RefObject<TheProfileRef | null>;
   detailsRef: React.RefObject<TheDetailsRef | null>;
-  passwordDialogRef: React.RefObject<ThePasswordDialogRef | null>;
-  editDialogRef: React.RefObject<TheEditDialogRef | null>;
+  onRefresh: () => void;
 }
 
-export default function UserCenter() {
+export default function Page() {
   const t = useTranslation();
-  const dataRef = useRef<TheDataRef>(null);
   const profileRef = useRef<TheProfileRef>(null);
   const detailsRef = useRef<TheDetailsRef>(null);
-  const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
-  const editDialogRef = useRef<TheEditDialogRef>(null);
+
+  // 获取当前用户信息
+  const fetchCurrentUser = useCallback(async () => {
+    try {
+      // 先从本地存储获取用户基本信息
+      const response = await AuthApi.getProfile({ data: {} });
+      const { userObj } = response.data.data;
+
+      // 通知各个组件更新数据
+      profileRef.current?.updateUser(userObj);
+      detailsRef.current?.updateUser(userObj);
+    } catch (error) {
+      console.warn(error);
+    }
+  }, []);
+
   const localObj: LocalObj = useMemo(
-    () => ({ dataRef, profileRef, detailsRef, passwordDialogRef, editDialogRef }),
-    [],
+    () => ({ profileRef, detailsRef, onRefresh: fetchCurrentUser }),
+    [fetchCurrentUser],
   );
+
+  // 初始化加载
+  useEffect(() => {
+    fetchCurrentUser();
+  }, [fetchCurrentUser]);
 
   return (
     <PageLayout title={t('me.title')}>
-      {/* 数据管理组件 */}
-      <TheData ref={dataRef} localObj={localObj} />
-
-      {/* 用户信息展示 */}
       <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3}>
         {/* 用户资料卡片 */}
         <Box>
@@ -49,10 +58,6 @@ export default function UserCenter() {
           <TheDetails ref={detailsRef} localObj={localObj} />
         </Box>
       </Box>
-
-      {/* 编辑用户信息对话框 */}
-      <ThePasswordDialog ref={passwordDialogRef} localObj={localObj} />
-      <TheEditDialog ref={editDialogRef} localObj={localObj} />
     </PageLayout>
   );
 }

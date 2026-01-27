@@ -395,6 +395,26 @@ async function uniqueCheck(
   }
 }
 
+async function verifyLangCode(langCode: string): Promise<void> {
+  const record = await db
+    .select({ id: languageTable.id })
+    .from(languageTable)
+    .where(
+      and(
+        eq(languageTable.langCode, langCode),
+        eq(languageTable.isEnabled, true)
+      )
+    )
+    .limit(1);
+  if (record.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+}
+
+export const utils = {
+  verifyLangCode,
+};
+
 export default {
   listAll: listAllApi,
   list: listApi,
