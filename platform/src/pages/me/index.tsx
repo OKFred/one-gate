@@ -24,7 +24,7 @@ export default function Page() {
   const fetchCurrentUser = useCallback(async () => {
     try {
       // 先从本地存储获取用户基本信息
-      const response = await AuthApi.getProfile({ data: {} });
+      const response = await AuthApi.getProfileFn({ data: {} });
       const { userObj } = response.data.data;
 
       // 通知各个组件更新数据

@@ -1,7 +1,7 @@
 import type { AxiosConfig } from '../config';
 import { axiosPlus } from '../config';
 
-export const commonLogin = (
+export const loginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/login', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
@@ -11,7 +11,7 @@ export const commonLogin = (
   });
 };
 
-export const wechatLogin = (
+export const wechatLoginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/wechat', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
@@ -21,7 +21,7 @@ export const wechatLogin = (
   });
 };
 
-export const refreshToken = (
+export const refreshTokenFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/refresh', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
@@ -31,7 +31,7 @@ export const refreshToken = (
   });
 };
 
-export const getProfile = (
+export const getProfileFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/profile', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({

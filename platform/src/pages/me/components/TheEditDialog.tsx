@@ -17,7 +17,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import * as RegionAPI from '@/api/i18n/region';
 import * as AuthAPI from '@/api/system/auth';
 import { showSnackbar } from '@/components/Notification';
-import type { GetUserRes, updateProfileReq } from '@/api/system/type';
+import type { GetUserRes, UpdateProfileReq } from '@/api/system/type';
 import type { ListAllRegionRes } from '@/api/i18n/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -74,7 +74,7 @@ const TheEditDialog = memo(
       if (!user?.id) return;
       setLoading(true);
       try {
-        const updateData: updateProfileReq = {
+        const updateData: UpdateProfileReq = {
           regionObj: regionObj,
         };
         await AuthAPI.updateProfileFn({ data: { ...updateData } });

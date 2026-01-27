@@ -122,6 +122,23 @@ export type DeleteMenuReq = NonNullable<Parameters<typeof MenuAPI.deleteFn>[0]['
 export type DeleteMenuRes = Awaited<ReturnType<typeof MenuAPI.deleteFn>>['data']['data'];
 
 // ==================== Auth ====================
+
+// 登录
+export type LoginReq = NonNullable<Parameters<typeof AuthAPI.loginFn>[0]['data']>;
+export type LoginRes = Awaited<ReturnType<typeof AuthAPI.loginFn>>['data']['data'];
+
+// 微信登录
+export type WechatLoginReq = NonNullable<Parameters<typeof AuthAPI.wechatLoginFn>[0]['data']>;
+export type WechatLoginRes = Awaited<ReturnType<typeof AuthAPI.wechatLoginFn>>['data']['data'];
+
+// 获取用户信息
+export type GetProfileReq = NonNullable<Parameters<typeof AuthAPI.getProfileFn>[0]['data']>;
+export type GetProfileRes = Awaited<ReturnType<typeof AuthAPI.getProfileFn>>['data']['data'];
+
+// 刷新 Token
+export type RefreshTokenReq = NonNullable<Parameters<typeof AuthAPI.refreshTokenFn>[0]['data']>;
+export type RefreshTokenRes = Awaited<ReturnType<typeof AuthAPI.refreshTokenFn>>['data']['data'];
+
 // 更新密码
 export type UpdatePasswordReq = NonNullable<Parameters<typeof AuthAPI.updatePasswordFn>[0]['data']>;
 export type UpdatePasswordRes = Awaited<
@@ -135,5 +152,5 @@ export type UpdateLangCodeRes = Awaited<
 >['data']['data'];
 
 // 更新用户信息
-export type updateProfileReq = NonNullable<Parameters<typeof AuthAPI.updateProfileFn>[0]['data']>;
-export type updateProfileRes = Awaited<ReturnType<typeof AuthAPI.updateProfileFn>>['data']['data'];
+export type UpdateProfileReq = NonNullable<Parameters<typeof AuthAPI.updateProfileFn>[0]['data']>;
+export type UpdateProfileRes = Awaited<ReturnType<typeof AuthAPI.updateProfileFn>>['data']['data'];

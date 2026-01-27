@@ -5,9 +5,9 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { commonLogin } from '@/api/system/auth';
+import { loginFn } from '@/api/system/auth';
+import type { LoginReq } from '@/api/system/type';
 import { authUtils } from '@/utils/auth';
-import type { CommonLoginReq, CommonLoginData } from '@/pages/login/type';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -18,7 +18,7 @@ export default function TheForm() {
   const t = useTranslation();
 
   // 状态管理
-  const [credentials, setCredentials] = useState<CommonLoginReq>({
+  const [credentials, setCredentials] = useState<LoginReq>({
     username: '',
     password: '',
   });
@@ -27,8 +27,8 @@ export default function TheForm() {
 
   // 处理输入变化
   const handleInputChange =
-    (field: keyof CommonLoginReq) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCredentials((prev: CommonLoginReq) => ({
+    (field: keyof LoginReq) => (event: React.ChangeEvent<HTMLInputElement>) => {
+      setCredentials((prev: LoginReq) => ({
         ...prev,
         [field]: event.target.value,
       }));
@@ -45,8 +45,8 @@ export default function TheForm() {
     try {
       const data = { ...credentials };
       data.password = globalThis.btoa(credentials.password); // 防小白
-      const response = await commonLogin({ data });
-      const loginData = response.data.data as CommonLoginData['data'];
+      const response = await loginFn({ data });
+      const loginData = response.data.data;
       const { userObj } = loginData;
       authUtils.setUserInfo(userObj);
       // 登录成功，跳转到首页

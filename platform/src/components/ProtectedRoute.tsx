@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { authUtils, type UserInfo } from '@/utils/auth';
-import { getProfile } from '@/api/system/auth';
+import { getProfileFn } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -35,7 +35,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       try {
         // 验证token是否有效
-        const result = await getProfile({ data: {} });
+        const result = await getProfileFn({ data: {} });
 
         if (result.data.ok) {
           const { userObj } = result.data.data;
