@@ -2,25 +2,8 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import type { Context } from "hono";
 import type { RouteConfig } from "@hono/zod-openapi";
 import { ParameterObject, RequestBodyObject } from "openapi3-ts/oas31";
-
-export type UserObj = {
-  userId: number;
-  username: string;
-  langCode: string;
-  isEnabled: boolean;
-  regionObj: {
-    value: number;
-    label: string;
-  } | null;
-  departmentObj: {
-    value: number;
-    label: string;
-  } | null;
-  roleArr: {
-    value: number;
-    label: string;
-  }[];
-};
+export type { UserObj } from "@/api/system/user/service";
+import type { UserObj } from "@/api/system/user/service";
 export type RawRouteConfig = RouteConfig & {
   method: Exclude<RouteConfig["method"], "head" | "trace">;
   request?: {

@@ -11,19 +11,19 @@ export default function HomeRefactored() {
   const t = useTranslation();
   const stats = [
     {
-      title: t('home.stats.accounts'),
+      title: t('quickStart.accounts'),
       value: '12',
       icon: <PersonIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
       color: 'primary.main',
     },
     {
-      title: t('home.stats.templates'),
+      title: t('quickStart.templates'),
       value: '24',
       icon: <EmailIcon sx={{ fontSize: 40, color: 'success.main' }} />,
       color: 'success.main',
     },
     {
-      title: t('home.stats.todaySent'),
+      title: t('quickStart.todaySent'),
       value: '156',
       icon: <DashboardIcon sx={{ fontSize: 40, color: 'warning.main' }} />,
       color: 'warning.main',
@@ -70,14 +70,14 @@ export default function HomeRefactored() {
       </SectionLayout>
 
       {/* 快速开始 */}
-      <SectionLayout title={t('home.quickStart.title')}>
+      <SectionLayout title={t('quickStart.title')}>
         <Card>
           <CardContent sx={{ p: { xs: 2, md: 3 } }}>
             <Stack spacing={2}>
-              <Typography variant="body1">{t('home.quickStart.configureAccounts')}</Typography>
-              <Typography variant="body1">{t('home.quickStart.createTemplate')}</Typography>
-              <Typography variant="body1">{t('home.quickStart.sendMail')}</Typography>
-              <Typography variant="body1">{t('home.quickStart.viewLogs')}</Typography>
+              <Typography variant="body1">{t('quickStart.configureAccounts')}</Typography>
+              <Typography variant="body1">{t('quickStart.createTemplate')}</Typography>
+              <Typography variant="body1">{t('quickStart.sendMail')}</Typography>
+              <Typography variant="body1">{t('quickStart.viewLogs')}</Typography>
             </Stack>
           </CardContent>
         </Card>

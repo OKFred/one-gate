@@ -77,7 +77,7 @@ const TheSendForm = memo(
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
             <Box sx={{ flex: 1 }}>
               <TextField
-                label={t('mail.send.form.subject')}
+                label={t('send.dialog.subject')}
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 size="small"
@@ -101,7 +101,7 @@ const TheSendForm = memo(
         {/* 邮件内容编辑器 */}
         <Box>
           <Typography fontWeight={500} mb={1}>
-            {t('mail.send.form.contentLabel')}
+            {t('send.dialog.contentLabel')}
           </Typography>
           <JoditEditor
             value={html}

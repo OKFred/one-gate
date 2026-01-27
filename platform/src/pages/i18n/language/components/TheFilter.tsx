@@ -133,10 +133,10 @@ const TheFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">{t('common.filter.title')}</Typography>
+            <Typography variant="h6">{t('filter.title')}</Typography>
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={t('common.filter.results').replace('{count}', filterCount.toString())}
+                label={t('filter.results').replace('{count}', filterCount.toString())}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -146,7 +146,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label={t('common.filter.clear')}
+                label={t('filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -163,8 +163,8 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label={t('common.filter.keywordLabel')}
-                placeholder={t('common.filter.keywordLabel')}
+                label={t('filter.keywordLabel')}
+                placeholder={t('filter.keywordLabel')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -180,7 +180,7 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('common.filter.enabledStatus')}</InputLabel>
+                  <InputLabel>{t('filter.enabledStatus')}</InputLabel>
                   <Select
                     value={
                       filters.isEnabled === undefined
@@ -189,7 +189,7 @@ const TheFilter = memo(
                           ? 'enabled'
                           : 'disabled'
                     }
-                    label={t('common.filter.enabledStatus')}
+                    label={t('filter.enabledStatus')}
                     onChange={(e) => {
                       const value = e.target.value;
                       handleFilterChange(
@@ -198,35 +198,35 @@ const TheFilter = memo(
                       );
                     }}
                   >
-                    <MenuItem value="all">{t('common.filter.all')}</MenuItem>
-                    <MenuItem value="enabled">{t('common.status.enabled')}</MenuItem>
-                    <MenuItem value="disabled">{t('common.status.disabled')}</MenuItem>
+                    <MenuItem value="all">{t('filter.all')}</MenuItem>
+                    <MenuItem value="enabled">{t('status.enabled')}</MenuItem>
+                    <MenuItem value="disabled">{t('status.disabled')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('common.filter.orderBy')}</InputLabel>
+                  <InputLabel>{t('filter.orderBy')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label={t('common.filter.orderBy')}
+                    label={t('filter.orderBy')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
-                    <MenuItem value="id">{t('common.columns.id')}</MenuItem>
-                    <MenuItem value="createTimeUtc">{t('common.columns.createTime')}</MenuItem>
+                    <MenuItem value="id">{t('columns.id')}</MenuItem>
+                    <MenuItem value="createTimeUtc">{t('columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('common.filter.sortOrder')}</InputLabel>
+                  <InputLabel>{t('filter.sortOrder')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label={t('common.filter.sortOrder')}
+                    label={t('filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">{t('common.filter.asc')}</MenuItem>
-                    <MenuItem value="desc">{t('common.filter.desc')}</MenuItem>
+                    <MenuItem value="asc">{t('filter.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('filter.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>

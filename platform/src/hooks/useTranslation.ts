@@ -8,7 +8,7 @@ type Translations = Record<string, string>;
 let translationCache: Record<LangCode, Translations> = {};
 let version = 0;
 const subscribers = new Set<() => void>();
-const fallbackLangCode = navigator.languages.includes('zh') ? 'zh-CN' : 'en-US';
+const fallbackLangCode = navigator.languages.some((str) => str.includes('zh')) ? 'zh-CN' : 'en-US';
 const notify = () => {
   version += 1;
   subscribers.forEach((fn) => {
@@ -75,9 +75,8 @@ const getSnapshot = () => version;
 export const useTranslation = () => {
   const userInfo = authUtils.getUserInfo();
   const langCode = userInfo?.langCode || fallbackLangCode;
-
-  const tick = useSyncExternalStore(subscribe, getSnapshot);
-  const t = useMemo(() => createTranslator(langCode), [langCode, tick]);
+  useSyncExternalStore(subscribe, getSnapshot);
+  const t = useMemo(() => createTranslator(langCode), [langCode]);
 
   return t;
 };

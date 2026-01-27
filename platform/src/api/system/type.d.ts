@@ -2,7 +2,7 @@ import * as UserAPI from '@/api/system/user';
 import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
 import * as MenuAPI from '@/api/system/menu';
-
+import * as AuthAPI from '@/api/system/auth';
 // ==================== User ====================
 
 // 获取所有用户列表
@@ -61,8 +61,12 @@ export type TreeDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.tree
 export type TreeDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.treeFn>>['data']['data'];
 
 // 获取所有部门列表
-export type ListAllDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.listAllFn>[0]['data']>;
-export type ListAllDepartmentRes = Awaited<ReturnType<typeof DepartmentAPI.listAllFn>>['data']['data'];
+export type ListAllDepartmentReq = NonNullable<
+  Parameters<typeof DepartmentAPI.listAllFn>[0]['data']
+>;
+export type ListAllDepartmentRes = Awaited<
+  ReturnType<typeof DepartmentAPI.listAllFn>
+>['data']['data'];
 
 // 获取部门列表
 export type ListDepartmentReq = NonNullable<Parameters<typeof DepartmentAPI.listFn>[0]['data']>;
@@ -116,3 +120,37 @@ export type UpdateMenuRes = Awaited<ReturnType<typeof MenuAPI.updateFn>>['data']
 // 删除菜单
 export type DeleteMenuReq = NonNullable<Parameters<typeof MenuAPI.deleteFn>[0]['data']>;
 export type DeleteMenuRes = Awaited<ReturnType<typeof MenuAPI.deleteFn>>['data']['data'];
+
+// ==================== Auth ====================
+
+// 登录
+export type LoginReq = NonNullable<Parameters<typeof AuthAPI.loginFn>[0]['data']>;
+export type LoginRes = Awaited<ReturnType<typeof AuthAPI.loginFn>>['data']['data'];
+
+// 微信登录
+export type WechatLoginReq = NonNullable<Parameters<typeof AuthAPI.wechatLoginFn>[0]['data']>;
+export type WechatLoginRes = Awaited<ReturnType<typeof AuthAPI.wechatLoginFn>>['data']['data'];
+
+// 获取用户信息
+export type GetProfileReq = NonNullable<Parameters<typeof AuthAPI.getProfileFn>[0]['data']>;
+export type GetProfileRes = Awaited<ReturnType<typeof AuthAPI.getProfileFn>>['data']['data'];
+
+// 刷新 Token
+export type RefreshTokenReq = NonNullable<Parameters<typeof AuthAPI.refreshTokenFn>[0]['data']>;
+export type RefreshTokenRes = Awaited<ReturnType<typeof AuthAPI.refreshTokenFn>>['data']['data'];
+
+// 更新密码
+export type UpdatePasswordReq = NonNullable<Parameters<typeof AuthAPI.updatePasswordFn>[0]['data']>;
+export type UpdatePasswordRes = Awaited<
+  ReturnType<typeof AuthAPI.updatePasswordFn>
+>['data']['data'];
+
+// 更新用户语言
+export type UpdateLangCodeReq = NonNullable<Parameters<typeof AuthAPI.updateLangCodeFn>[0]['data']>;
+export type UpdateLangCodeRes = Awaited<
+  ReturnType<typeof AuthAPI.updateLangCodeFn>
+>['data']['data'];
+
+// 更新用户信息
+export type UpdateProfileReq = NonNullable<Parameters<typeof AuthAPI.updateProfileFn>[0]['data']>;
+export type UpdateProfileRes = Awaited<ReturnType<typeof AuthAPI.updateProfileFn>>['data']['data'];

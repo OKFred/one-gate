@@ -229,13 +229,13 @@ const TheForm = memo(
         if (editingDepartment && formValues.id) {
           await DepartmentAPI.updateFn({ data: { ...submitData, id: formValues.id } });
           showSnackbar({
-            message: t('common.interact.operationSuccess'),
+            message: t('dialog.operationSuccess'),
             type: 'success',
           });
         } else {
           await DepartmentAPI.addFn({ data: submitData });
           showSnackbar({
-            message: t('common.interact.operationSuccess'),
+            message: t('dialog.operationSuccess'),
             type: 'success',
           });
         }
@@ -268,7 +268,7 @@ const TheForm = memo(
         <DialogTitle
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <span>{editingDepartment ? t('common.actions.edit') : t('common.actions.add')}</span>
+          <span>{editingDepartment ? t('dialog.edit') : t('dialog.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleClose}>
               <CloseIcon />
@@ -283,7 +283,7 @@ const TheForm = memo(
           )}
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label={t('system.department.form.name')}
+              label={t('department.table.name')}
               value={formValues.name}
               onChange={(e) => handleFormChange('name', e.target.value)}
               fullWidth
@@ -292,11 +292,11 @@ const TheForm = memo(
             />
             <FormControl fullWidth>
               <InputLabel id="parent-department-label">
-                {t('system.department.form.parentDepartment')}
+                {t('department.table.parentDepartment')}
               </InputLabel>
               <Select
                 labelId="parent-department-label"
-                label={t('system.department.form.parentDepartment')}
+                label={t('department.table.parentDepartment')}
                 value={formValues.parentId?.toString() || ''}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -304,7 +304,7 @@ const TheForm = memo(
                 }}
               >
                 <MenuItem value="">
-                  <em>{t('system.department.form.topLevelDepartment')}</em>
+                  <em>{t('department.table.topLevelDepartment')}</em>
                 </MenuItem>
                 {getAvailableParentDepartments().map((dept) => (
                   <MenuItem key={dept.id} value={dept.id.toString()}>
@@ -321,10 +321,10 @@ const TheForm = memo(
                   onChange={(e) => handleFormChange('isEnabled', e.target.checked)}
                 />
               }
-              label={t('common.status.enabled')}
+              label={t('status.enabled')}
             />
             <TextField
-              label={t('common.form.remark')}
+              label={t('column.remark')}
               value={formValues.remark ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
@@ -348,11 +348,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleClose}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -362,7 +363,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

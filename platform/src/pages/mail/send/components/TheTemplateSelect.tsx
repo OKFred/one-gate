@@ -9,7 +9,7 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import * as MailTemplateAPI from '@/api/mail/template';
-import type { ListMailTemplateRes } from '@/api/mail/type';
+import type { ListAllMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import { showSnackbar } from '@/components/Notification';
@@ -21,7 +21,7 @@ interface TheTemplateSelectProps extends Props {
 
 const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChange }) => {
   const t = useTranslation();
-  const [templates, setTemplates] = useState<NonNullable<ListMailTemplateRes['list']>>([]);
+  const [templates, setTemplates] = useState<NonNullable<ListAllMailTemplateRes>>([]);
   const [loading, setLoading] = useState(false);
 
   // 获取邮件模板列表
@@ -29,14 +29,11 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
     const fetchTemplates = async () => {
       setLoading(true);
       try {
-        const res = await MailTemplateAPI.listFn({
-          data: {
-            pageNo: 1,
-            pageSize: 100,
-          },
+        const res = await MailTemplateAPI.listAllFn({
+          data: { isEnabled: true },
         });
-        if (res.data?.data?.list) {
-          setTemplates(res.data.data.list);
+        if (res.data?.data) {
+          setTemplates(res.data.data);
         }
       } finally {
         setLoading(false);
@@ -53,7 +50,7 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
       const templateSubject = selectedTemplate.title || '';
       const templateHtml = selectedTemplate.content || '';
       onTemplateChange(selectedTemplateId, templateSubject, templateHtml);
-      showSnackbar({ type: 'success', message: t('mail.send.form.content.loaded') });
+      showSnackbar({ type: 'success', message: t('send.dialog.contentLoaded') });
     } else {
       // 清除模板选择时，也清除内容
       onTemplateChange(undefined, '', '');
@@ -74,7 +71,7 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
         >
           <MenuItem value="none">
             <Typography variant="body2" color="text.secondary">
-              {t('mail.send.noTemplate')}
+              {t('send.noTemplate')}
             </Typography>
           </MenuItem>
           {templates.map((template) => (
@@ -84,9 +81,8 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
                   {template.title || template.name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {t('mail.send.templateName')}: {template.name} | {t('mail.send.creator')}:{' '}
-                  {template.creatorId}
-                  {template.category && ` | ${t('mail.send.category')}: ${template.category}`}
+                  {t('send.templateName')}: {template.name}
+                  {template.category && ` | ${t('send.category')}: ${template.category}`}
                 </Typography>
               </Box>
             </MenuItem>

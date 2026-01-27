@@ -1,6 +1,9 @@
 import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
 import { validate } from "@cfworker/json-schema";
-import { HTTPException } from "hono/http-exception";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "../errorHandler/businessError";
 import { errorSchema } from "@/middleware/errorHandler/schema";
 import { StatusCodes } from "http-status-codes";
 import { ContentfulStatusCode } from "hono/utils/http-status";
@@ -58,10 +61,9 @@ function routeMaker({
     //如果不是 application/json 则报错
     const contentType = c.req.header("content-type");
     if (contentType !== "application/json") {
-      throw new HTTPException(
-        StatusCodes.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
-        { cause: ["Content-Type must be application/json"] }
-      );
+      throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
+        cause: ["Content-Type must be application/json"],
+      });
     }
     if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
       await authMiddleware(c);
@@ -69,10 +71,9 @@ function routeMaker({
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
     if (!valid) {
-      throw new HTTPException(
-        StatusCodes.UNPROCESSABLE_ENTITY as ContentfulStatusCode,
-        { cause: errors }
-      );
+      throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
+        cause: errors,
+      });
     }
     c.set("bodyObj", bodyObj);
     const result = adapter ? await adapter(service)(c) : await service(c); // 暂时设置为可选，后续改造完了变为必须

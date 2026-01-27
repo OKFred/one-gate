@@ -60,7 +60,7 @@ export default function UserManagement() {
   }, []);
 
   return (
-    <PageLayout title={t('system.user.title')} actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('user.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />

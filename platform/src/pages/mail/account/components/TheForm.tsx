@@ -137,7 +137,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {editId ? t('dialog.edit') : t('dialog.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -156,7 +156,7 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('mail.account.form.nickname')}
+                  label={t('account.table.nickname')}
                   value={form.nickname}
                   onChange={(e) => setForm({ ...form, nickname: e.target.value })}
                   required
@@ -164,7 +164,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label={t('mail.account.form.email')}
+                  label={t('account.table.email')}
                   type="email"
                   value={form.mailAddress}
                   onChange={(e) => setForm({ ...form, mailAddress: e.target.value })}
@@ -176,7 +176,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('mail.account.form.host')}
+                  label={t('account.table.host')}
                   value={form.host}
                   onChange={(e) => setForm({ ...form, host: e.target.value })}
                   required
@@ -184,7 +184,7 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                 />
                 <TextField
-                  label={t('mail.account.form.port')}
+                  label={t('account.table.port')}
                   type="number"
                   value={form.port}
                   onChange={(e) => setForm({ ...form, port: Number(e.target.value) })}
@@ -196,7 +196,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('mail.account.form.password')}
+                  label={t('account.table.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -221,7 +221,7 @@ const TheForm = memo(
               </Stack>
 
               <TextField
-                label={t('common.form.remark')}
+                label={t('column.remark')}
                 value={form.remark || ''}
                 onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
                 fullWidth
@@ -245,11 +245,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCancel}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -259,7 +260,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

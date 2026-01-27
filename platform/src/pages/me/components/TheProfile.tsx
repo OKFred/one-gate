@@ -1,10 +1,11 @@
-import { forwardRef, useImperativeHandle, useState, memo } from 'react';
+import { forwardRef, useImperativeHandle, useState, memo, useRef } from 'react';
 import { Card, CardContent, Avatar, Typography, Box } from '@mui/material';
 import { Person as PersonIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { GetUserRes } from '@/api/system/type';
 import type { Props } from '../index';
+import ThePasswordDialog, { type ThePasswordDialogRef } from './ThePasswordDialog';
 
 // 暴露给父组件的方法
 export interface TheProfileRef {
@@ -14,9 +15,9 @@ export interface TheProfileRef {
 
 const TheProfile = memo(
   forwardRef<TheProfileRef, Props>(({ localObj }, ref) => {
-    const { dataRef } = localObj;
     const t = useTranslation();
     const [user, setUser] = useState<GetUserRes | null>(null);
+    const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -30,40 +31,44 @@ const TheProfile = memo(
     );
 
     const handleEdit = () => {
-      dataRef.current?.openPasswordDialog();
+      passwordDialogRef.current?.open();
     };
 
     if (!user) return null;
 
     return (
-      <Card>
-        <CardContent sx={{ textAlign: 'center' }}>
-          <Avatar
-            sx={{
-              width: 80,
-              height: 80,
-              margin: '0 auto 16px auto',
-              bgcolor: 'primary.main',
-            }}
-          >
-            <PersonIcon sx={{ fontSize: 40 }} />
-          </Avatar>
-
-          <Typography variant="h5" gutterBottom>
-            {user.username}
-          </Typography>
-          <Box mt={2}>
-            <ResponsiveButton
-              variant="outlined"
-              startIcon={<EditIcon />}
-              onClick={handleEdit}
-              fullWidth
+      <>
+        <Card>
+          <CardContent sx={{ textAlign: 'center' }}>
+            <Avatar
+              sx={{
+                width: 80,
+                height: 80,
+                margin: '0 auto 16px auto',
+                bgcolor: 'primary.main',
+              }}
             >
-              {t('me.changePassword.title')}
-            </ResponsiveButton>
-          </Box>
-        </CardContent>
-      </Card>
+              <PersonIcon sx={{ fontSize: 40 }} />
+            </Avatar>
+
+            <Typography variant="h5" gutterBottom>
+              {user.username}
+            </Typography>
+            <Box mt={2}>
+              <ResponsiveButton
+                variant="outlined"
+                startIcon={<EditIcon />}
+                onClick={handleEdit}
+                fullWidth
+              >
+                {t('me.changePassword.title')}
+              </ResponsiveButton>
+            </Box>
+          </CardContent>
+        </Card>
+        {/* 编辑用户信息对话框 */}
+        <ThePasswordDialog ref={passwordDialogRef} localObj={localObj} />
+      </>
     );
   }),
 );

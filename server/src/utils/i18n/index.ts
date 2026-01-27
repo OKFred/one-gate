@@ -2,7 +2,7 @@ import type { NodeHonoContext } from "@/types/app";
 import {
   getTranslation,
   getSupportedLanguages,
-  isI18nCacheInitialized,
+  isTranslationCacheInitialized,
 } from "./cache";
 
 /**
@@ -14,7 +14,7 @@ export const createTranslator = (
   langCode?: string
 ): ((key: string) => string) => {
   // 如果缓存未初始化，先记录警告
-  if (!isI18nCacheInitialized()) {
+  if (!isTranslationCacheInitialized()) {
     console.warn("⚠️  多语言缓存尚未初始化，将返回原始 key");
   }
 
@@ -51,4 +51,4 @@ export const getTranslator = (c: NodeHonoContext) => {
 };
 
 // 导出缓存管理函数
-export { loadI18nCache, reloadI18nCache, getCacheStats } from "./cache";
+export { loadTranslationCache, reloadTranslationCache, getCacheStats } from "./cache";

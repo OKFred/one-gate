@@ -153,7 +153,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {editId ? t('dialog.edit') : t('dialog.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -196,7 +196,7 @@ const TheForm = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.region.form.alpha2Code')}
+                  label={t('region.table.alpha2Code')}
                   value={form.alpha2Code}
                   onChange={(e) => setForm({ ...form, alpha2Code: e.target.value.toUpperCase() })}
                   required
@@ -207,7 +207,7 @@ const TheForm = memo(
                 />
 
                 <TextField
-                  label={t('i18n.region.form.alpha3Code')}
+                  label={t('region.table.alpha3Code')}
                   value={form.alpha3Code}
                   onChange={(e) => setForm({ ...form, alpha3Code: e.target.value.toUpperCase() })}
                   required
@@ -218,7 +218,7 @@ const TheForm = memo(
                 />
 
                 <TextField
-                  label={t('i18n.region.form.numeric')}
+                  label={t('region.table.numeric')}
                   type="number"
                   value={form.numeric}
                   onChange={(e) => setForm({ ...form, numeric: parseInt(e.target.value) || 0 })}
@@ -238,7 +238,7 @@ const TheForm = memo(
                       onChange={(e) => setForm({ ...form, iso3166Independent: e.target.checked })}
                     />
                   }
-                  label={t('i18n.region.form.iso3166Independent')}
+                  label={t('region.table.iso3166Independent')}
                 />
 
                 <FormControlLabel
@@ -248,7 +248,7 @@ const TheForm = memo(
                       onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
                     />
                   }
-                  label={t('switch.enabled')}
+                  label={t('status.enabled')}
                 />
               </Stack>
 
@@ -269,7 +269,7 @@ const TheForm = memo(
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label={t('i18n.region.form.businessLanguages')}
+                    label={t('region.table.businessLanguages')}
                     placeholder={t('form.pleaseSelect')}
                     size={isMobile ? 'medium' : 'medium'}
                   />
@@ -277,7 +277,7 @@ const TheForm = memo(
                 fullWidth
               />
               <TextField
-                label={t('common.form.remark')}
+                label={t('column.remark')}
                 value={form.remark || ''}
                 onChange={(e) =>
                   setForm({
@@ -307,11 +307,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCancel}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -321,7 +322,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

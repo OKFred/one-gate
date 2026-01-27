@@ -41,7 +41,7 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
-import { reloadI18nCache } from "@/utils/i18n";
+import { reloadTranslationCache } from "@/utils/i18n";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -257,7 +257,7 @@ async function onAdd(
 
   // 触发多语言缓存重新加载（除非明确跳过）
   if (!options?.skipCacheReload) {
-    await reloadI18nCache();
+    await reloadTranslationCache();
   }
 
   return result[0]?.id;
@@ -317,7 +317,7 @@ async function onUpdate(
 
   // 触发多语言缓存重新加载（除非明确跳过）
   if (!options?.skipCacheReload) {
-    await reloadI18nCache();
+    await reloadTranslationCache();
   }
 
   return res[0].id;
@@ -363,7 +363,7 @@ async function onDelete(
 
   // 触发多语言缓存重新加载（除非明确跳过）
   if (!options?.skipCacheReload) {
-    await reloadI18nCache();
+    await reloadTranslationCache();
   }
 
   return result[0].id;

@@ -11,10 +11,10 @@ const NotFound: React.FC = () => {
         404
       </Typography>
       <Typography variant="h5" color="text.secondary" gutterBottom>
-        {t('error.notFound.message')}
+        {t('dialog.message')}
       </Typography>
       <Button variant="contained" color="primary" component={RouterLink} to="/home" sx={{ mt: 20 }}>
-        {t('error.notFound.backHome')}
+        {t('dialog.backHome')}
       </Button>
     </div>
   );

@@ -108,7 +108,7 @@ const TheForm = memo(
             },
           });
         }
-        showSnackbar({ type: 'success', message: t('common.interact.operationSuccess') });
+        showSnackbar({ type: 'success', message: t('dialog.operationSuccess') });
         handleCancel();
         // 刷新表格数据
         tableRef.current?.refresh();
@@ -142,7 +142,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {editId ? t('dialog.edit') : t('dialog.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -161,52 +161,52 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('mail.template.form.name')}
+                  label={t('template.table.name')}
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  helperText={t('mail.template.form.nameHelp')}
+                  helperText={t('template.table.nameHelp')}
                 />
                 <TextField
-                  label={t('mail.template.form.title')}
+                  label={t('template.table.subject')}
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  helperText={t('mail.template.form.titleHelp')}
+                  helperText={t('template.table.subjectHelp')}
                 />
               </Stack>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.translation.form.langCode')}
+                  label={t('translation.table.langCode')}
                   value={form.langCode}
                   onChange={(e) => setForm({ ...form, langCode: e.target.value })}
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder={t('form.pleaseEnter')}
-                  helperText={t('mail.template.form.langCodeHelp')}
+                  helperText={t('template.table.langCodeHelp')}
                 />
                 <TextField
-                  label={t('mail.template.form.category')}
+                  label={t('template.table.category')}
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder={t('form.pleaseEnter')}
-                  helperText={t('mail.template.form.categoryHelp')}
+                  helperText={t('template.table.categoryHelp')}
                 />
               </Stack>
 
               <Box>
                 <Typography variant="subtitle1" fontWeight={500} mb={1}>
-                  {t('mail.template.form.contentLabel')}
+                  {t('template.table.contentLabel')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  {t('mail.template.form.contentHelp')}
+                  {t('template.table.contentHelp')}
                 </Typography>
                 <JoditEditor
                   value={form.content || ''}
@@ -217,7 +217,7 @@ const TheForm = memo(
               </Box>
 
               <TextField
-                label={t('common.form.remark')}
+                label={t('column.remark')}
                 value={form.remark || ''}
                 onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
                 fullWidth
@@ -242,11 +242,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCancel}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -256,7 +257,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

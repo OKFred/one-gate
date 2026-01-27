@@ -169,7 +169,7 @@ const TheTable = memo(
       try {
         await MailTemplateAPI.deleteFn({ data: { id: deleteId } });
         showSnackbar({
-          message: t('common.interact.operationSuccess'),
+          message: t('dialog.operationSuccess'),
           type: 'success',
         });
         fetchTemplates(filters, page);
@@ -183,9 +183,9 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('columns.id'), render: (row) => row.id },
       {
-        title: t('mail.template.columns.title'),
+        title: t('template.table.title'),
         render: (row) => (
           <Tooltip title={row.title || ''}>
             <span>{truncateText(row.title, 30)}</span>
@@ -193,7 +193,7 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('mail.template.columns.name'),
+        title: t('template.table.name'),
         render: (row) => (
           <Tooltip title={row.name || ''}>
             <span>{truncateText(row.name, 20)}</span>
@@ -201,19 +201,19 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('mail.template.columns.contentPreview'),
+        title: t('dialog.title.preview'),
         render: (row) => truncateText(stripHtml(row.content), 40),
       },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
-        title: t('common.form.remark'),
+        title: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <>
@@ -240,22 +240,22 @@ const TheTable = memo(
       { type: 'title', render: (row) => row.title },
       {
         type: 'subtitle',
-        label: `ID: ${t('mail.template.columns.name')}`,
+        label: `ID: ${t('template.table.name')}`,
         render: (row) => `${row.id} | ${row.name}`,
       },
       {
         type: 'content',
-        label: t('mail.template.columns.contentPreview'),
+        label: t('dialog.title.preview'),
         render: (row) => truncateText(stripHtml(row.content), 100),
       },
       {
         type: 'content',
-        label: t('common.columns.createTime'),
+        label: t('columns.createTime'),
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
         type: 'content',
-        label: t('common.form.remark'),
+        label: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
@@ -303,12 +303,14 @@ const TheTable = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-          <DialogTitle>{t('common.actions.confirm')}</DialogTitle>
-          <DialogContent>{t('common.actions.deleteConfirmTitle')}</DialogContent>
+          <DialogTitle>{t('dialog.confirm')}</DialogTitle>
+          <DialogContent>{t('dialog.deleteConfirmTitle')}</DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
+              {t('dialog.cancel')}
+            </Button>
             <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-              {t('common.actions.delete')}
+              {t('dialog.delete')}
             </Button>
           </DialogActions>
         </Dialog>

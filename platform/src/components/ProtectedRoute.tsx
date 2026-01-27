@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { authUtils, type UserInfo } from '@/utils/auth';
-import { getProfile } from '@/api/system/auth';
+import { authUtils } from '@/utils/auth';
+import { checkTokenFn } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -18,39 +18,28 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     setIsAuthenticated(false);
   }
 
-  function successfulLogin(newUserInfo: UserInfo) {
-    authUtils.setUserInfo(newUserInfo);
+  function successfulLogin() {
     setIsAuthenticated(true);
   }
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = authUtils.getUserInfo()?.token;
-
       if (!token) {
         failedLogin();
         setIsLoading(false);
         return;
       }
-
       try {
-        // 验证token是否有效
-        const result = await getProfile({ data: {} });
-
-        if (result.data.ok) {
-          const { userObj } = result.data.data;
-          successfulLogin({ token, ...userObj });
-          return;
-        } else {
-          failedLogin();
-        }
+        await checkTokenFn({ data: {} });
+        successfulLogin();
+        return;
       } catch {
         failedLogin();
       } finally {
         setIsLoading(false);
       }
     };
-
     checkAuth();
   }, []);
 

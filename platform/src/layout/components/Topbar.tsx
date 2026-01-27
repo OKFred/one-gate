@@ -13,10 +13,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Logout from '@mui/icons-material/Logout';
 import LanguageIcon from '@mui/icons-material/Language';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { authUtils, type UserInfo } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
-import * as UserApiService from '@/api/system/user';
-import * as LanguageApiService from '@/api/i18n/language';
+import * as LanguageAPI from '@/api/i18n/language';
+import * as AuthAPI from '@/api/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ListAllLanguageRes } from '@/api/i18n/type';
 
@@ -28,6 +30,13 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    // 从 localStorage 读取主题设置
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved === 'dark';
+    // 如果没有保存，则跟随系统设置
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const t = useTranslation();
@@ -38,11 +47,23 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     setUserInfo(user);
   }, []);
 
+  // 应用主题设置
+  useEffect(() => {
+    const html = document.documentElement;
+    if (darkMode) {
+      html.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      html.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [darkMode]);
+
   // 加载语言列表
   useEffect(() => {
     const loadLanguages = async () => {
       try {
-        const response = await LanguageApiService.listAllFn({
+        const response = await LanguageAPI.listAllFn({
           data: { isEnabled: true },
         });
         setLanguages(response.data.data);
@@ -69,9 +90,13 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
 
   // 处理语言切换
   const handleChangeLanguage = async (langCode: string) => {
-    if (!userInfo) return;
+    if (!userInfo || userInfo.langCode === langCode) {
+      handleClose();
+      return;
+    }
     try {
-      await UserApiService.updateLangCodeFn({ data: { langCode } });
+      await AuthAPI.updateLangCodeFn({ data: { langCode } });
+      authUtils.setUserInfo({ ...userInfo, langCode }); // 更新本地存储的语言代码，否则前后端会不一致
       // 刷新页面以应用新语言
       window.location.reload();
     } catch (error) {
@@ -97,6 +122,11 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     return userInfo.username.charAt(0).toUpperCase();
   };
 
+  // 切换主题
+  const handleToggleTheme = () => {
+    setDarkMode((prev) => !prev);
+  };
+
   return (
     <AppBar position="fixed" sx={{ left: 0, right: 0, zIndex: (theme) => theme.zIndex.drawer + 2 }}>
       <Toolbar sx={{ minHeight: '64px', pl: { sm: 0 } }}>
@@ -119,6 +149,11 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
           {t('topbar.title')}
         </Typography>
+
+        {/* 主题切换按钮 */}
+        <IconButton color="inherit" onClick={handleToggleTheme} sx={{ mr: 1 }}>
+          {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+        </IconButton>
 
         {/* 用户信息和菜单 */}
         {userInfo && (

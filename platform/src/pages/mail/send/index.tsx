@@ -35,11 +35,11 @@ export default function MailSend() {
   };
 
   return (
-    <PageLayout title={t('mail.send.title')}>
+    <PageLayout title={t('send.title')}>
       <Box sx={{ mx: 'auto', p: 3 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
           <Typography variant="h5" gutterBottom fontWeight={600}>
-            {t('mail.send.title')}
+            {t('send.title')}
           </Typography>
           <Box component="form" onSubmit={handleSubmit} autoComplete="off">
             {/* 数据管理组件 */}
@@ -56,7 +56,7 @@ export default function MailSend() {
               sx={{ mt: 2 }}
               fullWidth
             >
-              {t('mail.send.action.send')}
+              {t('send.action.send')}
             </Button>
           </Box>
         </Paper>

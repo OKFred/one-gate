@@ -130,29 +130,29 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
-      { title: t('common.columns.name'), render: (row) => row.name },
+      { title: t('columns.id'), render: (row) => row.id },
+      { title: t('columns.name'), render: (row) => row.name },
       {
-        title: t('common.columns.status'),
+        title: t('columns.status'),
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />
         ),
       },
       {
-        title: t('common.columns.createTime'),
+        title: t('columns.createTime'),
         render: (row) => formatTime(row.createTimeUtc),
       },
       {
-        title: t('common.columns.updateTime'),
+        title: t('columns.updateTime'),
         render: (row) => formatTime(row.updateTimeUtc),
       },
-      { title: t('common.form.remark'), render: (row) => row.remark || '--' },
+      { title: t('column.remark'), render: (row) => row.remark || '--' },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <RoleActionButtons row={row} formRef={formRef} onDeleteSuccess={handleDeleteSuccess} />
@@ -163,18 +163,18 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => row.name },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('common.form.remark'), render: (row) => row.remark || '--' },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
+      { type: 'content', label: t('column.remark'), render: (row) => row.remark || '--' },
       {
         type: 'content',
-        label: t('common.columns.createTime'),
+        label: t('columns.createTime'),
         render: (row) => formatTime(row.createTimeUtc),
       },
       {
         type: 'tags',
         render: (row) => (
           <Chip
-            label={row.isEnabled ? t('switch.enabled') : t('switch.disabled')}
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             color={row.isEnabled ? 'success' : 'default'}
             size="small"
           />

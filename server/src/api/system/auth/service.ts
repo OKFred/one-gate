@@ -1,8 +1,16 @@
 import userService, { utils as userUtils } from "@/api/system/user/service";
+import { utils as regionUtils } from "@/api/i18n/region/service";
 import { tokenUtils } from "@/utils/token";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj } from "@/types/app";
-import { UserDetailKeys, UserVO } from "../user/db.table";
+import {
+  IndexVO,
+  UserAddVO,
+  UserDetailKeys,
+  UserLoginResultKeys,
+  UserTokenVO,
+  UserVO,
+} from "../user/db.table";
 import {
   bodyAdapter,
   bodyUserAdapter,
@@ -33,28 +41,24 @@ const loginReq = {
   required: ["username", "password"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const loginRes = {
   type: "object",
   properties: {
     userObj: {
       type: "object",
       properties: {
-        token: {
-          type: "string",
-          description: "用户token",
-          maxLength: 500,
-        },
-        ...UserVO,
+        id: UserVO.id,
+        username: UserVO.username,
+        langCode: UserVO.langCode,
+        token: UserTokenVO.token,
       },
-      required: ["token", ...UserDetailKeys] as const,
+      required: [...UserLoginResultKeys] as const,
       additionalProperties: false,
     },
   },
   required: ["userObj"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onLogin(
   params: FromSchema<typeof loginReq>
 ): Promise<FromSchema<typeof loginRes> | null> {
@@ -71,9 +75,9 @@ async function onLogin(
     !verifyResult.userObj ||
     !verifyResult.userObj.isEnabled
   )
-    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+    throw new BusinessError(BusinessErrorCode.LOGIN_FAILED);
   const userObj = verifyResult.userObj;
-  const { id, ...rest } = userObj;
+  const { id, langCode, ...rest } = userObj;
   // 生成token
   const token = tokenUtils.generateToken({
     userId: id,
@@ -82,9 +86,10 @@ async function onLogin(
 
   return {
     userObj: {
-      token,
       id,
-      ...rest,
+      username,
+      langCode,
+      token,
     },
   };
 }
@@ -158,45 +163,29 @@ const wechatLoginApi = {
 // 刷新token
 const refreshTokenReq = {
   type: "object",
-  properties: {
-    token: {
-      type: "string",
-      description: "需要刷新的token",
-      examples: ["example-session-token"],
-      maxLength: 500,
-    },
-  },
-  required: ["token"] as const,
+  properties: {},
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const refreshTokenRes = {
   type: "object",
   properties: {
     token: {
-      type: "string",
+      ...UserTokenVO.token,
       description: "新的token",
-      maxLength: 500,
     },
   },
   required: ["token"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onRefreshToken(
-  params: FromSchema<typeof refreshTokenReq>
+  params: FromSchema<typeof refreshTokenReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
-  const { token } = params;
+  const { token } = userObj;
   const newToken = tokenUtils.refreshToken(token);
-  if (!newToken) {
-    return null;
-  }
-
-  return {
-    token: newToken,
-  };
+  if (!newToken) throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  return { token: newToken };
 }
-
 const refreshTokenApi = {
   req: refreshTokenReq,
   res: refreshTokenRes,
@@ -209,13 +198,39 @@ const refreshTokenApi = {
   service: onRefreshToken,
 } satisfies API;
 
+// 检查token有效性
+const checkTokenReq = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const checkTokenRes = {
+  type: "boolean",
+} as const satisfies JSONSchema;
+async function onCheckToken(
+  params: FromSchema<typeof checkTokenReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof checkTokenRes> | null> {
+  return !!userObj;
+}
+const checkTokenApi = {
+  req: checkTokenReq,
+  res: checkTokenRes,
+  pathInfo: {
+    path: "/check",
+    method: "post",
+    summary: "检查token有效性",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onCheckToken,
+} satisfies API;
+
 // 获取当前用户信息
 const profileReq = {
   type: "object",
   properties: {},
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 const profileRes = {
   type: "object",
   properties: {
@@ -231,7 +246,6 @@ const profileRes = {
   required: ["userObj"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
-
 async function onProfile(
   _params: FromSchema<typeof profileReq>,
   userObj: UserObj
@@ -240,7 +254,6 @@ async function onProfile(
   const userDataObj = await userService.get.service({ id: userId });
   return { userObj: userDataObj };
 }
-
 const profileApi = {
   req: profileReq,
   res: profileRes,
@@ -253,9 +266,134 @@ const profileApi = {
   service: onProfile,
 } satisfies API;
 
+const updateProfileReq = {
+  type: "object",
+  properties: {
+    /* 当前仅支持更新用户国家/地区 */
+    regionObj: UserVO.regionObj,
+  },
+  required: [] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updateProfileRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onUpdateProfile(
+  params: FromSchema<typeof updateProfileReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updateProfileRes> | null> {
+  const { userId: id } = userObj;
+  const { regionObj } = params;
+  const regionId = regionObj ? regionObj.value : null;
+  if (regionId) await regionUtils.verifyRegion(regionId);
+  const res = await userService.update.service({ id, regionObj }, userObj);
+  return res;
+}
+const updateProfileApi = {
+  req: updateProfileReq,
+  res: updateProfileRes,
+  pathInfo: {
+    path: "/updateProfile",
+    method: "post",
+    summary: "更新当前用户信息",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onUpdateProfile,
+} satisfies API;
+
+/* 为什么“更新用户信息”和“更新用户语言”不适合强行复用？
+1️⃣ 权限语义完全不同（这是最关键的）
+2️⃣ 审计 & 合规视角：语言 ≠ 用户资料
+3️⃣ 频率 & 调用来源完全不一样 */
+const updateLangCodeReq = {
+  type: "object",
+  properties: {
+    langCode: UserVO.langCode,
+  },
+  required: ["langCode"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updateLangCodeRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onUpdateLangCode(
+  params: FromSchema<typeof updateLangCodeReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updateLangCodeRes> | null> {
+  const { userId: id } = userObj;
+  const { langCode } = params;
+  const updateData = { id, langCode };
+  const res = await userService.update.service(updateData, userObj);
+  return res;
+}
+const updateLangCodeApi = {
+  req: updateLangCodeReq,
+  res: updateLangCodeRes,
+  pathInfo: {
+    path: "/updateLangCode",
+    method: "post",
+    summary: "更新用户语言",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onUpdateLangCode,
+} satisfies API;
+
+// 更新用户密码
+const updatePasswordReq = {
+  type: "object",
+  properties: {
+    oldPassword: { ...UserAddVO.password, description: "旧密码" },
+    newPassword: { ...UserAddVO.password, description: "新密码" },
+  },
+  required: ["oldPassword", "newPassword"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const updatePasswordRes = {
+  ...IndexVO["id"],
+} as const satisfies JSONSchema;
+async function onUpdatePassword(
+  params: FromSchema<typeof updatePasswordReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updatePasswordRes> | null> {
+  const { userId: id, username } = userObj;
+  const { oldPassword: oldBase64Password, newPassword: newBase64Password } =
+    params;
+  const oldPlainPassword = Buffer.from(oldBase64Password, "base64").toString(
+    "utf-8"
+  );
+  const verifyResult = await userUtils.verifyUsernameAndPassword({
+    username,
+    password: oldPlainPassword,
+  });
+  if (!verifyResult.valid) {
+    throw new BusinessError(BusinessErrorCode.WRONG_PASSWORD);
+  }
+  const newHashedPassword = await userUtils.convertPassword(newBase64Password);
+  const res = await userUtils.updatePassword(
+    { id, newHashedPassword },
+    userObj
+  );
+  return res;
+}
+const updatePasswordApi = {
+  req: updatePasswordReq,
+  res: updatePasswordRes,
+  pathInfo: {
+    path: "/updatePassword",
+    method: "post",
+    summary: "更新用户密码",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onUpdatePassword,
+} satisfies API;
+
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
   refresh: refreshTokenApi,
+  check: checkTokenApi,
   profile: profileApi,
+  updateProfile: updateProfileApi,
+  updateLangCode: updateLangCodeApi,
+  updatePassword: updatePasswordApi,
 };

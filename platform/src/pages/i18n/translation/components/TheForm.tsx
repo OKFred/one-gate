@@ -191,7 +191,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {editId ? t('dialog.edit') : t('dialog.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -210,54 +210,54 @@ const TheForm = memo(
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.translation.form.application')}
+                  label={t('translation.table.application')}
                   value={form.application}
                   onChange={(e) => setForm({ ...form, application: e.target.value })}
                   required
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.translation.form.application')}
+                  placeholder={t('translation.table.application')}
                 />
 
                 <TextField
-                  label={t('i18n.translation.form.business')}
+                  label={t('translation.table.business')}
                   value={form.business}
                   onChange={(e) => setForm({ ...form, business: e.target.value })}
                   required
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.translation.form.business')}
+                  placeholder={t('translation.table.business')}
                 />
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label={t('i18n.translation.form.langCode')}
+                  label={t('translation.table.langCode')}
                   value={form.langCode}
                   onChange={(e) => setForm({ ...form, langCode: e.target.value })}
                   required
                   fullWidth
                   autoComplete="on"
                   size={isMobile ? 'medium' : 'medium'}
-                  placeholder={t('i18n.translation.form.langCode')}
+                  placeholder={t('translation.table.langCode')}
                 />
               </Stack>
 
               <TextField
-                label={t('i18n.translation.form.tKey')}
+                label={t('translation.table.tKey')}
                 value={form.tKey}
                 onChange={(e) => setForm({ ...form, tKey: e.target.value })}
                 required
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('i18n.translation.form.tKey')}
+                placeholder={t('translation.table.tKey')}
               />
 
               <Box>
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="flex-start">
                   <TextField
-                    label={t('i18n.translation.form.tValue')}
+                    label={t('translation.table.tValue')}
                     value={form.tValue}
                     onChange={(e) => setForm({ ...form, tValue: e.target.value })}
                     onBlur={() => checkDuplicate(form.tValue)}
@@ -266,7 +266,7 @@ const TheForm = memo(
                     multiline
                     rows={4}
                     size={isMobile ? 'medium' : 'medium'}
-                    placeholder={t('i18n.translation.form.tValue')}
+                    placeholder={t('translation.table.tValue')}
                     sx={{ flex: 1 }}
                   />
                   {checking && (
@@ -281,9 +281,10 @@ const TheForm = memo(
                   <Alert severity="warning" sx={{ mt: 2 }} icon={<WarningIcon />}>
                     <Box sx={{ mb: 1 }}>
                       <strong>
-                        {t('i18n.translation.duplicate.foundPrefix')}{' '}
-                        {duplicateInfo.duplicates.length}{' '}
-                        {t('i18n.translation.duplicate.foundSuffix')}
+                        {t('translation.duplicateWarning').replace(
+                          '{count}',
+                          String(duplicateInfo.duplicates.length),
+                        )}
                       </strong>
                     </Box>
                     <List dense sx={{ bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, mb: 1 }}>
@@ -314,14 +315,14 @@ const TheForm = memo(
                       ))}
                     </List>
                     <Box sx={{ fontSize: '0.875rem', color: 'text.secondary' }}>
-                      {t('i18n.translation.duplicate.suggestion')}
+                      {t('translation.dialog.duplicateSuggestion')}
                     </Box>
                   </Alert>
                 )}
               </Box>
 
               <Stack direction="row" spacing={2} alignItems="center">
-                <Typography variant="body2">{t('common.filter.enabledStatus')}</Typography>
+                <Typography variant="body2">{t('status.enabled')}</Typography>
                 <Box
                   component="label"
                   sx={{
@@ -337,15 +338,13 @@ const TheForm = memo(
                     style={{ width: 20, height: 20, cursor: 'pointer' }}
                   />
                   <Typography variant="body2" sx={{ ml: 1 }}>
-                    {form.isEnabled
-                      ? t('switch.enabled')
-                      : t('switch.disabled')}
+                    {form.isEnabled ? t('status.enabled') : t('status.disabled')}
                   </Typography>
                 </Box>
               </Stack>
 
               <TextField
-                label={t('common.form.remark')}
+                label={t('column.remark')}
                 value={form.remark || ''}
                 onChange={(e) =>
                   setForm({
@@ -375,11 +374,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCancel}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -389,7 +389,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -122,7 +122,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {editId ? t('dialog.edit') : t('dialog.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -140,7 +140,7 @@ const TheForm = memo(
           <form onSubmit={handleSubmit}>
             <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
               <TextField
-                label={t('common.form.roleName')}
+                label={t('role.table.roleName')}
                 value={form.name ?? ''}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
@@ -150,7 +150,7 @@ const TheForm = memo(
               />
 
               <TextField
-                label={t('common.form.permissions')}
+                label={t('role.table.permissions')}
                 value={form.permissions ?? ''}
                 onChange={(e) =>
                   setForm({
@@ -162,7 +162,7 @@ const TheForm = memo(
                 multiline
                 rows={4}
                 size={isMobile ? 'medium' : 'medium'}
-                helperText={t('system.role.form.permissionsHelper')}
+                helperText={t('role.table.permissionsHelper')}
               />
 
               <FormControlLabel
@@ -173,11 +173,11 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label={t('common.filter.enabledStatus')}
+                label={t('status.enabled')}
               />
 
               <TextField
-                label={t('common.form.remark')}
+                label={t('column.remark')}
                 value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({
@@ -207,11 +207,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCancel}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -221,7 +222,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

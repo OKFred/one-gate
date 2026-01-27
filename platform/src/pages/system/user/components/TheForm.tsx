@@ -213,11 +213,6 @@ const TheForm = memo(
       handleDepartmentClose();
     };
 
-    const handleDepartmentClear = () => {
-      setForm({ ...form, departmentObj: null });
-      handleDepartmentClose();
-    };
-
     const renderTreeItems = (nodes: TreeDepartmentRes): React.ReactNode => {
       return nodes.map((node) => (
         <TreeItem
@@ -268,7 +263,7 @@ const TheForm = memo(
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {editId ? t('common.actions.update') : t('common.actions.add')}
+            {editId ? t('dialog.edit') : t('dialog.add')}
           </Box>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
@@ -296,7 +291,7 @@ const TheForm = memo(
 
               {!editId && (
                 <TextField
-                  label={t('system.user.form.password')}
+                  label={t('user.table.password')}
                   type={showPassword ? 'text' : 'password'}
                   value={(form as AddUserReq).password ?? ''}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -322,7 +317,7 @@ const TheForm = memo(
 
               <Box>
                 <InputLabel sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
-                  {t('me.details.department')}
+                  {t('me.department')}
                 </InputLabel>
                 <Paper
                   variant="outlined"
@@ -368,19 +363,14 @@ const TheForm = memo(
                   }}
                 >
                   <Box sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="subtitle2">{t('form.select')}</Typography>
-                      {form.departmentObj && (
-                        <Button size="small" onClick={handleDepartmentClear}>
-                          {t('common.clear')}
-                        </Button>
-                      )}
-                    </Box>
                     {departmentTree.length > 0 ? (
-                      <SimpleTreeView>{renderTreeItems(departmentTree)}</SimpleTreeView>
+                      <SimpleTreeView>
+                        {renderTreeItems([{ id: 0, name: t('form.select') }] as TreeDepartmentRes)}
+                        {renderTreeItems(departmentTree)}
+                      </SimpleTreeView>
                     ) : (
                       <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
-                        {t('common.noData')}
+                        {t('column.noData')}
                       </Typography>
                     )}
                   </Box>
@@ -388,7 +378,7 @@ const TheForm = memo(
               </Box>
 
               <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('me.details.region')}</InputLabel>
+                <InputLabel>{t('me.region')}</InputLabel>
                 <Select
                   value={form.regionObj?.value || ''}
                   onChange={(e) => {
@@ -408,7 +398,7 @@ const TheForm = memo(
                       setForm({ ...form, regionObj: null });
                     }
                   }}
-                  label={t('me.details.region')}
+                  label={t('me.region')}
                 >
                   <MenuItem value="">
                     <em>{t('form.select')}</em>
@@ -427,14 +417,14 @@ const TheForm = memo(
               </FormControl>
 
               <FormControl fullWidth size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('common.language')}</InputLabel>
+                <InputLabel>{t('column.language')}</InputLabel>
                 <Select
                   value={form.langCode || ''}
                   onChange={(e) => {
                     const value = e.target.value;
                     setForm({ ...form, langCode: value || '' });
                   }}
-                  label={t('common.language')}
+                  label={t('column.language')}
                 >
                   <MenuItem value="">
                     <em>{t('form.select')}</em>
@@ -448,12 +438,12 @@ const TheForm = memo(
               </FormControl>
 
               <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('menu.system.role')}</InputLabel>
+                <InputLabel>{t('me.role')}</InputLabel>
                 <Select
                   multiple
                   value={selectedRoleValues}
                   onChange={handleRoleChange}
-                  input={<OutlinedInput label={t('menu.system.role')} />}
+                  input={<OutlinedInput label={t('me.role')} />}
                   renderValue={(selected) => (
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                       {selected.map((value) => {
@@ -482,11 +472,11 @@ const TheForm = memo(
                     disabled={editId === 1}
                   />
                 }
-                label={t('common.status.enabled')}
+                label={t('status.enabled')}
               />
 
               <TextField
-                label={t('common.form.remark')}
+                label={t('column.remark')}
                 value={form.remark ?? ''}
                 onChange={(e) =>
                   setForm({ ...form, remark: e.target.value ? e.target.value : null })
@@ -512,11 +502,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCancel}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -526,7 +517,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

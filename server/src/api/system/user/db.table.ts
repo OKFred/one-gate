@@ -29,8 +29,7 @@ const UserPasswordPO = {
   password: {
     type: "string",
     description: "密码",
-    examples: ["pass"],
-    maxLength: 100,
+    examples: ["QWRtaW5AM=="],
   },
 } as const satisfies Partial<Record<keyof UserPOLike, JSONSchema>>;
 export const UserBasePO = {
@@ -202,6 +201,14 @@ export const UserUpdateVO = {
   ...UserUniqueVO,
   ...UserBaseVO,
 } as const satisfies Partial<Record<keyof UserVOLike, JSONSchema>>; // 更新
+export const UserTokenVO = {
+  token: {
+    type: "string",
+    description: "用户的token",
+    examples: ["example-session-token"],
+    maxLength: 500,
+  },
+} as const satisfies Partial<Record<"token", JSONSchema>>; // Token
 export type UserVOLike = Omit<UserPOLike, UserDTOMapKeyLike> & UserDTOLike;
 export type UserAddVOLike = Omit<
   UserAddPOLike,
@@ -253,7 +260,14 @@ export const UserDetailKeys = [
   "roleArr",
 ] as const satisfies RequiredKeys<UserVOLike>[];
 export const UserUniqueKeys = ["username"] as const;
-
+export const UserLoginResultKeys = [
+  "token",
+  "id",
+  "username",
+  "langCode",
+] as const satisfies RequiredKeys<
+  Pick<UserVOLike, "id" | "username" | "langCode"> & { token: string }
+>[];
 // 可排序字段（解耦供 service 使用）
 export const UserSortableKeys = [
   "id",

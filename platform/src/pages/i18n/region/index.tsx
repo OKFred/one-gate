@@ -46,7 +46,7 @@ export default function ThePage() {
   }, []);
 
   return (
-    <PageLayout title={t('i18n.region.title')} actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('region.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />

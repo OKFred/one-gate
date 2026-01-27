@@ -137,9 +137,9 @@ const TheTable = memo(
 
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('common.columns.id'), render: (row) => row.id },
+      { title: t('columns.id'), render: (row) => row.id },
       {
-        title: t('mail.log.columns.subject'),
+        title: t('log.table.subject'),
         render: (row) => (
           <Tooltip title={row.title || ''}>
             <span>{truncateText(row.title, 30)}</span>
@@ -147,7 +147,7 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('mail.log.columns.recipient'),
+        title: t('log.table.recipient'),
         render: (row) => (
           <Tooltip title={row.mailTo || ''}>
             <span>{truncateText(row.mailTo, 25)}</span>
@@ -155,7 +155,7 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('mail.log.columns.sender'),
+        title: t('log.table.sender'),
         render: (row) => (
           <Tooltip title={row.mailFrom || ''}>
             <span>{truncateText(row.mailFrom, 25)}</span>
@@ -163,7 +163,7 @@ const TheTable = memo(
         ),
       },
       {
-        title: t('common.columns.status'),
+        title: t('columns.status'),
         align: 'center',
         render: (row) =>
           row.sendStatus ? (
@@ -175,15 +175,15 @@ const TheTable = memo(
           ),
       },
       {
-        title: t('mail.log.columns.sendTime'),
+        title: t('log.table.sendTime'),
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
-        title: t('common.form.remark'),
+        title: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {
-        title: t('common.columns.actions'),
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <IconButton onClick={() => handleViewLog(row)} color="primary" size="small">
@@ -196,25 +196,25 @@ const TheTable = memo(
     // 卡片字段配置（移动端）
     const cardFields: CardField<TableState['list'][0]>[] = [
       { type: 'title', render: (row) => truncateText(row.title, 40) },
-      { type: 'subtitle', label: t('common.columns.id'), render: (row) => row.id },
+      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
       {
         type: 'content',
-        label: t('mail.log.columns.recipient'),
+        label: t('log.table.recipient'),
         render: (row) => row.mailTo,
       },
       {
         type: 'content',
-        label: t('mail.log.columns.sender'),
+        label: t('log.table.sender'),
         render: (row) => row.mailFrom,
       },
       {
         type: 'content',
-        label: t('mail.log.columns.sendTime'),
+        label: t('log.table.sendTime'),
         render: (row) => formatDate(row.createTimeUtc),
       },
       {
         type: 'content',
-        label: t('common.form.remark'),
+        label: t('column.remark'),
         render: (row) => row.remark || '-',
       },
       {

@@ -177,7 +177,7 @@ const TheForm = memo(
     // 提交表单
     const handleSubmit = async () => {
       if (!formValues.name.trim()) {
-        setError(t('system.menu.form.menuNameRequired'));
+        setError(t('menu.table.menuNameRequired'));
         return;
       }
 
@@ -203,7 +203,7 @@ const TheForm = memo(
             },
           });
           showSnackbar({
-            message: t('common.interact.operationSuccess'),
+            message: t('dialog.operationSuccess'),
             type: 'success',
           });
         } else {
@@ -211,7 +211,7 @@ const TheForm = memo(
             data: submitData,
           });
           showSnackbar({
-            message: t('common.interact.operationSuccess'),
+            message: t('dialog.operationSuccess'),
             type: 'success',
           });
         }
@@ -250,7 +250,7 @@ const TheForm = memo(
         <DialogTitle
           sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
         >
-          <span>{editingMenu ? t('common.actions.edit') : t('common.actions.add')}</span>
+          <span>{editingMenu ? t('dialog.edit') : t('dialog.add')}</span>
           {isMobile && (
             <IconButton edge="end" color="inherit" onClick={handleCloseDialog}>
               <CloseIcon />
@@ -267,7 +267,7 @@ const TheForm = memo(
 
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
-              label={t('system.menu.form.menuName')}
+              label={t('menu.table.menuName')}
               value={formValues.name}
               onChange={(e) => handleFormChange('name', e.target.value)}
               fullWidth
@@ -275,36 +275,36 @@ const TheForm = memo(
             />
 
             <TextField
-              label={t('system.menu.form.customIcon')}
+              label={t('menu.table.customIcon')}
               value={formValues.icon}
               onChange={(e) => handleFormChange('icon', e.target.value)}
               fullWidth
-              helperText={t('system.menu.form.iconHelper')}
+              helperText={t('menu.table.iconHelper')}
             />
 
             <TextField
-              label={t('system.menu.form.routePath')}
+              label={t('menu.table.routePath')}
               value={formValues.path ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
                 handleFormChange('path', hasValue(value) ? value : null);
               }}
               fullWidth
-              helperText={t('system.menu.form.pathHelper')}
+              helperText={t('menu.table.pathHelper')}
             />
 
             <FormControl fullWidth>
-              <InputLabel>{t('system.menu.form.parentMenu')}</InputLabel>
+              <InputLabel>{t('menu.table.parentMenu')}</InputLabel>
               <Select
                 value={formValues.parentId === null ? '' : formValues.parentId}
-                label={t('system.menu.form.parentMenu')}
+                label={t('menu.table.parentMenu')}
                 onChange={(e) => {
                   const val = e.target.value as string | number;
                   handleFormChange('parentId', val === '' ? null : Number(val));
                 }}
               >
                 <MenuItem value="">
-                  <em>{t('system.menu.form.topLevelMenu')}</em>
+                  <em>{t('menu.table.topLevelMenu')}</em>
                 </MenuItem>
                 {allMenus
                   .filter((m) => m.id !== editingMenu?.id)
@@ -317,21 +317,21 @@ const TheForm = memo(
             </FormControl>
 
             <TextField
-              label={t('system.menu.form.sort')}
+              label={t('menu.table.sort')}
               type="number"
               value={formValues.sort}
               onChange={(e) => handleFormChange('sort', parseInt(e.target.value, 10) || 0)}
               fullWidth
-              helperText={t('system.menu.form.sortHelper')}
+              helperText={t('menu.table.sortHelper')}
             />
 
             <FormControl fullWidth>
-              <InputLabel>{t('system.menu.form.visibleRoles')}</InputLabel>
+              <InputLabel>{t('menu.table.visibleRoles')}</InputLabel>
               <Select
                 multiple
                 value={formValues.roleIdArr}
                 onChange={handleRoleChange}
-                input={<OutlinedInput label={t('system.menu.form.visibleRoles')} />}
+                input={<OutlinedInput label={t('menu.table.visibleRoles')} />}
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => {
@@ -349,7 +349,7 @@ const TheForm = memo(
               </Select>
             </FormControl>
             <Typography variant="caption" color="text.secondary">
-              {t('system.menu.form.allRolesVisible')}
+              {t('menu.table.allRolesVisible')}
             </Typography>
 
             <FormControlLabel
@@ -359,10 +359,10 @@ const TheForm = memo(
                   onChange={(e) => handleFormChange('isEnabled', e.target.checked)}
                 />
               }
-              label={t('common.filter.enabledStatus')}
+              label={t('status.enabled')}
             />
             <TextField
-              label={t('common.form.remark')}
+              label={t('column.remark')}
               value={formValues.remark ?? ''}
               onChange={(e) => {
                 const value = e.target.value;
@@ -387,11 +387,12 @@ const TheForm = memo(
         >
           <Button
             onClick={handleCloseDialog}
+            variant="outlined"
             fullWidth={isMobile}
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.cancel')}
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -401,7 +402,7 @@ const TheForm = memo(
             size={isMobile ? 'large' : 'medium'}
             disabled={loading}
           >
-            {t('common.actions.save')}
+            {t('dialog.save')}
           </Button>
         </DialogActions>
       </Dialog>

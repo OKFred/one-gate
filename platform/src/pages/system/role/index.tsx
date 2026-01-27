@@ -23,7 +23,7 @@ export default function RoleManagementPage() {
   const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
 
   return (
-    <PageLayout title={t('system.role.title')} actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('role.title')} actions={<TheActionButtons formRef={formRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
       <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />

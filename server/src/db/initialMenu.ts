@@ -3,27 +3,27 @@
 export const initialMenuData = [
   {
     id: 1,
-    name: "menu.home",
+    name: "sidebar.menu.home",
     icon: "material-symbols:home",
     path: "/home",
     sort: 1,
   },
   {
     id: 2,
-    name: "menu.me",
+    name: "sidebar.menu.me",
     icon: "material-symbols:account-circle",
     path: "/me",
     sort: 2,
   },
   {
     id: 3,
-    name: "menu.mail",
+    name: "sidebar.menu.mail",
     icon: "material-symbols:mail",
     sort: 3,
   },
   {
     id: 4,
-    name: "menu.mail.template",
+    name: "sidebar.menu.mail.template",
     icon: "material-symbols:description",
     path: "/mail/template",
     parentId: 3,
@@ -31,7 +31,7 @@ export const initialMenuData = [
   },
   {
     id: 5,
-    name: "menu.mail.log",
+    name: "sidebar.menu.mail.log",
     icon: "material-symbols:history",
     path: "/mail/log",
     parentId: 3,
@@ -39,7 +39,7 @@ export const initialMenuData = [
   },
   {
     id: 6,
-    name: "menu.mail.send",
+    name: "sidebar.menu.mail.send",
     icon: "material-symbols:send",
     path: "/mail/send",
     parentId: 3,
@@ -47,7 +47,7 @@ export const initialMenuData = [
   },
   {
     id: 7,
-    name: "menu.mail.account",
+    name: "sidebar.menu.mail.account",
     icon: "material-symbols:manage-accounts",
     path: "/mail/account",
     parentId: 3,
@@ -55,14 +55,14 @@ export const initialMenuData = [
   },
   {
     id: 8,
-    name: "menu.system",
+    name: "sidebar.menu.system",
     icon: "material-symbols:settings",
     sort: 4,
     roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 9,
-    name: "menu.system.role",
+    name: "sidebar.menu.system.role",
     icon: "material-symbols:supervisor-account",
     path: "/system/role",
     parentId: 8,
@@ -70,7 +70,7 @@ export const initialMenuData = [
   },
   {
     id: 10,
-    name: "menu.system.user",
+    name: "sidebar.menu.user",
     icon: "material-symbols:group",
     path: "/system/user",
     parentId: 8,
@@ -78,7 +78,7 @@ export const initialMenuData = [
   },
   {
     id: 11,
-    name: "menu.system.department",
+    name: "sidebar.menu.system.department",
     icon: "material-symbols:groups",
     path: "/system/department",
     parentId: 8,
@@ -86,7 +86,7 @@ export const initialMenuData = [
   },
   {
     id: 12,
-    name: "menu.system.menu",
+    name: "sidebar.menu.menu",
     icon: "material-symbols:menu",
     path: "/system/menu",
     parentId: 8,
@@ -94,14 +94,14 @@ export const initialMenuData = [
   },
   {
     id: 13,
-    name: "menu.i18n",
+    name: "sidebar.menu.i18n",
     icon: "material-symbols:language",
     sort: 5,
     roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 14,
-    name: "menu.i18n.language",
+    name: "sidebar.menu.language",
     icon: "material-symbols:language-international",
     path: "/i18n/language",
     parentId: 13,
@@ -109,7 +109,7 @@ export const initialMenuData = [
   },
   {
     id: 15,
-    name: "menu.i18n.translation",
+    name: "sidebar.menu.translation",
     icon: "material-symbols:translate",
     path: "/i18n/translation",
     parentId: 13,
@@ -117,7 +117,7 @@ export const initialMenuData = [
   },
   {
     id: 16,
-    name: "menu.i18n.region",
+    name: "sidebar.menu.i18n.region",
     icon: "material-symbols:public",
     path: "/i18n/region",
     parentId: 13,

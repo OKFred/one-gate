@@ -8,7 +8,6 @@ import {
   DialogContentText,
   DialogActions,
   Button,
-  Alert,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -32,7 +31,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
 
   return (
     <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
-      {t('common.actions.add')}
+      {t('dialog.add')}
     </Button>
   );
 });
@@ -99,20 +98,16 @@ export const TreeNodeActionButtons = memo(
     return (
       <>
         <Box sx={{ display: 'flex', gap: 0.5 }}>
-          <IconButton
-            size="small"
-            onClick={handleAddChild}
-            title={t('system.department.actions.addChild')}
-          >
+          <IconButton size="small" onClick={handleAddChild} title={t('department.dialog.addChild')}>
             <AddIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" onClick={handleEdit} title={t('common.actions.edit')}>
+          <IconButton size="small" onClick={handleEdit} title={t('dialog.edit')}>
             <EditIcon fontSize="small" />
           </IconButton>
           <IconButton
             size="small"
             onClick={openDeleteDialog}
-            title={t('common.actions.delete')}
+            title={t('dialog.delete')}
             disabled={hasChildren}
           >
             <DeleteIcon fontSize="small" />
@@ -121,21 +116,16 @@ export const TreeNodeActionButtons = memo(
 
         {/* 删除确认对话框 */}
         <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
-          <DialogTitle>{t('common.actions.deleteConfirmTitle')}</DialogTitle>
+          <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              {t('form.actions.deleteConfirmMessage')}
-            </DialogContentText>
-            {hasChildren && (
-              <Alert severity="warning" sx={{ mt: 2 }}>
-                该部门存在子部门，请先删除子部门后再删除该部门。
-              </Alert>
-            )}
+            <DialogContentText>{t('table.deleteConfirm')}</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={closeDeleteDialog}>{t('common.cancel')}</Button>
+            <Button onClick={closeDeleteDialog} variant="outlined">
+              {t('dialog.cancel')}
+            </Button>
             <Button onClick={handleConfirmDelete} color="error" autoFocus disabled={hasChildren}>
-              {t('common.actions.delete')}
+              {t('dialog.delete')}
             </Button>
           </DialogActions>
         </Dialog>
