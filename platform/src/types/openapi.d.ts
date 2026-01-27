@@ -6578,12 +6578,12 @@ export interface components {
         SystemAuthUpdatePasswordReq: {
             /**
              * @description 旧密码
-             * @example pass123
+             * @example QWRtaW5AM==
              */
             oldPassword: string;
             /**
              * @description 新密码
-             * @example pass123
+             * @example QWRtaW5AM==
              */
             newPassword: string;
         };
@@ -7620,7 +7620,7 @@ export interface components {
             username: string;
             /**
              * @description 密码
-             * @example pass123
+             * @example QWRtaW5AM==
              */
             password: string;
             /**
