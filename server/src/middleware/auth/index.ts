@@ -1,6 +1,6 @@
 import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
-import { utils as userUtils } from "@/api/system/user/service";
+import userService from "@/api/system/user/service";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -19,16 +19,16 @@ export const authMiddleware = async (c: NodeHonoContext) => {
   if (!payload) {
     throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   }
-
-  const user = await userUtils.getUserObjByName(payload.username);
-
+  const user = await userService.get.service({ id: payload.userId });
   if (!user?.isEnabled) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  const { password, id: userId, ...rest } = user;
+  const { id: userId, ...rest } = user;
   // 将用户信息添加到context中
   c.set("userObj", {
+    token,
     userId,
+    id: userId,
     ...rest,
   });
 };

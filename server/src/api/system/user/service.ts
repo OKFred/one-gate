@@ -31,7 +31,7 @@ import { utils as languageUtils } from "@/api/i18n/language/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
-import type { UserObj, RequiredKeys } from "@/types/app";
+import type { RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
@@ -401,6 +401,10 @@ const deleteApi = {
   service: onDelete,
 } satisfies API;
 
+export type UserObj = FromSchema<typeof getRes> & {
+  token: string;
+  userId: number;
+};
 const getReq = {
   type: "object",
   properties: {
