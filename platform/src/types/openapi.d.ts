@@ -2440,6 +2440,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/auth/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 检查token有效性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemAuthCheckReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemAuthCheckRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/auth/profile": {
         parameters: {
             query?: never;
@@ -6263,8 +6321,6 @@ export interface components {
             ok: boolean;
             data: {
                 userObj: {
-                    /** @description 用户token */
-                    token: string;
                     /**
                      * @description id
                      * @example 1
@@ -6281,63 +6337,11 @@ export interface components {
                      * @example zh-CN
                      */
                     langCode: string;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 备注说明 */
-                    remark?: ((string | null) | null) | null;
-                    /** @description 国家地区对象 */
-                    regionObj: (({
-                        /**
-                         * @description 国家地区ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 国家地区二位编码
-                         * @example CN
-                         */
-                        label: string;
-                    } | null) | null) | null;
-                    /** @description 部门对象 */
-                    departmentObj: (({
-                        /**
-                         * @description 部门ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 部门名称
-                         * @example 研发部
-                         */
-                        label: string;
-                    } | null) | null) | null;
-                    /** @description 角色数组 */
-                    roleArr: {
-                        /**
-                         * @description 角色ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 角色名称
-                         * @example 管理员
-                         */
-                        label: string;
-                    }[];
-                    /** @description 创建者ID */
-                    creatorId: number;
                     /**
-                     * @description 创建时间
-                     * @example 1672531199000
+                     * @description 用户的token
+                     * @example example-session-token
                      */
-                    createTimeUtc: number;
-                    /** @description 更新者ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
+                    token: string;
                 };
             };
             message: string;
@@ -6358,8 +6362,6 @@ export interface components {
             ok: boolean;
             data: {
                 userObj: {
-                    /** @description 用户token */
-                    token: string;
                     /**
                      * @description id
                      * @example 1
@@ -6376,80 +6378,31 @@ export interface components {
                      * @example zh-CN
                      */
                     langCode: string;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 备注说明 */
-                    remark?: ((string | null) | null) | null;
-                    /** @description 国家地区对象 */
-                    regionObj: (({
-                        /**
-                         * @description 国家地区ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 国家地区二位编码
-                         * @example CN
-                         */
-                        label: string;
-                    } | null) | null) | null;
-                    /** @description 部门对象 */
-                    departmentObj: (({
-                        /**
-                         * @description 部门ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 部门名称
-                         * @example 研发部
-                         */
-                        label: string;
-                    } | null) | null) | null;
-                    /** @description 角色数组 */
-                    roleArr: {
-                        /**
-                         * @description 角色ID
-                         * @example 1
-                         */
-                        value: number;
-                        /**
-                         * @description 角色名称
-                         * @example 管理员
-                         */
-                        label: string;
-                    }[];
-                    /** @description 创建者ID */
-                    creatorId: number;
                     /**
-                     * @description 创建时间
-                     * @example 1672531199000
+                     * @description 用户的token
+                     * @example example-session-token
                      */
-                    createTimeUtc: number;
-                    /** @description 更新者ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
+                    token: string;
                 };
             };
             message: string;
         };
-        SystemAuthRefreshReq: {
-            /**
-             * @description 需要刷新的token
-             * @example example-session-token
-             */
-            token: string;
-        };
+        SystemAuthRefreshReq: Record<string, never>;
         SystemAuthRefreshRes: {
             ok: boolean;
             data: {
-                /** @description 新的token */
+                /**
+                 * @description 新的token
+                 * @example example-session-token
+                 */
                 token: string;
             };
+            message: string;
+        };
+        SystemAuthCheckReq: Record<string, never>;
+        SystemAuthCheckRes: {
+            ok: boolean;
+            data: boolean;
             message: string;
         };
         SystemAuthProfileReq: Record<string, never>;

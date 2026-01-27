@@ -31,6 +31,16 @@ export const refreshTokenFn = (
   });
 };
 
+export const checkTokenFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/check', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/auth/check',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const getProfileFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/profile', 'post'>, 'url' | 'method'>,
 ) => {
@@ -49,7 +59,7 @@ export const updateProfileFn = (
     method: 'post',
     ...axiosConfig,
   });
-}
+};
 
 export const updatePasswordFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/auth/updatePassword', 'post'>, 'url' | 'method'>,
