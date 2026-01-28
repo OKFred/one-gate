@@ -123,6 +123,22 @@ export const initialMenuData = [
     parentId: 13,
     sort: 3,
   },
+  {
+    id: 17,
+    name: "sidebar.menu.system.permission",
+    icon: "material-symbols:lock",
+    path: "/system/permission",
+    parentId: 8,
+    sort: 5,
+  },
+  {
+    id: 18,
+    name: "sidebar.menu.system.rolePermission",
+    icon: "material-symbols:admin-panel-settings",
+    path: "/system/role-permission",
+    parentId: 8,
+    sort: 6,
+  },
 ] as menuLike[];
 
 type menuLike = {

@@ -1,0 +1,244 @@
+/**
+ * 权限工具函数
+ * 提供权限查询和处理的工具方法
+ */
+
+import db from "@/db/index";
+import { permissionTable } from "@/api/system/permission/db.table";
+import { rolePermissionTable } from "@/api/system/role_permission/db.table";
+import { eq, and, inArray } from "drizzle-orm";
+
+/**
+ * 权限信息接口
+ */
+export interface PermissionInfo {
+  id: number;
+  code: string;
+  name: string;
+  type: "menu" | "button" | "api";
+  resource: string | null;
+  effect: "allow" | "deny";
+  scope: "all" | "own" | "dept" | "custom";
+  resourceFilter: string | null;
+  conditions: string | null;
+}
+
+/**
+ * 根据角色ID数组获取所有权限
+ * @param roleIds 角色ID数组
+ * @returns 权限信息数组
+ */
+export async function getPermissionsByRoleIds(
+  roleIds: number[]
+): Promise<PermissionInfo[]> {
+  if (roleIds.length === 0) {
+    return [];
+  }
+
+  const rows = await db
+    .select({
+      id: permissionTable.id,
+      code: permissionTable.code,
+      name: permissionTable.name,
+      type: permissionTable.type,
+      resource: permissionTable.resource,
+      effect: permissionTable.effect,
+      scope: permissionTable.scope,
+      resourceFilter: rolePermissionTable.resourceFilter,
+      conditions: rolePermissionTable.conditions,
+    })
+    .from(rolePermissionTable)
+    .innerJoin(
+      permissionTable,
+      eq(rolePermissionTable.permissionId, permissionTable.id)
+    )
+    .where(
+      and(
+        inArray(rolePermissionTable.roleId, roleIds),
+        eq(permissionTable.isEnabled, true)
+      )
+    );
+
+  // 类型断言，因为 drizzle 的类型推断
+  return rows.map((row) => ({
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    type: row.type as "menu" | "button" | "api",
+    resource: row.resource,
+    effect: row.effect as "allow" | "deny",
+    scope: row.scope as "all" | "own" | "dept" | "custom",
+    resourceFilter: row.resourceFilter,
+    conditions: row.conditions,
+  }));
+}
+
+/**
+ * 根据权限代码获取权限信息
+ * @param codes 权限代码数组
+ * @returns 权限信息数组
+ */
+export async function getPermissionsByCodes(
+  codes: string[]
+): Promise<PermissionInfo[]> {
+  if (codes.length === 0) {
+    return [];
+  }
+
+  const rows = await db
+    .select({
+      id: permissionTable.id,
+      code: permissionTable.code,
+      name: permissionTable.name,
+      type: permissionTable.type,
+      resource: permissionTable.resource,
+      effect: permissionTable.effect,
+      scope: permissionTable.scope,
+    })
+    .from(permissionTable)
+    .where(
+      and(inArray(permissionTable.code, codes), eq(permissionTable.isEnabled, true))
+    );
+
+  return rows.map((row) => ({
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    type: row.type as "menu" | "button" | "api",
+    resource: row.resource,
+    effect: row.effect as "allow" | "deny",
+    scope: row.scope as "all" | "own" | "dept" | "custom",
+    resourceFilter: null, // 单独查询权限时没有关联数据
+    conditions: null,
+  }));
+}
+
+/**
+ * 过滤生效的权限（处理 allow/deny）
+ * @param permissions 权限数组
+ * @returns 处理后的权限数组（只包含最终允许的权限）
+ */
+export function filterEffectivePermissions(
+  permissions: PermissionInfo[]
+): PermissionInfo[] {
+  // 按权限代码分组
+  const permissionMap = new Map<string, PermissionInfo[]>();
+
+  for (const perm of permissions) {
+    const existing = permissionMap.get(perm.code) || [];
+    existing.push(perm);
+    permissionMap.set(perm.code, existing);
+  }
+
+  // 处理每个权限组
+  const result: PermissionInfo[] = [];
+  for (const [code, perms] of permissionMap) {
+    // 如果有任何 deny，则该权限被拒绝
+    const hasDeny = perms.some((p) => p.effect === "deny");
+    if (!hasDeny) {
+      // 只取第一个 allow 权限
+      const allowPerm = perms.find((p) => p.effect === "allow");
+      if (allowPerm) {
+        result.push(allowPerm);
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * 根据类型过滤权限
+ * @param permissions 权限数组
+ * @param type 权限类型
+ * @returns 过滤后的权限数组
+ */
+export function filterPermissionsByType(
+  permissions: PermissionInfo[],
+  type: "menu" | "button" | "api"
+): PermissionInfo[] {
+  return permissions.filter((p) => p.type === type);
+}
+
+/**
+ * 检查权限代码数组是否包含指定权限
+ * @param permissions 权限数组
+ * @param code 要检查的权限代码
+ * @returns 是否包含该权限
+ */
+export function hasPermissionCode(
+  permissions: PermissionInfo[],
+  code: string
+): boolean {
+  return permissions.some((p) => p.code === code && p.effect === "allow");
+}
+
+/**
+ * 检查权限代码数组是否包含任一指定权限
+ * @param permissions 权限数组
+ * @param codes 要检查的权限代码数组
+ * @returns 是否包含任一权限
+ */
+export function hasAnyPermission(
+  permissions: PermissionInfo[],
+  codes: string[]
+): boolean {
+  return codes.some((code) => hasPermissionCode(permissions, code));
+}
+
+/**
+ * 检查权限代码数组是否包含所有指定权限
+ * @param permissions 权限数组
+ * @param codes 要检查的权限代码数组
+ * @returns 是否包含所有权限
+ */
+export function hasAllPermissions(
+  permissions: PermissionInfo[],
+  codes: string[]
+): boolean {
+  return codes.every((code) => hasPermissionCode(permissions, code));
+}
+
+/**
+ * 获取用户的菜单权限
+ * @param permissions 权限数组
+ * @returns 菜单权限数组
+ */
+export function getMenuPermissions(
+  permissions: PermissionInfo[]
+): PermissionInfo[] {
+  return filterPermissionsByType(permissions, "menu");
+}
+
+/**
+ * 获取用户的按钮权限代码列表
+ * @param permissions 权限数组
+ * @returns 按钮权限代码数组
+ */
+export function getButtonPermissionCodes(permissions: PermissionInfo[]): string[] {
+  return filterPermissionsByType(permissions, "button").map((p) => p.code);
+}
+
+/**
+ * 获取用户的API权限
+ * @param permissions 权限数组
+ * @returns API权限数组
+ */
+export function getApiPermissions(permissions: PermissionInfo[]): PermissionInfo[] {
+  return filterPermissionsByType(permissions, "api");
+}
+
+export const permissionUtils = {
+  getPermissionsByRoleIds,
+  getPermissionsByCodes,
+  filterEffectivePermissions,
+  filterPermissionsByType,
+  hasPermissionCode,
+  hasAnyPermission,
+  hasAllPermissions,
+  getMenuPermissions,
+  getButtonPermissionCodes,
+  getApiPermissions,
+};
+
+export default permissionUtils;

@@ -14,6 +14,7 @@ import translationService, {
   utils as translationUtils,
 } from "@/api/i18n/translation/service";
 import { loadTranslationCache } from "@/utils/i18n";
+import { initPermissions } from "./initPermissions";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -30,16 +31,9 @@ const SUPER_ADMIN = {
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
-  permissions: JSON.stringify([
-    "system:*",
-    "user:*",
-    "role:*",
-    "department:*",
-    "mail:*",
-  ]),
   isEnabled: true,
   creatorId: 1, // 系统初始化
-  remark: "系统初始化创建的超级管理员角色",
+  remark: "系统初始化创建的超级管理员角色，拥有所有权限",
 };
 
 /**
@@ -257,21 +251,25 @@ export async function initDatabase() {
     // 1. 初始化超级管理员角色
     const roleId = await initSuperAdminRole();
 
-    // 2. 初始化超级管理员账号
+    // 2. 初始化权限数据
+    await initPermissions();
+
+    // 3. 初始化超级管理员账号
     await initSuperAdminUser(roleId);
-    // 3. 初始化菜单
+    
+    // 4. 初始化菜单
     await initMenu();
 
-    // 4. 初始化语言
+    // 5. 初始化语言
     await initLanguage();
 
-    // 5. 初始化多语言
+    // 6. 初始化多语言
     await initTranslation();
 
-    // 6. 加载多语言缓存
+    // 7. 加载多语言缓存
     await loadTranslationCache();
 
-    // 7. 初始化国家地区
+    // 8. 初始化国家地区
     await initCountryRegion();
 
     console.log("✅ 数据库初始化完成");

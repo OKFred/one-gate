@@ -17,7 +17,6 @@
 | name | TEXT | 权限名称 | "查看用户", "编辑文件" |
 | type | TEXT | 权限类型 | `menu`/`button`/`api` |
 | resource | TEXT | 资源路径 | `/api/users/:id`, `/dashboard/users` |
-| method | TEXT | HTTP方法（API类型） | `GET`, `POST`, `PUT`, `DELETE` |
 | effect | TEXT | 效果 | `allow`（允许）, `deny`（拒绝） |
 | scope | TEXT | 资源范围 | `all`/`own`/`dept`/`custom` |
 | parent_id | INTEGER | 父权限ID | 用于菜单层级 |
@@ -166,7 +165,6 @@ await fetch('/api/system/permission/add', {
     name: '查看用户',
     type: 'api',
     resource: '/api/users/:id',
-    method: 'GET',
     effect: 'allow',
     scope: 'all',
     isEnabled: true
