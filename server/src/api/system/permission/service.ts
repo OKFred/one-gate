@@ -1,33 +1,32 @@
 import db from "@/db/index";
 import {
-  roleTable,
+  permissionTable,
   IndexVO,
-  RoleVO,
-  RoleListVO,
-  RoleAddVO,
-  RoleUpdateVO,
-  RoleListKeys,
-  RoleDetailKeys,
-  RoleGetKeys,
-  RoleDeleteKeys,
-  RoleAddKeys,
-  RoleUpdateKeys,
-  RoleSortableKeys,
-  type RolePOLike,
-  type RoleVOLike,
-  type RoleAddVOLike,
-  type RoleUpdateVOLike,
-  type RoleDeleteVOLike,
-  type RoleGetVOLike,
-  RoleBaseVO,
-  RoleUniqueKeys,
-  RoleUniqueVO,
+  PermissionVO,
+  PermissionListVO,
+  PermissionAddVO,
+  PermissionUpdateVO,
+  PermissionListKeys,
+  PermissionDetailKeys,
+  PermissionGetKeys,
+  PermissionDeleteKeys,
+  PermissionAddKeys,
+  PermissionUpdateKeys,
+  PermissionSortableKeys,
+  type PermissionPOLike,
+  type PermissionVOLike,
+  type PermissionAddVOLike,
+  type PermissionUpdateVOLike,
+  type PermissionDeleteVOLike,
+  type PermissionGetVOLike,
+  PermissionBaseVO,
+  PermissionUniqueKeys,
+  PermissionUniqueVO,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -49,13 +48,29 @@ import {
 const buildWhereCondition = ({
   keyword,
   isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+  type,
+  scope,
+}: Pick<
+  FromSchema<typeof listReq>,
+  "keyword" | "isEnabled" | "type" | "scope"
+>) => {
   const conditions = [];
   if (hasValue(keyword)) {
-    conditions.push(or(like(roleTable.name, `%${keyword}%`)));
+    conditions.push(
+      or(
+        like(permissionTable.code, `%${keyword}%`),
+        like(permissionTable.name, `%${keyword}%`)
+      )
+    );
   }
   if (isEnabled !== undefined) {
-    conditions.push(eq(roleTable.isEnabled, isEnabled));
+    conditions.push(eq(permissionTable.isEnabled, isEnabled));
+  }
+  if (type !== undefined) {
+    conditions.push(eq(permissionTable.type, type));
+  }
+  if (scope !== undefined) {
+    conditions.push(eq(permissionTable.scope, scope));
   }
   return conditions.length > 0
     ? conditions.length === 1
@@ -68,8 +83,10 @@ const listAllReq = {
   type: "object",
   properties: {
     ...listAllReqBase,
-    isEnabled: RoleVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof RolePOLike)[]>(RoleSortableKeys),
+    isEnabled: PermissionVO["isEnabled"],
+    type: PermissionVO["type"],
+    scope: PermissionVO["scope"],
+    orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
   required: [],
   additionalProperties: false,
@@ -80,10 +97,10 @@ const listAllRes = {
     type: "object",
     properties: {
       ...IndexVO,
-      ...RoleBaseVO,
-      ...RoleUniqueVO,
+      ...PermissionBaseVO,
+      ...PermissionUniqueVO,
     },
-    required: [...RoleGetKeys, ...RoleUniqueKeys],
+    required: [...PermissionGetKeys, ...PermissionUniqueKeys],
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
@@ -91,21 +108,27 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
   const { orderBy = "id", descend = true } = params;
-  const orderField = roleTable[orderBy] || roleTable.id;
-  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
-  // 查询所有匹配的数据
+  const orderField = permissionTable[orderBy] || permissionTable.id;
+  const maxLimit = 10000;
+
   const rows = await db
     .select({
-      id: roleTable.id,
-      name: roleTable.name,
-      remark: roleTable.remark,
-      isEnabled: roleTable.isEnabled,
+      id: permissionTable.id,
+      code: permissionTable.code,
+      name: permissionTable.name,
+      type: permissionTable.type,
+      resource: permissionTable.resource,
+      effect: permissionTable.effect,
+      scope: permissionTable.scope,
+      parentId: permissionTable.parentId,
+      remark: permissionTable.remark,
+      isEnabled: permissionTable.isEnabled,
     })
-    .from(roleTable)
+    .from(permissionTable)
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(maxLimit);
-  return rows;
+  return rows as FromSchema<typeof listAllRes>;
 }
 const listAllApi = {
   req: listAllReq,
@@ -113,7 +136,7 @@ const listAllApi = {
   pathInfo: {
     path: "/listAll",
     method: "post",
-    summary: "获取所有角色（不分页）",
+    summary: "获取所有权限（不分页）",
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
@@ -123,39 +146,35 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    isEnabled: RoleVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof RolePOLike)[]>(RoleSortableKeys),
+    isEnabled: PermissionVO["isEnabled"],
+    type: PermissionVO["type"],
+    scope: PermissionVO["scope"],
+    orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<RolePOLike>[]>(
+  ...listResponseWrapper<RequiredKeys<PermissionPOLike>[]>(
     {
-      ...RoleListVO,
+      ...PermissionListVO,
     },
-    [...RoleListKeys]
+    [...PermissionListKeys]
   ),
 } as const satisfies JSONSchema;
 
-/**
- * 查询角色列表（纯业务逻辑）
- * @param params 查询参数
- * @returns 角色列表
- */
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
-  const orderField = roleTable[orderBy] || roleTable.id;
+  const orderField = permissionTable[orderBy] || permissionTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 查询总数
   const countResult = await db
-    .select({ total: count(roleTable.id).as("total") })
-    .from(roleTable)
+    .select({ total: count(permissionTable.id).as("total") })
+    .from(permissionTable)
     .where(buildWhereCondition(params));
   const total = countResult[0]?.total || 0;
   if (total === 0) {
@@ -167,10 +186,10 @@ async function onList(
       list: [],
     };
   }
-  // 查询列表数据
+
   const rows = await db
     .select()
-    .from(roleTable)
+    .from(permissionTable)
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
@@ -190,7 +209,7 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: "获取角色列表",
+    summary: "获取权限列表",
   } as const,
   adapter: bodyAdapter,
   service: onList,
@@ -199,9 +218,11 @@ const listApi = {
 const addReq = {
   type: "object",
   properties: {
-    ...RoleAddVO,
-  } satisfies Partial<Record<keyof RoleAddVOLike, JSONSchema>>,
-  required: [...RoleAddKeys] as const satisfies RequiredKeys<RoleAddVOLike>[],
+    ...PermissionAddVO,
+  } satisfies Partial<Record<keyof PermissionAddVOLike, JSONSchema>>,
+  required: [
+    ...PermissionAddKeys,
+  ] as const satisfies RequiredKeys<PermissionAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const addRes = {
@@ -214,12 +235,12 @@ async function onAdd(
   const { userId: creatorId } = userObj;
 
   const result = await db
-    .insert(roleTable)
+    .insert(permissionTable)
     .values({
       ...obj,
       creatorId,
     })
-    .returning({ id: roleTable.id });
+    .returning({ id: permissionTable.id });
 
   return result[0]?.id;
 }
@@ -229,7 +250,7 @@ const addApi = {
   pathInfo: {
     path: "/add",
     method: "post",
-    summary: "添加角色",
+    summary: "添加权限",
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
@@ -238,11 +259,11 @@ const addApi = {
 const updateReq = {
   type: "object",
   properties: {
-    ...RoleUpdateVO,
+    ...PermissionUpdateVO,
   },
   required: [
-    ...RoleUpdateKeys,
-  ] as const satisfies RequiredKeys<RoleUpdateVOLike>[],
+    ...PermissionUpdateKeys,
+  ] as const satisfies RequiredKeys<PermissionUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const updateRes = {
@@ -254,20 +275,18 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled; // 禁止禁用超级管理员角色
 
   const updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
-    isEnabled,
   };
 
   const res = await db
-    .update(roleTable)
+    .update(permissionTable)
     .set(updateData)
-    .where(eq(roleTable.id, id))
-    .returning({ id: roleTable.id });
+    .where(eq(permissionTable.id, id))
+    .returning({ id: permissionTable.id });
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -279,7 +298,7 @@ const updateApi = {
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: "更新角色",
+    summary: "更新权限",
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
@@ -291,8 +310,8 @@ const deleteReq = {
     ...IndexVO,
   },
   required: [
-    ...RoleDeleteKeys,
-  ] as const satisfies RequiredKeys<RoleDeleteVOLike>[],
+    ...PermissionDeleteKeys,
+  ] as const satisfies RequiredKeys<PermissionDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const deleteRes = {
@@ -303,13 +322,10 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  if (id === SUPER_ADMIN_ROLE_ID) {
-    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-  }
   const result = await db
-    .delete(roleTable)
-    .where(eq(roleTable.id, id))
-    .returning({ id: roleTable.id });
+    .delete(permissionTable)
+    .where(eq(permissionTable.id, id))
+    .returning({ id: permissionTable.id });
   if (!result || result.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -321,7 +337,7 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: "删除角色",
+    summary: "删除权限",
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
@@ -332,15 +348,19 @@ const getReq = {
   properties: {
     ...IndexVO,
   },
-  required: [...RoleGetKeys] as const satisfies RequiredKeys<RoleGetVOLike>[],
+  required: [
+    ...PermissionGetKeys,
+  ] as const satisfies RequiredKeys<PermissionGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getRes = {
   type: "object",
   properties: {
-    ...RoleVO,
+    ...PermissionVO,
   },
-  required: [...RoleDetailKeys] as const satisfies RequiredKeys<RoleVOLike>[],
+  required: [
+    ...PermissionDetailKeys,
+  ] as const satisfies RequiredKeys<PermissionVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
@@ -349,13 +369,13 @@ async function onGet(
   const { id } = obj;
   const rows = await db
     .select()
-    .from(roleTable)
-    .where(eq(roleTable.id, id))
+    .from(permissionTable)
+    .where(eq(permissionTable.id, id))
     .limit(1);
   if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  return rows[0];
+  return rows[0] as FromSchema<typeof getRes>;
 }
 const getApi = {
   req: getReq,
@@ -363,41 +383,11 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: "获取角色",
+    summary: "获取权限",
   } as const,
   adapter: bodyAdapter,
   service: onGet,
 } satisfies API;
-
-async function getRolesByIds(
-  ids: number[]
-): Promise<{ value: number; label: string }[]> {
-  if (ids.length === 0) return [];
-  const rows = await db
-    .select({ value: roleTable.id, label: roleTable.name })
-    .from(roleTable)
-    .where(inArray(roleTable.id, ids));
-  return rows;
-}
-
-async function verifyRoles(roleIdArr: number[]) {
-  const rows = await getRolesByIds(roleIdArr);
-  // 检查返回的角色数量是否与请求的数量一致
-  if (rows.length !== roleIdArr.length) {
-    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
-  }
-  // 检查每个请求的角色ID是否都在返回结果中
-  const returnedRoleIds = rows.map((r) => r.value);
-  const allRolesExist = roleIdArr.every((id) => returnedRoleIds.includes(id));
-  if (!allRolesExist) {
-    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
-  }
-}
-
-export const utils = {
-  getRolesByIds,
-  verifyRoles,
-};
 
 export default {
   listAll: listAllApi,

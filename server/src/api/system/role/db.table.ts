@@ -32,13 +32,6 @@ const RoleBasePO = {
     description: "备注说明",
     maxLength: 500,
   },
-  permissions: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "权限列表，JSON数组格式",
-    examples: ['["user:read","user:write","system:admin"]'],
-    maxLength: 500,
-  },
   isEnabled: {
     type: "boolean",
     description: "是否启用",
@@ -88,7 +81,6 @@ export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 export const RoleAddKeys = [
   "name",
   "remark",
-  "permissions",
   "isEnabled",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];
 export const RoleUpdateKeys = [
@@ -121,7 +113,6 @@ export const roleTable = sqliteTable("system_role", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull().unique(),
   remark: text("remark"),
-  permissions: text("permissions"), // JSON array string
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -137,7 +128,6 @@ export async function tableInit() {
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
       remark TEXT,
-      permissions TEXT,
       is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
