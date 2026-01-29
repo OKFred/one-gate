@@ -28,7 +28,7 @@ export const checkPermission = (
 
     // 超级管理员跳过权限检查
     if (userObj.isSuperAdmin) {
-      console.log("超级管理员，跳过权限检查");
+      // console.log("超级管理员，跳过权限检查");
       await next?.();
       return;
     }
@@ -38,7 +38,6 @@ export const checkPermission = (
     if (userPermissions.length === 0) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
-    console.log("用户权限列表：", userPermissions);
     // 规范化为数组
     const requiredPerms = Array.isArray(requiredPermissions)
       ? requiredPermissions
@@ -46,11 +45,11 @@ export const checkPermission = (
 
     // 检查权限 - 支持正则匹配（以 / 开头结尾）或前缀匹配
     const lookup = (perm: string) => {
-      userPermissions.some((up) => {
+      return userPermissions.some((up) => {
         if (up.code.startsWith("/") && up.code.endsWith("/")) {
           try {
             const regex = new RegExp(up.code.slice(1, -1));
-            return regex.test(perm);
+            return regex.exec(perm) !== null;
           } catch {
             return perm.startsWith(up.code);
           }
@@ -60,8 +59,8 @@ export const checkPermission = (
       });
     };
     const hasPermission = matchAll
-      ? requiredPerms.every((perm) => lookup(perm))
-      : requiredPerms.some((perm) => lookup(perm));
+      ? requiredPerms.every(lookup)
+      : requiredPerms.some(lookup);
     if (!hasPermission) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
