@@ -129,7 +129,9 @@ function setupInterceptors(service: AxiosInstance) {
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(error.message || t('error.networkError'));
+      handleErrorResponse(
+        error.response?.data?.message || error.message || t('error.networkError'),
+      );
       return Promise.reject(error);
     },
   );
