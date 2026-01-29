@@ -42,6 +42,7 @@ function componentMaker(
 }
 
 const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
+const BASE_API_PATH = process.env.BASE_API_PATH || "/api/v1";
 
 function routeMaker({
   pathInfo,
@@ -70,9 +71,12 @@ function routeMaker({
     }
     if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
       await authMiddleware(c);
-      if (requiredPermissions && requiredPermissions.length > 0) {
-        await checkPermission(requiredPermissions)(c);
+      if (!requiredPermissions) {
+        requiredPermissions = [c.req.path];
+      } else {
+        requiredPermissions.push(c.req.path);
       }
+      await checkPermission(requiredPermissions)(c);
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");

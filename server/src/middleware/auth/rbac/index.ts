@@ -44,14 +44,24 @@ export const checkPermission = (
       ? requiredPermissions
       : [requiredPermissions];
 
-    // 检查权限
+    // 检查权限 - 支持正则匹配（以 / 开头结尾）或前缀匹配
+    const lookup = (perm: string) => {
+      userPermissions.some((up) => {
+        if (up.code.startsWith("/") && up.code.endsWith("/")) {
+          try {
+            const regex = new RegExp(up.code.slice(1, -1));
+            return regex.test(perm);
+          } catch {
+            return perm.startsWith(up.code);
+          }
+        } else {
+          return perm.startsWith(up.code);
+        }
+      });
+    };
     const hasPermission = matchAll
-      ? requiredPerms.every((perm) =>
-          userPermissions.some((up) => up.code === perm)
-        )
-      : requiredPerms.some((perm) =>
-          userPermissions.some((up) => up.code === perm)
-        );
+      ? requiredPerms.every((perm) => lookup(perm))
+      : requiredPerms.some((perm) => lookup(perm));
     if (!hasPermission) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }

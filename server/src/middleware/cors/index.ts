@@ -3,5 +3,5 @@ import { cors } from "hono/cors";
 
 export default function corsHandler(app: App) {
   app.options("*", cors());
-  app.use("/api/v1/*", cors());
+  app.use(process.env.BASE_API_PATH + "/*", cors());
 }
