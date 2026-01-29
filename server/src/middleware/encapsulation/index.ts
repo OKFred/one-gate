@@ -10,7 +10,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
-import { authMiddleware } from "../auth";
+import { authMiddleware, checkPermission } from "../auth";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -50,11 +50,13 @@ function routeMaker({
   reqSchema,
   resSchema,
   componentArr,
+  requiredPermissions,
 }: API & {
   nameSpace: string;
   reqSchema: JSONSchema;
   resSchema: JSONSchema;
   componentArr: ReturnType<typeof componentMaker>[];
+  requiredPermissions?: string[];
 }) {
   const controller = async (c: NodeHonoContext) => {
     //获取request header content type
@@ -67,6 +69,9 @@ function routeMaker({
     }
     if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
       await authMiddleware(c);
+      if (requiredPermissions && requiredPermissions.length > 0) {
+        await checkPermission(requiredPermissions)(c);
+      }
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
@@ -76,7 +81,7 @@ function routeMaker({
       });
     }
     c.set("bodyObj", bodyObj);
-    const result = adapter ? await adapter(service)(c) : await service(c); // 暂时设置为可选，后续改造完了变为必须
+    const result = await adapter(service)(c);
     if (process.env.NODE_ENV !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
@@ -129,8 +134,9 @@ export interface API {
   req: JSONSchema;
   res: JSONSchema;
   pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
-  adapter?: Function;
+  adapter: Function;
   service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
+  requiredPermissions?: string[];
 }
 
 export default function main(

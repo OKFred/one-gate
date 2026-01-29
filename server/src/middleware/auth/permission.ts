@@ -19,7 +19,7 @@ export const checkPermission = (
   requiredPermissions: string | string[],
   matchAll = false
 ) => {
-  return async (c: NodeHonoContext, next: Next) => {
+  return async (c: NodeHonoContext, next?: Next) => {
     const userObj = c.var.userObj;
 
     if (!userObj) {
@@ -28,7 +28,8 @@ export const checkPermission = (
 
     // 超级管理员跳过权限检查
     if (userObj.isSuperAdmin) {
-      await next();
+      console.log("超级管理员，跳过权限检查");
+      await next?.();
       return;
     }
 
@@ -37,7 +38,7 @@ export const checkPermission = (
     if (userPermissions.length === 0) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
-
+    console.log("用户权限列表：", userPermissions);
     // 规范化为数组
     const requiredPerms = Array.isArray(requiredPermissions)
       ? requiredPermissions
@@ -51,12 +52,12 @@ export const checkPermission = (
       : requiredPerms.some((perm) =>
           userPermissions.some((up) => up.code === perm)
         );
-
+    console.log("权限检查结果：", hasPermission);
     if (!hasPermission) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 
-    await next();
+    await next?.();
   };
 };
 
@@ -65,7 +66,7 @@ export const checkPermission = (
  * 根据请求路径和方法自动匹配权限
  */
 export const checkApiPermission = () => {
-  return async (c: NodeHonoContext, next: Next) => {
+  return async (c: NodeHonoContext, next?: Next) => {
     const userObj = c.var.userObj;
 
     if (!userObj) {
@@ -74,7 +75,7 @@ export const checkApiPermission = () => {
 
     // 超级管理员跳过权限检查
     if (userObj.isSuperAdmin) {
-      await next();
+      await next?.();
       return;
     }
 
@@ -97,7 +98,7 @@ export const checkApiPermission = () => {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 
-    await next();
+    await next?.();
   };
 };
 
@@ -116,7 +117,9 @@ export function hasResourcePermission(
   }
 
   const userPermissions = userObj.permissions || [];
-  const permission = userPermissions.find((p: any) => p.code === permissionCode);
+  const permission = userPermissions.find(
+    (p: any) => p.code === permissionCode
+  );
 
   if (!permission) {
     return false;
@@ -128,7 +131,9 @@ export function hasResourcePermission(
       return true;
     case "own":
       // 只能访问自己的资源
-      return resourceOwnerId !== undefined && resourceOwnerId === userObj.userId;
+      return (
+        resourceOwnerId !== undefined && resourceOwnerId === userObj.userId
+      );
     case "dept":
       // 部门级权限（需要在调用时传入资源所属部门ID并比较）
       // 这里简化处理，实际可以扩展
@@ -146,7 +151,7 @@ export function hasResourcePermission(
  * 检查用户是否有任一指定角色
  */
 export const checkRole = (allowedRoleIds: number[]) => {
-  return async (c: NodeHonoContext, next: Next) => {
+  return async (c: NodeHonoContext, next?: Next) => {
     const userObj = c.var.userObj;
 
     if (!userObj) {
@@ -162,7 +167,7 @@ export const checkRole = (allowedRoleIds: number[]) => {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 
-    await next();
+    await next?.();
   };
 };
 

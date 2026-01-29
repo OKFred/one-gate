@@ -327,6 +327,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  requiredPermissions: ["mail.account:delete"],
 } satisfies API;
 
 const getReq = {
