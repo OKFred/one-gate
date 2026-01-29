@@ -10,7 +10,8 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
-import { authMiddleware, checkPermission } from "../auth";
+import { authMiddleware } from "../auth";
+import { checkPermission } from "../auth/rbac/index";
 
 function componentMaker(
   dataType: "request" | "response",

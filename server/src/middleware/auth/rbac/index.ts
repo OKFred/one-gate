@@ -8,7 +8,7 @@ import { NodeHonoContext } from "@/types/app";
 import {
   BusinessError,
   BusinessErrorCode,
-} from "../errorHandler/businessError";
+} from "../../errorHandler/businessError";
 
 /**
  * 权限检查中间件 - 检查用户是否拥有指定的权限代码
@@ -52,7 +52,6 @@ export const checkPermission = (
       : requiredPerms.some((perm) =>
           userPermissions.some((up) => up.code === perm)
         );
-    console.log("权限检查结果：", hasPermission);
     if (!hasPermission) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }

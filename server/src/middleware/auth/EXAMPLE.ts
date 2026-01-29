@@ -5,15 +5,15 @@
 
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { AppBindings } from "@/types/app";
+import { authMiddleware } from "@/middleware/auth";
 import {
-  authMiddleware,
   checkPermission,
   checkApiPermission,
   checkRole,
   hasResourcePermission,
   filterMenusByPermissions,
   hasButtonPermission,
-} from "@/middleware/auth";
+} from "@/middleware/auth/rbac";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -41,7 +41,7 @@ app.get("/api/example/list", checkPermission("example:read"), async (c) => {
 app.post("/api/example/create", checkPermission("example:write"), async (c) => {
   const userObj = c.var.userObj;
   const body = await c.req.json();
-  
+
   return c.json({
     message: "创建成功",
     data: body,
@@ -49,10 +49,14 @@ app.post("/api/example/create", checkPermission("example:write"), async (c) => {
 });
 
 // 删除 - 需要删除权限
-app.delete("/api/example/delete/:id", checkPermission("example:delete"), async (c) => {
-  const id = c.req.param("id");
-  return c.json({ message: `删除成功: ${id}` });
-});
+app.delete(
+  "/api/example/delete/:id",
+  checkPermission("example:delete"),
+  async (c) => {
+    const id = c.req.param("id");
+    return c.json({ message: `删除成功: ${id}` });
+  }
+);
 
 // ============================================================
 // 示例 2: 多权限检查（或关系）
@@ -121,17 +125,17 @@ app.get(
   async (c) => {
     const userObj = c.var.userObj;
     const id = parseInt(c.req.param("id"));
-    
+
     const doc = documents.find((d) => d.id === id);
     if (!doc) {
       throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
-    
+
     // 检查资源级权限
     if (!hasResourcePermission(userObj, "document:read", doc.creatorId)) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
-    
+
     return c.json(doc);
   }
 );
@@ -144,17 +148,17 @@ app.put(
     const userObj = c.var.userObj;
     const id = parseInt(c.req.param("id"));
     const body = await c.req.json();
-    
+
     const doc = documents.find((d) => d.id === id);
     if (!doc) {
       throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
-    
+
     // 检查资源级权限
     if (!hasResourcePermission(userObj, "document:write", doc.creatorId)) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
-    
+
     // 执行更新
     Object.assign(doc, body);
     return c.json({ message: "更新成功", data: doc });
@@ -170,12 +174,12 @@ app.get(
   checkPermission("document:read"),
   async (c) => {
     const userObj = c.var.userObj;
-    
+
     // 根据权限过滤文档列表
     const filtered = documents.filter((doc) =>
       hasResourcePermission(userObj, "document:read", doc.creatorId)
     );
-    
+
     return c.json({
       total: filtered.length,
       list: filtered,
@@ -214,10 +218,10 @@ const allMenus: Menu[] = [
 
 app.get("/api/example/menus", authMiddleware, async (c) => {
   const userObj = c.var.userObj;
-  
+
   // 根据用户权限过滤菜单
   const userMenus = filterMenusByPermissions(allMenus, userObj.permissions);
-  
+
   return c.json(userMenus);
 });
 
@@ -225,32 +229,28 @@ app.get("/api/example/menus", authMiddleware, async (c) => {
 // 示例 8: 获取页面数据（包含按钮权限）
 // ============================================================
 
-app.get(
-  "/api/example/page-data",
-  checkPermission("user:read"),
-  async (c) => {
-    const userObj = c.var.userObj;
-    
-    // 模拟获取数据
-    const users = [
-      { id: 1, name: "用户1" },
-      { id: 2, name: "用户2" },
-    ];
-    
-    // 检查按钮权限
-    const permissions = {
-      canAdd: hasButtonPermission(userObj.permissions, "button:user:add"),
-      canEdit: hasButtonPermission(userObj.permissions, "button:user:edit"),
-      canDelete: hasButtonPermission(userObj.permissions, "button:user:delete"),
-      canExport: hasButtonPermission(userObj.permissions, "button:user:export"),
-    };
-    
-    return c.json({
-      data: users,
-      permissions,
-    });
-  }
-);
+app.get("/api/example/page-data", checkPermission("user:read"), async (c) => {
+  const userObj = c.var.userObj;
+
+  // 模拟获取数据
+  const users = [
+    { id: 1, name: "用户1" },
+    { id: 2, name: "用户2" },
+  ];
+
+  // 检查按钮权限
+  const permissions = {
+    canAdd: hasButtonPermission(userObj.permissions, "button:user:add"),
+    canEdit: hasButtonPermission(userObj.permissions, "button:user:edit"),
+    canDelete: hasButtonPermission(userObj.permissions, "button:user:delete"),
+    canExport: hasButtonPermission(userObj.permissions, "button:user:export"),
+  };
+
+  return c.json({
+    data: users,
+    permissions,
+  });
+});
 
 // ============================================================
 // 示例 9: 自动 API 权限检查
@@ -316,18 +316,18 @@ const tickets: Ticket[] = [
 // 查看工单 - 根据权限范围决定能看哪些工单
 app.get("/api/example/tickets", checkPermission("ticket:read"), async (c) => {
   const userObj = c.var.userObj;
-  
+
   // 查找用户的 ticket:read 权限
   const ticketReadPerm = userObj.permissions.find(
     (p) => p.code === "ticket:read"
   );
-  
+
   if (!ticketReadPerm) {
     return c.json({ total: 0, list: [] });
   }
-  
+
   let filtered: Ticket[] = [];
-  
+
   // 根据权限范围过滤
   switch (ticketReadPerm.scope) {
     case "all":
@@ -348,7 +348,7 @@ app.get("/api/example/tickets", checkPermission("ticket:read"), async (c) => {
     default:
       filtered = [];
   }
-  
+
   return c.json({
     total: filtered.length,
     list: filtered,
@@ -363,24 +363,24 @@ app.put(
     const userObj = c.var.userObj;
     const id = parseInt(c.req.param("id"));
     const { status } = await c.req.json();
-    
+
     const ticket = tickets.find((t) => t.id === id);
     if (!ticket) {
       throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
     }
-    
+
     // 检查是否为分配人
     const isAssignee = ticket.assigneeId === userObj.userId;
-    
+
     // 检查是否有管理员权限
     const hasAdminPerm = userObj.permissions.some(
       (p) => p.code === "ticket:admin"
     );
-    
+
     if (!isAssignee && !hasAdminPerm) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
-    
+
     ticket.status = status;
     return c.json({ message: "状态更新成功", data: ticket });
   }

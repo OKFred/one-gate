@@ -8,6 +8,12 @@ import { permissionTable } from "@/api/system/permission/db.table";
 import { rolePermissionTable } from "@/api/system/role_permission/db.table";
 import { eq, and, inArray } from "drizzle-orm";
 
+/** 权限效果枚举 */
+const Effect = {
+  ALLOW: "allow",
+  DENY: "deny",
+} as const;
+
 /**
  * 权限信息接口
  */
@@ -17,7 +23,7 @@ export interface PermissionInfo {
   name: string;
   type: "menu" | "button" | "api";
   resource: string | null;
-  effect: "allow" | "deny";
+  effect: (typeof Effect)[keyof typeof Effect];
   scope: "all" | "own" | "dept" | "custom";
   resourceFilter: string | null;
   conditions: string | null;
@@ -87,7 +93,10 @@ export async function getPermissionsByCodes(
     })
     .from(permissionTable)
     .where(
-      and(inArray(permissionTable.code, codes), eq(permissionTable.isEnabled, true))
+      and(
+        inArray(permissionTable.code, codes),
+        eq(permissionTable.isEnabled, true)
+      )
     );
 
   return rows.map((row) => ({
@@ -118,10 +127,10 @@ export function filterEffectivePermissions(
   const result: PermissionInfo[] = [];
   for (const [code, perms] of permissionMap) {
     // 如果有任何 deny，则该权限被拒绝
-    const hasDeny = perms.some((p) => p.effect === "deny");
+    const hasDeny = perms.some((p) => p.effect === Effect.DENY);
     if (!hasDeny) {
       // 只取第一个 allow 权限
-      const allowPerm = perms.find((p) => p.effect === "allow");
+      const allowPerm = perms.find((p) => p.effect === Effect.ALLOW);
       if (allowPerm) {
         result.push(allowPerm);
       }
@@ -154,7 +163,7 @@ export function hasPermissionCode(
   permissions: PermissionInfo[],
   code: string
 ): boolean {
-  return permissions.some((p) => p.code === code && p.effect === "allow");
+  return permissions.some((p) => p.code === code && p.effect === Effect.ALLOW);
 }
 
 /**
@@ -199,7 +208,9 @@ export function getMenuPermissions(
  * @param permissions 权限数组
  * @returns 按钮权限代码数组
  */
-export function getButtonPermissionCodes(permissions: PermissionInfo[]): string[] {
+export function getButtonPermissionCodes(
+  permissions: PermissionInfo[]
+): string[] {
   return filterPermissionsByType(permissions, "button").map((p) => p.code);
 }
 
@@ -208,7 +219,9 @@ export function getButtonPermissionCodes(permissions: PermissionInfo[]): string[
  * @param permissions 权限数组
  * @returns API权限数组
  */
-export function getApiPermissions(permissions: PermissionInfo[]): PermissionInfo[] {
+export function getApiPermissions(
+  permissions: PermissionInfo[]
+): PermissionInfo[] {
   return filterPermissionsByType(permissions, "api");
 }
 
