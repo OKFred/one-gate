@@ -60,17 +60,7 @@ export async function getPermissionsByRoleIds(
     );
 
   // 类型断言，因为 drizzle 的类型推断
-  return rows.map((row) => ({
-    id: row.id,
-    code: row.code,
-    name: row.name,
-    type: row.type as "menu" | "button" | "api",
-    resource: row.resource,
-    effect: row.effect as "allow" | "deny",
-    scope: row.scope as "all" | "own" | "dept" | "custom",
-    resourceFilter: row.resourceFilter,
-    conditions: row.conditions,
-  }));
+  return rows as PermissionInfo[];
 }
 
 /**
@@ -101,16 +91,10 @@ export async function getPermissionsByCodes(
     );
 
   return rows.map((row) => ({
-    id: row.id,
-    code: row.code,
-    name: row.name,
-    type: row.type as "menu" | "button" | "api",
-    resource: row.resource,
-    effect: row.effect as "allow" | "deny",
-    scope: row.scope as "all" | "own" | "dept" | "custom",
+    ...row,
     resourceFilter: null, // 单独查询权限时没有关联数据
     conditions: null,
-  }));
+  })) as PermissionInfo[];
 }
 
 /**

@@ -5,7 +5,6 @@
 ### 1. 数据库表设计 ✓
 
 #### `system_permission` - 权限表
-- 删除了 `method` 字段（已按要求移除）
 - 保留字段：id, code, name, type, resource, effect, scope, parent_id, remark, is_enabled
 - 支持三种类型：menu（菜单）、button（按钮）、api（接口）
 - 支持四种范围：all（全部）、own（自己）、dept（部门）、custom（自定义）
@@ -86,9 +85,6 @@
 - 6个权限管理权限（API + 按钮）
 - 6个部门管理权限（API + 按钮）
 - 1个系统管理权限
-
-**自动分配：**
-- 所有预置权限自动分配给超级管理员角色
 
 ### 6. 数据库初始化集成 ✓
 
@@ -228,18 +224,6 @@ system:*               # 系统所有权限（通配符）
 
 ## 🎨 架构优势
 
-### vs 旧方案（JSON 字段）
-
-| 特性 | 旧方案 | 新方案 |
-|------|--------|--------|
-| 权限存储 | JSON 数组 | 独立表 |
-| 反向查询 | ❌ 困难 | ✅ 高效 |
-| 权限分类 | ❌ 无 | ✅ menu/button/api |
-| 资源级控制 | ❌ 不支持 | ✅ 支持 scope 和 resourceFilter |
-| 权限重命名 | ❌ 需更新所有角色 | ✅ 只需更新权限表 |
-| 扩展性 | ❌ 受限 | ✅ 预留扩展字段 |
-| 性能 | ❌ 需解析 JSON | ✅ 索引优化 |
-
 ### IAM 风格设计
 
 | AWS IAM 特性 | 本系统支持 | 实现方式 |
@@ -303,30 +287,6 @@ checkPermission (检查权限)
 ### 3. 性能优化
 - 考虑添加权限缓存（Redis）
 - 实现权限变更时的缓存失效策略
-
-### 4. 数据迁移
-如果有旧数据，创建迁移脚本：
-```typescript
-// 从旧的 permissions JSON 字段迁移到新表
-async function migrateOldPermissions() {
-  const roles = await db.select().from(roleTable);
-  
-  for (const role of roles) {
-    if (role.permissions) {
-      const permCodes = JSON.parse(role.permissions);
-      const permissions = await getPermissionsByCodes(permCodes);
-      
-      for (const perm of permissions) {
-        await db.insert(rolePermissionTable).values({
-          roleId: role.id,
-          permissionId: perm.id,
-          creatorId: 1,
-        });
-      }
-    }
-  }
-}
-```
 
 ## ✅ 验证清单
 
