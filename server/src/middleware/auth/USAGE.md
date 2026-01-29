@@ -114,16 +114,6 @@ app.use("/api/admin/*", authMiddleware, checkRole([1]));
 app.use("/api/manager/*", authMiddleware, checkRole([1, 2, 3]));
 ```
 
-### 5. `roleMiddleware` - 旧版角色中间件（向后兼容）
-
-与 `checkRole` 功能相同，保留以兼容旧代码。
-
-```typescript
-import { authMiddleware, roleMiddleware } from "@/middleware/auth";
-
-app.use("/api/admin/*", authMiddleware, roleMiddleware([1]));
-```
-
 ## 权限工具函数
 
 ### 1. `hasResourcePermission` - 检查资源权限

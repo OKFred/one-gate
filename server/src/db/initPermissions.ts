@@ -5,8 +5,6 @@
 
 import db from "@/db/index";
 import { permissionTable } from "@/api/system/permission/db.table";
-import { rolePermissionTable } from "@/api/system/role_permission/db.table";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { count } from "drizzle-orm";
 
 interface PermissionSeed {
@@ -306,25 +304,6 @@ export async function initPermissions() {
     }
 
     console.log(`✅ 成功插入 ${insertedPermissions.length} 条权限数据`);
-
-    // 为超级管理员角色分配所有权限
-    const permissionIds = insertedPermissions.map((p) => p.id);
-    if (permissionIds.length > 0) {
-      const rolePermissionValues = permissionIds.map((permissionId) => ({
-        roleId: SUPER_ADMIN_ROLE_ID,
-        permissionId,
-        resourceFilter: null,
-        conditions: null,
-        creatorId,
-      }));
-
-      await db.insert(rolePermissionTable).values(rolePermissionValues);
-      console.log(
-        `✅ 为超级管理员角色分配 ${permissionIds.length} 个权限`
-      );
-    }
-
-    console.log("🎉 权限初始化完成！");
   } catch (error) {
     console.error("❌ 权限初始化失败:", error);
     throw error;
