@@ -153,6 +153,7 @@ export const PermissionSortableKeys = [
   "code",
   "name",
   "type",
+  "effect",
   "isEnabled",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<PermissionPOLike>[];

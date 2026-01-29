@@ -8039,8 +8039,13 @@ export interface components {
              * @enum {string}
              */
             scope?: "all" | "own" | "dept" | "custom";
+            /**
+             * @description 效果：allow-允许，deny-拒绝
+             * @enum {string}
+             */
+            effect?: "allow" | "deny";
             /** @enum {string} */
-            orderBy?: "id" | "code" | "name" | "type" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "code" | "name" | "type" | "effect" | "isEnabled" | "createTimeUtc";
         };
         SystemPermissionListAllRes: {
             ok: boolean;
@@ -8122,8 +8127,13 @@ export interface components {
              * @enum {string}
              */
             scope?: "all" | "own" | "dept" | "custom";
+            /**
+             * @description 效果：allow-允许，deny-拒绝
+             * @enum {string}
+             */
+            effect?: "allow" | "deny";
             /** @enum {string} */
-            orderBy?: "id" | "code" | "name" | "type" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "code" | "name" | "type" | "effect" | "isEnabled" | "createTimeUtc";
         };
         SystemPermissionListRes: {
             ok: boolean;

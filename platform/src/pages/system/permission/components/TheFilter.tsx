@@ -27,7 +27,8 @@ import { useTranslation } from '@/hooks/useTranslation';
 // 筛选状态类型
 export interface FilterState {
   keyword: string;
-  type: 'menu' | 'button' | 'api' | '';
+  type?: 'menu' | 'button' | 'api';
+  effect?: 'allow' | 'deny';
   isEnabled: boolean | undefined;
   orderBy: NonNullable<ListPermissionReq['orderBy']>;
   descend: boolean;
@@ -49,7 +50,8 @@ const TheFilter = memo(
     const [filterCount, setFilterCount] = useState(0); // 结果数量
     const [filters, setFilters] = useState<FilterState>({
       keyword: '',
-      type: '',
+      type: undefined,
+      effect: undefined,
       isEnabled: undefined,
       orderBy: 'id',
       descend: true,
@@ -109,7 +111,8 @@ const TheFilter = memo(
     const clearFilters = () => {
       const emptyFilters: FilterState = {
         keyword: '',
-        type: '',
+        type: undefined,
+        effect: undefined,
         isEnabled: undefined,
         orderBy: 'id',
         descend: true,
@@ -124,6 +127,7 @@ const TheFilter = memo(
       return (
         keywordInput ||
         filters.type ||
+        filters.effect ||
         filters.isEnabled !== undefined ||
         filters.orderBy !== 'id' ||
         !filters.descend
@@ -184,7 +188,7 @@ const TheFilter = memo(
                 <FormControl size="small" fullWidth>
                   <InputLabel>{t('permission.type')}</InputLabel>
                   <Select
-                    value={filters.type}
+                    value={filters.type ?? ''}
                     label={t('permission.type')}
                     onChange={(e) => handleFilterChange('type', e.target.value)}
                   >
@@ -194,6 +198,21 @@ const TheFilter = memo(
                     <MenuItem value="menu">Menu</MenuItem>
                     <MenuItem value="button">Button</MenuItem>
                     <MenuItem value="api">API</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <FormControl size="small" fullWidth>
+                  <InputLabel>{t('permission.effect')}</InputLabel>
+                  <Select
+                    value={filters.effect ?? ''}
+                    label={t('permission.effect')}
+                    onChange={(e) => handleFilterChange('effect', e.target.value)}
+                  >
+                    <MenuItem value="">
+                      <em>{t('filter.all')}</em>
+                    </MenuItem>
+                    <MenuItem value="allow">Allow</MenuItem>
+                    <MenuItem value="deny">Deny</MenuItem>
                   </Select>
                 </FormControl>
 

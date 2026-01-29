@@ -50,9 +50,10 @@ const buildWhereCondition = ({
   isEnabled,
   type,
   scope,
+  effect,
 }: Pick<
   FromSchema<typeof listReq>,
-  "keyword" | "isEnabled" | "type" | "scope"
+  "keyword" | "isEnabled" | "type" | "scope" | "effect"
 >) => {
   const conditions = [];
   if (hasValue(keyword)) {
@@ -72,6 +73,9 @@ const buildWhereCondition = ({
   if (scope !== undefined) {
     conditions.push(eq(permissionTable.scope, scope));
   }
+  if (effect !== undefined) {
+    conditions.push(eq(permissionTable.effect, effect));
+  }
   return conditions.length > 0
     ? conditions.length === 1
       ? conditions[0]
@@ -86,6 +90,7 @@ const listAllReq = {
     isEnabled: PermissionVO["isEnabled"],
     type: PermissionVO["type"],
     scope: PermissionVO["scope"],
+    effect: PermissionVO["effect"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
   required: [],
@@ -149,6 +154,7 @@ const listReq = {
     isEnabled: PermissionVO["isEnabled"],
     type: PermissionVO["type"],
     scope: PermissionVO["scope"],
+    effect: PermissionVO["effect"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
   required: [],

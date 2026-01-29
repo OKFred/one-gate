@@ -30,10 +30,11 @@ export interface TheTableRef {
 
 const DEFAULT_FILTERS: FilterState = {
   keyword: '',
-  type: '',
+  type: undefined,
   isEnabled: undefined,
   orderBy: 'id',
   descend: false,
+  effect: undefined,
 };
 
 const TheTable = memo(
@@ -71,11 +72,7 @@ const TheTable = memo(
           const requestData = {
             pageNo: currentPage,
             pageSize: state.pageSize,
-            ...(searchFilters.keyword && { keyword: searchFilters.keyword }),
-            ...(searchFilters.type && { type: searchFilters.type }),
-            ...(searchFilters.isEnabled !== undefined && { isEnabled: searchFilters.isEnabled }),
-            orderBy: searchFilters.orderBy,
-            descend: searchFilters.descend,
+            ...searchFilters,
           };
 
           const res = await PermissionAPI.listFn({ data: requestData });
