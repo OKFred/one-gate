@@ -99,6 +99,8 @@ const TheTable = memo(
           filterRef.current?.updateCount(totalCount);
         } catch {
           setState((prev) => ({ ...prev, loading: false }));
+          setState((prev) => ({ ...prev, list: [], total: 0 }));
+          filterRef.current?.updateCount(0);
         }
       },
       [state.pageSize, filterRef],

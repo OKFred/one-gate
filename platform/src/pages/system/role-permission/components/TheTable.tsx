@@ -45,7 +45,7 @@ const DEFAULT_FILTERS: FilterState = {
 
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
-    const { formRef, allRoles, allPermissions } = localObj;
+    const { filterRef, formRef, allRoles, allPermissions } = localObj;
     const t = useTranslation();
 
     // 整合所有表格相关状态
@@ -108,11 +108,16 @@ const TheTable = memo(
             filters: searchFilters,
             loading: false,
           }));
+
+          // 通知筛选组件更新数量
+          filterRef.current?.updateCount(totalCount);
         } catch {
           setState((prev) => ({ ...prev, loading: false }));
+          setState((prev) => ({ ...prev, list: [], total: 0 }));
+          filterRef.current?.updateCount(0);
         }
       },
-      [state.pageSize],
+      [filterRef, state.pageSize],
     );
 
     // 删除成功后的回调
