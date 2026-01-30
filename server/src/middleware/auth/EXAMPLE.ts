@@ -8,7 +8,6 @@ import type { AppBindings } from "@/types/app";
 import { authMiddleware } from "@/middleware/auth";
 import {
   checkPermission,
-  checkApiPermission,
   checkRole,
   hasResourcePermission,
   filterMenusByPermissions,
@@ -29,7 +28,7 @@ const app = new OpenAPIHono<AppBindings>();
 app.use("/api/example/*", authMiddleware);
 
 // 查看列表 - 需要读权限
-app.get("/api/example/list", checkPermission("example:read"), async (c) => {
+app.get("/api/example/list", checkPermission(["example:read"]), async (c) => {
   const userObj = c.var.userObj;
   return c.json({
     message: "你有权限查看列表",
@@ -38,7 +37,7 @@ app.get("/api/example/list", checkPermission("example:read"), async (c) => {
 });
 
 // 创建 - 需要写权限
-app.post("/api/example/create", checkPermission("example:write"), async (c) => {
+app.post("/api/example/create", checkPermission(["example:write"]), async (c) => {
   const userObj = c.var.userObj;
   const body = await c.req.json();
 
@@ -51,7 +50,7 @@ app.post("/api/example/create", checkPermission("example:write"), async (c) => {
 // 删除 - 需要删除权限
 app.delete(
   "/api/example/delete/:id",
-  checkPermission("example:delete"),
+  checkPermission(["example:delete"]),
   async (c) => {
     const id = c.req.param("id");
     return c.json({ message: `删除成功: ${id}` });
@@ -121,7 +120,7 @@ const documents: Document[] = [
 // 查看文档 - 只能看自己的或有 all 权限
 app.get(
   "/api/example/documents/:id",
-  checkPermission("document:read"),
+  checkPermission(["document:read"]),
   async (c) => {
     const userObj = c.var.userObj;
     const id = parseInt(c.req.param("id"));
@@ -143,7 +142,7 @@ app.get(
 // 编辑文档 - 只能编辑自己的
 app.put(
   "/api/example/documents/:id",
-  checkPermission("document:write"),
+  checkPermission(["document:write"]),
   async (c) => {
     const userObj = c.var.userObj;
     const id = parseInt(c.req.param("id"));
@@ -171,7 +170,7 @@ app.put(
 
 app.get(
   "/api/example/documents",
-  checkPermission("document:read"),
+  checkPermission(["document:read"]),
   async (c) => {
     const userObj = c.var.userObj;
 
@@ -229,7 +228,7 @@ app.get("/api/example/menus", authMiddleware, async (c) => {
 // 示例 8: 获取页面数据（包含按钮权限）
 // ============================================================
 
-app.get("/api/example/page-data", checkPermission("user:read"), async (c) => {
+app.get("/api/example/page-data", checkPermission(["user:read"]), async (c) => {
   const userObj = c.var.userObj;
 
   // 模拟获取数据
@@ -258,9 +257,6 @@ app.get("/api/example/page-data", checkPermission("user:read"), async (c) => {
 
 // 创建一个子应用，使用自动 API 权限检查
 const autoPermissionApp = new OpenAPIHono<AppBindings>();
-
-// 所有路由自动检查 API 权限
-autoPermissionApp.use("*", authMiddleware, checkApiPermission());
 
 autoPermissionApp.get("/auto/users", async (c) => {
   // 需要有 type="api", resource="/auto/users" 的权限
@@ -314,7 +310,7 @@ const tickets: Ticket[] = [
 ];
 
 // 查看工单 - 根据权限范围决定能看哪些工单
-app.get("/api/example/tickets", checkPermission("ticket:read"), async (c) => {
+app.get("/api/example/tickets", checkPermission(["ticket:read"]), async (c) => {
   const userObj = c.var.userObj;
 
   // 查找用户的 ticket:read 权限
@@ -358,7 +354,7 @@ app.get("/api/example/tickets", checkPermission("ticket:read"), async (c) => {
 // 修改工单状态 - 只有分配人或管理员可以操作
 app.put(
   "/api/example/tickets/:id/status",
-  checkPermission("ticket:update"),
+  checkPermission(["ticket:update"]),
   async (c) => {
     const userObj = c.var.userObj;
     const id = parseInt(c.req.param("id"));

@@ -84,22 +84,6 @@ app.post(
 - `requiredPermissions`: string | string[] - 需要的权限代码
 - `matchAll`: boolean - 是否需要匹配所有权限（默认 false）
 
-### 3. `checkApiPermission` - API 权限自动检查
-
-根据请求路径自动匹配 API 权限。
-
-```typescript
-import { authMiddleware, checkApiPermission } from "@/middleware/auth";
-
-// 自动检查 API 权限
-app.use("/api/*", authMiddleware, checkApiPermission());
-```
-
-**工作原理：**
-- 从用户权限中查找 type 为 "api" 的权限
-- 将权限的 resource 字段作为路径模式匹配当前请求路径
-- 支持路径参数（如 `/api/users/:id`）
-
 ### 4. `checkRole` - 角色检查中间件
 
 检查用户是否拥有指定的角色。
@@ -209,7 +193,6 @@ const effective = permissionUtils.filterEffectivePermissions(allPermissions);
 
 // 按类型过滤权限
 const menuPerms = permissionUtils.filterPermissionsByType(permissions, "menu");
-const apiPerms = permissionUtils.filterPermissionsByType(permissions, "api");
 
 // 检查是否包含权限
 const hasRead = permissionUtils.hasPermissionCode(permissions, "user:read");
@@ -219,7 +202,6 @@ const hasAll = permissionUtils.hasAllPermissions(permissions, ["user:read", "use
 // 获取特定类型的权限
 const menuPerms = permissionUtils.getMenuPermissions(permissions);
 const buttonCodes = permissionUtils.getButtonPermissionCodes(permissions);
-const apiPerms = permissionUtils.getApiPermissions(permissions);
 ```
 
 ## 完整使用示例
@@ -339,12 +321,9 @@ app.get("/api/pages/user-management", authMiddleware, async (c) => {
 ### 示例 4: 自动 API 权限检查
 
 ```typescript
-import { authMiddleware, checkApiPermission } from "@/middleware/auth";
+import { authMiddleware } from "@/middleware/auth";
 
 const app = new OpenAPIHono<AppBindings>();
-
-// 所有 API 自动检查权限
-app.use("/api/*", authMiddleware, checkApiPermission());
 
 // 这些路由会自动根据路径匹配权限
 app.post("/api/users/list", async (c) => {

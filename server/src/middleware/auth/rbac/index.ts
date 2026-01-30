@@ -16,7 +16,7 @@ import {
  * @param matchAll 是否需要匹配所有权限（默认 false，只需匹配其中一个）
  */
 export const checkPermission = (
-  requiredPermissions: string | string[],
+  requiredPermissions: string[],
   matchAll = false
 ) => {
   return async (c: NodeHonoContext, next?: Next) => {
@@ -38,10 +38,6 @@ export const checkPermission = (
     if (userPermissions.length === 0) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
-    // 规范化为数组
-    const requiredPerms = Array.isArray(requiredPermissions)
-      ? requiredPermissions
-      : [requiredPermissions];
 
     // 检查权限 - 支持正则匹配（以 / 开头结尾）或前缀匹配
     const lookup = (perm: string) => {
@@ -59,50 +55,9 @@ export const checkPermission = (
       });
     };
     const hasPermission = matchAll
-      ? requiredPerms.every(lookup)
-      : requiredPerms.some(lookup);
+      ? requiredPermissions.every(lookup)
+      : requiredPermissions.some(lookup);
     if (!hasPermission) {
-      throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-    }
-
-    await next?.();
-  };
-};
-
-/**
- * 检查 API 权限的中间件
- * 根据请求路径和方法自动匹配权限
- */
-export const checkApiPermission = () => {
-  return async (c: NodeHonoContext, next?: Next) => {
-    const userObj = c.var.userObj;
-
-    if (!userObj) {
-      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
-    }
-
-    // 超级管理员跳过权限检查
-    if (userObj.isSuperAdmin) {
-      await next?.();
-      return;
-    }
-
-    const path = c.req.path;
-    const userPermissions = userObj.permissions || [];
-
-    // 查找匹配的 API 权限
-    const hasApiPermission = userPermissions.some((perm) => {
-      if (perm.type !== "api" || !perm.resource) {
-        return false;
-      }
-
-      // 简单的路径匹配（可以根据需要增强为正则匹配）
-      const resourcePattern = perm.resource.replace(/:\w+/g, "[^/]+");
-      const regex = new RegExp(`^${resourcePattern}$`);
-      return regex.test(path);
-    });
-
-    if (!hasApiPermission) {
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 

@@ -214,17 +214,6 @@ export function getButtonPermissionCodes(
   return filterPermissionsByType(permissions, "button").map((p) => p.code);
 }
 
-/**
- * 获取用户的API权限
- * @param permissions 权限数组
- * @returns API权限数组
- */
-export function getApiPermissions(
-  permissions: PermissionInfo[]
-): PermissionInfo[] {
-  return filterPermissionsByType(permissions, "api");
-}
-
 export const permissionUtils = {
   getPermissionsByRoleIds,
   getPermissionsByCodes,
@@ -235,7 +224,6 @@ export const permissionUtils = {
   hasAllPermissions,
   getMenuPermissions,
   getButtonPermissionCodes,
-  getApiPermissions,
 };
 
 export default permissionUtils;

@@ -50,7 +50,6 @@
 **便捷方法：**
 - `getMenuPermissions()` - 获取菜单权限
 - `getButtonPermissionCodes()` - 获取按钮权限代码
-- `getApiPermissions()` - 获取API权限
 
 ### 4. 用户认证升级 ✓
 
