@@ -8,7 +8,11 @@ import TheActionButtons from './components/TheActionButtons';
 import * as RolePermissionAPI from '@/api/system/role_permission';
 import * as RoleAPI from '@/api/system/role';
 import * as PermissionAPI from '@/api/system/permission';
-import type { ListAllRoleRes, ListAllPermissionRes, ListRolePermissionRes } from '@/api/system/type';
+import type {
+  ListAllRoleRes,
+  ListAllPermissionRes,
+  ListRolePermissionRes,
+} from '@/api/system/type';
 import {
   Dialog,
   DialogTitle,
@@ -19,6 +23,7 @@ import {
   Box,
 } from '@mui/material';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useSearchParams } from 'react-router-dom';
 
 export interface Props {
   localObj: LocalObj;
@@ -29,6 +34,10 @@ export interface LocalObj {
   filterRef: React.RefObject<TheFilterRef | null>;
   allRoles: ListAllRoleRes;
   allPermissions: ListAllPermissionRes;
+  query: {
+    roleId?: number;
+    [key: string]: string | number | boolean | undefined;
+  };
 }
 
 export default function RolePermissionManagement() {
@@ -42,10 +51,22 @@ export default function RolePermissionManagement() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { isMobile } = useResponsive();
-
+  const [searchParams] = useSearchParams();
+  const query = useMemo(() => {
+    const queryObj = {} as { [key: string]: string | number | boolean };
+    for (const [key, value] of searchParams.entries()) {
+      let finalValue = value as string | number | boolean;
+      if (/id/i.test(key)) {
+        finalValue = Number(value);
+      }
+      queryObj[key] = finalValue;
+    }
+    // console.log('跳转传参：', queryObj);
+    return queryObj;
+  }, [searchParams]);
   const localObj: LocalObj = useMemo(
-    () => ({ tableRef, formRef, filterRef, allRoles, allPermissions }),
-    [allRoles, allPermissions],
+    () => ({ tableRef, formRef, filterRef, allRoles, allPermissions, query }),
+    [allRoles, allPermissions, query],
   );
 
   // 获取所有角色列表
@@ -92,7 +113,7 @@ export default function RolePermissionManagement() {
       // 为每个角色调用批量删除
       for (const [roleId, permissionIds] of Object.entries(roleGroups)) {
         await RolePermissionAPI.batchDeleteFn({
-          data: { roleId: Number(roleId), permissionIds }
+          data: { roleId: Number(roleId), permissionIds },
         });
       }
 
@@ -131,10 +152,7 @@ export default function RolePermissionManagement() {
       >
         <TheFilter ref={localObj.filterRef} localObj={localObj} />
         <TheForm ref={localObj.formRef} localObj={localObj} />
-        <TheTable
-          ref={localObj.tableRef}
-          localObj={localObj}
-        />
+        <TheTable ref={localObj.tableRef} localObj={localObj} />
       </PageLayout>
 
       {/* 批量删除确认对话框 */}

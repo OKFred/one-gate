@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
+import { forwardRef, useImperativeHandle, useState, useCallback, memo } from 'react';
 import { Chip } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
@@ -126,9 +126,9 @@ const TheTable = memo(
     }, [fetchRolePermissions, filters, page]);
 
     // 初始加载
-    useEffect(() => {
+    /*     useEffect(() => {
       fetchRolePermissions(DEFAULT_FILTERS, 1);
-    }, [fetchRolePermissions]);
+    }, [fetchRolePermissions]); */
 
     // 暴露给父组件的方法
     useImperativeHandle(

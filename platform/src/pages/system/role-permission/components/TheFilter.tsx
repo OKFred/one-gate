@@ -1,4 +1,11 @@
-import React, { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  memo,
+  useCallback,
+  useEffect,
+} from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Box,
@@ -23,14 +30,16 @@ import {
   Search as SearchIcon,
   Clear as ClearIcon,
 } from '@mui/icons-material';
-import { useResponsive } from '@/hooks/useResponsive';
 import type { Props } from '../index';
 
 // 筛选状态类型
 export interface FilterState {
+  orderBy: 'id' | 'createTimeUtc' | 'roleId' | 'permissionId';
+  descend: boolean;
   keyword: string;
   roleId: number | null;
   permissionId: number | null;
+  isEnabled?: boolean;
 }
 
 // 暴露给父组件的方法
@@ -46,17 +55,19 @@ export interface TheFilterRef {
 const TheFilter = memo(
   forwardRef<TheFilterRef, Props>(function TheFilter({ localObj }, ref) {
     const t = useTranslation();
-    const { allRoles, allPermissions } = localObj;
-    const { isMobile } = useResponsive();
+    const { allRoles, allPermissions, tableRef, query } = localObj;
 
     const [expanded, setExpanded] = useState(true);
     const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
     const [isSearching, setIsSearching] = useState(false); // 搜索状态
     const [filterCount, setFilterCount] = useState(0); // 结果数量
     const [filters, setFilters] = useState<FilterState>({
+      orderBy: 'id',
+      descend: false,
       keyword: '',
-      roleId: null,
+      roleId: query.roleId || null,
       permissionId: null,
+      isEnabled: undefined,
     });
 
     // 暴露给父组件的方法
@@ -69,6 +80,9 @@ const TheFilter = memo(
             keyword: '',
             roleId: null,
             permissionId: null,
+            orderBy: 'id',
+            descend: false,
+            isEnabled: undefined,
           };
           setKeywordInput('');
           setFilters(emptyFilters);
@@ -79,6 +93,16 @@ const TheFilter = memo(
         },
       }),
       [filters],
+    );
+
+    // 调用表格刷新
+    const refreshTable = useCallback(
+      (newFilters: FilterState) => {
+        if (tableRef.current) {
+          tableRef.current.refresh(newFilters);
+        }
+      },
+      [tableRef],
     );
 
     // 防抖执行搜索
@@ -99,14 +123,19 @@ const TheFilter = memo(
       }
     }, [keywordInput, debouncedSearch, filters.keyword]);
 
+    // 当筛选条件改变时，刷新表格
+    useEffect(() => {
+      refreshTable(filters);
+    }, [filters, refreshTable]);
+
     const handleRoleChange = (event: SelectChangeEvent<number | ''>) => {
       const value = event.target.value === '' ? null : Number(event.target.value);
-      setFilters(prev => ({ ...prev, roleId: value }));
+      setFilters((prev) => ({ ...prev, roleId: value }));
     };
 
     const handlePermissionChange = (event: SelectChangeEvent<number | ''>) => {
       const value = event.target.value === '' ? null : Number(event.target.value);
-      setFilters(prev => ({ ...prev, permissionId: value }));
+      setFilters((prev) => ({ ...prev, permissionId: value }));
     };
 
     const handleKeywordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +147,17 @@ const TheFilter = memo(
     };
 
     const clearFilters = () => {
-      ref.current?.reset();
+      const emptyFilters: FilterState = {
+        keyword: '',
+        orderBy: 'id',
+        descend: false,
+        isEnabled: undefined,
+        roleId: null,
+        permissionId: null,
+      };
+      setKeywordInput(''); // 清空输入框
+      setFilters(emptyFilters);
+      refreshTable(emptyFilters);
     };
 
     const hasActiveFilters = () => {

@@ -31,6 +31,7 @@ import type {
   BatchAddRolePermissionReq,
   UpdateRolePermissionReq,
   GetPermissionsByRoleRes,
+  ListRolePermissionRes,
 } from '@/api/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -40,7 +41,7 @@ export interface TheFormRef {
   /** 打开批量添加权限表单 */
   onBatchAdd: () => void;
   /** 打开编辑表单 */
-  onOpen: (row?: any) => void;
+  onOpen: (row?: NonNullable<ListRolePermissionRes['list']>[0]) => void;
 }
 
 const TheForm = memo(
@@ -88,7 +89,7 @@ const TheForm = memo(
           setCurrentRolePermissions([]);
           setOpen(true);
         },
-        onOpen: async (row?: any) => {
+        onOpen: async (row?: NonNullable<ListRolePermissionRes['list']>[0]) => {
           setIsBatchMode(false);
           if (row) {
             setEditId(row.id);
