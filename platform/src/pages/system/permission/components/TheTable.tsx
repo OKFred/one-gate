@@ -30,7 +30,7 @@ export interface TheTableRef {
 
 const DEFAULT_FILTERS: FilterState = {
   keyword: '',
-  type: undefined,
+  category: undefined,
   isEnabled: undefined,
   orderBy: 'id',
   descend: false,
@@ -140,7 +140,7 @@ const TheTable = memo(
       { title: t('columns.id'), render: (row) => row.id },
       { title: t('permission.code'), render: (row) => row.code },
       { title: t('permission.name'), render: (row) => row.name },
-      { title: t('permission.type'), render: (row) => row.type },
+      { title: t('permission.category'), render: (row) => row.category },
       { title: t('permission.resource'), render: (row) => row.resource || '--' },
       { title: t('permission.effect'), render: (row) => row.effect },
       { title: t('permission.scope'), render: (row) => row.scope },
@@ -182,8 +182,8 @@ const TheTable = memo(
       { type: 'subtitle', label: t('permission.code'), render: (row) => row.code },
       {
         type: 'content',
-        label: t('permission.type'),
-        render: (row) => row.type,
+        label: t('permission.category'),
+        render: (row) => row.category,
       },
       {
         type: 'content',

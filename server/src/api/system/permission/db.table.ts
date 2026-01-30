@@ -33,10 +33,10 @@ const PermissionBasePO = {
     examples: ["查看用户", "编辑文件"],
     maxLength: 100,
   },
-  type: {
+  category: {
     type: "string",
     enum: ["menu", "button", "api"],
-    description: "权限类型：menu-菜单，button-按钮，api-接口",
+    description: "权限类别：menu-菜单，button-按钮，api-接口",
   },
   resource: {
     type: ["string", "null"],
@@ -121,7 +121,7 @@ export type PermissionGetVOLike = Pick<PermissionVOLike, IndexKeyLike>;
 export const PermissionAddKeys = [
   "code",
   "name",
-  "type",
+  "category",
   "resource",
   "effect",
   "scope",
@@ -152,7 +152,7 @@ export const PermissionSortableKeys = [
   "id",
   "code",
   "name",
-  "type",
+  "category",
   "effect",
   "isEnabled",
   "createTimeUtc",
@@ -162,7 +162,7 @@ export const permissionTable = sqliteTable("system_permission", {
   id: integer("id").primaryKey().notNull(),
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
-  type: text("type").notNull(), // menu, button, api
+  category: text("category").notNull(), // menu, button, api
   resource: text("resource"),
   effect: text("effect").notNull(), // allow, deny
   scope: text("scope").notNull(), // all, own, dept, custom
@@ -183,7 +183,7 @@ export async function tableInit() {
       id INTEGER PRIMARY KEY,
       code TEXT NOT NULL UNIQUE,
       name TEXT NOT NULL,
-      type TEXT NOT NULL,
+      category TEXT NOT NULL,
       resource TEXT,
       effect TEXT NOT NULL,
       scope TEXT NOT NULL,

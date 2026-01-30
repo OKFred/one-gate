@@ -48,12 +48,12 @@ import {
 const buildWhereCondition = ({
   keyword,
   isEnabled,
-  type,
+  category,
   scope,
   effect,
 }: Pick<
   FromSchema<typeof listReq>,
-  "keyword" | "isEnabled" | "type" | "scope" | "effect"
+  "keyword" | "isEnabled" | "category" | "scope" | "effect"
 >) => {
   const conditions = [];
   if (hasValue(keyword)) {
@@ -67,8 +67,8 @@ const buildWhereCondition = ({
   if (isEnabled !== undefined) {
     conditions.push(eq(permissionTable.isEnabled, isEnabled));
   }
-  if (type !== undefined) {
-    conditions.push(eq(permissionTable.type, type));
+  if (category !== undefined) {
+    conditions.push(eq(permissionTable.category, category));
   }
   if (scope !== undefined) {
     conditions.push(eq(permissionTable.scope, scope));
@@ -88,7 +88,7 @@ const listAllReq = {
   properties: {
     ...listAllReqBase,
     isEnabled: PermissionVO["isEnabled"],
-    type: PermissionVO["type"],
+    category: PermissionVO["category"],
     scope: PermissionVO["scope"],
     effect: PermissionVO["effect"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
@@ -121,7 +121,7 @@ async function onListAll(
       id: permissionTable.id,
       code: permissionTable.code,
       name: permissionTable.name,
-      type: permissionTable.type,
+      category: permissionTable.category,
       resource: permissionTable.resource,
       effect: permissionTable.effect,
       scope: permissionTable.scope,
@@ -152,7 +152,7 @@ const listReq = {
   properties: {
     ...listReqBase,
     isEnabled: PermissionVO["isEnabled"],
-    type: PermissionVO["type"],
+    category: PermissionVO["category"],
     scope: PermissionVO["scope"],
     effect: PermissionVO["effect"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
@@ -221,6 +221,7 @@ const listApi = {
   service: onList,
 } satisfies API;
 
+export type PermissionAddLike = FromSchema<typeof addReq>
 const addReq = {
   type: "object",
   properties: {

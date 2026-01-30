@@ -27,7 +27,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 // 筛选状态类型
 export interface FilterState {
   keyword: string;
-  type?: 'menu' | 'button' | 'api';
+  category?: 'menu' | 'button' | 'api';
   effect?: 'allow' | 'deny';
   isEnabled: boolean | undefined;
   orderBy: NonNullable<ListPermissionReq['orderBy']>;
@@ -50,7 +50,7 @@ const TheFilter = memo(
     const [filterCount, setFilterCount] = useState(0); // 结果数量
     const [filters, setFilters] = useState<FilterState>({
       keyword: '',
-      type: undefined,
+      category: undefined,
       effect: undefined,
       isEnabled: undefined,
       orderBy: 'id',
@@ -111,7 +111,7 @@ const TheFilter = memo(
     const clearFilters = () => {
       const emptyFilters: FilterState = {
         keyword: '',
-        type: undefined,
+        category: undefined,
         effect: undefined,
         isEnabled: undefined,
         orderBy: 'id',
@@ -126,7 +126,7 @@ const TheFilter = memo(
     const hasActiveFilters = () => {
       return (
         keywordInput ||
-        filters.type ||
+        filters.category ||
         filters.effect ||
         filters.isEnabled !== undefined ||
         filters.orderBy !== 'id' ||
@@ -186,11 +186,11 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('permission.type')}</InputLabel>
+                  <InputLabel>{t('permission.category')}</InputLabel>
                   <Select
-                    value={filters.type ?? ''}
-                    label={t('permission.type')}
-                    onChange={(e) => handleFilterChange('type', e.target.value)}
+                    value={filters.category ?? ''}
+                    label={t('permission.category')}
+                    onChange={(e) => handleFilterChange('category', e.target.value)}
                   >
                     <MenuItem value="">
                       <em>{t('filter.all')}</em>

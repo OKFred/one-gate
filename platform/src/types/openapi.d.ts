@@ -8030,10 +8030,10 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /**
-             * @description 权限类型：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
              * @enum {string}
              */
-            type?: "menu" | "button" | "api";
+            category?: "menu" | "button" | "api";
             /**
              * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
              * @enum {string}
@@ -8045,7 +8045,7 @@ export interface components {
              */
             effect?: "allow" | "deny";
             /** @enum {string} */
-            orderBy?: "id" | "code" | "name" | "type" | "effect" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
         };
         SystemPermissionListAllRes: {
             ok: boolean;
@@ -8062,10 +8062,10 @@ export interface components {
                  */
                 name?: string;
                 /**
-                 * @description 权限类型：menu-菜单，button-按钮，api-接口
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
                  * @enum {string}
                  */
-                type?: "menu" | "button" | "api";
+                category?: "menu" | "button" | "api";
                 /**
                  * @description 资源路径
                  * @example /api/users/:id
@@ -8118,10 +8118,10 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /**
-             * @description 权限类型：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
              * @enum {string}
              */
-            type?: "menu" | "button" | "api";
+            category?: "menu" | "button" | "api";
             /**
              * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
              * @enum {string}
@@ -8133,7 +8133,7 @@ export interface components {
              */
             effect?: "allow" | "deny";
             /** @enum {string} */
-            orderBy?: "id" | "code" | "name" | "type" | "effect" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
         };
         SystemPermissionListRes: {
             ok: boolean;
@@ -8165,10 +8165,10 @@ export interface components {
                      */
                     name: string;
                     /**
-                     * @description 权限类型：menu-菜单，button-按钮，api-接口
+                     * @description 权限类别：menu-菜单，button-按钮，api-接口
                      * @enum {string}
                      */
-                    type: "menu" | "button" | "api";
+                    category: "menu" | "button" | "api";
                     /**
                      * @description 资源路径
                      * @example /api/users/:id
@@ -8223,10 +8223,10 @@ export interface components {
              */
             name: string;
             /**
-             * @description 权限类型：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
              * @enum {string}
              */
-            type: "menu" | "button" | "api";
+            category: "menu" | "button" | "api";
             /**
              * @description 资源路径
              * @example /api/users/:id
@@ -8278,10 +8278,10 @@ export interface components {
              */
             name?: string;
             /**
-             * @description 权限类型：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
              * @enum {string}
              */
-            type?: "menu" | "button" | "api";
+            category?: "menu" | "button" | "api";
             /**
              * @description 资源路径
              * @example /api/users/:id
@@ -8358,10 +8358,10 @@ export interface components {
                  */
                 name: string;
                 /**
-                 * @description 权限类型：menu-菜单，button-按钮，api-接口
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
                  * @enum {string}
                  */
-                type: "menu" | "button" | "api";
+                category: "menu" | "button" | "api";
                 /**
                  * @description 资源路径
                  * @example /api/users/:id
@@ -8827,7 +8827,7 @@ export interface components {
                 id?: number;
                 code?: string;
                 name?: string;
-                type?: string;
+                category?: string;
                 resource?: ((string | null) | null) | null;
                 effect?: string;
                 scope?: string;

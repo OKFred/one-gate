@@ -39,7 +39,7 @@ export const checkPermission = (
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 
-    // 检查权限 - 支持正则匹配（以 / 开头结尾）或前缀匹配
+    // 检查权限 - 支持正则匹配（以 / 开头结尾）或部分匹配
     const lookup = (perm: string) => {
       return userPermissions.some((up) => {
         if (up.code.startsWith("/") && up.code.endsWith("/")) {
@@ -47,10 +47,10 @@ export const checkPermission = (
             const regex = new RegExp(up.code.slice(1, -1));
             return regex.exec(perm) !== null;
           } catch {
-            return perm.startsWith(up.code);
+            return perm.includes(up.code);
           }
         } else {
-          return perm.startsWith(up.code);
+          return perm.includes(up.code);
         }
       });
     };
@@ -146,7 +146,7 @@ export function filterMenusByPermissions(
     // 查找对应的菜单权限
     const hasMenuPermission = userPermissions.some(
       (perm) =>
-        perm.type === "menu" &&
+        perm.category === "menu" &&
         perm.resource === menu.path &&
         perm.effect === "allow"
     );
@@ -164,7 +164,7 @@ export function hasButtonPermission(
 ): boolean {
   return userPermissions.some(
     (perm) =>
-      perm.type === "button" &&
+      perm.category === "button" &&
       perm.code === buttonCode &&
       perm.effect === "allow"
   );

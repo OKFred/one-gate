@@ -21,7 +21,7 @@ export interface PermissionInfo {
   id: number;
   code: string;
   name: string;
-  type: "menu" | "button" | "api";
+  category: "menu" | "button" | "api";
   resource: string | null;
   effect: (typeof Effect)[keyof typeof Effect];
   scope: "all" | "own" | "dept" | "custom";
@@ -46,7 +46,7 @@ export async function getPermissionsByRoleIds(
       id: permissionTable.id,
       code: permissionTable.code,
       name: permissionTable.name,
-      type: permissionTable.type,
+      category: permissionTable.category,
       resource: permissionTable.resource,
       effect: permissionTable.effect,
       scope: permissionTable.scope,
@@ -86,7 +86,7 @@ export async function getPermissionsByCodes(
       id: permissionTable.id,
       code: permissionTable.code,
       name: permissionTable.name,
-      type: permissionTable.type,
+      category: permissionTable.category,
       resource: permissionTable.resource,
       effect: permissionTable.effect,
       scope: permissionTable.scope,
@@ -143,14 +143,14 @@ export function filterEffectivePermissions(
 /**
  * 根据类型过滤权限
  * @param permissions 权限数组
- * @param type 权限类型
+ * @param category 权限类别
  * @returns 过滤后的权限数组
  */
 export function filterPermissionsByType(
   permissions: PermissionInfo[],
-  type: "menu" | "button" | "api"
+  category: "menu" | "button" | "api"
 ): PermissionInfo[] {
-  return permissions.filter((p) => p.type === type);
+  return permissions.filter((p) => p.category === category);
 }
 
 /**

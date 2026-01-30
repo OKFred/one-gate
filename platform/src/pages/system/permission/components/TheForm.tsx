@@ -43,7 +43,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: AddPermissionReq | UpdatePermissionReq = {
   code: '',
   name: '',
-  type: 'api',
+  category: 'api',
   resource: '',
   effect: 'allow',
   scope: 'all',
@@ -280,11 +280,11 @@ const TheForm = memo(
               />
 
               <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('permission.type')}</InputLabel>
+                <InputLabel>{t('permission.category')}</InputLabel>
                 <Select
-                  value={form.type || ''}
-                  onChange={(e) => setForm({ ...form, type: e.target.value })}
-                  label={t('permission.type')}
+                  value={form.category || ''}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                  label={t('permission.category')}
                 >
                   {PERMISSION_TYPES.map((type) => (
                     <MenuItem key={type.value} value={type.value}>
