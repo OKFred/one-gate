@@ -54,7 +54,7 @@ const TheFilter = memo(
       effect: undefined,
       isEnabled: undefined,
       orderBy: 'id',
-      descend: true,
+      descend: false,
     });
 
     // 暴露给父组件的方法
@@ -115,7 +115,7 @@ const TheFilter = memo(
         effect: undefined,
         isEnabled: undefined,
         orderBy: 'id',
-        descend: true,
+        descend: false,
       };
       setKeywordInput('');
       setFilters(emptyFilters);
