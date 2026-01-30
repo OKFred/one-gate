@@ -163,9 +163,9 @@ export const permissionTable = sqliteTable("system_permission", {
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
   category: text("category").notNull(), // menu, button, api
-  resource: text("resource"),
   effect: text("effect").notNull(), // allow, deny
   scope: text("scope").notNull(), // all, own, dept, custom
+  resource: text("resource"),
   parentId: integer("parent_id"),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
@@ -184,9 +184,9 @@ export async function tableInit() {
       code TEXT NOT NULL UNIQUE,
       name TEXT NOT NULL,
       category TEXT NOT NULL,
-      resource TEXT,
       effect TEXT NOT NULL,
       scope TEXT NOT NULL,
+      resource TEXT,
       parent_id INTEGER,
       remark TEXT,
       is_enabled INTEGER NOT NULL,
