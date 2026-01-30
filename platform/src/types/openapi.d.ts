@@ -8421,6 +8421,8 @@ export interface components {
                 remark?: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
+                /** @description 权限数量 */
+                permissionCount?: number;
                 /**
                  * @description 角色名称
                  * @example 管理员
@@ -8478,6 +8480,8 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 权限数量 */
+                    permissionCount: number;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -8506,6 +8510,8 @@ export interface components {
             remark: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /** @description 权限数量 */
+            permissionCount: number;
         };
         SystemRoleAddRes: {
             ok: boolean;
@@ -8531,6 +8537,8 @@ export interface components {
             remark?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @description 权限数量 */
+            permissionCount?: number;
         };
         SystemRoleUpdateRes: {
             ok: boolean;
@@ -8581,6 +8589,8 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
+                /** @description 权限数量 */
+                permissionCount: number;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**

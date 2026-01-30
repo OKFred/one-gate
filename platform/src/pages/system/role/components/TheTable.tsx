@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { Chip } from '@mui/material';
+import { Chip, Link as MuiLink } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -11,6 +11,7 @@ import type { Props } from '../index';
 import dayjs from 'dayjs';
 import type { FilterState } from './TheFilter';
 import { useTranslation } from '@/hooks/useTranslation';
+import { Link as RouterLink } from 'react-router-dom';
 
 // 表格内部状态
 export interface TableState {
@@ -152,6 +153,18 @@ const TheTable = memo(
         title: t('columns.updateTime'),
         render: (row) => formatTime(row.updateTimeUtc),
       },
+      {
+        title: t('columns.permissionCount'),
+        render: (row) => (
+          <MuiLink
+            component={RouterLink}
+            to={`/system/role-permission?roleId=${row.id}`}
+            color="primary"
+          >
+            {row.permissionCount || 0}
+          </MuiLink>
+        ),
+      },
       { title: t('column.remark'), render: (row) => row.remark || '--' },
       {
         title: t('table.actions'),
@@ -171,6 +184,11 @@ const TheTable = memo(
         type: 'content',
         label: t('columns.createTime'),
         render: (row) => formatTime(row.createTimeUtc),
+      },
+      {
+        type: 'content',
+        label: t('columns.permissionCount'),
+        render: (row) => row.permissionCount || 0,
       },
       {
         type: 'tags',

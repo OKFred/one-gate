@@ -36,6 +36,10 @@ const RoleBasePO = {
     type: "boolean",
     description: "是否启用",
   },
+  permissionCount: {
+    type: "integer",
+    description: "权限数量",
+  },
 } as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
 const RolePO = {
   ...IndexPO,
@@ -82,6 +86,7 @@ export const RoleAddKeys = [
   "name",
   "remark",
   "isEnabled",
+  "permissionCount",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];
 export const RoleUpdateKeys = [
   ...IndexKey,
@@ -114,6 +119,7 @@ export const roleTable = sqliteTable("system_role", {
   name: text("name").notNull().unique(),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+  permissionCount: integer("permission_count").notNull().default(0),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
@@ -129,6 +135,7 @@ export async function tableInit() {
       name TEXT NOT NULL UNIQUE,
       remark TEXT,
       is_enabled INTEGER NOT NULL,
+      permission_count INTEGER DEFAULT 0,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

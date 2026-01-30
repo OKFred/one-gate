@@ -394,9 +394,21 @@ async function verifyRoles(roleIdArr: number[]) {
   }
 }
 
+/** 更新角色的权限数量 */
+async function updatePermissionCount(
+  roleId: number,
+  newCount: number
+): Promise<void> {
+  await db
+    .update(roleTable)
+    .set({ permissionCount: newCount })
+    .where(eq(roleTable.id, roleId));
+}
+
 export const utils = {
   getRolesByIds,
   verifyRoles,
+  updatePermissionCount,
 };
 
 export default {

@@ -22,7 +22,7 @@ import {
   RolePermissionBaseVO,
 } from "./db.table";
 import { permissionTable } from "../permission/db.table";
-import { roleTable } from "../role/db.table";
+import roleService, { utils as roleUtils } from "../role/service";
 import { asc, count, desc, eq, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
@@ -61,6 +61,14 @@ const buildWhereCondition = ({
       : and(...conditions)
     : undefined;
 };
+
+async function getCurrentPermissionCount(roleId: number): Promise<number> {
+  const countResult = await db
+    .select({ count: count(rolePermissionTable.id).as("count") })
+    .from(rolePermissionTable)
+    .where(eq(rolePermissionTable.roleId, roleId));
+  return countResult[0]?.count || 0;
+}
 
 const listReq = {
   type: "object",
@@ -157,14 +165,7 @@ async function onAdd(
   const { roleId, permissionId, resourceFilter, conditions } = obj;
 
   // 验证角色是否存在
-  const roleExists = await db
-    .select({ id: roleTable.id })
-    .from(roleTable)
-    .where(eq(roleTable.id, roleId))
-    .limit(1);
-  if (roleExists.length === 0) {
-    throw new BusinessError(BusinessErrorCode.ROLE_NOT_EXIST);
-  }
+  await roleService.get.service({ id: roleId });
 
   // 验证权限是否存在
   const permissionExists = await db
@@ -201,6 +202,10 @@ async function onAdd(
       creatorId,
     })
     .returning({ id: rolePermissionTable.id });
+
+  // 更新角色权限数量
+  const currentCount = await getCurrentPermissionCount(roleId);
+  await roleUtils.updatePermissionCount(roleId, currentCount);
 
   return result[0]?.id;
 }
@@ -243,14 +248,7 @@ async function onBatchAdd(
   const { roleId, permissionIds } = obj;
 
   // 验证角色是否存在
-  const roleExists = await db
-    .select({ id: roleTable.id })
-    .from(roleTable)
-    .where(eq(roleTable.id, roleId))
-    .limit(1);
-  if (roleExists.length === 0) {
-    throw new BusinessError(BusinessErrorCode.ROLE_NOT_EXIST);
-  }
+  await roleService.get.service({ id: roleId });
 
   // 验证权限是否存在
   const permissionsExist = await db
@@ -274,6 +272,10 @@ async function onBatchAdd(
     .insert(rolePermissionTable)
     .values(values)
     .returning({ id: rolePermissionTable.id });
+
+  // 更新角色权限数量
+  const currentCount = await getCurrentPermissionCount(roleId);
+  await roleUtils.updatePermissionCount(roleId, currentCount);
 
   return result.length;
 }
@@ -375,6 +377,18 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
+
+  // 先获取 roleId
+  const record = await db
+    .select({ roleId: rolePermissionTable.roleId })
+    .from(rolePermissionTable)
+    .where(eq(rolePermissionTable.id, id))
+    .limit(1);
+  if (record.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  const roleId = record[0].roleId;
+
   const result = await db
     .delete(rolePermissionTable)
     .where(eq(rolePermissionTable.id, id))
@@ -382,6 +396,11 @@ async function onDelete(
   if (!result || result.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
+
+  // 更新角色权限数量
+  const currentCount = await getCurrentPermissionCount(roleId);
+  await roleUtils.updatePermissionCount(roleId, currentCount);
+
   return result[0].id;
 }
 const deleteApi = {
@@ -430,6 +449,10 @@ async function onBatchDelete(
       )
     )
     .returning({ id: rolePermissionTable.id });
+
+  // 更新角色权限数量
+  const currentCount = await getCurrentPermissionCount(roleId);
+  await roleUtils.updatePermissionCount(roleId, currentCount);
 
   return result.length;
 }

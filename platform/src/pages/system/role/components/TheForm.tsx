@@ -28,11 +28,11 @@ export interface RoleFormRef {
   onOpen: (role?: TableState['list'][0]) => void;
 }
 
-const DEFAULT_FORM: AddRoleReq | UpdateRoleReq = {
+const DEFAULT_FORM: AddRoleReq = {
   name: '',
   remark: null,
-  permissions: null,
   isEnabled: true,
+  permissionCount: 0,
 };
 
 const TheForm = memo(
@@ -58,8 +58,8 @@ const TheForm = memo(
             setForm({
               name: role.name,
               remark: role.remark ?? null,
-              permissions: role.permissions,
               isEnabled: role.isEnabled,
+              permissionCount: role.permissionCount || 0,
             });
           } else {
             setEditId(null);
@@ -147,22 +147,6 @@ const TheForm = memo(
                 fullWidth
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder={t('form.pleaseEnter')}
-              />
-
-              <TextField
-                label={t('role.table.permissions')}
-                value={form.permissions ?? ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    permissions: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={4}
-                size={isMobile ? 'medium' : 'medium'}
-                helperText={t('role.table.permissionsHelper')}
               />
 
               <FormControlLabel
