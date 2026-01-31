@@ -1283,7 +1283,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.layout",
     langCode: "zh-CN",
-    tKey: "dialog.backHome",
+    tKey: "dialog.goBackHome",
     tValue: "返回首页",
     isEnabled: true,
   },
@@ -1291,8 +1291,8 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.layout",
     langCode: "en-US",
-    tKey: "dialog.backHome",
-    tValue: "Back to Home",
+    tKey: "dialog.goBackHome",
+    tValue: "Go Back Home",
     isEnabled: true,
   },
   {
@@ -3863,7 +3863,7 @@ export const initialTranslationData = [
     business: "page.system",
     langCode: "zh-CN",
     tKey: "rolePermission.resourceFilterHelp",
-    tValue: "JSON格式的资源过滤条件，例如：{\"userId\": \"${currentUser.id}\"}",
+    tValue: 'JSON格式的资源过滤条件，例如：{"userId": "${currentUser.id}"}',
     isEnabled: true,
   },
   {
@@ -3871,7 +3871,8 @@ export const initialTranslationData = [
     business: "page.system",
     langCode: "en-US",
     tKey: "rolePermission.resourceFilterHelp",
-    tValue: "JSON format resource filter conditions, e.g.: {\"userId\": \"${currentUser.id}\"}",
+    tValue:
+      'JSON format resource filter conditions, e.g.: {"userId": "${currentUser.id}"}',
     isEnabled: true,
   },
   {
@@ -3895,7 +3896,7 @@ export const initialTranslationData = [
     business: "page.system",
     langCode: "zh-CN",
     tKey: "rolePermission.conditionsHelp",
-    tValue: "JSON格式的附加条件，例如：{\"ipRange\": [\"192.168.1.0/24\"]}",
+    tValue: 'JSON格式的附加条件，例如：{"ipRange": ["192.168.1.0/24"]}',
     isEnabled: true,
   },
   {
@@ -3903,7 +3904,8 @@ export const initialTranslationData = [
     business: "page.system",
     langCode: "en-US",
     tKey: "rolePermission.conditionsHelp",
-    tValue: "JSON format additional conditions, e.g.: {\"ipRange\": [\"192.168.1.0/24\"]}",
+    tValue:
+      'JSON format additional conditions, e.g.: {"ipRange": ["192.168.1.0/24"]}',
     isEnabled: true,
   },
   {
@@ -3999,7 +4001,8 @@ export const initialTranslationData = [
     business: "page.system",
     langCode: "en-US",
     tKey: "rolePermission.confirmBatchDelete",
-    tValue: "Are you sure you want to delete the selected {count} role-permission associations?",
+    tValue:
+      "Are you sure you want to delete the selected {count} role-permission associations?",
     isEnabled: true,
   },
   {

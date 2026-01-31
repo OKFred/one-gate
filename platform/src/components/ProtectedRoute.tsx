@@ -3,6 +3,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { authUtils } from '@/utils/auth';
 import { checkTokenFn } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
+import { useMenu } from '@/hooks/useMenu';
+import type { MenuNode } from '@/contexts/MenuContext';
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -11,6 +13,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const { navItems, loading: menuLoading } = useMenu();
 
   function failedLogin() {
     // token无效，清理本地存储
@@ -43,8 +46,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     checkAuth();
   }, []);
 
-  // 正在验证token
-  if (isLoading) {
+  // 正在验证token或加载菜单
+  if (isLoading || menuLoading) {
     return (
       <Box
         sx={{
@@ -64,7 +67,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // 已认证，渲染子组件
+  // 已认证，检查路径是否在菜单中
+  const isValidPath = (items: MenuNode[], path: string): boolean => {
+    for (const item of items) {
+      if (item.path === path) return true;
+      if (item.children && item.children.length > 0) {
+        if (isValidPath(item.children, path)) return true;
+      }
+    }
+    return false;
+  };
+
+  if (!isValidPath(navItems, location.pathname)) {
+    return <Navigate to="/error/NotFound" replace />;
+  }
+
+  // 已认证且路径有效，渲染子组件
   return <>{children}</>;
 };
 

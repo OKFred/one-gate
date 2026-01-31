@@ -14,7 +14,7 @@ const NotFound: React.FC = () => {
         {t('dialog.message')}
       </Typography>
       <Button variant="contained" color="primary" component={RouterLink} to="/home" sx={{ mt: 20 }}>
-        {t('dialog.backHome')}
+        {t('dialog.goBackHome')}
       </Button>
     </div>
   );

@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useNavigate, useLocation } from 'react-router';
 import Icon from '@/components/Icon';
-import { treeFn } from '@/api/system/menu';
 import type { SystemMenuTree } from './type';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -28,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
-  const { navItems, setNavItems } = useMenu();
+  const { navItems } = useMenu();
   const { isMobile } = useResponsive();
   const t = useTranslation();
 
@@ -71,15 +70,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     traverse(items);
     return expanded;
   };
-
-  // 异步加载菜单数据
-  useEffect(() => {
-    const loadMenus = async () => {
-      const resData = await treeFn({ data: {} });
-      setNavItems(normalizeMenus(resData.data.data));
-    };
-    loadMenus();
-  }, [normalizeMenus, setNavItems]);
 
   // 当菜单加载或路径变化时，自动展开到当前菜单
   useEffect(() => {
