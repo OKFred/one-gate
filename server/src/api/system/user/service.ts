@@ -407,6 +407,7 @@ export type UserObj = FromSchema<typeof getRes> & {
   userId: number;
   isSuperAdmin: boolean;
   permissions: PermissionInfo[];
+  selfAndSubDepartmentIds?: number[];
 };
 const getReq = {
   type: "object",
@@ -574,7 +575,6 @@ async function getRegionObj(
 }
 
 export const utils = {
-  getUserObjByName,
   convertPassword,
   verifyUsernameAndPassword,
   updatePassword,

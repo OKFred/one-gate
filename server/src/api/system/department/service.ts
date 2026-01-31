@@ -551,6 +551,26 @@ async function getDepartmentNameById(id: number): Promise<string | null> {
   return rows.length > 0 ? rows[0].name : null;
 }
 
+/** @description 获取部门和子部门的ID列表 */
+async function getDepartmentAndSubIds(departmentId: number): Promise<number[]> {
+  const allDepartments = await db
+    .select({ id: departmentTable.id, parentId: departmentTable.parentId })
+    .from(departmentTable)
+    .where(eq(departmentTable.isEnabled, true));
+  const resultIds: number[] = [];
+
+  function collectSubIds(parentId: number) {
+    resultIds.push(parentId);
+    allDepartments.forEach((dept) => {
+      if (dept.parentId === parentId) {
+        collectSubIds(dept.id);
+      }
+    });
+  }
+  collectSubIds(departmentId);
+  return resultIds;
+}
+
 async function verifyDepartment(departmentId: number) {
   const departmentName = await getDepartmentNameById(departmentId);
   if (!departmentName) {
@@ -561,6 +581,7 @@ async function verifyDepartment(departmentId: number) {
 export const utils = {
   getDepartmentNameById,
   verifyDepartment,
+  getDepartmentAndSubIds,
 };
 
 export default {

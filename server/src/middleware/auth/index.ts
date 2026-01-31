@@ -1,6 +1,7 @@
 import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
 import userService from "@/api/system/user/service";
+import { utils as departmentUtils } from "@/api/system/department/service";
 import { SUPER_ADMIN_ID } from "@/db/init";
 import permissionUtils from "@/middleware/auth/rbac/permission";
 import {
@@ -26,18 +27,13 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   const { id: userId, ...rest } = user;
-
+  // 加载用户所属部门及其子部门ID
+  const selfAndSubDepartmentIds = user.departmentObj?.value
+    ? await departmentUtils.getDepartmentAndSubIds(user.departmentObj.value)
+    : undefined;
   // 加载用户权限
   const roleIds = user.roleArr?.map((r) => r.value) || [];
-  const allPermissions =
-    roleIds.length > 0
-      ? await permissionUtils.getPermissionsByRoleIds(roleIds)
-      : [];
-
-  // 过滤生效的权限（处理 allow/deny）
-  const permissions =
-    permissionUtils.filterEffectivePermissions(allPermissions);
-
+  const permissions = await fetchPermissionsByRoleIds(roleIds);
   // 判断是否为超级管理员
   const isSuperAdmin = userId === SUPER_ADMIN_ID;
 
@@ -47,7 +43,20 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     userId,
     id: userId,
     isSuperAdmin,
+    selfAndSubDepartmentIds,
     permissions,
     ...rest,
   });
 };
+
+async function fetchPermissionsByRoleIds(roleIds: number[]) {
+  const allPermissions =
+    roleIds.length > 0
+      ? await permissionUtils.getPermissionsByRoleIds(roleIds)
+      : [];
+
+  // 过滤生效的权限（处理 allow/deny）
+  const permissions =
+    permissionUtils.filterEffectivePermissions(allPermissions);
+  return permissions;
+}
