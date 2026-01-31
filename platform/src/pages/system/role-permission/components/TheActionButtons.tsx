@@ -1,5 +1,15 @@
-import { memo } from 'react';
-import { Button, Box, Stack, IconButton } from '@mui/material';
+import { memo, useState, useCallback } from 'react';
+import {
+  Button,
+  Box,
+  Stack,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from '@mui/material';
 import {
   Add as AddIcon,
   DeleteSweep as DeleteSweepIcon,
@@ -92,16 +102,28 @@ export interface RolePermissionActionButtonsProps {
  */
 export const RolePermissionActionButtons = memo(
   ({ row, formRef, onDeleteSuccess }: RolePermissionActionButtonsProps) => {
+    const t = useTranslation();
+    // 删除确认对话框状态
+    const [deleteDialog, setDeleteDialog] = useState(false);
+
     const handleEdit = () => {
       formRef.current?.onOpen(row);
     };
 
-    const handleDelete = async () => {
+    // 打开删除确认对话框
+    const openDeleteDialog = useCallback(() => {
+      setDeleteDialog(true);
+    }, []);
+
+    // 关闭删除确认对话框
+    const closeDeleteDialog = useCallback(() => {
+      setDeleteDialog(false);
+    }, []);
+
+    // 确认删除
+    const handleConfirmDelete = useCallback(async () => {
       if (row.id) {
         try {
-          // 由于batchDeleteFn按角色删除，这里我们需要单独处理单个删除
-          // 或者我们可以调用deleteFn如果存在的话
-          // 暂时使用batchDeleteFn按单个角色删除
           await RolePermissionAPI.batchDeleteFn({
             data: { roleId: row.roleId, permissionIds: [row.permissionId] },
           });
@@ -110,17 +132,36 @@ export const RolePermissionActionButtons = memo(
           console.warn('Failed to delete role permission:', error);
         }
       }
-    };
+      closeDeleteDialog();
+    }, [row.id, row.roleId, row.permissionId, onDeleteSuccess, closeDeleteDialog]);
 
     return (
-      <Stack direction="row" spacing={1} justifyContent="center">
-        <IconButton onClick={handleEdit} color="primary" size="small">
-          <EditIcon />
-        </IconButton>
-        <IconButton onClick={handleDelete} color="error" size="small">
-          <DeleteIcon />
-        </IconButton>
-      </Stack>
+      <>
+        <Stack direction="row" spacing={1} justifyContent="center">
+          <IconButton onClick={handleEdit} color="primary" size="small">
+            <EditIcon />
+          </IconButton>
+          <IconButton onClick={openDeleteDialog} color="error" size="small">
+            <DeleteIcon />
+          </IconButton>
+        </Stack>
+
+        {/* 删除确认对话框 */}
+        <Dialog open={deleteDialog} onClose={closeDeleteDialog}>
+          <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{t('table.deleteConfirm')}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDeleteDialog} variant="outlined">
+              {t('dialog.cancel')}
+            </Button>
+            <Button onClick={handleConfirmDelete} color="error" variant="contained">
+              {t('dialog.delete')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   },
 );
