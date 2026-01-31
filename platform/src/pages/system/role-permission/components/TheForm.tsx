@@ -296,19 +296,38 @@ const TheForm = memo(
                         {t('rolePermission.assignedPermission')}
                       </Typography>
                       {currentRolePermissions.length > 0 ? (
-                        currentRolePermissions.map((rp) => {
-                          const permission = allPermissions.find((p) => p.id === rp.id);
-                          return (
-                            <Chip
-                              key={rp.id}
-                              label={
-                                permission ? `${permission.name} (${permission.code})` : 'Unknown'
-                              }
-                              size="small"
-                              sx={{ m: 0.5 }}
-                            />
-                          );
-                        })
+                        (() => {
+                          // 按category分组权限
+                          const groupedPermissions = currentRolePermissions.reduce((acc, rp) => {
+                            const permission = allPermissions.find((p) => p.id === rp.id);
+                            const category = permission?.category || t('rolePermission.otherCategory');
+                            if (!acc[category]) acc[category] = [];
+                            acc[category].push(rp);
+                            return acc;
+                          }, {} as Record<string, typeof currentRolePermissions>);
+
+                          return Object.entries(groupedPermissions).map(([category, perms]) => (
+                            <Box key={category} sx={{ mb: 2 }}>
+                              <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'bold' }}>
+                                {category}
+                              </Typography>
+                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {perms.map((rp) => {
+                                  const permission = allPermissions.find((p) => p.id === rp.id);
+                                  return (
+                                    <Chip
+                                      key={rp.id}
+                                      label={
+                                        permission ? `${permission.name} (${permission.code})` : 'Unknown'
+                                      }
+                                      size="small"
+                                    />
+                                  );
+                                })}
+                              </Box>
+                            </Box>
+                          ));
+                        })()
                       ) : (
                         <Typography variant="body2" color="text.secondary">
                           {t('rolePermission.noPermissions')}
