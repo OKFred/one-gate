@@ -58,6 +58,13 @@ export const checkPermission = (
       ? requiredPermissions.every(lookup)
       : requiredPermissions.some(lookup);
     if (!hasPermission) {
+      console.log(
+        "权限不足，拒绝访问",
+        JSON.stringify({
+          requiredPermissions,
+          userPermissions,
+        })
+      );
       throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
     }
 

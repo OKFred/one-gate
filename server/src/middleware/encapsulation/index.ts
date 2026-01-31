@@ -60,6 +60,13 @@ function routeMaker({
   componentArr: ReturnType<typeof componentMaker>[];
   requiredPermissions?: string[];
 }) {
+  // 默认给接口都加上命名空间前缀作为权限标识
+  const permissionCode = nameSpace + pathInfo.path;
+  if (!requiredPermissions) {
+    requiredPermissions = [permissionCode];
+  } else {
+    requiredPermissions.push(permissionCode);
+  }
   const controller = async (c: NodeHonoContext) => {
     //获取request header content type
     //如果不是 application/json 则报错

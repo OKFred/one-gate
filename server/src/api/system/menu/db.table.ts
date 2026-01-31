@@ -55,12 +55,6 @@ const MenuBasePO = {
     minimum: 0,
     maximum: 1000,
   },
-  roleIdArr: {
-    type: ["array", "null"],
-    nullable: true,
-    description: "需要的角色ID列表",
-    items: { type: "number", examples: [1], minimum: 1 },
-  },
   isEnabled: {
     type: "boolean",
     description: "是否启用",
@@ -109,7 +103,6 @@ export const MenuAddKeys = [
   "remark",
   "parentId",
   "sort",
-  "roleIdArr",
   "isEnabled",
 ] as const satisfies RequiredKeys<MenuAddVOLike>[];
 export const MenuUpdateKeys = [
@@ -145,7 +138,6 @@ export const menuTable = sqliteTable("system_menu", {
   remark: text("remark"),
   parentId: integer("parent_id"),
   sort: integer("sort").notNull(),
-  roleIdArr: text("role_id_arr", { mode: "json" }).$type<number[]>(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -165,7 +157,6 @@ export async function tableInit() {
       remark TEXT,
       parent_id INTEGER,
       sort INTEGER NOT NULL,
-      role_id_arr TEXT,
       is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,

@@ -583,6 +583,43 @@ const getPermissionsByRoleApi = {
   service: onGetPermissionsByRole,
 } satisfies API;
 
+// 工具函数：为角色添加菜单权限
+async function addMenuPermissionToRole(roleId: number, permissionId: number, creatorId: number) {
+  const rolePermissionData = {
+    roleId,
+    permissionId,
+    resourceFilter: null,
+    conditions: null,
+    creatorId,
+  };
+
+  await db.insert(rolePermissionTable).values(rolePermissionData);
+}
+
+// 工具函数：获取角色有权限的菜单ID列表
+async function getMenuIdsByRoleIds(roleIds: number[]) {
+  if (roleIds.length === 0) return [];
+
+  const rows = await db
+    .select({
+      menuId: permissionTable.resource,
+    })
+    .from(rolePermissionTable)
+    .innerJoin(permissionTable, eq(rolePermissionTable.permissionId, permissionTable.id))
+    .where(and(
+      inArray(rolePermissionTable.roleId, roleIds),
+      eq(permissionTable.category, "menu"),
+      eq(permissionTable.isEnabled, true)
+    ));
+
+  return rows.map(row => parseInt(row.menuId)).filter(id => !isNaN(id));
+}
+
+export const utils = {
+  addMenuPermissionToRole,
+  getMenuIdsByRoleIds,
+};
+
 export default {
   list: listApi,
   add: addApi,

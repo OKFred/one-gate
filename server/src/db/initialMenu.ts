@@ -58,7 +58,6 @@ export const initialMenuData = [
     name: "sidebar.menu.system",
     icon: "material-symbols:settings",
     sort: 4,
-    roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 9,
@@ -97,7 +96,6 @@ export const initialMenuData = [
     name: "sidebar.menu.i18n",
     icon: "material-symbols:language",
     sort: 5,
-    roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 14,
@@ -148,5 +146,4 @@ type menuLike = {
   path?: string | null;
   parentId?: number | null;
   sort: number;
-  roleIdArr?: number[];
 };

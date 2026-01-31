@@ -7683,8 +7683,6 @@ export interface components {
                 parentId?: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort?: number;
-                /** @description 需要的角色ID列表 */
-                roleIdArr?: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
             }[];
@@ -7751,8 +7749,6 @@ export interface components {
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
-                    /** @description 需要的角色ID列表 */
-                    roleIdArr: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
@@ -7795,8 +7791,6 @@ export interface components {
             parentId: ((number | null) | null) | null;
             /** @description 排序 */
             sort: number;
-            /** @description 需要的角色ID列表 */
-            roleIdArr: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
@@ -7836,8 +7830,6 @@ export interface components {
             parentId?: ((number | null) | null) | null;
             /** @description 排序 */
             sort?: number;
-            /** @description 需要的角色ID列表 */
-            roleIdArr?: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
@@ -7902,8 +7894,6 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
-                /** @description 需要的角色ID列表 */
-                roleIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -7956,8 +7946,6 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
-                /** @description 需要的角色ID列表 */
-                roleIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -8001,8 +7989,6 @@ export interface components {
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
-                    /** @description 需要的角色ID列表 */
-                    roleIdArr: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */

@@ -27,50 +27,6 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     scope: "all",
     remark: "邮件相关接口，但不包括账户相关接口",
   },
-  // ==================== 菜单权限 ====================
-  {
-    code: "menu:dashboard",
-    name: "仪表盘菜单",
-    category: "menu",
-    resource: "/dashboard",
-    remark: "系统首页仪表盘",
-  },
-  {
-    code: "menu:system",
-    name: "系统管理菜单",
-    category: "menu",
-    resource: "/system",
-    remark: "系统管理菜单入口",
-  },
-  {
-    code: "menu:system:user",
-    name: "用户管理菜单",
-    category: "menu",
-    resource: "/system/user",
-    remark: "用户管理页面",
-  },
-  {
-    code: "menu:system:role",
-    name: "角色管理菜单",
-    category: "menu",
-    resource: "/system/role",
-    remark: "角色管理页面",
-  },
-  {
-    code: "menu:system:permission",
-    name: "权限管理菜单",
-    category: "menu",
-    resource: "/system/permission",
-    remark: "权限管理页面",
-  },
-  {
-    code: "menu:system:department",
-    name: "部门管理菜单",
-    category: "menu",
-    resource: "/system/department",
-    remark: "部门管理页面",
-  },
-
   // ==================== 用户管理权限 ====================
   {
     code: "button:user:add",

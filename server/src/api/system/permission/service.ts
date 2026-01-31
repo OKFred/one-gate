@@ -396,6 +396,44 @@ const getApi = {
   service: onGet,
 } satisfies API;
 
+// 工具函数：创建菜单权限
+async function createMenuPermission(menuId: number, menuName: string, creatorId: number) {
+  const permissionData = {
+    code: `menu:${menuId}`,
+    name: `菜单权限-${menuName}`,
+    category: "menu" as const,
+    resource: menuId.toString(),
+    effect: "allow" as const,
+    scope: "all" as const,
+    parentId: null,
+    remark: `菜单 ${menuName} 的访问权限`,
+    isEnabled: true,
+    creatorId,
+  };
+
+  const result = await db.insert(permissionTable).values(permissionData).returning({ id: permissionTable.id });
+  return result[0].id;
+}
+
+// 工具函数：根据菜单ID获取权限ID
+async function getPermissionIdByMenuId(menuId: number) {
+  const rows = await db
+    .select({ id: permissionTable.id })
+    .from(permissionTable)
+    .where(and(
+      eq(permissionTable.category, "menu"),
+      eq(permissionTable.resource, menuId.toString())
+    ))
+    .limit(1);
+
+  return rows.length > 0 ? rows[0].id : null;
+}
+
+export const utils = {
+  createMenuPermission,
+  getPermissionIdByMenuId,
+};
+
 export default {
   listAll: listAllApi,
   list: listApi,

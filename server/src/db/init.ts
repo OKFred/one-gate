@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
-import { menuTable } from "@/api/system/menu/db.table";
+import menuService from "@/api/system/menu/service";
 import { initialMenuData } from "@/db/initialMenu";
 import { initialTranslationData } from "./initTranslation";
 import { initialRegionData } from "./initRegion";
@@ -15,6 +15,7 @@ import translationService, {
 } from "@/api/i18n/translation/service";
 import { loadTranslationCache } from "@/utils/i18n";
 import { initPermissions } from "./initPermissions";
+import { UserObj } from "@/api/system/user/service";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -118,25 +119,23 @@ async function initSuperAdminUser(roleId: number) {
  */
 async function initMenu() {
   // 检查是否已有数据，没有则插入初始数据
-  const countResult = await db
-    .select({ total: count(menuTable.id).as("total") })
-    .from(menuTable);
-  if (countResult[0]?.total === 0) {
-    for (const menu of initialMenuData) {
-      await db.insert(menuTable).values({
-        id: menu.id,
+  const countResult = await menuService.listAll.service({});
+  if (countResult.length === initialMenuData.length) return;
+  for (const menu of initialMenuData) {
+    await menuService.add.service(
+      {
         name: menu.name,
         icon: menu.icon,
         sort: menu.sort,
         path: menu.path || null,
         parentId: menu.parentId || null,
-        roleIdArr: menu.roleIdArr || null,
         isEnabled: true,
-        creatorId: 1, // 系统初始化
-      });
-    }
-    console.log("💾 表 system_menu 初始数据已插入");
+        remark: null,
+      },
+      { userId: SUPER_ADMIN_ID } as UserObj
+    );
   }
+  console.log("💾 表 system_menu 初始数据已插入");
 }
 
 /**
@@ -256,7 +255,7 @@ export async function initDatabase() {
 
     // 3. 初始化超级管理员账号
     await initSuperAdminUser(roleId);
-    
+
     // 4. 初始化菜单
     await initMenu();
 
