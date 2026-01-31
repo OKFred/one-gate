@@ -71,11 +71,6 @@ function routeMaker({
     }
     if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
       await authMiddleware(c);
-      if (!requiredPermissions) {
-        requiredPermissions = [c.req.path];
-      } else {
-        requiredPermissions.push(c.req.path);
-      }
       await checkPermission(requiredPermissions)(c);
     }
     const bodyObj = await c.req.json();
