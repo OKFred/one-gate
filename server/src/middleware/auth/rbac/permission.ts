@@ -6,6 +6,7 @@
 import db from "@/db/index";
 import { permissionTable } from "@/api/system/permission/db.table";
 import { rolePermissionTable } from "@/api/system/role_permission/db.table";
+import roleService from "@/api/system/role/service";
 import { eq, and, inArray } from "drizzle-orm";
 
 /** 权限效果枚举 */
@@ -40,7 +41,13 @@ export async function getPermissionsByRoleIds(
   if (roleIds.length === 0) {
     return [];
   }
-
+  // 仅允许已启用的角色
+  const enabledRoles = await roleService.listAll.service({ isEnabled: true });
+  const enabledRoleIds = new Set(enabledRoles.map((role) => role.id));
+  const filteredRoleIds = roleIds.filter((id) => enabledRoleIds.has(id));
+  if (filteredRoleIds.length === 0) {
+    return [];
+  }
   const rows = await db
     .select({
       id: permissionTable.id,
@@ -60,7 +67,7 @@ export async function getPermissionsByRoleIds(
     )
     .where(
       and(
-        inArray(rolePermissionTable.roleId, roleIds),
+        inArray(rolePermissionTable.roleId, filteredRoleIds),
         eq(permissionTable.isEnabled, true)
       )
     );
