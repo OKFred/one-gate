@@ -1,7 +1,6 @@
 import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
 import userService from "@/api/system/user/service";
-import { utils as departmentUtils } from "@/api/system/department/service";
 import { SUPER_ADMIN_ID } from "@/db/init";
 import permissionUtils from "@/middleware/auth/rbac/permission";
 import {
@@ -27,10 +26,6 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   const { id: userId, ...rest } = user;
-  // 加载用户所属部门及其子部门ID
-  const selfAndSubDepartmentIds = user.departmentObj?.value
-    ? await departmentUtils.getDepartmentAndSubIds(user.departmentObj.value)
-    : undefined;
   // 加载用户权限
   const roleIds = user.roleArr?.map((r) => r.value) || [];
   const permissions = await fetchPermissionsByRoleIds(roleIds);
@@ -43,7 +38,6 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     userId,
     id: userId,
     isSuperAdmin,
-    selfAndSubDepartmentIds,
     permissions,
     ...rest,
   });
