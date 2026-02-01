@@ -420,10 +420,12 @@ async function getPermissionIdByMenuId(menuId: number) {
   const rows = await db
     .select({ id: permissionTable.id })
     .from(permissionTable)
-    .where(and(
-      eq(permissionTable.category, "menu"),
-      eq(permissionTable.resource, menuId.toString())
-    ))
+    .where(
+      and(
+        eq(permissionTable.category, "menu"),
+        eq(permissionTable.code, `menu:${menuId}`)
+      )
+    )
     .limit(1);
 
   return rows.length > 0 ? rows[0].id : null;
