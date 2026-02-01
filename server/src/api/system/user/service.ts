@@ -28,7 +28,7 @@ import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
 import regionService, { utils as regionUtils } from "@/api/i18n/region/service";
 import { utils as languageUtils } from "@/api/i18n/language/service";
-import type { PermissionInfo } from "@/middleware/auth/rbac/permission";
+import type { PermissionInfo } from "@/api/system/permission/service";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
@@ -51,6 +51,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { PermissionInfoCore } from "../role_permission/service";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -406,7 +407,7 @@ export type UserObj = FromSchema<typeof getRes> & {
   token: string;
   userId: number;
   isSuperAdmin: boolean;
-  permissions: PermissionInfo[];
+  permissions: PermissionInfoCore[];
 };
 const getReq = {
   type: "object",

@@ -42,6 +42,8 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { PermissionInfo } from "@/api/system/permission/service";
+import { utils as permissionUtils } from "@/api/system/permission/service";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -535,8 +537,6 @@ const getPermissionsByRoleRes = {
       resource: { type: ["string", "null"], nullable: true },
       effect: { type: "string" },
       scope: { type: "string" },
-      resourceFilter: { type: ["string", "null"], nullable: true },
-      conditions: { type: ["string", "null"], nullable: true },
     },
   },
 } as const satisfies JSONSchema;
@@ -544,7 +544,6 @@ async function onGetPermissionsByRole(
   obj: FromSchema<typeof getPermissionsByRoleReq>
 ): Promise<FromSchema<typeof getPermissionsByRoleRes>> {
   const { roleId } = obj;
-
   const rows = await db
     .select({
       id: permissionTable.id,
@@ -554,8 +553,6 @@ async function onGetPermissionsByRole(
       resource: permissionTable.resource,
       effect: permissionTable.effect,
       scope: permissionTable.scope,
-      resourceFilter: rolePermissionTable.resourceFilter,
-      conditions: rolePermissionTable.conditions,
     })
     .from(rolePermissionTable)
     .innerJoin(
@@ -568,7 +565,6 @@ async function onGetPermissionsByRole(
         eq(permissionTable.isEnabled, true)
       )
     );
-
   return rows;
 }
 const getPermissionsByRoleApi = {
@@ -583,8 +579,67 @@ const getPermissionsByRoleApi = {
   service: onGetPermissionsByRole,
 } satisfies API;
 
+export type PermissionInfoCore = Pick<
+  PermissionInfo,
+  | "id"
+  | "code"
+  | "name"
+  | "category"
+  | "resource"
+  | "effect"
+  | "scope"
+  | "parentId"
+>;
+
+/**
+ * 根据角色ID数组获取所有权限
+ * @param roleIds 角色ID数组
+ * @returns 权限信息数组
+ */
+export async function getPermissionsByRoleIds(roleIds: number[]) {
+  if (roleIds.length === 0) {
+    return [];
+  }
+  // 仅允许已启用的角色
+  const enabledRoles = await roleService.listAll.service({ isEnabled: true });
+  const enabledRoleIds = new Set(enabledRoles.map((role) => role.id));
+  const filteredRoleIds = roleIds.filter((id) => enabledRoleIds.has(id));
+  if (filteredRoleIds.length === 0) {
+    return [];
+  }
+  const rows = (await db
+    .select({
+      id: permissionTable.id,
+      code: permissionTable.code,
+      name: permissionTable.name,
+      category: permissionTable.category,
+      effect: permissionTable.effect,
+      scope: permissionTable.scope,
+      resource: permissionTable.resource,
+      parentId: permissionTable.parentId,
+    })
+    .from(rolePermissionTable)
+    .innerJoin(
+      permissionTable,
+      eq(rolePermissionTable.permissionId, permissionTable.id)
+    )
+    .where(
+      and(
+        inArray(rolePermissionTable.roleId, filteredRoleIds),
+        eq(permissionTable.isEnabled, true)
+      )
+    )) as PermissionInfoCore[];
+  // 过滤生效的权限（处理 allow/deny）
+  const permissions = permissionUtils.filterEffectivePermissions(rows);
+  return permissions;
+}
+
 // 工具函数：为角色添加菜单权限
-async function addMenuPermissionToRole(roleId: number, permissionId: number, creatorId: number) {
+async function addMenuPermissionToRole(
+  roleId: number,
+  permissionId: number,
+  creatorId: number
+) {
   const rolePermissionData = {
     roleId,
     permissionId,
@@ -599,25 +654,29 @@ async function addMenuPermissionToRole(roleId: number, permissionId: number, cre
 // 工具函数：获取角色有权限的菜单ID列表
 async function getMenuIdsByRoleIds(roleIds: number[]) {
   if (roleIds.length === 0) return [];
-
   const rows = await db
     .select({
       menuId: permissionTable.resource,
     })
     .from(rolePermissionTable)
-    .innerJoin(permissionTable, eq(rolePermissionTable.permissionId, permissionTable.id))
-    .where(and(
-      inArray(rolePermissionTable.roleId, roleIds),
-      eq(permissionTable.category, "menu"),
-      eq(permissionTable.isEnabled, true)
-    ));
-
-  return rows.map(row => parseInt(row.menuId)).filter(id => !isNaN(id));
+    .innerJoin(
+      permissionTable,
+      eq(rolePermissionTable.permissionId, permissionTable.id)
+    )
+    .where(
+      and(
+        inArray(rolePermissionTable.roleId, roleIds),
+        eq(permissionTable.category, "menu"),
+        eq(permissionTable.isEnabled, true)
+      )
+    );
+  return rows.map((row) => parseInt(row.menuId)).filter((id) => !isNaN(id));
 }
 
 export const utils = {
   addMenuPermissionToRole,
   getMenuIdsByRoleIds,
+  getPermissionsByRoleIds,
 };
 
 export default {

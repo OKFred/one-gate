@@ -2,7 +2,7 @@ import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
 import userService from "@/api/system/user/service";
 import { SUPER_ADMIN_ID } from "@/db/init";
-import permissionUtils from "@/middleware/auth/rbac/permission";
+import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -28,7 +28,8 @@ export const authMiddleware = async (c: NodeHonoContext) => {
   const { id: userId, ...rest } = user;
   // 加载用户权限
   const roleIds = user.roleArr?.map((r) => r.value) || [];
-  const permissions = await fetchPermissionsByRoleIds(roleIds);
+  const permissions =
+    await rolePermissionUtils.getPermissionsByRoleIds(roleIds);
   // 判断是否为超级管理员
   const isSuperAdmin = userId === SUPER_ADMIN_ID;
 
@@ -42,15 +43,3 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     ...rest,
   });
 };
-
-async function fetchPermissionsByRoleIds(roleIds: number[]) {
-  const allPermissions =
-    roleIds.length > 0
-      ? await permissionUtils.getPermissionsByRoleIds(roleIds)
-      : [];
-
-  // 过滤生效的权限（处理 allow/deny）
-  const permissions =
-    permissionUtils.filterEffectivePermissions(allPermissions);
-  return permissions;
-}

@@ -387,6 +387,56 @@ const updatePasswordApi = {
   service: onUpdatePassword,
 } satisfies API;
 
+// 获取按钮权限
+const getButtonPermissionReq = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const getButtonPermissionRes = {
+  type: "object",
+  properties: {
+    permissions: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          id: { type: "number" },
+          code: { type: "string" },
+          name: { type: "string" },
+          category: { type: "string", enum: ["menu", "button", "api"] },
+          resource: { type: ["string", "null"] },
+          effect: { type: "string" },
+          scope: { type: "string", enum: ["all", "own", "dept", "custom"] },
+          resourceFilter: { type: ["string", "null"] },
+          conditions: { type: ["string", "null"] },
+        },
+        required: ["id", "code", "name", "category", "effect", "scope"],
+      },
+    },
+  },
+  required: ["permissions"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+async function onGetButtonPermission(
+  params: FromSchema<typeof getButtonPermissionReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof getButtonPermissionRes> | null> {
+  const buttonPermissions = userObj.permissions.filter(p => p.category === 'button');
+  return { permissions: buttonPermissions };
+}
+const getButtonPermissionApi = {
+  req: getButtonPermissionReq,
+  res: getButtonPermissionRes,
+  pathInfo: {
+    path: "/getButtonPermission",
+    method: "post",
+    summary: "获取按钮权限",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onGetButtonPermission,
+} satisfies API;
+
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
@@ -396,4 +446,5 @@ export default {
   updateProfile: updateProfileApi,
   updateLangCode: updateLangCodeApi,
   updatePassword: updatePasswordApi,
+  getButtonPermission: getButtonPermissionApi,
 };

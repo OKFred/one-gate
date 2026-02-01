@@ -23,7 +23,7 @@ import {
   PermissionUniqueKeys,
   PermissionUniqueVO,
 } from "./db.table";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -43,17 +43,20 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { PermissionInfoCore } from "../role_permission/service";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
   isEnabled,
+  code,
+  name,
   category,
   scope,
   effect,
 }: Pick<
   FromSchema<typeof listReq>,
-  "keyword" | "isEnabled" | "category" | "scope" | "effect"
+  "keyword" | "isEnabled" | "code" | "name" | "category" | "scope" | "effect"
 >) => {
   const conditions = [];
   if (hasValue(keyword)) {
@@ -63,6 +66,12 @@ const buildWhereCondition = ({
         like(permissionTable.name, `%${keyword}%`)
       )
     );
+  }
+  if (hasValue(code)) {
+    conditions.push(eq(permissionTable.code, code));
+  }
+  if (hasValue(name)) {
+    conditions.push(eq(permissionTable.name, name));
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(permissionTable.isEnabled, isEnabled));
@@ -87,10 +96,12 @@ const listAllReq = {
   type: "object",
   properties: {
     ...listAllReqBase,
-    isEnabled: PermissionVO["isEnabled"],
+    code: PermissionVO["code"],
+    name: PermissionVO["name"],
     category: PermissionVO["category"],
     scope: PermissionVO["scope"],
     effect: PermissionVO["effect"],
+    isEnabled: PermissionVO["isEnabled"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
   required: [],
@@ -151,10 +162,12 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    isEnabled: PermissionVO["isEnabled"],
+    code: PermissionVO["code"],
+    name: PermissionVO["name"],
     category: PermissionVO["category"],
     scope: PermissionVO["scope"],
     effect: PermissionVO["effect"],
+    isEnabled: PermissionVO["isEnabled"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
   required: [],
@@ -221,7 +234,7 @@ const listApi = {
   service: onList,
 } satisfies API;
 
-export type PermissionAddLike = FromSchema<typeof addReq>
+export type PermissionAddLike = FromSchema<typeof addReq>;
 const addReq = {
   type: "object",
   properties: {
@@ -350,6 +363,7 @@ const deleteApi = {
   service: onDelete,
 } satisfies API;
 
+export type PermissionInfo = FromSchema<typeof getRes>;
 const getReq = {
   type: "object",
   properties: {
@@ -397,7 +411,11 @@ const getApi = {
 } satisfies API;
 
 // 工具函数：创建菜单权限
-async function createMenuPermission(menuId: number, menuName: string, creatorId: number) {
+async function createMenuPermission(
+  menuId: number,
+  menuName: string,
+  creatorId: number
+) {
   const permissionData = {
     code: `menu:${menuId}`,
     name: `菜单权限-${menuName}`,
@@ -411,7 +429,10 @@ async function createMenuPermission(menuId: number, menuName: string, creatorId:
     creatorId,
   };
 
-  const result = await db.insert(permissionTable).values(permissionData).returning({ id: permissionTable.id });
+  const result = await db
+    .insert(permissionTable)
+    .values(permissionData)
+    .returning({ id: permissionTable.id });
   return result[0].id;
 }
 
@@ -431,9 +452,50 @@ async function getPermissionIdByMenuId(menuId: number) {
   return rows.length > 0 ? rows[0].id : null;
 }
 
+/** 权限效果枚举 */
+const Effect = {
+  ALLOW: "allow",
+  DENY: "deny",
+} as const;
+
+/**
+ * 过滤生效的权限（处理 allow/deny）
+ * @param permissions 权限数组
+ * @returns 处理后的权限数组（只包含最终允许的权限）
+ */
+function filterEffectivePermissions(
+  permissions: PermissionInfoCore[]
+): PermissionInfoCore[] {
+  // 按权限代码分组
+  const permissionMap = new Map<string, PermissionInfoCore[]>();
+
+  for (const perm of permissions) {
+    const existing = permissionMap.get(perm.code) || [];
+    existing.push(perm);
+    permissionMap.set(perm.code, existing);
+  }
+
+  // 处理每个权限组
+  const result: PermissionInfoCore[] = [];
+  for (const [code, perms] of permissionMap) {
+    // 如果有任何 deny，则该权限被拒绝
+    const hasDeny = perms.some((p) => p.effect === Effect.DENY);
+    if (!hasDeny) {
+      // 只取第一个 allow 权限
+      const allowPerm = perms.find((p) => p.effect === Effect.ALLOW);
+      if (allowPerm) {
+        result.push(allowPerm);
+      }
+    }
+  }
+
+  return result;
+}
+
 export const utils = {
   createMenuPermission,
   getPermissionIdByMenuId,
+  filterEffectivePermissions,
 };
 
 export default {
