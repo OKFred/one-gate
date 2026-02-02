@@ -99,7 +99,6 @@ async function onListAll(
       id: roleTable.id,
       name: roleTable.name,
       remark: roleTable.remark,
-      permissions: roleTable.permissions,
       isEnabled: roleTable.isEnabled,
     })
     .from(roleTable)
@@ -213,14 +212,6 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { permissions } = obj;
-  // 如果提供了permissions，验证是否为有效JSON数组
-  if (hasValue(permissions)) {
-    const parsed = JSON.parse(permissions);
-    if (!Array.isArray(parsed)) {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
 
   const result = await db
     .insert(roleTable)
@@ -262,35 +253,16 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, permissions, ...rest } = params;
+  const { id, ...rest } = params;
   const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled; // 禁止禁用超级管理员角色
 
-  let updateData = {
+  const updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
-    permissions: undefined,
-    isEnabled: undefined,
+    isEnabled,
   };
-  // 如果更新permissions，验证是否为有效JSON数组
-  if (hasValue(permissions)) {
-    const parsed = JSON.parse(permissions);
-    if (!Array.isArray(parsed)) {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
-  if (permissions !== undefined) {
-    updateData = {
-      ...updateData,
-      permissions,
-    };
-  }
-  if (isEnabled !== undefined) {
-    updateData = {
-      ...updateData,
-      isEnabled,
-    };
-  }
+
   const res = await db
     .update(roleTable)
     .set(updateData)
@@ -422,9 +394,21 @@ async function verifyRoles(roleIdArr: number[]) {
   }
 }
 
+/** 更新角色的权限数量 */
+async function updatePermissionCount(
+  roleId: number,
+  newCount: number
+): Promise<void> {
+  await db
+    .update(roleTable)
+    .set({ permissionCount: newCount })
+    .where(eq(roleTable.id, roleId));
+}
+
 export const utils = {
   getRolesByIds,
   verifyRoles,
+  updatePermissionCount,
 };
 
 export default {

@@ -10,7 +10,8 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
-import { authMiddleware } from "../auth";
+import { authMiddleware } from "../bearerAuth";
+import { checkPermission } from "../accessControl";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -41,6 +42,7 @@ function componentMaker(
 }
 
 const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
+const BASE_API_PATH = process.env.BASE_API_PATH || "/api/v1";
 
 function routeMaker({
   pathInfo,
@@ -50,12 +52,21 @@ function routeMaker({
   reqSchema,
   resSchema,
   componentArr,
+  requiredPermissions,
 }: API & {
   nameSpace: string;
   reqSchema: JSONSchema;
   resSchema: JSONSchema;
   componentArr: ReturnType<typeof componentMaker>[];
+  requiredPermissions?: string[];
 }) {
+  // 默认给接口都加上命名空间前缀作为权限标识
+  const permissionCode = nameSpace + pathInfo.path;
+  if (!requiredPermissions) {
+    requiredPermissions = [permissionCode];
+  } else {
+    requiredPermissions.push(permissionCode);
+  }
   const controller = async (c: NodeHonoContext) => {
     //获取request header content type
     //如果不是 application/json 则报错
@@ -67,6 +78,7 @@ function routeMaker({
     }
     if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
       await authMiddleware(c);
+      await checkPermission(requiredPermissions)(c);
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
@@ -76,7 +88,7 @@ function routeMaker({
       });
     }
     c.set("bodyObj", bodyObj);
-    const result = adapter ? await adapter(service)(c) : await service(c); // 暂时设置为可选，后续改造完了变为必须
+    const result = await adapter(service)(c);
     if (process.env.NODE_ENV !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
@@ -129,8 +141,9 @@ export interface API {
   req: JSONSchema;
   res: JSONSchema;
   pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
-  adapter?: Function;
+  adapter: Function;
   service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
+  requiredPermissions?: string[];
 }
 
 export default function main(

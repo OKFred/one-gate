@@ -25,7 +25,7 @@ export default function logHandler(app: App) {
             {
               target: "hono-pino/debug-log",
               options,
-            },
+            } /* 
             {
               target: "pino-roll",
               options: {
@@ -38,11 +38,11 @@ export default function logHandler(app: App) {
                 },
                 mkdir: true,
               },
-            },
+            }, */,
           ],
         },
         timestamp: pino.stdTimeFunctions.epochTime, // hh:mm:ss.sss
       }),
-    }),
+    })
   );
 }

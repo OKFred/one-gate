@@ -41,6 +41,15 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import permissionService, {
+  utils as permissionUtils,
+} from "@/api/system/permission/service";
+import rolePermissionService, {
+  utils as rolePermissionUtils,
+} from "@/api/system/role_permission/service";
+import { rolePermissionTable } from "@/api/system/role_permission/db.table";
+import { permissionTable } from "@/api/system/permission/db.table";
+import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -99,7 +108,6 @@ async function onListAll(
       remark: menuTable.remark,
       parentId: menuTable.parentId,
       sort: menuTable.sort,
-      roleIdArr: menuTable.roleIdArr,
       isEnabled: menuTable.isEnabled,
     })
     .from(menuTable)
@@ -207,7 +215,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { parentId } = params;
+  const { parentId, name } = params;
 
   // 如果有父菜单，检查父菜单是否存在
   if (hasValue(parentId)) {
@@ -230,7 +238,13 @@ async function onAdd(
     .values(updateData)
     .returning({ id: menuTable.id });
 
-  return res[0]?.id;
+  const menuId = res[0]?.id;
+  if (menuId) {
+    // 创建菜单权限记录
+    await permissionUtils.createMenuPermission(menuId, name, creatorId);
+  }
+
+  return menuId;
 }
 const addApi = {
   req: addReq,
@@ -288,16 +302,44 @@ async function onUpdate(
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  const res = await db
-    .update(menuTable)
-    .set(updateData)
-    .where(eq(menuTable.id, id))
-    .returning({ id: menuTable.id });
+  // 使用事务确保菜单表和权限表的更新一致性
+  const result = await db.transaction(async (tx) => {
+    const res = await tx
+      .update(menuTable)
+      .set(updateData)
+      .where(eq(menuTable.id, id))
+      .returning({ id: menuTable.id });
 
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+    if (!res || res.length === 0) {
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+    }
+
+    // 如果更新了菜单名称，需要更新权限记录的名称
+    const { name } = rest;
+    if (name !== undefined) {
+      // 处理权限更新
+      const permissionId = await permissionUtils.getPermissionIdByMenuId(id);
+      if (permissionId) {
+        // 删除现有的角色权限关联
+        await tx
+          .delete(rolePermissionTable)
+          .where(eq(rolePermissionTable.permissionId, permissionId));
+        await tx
+          .update(permissionTable)
+          .set({
+            name: `菜单权限-${name}`,
+            remark: `菜单 ${name} 的访问权限`,
+            updaterId,
+            updateTimeUtc: getCurrentTimestampUtcSql(),
+          })
+          .where(eq(permissionTable.id, permissionId));
+      }
+    }
+
+    return res[0].id;
+  });
+
+  return result;
 }
 const updateApi = {
   req: updateReq,
@@ -451,6 +493,11 @@ async function onTree(
   userObj: UserObj
 ): Promise<FromSchema<typeof treeRes> | null> {
   const { roleArr } = userObj;
+  const roleIds = roleArr.map((r) => r.value);
+
+  // 检查是否为超管角色
+  const isSuperAdminRole = roleIds.includes(SUPER_ADMIN_ROLE_ID);
+
   // 获取所有菜单
   const { showAll } = params;
   // 构建查询条件
@@ -471,14 +518,22 @@ async function onTree(
     .where(buildWhereCondition())
     .orderBy(asc(menuTable.sort));
 
-  // 根据用户角色过滤菜单
-  let filteredMenus = allMenus.filter((menu) => {
-    if (!menu.roleIdArr) return true;
-    if (menu.roleIdArr.length === 0) return true;
-    return menu.roleIdArr.some((roleId) =>
-      roleArr.find((r) => r.value === roleId)
-    );
-  });
+  let filteredMenus = allMenus;
+
+  // 如果不是超管角色，则根据用户角色过滤菜单
+  if (!isSuperAdminRole) {
+    // 获取用户角色有权限的菜单ID列表
+    const accessibleMenuIds =
+      await rolePermissionUtils.getMenuIdsByRoleIds(roleIds);
+
+    // 根据用户角色过滤菜单
+    filteredMenus = allMenus.filter((menu) => {
+      // 如果没有配置权限的菜单，默认所有用户可见
+      if (!accessibleMenuIds.includes(menu.id)) return false;
+      return true;
+    });
+  }
+
   // 父菜单没有权限时，所有子菜单也不显示
   filteredMenus = filteredMenus.filter((menu) => {
     if (!menu.parentId) return true;

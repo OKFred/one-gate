@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
-import { menuTable } from "@/api/system/menu/db.table";
+import menuService from "@/api/system/menu/service";
 import { initialMenuData } from "@/db/initialMenu";
 import { initialTranslationData } from "./initTranslation";
 import { initialRegionData } from "./initRegion";
@@ -14,6 +14,8 @@ import translationService, {
   utils as translationUtils,
 } from "@/api/i18n/translation/service";
 import { loadTranslationCache } from "@/utils/i18n";
+import { initPermissions } from "./initPermissions";
+import { UserObj } from "@/api/system/user/service";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -30,16 +32,9 @@ const SUPER_ADMIN = {
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
-  permissions: JSON.stringify([
-    "system:*",
-    "user:*",
-    "role:*",
-    "department:*",
-    "mail:*",
-  ]),
   isEnabled: true,
   creatorId: 1, // 系统初始化
-  remark: "系统初始化创建的超级管理员角色",
+  remark: "系统初始化创建的超级管理员角色，拥有所有权限",
 };
 
 /**
@@ -124,25 +119,23 @@ async function initSuperAdminUser(roleId: number) {
  */
 async function initMenu() {
   // 检查是否已有数据，没有则插入初始数据
-  const countResult = await db
-    .select({ total: count(menuTable.id).as("total") })
-    .from(menuTable);
-  if (countResult[0]?.total === 0) {
-    for (const menu of initialMenuData) {
-      await db.insert(menuTable).values({
-        id: menu.id,
+  const countResult = await menuService.listAll.service({});
+  if (countResult.length === initialMenuData.length) return;
+  for (const menu of initialMenuData) {
+    await menuService.add.service(
+      {
         name: menu.name,
         icon: menu.icon,
         sort: menu.sort,
         path: menu.path || null,
         parentId: menu.parentId || null,
-        roleIdArr: menu.roleIdArr || null,
         isEnabled: true,
-        creatorId: 1, // 系统初始化
-      });
-    }
-    console.log("💾 表 system_menu 初始数据已插入");
+        remark: null,
+      },
+      { userId: SUPER_ADMIN_ID } as UserObj
+    );
   }
+  console.log("💾 表 system_menu 初始数据已插入");
 }
 
 /**
@@ -259,19 +252,23 @@ export async function initDatabase() {
 
     // 2. 初始化超级管理员账号
     await initSuperAdminUser(roleId);
-    // 3. 初始化菜单
+
+    // 3. 初始化权限数据
+    await initPermissions();
+
+    // 4. 初始化菜单
     await initMenu();
 
-    // 4. 初始化语言
+    // 5. 初始化语言
     await initLanguage();
 
-    // 5. 初始化多语言
+    // 6. 初始化多语言
     await initTranslation();
 
-    // 6. 加载多语言缓存
+    // 7. 加载多语言缓存
     await loadTranslationCache();
 
-    // 7. 初始化国家地区
+    // 8. 初始化国家地区
     await initCountryRegion();
 
     console.log("✅ 数据库初始化完成");

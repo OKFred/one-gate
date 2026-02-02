@@ -22,7 +22,7 @@ export default function ResponsiveLayout() {
 
   return (
     <div>
-      <Box sx={{ width: '100vw', minHeight: '100vh', bgcolor: 'background.default' }}>
+      <Box sx={{ width: '100vw', minHeight: '100vh' }}>
         <CssBaseline />
         <Topbar setSidebarOpen={setSidebarOpen} />
         <Box sx={{ display: 'flex', pt: { xs: 7, sm: 8 } }}>

@@ -1,10 +1,6 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { Chip, Tooltip, IconButton } from '@mui/material';
-import {
-  Visibility as ViewIcon,
-  CheckCircle as SuccessIcon,
-  Error as ErrorIcon,
-} from '@mui/icons-material';
+import { Chip, Tooltip } from '@mui/material';
+import { CheckCircle as SuccessIcon, Error as ErrorIcon } from '@mui/icons-material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -15,6 +11,7 @@ import type { ListMailLogRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { FilterState } from './TheFilter';
+import { LogViewButton } from './TheActionButtons';
 
 // 表格内部状态
 export interface TableState {
@@ -86,6 +83,8 @@ const TheTable = memo(
           filterRef.current?.updateCount(totalCount);
         } catch {
           setState((prev) => ({ ...prev, loading: false }));
+          setState((prev) => ({ ...prev, list: [], total: 0 }));
+          filterRef.current?.updateCount(0);
         }
       },
       [state.pageSize, filterRef],
@@ -185,11 +184,7 @@ const TheTable = memo(
       {
         title: t('table.actions'),
         align: 'center',
-        render: (row) => (
-          <IconButton onClick={() => handleViewLog(row)} color="primary" size="small">
-            <ViewIcon />
-          </IconButton>
-        ),
+        render: (row) => <LogViewButton log={row} onView={handleViewLog} />,
       },
     ];
 
@@ -240,11 +235,7 @@ const TheTable = memo(
         keyExtractor={(row) => row.id!}
         columns={columns}
         cardFields={cardFields}
-        cardActions={(row) => (
-          <IconButton onClick={() => handleViewLog(row)} color="primary" size="small">
-            <ViewIcon />
-          </IconButton>
-        )}
+        cardActions={(row) => <LogViewButton log={row} onView={handleViewLog} />}
       />
     );
   }),

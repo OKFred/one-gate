@@ -3,6 +3,8 @@ import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
 import * as MenuAPI from '@/api/system/menu';
 import * as AuthAPI from '@/api/system/auth';
+import * as PermissionAPI from '@/api/system/permission';
+import * as RolePermissionAPI from '@/api/system/role_permission';
 // ==================== User ====================
 
 // 获取所有用户列表
@@ -154,3 +156,113 @@ export type UpdateLangCodeRes = Awaited<
 // 更新用户信息
 export type UpdateProfileReq = NonNullable<Parameters<typeof AuthAPI.updateProfileFn>[0]['data']>;
 export type UpdateProfileRes = Awaited<ReturnType<typeof AuthAPI.updateProfileFn>>['data']['data'];
+
+// 检查 Token
+export type CheckTokenReq = NonNullable<Parameters<typeof AuthAPI.checkTokenFn>[0]['data']>;
+export type CheckTokenRes = Awaited<ReturnType<typeof AuthAPI.checkTokenFn>>['data']['data'];
+
+// 获取按钮权限列表
+export type GetButtonPermissionsReq = NonNullable<
+  Parameters<typeof AuthAPI.getButtonPermissionFn>[0]['data']
+>;
+export type GetButtonPermissionsRes = Awaited<
+  ReturnType<typeof AuthAPI.getButtonPermissionFn>
+>['data']['data'];
+
+// ==================== Permission ====================
+// 获取所有权限列表
+export type ListAllPermissionReq = NonNullable<
+  Parameters<typeof PermissionAPI.listAllFn>[0]['data']
+>;
+export type ListAllPermissionRes = Awaited<
+  ReturnType<typeof PermissionAPI.listAllFn>
+>['data']['data'];
+
+// 获取权限列表
+export type ListPermissionReq = NonNullable<Parameters<typeof PermissionAPI.listFn>[0]['data']>;
+export type ListPermissionRes = Awaited<ReturnType<typeof PermissionAPI.listFn>>['data']['data'];
+
+// 获取单个权限
+export type GetPermissionReq = NonNullable<Parameters<typeof PermissionAPI.getFn>[0]['data']>;
+export type GetPermissionRes = Awaited<ReturnType<typeof PermissionAPI.getFn>>['data']['data'];
+
+// 添加权限
+export type AddPermissionReq = NonNullable<Parameters<typeof PermissionAPI.addFn>[0]['data']>;
+export type AddPermissionRes = Awaited<ReturnType<typeof PermissionAPI.addFn>>['data']['data'];
+
+// 更新权限
+export type UpdatePermissionReq = NonNullable<Parameters<typeof PermissionAPI.updateFn>[0]['data']>;
+export type UpdatePermissionRes = Awaited<
+  ReturnType<typeof PermissionAPI.updateFn>
+>['data']['data'];
+
+// 删除权限
+export type DeletePermissionReq = NonNullable<Parameters<typeof PermissionAPI.deleteFn>[0]['data']>;
+export type DeletePermissionRes = Awaited<
+  ReturnType<typeof PermissionAPI.deleteFn>
+>['data']['data'];
+
+// ==================== RolePermission ====================
+// 获取角色权限关联列表
+export type ListRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.listFn>[0]['data']
+>;
+export type ListRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.listFn>
+>['data']['data'];
+
+// 添加单个角色权限关联
+export type AddRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.addFn>[0]['data']
+>;
+export type AddRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.addFn>
+>['data']['data'];
+
+// 批量添加权限到角色
+export type BatchAddRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.batchAddFn>[0]['data']
+>;
+export type BatchAddRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.batchAddFn>
+>['data']['data'];
+
+// 更新角色权限关联
+export type UpdateRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.updateFn>[0]['data']
+>;
+export type UpdateRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.updateFn>
+>['data']['data'];
+
+// 删除单个角色权限关联
+export type DeleteRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.deleteFn>[0]['data']
+>;
+export type DeleteRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.deleteFn>
+>['data']['data'];
+
+// 批量删除角色的权限
+export type BatchDeleteRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.batchDeleteFn>[0]['data']
+>;
+export type BatchDeleteRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.batchDeleteFn>
+>['data']['data'];
+
+// 获取角色权限关联详情
+export type GetRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.getFn>[0]['data']
+>;
+export type GetRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.getFn>
+>['data']['data'];
+
+// 获取角色的所有权限
+export type GetPermissionsByRoleReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.getPermissionsByRoleFn>[0]['data']
+>;
+export type GetPermissionsByRoleRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.getPermissionsByRoleFn>
+>['data']['data'];

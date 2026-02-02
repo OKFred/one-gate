@@ -1,6 +1,8 @@
 import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
 import userService from "@/api/system/user/service";
+import { SUPER_ADMIN_ID } from "@/db/init";
+import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -24,28 +26,20 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   const { id: userId, ...rest } = user;
+  // 加载用户权限
+  const roleIds = user.roleArr?.map((r) => r.value) || [];
+  const permissions =
+    await rolePermissionUtils.getPermissionsByRoleIds(roleIds);
+  // 判断是否为超级管理员
+  const isSuperAdmin = userId === SUPER_ADMIN_ID;
+
   // 将用户信息添加到context中
   c.set("userObj", {
     token,
     userId,
     id: userId,
+    isSuperAdmin,
+    permissions,
     ...rest,
   });
-};
-
-// 角色权限检查中间件
-export const roleMiddleware = (allowedRoles: number[]) => {
-  return async (c: NodeHonoContext) => {
-    if (!c.get("userObj")) {
-      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
-    }
-
-    if (
-      !allowedRoles.some((role) =>
-        c.get("userObj").roleArr.find((r) => r.value === role)
-      )
-    ) {
-      throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-    }
-  };
 };

@@ -53,7 +53,7 @@ export type AxiosConfig<U, M> = Omit<
 /** @description  axios 实例 */
 const service = axios.create({
   /*   baseURL: "http://localhost:3000", */
-  timeout: 10_000,
+  timeout: process.env.NODE_ENV !== 'production' ? 180000 : 30000,
 });
 
 // 初始化拦截器（只执行一次）
@@ -129,7 +129,9 @@ function setupInterceptors(service: AxiosInstance) {
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(error.message || t('error.networkError'));
+      handleErrorResponse(
+        error.response?.data?.message || error.message || t('error.networkError'),
+      );
       return Promise.reject(error);
     },
   );

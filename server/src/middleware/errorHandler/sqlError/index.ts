@@ -1,21 +1,23 @@
 import { BusinessError, BusinessErrorCode } from "../businessError";
 
 export function convertSqlErrorToBusinessError(e: Error): BusinessError | null {
-  const errorMessage = e.message || "";
+  const errorCause = String(e.cause || "");
+  if (!errorCause) {
+    return null;
+  }
   const errorName = e.name || "";
-
   // SQLite 唯一约束冲突
   if (
-    errorMessage.includes("SQLITE_CONSTRAINT_UNIQUE") ||
-    errorMessage.includes("UNIQUE constraint failed")
+    errorCause.includes("SQLITE_CONSTRAINT_UNIQUE") ||
+    errorCause.includes("UNIQUE constraint failed")
   ) {
     return new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
   }
 
   // 数据库锁定
   if (
-    errorMessage.includes("SQLITE_BUSY") ||
-    errorMessage.includes("database is locked")
+    errorCause.includes("SQLITE_BUSY") ||
+    errorCause.includes("database is locked")
   ) {
     return new BusinessError(BusinessErrorCode.DATABASE_BUSY);
   }
@@ -27,7 +29,7 @@ export function convertSqlErrorToBusinessError(e: Error): BusinessError | null {
 
   // 通用SQLite错误检测
   if (
-    errorMessage.includes("SQLITE_") ||
+    errorCause.includes("SQLITE_") ||
     errorName.includes("SqliteError") ||
     errorName.includes("DatabaseError")
   ) {

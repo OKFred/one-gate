@@ -2730,6 +2730,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/auth/getButtonPermission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取按钮权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemAuthGetButtonPermissionReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemAuthGetButtonPermissionRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/department/listAll": {
         parameters: {
             query?: never;
@@ -3542,6 +3600,354 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/permission/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有权限（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemPermissionListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/permission/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取权限列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemPermissionListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/permission/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemPermissionAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/permission/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemPermissionUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/permission/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemPermissionDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/permission/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemPermissionGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/role/listAll": {
         parameters: {
             query?: never;
@@ -3862,6 +4268,470 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["SystemRoleGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取角色权限关联列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加角色权限关联 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/batchAdd": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 批量添加角色权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionBatchAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionBatchAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新角色权限关联 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除角色权限关联 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/batchDelete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 批量删除角色权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionBatchDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionBatchDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取角色权限关联 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/getPermissionsByRole": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取角色的所有权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemRolePermissionGetPermissionsByRoleReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemRolePermissionGetPermissionsByRoleRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6549,6 +7419,73 @@ export interface components {
             data: number;
             message: string;
         };
+        SystemAuthGetButtonPermissionReq: Record<string, never>;
+        SystemAuthGetButtonPermissionRes: {
+            ok: boolean;
+            data: {
+                permissions: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 权限代码，唯一标识
+                     * @example user:read
+                     * @example file:write:own
+                     */
+                    code: string;
+                    /**
+                     * @description 权限名称
+                     * @example 查看用户
+                     * @example 编辑文件
+                     */
+                    name: string;
+                    /**
+                     * @description 权限类别：menu-菜单，button-按钮，api-接口
+                     * @enum {string}
+                     */
+                    category: "menu" | "button" | "api";
+                    /**
+                     * @description 资源路径
+                     * @example /api/users/:id
+                     * @example /dashboard/users
+                     */
+                    resource: ((string | null) | null) | null;
+                    /**
+                     * @description 效果：allow-允许，deny-拒绝
+                     * @enum {string}
+                     */
+                    effect: "allow" | "deny";
+                    /**
+                     * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                     * @enum {string}
+                     */
+                    scope: "all" | "own" | "dept" | "custom";
+                    /** @description 父权限ID，用于菜单层级 */
+                    parentId: ((number | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
         SystemDepartmentListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
@@ -6871,8 +7808,6 @@ export interface components {
                 parentId?: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort?: number;
-                /** @description 需要的角色ID列表 */
-                roleIdArr?: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
             }[];
@@ -6939,8 +7874,6 @@ export interface components {
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
-                    /** @description 需要的角色ID列表 */
-                    roleIdArr: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
@@ -6983,8 +7916,6 @@ export interface components {
             parentId: ((number | null) | null) | null;
             /** @description 排序 */
             sort: number;
-            /** @description 需要的角色ID列表 */
-            roleIdArr: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
@@ -7024,8 +7955,6 @@ export interface components {
             parentId?: ((number | null) | null) | null;
             /** @description 排序 */
             sort?: number;
-            /** @description 需要的角色ID列表 */
-            roleIdArr?: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
@@ -7090,8 +8019,6 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
-                /** @description 需要的角色ID列表 */
-                roleIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -7144,8 +8071,6 @@ export interface components {
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
-                /** @description 需要的角色ID列表 */
-                roleIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -7189,8 +8114,6 @@ export interface components {
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
-                    /** @description 需要的角色ID列表 */
-                    roleIdArr: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
@@ -7212,6 +8135,407 @@ export interface components {
             }[];
             message: string;
         };
+        SystemPermissionListAllReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 权限代码，唯一标识
+             * @example user:read
+             * @example file:write:own
+             */
+            code?: string;
+            /**
+             * @description 权限名称
+             * @example 查看用户
+             * @example 编辑文件
+             */
+            name?: string;
+            /**
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @enum {string}
+             */
+            category?: "menu" | "button" | "api";
+            /**
+             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+             * @enum {string}
+             */
+            scope?: "all" | "own" | "dept" | "custom";
+            /**
+             * @description 效果：allow-允许，deny-拒绝
+             * @enum {string}
+             */
+            effect?: "allow" | "deny";
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
+        };
+        SystemPermissionListAllRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 权限名称
+                 * @example 查看用户
+                 * @example 编辑文件
+                 */
+                name?: string;
+                /**
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @enum {string}
+                 */
+                category?: "menu" | "button" | "api";
+                /**
+                 * @description 资源路径
+                 * @example /api/users/:id
+                 * @example /dashboard/users
+                 */
+                resource?: ((string | null) | null) | null;
+                /**
+                 * @description 效果：allow-允许，deny-拒绝
+                 * @enum {string}
+                 */
+                effect?: "allow" | "deny";
+                /**
+                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                 * @enum {string}
+                 */
+                scope?: "all" | "own" | "dept" | "custom";
+                /** @description 父权限ID，用于菜单层级 */
+                parentId?: ((number | null) | null) | null;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /**
+                 * @description 权限代码，唯一标识
+                 * @example user:read
+                 * @example file:write:own
+                 */
+                code: string;
+            }[];
+            message: string;
+        };
+        SystemPermissionListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 权限代码，唯一标识
+             * @example user:read
+             * @example file:write:own
+             */
+            code?: string;
+            /**
+             * @description 权限名称
+             * @example 查看用户
+             * @example 编辑文件
+             */
+            name?: string;
+            /**
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @enum {string}
+             */
+            category?: "menu" | "button" | "api";
+            /**
+             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+             * @enum {string}
+             */
+            scope?: "all" | "own" | "dept" | "custom";
+            /**
+             * @description 效果：allow-允许，deny-拒绝
+             * @enum {string}
+             */
+            effect?: "allow" | "deny";
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
+        };
+        SystemPermissionListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 权限代码，唯一标识
+                     * @example user:read
+                     * @example file:write:own
+                     */
+                    code: string;
+                    /**
+                     * @description 权限名称
+                     * @example 查看用户
+                     * @example 编辑文件
+                     */
+                    name: string;
+                    /**
+                     * @description 权限类别：menu-菜单，button-按钮，api-接口
+                     * @enum {string}
+                     */
+                    category: "menu" | "button" | "api";
+                    /**
+                     * @description 资源路径
+                     * @example /api/users/:id
+                     * @example /dashboard/users
+                     */
+                    resource: ((string | null) | null) | null;
+                    /**
+                     * @description 效果：allow-允许，deny-拒绝
+                     * @enum {string}
+                     */
+                    effect: "allow" | "deny";
+                    /**
+                     * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                     * @enum {string}
+                     */
+                    scope: "all" | "own" | "dept" | "custom";
+                    /** @description 父权限ID，用于菜单层级 */
+                    parentId: ((number | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        SystemPermissionAddReq: {
+            /**
+             * @description 权限代码，唯一标识
+             * @example user:read
+             * @example file:write:own
+             */
+            code: string;
+            /**
+             * @description 权限名称
+             * @example 查看用户
+             * @example 编辑文件
+             */
+            name: string;
+            /**
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @enum {string}
+             */
+            category: "menu" | "button" | "api";
+            /**
+             * @description 资源路径
+             * @example /api/users/:id
+             * @example /dashboard/users
+             */
+            resource: ((string | null) | null) | null;
+            /**
+             * @description 效果：allow-允许，deny-拒绝
+             * @enum {string}
+             */
+            effect: "allow" | "deny";
+            /**
+             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+             * @enum {string}
+             */
+            scope: "all" | "own" | "dept" | "custom";
+            /** @description 父权限ID，用于菜单层级 */
+            parentId: ((number | null) | null) | null;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+        };
+        SystemPermissionAddRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemPermissionUpdateReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 权限代码，唯一标识
+             * @example user:read
+             * @example file:write:own
+             */
+            code?: string;
+            /**
+             * @description 权限名称
+             * @example 查看用户
+             * @example 编辑文件
+             */
+            name?: string;
+            /**
+             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @enum {string}
+             */
+            category?: "menu" | "button" | "api";
+            /**
+             * @description 资源路径
+             * @example /api/users/:id
+             * @example /dashboard/users
+             */
+            resource?: ((string | null) | null) | null;
+            /**
+             * @description 效果：allow-允许，deny-拒绝
+             * @enum {string}
+             */
+            effect?: "allow" | "deny";
+            /**
+             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+             * @enum {string}
+             */
+            scope?: "all" | "own" | "dept" | "custom";
+            /** @description 父权限ID，用于菜单层级 */
+            parentId?: ((number | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+        };
+        SystemPermissionUpdateRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemPermissionDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        SystemPermissionDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemPermissionGetReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        SystemPermissionGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 权限代码，唯一标识
+                 * @example user:read
+                 * @example file:write:own
+                 */
+                code: string;
+                /**
+                 * @description 权限名称
+                 * @example 查看用户
+                 * @example 编辑文件
+                 */
+                name: string;
+                /**
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @enum {string}
+                 */
+                category: "menu" | "button" | "api";
+                /**
+                 * @description 资源路径
+                 * @example /api/users/:id
+                 * @example /dashboard/users
+                 */
+                resource: ((string | null) | null) | null;
+                /**
+                 * @description 效果：allow-允许，deny-拒绝
+                 * @enum {string}
+                 */
+                effect: "allow" | "deny";
+                /**
+                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                 * @enum {string}
+                 */
+                scope: "all" | "own" | "dept" | "custom";
+                /** @description 父权限ID，用于菜单层级 */
+                parentId: ((number | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
         SystemRoleListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
@@ -7230,13 +8554,10 @@ export interface components {
                 id: number;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
-                /**
-                 * @description 权限列表，JSON数组格式
-                 * @example ["user:read","user:write","system:admin"]
-                 */
-                permissions?: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
+                /** @description 权限数量 */
+                permissionCount?: number;
                 /**
                  * @description 角色名称
                  * @example 管理员
@@ -7292,13 +8613,10 @@ export interface components {
                     name: string;
                     /** @description 备注说明 */
                     remark: ((string | null) | null) | null;
-                    /**
-                     * @description 权限列表，JSON数组格式
-                     * @example ["user:read","user:write","system:admin"]
-                     */
-                    permissions: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /** @description 权限数量 */
+                    permissionCount: number;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -7325,13 +8643,10 @@ export interface components {
             name: string;
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
-            /**
-             * @description 权限列表，JSON数组格式
-             * @example ["user:read","user:write","system:admin"]
-             */
-            permissions: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /** @description 权限数量 */
+            permissionCount: number;
         };
         SystemRoleAddRes: {
             ok: boolean;
@@ -7355,13 +8670,10 @@ export interface components {
             name?: string;
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
-            /**
-             * @description 权限列表，JSON数组格式
-             * @example ["user:read","user:write","system:admin"]
-             */
-            permissions?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @description 权限数量 */
+            permissionCount?: number;
         };
         SystemRoleUpdateRes: {
             ok: boolean;
@@ -7410,11 +8722,295 @@ export interface components {
                 name: string;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 权限数量 */
+                permissionCount: number;
+                /** @description 创建者ID */
+                creatorId: number;
                 /**
-                 * @description 权限列表，JSON数组格式
-                 * @example ["user:read","user:write","system:admin"]
+                 * @description 创建时间
+                 * @example 1672531199000
                  */
-                permissions: ((string | null) | null) | null;
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        SystemRolePermissionListReq: {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 角色ID */
+            roleId?: number;
+            /** @description 权限ID */
+            permissionId?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "roleId" | "permissionId" | "createTimeUtc";
+        };
+        SystemRolePermissionListRes: {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 角色ID */
+                    roleId: number;
+                    /** @description 权限ID */
+                    permissionId: number;
+                    /**
+                     * @description 资源过滤器，JSON格式，用于实现资源级权限控制
+                     * @example {"userId":"${currentUser.id}"}
+                     * @example {"deptId":"${currentUser.deptId}"}
+                     */
+                    resourceFilter: ((string | null) | null) | null;
+                    /**
+                     * @description 条件判断，JSON格式，用于动态权限控制
+                     * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
+                     */
+                    conditions: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        SystemRolePermissionAddReq: {
+            /** @description 角色ID */
+            roleId: number;
+            /** @description 权限ID */
+            permissionId: number;
+            /**
+             * @description 资源过滤器，JSON格式，用于实现资源级权限控制
+             * @example {"userId":"${currentUser.id}"}
+             * @example {"deptId":"${currentUser.deptId}"}
+             */
+            resourceFilter: ((string | null) | null) | null;
+            /**
+             * @description 条件判断，JSON格式，用于动态权限控制
+             * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
+             */
+            conditions: ((string | null) | null) | null;
+        };
+        SystemRolePermissionAddRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemRolePermissionBatchAddReq: {
+            /** @description 角色ID */
+            roleId: number;
+            /** @description 权限ID列表 */
+            permissionIds: number[];
+        };
+        SystemRolePermissionBatchAddRes: {
+            ok: boolean;
+            /** @description 成功添加的数量 */
+            data: number;
+            message: string;
+        };
+        SystemRolePermissionUpdateReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 角色ID */
+            roleId?: number;
+            /** @description 权限ID */
+            permissionId?: number;
+            /**
+             * @description 资源过滤器，JSON格式，用于实现资源级权限控制
+             * @example {"userId":"${currentUser.id}"}
+             * @example {"deptId":"${currentUser.deptId}"}
+             */
+            resourceFilter?: ((string | null) | null) | null;
+            /**
+             * @description 条件判断，JSON格式，用于动态权限控制
+             * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
+             */
+            conditions?: ((string | null) | null) | null;
+        };
+        SystemRolePermissionUpdateRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemRolePermissionDeleteReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        SystemRolePermissionDeleteRes: {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        SystemRolePermissionBatchDeleteReq: {
+            /** @description 角色ID */
+            roleId: number;
+            /** @description 权限ID列表 */
+            permissionIds: number[];
+        };
+        SystemRolePermissionBatchDeleteRes: {
+            ok: boolean;
+            /** @description 成功删除的数量 */
+            data: number;
+            message: string;
+        };
+        SystemRolePermissionGetReq: {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        SystemRolePermissionGetRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 角色ID */
+                roleId: number;
+                /** @description 权限ID */
+                permissionId: number;
+                /**
+                 * @description 资源过滤器，JSON格式，用于实现资源级权限控制
+                 * @example {"userId":"${currentUser.id}"}
+                 * @example {"deptId":"${currentUser.deptId}"}
+                 */
+                resourceFilter: ((string | null) | null) | null;
+                /**
+                 * @description 条件判断，JSON格式，用于动态权限控制
+                 * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
+                 */
+                conditions: ((string | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        SystemRolePermissionGetPermissionsByRoleReq: {
+            /** @description 角色ID */
+            roleId: number;
+        };
+        SystemRolePermissionGetPermissionsByRoleRes: {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 权限代码，唯一标识
+                 * @example user:read
+                 * @example file:write:own
+                 */
+                code: string;
+                /**
+                 * @description 权限名称
+                 * @example 查看用户
+                 * @example 编辑文件
+                 */
+                name: string;
+                /**
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @enum {string}
+                 */
+                category: "menu" | "button" | "api";
+                /**
+                 * @description 资源路径
+                 * @example /api/users/:id
+                 * @example /dashboard/users
+                 */
+                resource: ((string | null) | null) | null;
+                /**
+                 * @description 效果：allow-允许，deny-拒绝
+                 * @enum {string}
+                 */
+                effect: "allow" | "deny";
+                /**
+                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                 * @enum {string}
+                 */
+                scope: "all" | "own" | "dept" | "custom";
+                /** @description 父权限ID，用于菜单层级 */
+                parentId: ((number | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -7431,7 +9027,7 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
-            };
+            }[];
             message: string;
         };
         SystemUserListAllReq: {

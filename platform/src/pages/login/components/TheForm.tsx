@@ -9,6 +9,8 @@ import { loginFn } from '@/api/system/auth';
 import type { LoginReq } from '@/api/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
+import { findFirstValidPath } from '@/hooks/useFirstValidPath';
+import { useMenu } from '@/hooks/useMenu';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -16,6 +18,7 @@ export default function TheForm() {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const t = useTranslation();
+  const { loadMenus } = useMenu();
 
   // 状态管理
   const [credentials, setCredentials] = useState<LoginReq>({
@@ -49,8 +52,11 @@ export default function TheForm() {
       const loginData = response.data.data;
       const { userObj } = loginData;
       authUtils.setUserInfo(userObj);
+      // 重新加载菜单
+      const menus = await loadMenus();
+      const nextPath = findFirstValidPath(menus);
       // 登录成功，跳转到首页
-      navigate('/home');
+      navigate(nextPath);
     } catch (err) {
       console.log(err);
     } finally {

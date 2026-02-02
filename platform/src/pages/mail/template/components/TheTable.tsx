@@ -1,30 +1,16 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import {
-  Chip,
-  Tooltip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-} from '@mui/material';
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Visibility as ViewIcon,
-} from '@mui/icons-material';
+import { Chip, Tooltip } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
 import dayjs from 'dayjs';
 import * as MailTemplateAPI from '@/api/mail/template';
-import { showSnackbar } from '@/components/Notification';
 import type { ListMailTemplateRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { FilterState } from './TheFilter';
+import { TemplateActionButtons } from './TheActionButtons';
 
 // 表格内部状态
 export interface TableState {
@@ -63,9 +49,6 @@ const TheTable = memo(
       filters: DEFAULT_FILTERS,
     });
 
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [deleteId, setDeleteId] = useState<number | null>(null);
-
     const { list, loading, page, pageSize, total, filters } = state;
 
     // 获取数据的核心函数
@@ -99,6 +82,8 @@ const TheTable = memo(
           filterRef.current?.updateCount(totalCount);
         } catch {
           setState((prev) => ({ ...prev, loading: false }));
+          setState((prev) => ({ ...prev, list: [], total: 0 }));
+          filterRef.current?.updateCount(0);
         }
       },
       [state.pageSize, filterRef],
@@ -150,37 +135,6 @@ const TheTable = memo(
       return doc.body.textContent || '';
     };
 
-    const handleEdit = (template: NonNullable<ListMailTemplateRes['list']>[0]) => {
-      formRef.current?.onOpen(template);
-    };
-
-    const handlePreview = (template: NonNullable<ListMailTemplateRes['list']>[0]) => {
-      previewRef.current?.onOpen(template);
-    };
-
-    const handleDeleteClick = (id: number) => {
-      setDeleteId(id);
-      setDeleteDialogOpen(true);
-    };
-
-    const handleDeleteConfirm = async () => {
-      if (!deleteId) return;
-
-      try {
-        await MailTemplateAPI.deleteFn({ data: { id: deleteId } });
-        showSnackbar({
-          message: t('dialog.operationSuccess'),
-          type: 'success',
-        });
-        fetchTemplates(filters, page);
-      } catch (error) {
-        console.warn(error);
-      } finally {
-        setDeleteDialogOpen(false);
-        setDeleteId(null);
-      }
-    };
-
     // 表格列配置（PC端）
     const columns: TableColumn<TableState['list'][0]>[] = [
       { title: t('columns.id'), render: (row) => row.id },
@@ -216,21 +170,12 @@ const TheTable = memo(
         title: t('table.actions'),
         align: 'center',
         render: (row) => (
-          <>
-            <IconButton onClick={() => handlePreview(row)} color="info" size="small">
-              <ViewIcon />
-            </IconButton>
-            <IconButton onClick={() => handleEdit(row)} color="primary" size="small">
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => row.id && handleDeleteClick(row.id)}
-              color="error"
-              size="small"
-            >
-              <DeleteIcon />
-            </IconButton>
-          </>
+          <TemplateActionButtons
+            template={row}
+            formRef={formRef}
+            previewRef={previewRef}
+            onDeleteSuccess={() => fetchTemplates(filters, page)}
+          />
         ),
       },
     ];
@@ -270,51 +215,26 @@ const TheTable = memo(
     ];
 
     return (
-      <>
-        <ResponsiveList
-          data={list}
-          loading={loading}
-          page={page}
-          total={total}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          keyExtractor={(row) => row.id!}
-          columns={columns}
-          cardFields={cardFields}
-          cardActions={(row) => (
-            <>
-              <IconButton onClick={() => handlePreview(row)} color="info" size="small">
-                <ViewIcon />
-              </IconButton>
-              <IconButton onClick={() => handleEdit(row)} color="primary" size="small">
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                onClick={() => row.id && handleDeleteClick(row.id)}
-                color="error"
-                size="small"
-              >
-                <DeleteIcon />
-              </IconButton>
-            </>
-          )}
-        />
-
-        {/* 删除确认对话框 */}
-        <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-          <DialogTitle>{t('dialog.confirm')}</DialogTitle>
-          <DialogContent>{t('dialog.deleteConfirmTitle')}</DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined">
-              {t('dialog.cancel')}
-            </Button>
-            <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-              {t('dialog.delete')}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </>
+      <ResponsiveList
+        data={list}
+        loading={loading}
+        page={page}
+        total={total}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        keyExtractor={(row) => row.id!}
+        columns={columns}
+        cardFields={cardFields}
+        cardActions={(row) => (
+          <TemplateActionButtons
+            template={row}
+            formRef={formRef}
+            previewRef={previewRef}
+            onDeleteSuccess={() => fetchTemplates(filters, page)}
+          />
+        )}
+      />
     );
   }),
 );

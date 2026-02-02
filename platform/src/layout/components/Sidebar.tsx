@@ -10,10 +10,10 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useNavigate, useLocation } from 'react-router';
 import Icon from '@/components/Icon';
-import { treeFn } from '@/api/system/menu';
 import type { SystemMenuTree } from './type';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useMenu } from '@/hooks/useMenu';
 
 const drawerWidth = 240;
 type MenuNode = Omit<SystemMenuTree, 'children'> & { children?: MenuNode[] };
@@ -27,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
-  const [navItems, setNavItems] = useState<MenuNode[]>([]);
+  const { navItems } = useMenu();
   const { isMobile } = useResponsive();
   const t = useTranslation();
 
@@ -47,13 +47,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   // 递归查找匹配路径的菜单项，并返回需要展开的菜单 ID 集合
   const findExpandedMenus = (items: MenuNode[], currentPath: string): Record<string, boolean> => {
     const expanded: Record<string, boolean> = {};
-    
+
     const traverse = (nodes: MenuNode[], parentIds: string[] = []): boolean => {
       for (const item of nodes) {
         const currentIds = [...parentIds, String(item.id)];
         if (item.path === currentPath) {
           // 找到匹配项，设置所有父级为展开
-          parentIds.forEach(id => expanded[id] = true);
+          parentIds.forEach((id) => (expanded[id] = true));
           return true;
         }
         if (item.children && item.children.length > 0) {
@@ -66,19 +66,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       }
       return false;
     };
-    
+
     traverse(items);
     return expanded;
   };
-
-  // 异步加载菜单数据
-  useEffect(() => {
-    const loadMenus = async () => {
-      const resData = await treeFn({ data: {} });
-      setNavItems(normalizeMenus(resData.data.data));
-    };
-    loadMenus();
-  }, [normalizeMenus]);
 
   // 当菜单加载或路径变化时，自动展开到当前菜单
   useEffect(() => {
@@ -110,9 +101,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
     return (
       <React.Fragment key={item.id}>
-        <ListItemButton 
-          onClick={() => handleMenuClick(item)} 
-          sx={{ 
+        <ListItemButton
+          onClick={() => handleMenuClick(item)}
+          sx={{
             pl: level > 0 ? 4 : 2,
             backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
           }}
@@ -131,7 +122,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         {hasChildren && (
           <Collapse in={isExpanded} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {(item.children ?? []).map((child) => renderSystemMenuTree(child, currentPath, level + 1))}
+              {(item.children ?? []).map((child) =>
+                renderSystemMenuTree(child, currentPath, level + 1),
+              )}
             </List>
           </Collapse>
         )}

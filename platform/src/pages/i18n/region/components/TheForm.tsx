@@ -270,7 +270,7 @@ const TheForm = memo(
                   <TextField
                     {...params}
                     label={t('region.table.businessLanguages')}
-                    placeholder={t('form.pleaseSelect')}
+                    placeholder={t('form.select')}
                     size={isMobile ? 'medium' : 'medium'}
                   />
                 )}

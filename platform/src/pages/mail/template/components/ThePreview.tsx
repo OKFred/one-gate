@@ -103,13 +103,6 @@ const ThePreview = memo(
                 {t('template.preview.basicInfo')}
               </Typography>
               <Stack spacing={2}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t('columns.id')}
-                  </Typography>
-                  <Typography variant="body1">{template.id}</Typography>
-                </Box>
-
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -164,9 +157,6 @@ const ThePreview = memo(
 
             {/* 邮件预览 */}
             <Box>
-              <Typography variant="h6" gutterBottom>
-                {t('dialog.title.preview')}
-              </Typography>
               <Box
                 sx={{
                   border: 1,
@@ -179,7 +169,6 @@ const ThePreview = memo(
                 <Box
                   sx={{
                     p: 2,
-                    bgcolor: 'grey.50',
                     borderBottom: 1,
                     borderColor: 'divider',
                   }}

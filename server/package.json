@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "npx tsx --watch -r dotenv/config ./src/index.ts",
+    "debug": "npx tsx --inspect-brk -r dotenv/config ./src/index.ts",
     "build": "npx tsgo && npx tsc-alias",
     "visualize": "node dependency-visualize.ts",
     "start:ts": "node ./src/index.ts",

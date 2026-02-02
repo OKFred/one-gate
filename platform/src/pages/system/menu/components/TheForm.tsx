@@ -7,7 +7,6 @@ import {
   DialogActions,
   TextField,
   Stack,
-  Box,
   IconButton,
   Alert,
   FormControlLabel,
@@ -16,43 +15,25 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  OutlinedInput,
-  Chip,
-  Typography,
 } from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as MenuAPI from '@/api/system/menu';
-import * as RoleAPI from '@/api/system/role';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showSnackbar } from '@/components/Notification';
 import hasValue from '@/utils/hasValue';
 import { useTranslation } from '@/hooks/useTranslation';
-
+import type { TreeMenuRes } from '@/api/system/type';
 // 菜单数据接口
-export interface MenuFormData {
+export interface MenuFormData
+  extends Pick<
+    TreeMenuRes[0],
+    'name' | 'icon' | 'path' | 'remark' | 'parentId' | 'sort' | 'isEnabled'
+  > {
   id?: number;
-  name: string;
-  icon: string;
-  path: string | null;
-  remark: string | null;
-  parentId: number | null;
-  sort: number;
-  roleIdArr: number[];
-  isEnabled: boolean;
 }
-
 // 菜单菜单类型（简化版）
-export interface MenuData {
-  id: number;
-  name: string;
-  icon: string;
-  path: string | null;
-  parentId: number | null;
-  sort: number;
-  roleIdArr: number[] | null;
-  isEnabled: boolean;
+export interface MenuData extends MenuFormData {
   children?: MenuData[] | null;
 }
 
@@ -73,7 +54,6 @@ const DEFAULT_FORM: MenuFormData = {
   remark: null,
   parentId: null,
   sort: 0,
-  roleIdArr: [],
   isEnabled: true,
 };
 
@@ -88,23 +68,7 @@ const TheForm = memo(
     const [formValues, setFormValues] = useState<MenuFormData>(DEFAULT_FORM);
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState(false);
-    const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
     const [allMenus, setAllMenus] = useState<MenuData[]>([]);
-
-    // 获取角色列表
-    const fetchRoles = useCallback(async () => {
-      try {
-        const res = await RoleAPI.listAllFn({ data: {} });
-        const roles = res.data.data || [];
-        const options = roles.map((role: { id: number; name: string }) => ({
-          value: role.id,
-          label: role.name,
-        }));
-        setRoleOptions(options);
-      } catch (error) {
-        console.error('获取角色列表失败:', error);
-      }
-    }, []);
 
     // 获取所有菜单列表
     const fetchAllMenus = useCallback(async () => {
@@ -129,7 +93,6 @@ const TheForm = memo(
           });
           setError('');
           setDialogOpen(true);
-          fetchRoles();
           fetchAllMenus();
         },
         openEdit: (menu: MenuData) => {
@@ -142,19 +105,17 @@ const TheForm = memo(
             remark: null,
             parentId: menu.parentId ?? null,
             sort: menu.sort ?? 0,
-            roleIdArr: menu.roleIdArr || [],
             isEnabled: menu.isEnabled ?? true,
           });
           setError('');
           setDialogOpen(true);
-          fetchRoles();
           fetchAllMenus();
         },
         close: () => {
           setDialogOpen(false);
         },
       }),
-      [fetchRoles, fetchAllMenus],
+      [fetchAllMenus],
     );
 
     // 处理表单变化
@@ -163,15 +124,6 @@ const TheForm = memo(
       value: string | number | number[] | boolean | null,
     ) => {
       setFormValues((prev) => ({ ...prev, [field]: value }));
-    };
-
-    // 处理角色多选变化
-    const handleRoleChange = (event: SelectChangeEvent<number[]>) => {
-      const value = event.target.value;
-      handleFormChange(
-        'roleIdArr',
-        typeof value === 'string' ? value.split(',').map(Number) : value,
-      );
     };
 
     // 提交表单
@@ -190,15 +142,13 @@ const TheForm = memo(
           remark: hasValue(formValues.remark) ? formValues.remark : null,
           parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
           sort: formValues.sort,
-          roleIdArr:
-            formValues.roleIdArr && formValues.roleIdArr.length > 0 ? formValues.roleIdArr : null,
           isEnabled: formValues.isEnabled,
         };
 
         if (editingMenu) {
           await MenuAPI.updateFn({
             data: {
-              id: editingMenu.id,
+              id: editingMenu.id!,
               ...submitData,
             },
           });
@@ -324,33 +274,6 @@ const TheForm = memo(
               fullWidth
               helperText={t('menu.table.sortHelper')}
             />
-
-            <FormControl fullWidth>
-              <InputLabel>{t('menu.table.visibleRoles')}</InputLabel>
-              <Select
-                multiple
-                value={formValues.roleIdArr}
-                onChange={handleRoleChange}
-                input={<OutlinedInput label={t('menu.table.visibleRoles')} />}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((value) => {
-                      const role = roleOptions.find((r) => r.value === value);
-                      return <Chip key={value} label={role?.label || value} size="small" />;
-                    })}
-                  </Box>
-                )}
-              >
-                {roleOptions.map((role) => (
-                  <MenuItem key={role.value} value={role.value}>
-                    {role.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Typography variant="caption" color="text.secondary">
-              {t('menu.table.allRolesVisible')}
-            </Typography>
 
             <FormControlLabel
               control={

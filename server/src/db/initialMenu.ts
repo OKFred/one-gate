@@ -58,7 +58,6 @@ export const initialMenuData = [
     name: "sidebar.menu.system",
     icon: "material-symbols:settings",
     sort: 4,
-    roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 9,
@@ -97,7 +96,6 @@ export const initialMenuData = [
     name: "sidebar.menu.i18n",
     icon: "material-symbols:language",
     sort: 5,
-    roleIdArr: [1], // 仅管理员可见
   },
   {
     id: 14,
@@ -123,6 +121,22 @@ export const initialMenuData = [
     parentId: 13,
     sort: 3,
   },
+  {
+    id: 17,
+    name: "sidebar.menu.system.permission",
+    icon: "material-symbols:lock",
+    path: "/system/permission",
+    parentId: 8,
+    sort: 5,
+  },
+  {
+    id: 18,
+    name: "sidebar.menu.system.rolePermission",
+    icon: "material-symbols:admin-panel-settings",
+    path: "/system/role-permission",
+    parentId: 8,
+    sort: 6,
+  },
 ] as menuLike[];
 
 type menuLike = {
@@ -132,5 +146,4 @@ type menuLike = {
   path?: string | null;
   parentId?: number | null;
   sort: number;
-  roleIdArr?: number[];
 };

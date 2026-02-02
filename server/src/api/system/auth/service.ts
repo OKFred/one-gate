@@ -1,4 +1,5 @@
 import userService, { utils as userUtils } from "@/api/system/user/service";
+import permissionService from "@/api/system/permission/service";
 import { utils as regionUtils } from "@/api/i18n/region/service";
 import { tokenUtils } from "@/utils/token";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -387,6 +388,46 @@ const updatePasswordApi = {
   service: onUpdatePassword,
 } satisfies API;
 
+// 获取按钮权限
+const getButtonPermissionReq = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const getButtonPermissionRes = {
+  type: "object",
+  properties: {
+    permissions: {
+      type: "array",
+      items: {
+        ...permissionService.get.res,
+      },
+    },
+  },
+  required: ["permissions"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+async function onGetButtonPermission(
+  params: FromSchema<typeof getButtonPermissionReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof getButtonPermissionRes> | null> {
+  const buttonPermissions = userObj.permissions.filter(
+    (p) => p.category === "button"
+  );
+  return { permissions: buttonPermissions };
+}
+const getButtonPermissionApi = {
+  req: getButtonPermissionReq,
+  res: getButtonPermissionRes,
+  pathInfo: {
+    path: "/getButtonPermission",
+    method: "post",
+    summary: "获取按钮权限",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onGetButtonPermission,
+} satisfies API;
+
 export default {
   login: loginApi,
   wechat: wechatLoginApi,
@@ -396,4 +437,5 @@ export default {
   updateProfile: updateProfileApi,
   updateLangCode: updateLangCodeApi,
   updatePassword: updatePasswordApi,
+  getButtonPermission: getButtonPermissionApi,
 };
