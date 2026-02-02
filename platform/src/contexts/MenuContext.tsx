@@ -11,6 +11,7 @@ interface MenuContextType {
   navItems: MenuNode[];
   setNavItems: (items: MenuNode[]) => void;
   loading: boolean;
+  loadMenus: () => Promise<MenuNode[]>;
 }
 
 const MenuContext = createContext<MenuContextType | undefined>(undefined);
@@ -33,21 +34,27 @@ export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   // 异步加载菜单数据
-  useEffect(() => {
-    const loadMenus = async () => {
-      try {
-        const resData = await treeFn({ data: {} });
-        setNavItems(normalizeMenus(resData.data.data));
-      } catch (error) {
-        console.error('Failed to load menus', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadMenus();
+  const loadMenuData = useCallback(async (): Promise<MenuNode[]> => {
+    setLoading(true);
+    try {
+      const resData = await treeFn({ data: {} });
+      const normalizedMenus = normalizeMenus(resData.data.data);
+      setNavItems(normalizedMenus);
+      return normalizedMenus;
+    } catch (error) {
+      console.error('Failed to load menus', error);
+      return [];
+    } finally {
+      setLoading(false);
+    }
   }, [normalizeMenus]);
 
-  return <MenuContext.Provider value={{ navItems, setNavItems, loading }}>{children}</MenuContext.Provider>;
+  // 初始化时加载菜单
+  useEffect(() => {
+    loadMenuData();
+  }, [loadMenuData]);
+
+  return <MenuContext.Provider value={{ navItems, setNavItems, loading, loadMenus: loadMenuData }}>{children}</MenuContext.Provider>;
 };
 
 export { MenuContext };
