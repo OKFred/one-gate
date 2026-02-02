@@ -51,7 +51,6 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-import { PermissionInfoCore } from "../role_permission/service";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -407,7 +406,7 @@ export type UserObj = FromSchema<typeof getRes> & {
   token: string;
   userId: number;
   isSuperAdmin: boolean;
-  permissions: PermissionInfoCore[];
+  permissions: PermissionInfo[];
 };
 const getReq = {
   type: "object",

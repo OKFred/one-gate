@@ -43,7 +43,6 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-import { PermissionInfoCore } from "../role_permission/service";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -464,10 +463,10 @@ const Effect = {
  * @returns 处理后的权限数组（只包含最终允许的权限）
  */
 function filterEffectivePermissions(
-  permissions: PermissionInfoCore[]
-): PermissionInfoCore[] {
+  permissions: PermissionInfo[]
+): PermissionInfo[] {
   // 按权限代码分组
-  const permissionMap = new Map<string, PermissionInfoCore[]>();
+  const permissionMap = new Map<string, PermissionInfo[]>();
 
   for (const perm of permissions) {
     const existing = permissionMap.get(perm.code) || [];
@@ -476,8 +475,8 @@ function filterEffectivePermissions(
   }
 
   // 处理每个权限组
-  const result: PermissionInfoCore[] = [];
-  for (const [code, perms] of permissionMap) {
+  const result: PermissionInfo[] = [];
+  for (const [_, perms] of permissionMap) {
     // 如果有任何 deny，则该权限被拒绝
     const hasDeny = perms.some((p) => p.effect === Effect.DENY);
     if (!hasDeny) {

@@ -23,7 +23,8 @@ import {
 } from "./db.table";
 import { permissionTable } from "../permission/db.table";
 import roleService, { utils as roleUtils } from "../role/service";
-import { asc, count, desc, eq, and, inArray } from "drizzle-orm";
+import permissionService from "../permission/service";
+import { asc, count, desc, eq, and, inArray, is } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -526,19 +527,7 @@ const getPermissionsByRoleReq = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getPermissionsByRoleRes = {
-  type: "array",
-  items: {
-    type: "object",
-    properties: {
-      id: { type: "number" },
-      code: { type: "string" },
-      name: { type: "string" },
-      category: { type: "string" },
-      resource: { type: ["string", "null"], nullable: true },
-      effect: { type: "string" },
-      scope: { type: "string" },
-    },
-  },
+  ...permissionService.listAll.res,
 } as const satisfies JSONSchema;
 async function onGetPermissionsByRole(
   obj: FromSchema<typeof getPermissionsByRoleReq>
@@ -550,9 +539,16 @@ async function onGetPermissionsByRole(
       code: permissionTable.code,
       name: permissionTable.name,
       category: permissionTable.category,
-      resource: permissionTable.resource,
       effect: permissionTable.effect,
       scope: permissionTable.scope,
+      resource: permissionTable.resource,
+      parentId: permissionTable.parentId,
+      remark: permissionTable.remark,
+      isEnabled: permissionTable.isEnabled,
+      creatorId: permissionTable.creatorId,
+      updaterId: permissionTable.updaterId,
+      createTimeUtc: permissionTable.createTimeUtc,
+      updateTimeUtc: permissionTable.updateTimeUtc,
     })
     .from(rolePermissionTable)
     .innerJoin(
@@ -565,7 +561,7 @@ async function onGetPermissionsByRole(
         eq(permissionTable.isEnabled, true)
       )
     );
-  return rows;
+  return rows as PermissionInfo[];
 }
 const getPermissionsByRoleApi = {
   req: getPermissionsByRoleReq,
@@ -578,18 +574,6 @@ const getPermissionsByRoleApi = {
   adapter: bodyAdapter,
   service: onGetPermissionsByRole,
 } satisfies API;
-
-export type PermissionInfoCore = Pick<
-  PermissionInfo,
-  | "id"
-  | "code"
-  | "name"
-  | "category"
-  | "resource"
-  | "effect"
-  | "scope"
-  | "parentId"
->;
 
 /**
  * 根据角色ID数组获取所有权限
@@ -617,6 +601,12 @@ export async function getPermissionsByRoleIds(roleIds: number[]) {
       scope: permissionTable.scope,
       resource: permissionTable.resource,
       parentId: permissionTable.parentId,
+      remark: permissionTable.remark,
+      isEnabled: permissionTable.isEnabled,
+      creatorId: permissionTable.creatorId,
+      updaterId: permissionTable.updaterId,
+      createTimeUtc: permissionTable.createTimeUtc,
+      updateTimeUtc: permissionTable.updateTimeUtc,
     })
     .from(rolePermissionTable)
     .innerJoin(
@@ -628,7 +618,7 @@ export async function getPermissionsByRoleIds(roleIds: number[]) {
         inArray(rolePermissionTable.roleId, filteredRoleIds),
         eq(permissionTable.isEnabled, true)
       )
-    )) as PermissionInfoCore[];
+    )) as PermissionInfo[];
   // 过滤生效的权限（处理 allow/deny）
   const permissions = permissionUtils.filterEffectivePermissions(rows);
   return permissions;
@@ -647,7 +637,6 @@ async function addMenuPermissionToRole(
     conditions: null,
     creatorId,
   };
-
   await db.insert(rolePermissionTable).values(rolePermissionData);
 }
 
