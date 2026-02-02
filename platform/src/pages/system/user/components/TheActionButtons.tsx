@@ -1,6 +1,5 @@
 import { useState, useCallback, memo } from 'react';
 import {
-  IconButton,
   Stack,
   Dialog,
   DialogTitle,
@@ -10,7 +9,7 @@ import {
   Button,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { ResponsiveButton } from '@/components/Responsive/index';
+import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
 import * as UserAPI from '@/api/system/user';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
@@ -90,12 +89,23 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
   return (
     <>
       <Stack direction="row" spacing={1} justifyContent="center">
-        <IconButton onClick={handleEdit} color="primary" size="small">
+        <ResponsiveIconButton
+          onClick={handleEdit}
+          color="primary"
+          size="small"
+          permissionCodes={[USER_PERMISSIONS.EDIT]}
+        >
           <EditIcon />
-        </IconButton>
-        <IconButton onClick={openDeleteDialog} color="error" size="small" disabled={row.id === 1}>
+        </ResponsiveIconButton>
+        <ResponsiveIconButton
+          onClick={openDeleteDialog}
+          color="error"
+          size="small"
+          disabled={row.id === 1}
+          permissionCodes={[USER_PERMISSIONS.DELETE]}
+        >
           <DeleteIcon />
-        </IconButton>
+        </ResponsiveIconButton>
       </Stack>
 
       {/* 删除确认对话框 */}
