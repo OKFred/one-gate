@@ -10,7 +10,7 @@ import {
   type SelectChangeEvent,
 } from '@mui/material';
 import * as AccountAPI from '@/api/mail/account';
-import type { ListMailAccountRes } from '@/api/mail/type';
+import type { ListAllMailAccountRes } from '@/api/mail/type';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -30,7 +30,7 @@ export interface TheAccountListRef {
 const TheAccountList = memo(
   forwardRef<TheAccountListRef, Props>((_, ref) => {
     const t = useTranslation();
-    const [accounts, setAccounts] = useState<NonNullable<ListMailAccountRes['list']>>([]);
+    const [accounts, setAccounts] = useState<NonNullable<ListAllMailAccountRes>>([]);
     const [loading, setLoading] = useState(false);
     const [sender, setSender] = useState<SenderObj>({
       accountId: '',
@@ -42,15 +42,12 @@ const TheAccountList = memo(
       const fetchAccounts = async () => {
         setLoading(true);
         try {
-          const res = await AccountAPI.listFn({
+          const res = await AccountAPI.listAllFn({
             data: {
-              pageNo: 1,
-              pageSize: 100,
+              isEnabled: true,
             },
           });
-          if (res.data?.data?.list) {
-            setAccounts(res.data.data.list);
-          }
+          setAccounts(res.data.data);
         } finally {
           setLoading(false);
         }

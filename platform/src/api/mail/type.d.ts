@@ -3,9 +3,9 @@ import * as TemplateAPI from '@/api/mail/template';
 import * as LogAPI from '@/api/mail/log';
 import * as ActionAPI from '@/api/mail/action';
 
-// 获取所有邮件模板
-export type ListAllMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.listAllFn>[0]['data']>;
-export type ListAllMailTemplateRes = Awaited<ReturnType<typeof TemplateAPI.listAllFn>>['data']['data'];
+// 获取所有邮件账户
+export type ListAllMailAccountReq = NonNullable<Parameters<typeof AccountAPI.listAllFn>[0]['data']>;
+export type ListAllMailAccountRes = Awaited<ReturnType<typeof AccountAPI.listAllFn>>['data']['data'];
 
 // 获取邮件账户列表
 export type ListMailAccountReq = NonNullable<Parameters<typeof AccountAPI.listFn>[0]['data']>;
@@ -26,6 +26,10 @@ export type UpdateMailAccountRes = Awaited<ReturnType<typeof AccountAPI.updateFn
 // 删除邮件账户
 export type DeleteMailAccountReq = NonNullable<Parameters<typeof AccountAPI.deleteFn>[0]['data']>;
 export type DeleteMailAccountRes = Awaited<ReturnType<typeof AccountAPI.deleteFn>>['data']['data'];
+
+// 获取所有邮件模板
+export type ListAllMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.listAllFn>[0]['data']>;
+export type ListAllMailTemplateRes = Awaited<ReturnType<typeof TemplateAPI.listAllFn>>['data']['data'];
 
 // 获取邮件模板列表
 export type ListMailTemplateReq = NonNullable<Parameters<typeof TemplateAPI.listFn>[0]['data']>;
