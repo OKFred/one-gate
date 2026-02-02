@@ -14,7 +14,7 @@ import * as RoleAPI from '@/api/system/role';
 import type { RoleFormRef } from './TheForm';
 import type { TableState } from './TheTable';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ROLE_PERMISSIONS } from '@/hooks/usePermission';
+import { SYSTEM } from '@/hooks/usePermission';
 
 // ==================== 新增角色按钮 ====================
 
@@ -37,7 +37,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
       variant="contained"
       startIcon={<AddIcon />}
       onClick={handleAdd}
-      permissionCodes={[ROLE_PERMISSIONS.ADD]}
+      permissionCodes={[SYSTEM.ROLE.ADD]}
     >
       {t('dialog.add')}
     </ResponsiveButton>
@@ -93,7 +93,7 @@ export const RoleActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
           onClick={handleEdit}
           color="primary"
           size="small"
-          permissionCodes={[ROLE_PERMISSIONS.EDIT]}
+          permissionCodes={[SYSTEM.ROLE.EDIT]}
         >
           <EditIcon />
         </ResponsiveIconButton>
@@ -102,7 +102,7 @@ export const RoleActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
           color="error"
           size="small"
           disabled={row.id === 1}
-          permissionCodes={[ROLE_PERMISSIONS.DELETE]}
+          permissionCodes={[SYSTEM.ROLE.DELETE]}
         >
           <DeleteIcon />
         </ResponsiveIconButton>
