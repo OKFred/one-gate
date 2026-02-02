@@ -2,6 +2,7 @@ import { forwardRef, useImperativeHandle, useState, memo, useRef, useEffect } fr
 import { Card, CardContent, Typography, Box, Chip, Paper } from '@mui/material';
 import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
+import { AUTH } from '@/hooks/usePermission';
 import type { GetUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
@@ -64,7 +65,12 @@ const TheDetails = memo(
                 <AccountBoxIcon sx={{ mr: 1 }} />
                 <Typography variant="h6">{t('me.subtitle')}</Typography>
               </Box>
-              <ResponsiveButton variant="contained" startIcon={<EditIcon />} onClick={handleEdit}>
+              <ResponsiveButton
+                variant="contained"
+                startIcon={<EditIcon />}
+                onClick={handleEdit}
+                permissionCodes={[AUTH.PROFILE.EDIT]}
+              >
                 {t('dialog.edit')}
               </ResponsiveButton>
             </Box>

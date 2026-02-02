@@ -3,7 +3,6 @@ import {
   Button,
   Box,
   Stack,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -17,10 +16,12 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { useResponsive } from '@/hooks/useResponsive';
+import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
 import type { Props } from '../index';
 import * as RolePermissionAPI from '@/api/system/role_permission';
 import type { ListRolePermissionRes } from '@/api/system/type';
 import { useTranslation } from '@/hooks/useTranslation';
+import { SYSTEM } from '@/hooks/usePermission';
 
 interface TheActionButtonsProps extends Props {
   /** 选中的行数据 */
@@ -52,7 +53,7 @@ const TheActionButtons = memo(function TheActionButtons({
         mb: 2,
       }}
     >
-      <Button
+      <ResponsiveButton
         variant="contained"
         color="primary"
         startIcon={<AddIcon />}
@@ -62,12 +63,13 @@ const TheActionButtons = memo(function TheActionButtons({
           minWidth: isMobile ? 'auto' : 120,
           flex: isMobile ? 1 : 'none',
         }}
+        permissionCodes={[SYSTEM.ROLE_PERMISSION.ADD]}
       >
         {t('rolePermission.batchAdd')}
-      </Button>
+      </ResponsiveButton>
 
       {selectedRows.length > 0 && (
-        <Button
+        <ResponsiveButton
           variant="outlined"
           color="error"
           startIcon={<DeleteSweepIcon />}
@@ -77,9 +79,10 @@ const TheActionButtons = memo(function TheActionButtons({
             minWidth: isMobile ? 'auto' : 120,
             flex: isMobile ? 1 : 'none',
           }}
+          permissionCodes={[SYSTEM.ROLE_PERMISSION.BATCH_DELETE]}
         >
           {t('rolePermission.batchDelete')} ({selectedRows.length})
-        </Button>
+        </ResponsiveButton>
       )}
     </Box>
   );
@@ -138,12 +141,22 @@ export const RolePermissionActionButtons = memo(
     return (
       <>
         <Stack direction="row" spacing={1} justifyContent="center">
-          <IconButton onClick={handleEdit} color="primary" size="small">
+          <ResponsiveIconButton
+            onClick={handleEdit}
+            color="primary"
+            size="small"
+            permissionCodes={[SYSTEM.ROLE_PERMISSION.EDIT]}
+          >
             <EditIcon />
-          </IconButton>
-          <IconButton onClick={openDeleteDialog} color="error" size="small">
+          </ResponsiveIconButton>
+          <ResponsiveIconButton
+            onClick={openDeleteDialog}
+            color="error"
+            size="small"
+            permissionCodes={[SYSTEM.ROLE_PERMISSION.DELETE]}
+          >
             <DeleteIcon />
-          </IconButton>
+          </ResponsiveIconButton>
         </Stack>
 
         {/* 删除确认对话框 */}

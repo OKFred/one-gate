@@ -1,6 +1,5 @@
 import { useState, useCallback, memo } from 'react';
 import {
-  IconButton,
   Box,
   Dialog,
   DialogTitle,
@@ -11,6 +10,8 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
+import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
+import { SYSTEM } from '@/hooks/usePermission';
 import type { TheFormRef, DepartmentData } from './TheForm';
 
 // ==================== 新增部门按钮 ====================
@@ -30,9 +31,14 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
   }, [formRef]);
 
   return (
-    <Button variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+    <ResponsiveButton
+      variant="contained"
+      startIcon={<AddIcon />}
+      onClick={handleAdd}
+      permissionCodes={[SYSTEM.DEPARTMENT.ADD]}
+    >
       {t('dialog.add')}
-    </Button>
+    </ResponsiveButton>
   );
 });
 
@@ -98,20 +104,31 @@ export const TreeNodeActionButtons = memo(
     return (
       <>
         <Box sx={{ display: 'flex', gap: 0.5 }}>
-          <IconButton size="small" onClick={handleAddChild} title={t('department.dialog.addChild')}>
+          <ResponsiveIconButton
+            size="small"
+            onClick={handleAddChild}
+            title={t('department.dialog.addChild')}
+            permissionCodes={[SYSTEM.DEPARTMENT.ADD]}
+          >
             <AddIcon fontSize="small" />
-          </IconButton>
-          <IconButton size="small" onClick={handleEdit} title={t('dialog.edit')}>
+          </ResponsiveIconButton>
+          <ResponsiveIconButton
+            size="small"
+            onClick={handleEdit}
+            title={t('dialog.edit')}
+            permissionCodes={[SYSTEM.DEPARTMENT.EDIT]}
+          >
             <EditIcon fontSize="small" />
-          </IconButton>
-          <IconButton
+          </ResponsiveIconButton>
+          <ResponsiveIconButton
             size="small"
             onClick={openDeleteDialog}
             title={t('dialog.delete')}
             disabled={hasChildren}
+            permissionCodes={[SYSTEM.DEPARTMENT.DELETE]}
           >
             <DeleteIcon fontSize="small" />
-          </IconButton>
+          </ResponsiveIconButton>
         </Box>
 
         {/* 删除确认对话框 */}

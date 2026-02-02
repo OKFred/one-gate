@@ -1,6 +1,5 @@
 import { useState, useCallback, memo } from 'react';
 import {
-  IconButton,
   Stack,
   Dialog,
   DialogTitle,
@@ -10,11 +9,12 @@ import {
   Button,
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { ResponsiveButton } from '@/components/Responsive/index';
+import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
 import * as RegionAPI from '@/api/i18n/region';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
 import { useTranslation } from '@/hooks/useTranslation';
+import { I18N } from '@/hooks/usePermission';
 
 // ==================== 新增地区按钮 ====================
 
@@ -29,7 +29,12 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
   }, [formRef]);
 
   return (
-    <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+    <ResponsiveButton
+      variant="contained"
+      startIcon={<AddIcon />}
+      onClick={handleAdd}
+      permissionCodes={[I18N.REGION.ADD]}
+    >
       {t('dialog.add')}
     </ResponsiveButton>
   );
@@ -76,12 +81,22 @@ export const RegionActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowB
   return (
     <>
       <Stack direction="row" spacing={1} justifyContent="center">
-        <IconButton onClick={handleEdit} color="primary" size="small">
+        <ResponsiveIconButton
+          onClick={handleEdit}
+          color="primary"
+          size="small"
+          permissionCodes={[I18N.REGION.EDIT]}
+        >
           <EditIcon />
-        </IconButton>
-        <IconButton onClick={openDeleteDialog} color="error" size="small">
+        </ResponsiveIconButton>
+        <ResponsiveIconButton
+          onClick={openDeleteDialog}
+          color="error"
+          size="small"
+          permissionCodes={[I18N.REGION.DELETE]}
+        >
           <DeleteIcon />
-        </IconButton>
+        </ResponsiveIconButton>
       </Stack>
 
       {/* 删除确认对话框 */}
