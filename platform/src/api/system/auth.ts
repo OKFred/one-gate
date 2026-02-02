@@ -80,3 +80,16 @@ export const updateLangCodeFn = (
     ...axiosConfig,
   });
 };
+
+export const getButtonPermissionFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/system/auth/getButtonPermission', 'post'>,
+    'url' | 'method'
+  >,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/auth/getButtonPermission',
+    method: 'post',
+    ...axiosConfig,
+  });
+};

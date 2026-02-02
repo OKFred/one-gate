@@ -15,6 +15,7 @@ import * as UserAPI from '@/api/system/user';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
 import { useTranslation } from '@/hooks/useTranslation';
+import { USER_PERMISSIONS } from '@/hooks/usePermission';
 
 // ==================== 新增用户按钮 ====================
 
@@ -33,7 +34,12 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
   }, [formRef]);
 
   return (
-    <ResponsiveButton variant="contained" startIcon={<AddIcon />} onClick={handleAdd}>
+    <ResponsiveButton
+      variant="contained"
+      startIcon={<AddIcon />}
+      onClick={handleAdd}
+      permissionCodes={[USER_PERMISSIONS.ADD]}
+    >
       {t('dialog.add')}
     </ResponsiveButton>
   );
