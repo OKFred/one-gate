@@ -2730,6 +2730,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/auth/getButtonPermission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取按钮权限 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SystemAuthGetButtonPermissionReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["SystemAuthGetButtonPermissionRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/department/listAll": {
         parameters: {
             query?: never;
@@ -7361,6 +7419,26 @@ export interface components {
             data: number;
             message: string;
         };
+        SystemAuthGetButtonPermissionReq: Record<string, never>;
+        SystemAuthGetButtonPermissionRes: {
+            ok: boolean;
+            data: {
+                permissions: {
+                    id: number;
+                    code: string;
+                    name: string;
+                    /** @enum {string} */
+                    category: "menu" | "button" | "api";
+                    resource?: string | null;
+                    effect: string;
+                    /** @enum {string} */
+                    scope: "all" | "own" | "dept" | "custom";
+                    resourceFilter?: string | null;
+                    conditions?: string | null;
+                }[];
+            };
+            message: string;
+        };
         SystemDepartmentListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
@@ -8013,8 +8091,18 @@ export interface components {
         SystemPermissionListAllReq: {
             /** @description 是否降序 */
             descend?: boolean;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
+            /**
+             * @description 权限代码，唯一标识
+             * @example user:read
+             * @example file:write:own
+             */
+            code?: string;
+            /**
+             * @description 权限名称
+             * @example 查看用户
+             * @example 编辑文件
+             */
+            name?: string;
             /**
              * @description 权限类别：menu-菜单，button-按钮，api-接口
              * @enum {string}
@@ -8030,6 +8118,8 @@ export interface components {
              * @enum {string}
              */
             effect?: "allow" | "deny";
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
         };
@@ -8101,8 +8191,18 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
+            /**
+             * @description 权限代码，唯一标识
+             * @example user:read
+             * @example file:write:own
+             */
+            code?: string;
+            /**
+             * @description 权限名称
+             * @example 查看用户
+             * @example 编辑文件
+             */
+            name?: string;
             /**
              * @description 权限类别：menu-菜单，button-按钮，api-接口
              * @enum {string}
@@ -8118,6 +8218,8 @@ export interface components {
              * @enum {string}
              */
             effect?: "allow" | "deny";
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
         };
@@ -8820,15 +8922,50 @@ export interface components {
         SystemRolePermissionGetPermissionsByRoleRes: {
             ok: boolean;
             data: {
-                id?: number;
-                code?: string;
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 权限名称
+                 * @example 查看用户
+                 * @example 编辑文件
+                 */
                 name?: string;
-                category?: string;
+                /**
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @enum {string}
+                 */
+                category?: "menu" | "button" | "api";
+                /**
+                 * @description 资源路径
+                 * @example /api/users/:id
+                 * @example /dashboard/users
+                 */
                 resource?: ((string | null) | null) | null;
-                effect?: string;
-                scope?: string;
-                resourceFilter?: ((string | null) | null) | null;
-                conditions?: ((string | null) | null) | null;
+                /**
+                 * @description 效果：allow-允许，deny-拒绝
+                 * @enum {string}
+                 */
+                effect?: "allow" | "deny";
+                /**
+                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                 * @enum {string}
+                 */
+                scope?: "all" | "own" | "dept" | "custom";
+                /** @description 父权限ID，用于菜单层级 */
+                parentId?: ((number | null) | null) | null;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled?: boolean;
+                /**
+                 * @description 权限代码，唯一标识
+                 * @example user:read
+                 * @example file:write:own
+                 */
+                code: string;
             }[];
             message: string;
         };
