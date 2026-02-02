@@ -14,43 +14,109 @@ import { PermissionAddLike } from "@/api/system/permission/service";
 const permissionSeeds: Partial<PermissionAddLike>[] = [
   // ==================== API权限 ====================
   {
-    code: "/api/v1/system",
-    name: "系统管理接口",
+    code: "SystemAuth",
+    name: "系统鉴权接口",
     category: "api",
     scope: "all",
-    remark: "系统相关接口",
   },
   {
-    code: "/^\\/api\\/v1\\/mail(?!.*account).*$/",
-    name: "邮件服务接口(排除账户相关)",
+    code: "SystemUser",
+    name: "系统用户接口",
     category: "api",
     scope: "all",
-    remark: "邮件相关接口，但不包括账户相关接口",
+  },
+  {
+    code: "SystemRole",
+    name: "系统角色接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "SystemPermission",
+    name: "系统权限接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "SystemRolePermission",
+    name: "系统角色权限接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "SystemDepartment",
+    name: "系统部门接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "SystemMenu",
+    name: "系统菜单接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "I18nLanguage",
+    name: "国际化语言接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "I18nRegion",
+    name: "国际化地区接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "I18nTranslation",
+    name: "国际化翻译接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "MailAccount",
+    name: "邮件账户接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "MailTemplate",
+    name: "邮件模板接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "MailLog",
+    name: "邮件日志接口",
+    category: "api",
+    scope: "all",
+  },
+  {
+    code: "MailAction",
+    name: "邮件操作接口",
+    category: "api",
+    scope: "all",
   },
   // ==================== 用户管理权限 ====================
   {
     code: "button:user:add",
     name: "添加用户按钮",
     category: "button",
-    remark: "用户管理页面的添加按钮",
   },
   {
     code: "button:user:edit",
     name: "编辑用户按钮",
     category: "button",
-    remark: "用户管理页面的编辑按钮",
   },
   {
     code: "button:user:delete",
     name: "删除用户按钮",
     category: "button",
-    remark: "用户管理页面的删除按钮",
   },
   {
     code: "button:user:export",
     name: "导出用户按钮",
     category: "button",
-    remark: "导出用户数据按钮",
   },
 
   // ==================== 角色管理权限 ====================
@@ -58,19 +124,16 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     code: "button:role:add",
     name: "添加角色按钮",
     category: "button",
-    remark: "角色管理页面的添加按钮",
   },
   {
     code: "button:role:edit",
     name: "编辑角色按钮",
     category: "button",
-    remark: "角色管理页面的编辑按钮",
   },
   {
     code: "button:role:delete",
     name: "删除角色按钮",
     category: "button",
-    remark: "角色管理页面的删除按钮",
   },
 
   // ==================== 权限管理权限 ====================
@@ -78,19 +141,16 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     code: "button:permission:add",
     name: "添加权限按钮",
     category: "button",
-    remark: "权限管理页面的添加按钮",
   },
   {
     code: "button:permission:edit",
     name: "编辑权限按钮",
     category: "button",
-    remark: "权限管理页面的编辑按钮",
   },
   {
     code: "button:permission:delete",
     name: "删除权限按钮",
     category: "button",
-    remark: "权限管理页面的删除按钮",
   },
 
   // ==================== 部门管理权限 ====================
@@ -98,19 +158,159 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     code: "button:department:add",
     name: "添加部门按钮",
     category: "button",
-    remark: "部门管理页面的添加按钮",
   },
   {
     code: "button:department:edit",
     name: "编辑部门按钮",
     category: "button",
-    remark: "部门管理页面的编辑按钮",
   },
   {
     code: "button:department:delete",
     name: "删除部门按钮",
     category: "button",
-    remark: "部门管理页面的删除按钮",
+  },
+
+  // ==================== 菜单管理权限 ====================
+  {
+    code: "button:menu:add",
+    name: "添加菜单按钮",
+    category: "button",
+  },
+  {
+    code: "button:menu:edit",
+    name: "编辑菜单按钮",
+    category: "button",
+  },
+  {
+    code: "button:menu:delete",
+    name: "删除菜单按钮",
+    category: "button",
+  },
+
+  // ==================== 角色权限管理权限 ====================
+  {
+    code: "button:role-permission:add",
+    name: "添加角色权限按钮",
+    category: "button",
+  },
+  {
+    code: "button:role-permission:edit",
+    name: "编辑角色权限按钮",
+    category: "button",
+  },
+  {
+    code: "button:role-permission:delete",
+    name: "删除角色权限按钮",
+    category: "button",
+  },
+  {
+    code: "button:role-permission:batch-delete",
+    name: "批量删除角色权限按钮",
+    category: "button",
+  },
+
+  // ==================== 国际化 - 语言管理权限 ====================
+  {
+    code: "button:language:add",
+    name: "添加语言按钮",
+    category: "button",
+  },
+  {
+    code: "button:language:edit",
+    name: "编辑语言按钮",
+    category: "button",
+  },
+  {
+    code: "button:language:delete",
+    name: "删除语言按钮",
+    category: "button",
+  },
+
+  // ==================== 国际化 - 地区管理权限 ====================
+  {
+    code: "button:region:add",
+    name: "添加地区按钮",
+    category: "button",
+  },
+  {
+    code: "button:region:edit",
+    name: "编辑地区按钮",
+    category: "button",
+  },
+  {
+    code: "button:region:delete",
+    name: "删除地区按钮",
+    category: "button",
+  },
+
+  // ==================== 国际化 - 翻译管理权限 ====================
+  {
+    code: "button:translation:add",
+    name: "添加翻译按钮",
+    category: "button",
+  },
+  {
+    code: "button:translation:edit",
+    name: "编辑翻译按钮",
+    category: "button",
+  },
+  {
+    code: "button:translation:delete",
+    name: "删除翻译按钮",
+    category: "button",
+  },
+
+  // ==================== 邮件 - 账户管理权限 ====================
+  {
+    code: "button:mail-account:add",
+    name: "添加邮件账户按钮",
+    category: "button",
+  },
+  {
+    code: "button:mail-account:edit",
+    name: "编辑邮件账户按钮",
+    category: "button",
+  },
+  {
+    code: "button:mail-account:delete",
+    name: "删除邮件账户按钮",
+    category: "button",
+  },
+
+  // ==================== 邮件 - 模板管理权限 ====================
+  {
+    code: "button:mail-template:add",
+    name: "添加邮件模板按钮",
+    category: "button",
+  },
+  {
+    code: "button:mail-template:edit",
+    name: "编辑邮件模板按钮",
+    category: "button",
+  },
+  {
+    code: "button:mail-template:delete",
+    name: "删除邮件模板按钮",
+    category: "button",
+  },
+
+  // ==================== 邮件 - 日志管理权限 ====================
+  {
+    code: "button:mail-log:view",
+    name: "查看邮件日志按钮",
+    category: "button",
+  },
+
+  // ==================== 个人信息管理权限 ====================
+  {
+    code: "button:profile:edit",
+    name: "编辑个人信息按钮",
+    category: "button",
+  },
+  {
+    code: "button:profile:change-password",
+    name: "修改密码按钮",
+    category: "button",
   },
 ];
 

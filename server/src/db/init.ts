@@ -250,11 +250,11 @@ export async function initDatabase() {
     // 1. 初始化超级管理员角色
     const roleId = await initSuperAdminRole();
 
-    // 2. 初始化权限数据
-    await initPermissions();
-
-    // 3. 初始化超级管理员账号
+    // 2. 初始化超级管理员账号
     await initSuperAdminUser(roleId);
+
+    // 3. 初始化权限数据
+    await initPermissions();
 
     // 4. 初始化菜单
     await initMenu();
