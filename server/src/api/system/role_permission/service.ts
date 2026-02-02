@@ -45,6 +45,7 @@ import {
 } from "@/middleware/errorHandler/businessError/index";
 import { PermissionInfo } from "@/api/system/permission/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
+import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -586,6 +587,11 @@ const getPermissionsByRoleApi = {
 export async function getPermissionsByRoleIds(roleIds: number[]) {
   if (roleIds.length === 0) {
     return [];
+  }
+  // 如果是超管，给到所有权限（无视启用状态）
+  if (roleIds.includes(SUPER_ADMIN_ROLE_ID)) {
+    const rows = (await db.select().from(permissionTable)) as PermissionInfo[];
+    return permissionUtils.filterEffectivePermissions(rows);
   }
   // 仅允许已启用的角色
   const enabledRoles = await roleService.listAll.service({ isEnabled: true });
