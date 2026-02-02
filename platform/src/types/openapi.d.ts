@@ -7424,17 +7424,64 @@ export interface components {
             ok: boolean;
             data: {
                 permissions: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
                     id: number;
+                    /**
+                     * @description 权限代码，唯一标识
+                     * @example user:read
+                     * @example file:write:own
+                     */
                     code: string;
+                    /**
+                     * @description 权限名称
+                     * @example 查看用户
+                     * @example 编辑文件
+                     */
                     name: string;
-                    /** @enum {string} */
+                    /**
+                     * @description 权限类别：menu-菜单，button-按钮，api-接口
+                     * @enum {string}
+                     */
                     category: "menu" | "button" | "api";
-                    resource?: string | null;
-                    effect: string;
-                    /** @enum {string} */
+                    /**
+                     * @description 资源路径
+                     * @example /api/users/:id
+                     * @example /dashboard/users
+                     */
+                    resource: ((string | null) | null) | null;
+                    /**
+                     * @description 效果：allow-允许，deny-拒绝
+                     * @enum {string}
+                     */
+                    effect: "allow" | "deny";
+                    /**
+                     * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                     * @enum {string}
+                     */
                     scope: "all" | "own" | "dept" | "custom";
-                    resourceFilter?: string | null;
-                    conditions?: string | null;
+                    /** @description 父权限ID，用于菜单层级 */
+                    parentId: ((number | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -8928,44 +8975,58 @@ export interface components {
                  */
                 id: number;
                 /**
-                 * @description 权限名称
-                 * @example 查看用户
-                 * @example 编辑文件
-                 */
-                name?: string;
-                /**
-                 * @description 权限类别：menu-菜单，button-按钮，api-接口
-                 * @enum {string}
-                 */
-                category?: "menu" | "button" | "api";
-                /**
-                 * @description 资源路径
-                 * @example /api/users/:id
-                 * @example /dashboard/users
-                 */
-                resource?: ((string | null) | null) | null;
-                /**
-                 * @description 效果：allow-允许，deny-拒绝
-                 * @enum {string}
-                 */
-                effect?: "allow" | "deny";
-                /**
-                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-                 * @enum {string}
-                 */
-                scope?: "all" | "own" | "dept" | "custom";
-                /** @description 父权限ID，用于菜单层级 */
-                parentId?: ((number | null) | null) | null;
-                /** @description 备注说明 */
-                remark?: ((string | null) | null) | null;
-                /** @description 是否启用 */
-                isEnabled?: boolean;
-                /**
                  * @description 权限代码，唯一标识
                  * @example user:read
                  * @example file:write:own
                  */
                 code: string;
+                /**
+                 * @description 权限名称
+                 * @example 查看用户
+                 * @example 编辑文件
+                 */
+                name: string;
+                /**
+                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @enum {string}
+                 */
+                category: "menu" | "button" | "api";
+                /**
+                 * @description 资源路径
+                 * @example /api/users/:id
+                 * @example /dashboard/users
+                 */
+                resource: ((string | null) | null) | null;
+                /**
+                 * @description 效果：allow-允许，deny-拒绝
+                 * @enum {string}
+                 */
+                effect: "allow" | "deny";
+                /**
+                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
+                 * @enum {string}
+                 */
+                scope: "all" | "own" | "dept" | "custom";
+                /** @description 父权限ID，用于菜单层级 */
+                parentId: ((number | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
             }[];
             message: string;
         };
