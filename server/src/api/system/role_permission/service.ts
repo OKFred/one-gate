@@ -527,7 +527,10 @@ const getPermissionsByRoleReq = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 const getPermissionsByRoleRes = {
-  ...permissionService.listAll.res,
+  type: "array",
+  items: {
+    ...permissionService.get.res,
+  },
 } as const satisfies JSONSchema;
 async function onGetPermissionsByRole(
   obj: FromSchema<typeof getPermissionsByRoleReq>

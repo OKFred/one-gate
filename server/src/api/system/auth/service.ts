@@ -1,4 +1,5 @@
 import userService, { utils as userUtils } from "@/api/system/user/service";
+import permissionService from "@/api/system/permission/service";
 import { utils as regionUtils } from "@/api/i18n/region/service";
 import { tokenUtils } from "@/utils/token";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -399,19 +400,7 @@ const getButtonPermissionRes = {
     permissions: {
       type: "array",
       items: {
-        type: "object",
-        properties: {
-          id: { type: "number" },
-          code: { type: "string" },
-          name: { type: "string" },
-          category: { type: "string", enum: ["menu", "button", "api"] },
-          resource: { type: ["string", "null"] },
-          effect: { type: "string" },
-          scope: { type: "string", enum: ["all", "own", "dept", "custom"] },
-          resourceFilter: { type: ["string", "null"] },
-          conditions: { type: ["string", "null"] },
-        },
-        required: ["id", "code", "name", "category", "effect", "scope"],
+        ...permissionService.get.res,
       },
     },
   },
@@ -422,7 +411,9 @@ async function onGetButtonPermission(
   params: FromSchema<typeof getButtonPermissionReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof getButtonPermissionRes> | null> {
-  const buttonPermissions = userObj.permissions.filter(p => p.category === 'button');
+  const buttonPermissions = userObj.permissions.filter(
+    (p) => p.category === "button"
+  );
   return { permissions: buttonPermissions };
 }
 const getButtonPermissionApi = {
