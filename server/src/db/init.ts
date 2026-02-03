@@ -26,14 +26,14 @@ const SUPER_ADMIN = {
   username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
   password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
   langCode: process.env.LOCALE,
-  roleId: 1, // 超级管理员角色ID
+  roleId: SUPER_ADMIN_ROLE_ID,
 };
 
 // 超级管理员角色配置
 const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
   isEnabled: true,
-  creatorId: 1, // 系统初始化
+  creatorId: SUPER_ADMIN_ID,
   remark: "系统初始化创建的超级管理员角色，拥有所有权限",
 };
 
@@ -97,7 +97,7 @@ async function initSuperAdminUser(roleId: number) {
         langCode: SUPER_ADMIN.langCode,
         roleIdArr: [roleId], // 关联超级管理员角色
         isEnabled: true,
-        creatorId: 1, // 系统初始化
+        creatorId: SUPER_ADMIN_ID,
         remark: "系统初始化创建的超级管理员账号",
       })
       .returning({ id: userTable.id });
@@ -132,7 +132,7 @@ async function initMenu() {
         isEnabled: true,
         remark: null,
       },
-      { userId: SUPER_ADMIN_ID } as UserObj
+      { userId: SUPER_ADMIN_ID, langCode: SUPER_ADMIN.langCode } as UserObj
     );
   }
   console.log("💾 表 system_menu 初始数据已插入");
@@ -247,30 +247,29 @@ export async function initDatabase() {
   try {
     console.log("⌛ 开始初始化数据库...");
 
-    // 1. 初始化超级管理员角色
+    // 初始化超级管理员角色
     const roleId = await initSuperAdminRole();
 
-    // 2. 初始化超级管理员账号
+    // 初始化超级管理员账号
     await initSuperAdminUser(roleId);
 
-    // 3. 初始化权限数据
+    // 初始化权限数据
     await initPermissions();
 
-    // 4. 初始化菜单
-    await initMenu();
-
-    // 5. 初始化语言
+    // 初始化语言
     await initLanguage();
 
-    // 6. 初始化多语言
+    // 初始化多语言
     await initTranslation();
 
-    // 7. 加载多语言缓存
+    // 加载多语言缓存
     await loadTranslationCache();
 
-    // 8. 初始化国家地区
+    // 初始化国家地区
     await initCountryRegion();
 
+    // 初始化菜单
+    await initMenu();
     console.log("✅ 数据库初始化完成");
   } catch (error) {
     console.error("❌ 数据库初始化失败:", error);

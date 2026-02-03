@@ -413,26 +413,21 @@ const getApi = {
 async function createMenuPermission(
   menuId: number,
   menuName: string,
-  creatorId: number
+  userObj: UserObj
 ) {
   const permissionData = {
-    code: `menu:${menuId}`,
-    name: `菜单权限-${menuName}`,
+    code: `menu:${menuName}`,
+    name: menuName,
     category: "menu" as const,
-    resource: menuId.toString(),
     effect: "allow" as const,
     scope: "all" as const,
+    resource: `${menuId}`,
     parentId: null,
-    remark: `菜单 ${menuName} 的访问权限`,
+    remark: null,
     isEnabled: true,
-    creatorId,
   };
-
-  const result = await db
-    .insert(permissionTable)
-    .values(permissionData)
-    .returning({ id: permissionTable.id });
-  return result[0].id;
+  const result = await onAdd(permissionData, userObj);
+  return result;
 }
 
 // 工具函数：根据菜单ID获取权限ID
@@ -443,7 +438,7 @@ async function getPermissionIdByMenuId(menuId: number) {
     .where(
       and(
         eq(permissionTable.category, "menu"),
-        eq(permissionTable.code, `menu:${menuId}`)
+        eq(permissionTable.resource, `${menuId}`)
       )
     )
     .limit(1);

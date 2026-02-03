@@ -237,13 +237,11 @@ async function onAdd(
     .insert(menuTable)
     .values(updateData)
     .returning({ id: menuTable.id });
-
   const menuId = res[0]?.id;
   if (menuId) {
     // 创建菜单权限记录
-    await permissionUtils.createMenuPermission(menuId, name, creatorId);
+    await permissionUtils.createMenuPermission(menuId, name, userObj);
   }
-
   return menuId;
 }
 const addApi = {
@@ -327,8 +325,8 @@ async function onUpdate(
         await tx
           .update(permissionTable)
           .set({
-            name: `菜单权限-${name}`,
-            remark: `菜单 ${name} 的访问权限`,
+            code: `menu:${name}`,
+            name,
             updaterId,
             updateTimeUtc: getCurrentTimestampUtcSql(),
           })
