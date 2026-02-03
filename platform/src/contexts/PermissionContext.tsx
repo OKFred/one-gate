@@ -33,9 +33,7 @@ export const PermissionProvider: React.FC<{ children: ReactNode }> = ({ children
 
   // 将权限列表转换为 Set，方便快速查找
   const permissionCodes = useMemo(() => {
-    return new Set(
-      permissions.filter((p) => p.isEnabled && p.effect === 'allow').map((p) => p.code),
-    );
+    return new Set(permissions.filter((p) => p.isEnabled).map((p) => p.code));
   }, [permissions]);
 
   // 加载权限数据

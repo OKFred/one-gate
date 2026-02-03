@@ -34,7 +34,6 @@ const DEFAULT_FILTERS: FilterState = {
   isEnabled: undefined,
   orderBy: 'id',
   descend: false,
-  effect: undefined,
 };
 
 const TheTable = memo(
@@ -56,9 +55,9 @@ const TheTable = memo(
 
     // 根据权限ID获取权限名称
     const getPermissionName = useCallback(
-      (permissionId: number | null | undefined): string => {
-        if (!permissionId) return '--';
-        const permission = allPermissions.find((p) => p.id === permissionId);
+      (business: string | undefined): string => {
+        if (!business) return '--';
+        const permission = allPermissions.find((p) => p.business === business);
         return permission?.name || '--';
       },
       [allPermissions],
@@ -142,11 +141,9 @@ const TheTable = memo(
       { title: t('permission.name'), render: (row) => row.name },
       { title: t('permission.category'), render: (row) => row.category },
       { title: t('permission.resource'), render: (row) => row.resource || '--' },
-      { title: t('permission.effect'), render: (row) => row.effect },
-      { title: t('permission.scope'), render: (row) => row.scope },
       {
-        title: t('permission.parent'),
-        render: (row) => getPermissionName(row.parentId),
+        title: t('permission.business'),
+        render: (row) => getPermissionName(row.business!),
       },
       {
         title: t('columns.status'),
@@ -184,16 +181,6 @@ const TheTable = memo(
         type: 'content',
         label: t('permission.category'),
         render: (row) => row.category,
-      },
-      {
-        type: 'content',
-        label: t('permission.effect'),
-        render: (row) => row.effect,
-      },
-      {
-        type: 'content',
-        label: t('permission.scope'),
-        render: (row) => row.scope,
       },
       {
         type: 'content',

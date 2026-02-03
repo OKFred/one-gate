@@ -27,8 +27,8 @@ const TranslationUniquePO = {
   tKey: {
     type: "string",
     description: "翻译键",
-    pattern: "^[a-zA-Z0-9]+(?:\\.[a-zA-Z0-9]+)*$",
-    examples: ["welcome.message"],
+    pattern: "^[a-zA-Z0-9_]+(?:\\.[a-zA-Z0-9_]+)*$",
+    examples: ["welcome.message", "businessType.i18n"],
     maxLength: 100,
   },
 } as const satisfies Partial<Record<keyof TranslationPOLike, JSONSchema>>;

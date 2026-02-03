@@ -77,6 +77,4 @@ process.on("uncaughtException", function (err) {
 });
 
 process.env.NODE_ENV === "production" &&
-  console.log(
-    createTranslator(process.env.LOCALE)("errorHandler.serverStarted")
-  );
+  console.log("🚀 Server started in production mode");

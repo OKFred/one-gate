@@ -28,7 +28,6 @@ import { useTranslation } from '@/hooks/useTranslation';
 export interface FilterState {
   keyword: string;
   category?: 'menu' | 'button' | 'api';
-  effect?: 'allow' | 'deny';
   isEnabled: boolean | undefined;
   orderBy: NonNullable<ListPermissionReq['orderBy']>;
   descend: boolean;
@@ -51,7 +50,6 @@ const TheFilter = memo(
     const [filters, setFilters] = useState<FilterState>({
       keyword: '',
       category: undefined,
-      effect: undefined,
       isEnabled: undefined,
       orderBy: 'id',
       descend: false,
@@ -112,7 +110,6 @@ const TheFilter = memo(
       const emptyFilters: FilterState = {
         keyword: '',
         category: undefined,
-        effect: undefined,
         isEnabled: undefined,
         orderBy: 'id',
         descend: false,
@@ -127,7 +124,6 @@ const TheFilter = memo(
       return (
         keywordInput ||
         filters.category ||
-        filters.effect ||
         filters.isEnabled !== undefined ||
         filters.orderBy !== 'id' ||
         !filters.descend
@@ -190,29 +186,14 @@ const TheFilter = memo(
                   <Select
                     value={filters.category ?? ''}
                     label={t('permission.category')}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
+                    onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
                   >
                     <MenuItem value="">
                       <em>{t('filter.all')}</em>
                     </MenuItem>
-                    <MenuItem value="menu">Menu</MenuItem>
-                    <MenuItem value="button">Button</MenuItem>
-                    <MenuItem value="api">API</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <FormControl size="small" fullWidth>
-                  <InputLabel>{t('permission.effect')}</InputLabel>
-                  <Select
-                    value={filters.effect ?? ''}
-                    label={t('permission.effect')}
-                    onChange={(e) => handleFilterChange('effect', e.target.value)}
-                  >
-                    <MenuItem value="">
-                      <em>{t('filter.all')}</em>
-                    </MenuItem>
-                    <MenuItem value="allow">Allow</MenuItem>
-                    <MenuItem value="deny">Deny</MenuItem>
+                    <MenuItem value="menu">{t('permission.category.menu')}</MenuItem>
+                    <MenuItem value="button">{t('permission.category.button')}</MenuItem>
+                    <MenuItem value="api">{t('permission.category.api')}</MenuItem>
                   </Select>
                 </FormControl>
 

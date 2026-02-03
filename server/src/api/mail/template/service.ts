@@ -106,6 +106,7 @@ async function onListAll(
       name: mailTemplateTable.name,
       title: mailTemplateTable.title,
       langCode: mailTemplateTable.langCode,
+      content: mailTemplateTable.content,
       category: mailTemplateTable.category,
       isEnabled: mailTemplateTable.isEnabled,
     })

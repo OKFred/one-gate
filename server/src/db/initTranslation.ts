@@ -1,7 +1,45 @@
+import translationService, {
+  utils as translationUtils,
+} from "@/api/i18n/translation/service";
+import { SUPER_ADMIN_ID } from "./init";
+
+/**
+ * 初始化多语言数据
+ */
+export async function initTranslation() {
+  const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
+  const promises = initialTranslationData.map(async (item) => {
+    // 计算 hash 值
+    const valueHash = await translationUtils.calculateSHA256(item.tValue);
+    const params = {
+      application: item.application,
+      business: item.business,
+      langCode: item.langCode,
+      tKey: item.tKey,
+      tValue: item.tValue,
+      valueHash,
+      remark: null,
+      isEnabled: item.isEnabled,
+    };
+    return translationService.add.service(params, userObj, {
+      skipCacheReload: true,
+    });
+  });
+
+  const addResults = await Promise.allSettled(promises);
+  const successCount = addResults.filter(
+    (res) => res.status === "fulfilled"
+  ).length;
+  const totalCount = initialTranslationData.length;
+  console.log(
+    `🌐 多语言数据初始化完成: ${successCount}/${totalCount} 条记录已添加`
+  );
+}
+
 export const initialTranslationData = [
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "table.deleteConfirm",
     tValue: "确定要删除吗？此操作不可撤销。",
@@ -9,7 +47,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "table.deleteConfirm",
     tValue: "Are you sure you want to delete it? This action cannot be undone.",
@@ -17,7 +55,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.results",
     tValue: "{count} 个结果",
@@ -25,7 +63,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.results",
     tValue: "{count} results",
@@ -33,7 +71,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.login",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "form.missingCredentials",
     tValue: "请输入用户名和密码",
@@ -41,7 +79,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.login",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "form.missingCredentials",
     tValue: "Please enter username and password",
@@ -49,7 +87,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "form.pleaseEnter",
     tValue: "请输入",
@@ -57,7 +95,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "form.pleaseEnter",
     tValue: "Please Enter",
@@ -65,7 +103,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "form.select",
     tValue: "请选择",
@@ -73,7 +111,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "form.select",
     tValue: "Please Select",
@@ -81,7 +119,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "status.success",
     tValue: "成功",
@@ -89,7 +127,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "status.success",
     tValue: "Success",
@@ -97,7 +135,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "status.failure",
     tValue: "失败",
@@ -105,7 +143,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "status.failure",
     tValue: "Failure",
@@ -113,7 +151,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "table.refresh",
     tValue: "刷新",
@@ -121,7 +159,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "table.refresh",
     tValue: "Refresh",
@@ -129,7 +167,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "status.enabled",
     tValue: "启用",
@@ -137,7 +175,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "status.enabled",
     tValue: "Enabled",
@@ -145,7 +183,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "status.disabled",
     tValue: "禁用",
@@ -153,7 +191,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "status.disabled",
     tValue: "Disabled",
@@ -161,7 +199,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.cancel",
     tValue: "取消",
@@ -169,7 +207,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.cancel",
     tValue: "Cancel",
@@ -177,7 +215,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "table.pageSizeLabel",
     tValue: "每页条数",
@@ -185,7 +223,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "table.pageSizeLabel",
     tValue: "Items per page",
@@ -193,7 +231,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.noData",
     tValue: "暂无数据",
@@ -201,7 +239,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.noData",
     tValue: "No data",
@@ -209,7 +247,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.language",
     tValue: "语言",
@@ -217,7 +255,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.language",
     tValue: "Language",
@@ -225,7 +263,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.category",
     tValue: "分类",
@@ -233,7 +271,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.category",
     tValue: "Category",
@@ -241,7 +279,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.close",
     tValue: "关闭",
@@ -249,7 +287,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.close",
     tValue: "Close",
@@ -257,7 +295,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "columns.id",
     tValue: "ID",
@@ -265,7 +303,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "columns.id",
     tValue: "ID",
@@ -273,7 +311,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "columns.status",
     tValue: "状态",
@@ -281,7 +319,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "columns.status",
     tValue: "Status",
@@ -289,7 +327,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "columns.createTime",
     tValue: "创建时间",
@@ -297,7 +335,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "columns.createTime",
     tValue: "Create Time",
@@ -305,7 +343,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "columns.updateTime",
     tValue: "更新时间",
@@ -313,7 +351,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "columns.updateTime",
     tValue: "Update Time",
@@ -321,7 +359,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "columns.permissionCount",
     tValue: "权限数量",
@@ -329,7 +367,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "columns.permissionCount",
     tValue: "Permission Count",
@@ -337,7 +375,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "table.actions",
     tValue: "操作",
@@ -345,7 +383,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "table.actions",
     tValue: "Actions",
@@ -353,7 +391,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.add",
     tValue: "新增",
@@ -361,7 +399,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.add",
     tValue: "Add",
@@ -369,7 +407,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.edit",
     tValue: "编辑",
@@ -377,7 +415,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.edit",
     tValue: "Edit",
@@ -385,7 +423,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.delete",
     tValue: "删除",
@@ -393,7 +431,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.delete",
     tValue: "Delete",
@@ -401,7 +439,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.save",
     tValue: "保存",
@@ -409,7 +447,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.save",
     tValue: "Save",
@@ -417,7 +455,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.confirm",
     tValue: "确定",
@@ -425,7 +463,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.confirm",
     tValue: "Confirm",
@@ -433,7 +471,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.yes",
     tValue: "是",
@@ -441,7 +479,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.yes",
     tValue: "Yes",
@@ -449,7 +487,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.no",
     tValue: "否",
@@ -457,7 +495,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.no",
     tValue: "No",
@@ -465,7 +503,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.deleteConfirmTitle",
     tValue: "确认删除",
@@ -473,7 +511,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.deleteConfirmTitle",
     tValue: "Confirm Delete",
@@ -481,7 +519,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.title",
     tValue: "搜索与筛选",
@@ -489,7 +527,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.title",
     tValue: "Search & Filter",
@@ -497,7 +535,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.clear",
     tValue: "清除筛选",
@@ -505,7 +543,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.clear",
     tValue: "Clear Filters",
@@ -513,7 +551,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.keywordLabel",
     tValue: "关键字搜索",
@@ -521,7 +559,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.keywordLabel",
     tValue: "Keyword Search",
@@ -529,7 +567,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.orderBy",
     tValue: "排序字段",
@@ -537,7 +575,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.orderBy",
     tValue: "Sort By",
@@ -545,7 +583,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.sortOrder",
     tValue: "排序方式",
@@ -553,7 +591,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.sortOrder",
     tValue: "Sort Order",
@@ -561,7 +599,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.asc",
     tValue: "升序",
@@ -569,7 +607,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.asc",
     tValue: "Ascending",
@@ -577,7 +615,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.desc",
     tValue: "降序",
@@ -585,7 +623,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.desc",
     tValue: "Descending",
@@ -593,7 +631,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.unassigned",
     tValue: "未分配",
@@ -601,7 +639,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.unassigned",
     tValue: "Unassigned",
@@ -609,7 +647,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "table.refresh",
     tValue: "刷新",
@@ -617,7 +655,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "table.refresh",
     tValue: "Refresh",
@@ -625,7 +663,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "columns.name",
     tValue: "名称",
@@ -633,7 +671,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "columns.name",
     tValue: "Name",
@@ -641,7 +679,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "column.remark",
     tValue: "备注",
@@ -649,7 +687,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "column.remark",
     tValue: "Remark",
@@ -657,7 +695,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.keyword",
     tValue: "关键词",
@@ -665,7 +703,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.keyword",
     tValue: "Keyword",
@@ -673,7 +711,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.enabledStatus",
     tValue: "启用状态",
@@ -681,7 +719,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.enabledStatus",
     tValue: "Enabled Status",
@@ -689,7 +727,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.all",
     tValue: "全部",
@@ -697,7 +735,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.all",
     tValue: "All",
@@ -705,7 +743,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "filter.condition",
     tValue: "筛选条件",
@@ -713,7 +751,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "filter.condition",
     tValue: "Filter Conditions",
@@ -721,7 +759,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.operationSuccess",
     tValue: "操作成功",
@@ -729,7 +767,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.operationSuccess",
     tValue: "Operation successful",
@@ -737,7 +775,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.required",
     tValue: "该项为必填项",
@@ -745,7 +783,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.required",
     tValue: "This field is required",
@@ -753,7 +791,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "page.details",
     tValue: "详情",
@@ -761,7 +799,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "page.details",
     tValue: "Details",
@@ -769,7 +807,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.titie.error",
     tValue: "错误提示",
@@ -777,7 +815,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.titie.error",
     tValue: "Error",
@@ -785,7 +823,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.titie.warning",
     tValue: "警告",
@@ -793,7 +831,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.titie.warning",
     tValue: "Warning",
@@ -801,7 +839,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.titie.success",
     tValue: "成功",
@@ -809,7 +847,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.titie.success",
     tValue: "Success",
@@ -817,7 +855,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "zh-CN",
     tKey: "dialog.titie.info",
     tValue: "提示",
@@ -825,7 +863,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "common",
+    business: "components",
     langCode: "en-US",
     tKey: "dialog.titie.info",
     tValue: "Info",
@@ -833,7 +871,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.home",
     tValue: "主页",
@@ -841,7 +879,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.home",
     tValue: "Home",
@@ -849,7 +887,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.me",
     tValue: "我的",
@@ -857,7 +895,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.me",
     tValue: "Profile",
@@ -865,7 +903,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.mail",
     tValue: "邮件管理",
@@ -873,7 +911,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.mail",
     tValue: "Mail Management",
@@ -881,7 +919,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.mail.template",
     tValue: "模板",
@@ -889,7 +927,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.mail.template",
     tValue: "Templates",
@@ -897,7 +935,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.mail.log",
     tValue: "日志",
@@ -905,7 +943,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.mail.log",
     tValue: "Logs",
@@ -913,7 +951,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.mail.send",
     tValue: "发送",
@@ -921,7 +959,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.mail.send",
     tValue: "Send",
@@ -929,7 +967,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.mail.account",
     tValue: "账户",
@@ -937,7 +975,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.mail.account",
     tValue: "Accounts",
@@ -945,7 +983,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.system",
     tValue: "系统管理",
@@ -953,7 +991,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.system",
     tValue: "System",
@@ -961,7 +999,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.system.role",
     tValue: "角色",
@@ -969,7 +1007,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.system.role",
     tValue: "Roles",
@@ -977,7 +1015,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.user",
     tValue: "用户",
@@ -985,7 +1023,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.user",
     tValue: "Users",
@@ -993,7 +1031,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.system.department",
     tValue: "部门",
@@ -1001,7 +1039,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.system.department",
     tValue: "Departments",
@@ -1009,7 +1047,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.menu",
     tValue: "菜单",
@@ -1017,7 +1055,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.menu",
     tValue: "Menus",
@@ -1025,7 +1063,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.system.permission",
     tValue: "权限",
@@ -1033,7 +1071,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.system.permission",
     tValue: "Permissions",
@@ -1041,7 +1079,23 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
+    langCode: "zh-CN",
+    tKey: "sidebar.menu.system.rolePermission",
+    tValue: "角色权限",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    langCode: "en-US",
+    tKey: "sidebar.menu.system.rolePermission",
+    tValue: "Role Permission",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.i18n",
     tValue: "国际化",
@@ -1049,7 +1103,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.i18n",
     tValue: "Internationalization",
@@ -1057,7 +1111,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.language",
     tValue: "语言",
@@ -1065,7 +1119,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.language",
     tValue: "Languages",
@@ -1073,7 +1127,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.translation",
     tValue: "翻译",
@@ -1081,7 +1135,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.translation",
     tValue: "Translations",
@@ -1089,7 +1143,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.i18n.region",
     tValue: "国家地区",
@@ -1097,7 +1151,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.i18n.region",
     tValue: "Regions",
@@ -1105,7 +1159,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "topbar.title",
     tValue: "条条大道通罗马",
@@ -1113,7 +1167,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "topbar.title",
     tValue: "All roads lead to Rome",
@@ -1121,7 +1175,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "topbar.profile",
     tValue: "个人设置",
@@ -1129,7 +1183,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "topbar.profile",
     tValue: "Profile",
@@ -1137,7 +1191,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "topbar.logout",
     tValue: "退出登录",
@@ -1145,7 +1199,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "topbar.logout",
     tValue: "Log out",
@@ -1153,7 +1207,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "topbar.notLoggedIn",
     tValue: "未登录",
@@ -1161,7 +1215,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "topbar.notLoggedIn",
     tValue: "Not signed in",
@@ -1169,7 +1223,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "login.username",
     tValue: "用户名",
@@ -1177,7 +1231,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "login.username",
     tValue: "Username",
@@ -1185,7 +1239,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "login.password",
     tValue: "密码",
@@ -1193,7 +1247,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "login.password",
     tValue: "Password",
@@ -1201,7 +1255,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "login.signIn",
     tValue: "登录",
@@ -1209,7 +1263,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "login.signIn",
     tValue: "Sign in",
@@ -1217,7 +1271,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "login.wechatSignIn",
     tValue: "微信登录",
@@ -1225,7 +1279,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "login.wechatSignIn",
     tValue: "WeChat Sign in",
@@ -1233,7 +1287,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "login.wechatWIP",
     tValue: "微信登录功能正在开发中...",
@@ -1241,7 +1295,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "login.wechatWIP",
     tValue: "WeChat sign-in is under development...",
@@ -1249,7 +1303,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "login.forgotPassword",
     tValue: "忘记密码？",
@@ -1257,7 +1311,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "login.forgotPassword",
     tValue: "Forgot password?",
@@ -1265,7 +1319,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "dialog.message",
     tValue: "页面未找到",
@@ -1273,7 +1327,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "dialog.message",
     tValue: "Page Not Found",
@@ -1281,7 +1335,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "dialog.goBackHome",
     tValue: "返回首页",
@@ -1289,7 +1343,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.layout",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "dialog.goBackHome",
     tValue: "Go Back Home",
@@ -1297,7 +1351,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.databaseBusy",
     tValue: "数据库繁忙或锁定",
@@ -1305,7 +1359,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.databaseBusy",
     tValue: "Database busy or locked",
@@ -1313,7 +1367,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.databaseError",
     tValue: "数据库操作错误",
@@ -1321,7 +1375,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.databaseError",
     tValue: "Database operation error",
@@ -1329,7 +1383,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.notFound",
     tValue: "未找到请求的资源",
@@ -1337,7 +1391,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.notFound",
     tValue: "Resource not found",
@@ -1345,7 +1399,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.targetNotExist",
     tValue: "目标不存在",
@@ -1353,7 +1407,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.targetNotExist",
     tValue: "Target does not exist",
@@ -1361,7 +1415,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.forbidden",
     tValue: "禁止访问",
@@ -1369,7 +1423,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.forbidden",
     tValue: "Access forbidden",
@@ -1377,7 +1431,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.validationFailed",
     tValue: "请求校验失败",
@@ -1385,7 +1439,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.validationFailed",
     tValue: "Request validation failed",
@@ -1393,7 +1447,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.serverError",
     tValue: "服务器异常",
@@ -1401,7 +1455,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.serverError",
     tValue: "Server error",
@@ -1409,7 +1463,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.unknownError",
     tValue: "未知异常",
@@ -1417,7 +1471,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.unknownError",
     tValue: "Unknown error",
@@ -1425,7 +1479,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.undefinedError",
     tValue: "未定义的错误类型",
@@ -1433,7 +1487,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.undefinedError",
     tValue: "Undefined error type",
@@ -1441,7 +1495,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.duplicatedData",
     tValue: "数据重复",
@@ -1449,7 +1503,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.duplicatedData",
     tValue: "Duplicated data",
@@ -1457,23 +1511,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
-    langCode: "zh-CN",
-    tKey: "errorHandler.serverStarted",
-    tValue: "服务器已启动",
-    isEnabled: true,
-  },
-  {
-    application: "backend",
-    business: "infra.session",
-    langCode: "en-US",
-    tKey: "errorHandler.serverStarted",
-    tValue: "Server started",
-    isEnabled: true,
-  },
-  {
-    application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.invalidParams",
     tValue: "无效的参数",
@@ -1481,7 +1519,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.invalidParams",
     tValue: "Invalid parameters",
@@ -1489,7 +1527,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.departmentNotExist",
     tValue: "部门不存在或已被禁用",
@@ -1497,7 +1535,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.departmentNotExist",
     tValue: "Department does not exist or has been disabled",
@@ -1505,7 +1543,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.roleNotExist",
     tValue: "角色不存在或已被禁用",
@@ -1513,7 +1551,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.roleNotExist",
     tValue: "Role does not exist or has been disabled",
@@ -1521,7 +1559,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.hasChildren",
     tValue: "存在子节点，请检查后重试",
@@ -1529,7 +1567,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.hasChildren",
     tValue: "Child nodes exist, please check and try again",
@@ -1537,7 +1575,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.notAuthenticated",
     tValue: "用户未认证或token无效",
@@ -1545,7 +1583,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.notAuthenticated",
     tValue: "User not authenticated or token is invalid",
@@ -1553,7 +1591,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.notExistOrDisabled",
     tValue: "数据不存在或已被禁用",
@@ -1561,7 +1599,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.notExistOrDisabled",
     tValue: "Data does not exist or has been disabled",
@@ -1569,7 +1607,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.notYetImplemented",
     tValue: "功能暂未实现",
@@ -1577,7 +1615,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.notYetImplemented",
     tValue: "Feature not yet implemented",
@@ -1585,7 +1623,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.wrongPassword",
     tValue: "密码错误",
@@ -1593,7 +1631,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.wrongPassword",
     tValue: "Invalid password",
@@ -1601,7 +1639,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "errorHandler.loginFailed",
     tValue: "登录失败，请检查用户名和密码",
@@ -1609,7 +1647,7 @@ export const initialTranslationData = [
   },
   {
     application: "backend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "errorHandler.loginFailed",
     tValue: "Login failed, please check username and password",
@@ -1617,7 +1655,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "error.requestFailed",
     tValue: "请求失败",
@@ -1625,7 +1663,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "error.requestFailed",
     tValue: "Request failed",
@@ -1633,7 +1671,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "error.sessionExpired",
     tValue: "登录已过期，请重新登录",
@@ -1641,7 +1679,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "error.sessionExpired",
     tValue: "Session expired, please login again",
@@ -1649,7 +1687,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "zh-CN",
     tKey: "error.networkError",
     tValue: "网络错误",
@@ -1657,7 +1695,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "infra.session",
+    business: "business.exception",
     langCode: "en-US",
     tKey: "error.networkError",
     tValue: "Network error",
@@ -1665,7 +1703,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "home.title",
     tValue: "欢迎使用",
@@ -1673,7 +1711,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "home.title",
     tValue: "Welcome",
@@ -1681,7 +1719,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "home.subtitle",
     tValue: "一站式信息管理解决方案",
@@ -1689,7 +1727,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "home.subtitle",
     tValue: "All-in-one information management solution",
@@ -1697,7 +1735,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.accounts",
     tValue: "邮件账户",
@@ -1705,7 +1743,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.accounts",
     tValue: "Mail Accounts",
@@ -1713,7 +1751,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.templates",
     tValue: "邮件模板",
@@ -1721,7 +1759,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.templates",
     tValue: "Mail Templates",
@@ -1729,7 +1767,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.todaySent",
     tValue: "今日发送",
@@ -1737,7 +1775,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.todaySent",
     tValue: "Sent Today",
@@ -1745,7 +1783,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.title",
     tValue: "快速开始",
@@ -1753,7 +1791,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.title",
     tValue: "Quick Start",
@@ -1761,7 +1799,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.configureAccounts",
     tValue: "🔧 配置邮件账户：在邮件账户管理中添加您的SMTP配置",
@@ -1769,7 +1807,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.configureAccounts",
     tValue: "🔧 Configure accounts: Add your SMTP settings in Mail Accounts",
@@ -1777,7 +1815,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.createTemplate",
     tValue: "📝 创建邮件模板：设计可重复使用的邮件模板",
@@ -1785,7 +1823,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.createTemplate",
     tValue: "📝 Create templates: Design reusable mail templates",
@@ -1793,7 +1831,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.sendMail",
     tValue: "📧 发送邮件：使用模板快速发送邮件",
@@ -1801,7 +1839,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.sendMail",
     tValue: "📧 Send mail: Quickly send using templates",
@@ -1809,7 +1847,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "quickStart.viewLogs",
     tValue: "📊 查看日志：监控邮件发送状态和历史记录",
@@ -1817,7 +1855,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.home",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "quickStart.viewLogs",
     tValue: "📊 View logs: Monitor mail send status and history",
@@ -1825,7 +1863,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.title",
     tValue: "翻译管理",
@@ -1833,7 +1871,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.title",
     tValue: "Translation Management",
@@ -1841,7 +1879,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.table.application",
     tValue: "应用",
@@ -1849,7 +1887,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.table.application",
     tValue: "Application",
@@ -1857,7 +1895,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.table.business",
     tValue: "业务",
@@ -1865,7 +1903,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.table.business",
     tValue: "Business",
@@ -1873,7 +1911,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.table.langCode",
     tValue: "语言代码",
@@ -1881,7 +1919,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.table.langCode",
     tValue: "Language Code",
@@ -1889,7 +1927,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.table.tKey",
     tValue: "翻译键",
@@ -1897,7 +1935,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.table.tKey",
     tValue: "Translation Key",
@@ -1905,7 +1943,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.table.tValue",
     tValue: "翻译值",
@@ -1913,7 +1951,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.table.tValue",
     tValue: "Translation Value",
@@ -1921,7 +1959,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.dialog.duplicateWarning",
     tValue: "发现{count}个相同的翻译文案：",
@@ -1929,7 +1967,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.dialog.duplicateWarning",
     tValue: "Found {count} duplicated translation(s):",
@@ -1937,7 +1975,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "zh-CN",
     tKey: "translation.dialog.duplicateSuggestion",
     tValue: "💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键",
@@ -1945,7 +1983,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.translation",
     langCode: "en-US",
     tKey: "translation.dialog.duplicateSuggestion",
     tValue:
@@ -1954,7 +1992,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "zh-CN",
     tKey: "region.title",
     tValue: "国家地区管理",
@@ -1962,7 +2000,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "en-US",
     tKey: "region.title",
     tValue: "Region Management",
@@ -1970,7 +2008,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "zh-CN",
     tKey: "region.table.alpha2Code",
     tValue: "ISO两位代码",
@@ -1978,7 +2016,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "en-US",
     tKey: "region.table.alpha2Code",
     tValue: "ISO 3166-1 alpha-2",
@@ -1986,7 +2024,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "zh-CN",
     tKey: "region.table.alpha3Code",
     tValue: "ISO三位代码",
@@ -1994,7 +2032,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "en-US",
     tKey: "region.table.alpha3Code",
     tValue: "ISO 3166-1 alpha-3",
@@ -2002,7 +2040,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "zh-CN",
     tKey: "region.table.numeric",
     tValue: "数字代码",
@@ -2010,7 +2048,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "en-US",
     tKey: "region.table.numeric",
     tValue: "Numeric Code",
@@ -2018,7 +2056,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "zh-CN",
     tKey: "region.table.iso3166Independent",
     tValue: "是否ISO3166独立主权国家",
@@ -2026,7 +2064,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "en-US",
     tKey: "region.table.iso3166Independent",
     tValue: "Is Independent Country / Region in ISO3166",
@@ -2034,7 +2072,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "zh-CN",
     tKey: "region.table.businessLanguages",
     tValue: "业务语言",
@@ -2042,7 +2080,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.region",
     langCode: "en-US",
     tKey: "region.table.businessLanguages",
     tValue: "Business Languages",
@@ -2050,7 +2088,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.language",
     langCode: "zh-CN",
     tKey: "language.title",
     tValue: "语言管理",
@@ -2058,7 +2096,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.language",
     langCode: "en-US",
     tKey: "language.title",
     tValue: "Language Management",
@@ -2066,7 +2104,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.language",
     langCode: "zh-CN",
     tKey: "language.table.langCode",
     tValue: "语言代码",
@@ -2074,7 +2112,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.language",
     langCode: "en-US",
     tKey: "language.table.langCode",
     tValue: "Language Code",
@@ -2082,7 +2120,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.language",
     langCode: "zh-CN",
     tKey: "language.table.nativeName",
     tValue: "本地名称",
@@ -2090,7 +2128,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.i18n",
+    business: "i18n.language",
     langCode: "en-US",
     tKey: "language.table.nativeName",
     tValue: "Native Name",
@@ -2098,7 +2136,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "zh-CN",
     tKey: "account.title",
     tValue: "邮件账户管理",
@@ -2106,7 +2144,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "en-US",
     tKey: "account.title",
     tValue: "Mail Account Management",
@@ -2114,7 +2152,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "zh-CN",
     tKey: "account.table.nickname",
     tValue: "昵称",
@@ -2122,7 +2160,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "en-US",
     tKey: "account.table.nickname",
     tValue: "Nickname",
@@ -2130,7 +2168,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "zh-CN",
     tKey: "account.table.email",
     tValue: "邮箱",
@@ -2138,7 +2176,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "en-US",
     tKey: "account.table.email",
     tValue: "Email",
@@ -2146,7 +2184,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "zh-CN",
     tKey: "account.table.host",
     tValue: "主机",
@@ -2154,7 +2192,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "en-US",
     tKey: "account.table.host",
     tValue: "Host",
@@ -2162,7 +2200,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "zh-CN",
     tKey: "account.table.port",
     tValue: "端口",
@@ -2170,7 +2208,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "en-US",
     tKey: "account.table.port",
     tValue: "Port",
@@ -2178,7 +2216,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "zh-CN",
     tKey: "account.table.password",
     tValue: "密码",
@@ -2186,7 +2224,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.account",
     langCode: "en-US",
     tKey: "account.table.password",
     tValue: "Password",
@@ -2194,7 +2232,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.customFrom",
     tValue: "或直接输入发件邮箱",
@@ -2202,7 +2240,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.customFrom",
     tValue: "Or input sender email directly",
@@ -2210,7 +2248,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.customFromHelp",
     tValue: "如果没有配置的账户，可以直接输入邮箱地址",
@@ -2218,7 +2256,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.customFromHelp",
     tValue: "If no account configured, you can input email directly",
@@ -2226,7 +2264,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.recipientName",
     tValue: "姓名",
@@ -2234,7 +2272,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.recipientName",
     tValue: "Name",
@@ -2242,7 +2280,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.recipientEmail",
     tValue: "邮箱",
@@ -2250,7 +2288,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.recipientEmail",
     tValue: "Email",
@@ -2258,7 +2296,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.removeRecipient",
     tValue: "移除收件人",
@@ -2266,7 +2304,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.removeRecipient",
     tValue: "Remove recipient",
@@ -2274,7 +2312,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.subject",
     tValue: "主题",
@@ -2282,7 +2320,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.subject",
     tValue: "Subject",
@@ -2290,7 +2328,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.contentLoaded",
     tValue: "模板内容已加载，您可以在此基础上编辑...",
@@ -2298,7 +2336,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.contentLoaded",
     tValue: "Template content loaded, you can edit it...",
@@ -2306,7 +2344,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.action.send",
     tValue: "发送",
@@ -2314,7 +2352,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.action.send",
     tValue: "Send",
@@ -2322,7 +2360,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.title",
     tValue: "邮件模板管理",
@@ -2330,7 +2368,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.title",
     tValue: "Mail Template Management",
@@ -2338,7 +2376,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.title",
     tValue: "发送邮件",
@@ -2346,7 +2384,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.title",
     tValue: "Send Mail",
@@ -2354,7 +2392,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.recipients",
     tValue: "收件人",
@@ -2362,7 +2400,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.recipients",
     tValue: "Recipients",
@@ -2370,7 +2408,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.addRecipient",
     tValue: "添加收件人",
@@ -2378,7 +2416,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.addRecipient",
     tValue: "Add recipient",
@@ -2386,7 +2424,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.noTemplate",
     tValue: "不使用模板 - 手动编写内容",
@@ -2394,7 +2432,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.noTemplate",
     tValue: "No template - write content manually",
@@ -2402,7 +2440,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.templateName",
     tValue: "模板名",
@@ -2410,7 +2448,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.templateName",
     tValue: "Template",
@@ -2418,7 +2456,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.creator",
     tValue: "创建人",
@@ -2426,7 +2464,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.creator",
     tValue: "Creator",
@@ -2434,7 +2472,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.category",
     tValue: "分类",
@@ -2442,7 +2480,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.category",
     tValue: "Category",
@@ -2450,7 +2488,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "zh-CN",
     tKey: "send.dialog.contentLabel",
     tValue: "邮件内容",
@@ -2458,7 +2496,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.action",
     langCode: "en-US",
     tKey: "send.dialog.contentLabel",
     tValue: "Mail Content",
@@ -2466,7 +2504,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.name",
     tValue: "模板名称",
@@ -2474,7 +2512,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.name",
     tValue: "Template Name",
@@ -2482,7 +2520,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.nameHelp",
     tValue: "邮件模板的唯一标识名称",
@@ -2490,7 +2528,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.nameHelp",
     tValue: "Unique identifier for the template",
@@ -2498,7 +2536,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.subject",
     tValue: "邮件标题",
@@ -2506,7 +2544,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.subject",
     tValue: "Mail Subject",
@@ -2514,7 +2552,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.subjectHelp",
     tValue: "邮件的主题行",
@@ -2522,7 +2560,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.subjectHelp",
     tValue: "Subject line of the mail",
@@ -2530,7 +2568,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.langCodeHelp",
     tValue: "模板使用的语言代码（可选）",
@@ -2538,7 +2576,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.langCodeHelp",
     tValue: "Language code for the template (optional)",
@@ -2546,7 +2584,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.category",
     tValue: "模板分类",
@@ -2554,7 +2592,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.category",
     tValue: "Template Category",
@@ -2562,7 +2600,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.categoryHelp",
     tValue: "模板的分类标签（可选）",
@@ -2570,7 +2608,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.categoryHelp",
     tValue: "Category tag for the template (optional)",
@@ -2578,7 +2616,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.contentLabel",
     tValue: "邮件内容",
@@ -2586,7 +2624,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.contentLabel",
     tValue: "Mail Content",
@@ -2594,7 +2632,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.contentHelp",
     tValue: "使用富文本编辑器编写邮件模板内容，支持HTML格式",
@@ -2602,7 +2640,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.contentHelp",
     tValue: "Use the rich text editor; HTML supported",
@@ -2610,7 +2648,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.table.title",
     tValue: "邮件标题",
@@ -2618,7 +2656,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.table.title",
     tValue: "Mail Subject",
@@ -2626,7 +2664,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "dialog.title.preview",
     tValue: "预览",
@@ -2634,7 +2672,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "dialog.title.preview",
     tValue: "Preview",
@@ -2642,7 +2680,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.preview.basicInfo",
     tValue: "基本信息",
@@ -2650,7 +2688,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.preview.basicInfo",
     tValue: "Basic Info",
@@ -2658,7 +2696,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "zh-CN",
     tKey: "template.preview.tags",
     tValue: "标签",
@@ -2666,7 +2704,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.template",
     langCode: "en-US",
     tKey: "template.preview.tags",
     tValue: "Tags",
@@ -2674,7 +2712,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.templateParams",
     tValue: "模板参数",
@@ -2682,7 +2720,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.templateParams",
     tValue: "Template Parameters",
@@ -2690,7 +2728,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.errorCode",
     tValue: "错误代码",
@@ -2698,7 +2736,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.errorCode",
     tValue: "Error Code",
@@ -2706,7 +2744,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.errorDetails",
     tValue: "错误详情",
@@ -2714,7 +2752,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.errorDetails",
     tValue: "Error Details",
@@ -2722,7 +2760,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.title",
     tValue: "邮件发送日志",
@@ -2730,7 +2768,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.title",
     tValue: "Mail Send Log",
@@ -2738,7 +2776,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.basicInfo",
     tValue: "基本信息",
@@ -2746,7 +2784,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.basicInfo",
     tValue: "Basic Information",
@@ -2754,7 +2792,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.timeInfo",
     tValue: "时间信息",
@@ -2762,7 +2800,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.timeInfo",
     tValue: "Time Information",
@@ -2770,7 +2808,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.templateInfo",
     tValue: "模板信息",
@@ -2778,7 +2816,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.templateInfo",
     tValue: "Template Information",
@@ -2786,7 +2824,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.errorInfo",
     tValue: "错误信息",
@@ -2794,7 +2832,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.errorInfo",
     tValue: "Error Information",
@@ -2802,7 +2840,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.subject",
     tValue: "标题",
@@ -2810,7 +2848,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.subject",
     tValue: "Subject",
@@ -2818,7 +2856,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.recipient",
     tValue: "收件人",
@@ -2826,7 +2864,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.recipient",
     tValue: "Recipient",
@@ -2834,7 +2872,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.sender",
     tValue: "发件人",
@@ -2842,7 +2880,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.sender",
     tValue: "Sender",
@@ -2850,7 +2888,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "zh-CN",
     tKey: "log.table.sendTime",
     tValue: "发送时间",
@@ -2858,7 +2896,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.mail",
+    business: "mail.log",
     langCode: "en-US",
     tKey: "log.table.sendTime",
     tValue: "Send Time",
@@ -2866,7 +2904,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.title",
     tValue: "我的",
@@ -2874,7 +2912,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.title",
     tValue: "My Profile",
@@ -2882,7 +2920,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.changePassword.title",
     tValue: "修改密码",
@@ -2890,7 +2928,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.changePassword.title",
     tValue: "Change Password",
@@ -2898,7 +2936,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.table.currentPassword",
     tValue: "当前密码",
@@ -2906,7 +2944,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.table.currentPassword",
     tValue: "Current Password",
@@ -2914,7 +2952,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.table.newPassword",
     tValue: "新密码",
@@ -2922,7 +2960,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.table.newPassword",
     tValue: "New Password",
@@ -2930,7 +2968,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.table.confirmPassword",
     tValue: "确认新密码",
@@ -2938,7 +2976,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.table.confirmPassword",
     tValue: "Confirm New Password",
@@ -2946,7 +2984,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.subtitle",
     tValue: "个人信息",
@@ -2954,7 +2992,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.subtitle",
     tValue: "Personal Information",
@@ -2962,7 +3000,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.region",
     tValue: "国家/地区",
@@ -2970,7 +3008,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.region",
     tValue: "Country/Region",
@@ -2978,7 +3016,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.department",
     tValue: "部门",
@@ -2986,7 +3024,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.department",
     tValue: "Department",
@@ -2994,7 +3032,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.role",
     tValue: "角色",
@@ -3002,7 +3040,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.role",
     tValue: "Role",
@@ -3010,7 +3048,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.accountStatus",
     tValue: "账户状态",
@@ -3018,7 +3056,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.accountStatus",
     tValue: "Account Status",
@@ -3026,7 +3064,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.changePassword.passwordFormatHint" /* ^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&]{7,30}$ */,
     tValue: "密码长度7位~30位，至少包含一个字母和一个数字",
@@ -3034,7 +3072,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.changePassword.passwordFormatHint",
     tValue:
@@ -3043,7 +3081,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.changePassword.sameAsOldPassword",
     tValue: "新密码不能与当前密码相同",
@@ -3051,7 +3089,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.changePassword.sameAsOldPassword",
     tValue: "New password cannot be the same as current password",
@@ -3059,7 +3097,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.changePassword.passwordMismatch",
     tValue: "新密码与确认密码不匹配",
@@ -3067,7 +3105,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.changePassword.passwordMismatch",
     tValue: "New password and confirm password do not match",
@@ -3075,7 +3113,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "zh-CN",
     tKey: "me.changePassword.success",
     tValue: "密码修改成功",
@@ -3083,7 +3121,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.me",
+    business: "system.auth",
     langCode: "en-US",
     tKey: "me.changePassword.success",
     tValue: "Password changed successfully",
@@ -3091,7 +3129,23 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.auth",
+    langCode: "zh-CN",
+    tKey: "auth.title",
+    tValue: "鉴权管理",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.auth",
+    langCode: "en-US",
+    tKey: "auth.title",
+    tValue: "Authorization Management",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.user",
     langCode: "zh-CN",
     tKey: "user.title",
     tValue: "用户管理",
@@ -3099,7 +3153,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.user",
     langCode: "en-US",
     tKey: "user.title",
     tValue: "User Management",
@@ -3107,7 +3161,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.user",
     langCode: "zh-CN",
     tKey: "user.table.password",
     tValue: "密码",
@@ -3115,7 +3169,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.user",
     langCode: "en-US",
     tKey: "user.table.password",
     tValue: "Password",
@@ -3123,7 +3177,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.title",
     tValue: "部门管理",
@@ -3131,7 +3185,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.title",
     tValue: "Department Management",
@@ -3139,7 +3193,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.table.name",
     tValue: "名称",
@@ -3147,7 +3201,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.table.name",
     tValue: "Name",
@@ -3155,7 +3209,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "zh-CN",
     tKey: "role.table.roleName",
     tValue: "角色名称",
@@ -3163,7 +3217,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "en-US",
     tKey: "role.table.roleName",
     tValue: "Role Name",
@@ -3171,7 +3225,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "zh-CN",
     tKey: "role.table.permissions",
     tValue: "权限列表",
@@ -3179,7 +3233,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "en-US",
     tKey: "role.table.permissions",
     tValue: "Permissions",
@@ -3187,7 +3241,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "zh-CN",
     tKey: "role.table.permissionsHelper",
     tValue: "权限列表为JSON数组格式",
@@ -3195,7 +3249,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "en-US",
     tKey: "role.table.permissionsHelper",
     tValue: "Permissions list in JSON array format",
@@ -3203,7 +3257,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.dialog.addSubMenu",
     tValue: "添加子菜单",
@@ -3211,7 +3265,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.dialog.addSubMenu",
     tValue: "Add Sub-menu",
@@ -3219,7 +3273,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.menuName",
     tValue: "菜单名称",
@@ -3227,7 +3281,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.menuName",
     tValue: "Menu Name",
@@ -3235,7 +3289,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.customIcon",
     tValue: "自定义图标 (Iconify格式)",
@@ -3243,7 +3297,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.customIcon",
     tValue: "Custom Icon (Iconify Format)",
@@ -3251,7 +3305,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.iconHelper",
     tValue: "例如: material-symbols:home",
@@ -3259,7 +3313,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.iconHelper",
     tValue: "e.g., material-symbols:home",
@@ -3267,7 +3321,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.routePath",
     tValue: "路由路径",
@@ -3275,7 +3329,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.routePath",
     tValue: "Route Path",
@@ -3283,7 +3337,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.pathHelper",
     tValue: "例如: /system/menu",
@@ -3291,7 +3345,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.pathHelper",
     tValue: "e.g., /system/menu",
@@ -3299,7 +3353,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.parentMenu",
     tValue: "父菜单",
@@ -3307,7 +3361,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.parentMenu",
     tValue: "Parent Menu",
@@ -3315,7 +3369,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.topLevelMenu",
     tValue: "无 (顶级菜单)",
@@ -3323,7 +3377,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.topLevelMenu",
     tValue: "None (Top Level)",
@@ -3331,7 +3385,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.sort",
     tValue: "排序",
@@ -3339,7 +3393,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.sort",
     tValue: "Sort",
@@ -3347,7 +3401,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.sortHelper",
     tValue: "数字越小越靠前",
@@ -3355,7 +3409,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.sortHelper",
     tValue: "Smaller numbers come first",
@@ -3363,7 +3417,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.table.menuNameRequired",
     tValue: "菜单名称不能为空",
@@ -3371,7 +3425,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.table.menuNameRequired",
     tValue: "Menu name is required",
@@ -3379,7 +3433,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.table.name",
     tValue: "名称",
@@ -3387,7 +3441,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.table.name",
     tValue: "Name",
@@ -3395,7 +3449,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.table.parentDepartment",
     tValue: "上级部门",
@@ -3403,7 +3457,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.table.parentDepartment",
     tValue: "Parent Department",
@@ -3411,7 +3465,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.table.topLevelDepartment",
     tValue: "无（顶级部门）",
@@ -3419,7 +3473,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.table.topLevelDepartment",
     tValue: "None (Top Level)",
@@ -3427,7 +3481,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.title",
     tValue: "部门管理",
@@ -3435,7 +3489,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.title",
     tValue: "Department Management",
@@ -3443,7 +3497,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "zh-CN",
     tKey: "department.dialog.addChild",
     tValue: "添加子部门",
@@ -3451,7 +3505,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.department",
     langCode: "en-US",
     tKey: "department.dialog.addChild",
     tValue: "Add Sub-Department",
@@ -3459,7 +3513,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "zh-CN",
     tKey: "menu.title",
     tValue: "菜单管理",
@@ -3467,7 +3521,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.menu",
     langCode: "en-US",
     tKey: "menu.title",
     tValue: "Menu Management",
@@ -3475,7 +3529,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "zh-CN",
     tKey: "role.title",
     tValue: "角色管理",
@@ -3483,7 +3537,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.role",
     langCode: "en-US",
     tKey: "role.title",
     tValue: "Role Management",
@@ -3491,7 +3545,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "zh-CN",
     tKey: "permission.title",
     tValue: "权限管理",
@@ -3499,7 +3553,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "en-US",
     tKey: "permission.title",
     tValue: "Permission Management",
@@ -3507,7 +3561,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "zh-CN",
     tKey: "permission.code",
     tValue: "权限代码",
@@ -3515,7 +3569,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "en-US",
     tKey: "permission.code",
     tValue: "Permission Code",
@@ -3523,7 +3577,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "zh-CN",
     tKey: "permission.name",
     tValue: "权限名称",
@@ -3531,7 +3585,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "en-US",
     tKey: "permission.name",
     tValue: "Permission Name",
@@ -3539,7 +3593,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "zh-CN",
     tKey: "permission.category",
     tValue: "权限类别",
@@ -3547,7 +3601,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "en-US",
     tKey: "permission.category",
     tValue: "Permission Category",
@@ -3555,7 +3609,55 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
+    langCode: "zh-CN",
+    tKey: "permission.category.menu",
+    tValue: "菜单",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
+    langCode: "en-US",
+    tKey: "permission.category.menu",
+    tValue: "Menu",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
+    langCode: "zh-CN",
+    tKey: "permission.category.button",
+    tValue: "按钮",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
+    langCode: "en-US",
+    tKey: "permission.category.button",
+    tValue: "Button",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
+    langCode: "zh-CN",
+    tKey: "permission.category.api",
+    tValue: "接口",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
+    langCode: "en-US",
+    tKey: "permission.category.api",
+    tValue: "API",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
     langCode: "zh-CN",
     tKey: "permission.resource",
     tValue: "资源路径",
@@ -3563,7 +3665,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "en-US",
     tKey: "permission.resource",
     tValue: "Resource Path",
@@ -3571,56 +3673,23 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "zh-CN",
-    tKey: "permission.effect",
-    tValue: "效果",
+    tKey: "permission.business",
+    tValue: "业务",
     isEnabled: true,
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.permission",
     langCode: "en-US",
-    tKey: "permission.effect",
-    tValue: "Effect",
+    tKey: "permission.business",
+    tValue: "Business",
     isEnabled: true,
   },
   {
     application: "frontend",
-    business: "page.system",
-    langCode: "zh-CN",
-    tKey: "permission.scope",
-    tValue: "资源范围",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "page.system",
-    langCode: "en-US",
-    tKey: "permission.scope",
-    tValue: "Resource Scope",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "page.system",
-    langCode: "zh-CN",
-    tKey: "permission.parent",
-    tValue: "上级权限",
-    isEnabled: true,
-  },
-  {
-    application: "frontend",
-    business: "page.system",
-    langCode: "en-US",
-    tKey: "permission.parent",
-    tValue: "Parent Permission",
-    isEnabled: true,
-  },
-  // Role-Permission Management Page Translations
-  {
-    application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.title",
     tValue: "角色权限管理",
@@ -3628,7 +3697,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.title",
     tValue: "Role Permission Management",
@@ -3636,7 +3705,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.batchAdd",
     tValue: "批量添加权限",
@@ -3644,7 +3713,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.batchAdd",
     tValue: "Batch Add Permissions",
@@ -3652,7 +3721,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.selectRole",
     tValue: "选择角色",
@@ -3660,7 +3729,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.selectRole",
     tValue: "Select Role",
@@ -3668,7 +3737,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.selectPermissions",
     tValue: "选择权限",
@@ -3676,7 +3745,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.selectPermissions",
     tValue: "Select Permissions",
@@ -3684,7 +3753,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.availablePermissions",
     tValue: "可用权限",
@@ -3692,7 +3761,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.availablePermissions",
     tValue: "Available Permissions",
@@ -3700,7 +3769,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.noAvailablePermissions",
     tValue: "暂无可用权限",
@@ -3708,7 +3777,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.noAvailablePermissions",
     tValue: "No Available Permissions",
@@ -3716,7 +3785,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.currentPermissions",
     tValue: "当前权限",
@@ -3724,7 +3793,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.currentPermissions",
     tValue: "Current Permissions",
@@ -3732,7 +3801,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.assignedPermission",
     tValue: "已分配权限",
@@ -3740,7 +3809,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.assignedPermission",
     tValue: "Assigned Permission",
@@ -3748,7 +3817,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.noPermissions",
     tValue: "暂无权限",
@@ -3756,7 +3825,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.noPermissions",
     tValue: "No Permissions",
@@ -3764,7 +3833,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.advancedSettings",
     tValue: "高级设置",
@@ -3772,7 +3841,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.advancedSettings",
     tValue: "Advanced Settings",
@@ -3780,7 +3849,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.resourceFilter",
     tValue: "资源过滤器",
@@ -3788,7 +3857,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.resourceFilter",
     tValue: "Resource Filter",
@@ -3796,7 +3865,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.resourceFilterHelp",
     tValue: 'JSON格式的资源过滤条件，例如：{"userId": "${currentUser.id}"}',
@@ -3804,7 +3873,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.resourceFilterHelp",
     tValue:
@@ -3813,7 +3882,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.conditions",
     tValue: "附加条件",
@@ -3821,7 +3890,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.conditions",
     tValue: "Additional Conditions",
@@ -3829,7 +3898,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.conditionsHelp",
     tValue: 'JSON格式的附加条件，例如：{"ipRange": ["192.168.1.0/24"]}',
@@ -3837,7 +3906,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.conditionsHelp",
     tValue:
@@ -3846,7 +3915,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.keyword",
     tValue: "关键词",
@@ -3854,7 +3923,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.keyword",
     tValue: "Keyword",
@@ -3862,7 +3931,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.keywordPlaceholder",
     tValue: "搜索角色或权限名称",
@@ -3870,7 +3939,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.keywordPlaceholder",
     tValue: "Search role or permission name",
@@ -3878,7 +3947,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.filterByRole",
     tValue: "按角色筛选",
@@ -3886,7 +3955,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.filterByRole",
     tValue: "Filter by Role",
@@ -3894,7 +3963,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.filterByPermission",
     tValue: "按权限筛选",
@@ -3902,7 +3971,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.filterByPermission",
     tValue: "Filter by Permission",
@@ -3910,7 +3979,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.batchDelete",
     tValue: "批量删除",
@@ -3918,7 +3987,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.batchDelete",
     tValue: "Batch Delete",
@@ -3926,7 +3995,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.confirmBatchDelete",
     tValue: "确定要删除选中的 {count} 个角色权限关联吗？",
@@ -3934,7 +4003,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.confirmBatchDelete",
     tValue:
@@ -3943,7 +4012,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.selectedItems",
     tValue: "选中项目",
@@ -3951,7 +4020,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.selectedItems",
     tValue: "Selected Items",
@@ -3959,7 +4028,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.andMore",
     tValue: "等 {count} 个",
@@ -3967,7 +4036,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.andMore",
     tValue: "and {count} more",
@@ -3975,7 +4044,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.hasFilter",
     tValue: "有过滤条件",
@@ -3983,7 +4052,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.hasFilter",
     tValue: "Has Filter",
@@ -3991,7 +4060,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "zh-CN",
     tKey: "rolePermission.hasConditions",
     tValue: "有附加条件",
@@ -3999,27 +4068,298 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "page.system",
+    business: "system.rolePermission",
     langCode: "en-US",
     tKey: "rolePermission.hasConditions",
     tValue: "Has Conditions",
     isEnabled: true,
   },
-  // Sidebar Menu Translations
   {
     application: "frontend",
-    business: "menu",
+    business: "infra.businessType",
     langCode: "zh-CN",
-    tKey: "sidebar.menu.system.rolePermission",
-    tValue: "角色权限",
+    tKey: "businessType.i18n",
+    tValue: "国际化",
     isEnabled: true,
   },
   {
     application: "frontend",
-    business: "menu",
+    business: "infra.businessType",
     langCode: "en-US",
-    tKey: "sidebar.menu.system.rolePermission",
-    tValue: "Role Permission",
+    tKey: "businessType.i18n",
+    tValue: "Internationalization",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.i18n.language",
+    tValue: "国际化语言",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.i18n.language",
+    tValue: "Internationalization Language",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.i18n.region",
+    tValue: "国际化地区",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.i18n.region",
+    tValue: "Internationalization Region",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.i18n.translation",
+    tValue: "国际化翻译",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.i18n.translation",
+    tValue: "Internationalization Translation",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.mail",
+    tValue: "邮件",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.mail",
+    tValue: "Mail",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.mail.account",
+    tValue: "邮件账户",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.mail.account",
+    tValue: "Mail Account",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.mail.template",
+    tValue: "邮件模板",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.mail.template",
+    tValue: "Mail Template",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.mail.action",
+    tValue: "邮件操作",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.mail.action",
+    tValue: "Mail Action",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.mail.log",
+    tValue: "邮件日志",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.mail.log",
+    tValue: "Mail Log",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system",
+    tValue: "系统",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system",
+    tValue: "System",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.auth",
+    tValue: "系统鉴权",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.auth",
+    tValue: "System Auth",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.compliance",
+    tValue: "系统合规",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.compliance",
+    tValue: "System Compliance",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.department",
+    tValue: "系统部门",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.department",
+    tValue: "System Department",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.menu",
+    tValue: "系统菜单",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.menu",
+    tValue: "System Menu",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.permission",
+    tValue: "系统权限",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.permission",
+    tValue: "System Permission",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.role",
+    tValue: "系统角色",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.role",
+    tValue: "System Role",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.role_permission",
+    tValue: "系统角色权限",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.role_permission",
+    tValue: "System Role Permission",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "zh-CN",
+    tKey: "businessType.system.user",
+    tValue: "系统用户",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    langCode: "en-US",
+    tKey: "businessType.system.user",
+    tValue: "System User",
     isEnabled: true,
   },
 ];

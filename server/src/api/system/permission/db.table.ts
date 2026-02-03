@@ -45,20 +45,10 @@ const PermissionBasePO = {
     examples: ["/api/users/:id", "/dashboard/users"],
     maxLength: 500,
   },
-  effect: {
-    type: "string",
-    enum: ["allow", "deny"],
-    description: "效果：allow-允许，deny-拒绝",
-  },
-  scope: {
-    type: "string",
-    enum: ["all", "own", "dept", "custom"],
-    description: "资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义",
-  },
-  parentId: {
-    type: ["number", "null"],
+  business: {
+    type: ["string", "null"],
     nullable: true,
-    description: "父权限ID，用于菜单层级",
+    description: "业务标识",
   },
   remark: {
     type: ["string", "null"],
@@ -123,9 +113,7 @@ export const PermissionAddKeys = [
   "name",
   "category",
   "resource",
-  "effect",
-  "scope",
-  "parentId",
+  "business",
   "remark",
   "isEnabled",
 ] as const satisfies RequiredKeys<PermissionAddVOLike>[];
@@ -153,7 +141,6 @@ export const PermissionSortableKeys = [
   "code",
   "name",
   "category",
-  "effect",
   "isEnabled",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<PermissionPOLike>[];
@@ -163,10 +150,8 @@ export const permissionTable = sqliteTable("system_permission", {
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
   category: text("category").notNull(), // menu, button, api
-  effect: text("effect").notNull(), // allow, deny
-  scope: text("scope").notNull(), // all, own, dept, custom
   resource: text("resource"),
-  parentId: integer("parent_id"),
+  business: text("business"),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
@@ -184,10 +169,8 @@ export async function tableInit() {
       code TEXT NOT NULL UNIQUE,
       name TEXT NOT NULL,
       category TEXT NOT NULL,
-      effect TEXT NOT NULL,
-      scope TEXT NOT NULL,
       resource TEXT,
-      parent_id INTEGER,
+      business TEXT,
       remark TEXT,
       is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,

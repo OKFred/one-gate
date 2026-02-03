@@ -1,5 +1,8 @@
 import { useRef, useMemo } from 'react';
+import { useTheme } from '@mui/material';
 import JoditEditor from 'jodit-react';
+import { useTranslation } from '@/hooks/useTranslation';
+import { authUtils } from '@/utils/auth';
 
 interface JoditEditorComponentProps {
   value: string;
@@ -12,18 +15,26 @@ interface JoditEditorComponentProps {
 export default function JoditEditorComponent({
   value,
   onChange,
-  placeholder = '请输入内容...',
+  placeholder,
   height = 400,
   readonly = false,
 }: JoditEditorComponentProps) {
   const editor = useRef(null);
+  const theme = useTheme();
+  const t = useTranslation();
+  const userInfo = authUtils.getUserInfo();
+  const isDarkMode = theme.palette.mode === 'dark';
 
+  const finalPlaceholder = useMemo(() => {
+    return placeholder || t('form.pleaseEnter');
+  }, [placeholder, t]);
   const config = useMemo(
     () => ({
+      theme: isDarkMode ? 'dark' : 'light',
       readonly,
-      placeholder,
+      placeholder: finalPlaceholder,
       height,
-      language: 'zh_cn',
+      language: userInfo?.langCode?.replace('-', '_')?.toLowerCase() || 'en_us',
       toolbarAdaptive: false,
       toolbarSticky: false,
       showCharsCounter: false,
@@ -73,7 +84,7 @@ export default function JoditEditorComponent({
         font: '14px Arial, sans-serif',
       },
     }),
-    [readonly, placeholder, height],
+    [isDarkMode, readonly, finalPlaceholder, height, userInfo?.langCode],
   );
 
   return (

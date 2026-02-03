@@ -61,7 +61,7 @@ const TheProfile = memo(
                 startIcon={<EditIcon />}
                 onClick={handleEdit}
                 fullWidth
-                permissionCodes={[AUTH.PROFILE.CHANGE_PASSWORD]}
+                permissionCodes={[AUTH.PROFILE.UPDATE_PASSWORD]}
               >
                 {t('me.changePassword.title')}
               </ResponsiveButton>

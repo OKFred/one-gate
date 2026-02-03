@@ -1,3 +1,8 @@
+import db from "@/db/index";
+import { regionTable } from "@/api/i18n/region/db.table";
+import { count } from "drizzle-orm";
+import { SUPER_ADMIN_ID } from "./init";
+
 export const initialRegionData = [
   {
     label_zhCN: "安道尔",
@@ -1992,3 +1997,42 @@ export const initialRegionData = [
     ISO3166Independent: true,
   },
 ];
+
+/**
+ * 初始化国家地区数据
+ */
+export async function initCountryRegion() {
+  try {
+    const countResult = await db
+      .select({ total: count(regionTable.id).as("total") })
+      .from(regionTable);
+    if (countResult[0]?.total > 0) {
+      console.log("ℹ️  国家地区数据已存在，跳过初始化");
+      return;
+    }
+
+    const mappedData = initialRegionData.map((item) => ({
+      labels: {
+        "zh-CN": item.label_zhCN,
+        "en-US": item.label_enUS,
+      },
+      alpha2Code: item.alpha2Code,
+      alpha3Code: item.alpha3Code,
+      numeric: item.numeric,
+      iso3166Independent: item.ISO3166Independent,
+      businessLanguages: null,
+      isEnabled: true,
+      creatorId: SUPER_ADMIN_ID,
+    }));
+
+    const chunkSize = 100;
+    for (let i = 0; i < mappedData.length; i += chunkSize) {
+      const chunk = mappedData.slice(i, i + chunkSize);
+      await db.insert(regionTable).values(chunk);
+    }
+    console.log(`💾 表 i18n_region 初始数据已插入 (${mappedData.length} 条)`);
+  } catch (error) {
+    console.error("❌ 国家地区数据初始化失败:", error);
+    throw error;
+  }
+}

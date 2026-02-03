@@ -69,7 +69,7 @@ const TheDetails = memo(
                 variant="contained"
                 startIcon={<EditIcon />}
                 onClick={handleEdit}
-                permissionCodes={[AUTH.PROFILE.EDIT]}
+                permissionCodes={[AUTH.PROFILE.UPDATE_PROFILE]}
               >
                 {t('dialog.edit')}
               </ResponsiveButton>

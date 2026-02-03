@@ -43,6 +43,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import translationService from "@/api/i18n/translation/service";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -51,11 +52,9 @@ const buildWhereCondition = ({
   code,
   name,
   category,
-  scope,
-  effect,
 }: Pick<
   FromSchema<typeof listReq>,
-  "keyword" | "isEnabled" | "code" | "name" | "category" | "scope" | "effect"
+  "keyword" | "isEnabled" | "code" | "name" | "category"
 >) => {
   const conditions = [];
   if (hasValue(keyword)) {
@@ -78,12 +77,6 @@ const buildWhereCondition = ({
   if (category !== undefined) {
     conditions.push(eq(permissionTable.category, category));
   }
-  if (scope !== undefined) {
-    conditions.push(eq(permissionTable.scope, scope));
-  }
-  if (effect !== undefined) {
-    conditions.push(eq(permissionTable.effect, effect));
-  }
   return conditions.length > 0
     ? conditions.length === 1
       ? conditions[0]
@@ -98,8 +91,6 @@ const listAllReq = {
     code: PermissionVO["code"],
     name: PermissionVO["name"],
     category: PermissionVO["category"],
-    scope: PermissionVO["scope"],
-    effect: PermissionVO["effect"],
     isEnabled: PermissionVO["isEnabled"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
@@ -133,9 +124,7 @@ async function onListAll(
       name: permissionTable.name,
       category: permissionTable.category,
       resource: permissionTable.resource,
-      effect: permissionTable.effect,
-      scope: permissionTable.scope,
-      parentId: permissionTable.parentId,
+      business: permissionTable.business,
       remark: permissionTable.remark,
       isEnabled: permissionTable.isEnabled,
     })
@@ -164,8 +153,6 @@ const listReq = {
     code: PermissionVO["code"],
     name: PermissionVO["name"],
     category: PermissionVO["category"],
-    scope: PermissionVO["scope"],
-    effect: PermissionVO["effect"],
     isEnabled: PermissionVO["isEnabled"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
@@ -411,28 +398,44 @@ const getApi = {
 
 // 工具函数：创建菜单权限
 async function createMenuPermission(
-  menuId: number,
-  menuName: string,
-  creatorId: number
+  params: {
+    menuId: number;
+    menuName: string;
+    business: string | null;
+  },
+  userObj: UserObj
 ) {
+  const { menuId, menuName, business } = params;
+  const permissionName = await translationService.listAll
+    .service({
+      isEnabled: true,
+    })
+    .then((translationList) => {
+      const tKeySubString = business || "";
+      const prefix =
+        translationList.find(
+          (item) =>
+            item.tKey === "businessType." + tKeySubString &&
+            item.langCode === userObj.langCode
+        )?.tValue || "未知菜单权限";
+      const postfix = translationList.find(
+        (item) =>
+          item.tKey === "permission.category.menu" &&
+          item.langCode === userObj.langCode
+      )?.tValue;
+      return postfix ? `${prefix}${postfix}` : menuName + "未知菜单";
+    });
   const permissionData = {
-    code: `menu:${menuId}`,
-    name: `菜单权限-${menuName}`,
+    code: `${menuName}:menu`,
+    name: permissionName,
     category: "menu" as const,
-    resource: menuId.toString(),
-    effect: "allow" as const,
-    scope: "all" as const,
-    parentId: null,
-    remark: `菜单 ${menuName} 的访问权限`,
+    resource: `${menuId}`,
+    business,
+    remark: null,
     isEnabled: true,
-    creatorId,
   };
-
-  const result = await db
-    .insert(permissionTable)
-    .values(permissionData)
-    .returning({ id: permissionTable.id });
-  return result[0].id;
+  const result = await onAdd(permissionData, userObj);
+  return result;
 }
 
 // 工具函数：根据菜单ID获取权限ID
@@ -443,19 +446,13 @@ async function getPermissionIdByMenuId(menuId: number) {
     .where(
       and(
         eq(permissionTable.category, "menu"),
-        eq(permissionTable.code, `menu:${menuId}`)
+        eq(permissionTable.resource, `${menuId}`)
       )
     )
     .limit(1);
 
   return rows.length > 0 ? rows[0].id : null;
 }
-
-/** 权限效果枚举 */
-const Effect = {
-  ALLOW: "allow",
-  DENY: "deny",
-} as const;
 
 /**
  * 过滤生效的权限（处理 allow/deny）
@@ -477,15 +474,7 @@ function filterEffectivePermissions(
   // 处理每个权限组
   const result: PermissionInfo[] = [];
   for (const [_, perms] of permissionMap) {
-    // 如果有任何 deny，则该权限被拒绝
-    const hasDeny = perms.some((p) => p.effect === Effect.DENY);
-    if (!hasDeny) {
-      // 只取第一个 allow 权限
-      const allowPerm = perms.find((p) => p.effect === Effect.ALLOW);
-      if (allowPerm) {
-        result.push(allowPerm);
-      }
-    }
+    result.push(perms[0]);
   }
 
   return result;

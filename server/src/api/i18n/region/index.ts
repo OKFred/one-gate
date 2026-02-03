@@ -1,9 +1,10 @@
 import encapsulation from "@/middleware/encapsulation";
 import { tableInit } from "./db.table";
 import service from "./service";
+import { BusinessKey } from "@/types/business";
 
 function createApp() {
-  return encapsulation(service, "I18nRegion", () => {
+  return encapsulation(service, "i18n.region" satisfies BusinessKey, () => {
     tableInit();
   });
 }
