@@ -293,7 +293,7 @@ const TheForm = memo(
                                           size="small"
                                         />
                                       }
-                                      label={`${permission.category === 'menu' ? t(permission.name!) : permission.name} (${permission.code})`}
+                                      label={`${permission.category !== 'button' ? t(permission.name!) : permission.name} (${permission.code})`}
                                       sx={{ width: '100%' }}
                                     />
                                   </ListItem>

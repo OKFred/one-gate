@@ -253,9 +253,6 @@ export async function initDatabase() {
     // 初始化超级管理员账号
     await initSuperAdminUser(roleId);
 
-    // 初始化权限数据
-    await initPermissions();
-
     // 初始化语言
     await initLanguage();
 
@@ -264,6 +261,9 @@ export async function initDatabase() {
 
     // 加载多语言缓存
     await loadTranslationCache();
+
+    // 初始化权限数据
+    await initPermissions();
 
     // 初始化国家地区
     await initCountryRegion();
