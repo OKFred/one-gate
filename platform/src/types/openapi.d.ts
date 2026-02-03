@@ -5779,6 +5779,7 @@ export interface components {
                 /**
                  * @description 翻译键
                  * @example welcome.message
+                 * @example businessType.i18n
                  */
                 tKey?: string;
                 /**
@@ -5861,6 +5862,7 @@ export interface components {
                     /**
                      * @description 翻译键
                      * @example welcome.message
+                     * @example businessType.i18n
                      */
                     tKey: string;
                     /**
@@ -5925,6 +5927,7 @@ export interface components {
             /**
              * @description 翻译键
              * @example welcome.message
+             * @example businessType.i18n
              */
             tKey: string;
             /**
@@ -5986,6 +5989,7 @@ export interface components {
             /**
              * @description 翻译键
              * @example welcome.message
+             * @example businessType.i18n
              */
             tKey?: string;
             /**
@@ -6072,6 +6076,7 @@ export interface components {
                 /**
                  * @description 翻译键
                  * @example welcome.message
+                 * @example businessType.i18n
                  */
                 tKey: string;
                 /**
@@ -6181,6 +6186,7 @@ export interface components {
                     /**
                      * @description 翻译键
                      * @example welcome.message
+                     * @example businessType.i18n
                      */
                     tKey?: string;
                     /**

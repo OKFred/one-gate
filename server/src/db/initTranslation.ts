@@ -1,3 +1,41 @@
+import translationService, {
+  utils as translationUtils,
+} from "@/api/i18n/translation/service";
+import { SUPER_ADMIN_ID } from "./init";
+
+/**
+ * 初始化多语言数据
+ */
+export async function initTranslation() {
+  const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
+  const promises = initialTranslationData.map(async (item) => {
+    // 计算 hash 值
+    const valueHash = await translationUtils.calculateSHA256(item.tValue);
+    const params = {
+      application: item.application,
+      business: item.business,
+      langCode: item.langCode,
+      tKey: item.tKey,
+      tValue: item.tValue,
+      valueHash,
+      remark: null,
+      isEnabled: item.isEnabled,
+    };
+    return translationService.add.service(params, userObj, {
+      skipCacheReload: true,
+    });
+  });
+
+  const addResults = await Promise.allSettled(promises);
+  const successCount = addResults.filter(
+    (res) => res.status === "fulfilled"
+  ).length;
+  const totalCount = initialTranslationData.length;
+  console.log(
+    `🌐 多语言数据初始化完成: ${successCount}/${totalCount} 条记录已添加`
+  );
+}
+
 export const initialTranslationData = [
   {
     application: "frontend",

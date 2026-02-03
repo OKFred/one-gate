@@ -1,19 +1,10 @@
-import db from "@/db/index";
-import bcrypt from "bcrypt";
-import { count, eq } from "drizzle-orm";
-import { userTable } from "@/api/system/user/db.table";
-import { roleTable } from "@/api/system/role/db.table";
-import { initMenu } from "@/db/initMenu";
-import { initialTranslationData } from "./initTranslation";
-import { initialRegionData } from "./initRegion";
-import { initialLanguageData } from "./initLanguage";
-import { regionTable } from "@/api/i18n/region/db.table";
-import { languageTable } from "@/api/i18n/language/db.table";
-import translationService, {
-  utils as translationUtils,
-} from "@/api/i18n/translation/service";
+import { initMenu } from "./initMenu";
+import { initTranslation } from "./initTranslation";
+import { initCountryRegion } from "./initRegion";
+import { initLanguage } from "./initLanguage";
 import { loadTranslationCache } from "@/utils/i18n";
 import { initPermissions } from "./initPermissions";
+import { initSuperAdminRole, initSuperAdminUser } from "./initUserAndRole";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
@@ -28,191 +19,12 @@ export const SUPER_ADMIN = {
 };
 
 // 超级管理员角色配置
-const SUPER_ADMIN_ROLE = {
+export const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
   isEnabled: true,
   creatorId: SUPER_ADMIN_ID,
   remark: "系统初始化创建的超级管理员角色，拥有所有权限",
 };
-
-/**
- * 初始化超级管理员角色
- */
-async function initSuperAdminRole() {
-  try {
-    // 检查超级管理员角色是否已存在
-    const existingRole = await db
-      .select()
-      .from(roleTable)
-      .where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID))
-      .limit(1);
-
-    if (existingRole.length > 0) {
-      console.log("ℹ️  超级管理员角色已存在，跳过初始化");
-      return SUPER_ADMIN_ROLE_ID;
-    }
-
-    // 创建超级管理员角色
-    const result = await db
-      .insert(roleTable)
-      .values(SUPER_ADMIN_ROLE)
-      .returning({ id: roleTable.id });
-
-    console.log(`✅ 超级管理员角色初始化成功 (ID: ${result[0].id})`);
-    return result[0].id;
-  } catch (error) {
-    console.error("❌ 超级管理员角色初始化失败:", error);
-    throw error;
-  }
-}
-
-/**
- * 初始化超级管理员账号
- */
-async function initSuperAdminUser(roleId: number) {
-  try {
-    // 检查超级管理员账号是否已存在
-    const existingUser = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.username, SUPER_ADMIN.username))
-      .limit(1);
-
-    if (existingUser.length > 0) {
-      console.log("ℹ️  超级管理员账号已存在，跳过初始化");
-      return existingUser[0].id;
-    }
-
-    // 加密密码
-    const hashedPassword = await bcrypt.hash(SUPER_ADMIN.password, SALT_ROUNDS);
-
-    // 创建超级管理员账号
-    const result = await db
-      .insert(userTable)
-      .values({
-        username: SUPER_ADMIN.username,
-        password: hashedPassword,
-        langCode: SUPER_ADMIN.langCode,
-        roleIdArr: [roleId], // 关联超级管理员角色
-        isEnabled: true,
-        creatorId: SUPER_ADMIN_ID,
-        remark: "系统初始化创建的超级管理员账号",
-      })
-      .returning({ id: userTable.id });
-
-    console.log(
-      `✅ 超级管理员账号初始化成功 (用户名: ${SUPER_ADMIN.username})`
-    );
-    console.log(`⚠️ 默认密码: ${SUPER_ADMIN.password?.replace(/./g, "*")}`);
-    console.log(`⚠️  请在首次登录后立即修改密码！`);
-    return result[0].id;
-  } catch (error) {
-    console.error("超级管理员账号初始化失败:", error);
-    throw error;
-  }
-}
-
-/**
- * 初始化多语言数据
- */
-async function initTranslation() {
-  const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
-  const promises = initialTranslationData.map(async (item) => {
-    // 计算 hash 值
-    const valueHash = await translationUtils.calculateSHA256(item.tValue);
-    const params = {
-      application: item.application,
-      business: item.business,
-      langCode: item.langCode,
-      tKey: item.tKey,
-      tValue: item.tValue,
-      valueHash,
-      remark: null,
-      isEnabled: item.isEnabled,
-    };
-    return translationService.add.service(params, userObj, {
-      skipCacheReload: true,
-    });
-  });
-
-  const addResults = await Promise.allSettled(promises);
-  const successCount = addResults.filter(
-    (res) => res.status === "fulfilled"
-  ).length;
-  const totalCount = initialTranslationData.length;
-  console.log(
-    `🌐 多语言数据初始化完成: ${successCount}/${totalCount} 条记录已添加`
-  );
-}
-
-/**
- * 初始化语言数据
- */
-async function initLanguage() {
-  try {
-    const countResult = await db
-      .select({ total: count(languageTable.id).as("total") })
-      .from(languageTable);
-    if (countResult[0]?.total > 0) {
-      console.log("ℹ️  语言数据已存在，跳过初始化");
-      return;
-    }
-
-    const mappedData = initialLanguageData.map((item) => ({
-      langCode: item.langCode,
-      nativeName: item.nativeName,
-      isEnabled: item.isEnabled,
-      sortOrder: item.sortOrder,
-      remark: null,
-      creatorId: SUPER_ADMIN_ID,
-    }));
-
-    await db.insert(languageTable).values(mappedData);
-    console.log(`💾 表 i18n_language 初始数据已插入 (${mappedData.length} 条)`);
-  } catch (error) {
-    console.error("❌ 语言数据初始化失败:", error);
-    throw error;
-  }
-}
-
-/**
- * 初始化国家地区数据
- */
-async function initCountryRegion() {
-  try {
-    const countResult = await db
-      .select({ total: count(regionTable.id).as("total") })
-      .from(regionTable);
-    if (countResult[0]?.total > 0) {
-      console.log("ℹ️  国家地区数据已存在，跳过初始化");
-      return;
-    }
-
-    const mappedData = initialRegionData.map((item) => ({
-      labels: {
-        "zh-CN": item.label_zhCN,
-        "en-US": item.label_enUS,
-      },
-      alpha2Code: item.alpha2Code,
-      alpha3Code: item.alpha3Code,
-      numeric: item.numeric,
-      iso3166Independent: item.ISO3166Independent,
-      businessLanguages: null,
-      isEnabled: true,
-      creatorId: SUPER_ADMIN_ID,
-    }));
-
-    const chunkSize = 100;
-    for (let i = 0; i < mappedData.length; i += chunkSize) {
-      const chunk = mappedData.slice(i, i + chunkSize);
-      await db.insert(regionTable).values(chunk);
-    }
-    console.log(`💾 表 i18n_region 初始数据已插入 (${mappedData.length} 条)`);
-  } catch (error) {
-    console.error("❌ 国家地区数据初始化失败:", error);
-    throw error;
-  }
-}
 
 /**
  * 初始化数据库数据
