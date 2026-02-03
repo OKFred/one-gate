@@ -260,29 +260,48 @@ const TheForm = memo(
                   </Typography>
 
                   {isBatchMode ? (
-                    // 批量添加模式：显示可用权限列表
+                    // 批量添加模式：显示可用权限列表（按类别分组）
                     <Paper variant="outlined" sx={{ p: 2, maxHeight: 300, overflow: 'auto' }}>
-                      <Typography variant="subtitle2" gutterBottom>
-                        {t('rolePermission.availablePermissions')}
-                      </Typography>
                       {availablePermissions.length > 0 ? (
-                        <List dense>
-                          {availablePermissions.map((permission) => (
-                            <ListItem key={permission.id} disablePadding>
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    checked={selectedPermissionIds.includes(permission.id)}
-                                    onChange={() => handlePermissionToggle(permission.id)}
-                                    size="small"
-                                  />
-                                }
-                                label={`${permission.name} (${permission.code})`}
-                                sx={{ width: '100%' }}
+                        (() => {
+                          const groupedPermissions = availablePermissions.reduce(
+                            (acc, permission) => {
+                              const category =
+                                permission.category || t('rolePermission.otherCategory');
+                              if (!acc[category]) acc[category] = [];
+                              acc[category].push(permission);
+                              return acc;
+                            },
+                            {} as Record<string, typeof availablePermissions>,
+                          );
+
+                          return Object.entries(groupedPermissions).map(([category, perms]) => (
+                            <Box key={category} sx={{ mb: 2 }}>
+                              <Chip
+                                label={category}
+                                sx={{ mb: 1, fontWeight: 'bold' }}
+                                color="secondary"
                               />
-                            </ListItem>
-                          ))}
-                        </List>
+                              <List dense>
+                                {perms.map((permission) => (
+                                  <ListItem key={permission.id} disablePadding>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          checked={selectedPermissionIds.includes(permission.id)}
+                                          onChange={() => handlePermissionToggle(permission.id)}
+                                          size="small"
+                                        />
+                                      }
+                                      label={`${permission.category === 'menu' ? t(permission.name!) : permission.name} (${permission.code})`}
+                                      sx={{ width: '100%' }}
+                                    />
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </Box>
+                          ));
+                        })()
                       ) : (
                         <Typography variant="body2" color="text.secondary">
                           {t('rolePermission.noAvailablePermissions')}
@@ -298,13 +317,17 @@ const TheForm = memo(
                       {currentRolePermissions.length > 0 ? (
                         (() => {
                           // 按category分组权限
-                          const groupedPermissions = currentRolePermissions.reduce((acc, rp) => {
-                            const permission = allPermissions.find((p) => p.id === rp.id);
-                            const category = permission?.category || t('rolePermission.otherCategory');
-                            if (!acc[category]) acc[category] = [];
-                            acc[category].push(rp);
-                            return acc;
-                          }, {} as Record<string, typeof currentRolePermissions>);
+                          const groupedPermissions = currentRolePermissions.reduce(
+                            (acc, rp) => {
+                              const permission = allPermissions.find((p) => p.id === rp.id);
+                              const category =
+                                permission?.category || t('rolePermission.otherCategory');
+                              if (!acc[category]) acc[category] = [];
+                              acc[category].push(rp);
+                              return acc;
+                            },
+                            {} as Record<string, typeof currentRolePermissions>,
+                          );
 
                           return Object.entries(groupedPermissions).map(([category, perms]) => (
                             <Box key={category} sx={{ mb: 2 }}>
@@ -318,7 +341,9 @@ const TheForm = memo(
                                     <Chip
                                       key={rp.id}
                                       label={
-                                        permission ? `${permission.name} (${permission.code})` : 'Unknown'
+                                        permission
+                                          ? `${permission.name} (${permission.code})`
+                                          : 'Unknown'
                                       }
                                       size="small"
                                     />

@@ -190,7 +190,7 @@ const TheFilter = memo(
                   <Select
                     value={filters.category ?? ''}
                     label={t('permission.category')}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
+                    onChange={(e) => handleFilterChange('category', e.target.value || undefined)}
                   >
                     <MenuItem value="">
                       <em>{t('filter.all')}</em>
