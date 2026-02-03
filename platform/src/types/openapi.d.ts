@@ -7452,16 +7452,6 @@ export interface components {
                      * @example /dashboard/users
                      */
                     resource: ((string | null) | null) | null;
-                    /**
-                     * @description 效果：allow-允许，deny-拒绝
-                     * @enum {string}
-                     */
-                    effect: "allow" | "deny";
-                    /**
-                     * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-                     * @enum {string}
-                     */
-                    scope: "all" | "own" | "dept" | "custom";
                     /** @description 父权限ID，用于菜单层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 备注说明 */
@@ -8155,20 +8145,10 @@ export interface components {
              * @enum {string}
              */
             category?: "menu" | "button" | "api";
-            /**
-             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-             * @enum {string}
-             */
-            scope?: "all" | "own" | "dept" | "custom";
-            /**
-             * @description 效果：allow-允许，deny-拒绝
-             * @enum {string}
-             */
-            effect?: "allow" | "deny";
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "code" | "name" | "category" | "isEnabled" | "createTimeUtc";
         };
         SystemPermissionListAllRes: {
             ok: boolean;
@@ -8195,16 +8175,6 @@ export interface components {
                  * @example /dashboard/users
                  */
                 resource?: ((string | null) | null) | null;
-                /**
-                 * @description 效果：allow-允许，deny-拒绝
-                 * @enum {string}
-                 */
-                effect?: "allow" | "deny";
-                /**
-                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-                 * @enum {string}
-                 */
-                scope?: "all" | "own" | "dept" | "custom";
                 /** @description 父权限ID，用于菜单层级 */
                 parentId?: ((number | null) | null) | null;
                 /** @description 备注说明 */
@@ -8255,20 +8225,10 @@ export interface components {
              * @enum {string}
              */
             category?: "menu" | "button" | "api";
-            /**
-             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-             * @enum {string}
-             */
-            scope?: "all" | "own" | "dept" | "custom";
-            /**
-             * @description 效果：allow-允许，deny-拒绝
-             * @enum {string}
-             */
-            effect?: "allow" | "deny";
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "code" | "name" | "category" | "effect" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "code" | "name" | "category" | "isEnabled" | "createTimeUtc";
         };
         SystemPermissionListRes: {
             ok: boolean;
@@ -8310,16 +8270,6 @@ export interface components {
                      * @example /dashboard/users
                      */
                     resource: ((string | null) | null) | null;
-                    /**
-                     * @description 效果：allow-允许，deny-拒绝
-                     * @enum {string}
-                     */
-                    effect: "allow" | "deny";
-                    /**
-                     * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-                     * @enum {string}
-                     */
-                    scope: "all" | "own" | "dept" | "custom";
                     /** @description 父权限ID，用于菜单层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 备注说明 */
@@ -8368,16 +8318,6 @@ export interface components {
              * @example /dashboard/users
              */
             resource: ((string | null) | null) | null;
-            /**
-             * @description 效果：allow-允许，deny-拒绝
-             * @enum {string}
-             */
-            effect: "allow" | "deny";
-            /**
-             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-             * @enum {string}
-             */
-            scope: "all" | "own" | "dept" | "custom";
             /** @description 父权限ID，用于菜单层级 */
             parentId: ((number | null) | null) | null;
             /** @description 备注说明 */
@@ -8423,16 +8363,6 @@ export interface components {
              * @example /dashboard/users
              */
             resource?: ((string | null) | null) | null;
-            /**
-             * @description 效果：allow-允许，deny-拒绝
-             * @enum {string}
-             */
-            effect?: "allow" | "deny";
-            /**
-             * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-             * @enum {string}
-             */
-            scope?: "all" | "own" | "dept" | "custom";
             /** @description 父权限ID，用于菜单层级 */
             parentId?: ((number | null) | null) | null;
             /** @description 备注说明 */
@@ -8503,16 +8433,6 @@ export interface components {
                  * @example /dashboard/users
                  */
                 resource: ((string | null) | null) | null;
-                /**
-                 * @description 效果：allow-允许，deny-拒绝
-                 * @enum {string}
-                 */
-                effect: "allow" | "deny";
-                /**
-                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-                 * @enum {string}
-                 */
-                scope: "all" | "own" | "dept" | "custom";
                 /** @description 父权限ID，用于菜单层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 备注说明 */
@@ -8997,16 +8917,6 @@ export interface components {
                  * @example /dashboard/users
                  */
                 resource: ((string | null) | null) | null;
-                /**
-                 * @description 效果：allow-允许，deny-拒绝
-                 * @enum {string}
-                 */
-                effect: "allow" | "deny";
-                /**
-                 * @description 资源范围：all-所有，own-仅自己，dept-本部门，custom-自定义
-                 * @enum {string}
-                 */
-                scope: "all" | "own" | "dept" | "custom";
                 /** @description 父权限ID，用于菜单层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 备注说明 */

@@ -45,8 +45,6 @@ const DEFAULT_FORM: AddPermissionReq | UpdatePermissionReq = {
   name: '',
   category: 'api',
   resource: '',
-  effect: 'allow',
-  scope: 'all',
   parentId: null,
   remark: null,
   isEnabled: true,
@@ -71,23 +69,7 @@ const TheForm = memo(
         { value: 'button', label: t('permission.category.button') },
         { value: 'api', label: t('permission.category.api') },
       ],
-      [],
-    );
-    const EFFECTS = useMemo(
-      () => [
-        { value: 'allow', label: t('permission.effect.allow') },
-        { value: 'deny', label: t('permission.effect.deny') },
-      ],
-      [],
-    );
-    const SCOPES = useMemo(
-      () => [
-        { value: 'all', label: 'All' },
-        { value: 'own', label: 'Own' },
-        { value: 'dept', label: 'Department' },
-        { value: 'custom', label: 'Custom' },
-      ],
-      [],
+      [t],
     );
 
     // 构建权限树结构
@@ -309,39 +291,9 @@ const TheForm = memo(
                 placeholder="/api/example"
               />
 
-              <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('permission.effect')}</InputLabel>
-                <Select
-                  value={form.effect || ''}
-                  onChange={(e) => setForm({ ...form, effect: e.target.value })}
-                  label={t('permission.effect')}
-                >
-                  {EFFECTS.map((effect) => (
-                    <MenuItem key={effect.value} value={effect.value}>
-                      {effect.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth required size={isMobile ? 'medium' : 'medium'}>
-                <InputLabel>{t('permission.scope')}</InputLabel>
-                <Select
-                  value={form.scope || ''}
-                  onChange={(e) => setForm({ ...form, scope: e.target.value })}
-                  label={t('permission.scope')}
-                >
-                  {SCOPES.map((scope) => (
-                    <MenuItem key={scope.value} value={scope.value}>
-                      {scope.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
               <Box>
                 <InputLabel sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
-                  {t('permission.parent')}
+                  {t('permission.business')}
                 </InputLabel>
                 <Paper
                   variant="outlined"

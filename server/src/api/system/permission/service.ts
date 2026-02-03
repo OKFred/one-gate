@@ -51,11 +51,9 @@ const buildWhereCondition = ({
   code,
   name,
   category,
-  scope,
-  effect,
 }: Pick<
   FromSchema<typeof listReq>,
-  "keyword" | "isEnabled" | "code" | "name" | "category" | "scope" | "effect"
+  "keyword" | "isEnabled" | "code" | "name" | "category"
 >) => {
   const conditions = [];
   if (hasValue(keyword)) {
@@ -78,12 +76,6 @@ const buildWhereCondition = ({
   if (category !== undefined) {
     conditions.push(eq(permissionTable.category, category));
   }
-  if (scope !== undefined) {
-    conditions.push(eq(permissionTable.scope, scope));
-  }
-  if (effect !== undefined) {
-    conditions.push(eq(permissionTable.effect, effect));
-  }
   return conditions.length > 0
     ? conditions.length === 1
       ? conditions[0]
@@ -98,8 +90,6 @@ const listAllReq = {
     code: PermissionVO["code"],
     name: PermissionVO["name"],
     category: PermissionVO["category"],
-    scope: PermissionVO["scope"],
-    effect: PermissionVO["effect"],
     isEnabled: PermissionVO["isEnabled"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
@@ -133,9 +123,7 @@ async function onListAll(
       name: permissionTable.name,
       category: permissionTable.category,
       resource: permissionTable.resource,
-      effect: permissionTable.effect,
-      scope: permissionTable.scope,
-      parentId: permissionTable.parentId,
+      business: permissionTable.business,
       remark: permissionTable.remark,
       isEnabled: permissionTable.isEnabled,
     })
@@ -164,8 +152,6 @@ const listReq = {
     code: PermissionVO["code"],
     name: PermissionVO["name"],
     category: PermissionVO["category"],
-    scope: PermissionVO["scope"],
-    effect: PermissionVO["effect"],
     isEnabled: PermissionVO["isEnabled"],
     orderBy: orderByWrapper<(keyof PermissionPOLike)[]>(PermissionSortableKeys),
   },
@@ -419,10 +405,8 @@ async function createMenuPermission(
     code: `menu:${menuName}`,
     name: menuName,
     category: "menu" as const,
-    effect: "allow" as const,
-    scope: "all" as const,
     resource: `${menuId}`,
-    parentId: null,
+    business: null,
     remark: null,
     isEnabled: true,
   };
@@ -446,12 +430,6 @@ async function getPermissionIdByMenuId(menuId: number) {
   return rows.length > 0 ? rows[0].id : null;
 }
 
-/** 权限效果枚举 */
-const Effect = {
-  ALLOW: "allow",
-  DENY: "deny",
-} as const;
-
 /**
  * 过滤生效的权限（处理 allow/deny）
  * @param permissions 权限数组
@@ -472,15 +450,7 @@ function filterEffectivePermissions(
   // 处理每个权限组
   const result: PermissionInfo[] = [];
   for (const [_, perms] of permissionMap) {
-    // 如果有任何 deny，则该权限被拒绝
-    const hasDeny = perms.some((p) => p.effect === Effect.DENY);
-    if (!hasDeny) {
-      // 只取第一个 allow 权限
-      const allowPerm = perms.find((p) => p.effect === Effect.ALLOW);
-      if (allowPerm) {
-        result.push(allowPerm);
-      }
-    }
+    result.push(perms[0]);
   }
 
   return result;
