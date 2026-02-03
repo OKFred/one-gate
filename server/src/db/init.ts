@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
-import { initMenu } from "@/db/initialMenu";
+import { initMenu } from "@/db/initMenu";
 import { initialTranslationData } from "./initTranslation";
 import { initialRegionData } from "./initRegion";
 import { initialLanguageData } from "./initLanguage";

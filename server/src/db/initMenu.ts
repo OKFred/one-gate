@@ -154,7 +154,7 @@ export const initialMenuData = [
     id: 18,
     name: "sidebar.menu.system.rolePermission",
     icon: "material-symbols:admin-panel-settings",
-    path: "/system/role-permission",
+    path: "/system/role_permission",
     parentId: 8,
     sort: 6,
     business: "system.role_permission",
