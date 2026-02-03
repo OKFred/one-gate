@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle, memo } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, memo, useMemo } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Button,
@@ -52,24 +52,6 @@ const DEFAULT_FORM: AddPermissionReq | UpdatePermissionReq = {
   isEnabled: true,
 };
 
-const PERMISSION_TYPES = [
-  { value: 'menu', label: 'Menu' },
-  { value: 'button', label: 'Button' },
-  { value: 'api', label: 'API' },
-];
-
-const EFFECTS = [
-  { value: 'allow', label: 'Allow' },
-  { value: 'deny', label: 'Deny' },
-];
-
-const SCOPES = [
-  { value: 'all', label: 'All' },
-  { value: 'own', label: 'Own' },
-  { value: 'dept', label: 'Department' },
-  { value: 'custom', label: 'Custom' },
-];
-
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(function TheForm({ localObj }, ref) {
     const t = useTranslation();
@@ -83,6 +65,30 @@ const TheForm = memo(
     const [form, setForm] = useState<AddPermissionReq | UpdatePermissionReq>(DEFAULT_FORM);
     const [parentAnchorEl, setParentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [loading, setLoading] = useState(false);
+    const PERMISSION_TYPES = useMemo(
+      () => [
+        { value: 'menu', label: t('permission.category.menu') },
+        { value: 'button', label: t('permission.category.button') },
+        { value: 'api', label: t('permission.category.api') },
+      ],
+      [],
+    );
+    const EFFECTS = useMemo(
+      () => [
+        { value: 'allow', label: t('permission.effect.allow') },
+        { value: 'deny', label: t('permission.effect.deny') },
+      ],
+      [],
+    );
+    const SCOPES = useMemo(
+      () => [
+        { value: 'all', label: 'All' },
+        { value: 'own', label: 'Own' },
+        { value: 'dept', label: 'Department' },
+        { value: 'custom', label: 'Custom' },
+      ],
+      [],
+    );
 
     // 构建权限树结构
     type PermissionNode = ListAllPermissionRes[number] & { children: PermissionNode[] };

@@ -195,9 +195,9 @@ const TheFilter = memo(
                     <MenuItem value="">
                       <em>{t('filter.all')}</em>
                     </MenuItem>
-                    <MenuItem value="menu">Menu</MenuItem>
-                    <MenuItem value="button">Button</MenuItem>
-                    <MenuItem value="api">API</MenuItem>
+                    <MenuItem value="menu">{t('permission.category.menu')}</MenuItem>
+                    <MenuItem value="button">{t('permission.category.button')}</MenuItem>
+                    <MenuItem value="api">{t('permission.category.api')}</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -211,8 +211,8 @@ const TheFilter = memo(
                     <MenuItem value="">
                       <em>{t('filter.all')}</em>
                     </MenuItem>
-                    <MenuItem value="allow">Allow</MenuItem>
-                    <MenuItem value="deny">Deny</MenuItem>
+                    <MenuItem value="allow">{t('permission.effect.allow')}</MenuItem>
+                    <MenuItem value="deny">{t('permission.effect.deny')}</MenuItem>
                   </Select>
                 </FormControl>
 
