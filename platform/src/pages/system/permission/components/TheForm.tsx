@@ -45,7 +45,7 @@ const DEFAULT_FORM: AddPermissionReq | UpdatePermissionReq = {
   name: '',
   category: 'api',
   resource: '',
-  parentId: null,
+  business: null,
   remark: null,
   isEnabled: true,
 };
@@ -76,17 +76,17 @@ const TheForm = memo(
     type PermissionNode = ListAllPermissionRes[number] & { children: PermissionNode[] };
 
     const buildPermissionTree = (permissions: ListAllPermissionRes): PermissionNode[] => {
-      const map = new Map<number, PermissionNode>();
+      const map = new Map<string, PermissionNode>();
       const roots: PermissionNode[] = [];
 
       permissions.forEach((perm) => {
-        map.set(perm.id, { ...perm, children: [] });
+        map.set(perm.business!, { ...perm, children: [] });
       });
 
       permissions.forEach((perm) => {
-        const node = map.get(perm.id)!;
-        if (perm.parentId && map.has(perm.parentId)) {
-          map.get(perm.parentId)!.children.push(node);
+        const node = map.get(perm.business!)!;
+        if (perm.business && map.has(perm.business)) {
+          map.get(perm.business)!.children.push(node);
         } else {
           roots.push(node);
         }
@@ -170,10 +170,10 @@ const TheForm = memo(
       setParentAnchorEl(null);
     };
 
-    const handleParentSelect = (nodeId: number) => {
+    const handleParentSelect = (business: string) => {
       setForm({
         ...form,
-        parentId: nodeId,
+        business,
       });
       handleParentClose();
     };
@@ -182,10 +182,10 @@ const TheForm = memo(
       return nodes.map((node) => (
         <TreeItem
           key={node.id}
-          itemId={String(node.id)}
+          itemId={node.business!}
           label={
             <Box
-              onClick={() => handleParentSelect(node.id)}
+              onClick={() => handleParentSelect(node.business!)}
               sx={{
                 py: 1,
                 cursor: 'pointer',
@@ -204,8 +204,8 @@ const TheForm = memo(
     const parentPopoverOpen = Boolean(parentAnchorEl);
 
     const getParentName = () => {
-      if (!form.parentId) return t('form.select');
-      const parent = allPermissions.find((p) => p.id === form.parentId);
+      if (!form.business) return t('form.select');
+      const parent = allPermissions.find((p) => p.business === form.business);
       return parent ? `${parent.name} (${parent.code})` : t('form.select');
     };
 
@@ -310,7 +310,7 @@ const TheForm = memo(
                     },
                   }}
                 >
-                  <Typography color={form.parentId ? 'text.primary' : 'text.secondary'}>
+                  <Typography color={form.business ? 'text.primary' : 'text.secondary'}>
                     {getParentName()}
                   </Typography>
                   <ArrowDropDownIcon color="action" />
@@ -346,7 +346,7 @@ const TheForm = memo(
                           label={
                             <Box
                               onClick={() => {
-                                setForm({ ...form, parentId: null });
+                                setForm({ ...form, business: null });
                                 handleParentClose();
                               }}
                               sx={{

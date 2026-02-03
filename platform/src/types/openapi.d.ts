@@ -7452,8 +7452,8 @@ export interface components {
                      * @example /dashboard/users
                      */
                     resource: ((string | null) | null) | null;
-                    /** @description 父权限ID，用于菜单层级 */
-                    parentId: ((number | null) | null) | null;
+                    /** @description 业务标识 */
+                    business: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
@@ -8175,8 +8175,8 @@ export interface components {
                  * @example /dashboard/users
                  */
                 resource?: ((string | null) | null) | null;
-                /** @description 父权限ID，用于菜单层级 */
-                parentId?: ((number | null) | null) | null;
+                /** @description 业务标识 */
+                business?: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
                 /** @description 是否启用 */
@@ -8270,8 +8270,8 @@ export interface components {
                      * @example /dashboard/users
                      */
                     resource: ((string | null) | null) | null;
-                    /** @description 父权限ID，用于菜单层级 */
-                    parentId: ((number | null) | null) | null;
+                    /** @description 业务标识 */
+                    business: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
@@ -8318,8 +8318,8 @@ export interface components {
              * @example /dashboard/users
              */
             resource: ((string | null) | null) | null;
-            /** @description 父权限ID，用于菜单层级 */
-            parentId: ((number | null) | null) | null;
+            /** @description 业务标识 */
+            business: ((string | null) | null) | null;
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
             /** @description 是否启用 */
@@ -8363,8 +8363,8 @@ export interface components {
              * @example /dashboard/users
              */
             resource?: ((string | null) | null) | null;
-            /** @description 父权限ID，用于菜单层级 */
-            parentId?: ((number | null) | null) | null;
+            /** @description 业务标识 */
+            business?: ((string | null) | null) | null;
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
             /** @description 是否启用 */
@@ -8433,8 +8433,8 @@ export interface components {
                  * @example /dashboard/users
                  */
                 resource: ((string | null) | null) | null;
-                /** @description 父权限ID，用于菜单层级 */
-                parentId: ((number | null) | null) | null;
+                /** @description 业务标识 */
+                business: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
@@ -8917,8 +8917,8 @@ export interface components {
                  * @example /dashboard/users
                  */
                 resource: ((string | null) | null) | null;
-                /** @description 父权限ID，用于菜单层级 */
-                parentId: ((number | null) | null) | null;
+                /** @description 业务标识 */
+                business: ((string | null) | null) | null;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */

@@ -55,9 +55,9 @@ const TheTable = memo(
 
     // 根据权限ID获取权限名称
     const getPermissionName = useCallback(
-      (permissionId: number | null | undefined): string => {
-        if (!permissionId) return '--';
-        const permission = allPermissions.find((p) => p.id === permissionId);
+      (business: string | undefined): string => {
+        if (!business) return '--';
+        const permission = allPermissions.find((p) => p.business === business);
         return permission?.name || '--';
       },
       [allPermissions],
@@ -143,7 +143,7 @@ const TheTable = memo(
       { title: t('permission.resource'), render: (row) => row.resource || '--' },
       {
         title: t('permission.business'),
-        render: (row) => getPermissionName(row.parentId),
+        render: (row) => getPermissionName(row.business!),
       },
       {
         title: t('columns.status'),
