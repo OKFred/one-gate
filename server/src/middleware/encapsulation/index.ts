@@ -61,7 +61,7 @@ function routeMaker({
   requiredPermissions?: string[];
 }) {
   // 默认给接口都加上命名空间前缀作为权限标识
-  const permissionCode = "api:" + nameSpace + pathInfo.path;
+  const permissionCode = nameSpace + ":api" + pathInfo.path;
   if (!requiredPermissions) {
     requiredPermissions = [permissionCode];
   } else {

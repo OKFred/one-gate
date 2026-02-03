@@ -3,8 +3,7 @@ import bcrypt from "bcrypt";
 import { count, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/db.table";
 import { roleTable } from "@/api/system/role/db.table";
-import menuService from "@/api/system/menu/service";
-import { initialMenuData } from "@/db/initialMenu";
+import { initMenu } from "@/db/initialMenu";
 import { initialTranslationData } from "./initTranslation";
 import { initialRegionData } from "./initRegion";
 import { initialLanguageData } from "./initLanguage";
@@ -15,14 +14,13 @@ import translationService, {
 } from "@/api/i18n/translation/service";
 import { loadTranslationCache } from "@/utils/i18n";
 import { initPermissions } from "./initPermissions";
-import { UserObj } from "@/api/system/user/service";
 
 export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
 export const SUPER_ADMIN_ROLE_ID = 1;
 
 // 超级管理员配置
-const SUPER_ADMIN = {
+export const SUPER_ADMIN = {
   username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
   password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
   langCode: process.env.LOCALE,
@@ -112,30 +110,6 @@ async function initSuperAdminUser(roleId: number) {
     console.error("超级管理员账号初始化失败:", error);
     throw error;
   }
-}
-
-/**
- * 初始化菜单
- */
-async function initMenu() {
-  // 检查是否已有数据，没有则插入初始数据
-  const countResult = await menuService.listAll.service({});
-  if (countResult.length === initialMenuData.length) return;
-  for (const menu of initialMenuData) {
-    await menuService.add.service(
-      {
-        name: menu.name,
-        icon: menu.icon,
-        sort: menu.sort,
-        path: menu.path || null,
-        parentId: menu.parentId || null,
-        isEnabled: true,
-        remark: null,
-      },
-      { userId: SUPER_ADMIN_ID, langCode: SUPER_ADMIN.langCode } as UserObj
-    );
-  }
-  console.log("💾 表 system_menu 初始数据已插入");
 }
 
 /**

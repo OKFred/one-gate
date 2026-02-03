@@ -43,6 +43,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import translationService from "@/api/i18n/translation/service";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -397,16 +398,39 @@ const getApi = {
 
 // 工具函数：创建菜单权限
 async function createMenuPermission(
-  menuId: number,
-  menuName: string,
+  params: {
+    menuId: number;
+    menuName: string;
+    business: string | null;
+  },
   userObj: UserObj
 ) {
+  const { menuId, menuName, business } = params;
+  const permissionName = await translationService.listAll
+    .service({
+      isEnabled: true,
+    })
+    .then((translationList) => {
+      const tKeySubString = business || "";
+      const prefix =
+        translationList.find(
+          (item) =>
+            item.tKey === "businessType." + tKeySubString &&
+            item.langCode === userObj.langCode
+        )?.tValue || "未知菜单权限";
+      const postfix = translationList.find(
+        (item) =>
+          item.tKey === "permission.category.menu" &&
+          item.langCode === userObj.langCode
+      )?.tValue;
+      return postfix ? `${prefix}${postfix}` : menuName + "未知菜单";
+    });
   const permissionData = {
-    code: `menu:${menuName}`,
-    name: menuName,
+    code: `${menuName}:menu`,
+    name: permissionName,
     category: "menu" as const,
     resource: `${menuId}`,
-    business: null,
+    business,
     remark: null,
     isEnabled: true,
   };

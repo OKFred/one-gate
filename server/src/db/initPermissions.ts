@@ -7,322 +7,272 @@ import db from "@/db/index";
 import { permissionTable } from "@/api/system/permission/db.table";
 import { count } from "drizzle-orm";
 import { PermissionAddLike } from "@/api/system/permission/service";
-
+import { initialTranslationData } from "./initTranslation";
+import { SUPER_ADMIN_ID } from "./init";
+const LOCALE = process.env.LOCALE || "zh-CN";
 /**
  * 基础权限种子数据
  */
 const permissionSeeds: Partial<PermissionAddLike>[] = [
   {
-    code: "api:SystemAuth",
-    name: "auth.title",
     category: "api",
-    business: "SystemAuth",
+    code: "system.auth:api",
+    business: "system.auth",
   },
   {
-    code: "api:SystemUser",
-    name: "user.title",
     category: "api",
-    business: "SystemUser",
+    code: "system.user:api",
+    business: "system.user",
   },
   {
-    code: "api:SystemRole",
-    name: "role.title",
     category: "api",
-    business: "SystemRole",
+    code: "system.role:api",
+    business: "system.role",
   },
   {
-    code: "api:SystemPermission",
-    name: "permission.title",
     category: "api",
-    business: "SystemPermission",
+    code: "system.permission:api",
+    business: "system.permission",
   },
   {
-    code: "api:SystemRolePermission",
-    name: "rolePermission.title",
     category: "api",
-    business: "SystemRolePermission",
+    code: "system.role_permission:api",
+    business: "system.role_permission",
   },
   {
-    code: "api:SystemDepartment",
-    name: "department.title",
     category: "api",
-    business: "SystemDepartment",
+    code: "system.department:api",
+    business: "system.department",
   },
   {
-    code: "api:SystemMenu",
-    name: "menu.title",
     category: "api",
-    business: "SystemMenu",
+    code: "system.menu:api",
+    business: "system.menu",
   },
   {
-    code: "api:I18nLanguage",
-    name: "language.title",
     category: "api",
-    business: "I18nLanguage",
+    code: "i18n.language:api",
+    business: "i18n.language",
   },
   {
-    code: "api:I18nRegion",
-    name: "region.title",
     category: "api",
-    business: "I18nRegion",
+    code: "i18n.region:api",
+    business: "i18n.region",
   },
   {
-    code: "api:I18nTranslation",
-    name: "translation.title",
     category: "api",
-    business: "I18nTranslation",
+    code: "i18n.translation:api",
+    business: "i18n.translation",
   },
   {
-    code: "api:MailAccount",
-    name: "account.title",
     category: "api",
-    business: "MailAccount",
+    code: "mail.account:api",
+    business: "mail.account",
   },
   {
-    code: "api:MailTemplate",
-    name: "template.title",
     category: "api",
-    business: "MailTemplate",
+    code: "mail.template:api",
+    business: "mail.template",
   },
   {
-    code: "api:MailLog",
-    name: "log.title",
     category: "api",
-    business: "MailLog",
+    code: "mail.log:api",
+    business: "mail.log",
   },
   {
-    code: "api:MailAction",
-    name: "send.title",
     category: "api",
-    business: "MailAction",
+    code: "mail.action:api",
+    business: "mail.action",
   },
   {
-    code: "button:user:add",
-    name: "添加用户按钮",
     category: "button",
-    business: "SystemUser",
+    code: "system.user:add",
+    business: "system.user",
   },
   {
-    code: "button:user:edit",
-    name: "编辑用户按钮",
     category: "button",
-    business: "SystemUser",
+    code: "system.user:edit",
+    business: "system.user",
   },
   {
-    code: "button:user:delete",
-    name: "删除用户按钮",
     category: "button",
-    business: "SystemUser",
+    code: "system.user:delete",
+    business: "system.user",
   },
   {
-    code: "button:user:export",
-    name: "导出用户按钮",
     category: "button",
-    business: "SystemUser",
+    code: "system.user:export",
+    business: "system.user",
   },
   {
-    code: "button:role:add",
-    name: "添加角色按钮",
     category: "button",
-    business: "SystemRole",
+    code: "system.role:add",
+    business: "system.role",
   },
   {
-    code: "button:role:edit",
-    name: "编辑角色按钮",
     category: "button",
-    business: "SystemRole",
+    code: "system.role:edit",
+    business: "system.role",
   },
   {
-    code: "button:role:delete",
-    name: "删除角色按钮",
     category: "button",
-    business: "SystemRole",
+    code: "system.role:delete",
+    business: "system.role",
   },
   {
-    code: "button:permission:add",
-    name: "添加权限按钮",
     category: "button",
-    business: "SystemPermission",
+    code: "system.permission:add",
+    business: "system.permission",
   },
   {
-    code: "button:permission:edit",
-    name: "编辑权限按钮",
     category: "button",
-    business: "SystemPermission",
+    code: "system.permission:edit",
+    business: "system.permission",
   },
   {
-    code: "button:permission:delete",
-    name: "删除权限按钮",
     category: "button",
-    business: "SystemPermission",
+    code: "system.permission:delete",
+    business: "system.permission",
   },
   {
-    code: "button:department:add",
-    name: "添加部门按钮",
     category: "button",
-    business: "SystemDepartment",
+    code: "system.department:add",
+    business: "system.department",
   },
   {
-    code: "button:department:edit",
-    name: "编辑部门按钮",
     category: "button",
-    business: "SystemDepartment",
+    code: "system.department:edit",
+    business: "system.department",
   },
   {
-    code: "button:department:delete",
-    name: "删除部门按钮",
     category: "button",
-    business: "SystemDepartment",
+    code: "system.department:delete",
+    business: "system.department",
   },
   {
-    code: "button:menu:add",
-    name: "添加菜单按钮",
     category: "button",
-    business: "SystemMenu",
+    code: "system.menu:add",
+    business: "system.menu",
   },
   {
-    code: "button:menu:edit",
-    name: "编辑菜单按钮",
     category: "button",
-    business: "SystemMenu",
+    code: "system.menu:edit",
+    business: "system.menu",
   },
   {
-    code: "button:menu:delete",
-    name: "删除菜单按钮",
     category: "button",
-    business: "SystemMenu",
+    code: "system.menu:delete",
+    business: "system.menu",
   },
   {
-    code: "button:role-permission:add",
-    name: "添加角色权限按钮",
     category: "button",
-    business: "SystemRolePermission",
+    code: "system.role_permission:add",
+    business: "system.role_permission",
   },
   {
-    code: "button:role-permission:edit",
-    name: "编辑角色权限按钮",
     category: "button",
-    business: "SystemRolePermission",
+    code: "system.role_permission:edit",
+    business: "system.role_permission",
   },
   {
-    code: "button:role-permission:delete",
-    name: "删除角色权限按钮",
     category: "button",
-    business: "SystemRolePermission",
+    code: "system.role_permission:delete",
+    business: "system.role_permission",
   },
   {
-    code: "button:role-permission:batch-delete",
-    name: "批量删除角色权限按钮",
     category: "button",
-    business: "SystemRolePermission",
+    code: "system.role_permission:batch-delete",
+    business: "system.role_permission",
   },
   {
-    code: "button:language:add",
-    name: "添加语言按钮",
     category: "button",
-    business: "I18nLanguage",
+    code: "i18n.language:add",
+    business: "i18n.language",
   },
   {
-    code: "button:language:edit",
-    name: "编辑语言按钮",
     category: "button",
-    business: "I18nLanguage",
+    code: "i18n.language:edit",
+    business: "i18n.language",
   },
   {
-    code: "button:language:delete",
-    name: "删除语言按钮",
     category: "button",
-    business: "I18nLanguage",
+    code: "i18n.language:delete",
+    business: "i18n.language",
   },
   {
-    code: "button:region:add",
-    name: "添加地区按钮",
     category: "button",
-    business: "I18nRegion",
+    code: "i18n.region:add",
+    business: "i18n.region",
   },
   {
-    code: "button:region:edit",
-    name: "编辑地区按钮",
     category: "button",
-    business: "I18nRegion",
+    code: "i18n.region:edit",
+    business: "i18n.region",
   },
   {
-    code: "button:region:delete",
-    name: "删除地区按钮",
     category: "button",
-    business: "I18nRegion",
+    code: "i18n.region:delete",
+    business: "i18n.region",
   },
   {
-    code: "button:translation:add",
-    name: "添加翻译按钮",
     category: "button",
-    business: "I18nTranslation",
+    code: "i18n.translation:add",
+    business: "i18n.translation",
   },
   {
-    code: "button:translation:edit",
-    name: "编辑翻译按钮",
     category: "button",
-    business: "I18nTranslation",
+    code: "i18n.translation:edit",
+    business: "i18n.translation",
   },
   {
-    code: "button:translation:delete",
-    name: "删除翻译按钮",
     category: "button",
-    business: "I18nTranslation",
+    code: "i18n.translation:delete",
+    business: "i18n.translation",
   },
   {
-    code: "button:mail-account:add",
-    name: "添加邮件账户按钮",
     category: "button",
-    business: "MailAccount",
+    code: "mail.account:add",
+    business: "mail.account",
   },
   {
-    code: "button:mail-account:edit",
-    name: "编辑邮件账户按钮",
     category: "button",
-    business: "MailAccount",
+    code: "mail.account:edit",
+    business: "mail.account",
   },
   {
-    code: "button:mail-account:delete",
-    name: "删除邮件账户按钮",
     category: "button",
-    business: "MailAccount",
+    code: "mail.account:delete",
+    business: "mail.account",
   },
   {
-    code: "button:mail-template:add",
-    name: "添加邮件模板按钮",
     category: "button",
-    business: "MailTemplate",
+    code: "mail.template:add",
+    business: "mail.template",
   },
   {
-    code: "button:mail-template:edit",
-    name: "编辑邮件模板按钮",
     category: "button",
-    business: "MailTemplate",
+    code: "mail.template:edit",
+    business: "mail.template",
   },
   {
-    code: "button:mail-template:delete",
-    name: "删除邮件模板按钮",
     category: "button",
-    business: "MailTemplate",
+    code: "mail.template:delete",
+    business: "mail.template",
   },
   {
-    code: "button:mail-log:view",
-    name: "查看邮件日志按钮",
     category: "button",
-    business: "MailLog",
+    code: "mail.log:view",
+    business: "mail.log",
   },
   {
-    code: "button:profile:edit",
-    name: "编辑个人信息按钮",
     category: "button",
-    business: "SystemUser",
+    code: "system.auth:update_profile",
+    business: "system.auth",
   },
   {
-    code: "button:profile:change-password",
-    name: "修改密码按钮",
     category: "button",
-    business: "SystemUser",
+    code: "system.auth:update_password",
+    business: "system.auth",
   },
 ];
 
@@ -343,17 +293,54 @@ export async function initPermissions() {
       console.log(`⚠️  权限表已存在 ${existingCount} 条数据，跳过初始化`);
       return;
     }
-
     // 插入权限数据
-    const creatorId = 1; // 系统初始化
+    const creatorId = SUPER_ADMIN_ID; // 系统初始化
     const insertedPermissions: { id: number; code: string }[] = [];
 
     for (const seed of permissionSeeds) {
+      const getAPIName = () => {
+        const tKeySubString = seed.code.replace(":api", "");
+        const prefix = initialTranslationData.find(
+          (item) =>
+            item.tKey === "businessType." + tKeySubString &&
+            item.langCode === LOCALE
+        )?.tValue;
+        const postfix = initialTranslationData.find(
+          (item) =>
+            item.tKey === "permission.category.api" && item.langCode === LOCALE
+        )?.tValue;
+        return prefix && postfix
+          ? `${prefix}${postfix}`
+          : seed.code + "未知接口";
+      };
+      const getButtonName = () => {
+        const [tKeySubString, action] = seed.code.split(":");
+        const prefix = initialTranslationData.find(
+          (item) =>
+            item.tKey === "businessType." + tKeySubString &&
+            item.langCode === LOCALE
+        )?.tValue;
+        const postfix = initialTranslationData.find(
+          (item) =>
+            item.tKey === "permission.category.button" &&
+            item.langCode === LOCALE
+        )?.tValue;
+        return prefix && postfix
+          ? `${prefix}${postfix}:${action}`
+          : seed.code + "未知按钮";
+      };
+      const name =
+        seed.category === "api"
+          ? getAPIName()
+          : seed.category === "button"
+            ? getButtonName()
+            : "未知权限";
+      // console.log(`🔐 正在插入权限: [${seed.code}] ${name}`);
       const result = await db
         .insert(permissionTable)
         .values({
           code: seed.code,
-          name: seed.name,
+          name,
           category: seed.category,
           resource: seed.resource || null,
           business: seed.business || null,

@@ -37,12 +37,6 @@ const MenuBasePO = {
     examples: ["/home"],
     maxLength: 500,
   },
-  remark: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "备注说明",
-    maxLength: 500,
-  },
   parentId: {
     type: ["number", "null"],
     nullable: true,
@@ -54,6 +48,17 @@ const MenuBasePO = {
     description: "排序",
     minimum: 0,
     maximum: 1000,
+  },
+  business: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "业务标识",
+  },
+  remark: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "备注说明",
+    maxLength: 500,
   },
   isEnabled: {
     type: "boolean",
@@ -100,9 +105,10 @@ export const MenuAddKeys = [
   "name",
   "icon",
   "path",
-  "remark",
   "parentId",
   "sort",
+  "business",
+  "remark",
   "isEnabled",
 ] as const satisfies RequiredKeys<MenuAddVOLike>[];
 export const MenuUpdateKeys = [
@@ -126,6 +132,7 @@ export const MenuDetailKeys = MenuBaseKeys;
 export const MenuSortableKeys = [
   "id",
   "name",
+  "business",
   "isEnabled",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<MenuPOLike>[];
@@ -135,9 +142,10 @@ export const menuTable = sqliteTable("system_menu", {
   name: text("name").notNull(),
   icon: text("icon").notNull(),
   path: text("path"),
-  remark: text("remark"),
   parentId: integer("parent_id"),
   sort: integer("sort").notNull(),
+  business: text("business").notNull(),
+  remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
@@ -154,9 +162,10 @@ export async function tableInit() {
       name TEXT NOT NULL,
       icon TEXT NOT NULL,
       path TEXT,
-      remark TEXT,
       parent_id INTEGER,
       sort INTEGER NOT NULL,
+      business TEXT NOT NULL,
+      remark TEXT,
       is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,

@@ -1,10 +1,14 @@
 export type BusinessType = {
+  /** 国际化 */
+  i18n: "i18n";
   /** 国际化语言 */
   "i18n.language": "i18n.language";
   /** 国际化地区 */
   "i18n.region": "i18n.region";
   /** 国际化翻译 */
   "i18n.translation": "i18n.translation";
+  /** 邮件 */
+  mail: "mail";
   /** 邮件账户 */
   "mail.account": "mail.account";
   /** 邮件模板 */
@@ -13,6 +17,8 @@ export type BusinessType = {
   "mail.action": "mail.action";
   /** 邮件日志 */
   "mail.log": "mail.log";
+  /** 系统 */
+  system: "system";
   /** 系统鉴权 */
   "system.auth": "system.auth";
   /** 系统合规 */

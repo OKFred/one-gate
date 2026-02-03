@@ -41,6 +41,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import translationService from "@/api/i18n/translation/service";
 import permissionService, {
   utils as permissionUtils,
 } from "@/api/system/permission/service";
@@ -54,11 +55,15 @@ import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
+  business,
   isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+}: Pick<FromSchema<typeof listReq>, "keyword" | "business" | "isEnabled">) => {
   const conditions = [];
   if (hasValue(keyword)) {
     conditions.push(or(like(menuTable.name, `%${keyword}%`)));
+  }
+  if (hasValue(business)) {
+    conditions.push(eq(menuTable.business, business));
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(menuTable.isEnabled, isEnabled));
@@ -74,6 +79,7 @@ const listAllReq = {
   type: "object",
   properties: {
     ...listAllReqBase,
+    business: MenuVO["business"],
     isEnabled: MenuVO["isEnabled"],
     orderBy: orderByWrapper<(keyof MenuPOLike)[]>(MenuSortableKeys),
   },
@@ -105,9 +111,10 @@ async function onListAll(
       name: menuTable.name,
       icon: menuTable.icon,
       path: menuTable.path,
-      remark: menuTable.remark,
       parentId: menuTable.parentId,
       sort: menuTable.sort,
+      business: menuTable.business,
+      remark: menuTable.remark,
       isEnabled: menuTable.isEnabled,
     })
     .from(menuTable)
@@ -132,6 +139,7 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
+    business: MenuVO["business"],
     isEnabled: MenuVO["isEnabled"],
     orderBy: orderByWrapper<(keyof MenuPOLike)[]>(MenuSortableKeys),
   },
@@ -240,7 +248,10 @@ async function onAdd(
   const menuId = res[0]?.id;
   if (menuId) {
     // 创建菜单权限记录
-    await permissionUtils.createMenuPermission(menuId, name, userObj);
+    await permissionUtils.createMenuPermission(
+      { menuId, menuName: name, business: params.business },
+      userObj
+    );
   }
   return menuId;
 }
@@ -317,6 +328,22 @@ async function onUpdate(
     if (name !== undefined) {
       // 处理权限更新
       const permissionId = await permissionUtils.getPermissionIdByMenuId(id);
+      const permissionName = await translationService.listAll
+        .service({
+          isEnabled: true,
+        })
+        .then((translationList) => {
+          const prefix =
+            translationList.find(
+              (t) => t.tKey === rest.business && t.langCode === userObj.langCode
+            )?.tValue || "未知菜单权限";
+          const postfix = translationList.find(
+            (item) =>
+              item.tKey === "permission.category.menu" &&
+              item.langCode === userObj.langCode
+          )?.tValue;
+          return postfix ? `${prefix}${postfix}` : name + "未知菜单";
+        });
       if (permissionId) {
         // 删除现有的角色权限关联
         await tx
@@ -325,8 +352,8 @@ async function onUpdate(
         await tx
           .update(permissionTable)
           .set({
-            code: `menu:${name}`,
-            name,
+            code: `${name}:menu`,
+            name: permissionName,
             updaterId,
             updateTimeUtc: getCurrentTimestampUtcSql(),
           })

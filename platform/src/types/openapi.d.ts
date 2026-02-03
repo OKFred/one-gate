@@ -7764,10 +7764,12 @@ export interface components {
         "system.menuListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
+            /** @description 业务标识 */
+            business?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "name" | "business" | "isEnabled" | "createTimeUtc";
         };
         "system.menuListAllRes": {
             ok: boolean;
@@ -7792,12 +7794,14 @@ export interface components {
                  * @example /home
                  */
                 path?: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark?: ((string | null) | null) | null;
                 /** @description 父菜单ID，支持菜单层级 */
                 parentId?: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort?: number;
+                /** @description 业务标识 */
+                business?: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
             }[];
@@ -7821,10 +7825,12 @@ export interface components {
              * @default 10
              */
             pageSize: number;
+            /** @description 业务标识 */
+            business?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "name" | "business" | "isEnabled" | "createTimeUtc";
         };
         "system.menuListRes": {
             ok: boolean;
@@ -7858,12 +7864,14 @@ export interface components {
                      * @example /home
                      */
                     path: ((string | null) | null) | null;
-                    /** @description 备注说明 */
-                    remark: ((string | null) | null) | null;
                     /** @description 父菜单ID，支持菜单层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
+                    /** @description 业务标识 */
+                    business: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
@@ -7900,12 +7908,14 @@ export interface components {
              * @example /home
              */
             path: ((string | null) | null) | null;
-            /** @description 备注说明 */
-            remark: ((string | null) | null) | null;
             /** @description 父菜单ID，支持菜单层级 */
             parentId: ((number | null) | null) | null;
             /** @description 排序 */
             sort: number;
+            /** @description 业务标识 */
+            business: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
@@ -7939,12 +7949,14 @@ export interface components {
              * @example /home
              */
             path?: ((string | null) | null) | null;
-            /** @description 备注说明 */
-            remark?: ((string | null) | null) | null;
             /** @description 父菜单ID，支持菜单层级 */
             parentId?: ((number | null) | null) | null;
             /** @description 排序 */
             sort?: number;
+            /** @description 业务标识 */
+            business?: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
@@ -8003,12 +8015,14 @@ export interface components {
                  * @example /home
                  */
                 path: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
                 /** @description 父菜单ID，支持菜单层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
+                /** @description 业务标识 */
+                business: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -8055,12 +8069,14 @@ export interface components {
                  * @example /home
                  */
                 path: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
                 /** @description 父菜单ID，支持菜单层级 */
                 parentId: ((number | null) | null) | null;
                 /** @description 排序 */
                 sort: number;
+                /** @description 业务标识 */
+                business: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建者ID */
@@ -8098,12 +8114,14 @@ export interface components {
                      * @example /home
                      */
                     path: ((string | null) | null) | null;
-                    /** @description 备注说明 */
-                    remark: ((string | null) | null) | null;
                     /** @description 父菜单ID，支持菜单层级 */
                     parentId: ((number | null) | null) | null;
                     /** @description 排序 */
                     sort: number;
+                    /** @description 业务标识 */
+                    business: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建者ID */
