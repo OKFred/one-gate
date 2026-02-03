@@ -1,8 +1,9 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import type { NodeHonoContext } from "@/types/app";
+import type { UserObj } from "@/types/app";
 import mailAccountService from "../account/service";
 import mailTemplateService from "../template/service";
 import mailLogService from "../log/service";
+import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 
 const sendReq = {
   type: "object",
@@ -92,11 +93,12 @@ const sendRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-async function onSend(c: NodeHonoContext): Promise<FromSchema<typeof sendRes>> {
-  const obj = c.get("bodyObj") as FromSchema<typeof sendReq>;
-  const userObj = c.get("userObj");
+async function onSend(
+  bodyObj: FromSchema<typeof sendReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof sendRes>> {
   const { accountId, templateId, receiverArr, subject, html, templateParams } =
-    obj;
+    bodyObj;
 
   // 1. 获取邮件账户信息
   const accountObj = await mailAccountService.get.service({ id: accountId });
@@ -224,6 +226,7 @@ const sendApi = {
     method: "post",
     summary: "发送邮件",
   } as const,
+  adapter: bodyUserAdapter,
   service: onSend,
 };
 
