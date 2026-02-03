@@ -1,4 +1,5 @@
 import { useRef, useMemo } from 'react';
+import { useTheme } from '@mui/material';
 import JoditEditor from 'jodit-react';
 import { useTranslation } from '@/hooks/useTranslation';
 import { authUtils } from '@/utils/auth';
@@ -19,13 +20,17 @@ export default function JoditEditorComponent({
   readonly = false,
 }: JoditEditorComponentProps) {
   const editor = useRef(null);
+  const theme = useTheme();
   const t = useTranslation();
   const userInfo = authUtils.getUserInfo();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   const finalPlaceholder = useMemo(() => {
     return placeholder || t('form.pleaseEnter');
   }, [placeholder, t]);
   const config = useMemo(
     () => ({
+      theme: isDarkMode ? 'dark' : 'light',
       readonly,
       placeholder: finalPlaceholder,
       height,
@@ -79,7 +84,7 @@ export default function JoditEditorComponent({
         font: '14px Arial, sans-serif',
       },
     }),
-    [readonly, finalPlaceholder, height],
+    [isDarkMode, readonly, finalPlaceholder, height, userInfo?.langCode],
   );
 
   return (
