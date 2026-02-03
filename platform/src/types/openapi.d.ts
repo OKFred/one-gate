@@ -23,7 +23,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageListAllReq"];
+                    "application/json": components["schemas"]["i18n.languageListAllReq"];
                 };
             };
             responses: {
@@ -33,7 +33,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageListAllRes"];
+                        "application/json": components["schemas"]["i18n.languageListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -81,7 +81,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageListReq"];
+                    "application/json": components["schemas"]["i18n.languageListReq"];
                 };
             };
             responses: {
@@ -91,7 +91,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageListRes"];
+                        "application/json": components["schemas"]["i18n.languageListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -139,7 +139,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageAddReq"];
+                    "application/json": components["schemas"]["i18n.languageAddReq"];
                 };
             };
             responses: {
@@ -149,7 +149,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageAddRes"];
+                        "application/json": components["schemas"]["i18n.languageAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -197,7 +197,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageUpdateReq"];
+                    "application/json": components["schemas"]["i18n.languageUpdateReq"];
                 };
             };
             responses: {
@@ -207,7 +207,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageUpdateRes"];
+                        "application/json": components["schemas"]["i18n.languageUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -255,7 +255,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageDeleteReq"];
+                    "application/json": components["schemas"]["i18n.languageDeleteReq"];
                 };
             };
             responses: {
@@ -265,7 +265,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageDeleteRes"];
+                        "application/json": components["schemas"]["i18n.languageDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -313,7 +313,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nLanguageGetReq"];
+                    "application/json": components["schemas"]["i18n.languageGetReq"];
                 };
             };
             responses: {
@@ -323,7 +323,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nLanguageGetRes"];
+                        "application/json": components["schemas"]["i18n.languageGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -371,7 +371,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nRegionListAllReq"];
+                    "application/json": components["schemas"]["i18n.regionListAllReq"];
                 };
             };
             responses: {
@@ -381,7 +381,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nRegionListAllRes"];
+                        "application/json": components["schemas"]["i18n.regionListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -429,7 +429,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nRegionListReq"];
+                    "application/json": components["schemas"]["i18n.regionListReq"];
                 };
             };
             responses: {
@@ -439,7 +439,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nRegionListRes"];
+                        "application/json": components["schemas"]["i18n.regionListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -487,7 +487,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nRegionAddReq"];
+                    "application/json": components["schemas"]["i18n.regionAddReq"];
                 };
             };
             responses: {
@@ -497,7 +497,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nRegionAddRes"];
+                        "application/json": components["schemas"]["i18n.regionAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -545,7 +545,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nRegionUpdateReq"];
+                    "application/json": components["schemas"]["i18n.regionUpdateReq"];
                 };
             };
             responses: {
@@ -555,7 +555,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nRegionUpdateRes"];
+                        "application/json": components["schemas"]["i18n.regionUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -603,7 +603,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nRegionDeleteReq"];
+                    "application/json": components["schemas"]["i18n.regionDeleteReq"];
                 };
             };
             responses: {
@@ -613,7 +613,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nRegionDeleteRes"];
+                        "application/json": components["schemas"]["i18n.regionDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -661,7 +661,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nRegionGetReq"];
+                    "application/json": components["schemas"]["i18n.regionGetReq"];
                 };
             };
             responses: {
@@ -671,7 +671,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nRegionGetRes"];
+                        "application/json": components["schemas"]["i18n.regionGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -719,7 +719,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationListAllReq"];
+                    "application/json": components["schemas"]["i18n.translationListAllReq"];
                 };
             };
             responses: {
@@ -729,7 +729,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationListAllRes"];
+                        "application/json": components["schemas"]["i18n.translationListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -777,7 +777,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationListReq"];
+                    "application/json": components["schemas"]["i18n.translationListReq"];
                 };
             };
             responses: {
@@ -787,7 +787,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationListRes"];
+                        "application/json": components["schemas"]["i18n.translationListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -835,7 +835,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationAddReq"];
+                    "application/json": components["schemas"]["i18n.translationAddReq"];
                 };
             };
             responses: {
@@ -845,7 +845,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationAddRes"];
+                        "application/json": components["schemas"]["i18n.translationAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -893,7 +893,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationUpdateReq"];
+                    "application/json": components["schemas"]["i18n.translationUpdateReq"];
                 };
             };
             responses: {
@@ -903,7 +903,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationUpdateRes"];
+                        "application/json": components["schemas"]["i18n.translationUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -951,7 +951,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationDeleteReq"];
+                    "application/json": components["schemas"]["i18n.translationDeleteReq"];
                 };
             };
             responses: {
@@ -961,7 +961,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationDeleteRes"];
+                        "application/json": components["schemas"]["i18n.translationDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1009,7 +1009,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationGetReq"];
+                    "application/json": components["schemas"]["i18n.translationGetReq"];
                 };
             };
             responses: {
@@ -1019,7 +1019,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationGetRes"];
+                        "application/json": components["schemas"]["i18n.translationGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1067,7 +1067,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["I18nTranslationCheckDuplicateReq"];
+                    "application/json": components["schemas"]["i18n.translationCheckDuplicateReq"];
                 };
             };
             responses: {
@@ -1077,7 +1077,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["I18nTranslationCheckDuplicateRes"];
+                        "application/json": components["schemas"]["i18n.translationCheckDuplicateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1125,7 +1125,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountListAllReq"];
+                    "application/json": components["schemas"]["mail.accountListAllReq"];
                 };
             };
             responses: {
@@ -1135,7 +1135,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountListAllRes"];
+                        "application/json": components["schemas"]["mail.accountListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1183,7 +1183,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountListReq"];
+                    "application/json": components["schemas"]["mail.accountListReq"];
                 };
             };
             responses: {
@@ -1193,7 +1193,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountListRes"];
+                        "application/json": components["schemas"]["mail.accountListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1241,7 +1241,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountAddReq"];
+                    "application/json": components["schemas"]["mail.accountAddReq"];
                 };
             };
             responses: {
@@ -1251,7 +1251,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountAddRes"];
+                        "application/json": components["schemas"]["mail.accountAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1299,7 +1299,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountUpdateReq"];
+                    "application/json": components["schemas"]["mail.accountUpdateReq"];
                 };
             };
             responses: {
@@ -1309,7 +1309,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountUpdateRes"];
+                        "application/json": components["schemas"]["mail.accountUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1357,7 +1357,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountDeleteReq"];
+                    "application/json": components["schemas"]["mail.accountDeleteReq"];
                 };
             };
             responses: {
@@ -1367,7 +1367,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountDeleteRes"];
+                        "application/json": components["schemas"]["mail.accountDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1415,7 +1415,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountGetReq"];
+                    "application/json": components["schemas"]["mail.accountGetReq"];
                 };
             };
             responses: {
@@ -1425,7 +1425,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountGetRes"];
+                        "application/json": components["schemas"]["mail.accountGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1473,7 +1473,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailAccountVerifyReq"];
+                    "application/json": components["schemas"]["mail.accountVerifyReq"];
                 };
             };
             responses: {
@@ -1483,7 +1483,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailAccountVerifyRes"];
+                        "application/json": components["schemas"]["mail.accountVerifyRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1531,7 +1531,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailActionSendReq"];
+                    "application/json": components["schemas"]["mail.actionSendReq"];
                 };
             };
             responses: {
@@ -1541,7 +1541,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailActionSendRes"];
+                        "application/json": components["schemas"]["mail.actionSendRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1589,7 +1589,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogListAllReq"];
+                    "application/json": components["schemas"]["mail.logListAllReq"];
                 };
             };
             responses: {
@@ -1599,7 +1599,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogListAllRes"];
+                        "application/json": components["schemas"]["mail.logListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1647,7 +1647,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogListReq"];
+                    "application/json": components["schemas"]["mail.logListReq"];
                 };
             };
             responses: {
@@ -1657,7 +1657,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogListRes"];
+                        "application/json": components["schemas"]["mail.logListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1705,7 +1705,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogAddReq"];
+                    "application/json": components["schemas"]["mail.logAddReq"];
                 };
             };
             responses: {
@@ -1715,7 +1715,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogAddRes"];
+                        "application/json": components["schemas"]["mail.logAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1763,7 +1763,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogUpdateReq"];
+                    "application/json": components["schemas"]["mail.logUpdateReq"];
                 };
             };
             responses: {
@@ -1773,7 +1773,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogUpdateRes"];
+                        "application/json": components["schemas"]["mail.logUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1821,7 +1821,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogDeleteReq"];
+                    "application/json": components["schemas"]["mail.logDeleteReq"];
                 };
             };
             responses: {
@@ -1831,7 +1831,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogDeleteRes"];
+                        "application/json": components["schemas"]["mail.logDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1879,7 +1879,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailLogGetReq"];
+                    "application/json": components["schemas"]["mail.logGetReq"];
                 };
             };
             responses: {
@@ -1889,7 +1889,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailLogGetRes"];
+                        "application/json": components["schemas"]["mail.logGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1937,7 +1937,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateListAllReq"];
+                    "application/json": components["schemas"]["mail.templateListAllReq"];
                 };
             };
             responses: {
@@ -1947,7 +1947,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateListAllRes"];
+                        "application/json": components["schemas"]["mail.templateListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1995,7 +1995,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateListReq"];
+                    "application/json": components["schemas"]["mail.templateListReq"];
                 };
             };
             responses: {
@@ -2005,7 +2005,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateListRes"];
+                        "application/json": components["schemas"]["mail.templateListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2053,7 +2053,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateAddReq"];
+                    "application/json": components["schemas"]["mail.templateAddReq"];
                 };
             };
             responses: {
@@ -2063,7 +2063,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateAddRes"];
+                        "application/json": components["schemas"]["mail.templateAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2111,7 +2111,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateUpdateReq"];
+                    "application/json": components["schemas"]["mail.templateUpdateReq"];
                 };
             };
             responses: {
@@ -2121,7 +2121,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateUpdateRes"];
+                        "application/json": components["schemas"]["mail.templateUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2169,7 +2169,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateDeleteReq"];
+                    "application/json": components["schemas"]["mail.templateDeleteReq"];
                 };
             };
             responses: {
@@ -2179,7 +2179,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateDeleteRes"];
+                        "application/json": components["schemas"]["mail.templateDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2227,7 +2227,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["MailTemplateGetReq"];
+                    "application/json": components["schemas"]["mail.templateGetReq"];
                 };
             };
             responses: {
@@ -2237,7 +2237,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["MailTemplateGetRes"];
+                        "application/json": components["schemas"]["mail.templateGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2285,7 +2285,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthLoginReq"];
+                    "application/json": components["schemas"]["system.authLoginReq"];
                 };
             };
             responses: {
@@ -2295,7 +2295,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthLoginRes"];
+                        "application/json": components["schemas"]["system.authLoginRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2343,7 +2343,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthWechatReq"];
+                    "application/json": components["schemas"]["system.authWechatReq"];
                 };
             };
             responses: {
@@ -2353,7 +2353,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthWechatRes"];
+                        "application/json": components["schemas"]["system.authWechatRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2401,7 +2401,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthRefreshReq"];
+                    "application/json": components["schemas"]["system.authRefreshReq"];
                 };
             };
             responses: {
@@ -2411,7 +2411,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthRefreshRes"];
+                        "application/json": components["schemas"]["system.authRefreshRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2459,7 +2459,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthCheckReq"];
+                    "application/json": components["schemas"]["system.authCheckReq"];
                 };
             };
             responses: {
@@ -2469,7 +2469,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthCheckRes"];
+                        "application/json": components["schemas"]["system.authCheckRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2517,7 +2517,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthProfileReq"];
+                    "application/json": components["schemas"]["system.authProfileReq"];
                 };
             };
             responses: {
@@ -2527,7 +2527,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthProfileRes"];
+                        "application/json": components["schemas"]["system.authProfileRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2575,7 +2575,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthUpdateProfileReq"];
+                    "application/json": components["schemas"]["system.authUpdateProfileReq"];
                 };
             };
             responses: {
@@ -2585,7 +2585,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthUpdateProfileRes"];
+                        "application/json": components["schemas"]["system.authUpdateProfileRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2633,7 +2633,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthUpdateLangCodeReq"];
+                    "application/json": components["schemas"]["system.authUpdateLangCodeReq"];
                 };
             };
             responses: {
@@ -2643,7 +2643,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthUpdateLangCodeRes"];
+                        "application/json": components["schemas"]["system.authUpdateLangCodeRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2691,7 +2691,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthUpdatePasswordReq"];
+                    "application/json": components["schemas"]["system.authUpdatePasswordReq"];
                 };
             };
             responses: {
@@ -2701,7 +2701,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthUpdatePasswordRes"];
+                        "application/json": components["schemas"]["system.authUpdatePasswordRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2749,7 +2749,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemAuthGetButtonPermissionReq"];
+                    "application/json": components["schemas"]["system.authGetButtonPermissionReq"];
                 };
             };
             responses: {
@@ -2759,7 +2759,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemAuthGetButtonPermissionRes"];
+                        "application/json": components["schemas"]["system.authGetButtonPermissionRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2807,7 +2807,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentListAllReq"];
+                    "application/json": components["schemas"]["system.departmentListAllReq"];
                 };
             };
             responses: {
@@ -2817,7 +2817,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentListAllRes"];
+                        "application/json": components["schemas"]["system.departmentListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2865,7 +2865,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentListReq"];
+                    "application/json": components["schemas"]["system.departmentListReq"];
                 };
             };
             responses: {
@@ -2875,7 +2875,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentListRes"];
+                        "application/json": components["schemas"]["system.departmentListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2923,7 +2923,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentAddReq"];
+                    "application/json": components["schemas"]["system.departmentAddReq"];
                 };
             };
             responses: {
@@ -2933,7 +2933,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentAddRes"];
+                        "application/json": components["schemas"]["system.departmentAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2981,7 +2981,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentDeleteReq"];
+                    "application/json": components["schemas"]["system.departmentDeleteReq"];
                 };
             };
             responses: {
@@ -2991,7 +2991,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentDeleteRes"];
+                        "application/json": components["schemas"]["system.departmentDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3039,7 +3039,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentUpdateReq"];
+                    "application/json": components["schemas"]["system.departmentUpdateReq"];
                 };
             };
             responses: {
@@ -3049,7 +3049,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentUpdateRes"];
+                        "application/json": components["schemas"]["system.departmentUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3097,7 +3097,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentGetReq"];
+                    "application/json": components["schemas"]["system.departmentGetReq"];
                 };
             };
             responses: {
@@ -3107,7 +3107,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentGetRes"];
+                        "application/json": components["schemas"]["system.departmentGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3155,7 +3155,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemDepartmentTreeReq"];
+                    "application/json": components["schemas"]["system.departmentTreeReq"];
                 };
             };
             responses: {
@@ -3165,7 +3165,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemDepartmentTreeRes"];
+                        "application/json": components["schemas"]["system.departmentTreeRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3213,7 +3213,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuListAllReq"];
+                    "application/json": components["schemas"]["system.menuListAllReq"];
                 };
             };
             responses: {
@@ -3223,7 +3223,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuListAllRes"];
+                        "application/json": components["schemas"]["system.menuListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3271,7 +3271,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuListReq"];
+                    "application/json": components["schemas"]["system.menuListReq"];
                 };
             };
             responses: {
@@ -3281,7 +3281,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuListRes"];
+                        "application/json": components["schemas"]["system.menuListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3329,7 +3329,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuAddReq"];
+                    "application/json": components["schemas"]["system.menuAddReq"];
                 };
             };
             responses: {
@@ -3339,7 +3339,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuAddRes"];
+                        "application/json": components["schemas"]["system.menuAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3387,7 +3387,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuUpdateReq"];
+                    "application/json": components["schemas"]["system.menuUpdateReq"];
                 };
             };
             responses: {
@@ -3397,7 +3397,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuUpdateRes"];
+                        "application/json": components["schemas"]["system.menuUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3445,7 +3445,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuDeleteReq"];
+                    "application/json": components["schemas"]["system.menuDeleteReq"];
                 };
             };
             responses: {
@@ -3455,7 +3455,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuDeleteRes"];
+                        "application/json": components["schemas"]["system.menuDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3503,7 +3503,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuGetReq"];
+                    "application/json": components["schemas"]["system.menuGetReq"];
                 };
             };
             responses: {
@@ -3513,7 +3513,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuGetRes"];
+                        "application/json": components["schemas"]["system.menuGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3561,7 +3561,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemMenuTreeReq"];
+                    "application/json": components["schemas"]["system.menuTreeReq"];
                 };
             };
             responses: {
@@ -3571,7 +3571,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemMenuTreeRes"];
+                        "application/json": components["schemas"]["system.menuTreeRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3619,7 +3619,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemPermissionListAllReq"];
+                    "application/json": components["schemas"]["system.permissionListAllReq"];
                 };
             };
             responses: {
@@ -3629,7 +3629,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemPermissionListAllRes"];
+                        "application/json": components["schemas"]["system.permissionListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3677,7 +3677,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemPermissionListReq"];
+                    "application/json": components["schemas"]["system.permissionListReq"];
                 };
             };
             responses: {
@@ -3687,7 +3687,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemPermissionListRes"];
+                        "application/json": components["schemas"]["system.permissionListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3735,7 +3735,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemPermissionAddReq"];
+                    "application/json": components["schemas"]["system.permissionAddReq"];
                 };
             };
             responses: {
@@ -3745,7 +3745,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemPermissionAddRes"];
+                        "application/json": components["schemas"]["system.permissionAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3793,7 +3793,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemPermissionUpdateReq"];
+                    "application/json": components["schemas"]["system.permissionUpdateReq"];
                 };
             };
             responses: {
@@ -3803,7 +3803,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemPermissionUpdateRes"];
+                        "application/json": components["schemas"]["system.permissionUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3851,7 +3851,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemPermissionDeleteReq"];
+                    "application/json": components["schemas"]["system.permissionDeleteReq"];
                 };
             };
             responses: {
@@ -3861,7 +3861,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemPermissionDeleteRes"];
+                        "application/json": components["schemas"]["system.permissionDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3909,7 +3909,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemPermissionGetReq"];
+                    "application/json": components["schemas"]["system.permissionGetReq"];
                 };
             };
             responses: {
@@ -3919,7 +3919,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemPermissionGetRes"];
+                        "application/json": components["schemas"]["system.permissionGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3967,7 +3967,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRoleListAllReq"];
+                    "application/json": components["schemas"]["system.roleListAllReq"];
                 };
             };
             responses: {
@@ -3977,7 +3977,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRoleListAllRes"];
+                        "application/json": components["schemas"]["system.roleListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4025,7 +4025,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRoleListReq"];
+                    "application/json": components["schemas"]["system.roleListReq"];
                 };
             };
             responses: {
@@ -4035,7 +4035,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRoleListRes"];
+                        "application/json": components["schemas"]["system.roleListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4083,7 +4083,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRoleAddReq"];
+                    "application/json": components["schemas"]["system.roleAddReq"];
                 };
             };
             responses: {
@@ -4093,7 +4093,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRoleAddRes"];
+                        "application/json": components["schemas"]["system.roleAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4141,7 +4141,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRoleUpdateReq"];
+                    "application/json": components["schemas"]["system.roleUpdateReq"];
                 };
             };
             responses: {
@@ -4151,7 +4151,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRoleUpdateRes"];
+                        "application/json": components["schemas"]["system.roleUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4199,7 +4199,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRoleDeleteReq"];
+                    "application/json": components["schemas"]["system.roleDeleteReq"];
                 };
             };
             responses: {
@@ -4209,7 +4209,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRoleDeleteRes"];
+                        "application/json": components["schemas"]["system.roleDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4257,7 +4257,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRoleGetReq"];
+                    "application/json": components["schemas"]["system.roleGetReq"];
                 };
             };
             responses: {
@@ -4267,7 +4267,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRoleGetRes"];
+                        "application/json": components["schemas"]["system.roleGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4315,7 +4315,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionListReq"];
+                    "application/json": components["schemas"]["system.role_permissionListReq"];
                 };
             };
             responses: {
@@ -4325,7 +4325,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionListRes"];
+                        "application/json": components["schemas"]["system.role_permissionListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4373,7 +4373,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionAddReq"];
+                    "application/json": components["schemas"]["system.role_permissionAddReq"];
                 };
             };
             responses: {
@@ -4383,7 +4383,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionAddRes"];
+                        "application/json": components["schemas"]["system.role_permissionAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4431,7 +4431,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionBatchAddReq"];
+                    "application/json": components["schemas"]["system.role_permissionBatchAddReq"];
                 };
             };
             responses: {
@@ -4441,7 +4441,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionBatchAddRes"];
+                        "application/json": components["schemas"]["system.role_permissionBatchAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4489,7 +4489,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionUpdateReq"];
+                    "application/json": components["schemas"]["system.role_permissionUpdateReq"];
                 };
             };
             responses: {
@@ -4499,7 +4499,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionUpdateRes"];
+                        "application/json": components["schemas"]["system.role_permissionUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4547,7 +4547,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionDeleteReq"];
+                    "application/json": components["schemas"]["system.role_permissionDeleteReq"];
                 };
             };
             responses: {
@@ -4557,7 +4557,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionDeleteRes"];
+                        "application/json": components["schemas"]["system.role_permissionDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4605,7 +4605,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionBatchDeleteReq"];
+                    "application/json": components["schemas"]["system.role_permissionBatchDeleteReq"];
                 };
             };
             responses: {
@@ -4615,7 +4615,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionBatchDeleteRes"];
+                        "application/json": components["schemas"]["system.role_permissionBatchDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4663,7 +4663,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionGetReq"];
+                    "application/json": components["schemas"]["system.role_permissionGetReq"];
                 };
             };
             responses: {
@@ -4673,7 +4673,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionGetRes"];
+                        "application/json": components["schemas"]["system.role_permissionGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4721,7 +4721,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemRolePermissionGetPermissionsByRoleReq"];
+                    "application/json": components["schemas"]["system.role_permissionGetPermissionsByRoleReq"];
                 };
             };
             responses: {
@@ -4731,7 +4731,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemRolePermissionGetPermissionsByRoleRes"];
+                        "application/json": components["schemas"]["system.role_permissionGetPermissionsByRoleRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4779,7 +4779,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemUserListAllReq"];
+                    "application/json": components["schemas"]["system.userListAllReq"];
                 };
             };
             responses: {
@@ -4789,7 +4789,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemUserListAllRes"];
+                        "application/json": components["schemas"]["system.userListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4837,7 +4837,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemUserListReq"];
+                    "application/json": components["schemas"]["system.userListReq"];
                 };
             };
             responses: {
@@ -4847,7 +4847,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemUserListRes"];
+                        "application/json": components["schemas"]["system.userListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4895,7 +4895,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemUserAddReq"];
+                    "application/json": components["schemas"]["system.userAddReq"];
                 };
             };
             responses: {
@@ -4905,7 +4905,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemUserAddRes"];
+                        "application/json": components["schemas"]["system.userAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4953,7 +4953,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemUserUpdateReq"];
+                    "application/json": components["schemas"]["system.userUpdateReq"];
                 };
             };
             responses: {
@@ -4963,7 +4963,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemUserUpdateRes"];
+                        "application/json": components["schemas"]["system.userUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5011,7 +5011,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemUserDeleteReq"];
+                    "application/json": components["schemas"]["system.userDeleteReq"];
                 };
             };
             responses: {
@@ -5021,7 +5021,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemUserDeleteRes"];
+                        "application/json": components["schemas"]["system.userDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5069,7 +5069,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["SystemUserGetReq"];
+                    "application/json": components["schemas"]["system.userGetReq"];
                 };
             };
             responses: {
@@ -5079,7 +5079,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["SystemUserGetRes"];
+                        "application/json": components["schemas"]["system.userGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5117,7 +5117,7 @@ export interface components {
             message: string;
             data: Record<string, never>;
         };
-        I18nLanguageListAllReq: {
+        "i18n.languageListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -5129,7 +5129,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
         };
-        I18nLanguageListAllRes: {
+        "i18n.languageListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -5165,7 +5165,7 @@ export interface components {
             }[];
             message: string;
         };
-        I18nLanguageListReq: {
+        "i18n.languageListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -5192,7 +5192,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
         };
-        I18nLanguageListRes: {
+        "i18n.languageListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -5254,7 +5254,7 @@ export interface components {
             };
             message: string;
         };
-        I18nLanguageAddReq: {
+        "i18n.languageAddReq": {
             /**
              * @description 语言代码
              * @example zh-CN
@@ -5283,7 +5283,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        I18nLanguageAddRes: {
+        "i18n.languageAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -5292,7 +5292,7 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nLanguageUpdateReq: {
+        "i18n.languageUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -5326,7 +5326,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        I18nLanguageUpdateRes: {
+        "i18n.languageUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -5335,14 +5335,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nLanguageDeleteReq: {
+        "i18n.languageDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nLanguageDeleteRes: {
+        "i18n.languageDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -5351,14 +5351,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nLanguageGetReq: {
+        "i18n.languageGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nLanguageGetRes: {
+        "i18n.languageGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -5410,7 +5410,7 @@ export interface components {
             };
             message: string;
         };
-        I18nRegionListAllReq: {
+        "i18n.regionListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -5422,7 +5422,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
         };
-        I18nRegionListAllRes: {
+        "i18n.regionListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -5461,7 +5461,7 @@ export interface components {
             }[];
             message: string;
         };
-        I18nRegionListReq: {
+        "i18n.regionListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -5488,7 +5488,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
         };
-        I18nRegionListRes: {
+        "i18n.regionListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -5553,7 +5553,7 @@ export interface components {
             };
             message: string;
         };
-        I18nRegionAddReq: {
+        "i18n.regionAddReq": {
             /** @description ISO 3166-1 alpha-2 */
             alpha2Code: string;
             /** @description ISO 3166-1 alpha-3 */
@@ -5585,7 +5585,7 @@ export interface components {
             /** @description 备注 */
             remark: ((string | null) | null) | null;
         };
-        I18nRegionAddRes: {
+        "i18n.regionAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -5594,7 +5594,7 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nRegionUpdateReq: {
+        "i18n.regionUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -5631,7 +5631,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        I18nRegionUpdateRes: {
+        "i18n.regionUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -5640,14 +5640,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nRegionDeleteReq: {
+        "i18n.regionDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nRegionDeleteRes: {
+        "i18n.regionDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -5656,14 +5656,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nRegionGetReq: {
+        "i18n.regionGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nRegionGetRes: {
+        "i18n.regionGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -5718,7 +5718,7 @@ export interface components {
             };
             message: string;
         };
-        I18nTranslationListAllReq: {
+        "i18n.translationListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -5749,7 +5749,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
         };
-        I18nTranslationListAllRes: {
+        "i18n.translationListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -5795,7 +5795,7 @@ export interface components {
             }[];
             message: string;
         };
-        I18nTranslationListReq: {
+        "i18n.translationListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -5841,7 +5841,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
         };
-        I18nTranslationListRes: {
+        "i18n.translationListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -5921,7 +5921,7 @@ export interface components {
             };
             message: string;
         };
-        I18nTranslationAddReq: {
+        "i18n.translationAddReq": {
             /**
              * @description 翻译键
              * @example welcome.message
@@ -5968,7 +5968,7 @@ export interface components {
              */
             isEnabled: boolean;
         };
-        I18nTranslationAddRes: {
+        "i18n.translationAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -5977,7 +5977,7 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nTranslationUpdateReq: {
+        "i18n.translationUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -6029,7 +6029,7 @@ export interface components {
              */
             isEnabled?: boolean;
         };
-        I18nTranslationUpdateRes: {
+        "i18n.translationUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -6038,14 +6038,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nTranslationDeleteReq: {
+        "i18n.translationDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nTranslationDeleteRes: {
+        "i18n.translationDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -6054,14 +6054,14 @@ export interface components {
             data: number;
             message: string;
         };
-        I18nTranslationGetReq: {
+        "i18n.translationGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        I18nTranslationGetRes: {
+        "i18n.translationGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -6131,7 +6131,7 @@ export interface components {
             };
             message: string;
         };
-        I18nTranslationCheckDuplicateReq: {
+        "i18n.translationCheckDuplicateReq": {
             /**
              * @description 翻译值
              * @example Welcome to our application
@@ -6148,7 +6148,7 @@ export interface components {
              */
             excludeId?: ((number | null) | null) | null;
         };
-        I18nTranslationCheckDuplicateRes: {
+        "i18n.translationCheckDuplicateRes": {
             ok: boolean;
             data: {
                 /** @description 是否有重复 */
@@ -6198,7 +6198,7 @@ export interface components {
             };
             message: string;
         };
-        MailAccountListAllReq: {
+        "mail.accountListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -6206,7 +6206,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailAddress" | "isEnabled" | "createTimeUtc";
         };
-        MailAccountListAllRes: {
+        "mail.accountListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -6251,7 +6251,7 @@ export interface components {
             }[];
             message: string;
         };
-        MailAccountListReq: {
+        "mail.accountListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -6274,7 +6274,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailAddress" | "isEnabled" | "createTimeUtc";
         };
-        MailAccountListRes: {
+        "mail.accountListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -6343,7 +6343,7 @@ export interface components {
             };
             message: string;
         };
-        MailAccountAddReq: {
+        "mail.accountAddReq": {
             /**
              * Format: email
              * @description 邮箱地址
@@ -6379,7 +6379,7 @@ export interface components {
              */
             remark: ((string | null) | null) | null;
         };
-        MailAccountAddRes: {
+        "mail.accountAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -6388,7 +6388,7 @@ export interface components {
             data: number;
             message: string;
         };
-        MailAccountUpdateReq: {
+        "mail.accountUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -6429,7 +6429,7 @@ export interface components {
              */
             remark?: ((string | null) | null) | null;
         };
-        MailAccountUpdateRes: {
+        "mail.accountUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -6438,14 +6438,14 @@ export interface components {
             data: number;
             message: string;
         };
-        MailAccountDeleteReq: {
+        "mail.accountDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailAccountDeleteRes: {
+        "mail.accountDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -6454,14 +6454,14 @@ export interface components {
             data: number;
             message: string;
         };
-        MailAccountGetReq: {
+        "mail.accountGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailAccountGetRes: {
+        "mail.accountGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -6520,20 +6520,20 @@ export interface components {
             };
             message: string;
         };
-        MailAccountVerifyReq: {
+        "mail.accountVerifyReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailAccountVerifyRes: {
+        "mail.accountVerifyRes": {
             ok: boolean;
             /** @description 验证结果，true 表示验证成功 */
             data: boolean;
             message: string;
         };
-        MailActionSendReq: {
+        "mail.actionSendReq": {
             /**
              * @description 邮箱账号ID
              * @example 1
@@ -6566,7 +6566,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        MailActionSendRes: {
+        "mail.actionSendRes": {
             ok: boolean;
             data: {
                 /** @description 成功接收的邮箱地址列表 */
@@ -6584,7 +6584,7 @@ export interface components {
             };
             message: string;
         };
-        MailLogListAllReq: {
+        "mail.logListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 发送状态 */
@@ -6598,7 +6598,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
         };
-        MailLogListAllRes: {
+        "mail.logListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -6638,7 +6638,7 @@ export interface components {
             }[];
             message: string;
         };
-        MailLogListReq: {
+        "mail.logListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -6667,7 +6667,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
         };
-        MailLogListRes: {
+        "mail.logListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -6731,7 +6731,7 @@ export interface components {
             };
             message: string;
         };
-        MailLogAddReq: {
+        "mail.logAddReq": {
             /**
              * Format: email
              * @description 收件人邮箱地址
@@ -6762,7 +6762,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        MailLogAddRes: {
+        "mail.logAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -6771,7 +6771,7 @@ export interface components {
             data: number;
             message: string;
         };
-        MailLogUpdateReq: {
+        "mail.logUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -6807,7 +6807,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        MailLogUpdateRes: {
+        "mail.logUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -6816,14 +6816,14 @@ export interface components {
             data: number;
             message: string;
         };
-        MailLogDeleteReq: {
+        "mail.logDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailLogDeleteRes: {
+        "mail.logDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -6832,14 +6832,14 @@ export interface components {
             data: number;
             message: string;
         };
-        MailLogGetReq: {
+        "mail.logGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailLogGetRes: {
+        "mail.logGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -6893,7 +6893,7 @@ export interface components {
             };
             message: string;
         };
-        MailTemplateListAllReq: {
+        "mail.templateListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -6901,7 +6901,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        MailTemplateListAllRes: {
+        "mail.templateListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -6938,7 +6938,7 @@ export interface components {
             }[];
             message: string;
         };
-        MailTemplateListReq: {
+        "mail.templateListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -6961,7 +6961,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        MailTemplateListRes: {
+        "mail.templateListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -7022,7 +7022,7 @@ export interface components {
             };
             message: string;
         };
-        MailTemplateAddReq: {
+        "mail.templateAddReq": {
             /**
              * @description 邮件模板名称
              * @example welcome_email
@@ -7050,7 +7050,7 @@ export interface components {
              */
             remark?: ((string | null) | null) | null;
         };
-        MailTemplateAddRes: {
+        "mail.templateAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -7059,7 +7059,7 @@ export interface components {
             data: number;
             message: string;
         };
-        MailTemplateUpdateReq: {
+        "mail.templateUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -7092,7 +7092,7 @@ export interface components {
              */
             remark?: ((string | null) | null) | null;
         };
-        MailTemplateUpdateRes: {
+        "mail.templateUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -7101,14 +7101,14 @@ export interface components {
             data: number;
             message: string;
         };
-        MailTemplateDeleteReq: {
+        "mail.templateDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailTemplateDeleteRes: {
+        "mail.templateDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -7117,14 +7117,14 @@ export interface components {
             data: number;
             message: string;
         };
-        MailTemplateGetReq: {
+        "mail.templateGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        MailTemplateGetRes: {
+        "mail.templateGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -7175,7 +7175,7 @@ export interface components {
             };
             message: string;
         };
-        SystemAuthLoginReq: {
+        "system.authLoginReq": {
             /**
              * @description 用户名
              * @example admin
@@ -7187,7 +7187,7 @@ export interface components {
              */
             password: string;
         };
-        SystemAuthLoginRes: {
+        "system.authLoginRes": {
             ok: boolean;
             data: {
                 userObj: {
@@ -7216,7 +7216,7 @@ export interface components {
             };
             message: string;
         };
-        SystemAuthWechatReq: {
+        "system.authWechatReq": {
             /**
              * @description 微信授权码
              * @example 061abc123
@@ -7228,7 +7228,7 @@ export interface components {
              */
             state?: string;
         };
-        SystemAuthWechatRes: {
+        "system.authWechatRes": {
             ok: boolean;
             data: {
                 userObj: {
@@ -7257,8 +7257,8 @@ export interface components {
             };
             message: string;
         };
-        SystemAuthRefreshReq: Record<string, never>;
-        SystemAuthRefreshRes: {
+        "system.authRefreshReq": Record<string, never>;
+        "system.authRefreshRes": {
             ok: boolean;
             data: {
                 /**
@@ -7269,14 +7269,14 @@ export interface components {
             };
             message: string;
         };
-        SystemAuthCheckReq: Record<string, never>;
-        SystemAuthCheckRes: {
+        "system.authCheckReq": Record<string, never>;
+        "system.authCheckRes": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        SystemAuthProfileReq: Record<string, never>;
-        SystemAuthProfileRes: {
+        "system.authProfileReq": Record<string, never>;
+        "system.authProfileRes": {
             ok: boolean;
             data: {
                 userObj: {
@@ -7357,7 +7357,7 @@ export interface components {
             };
             message: string;
         };
-        SystemAuthUpdateProfileReq: {
+        "system.authUpdateProfileReq": {
             /** @description 国家地区对象 */
             regionObj?: (({
                 /**
@@ -7372,7 +7372,7 @@ export interface components {
                 label: string;
             } | null) | null) | null;
         };
-        SystemAuthUpdateProfileRes: {
+        "system.authUpdateProfileRes": {
             ok: boolean;
             /**
              * @description id
@@ -7381,7 +7381,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemAuthUpdateLangCodeReq: {
+        "system.authUpdateLangCodeReq": {
             /**
              * @description 语言代码
              * @example en-US
@@ -7389,7 +7389,7 @@ export interface components {
              */
             langCode: string;
         };
-        SystemAuthUpdateLangCodeRes: {
+        "system.authUpdateLangCodeRes": {
             ok: boolean;
             /**
              * @description id
@@ -7398,7 +7398,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemAuthUpdatePasswordReq: {
+        "system.authUpdatePasswordReq": {
             /**
              * @description 旧密码
              * @example QWRtaW5AM==
@@ -7410,7 +7410,7 @@ export interface components {
              */
             newPassword: string;
         };
-        SystemAuthUpdatePasswordRes: {
+        "system.authUpdatePasswordRes": {
             ok: boolean;
             /**
              * @description id
@@ -7419,8 +7419,8 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemAuthGetButtonPermissionReq: Record<string, never>;
-        SystemAuthGetButtonPermissionRes: {
+        "system.authGetButtonPermissionReq": Record<string, never>;
+        "system.authGetButtonPermissionRes": {
             ok: boolean;
             data: {
                 permissions: {
@@ -7476,7 +7476,7 @@ export interface components {
             };
             message: string;
         };
-        SystemDepartmentListAllReq: {
+        "system.departmentListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -7484,7 +7484,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
         };
-        SystemDepartmentListAllRes: {
+        "system.departmentListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -7506,7 +7506,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemDepartmentListReq: {
+        "system.departmentListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -7534,7 +7534,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
         };
-        SystemDepartmentListRes: {
+        "system.departmentListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -7580,7 +7580,7 @@ export interface components {
             };
             message: string;
         };
-        SystemDepartmentAddReq: {
+        "system.departmentAddReq": {
             /**
              * @description 部门名称
              * @example 技术部
@@ -7593,7 +7593,7 @@ export interface components {
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
         };
-        SystemDepartmentAddRes: {
+        "system.departmentAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -7602,14 +7602,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemDepartmentDeleteReq: {
+        "system.departmentDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemDepartmentDeleteRes: {
+        "system.departmentDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -7618,7 +7618,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemDepartmentUpdateReq: {
+        "system.departmentUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -7636,7 +7636,7 @@ export interface components {
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
         };
-        SystemDepartmentUpdateRes: {
+        "system.departmentUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -7645,14 +7645,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemDepartmentGetReq: {
+        "system.departmentGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemDepartmentGetRes: {
+        "system.departmentGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -7688,11 +7688,11 @@ export interface components {
             };
             message: string;
         };
-        SystemDepartmentTreeReq: {
+        "system.departmentTreeReq": {
             /** @description 是否显示所有部门（包括未启用的） */
             showAll?: boolean;
         };
-        SystemDepartmentTreeRes: {
+        "system.departmentTreeRes": {
             ok: boolean;
             data: {
                 /**
@@ -7761,7 +7761,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemMenuListAllReq: {
+        "system.menuListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -7769,7 +7769,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        SystemMenuListAllRes: {
+        "system.menuListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -7803,7 +7803,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemMenuListReq: {
+        "system.menuListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -7826,7 +7826,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        SystemMenuListRes: {
+        "system.menuListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -7884,7 +7884,7 @@ export interface components {
             };
             message: string;
         };
-        SystemMenuAddReq: {
+        "system.menuAddReq": {
             /**
              * @description 菜单名称
              * @example 主页
@@ -7909,7 +7909,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
         };
-        SystemMenuAddRes: {
+        "system.menuAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -7918,7 +7918,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemMenuUpdateReq: {
+        "system.menuUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -7948,7 +7948,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
-        SystemMenuUpdateRes: {
+        "system.menuUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -7957,14 +7957,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemMenuDeleteReq: {
+        "system.menuDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemMenuDeleteRes: {
+        "system.menuDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -7973,14 +7973,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemMenuGetReq: {
+        "system.menuGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemMenuGetRes: {
+        "system.menuGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -8028,11 +8028,11 @@ export interface components {
             };
             message: string;
         };
-        SystemMenuTreeReq: {
+        "system.menuTreeReq": {
             /** @description 是否显示所有菜单（包括未启用的） */
             showAll?: boolean;
         };
-        SystemMenuTreeRes: {
+        "system.menuTreeRes": {
             ok: boolean;
             data: {
                 /**
@@ -8125,7 +8125,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemPermissionListAllReq: {
+        "system.permissionListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -8150,7 +8150,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "code" | "name" | "category" | "isEnabled" | "createTimeUtc";
         };
-        SystemPermissionListAllRes: {
+        "system.permissionListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -8190,7 +8190,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemPermissionListReq: {
+        "system.permissionListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -8230,7 +8230,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "code" | "name" | "category" | "isEnabled" | "createTimeUtc";
         };
-        SystemPermissionListRes: {
+        "system.permissionListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -8294,7 +8294,7 @@ export interface components {
             };
             message: string;
         };
-        SystemPermissionAddReq: {
+        "system.permissionAddReq": {
             /**
              * @description 权限代码，唯一标识
              * @example user:read
@@ -8325,7 +8325,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
         };
-        SystemPermissionAddRes: {
+        "system.permissionAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -8334,7 +8334,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemPermissionUpdateReq: {
+        "system.permissionUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -8370,7 +8370,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
-        SystemPermissionUpdateRes: {
+        "system.permissionUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -8379,14 +8379,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemPermissionDeleteReq: {
+        "system.permissionDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemPermissionDeleteRes: {
+        "system.permissionDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -8395,14 +8395,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemPermissionGetReq: {
+        "system.permissionGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemPermissionGetRes: {
+        "system.permissionGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -8456,7 +8456,7 @@ export interface components {
             };
             message: string;
         };
-        SystemRoleListAllReq: {
+        "system.roleListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -8464,7 +8464,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        SystemRoleListAllRes: {
+        "system.roleListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -8486,7 +8486,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemRoleListReq: {
+        "system.roleListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -8509,7 +8509,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        SystemRoleListRes: {
+        "system.roleListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -8555,7 +8555,7 @@ export interface components {
             };
             message: string;
         };
-        SystemRoleAddReq: {
+        "system.roleAddReq": {
             /**
              * @description 角色名称
              * @example 管理员
@@ -8568,7 +8568,7 @@ export interface components {
             /** @description 权限数量 */
             permissionCount: number;
         };
-        SystemRoleAddRes: {
+        "system.roleAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -8577,7 +8577,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemRoleUpdateReq: {
+        "system.roleUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -8595,7 +8595,7 @@ export interface components {
             /** @description 权限数量 */
             permissionCount?: number;
         };
-        SystemRoleUpdateRes: {
+        "system.roleUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -8604,14 +8604,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemRoleDeleteReq: {
+        "system.roleDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemRoleDeleteRes: {
+        "system.roleDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -8620,14 +8620,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemRoleGetReq: {
+        "system.roleGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemRoleGetRes: {
+        "system.roleGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -8663,7 +8663,7 @@ export interface components {
             };
             message: string;
         };
-        SystemRolePermissionListReq: {
+        "system.role_permissionListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -8688,7 +8688,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "roleId" | "permissionId" | "createTimeUtc";
         };
-        SystemRolePermissionListRes: {
+        "system.role_permissionListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -8738,7 +8738,7 @@ export interface components {
             };
             message: string;
         };
-        SystemRolePermissionAddReq: {
+        "system.role_permissionAddReq": {
             /** @description 角色ID */
             roleId: number;
             /** @description 权限ID */
@@ -8755,7 +8755,7 @@ export interface components {
              */
             conditions: ((string | null) | null) | null;
         };
-        SystemRolePermissionAddRes: {
+        "system.role_permissionAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -8764,19 +8764,19 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemRolePermissionBatchAddReq: {
+        "system.role_permissionBatchAddReq": {
             /** @description 角色ID */
             roleId: number;
             /** @description 权限ID列表 */
             permissionIds: number[];
         };
-        SystemRolePermissionBatchAddRes: {
+        "system.role_permissionBatchAddRes": {
             ok: boolean;
             /** @description 成功添加的数量 */
             data: number;
             message: string;
         };
-        SystemRolePermissionUpdateReq: {
+        "system.role_permissionUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -8798,7 +8798,7 @@ export interface components {
              */
             conditions?: ((string | null) | null) | null;
         };
-        SystemRolePermissionUpdateRes: {
+        "system.role_permissionUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -8807,14 +8807,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemRolePermissionDeleteReq: {
+        "system.role_permissionDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemRolePermissionDeleteRes: {
+        "system.role_permissionDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -8823,26 +8823,26 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemRolePermissionBatchDeleteReq: {
+        "system.role_permissionBatchDeleteReq": {
             /** @description 角色ID */
             roleId: number;
             /** @description 权限ID列表 */
             permissionIds: number[];
         };
-        SystemRolePermissionBatchDeleteRes: {
+        "system.role_permissionBatchDeleteRes": {
             ok: boolean;
             /** @description 成功删除的数量 */
             data: number;
             message: string;
         };
-        SystemRolePermissionGetReq: {
+        "system.role_permissionGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemRolePermissionGetRes: {
+        "system.role_permissionGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -8882,11 +8882,11 @@ export interface components {
             };
             message: string;
         };
-        SystemRolePermissionGetPermissionsByRoleReq: {
+        "system.role_permissionGetPermissionsByRoleReq": {
             /** @description 角色ID */
             roleId: number;
         };
-        SystemRolePermissionGetPermissionsByRoleRes: {
+        "system.role_permissionGetPermissionsByRoleRes": {
             ok: boolean;
             data: {
                 /**
@@ -8940,7 +8940,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemUserListAllReq: {
+        "system.userListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -8948,7 +8948,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
-        SystemUserListAllRes: {
+        "system.userListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -8986,7 +8986,7 @@ export interface components {
             }[];
             message: string;
         };
-        SystemUserListReq: {
+        "system.userListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -9009,7 +9009,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
-        SystemUserListRes: {
+        "system.userListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -9071,7 +9071,7 @@ export interface components {
             };
             message: string;
         };
-        SystemUserAddReq: {
+        "system.userAddReq": {
             /**
              * @description 用户名
              * @example user
@@ -9132,7 +9132,7 @@ export interface components {
                 label: string;
             }[];
         };
-        SystemUserAddRes: {
+        "system.userAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -9141,7 +9141,7 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemUserUpdateReq: {
+        "system.userUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -9202,7 +9202,7 @@ export interface components {
                 label: string;
             }[];
         };
-        SystemUserUpdateRes: {
+        "system.userUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -9211,14 +9211,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemUserDeleteReq: {
+        "system.userDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemUserDeleteRes: {
+        "system.userDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -9227,14 +9227,14 @@ export interface components {
             data: number;
             message: string;
         };
-        SystemUserGetReq: {
+        "system.userGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        SystemUserGetRes: {
+        "system.userGetRes": {
             ok: boolean;
             data: {
                 /**
