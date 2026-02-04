@@ -5,6 +5,7 @@ import docRegister from "@/middleware/doc/docRegister";
 import corsHandler from "@/middleware/cors";
 import nodeServer from "@/middleware/nodeServer/index";
 import routeRegister from "@/api/index";
+import serverTiming from "@/middleware/serverTiming";
 import type { AppBindings, NodeHonoContext } from "@/types/app";
 import initDatabase from "@/db/init";
 
@@ -13,6 +14,7 @@ async function createApp() {
   logHandler(app);
   errorHandler(app);
   corsHandler(app);
+  serverTiming(app);
   //   basicAuthHandler(app);
   //   bearerAuthHandler(app);
   //   pathHandler(app);
