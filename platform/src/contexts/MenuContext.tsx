@@ -54,7 +54,11 @@ export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loadMenuData();
   }, [loadMenuData]);
 
-  return <MenuContext.Provider value={{ navItems, setNavItems, loading, loadMenus: loadMenuData }}>{children}</MenuContext.Provider>;
+  return (
+    <MenuContext.Provider value={{ navItems, setNavItems, loading, loadMenus: loadMenuData }}>
+      {children}
+    </MenuContext.Provider>
+  );
 };
 
 export { MenuContext };
