@@ -46,6 +46,29 @@ export default defineConfig(({ command, mode }) => {
     },
     server: { proxy: {} },
     plugins: [react(), UnoCSS()],
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        '@mui/material',
+        '@mui/icons-material',
+        '@iconify/react',
+        '@iconify-json/material-symbols',
+        'axios',
+      ],
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'mui-vendor': ['@mui/material'],
+            'mui-icons': ['@mui/icons-material'],
+          },
+        },
+      },
+    },
   };
   if (mode === 'development') {
     if (env.SERVER_URL || env.VITE_SERVER_URL) {
