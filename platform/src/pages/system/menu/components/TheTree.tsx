@@ -1,9 +1,5 @@
 import { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect } from 'react';
-import {
-  Box,
-  CircularProgress,
-  Typography,
-} from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
@@ -39,7 +35,7 @@ const TheTree = memo(
       const map = new Map<number, MenuData & { children?: MenuData[] }>();
       list.forEach((item) => {
         // 确保 children 存在，便于后续遍历/展开
-        map.set(item.id, { ...item, children: item.children ?? [] });
+        map.set(Number(item.id), { ...item, children: item.children ?? [] });
       });
 
       const roots: MenuData[] = [];
@@ -117,7 +113,7 @@ const TheTree = memo(
           const traverse = (items: MenuData[]) => {
             items.forEach((item) => {
               if (item.children && item.children.length > 0) {
-                expandedIds.push(item.id.toString());
+                expandedIds.push(String(item.id));
                 traverse(item.children);
               }
             });
@@ -128,12 +124,12 @@ const TheTree = memo(
             setFilters(searchFilters);
           }
         } catch (err) {
-          console.error(err); 
+          console.error(err);
         } finally {
           setLoading(false);
         }
       },
-      [buildTree, filterMenus, t],
+      [buildTree, filterMenus],
     );
 
     // 暴露给父组件的方法
@@ -158,63 +154,67 @@ const TheTree = memo(
     }, [fetchMenus]);
 
     // 删除成功后的回调
-    const handleDeleteSuccess = useCallback(async (menuId: number) => {
-      setLoading(true);
-      try {
-        await MenuAPI.deleteFn({ data: { id: menuId } });
-        fetchMenus(filters);
-        showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
-      } catch (err) {
-        console.error(err); 
-      } finally {
-        setLoading(false);
-      }
-    }, [fetchMenus, filters, t]);
+    const handleDeleteSuccess = useCallback(
+      async (menuId: number) => {
+        setLoading(true);
+        try {
+          await MenuAPI.deleteFn({ data: { id: menuId } });
+          fetchMenus(filters);
+          showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      },
+      [fetchMenus, filters, t],
+    );
 
     // 渲染菜单树
     const renderTree = useCallback(
       (nodes: MenuData[]) =>
         nodes.map((node) => (
-        <TreeItem
-          key={node.id}
-          itemId={node.id.toString()}
-          label={
-            <Box display="flex" alignItems="center" py={0.5}>
-              {node.icon && (
-                <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                  <Icon name={node.icon} size={20} />
-                </Box>
-              )}
-              <Typography sx={{ flexGrow: 1 }}>
-                {t(node.name)}
-                {node.path && (
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ ml: 1 }}
-                  >
-                    ({node.path})
-                  </Typography>
+          <TreeItem
+            key={node.id}
+            itemId={String(node.id)}
+            label={
+              <Box display="flex" alignItems="center" py={0.5}>
+                {node.icon && (
+                  <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+                    <Icon name={node.icon} size={20} />
+                  </Box>
                 )}
-                {!node.isEnabled && (
-                  <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                    {t('status.disabled')}
-                  </Typography>
-                )}
-              </Typography>
-              <TreeNodeActionButtons
-                node={node}
-                formRef={formRef}
-                onDeleteSuccess={() => handleDeleteSuccess(node.id)}
-              />
-            </Box>
-          }
-        >
-          {node.children && node.children.length > 0 && renderTree(node.children)}
-        </TreeItem>
-      )),
-    [formRef, handleDeleteSuccess, t]);
+                <Typography sx={{ flexGrow: 1 }}>
+                  {t(node.name)}
+                  {node.path && (
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ ml: 1 }}
+                    >
+                      ({node.path})
+                    </Typography>
+                  )}
+                  {!node.isEnabled && (
+                    <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
+                      {t('status.disabled')}
+                    </Typography>
+                  )}
+                </Typography>
+                <TreeNodeActionButtons
+                  node={node}
+                  formRef={formRef}
+                  onDeleteSuccess={() => handleDeleteSuccess(node.id!)}
+                />
+              </Box>
+            }
+          >
+            {node.children && node.children.length > 0 && renderTree(node.children)}
+          </TreeItem>
+        )),
+      [formRef, handleDeleteSuccess, t],
+    );
 
     return (
       <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>

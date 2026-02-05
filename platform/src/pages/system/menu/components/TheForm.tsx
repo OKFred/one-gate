@@ -28,7 +28,7 @@ import type { TreeMenuRes } from '@/api/system/type';
 export interface MenuFormData
   extends Pick<
     TreeMenuRes[0],
-    'name' | 'icon' | 'path' | 'remark' | 'parentId' | 'sort' | 'isEnabled'
+    'name' | 'icon' | 'business' | 'path' | 'remark' | 'parentId' | 'sort' | 'isEnabled'
   > {
   id?: number;
 }
@@ -50,6 +50,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: MenuFormData = {
   name: '',
   icon: 'material-symbols:folder',
+  business: null,
   path: null,
   remark: null,
   parentId: null,
@@ -101,6 +102,7 @@ const TheForm = memo(
             id: menu.id,
             name: menu.name,
             icon: menu.icon,
+            business: menu.business ?? null,
             path: menu.path ?? null,
             remark: null,
             parentId: menu.parentId ?? null,
@@ -138,6 +140,7 @@ const TheForm = memo(
         const submitData = {
           name: formValues.name,
           icon: formValues.icon || 'material-symbols:folder',
+          business: hasValue(formValues.business) ? formValues.business : null,
           path: hasValue(formValues.path) ? formValues.path : null,
           remark: hasValue(formValues.remark) ? formValues.remark : null,
           parentId: hasValue(formValues.parentId) ? formValues.parentId : null,
