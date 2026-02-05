@@ -29,6 +29,7 @@ interface TopbarProps {
 const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
+  const [languagesLoaded, setLanguagesLoaded] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     // 从 localStorage 读取主题设置
@@ -59,24 +60,25 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     }
   }, [darkMode]);
 
-  // 加载语言列表
-  useEffect(() => {
-    const loadLanguages = async () => {
-      try {
-        const response = await LanguageAPI.listAllFn({
-          data: { isEnabled: true },
-        });
-        setLanguages(response.data.data);
-      } catch (error) {
-        console.error('Failed to load languages:', error);
-      }
-    };
-    loadLanguages();
-  }, []);
+  // 懒加载语言列表：只在用户第一次打开菜单时加载
+  const loadLanguages = async () => {
+    if (languagesLoaded) return;
+    try {
+      const response = await LanguageAPI.listAllFn({
+        data: { isEnabled: true },
+      });
+      setLanguages(response.data.data);
+      setLanguagesLoaded(true);
+    } catch (error) {
+      console.error('Failed to load languages:', error);
+    }
+  };
 
   // 处理用户菜单点击
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = async (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    // 菜单打开时才加载语言列表
+    await loadLanguages();
   };
 
   // 关闭用户菜单

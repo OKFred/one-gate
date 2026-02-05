@@ -7,7 +7,7 @@ import Content from './components/Content';
 import ScrollTop from './components/ScrollTop';
 import { useResponsive } from '../hooks/useResponsive';
 
-export default function ResponsiveLayout() {
+export default React.memo(function ResponsiveLayout() {
   const { isMobile } = useResponsive();
   const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile);
 
@@ -33,4 +33,4 @@ export default function ResponsiveLayout() {
       </Box>
     </div>
   );
-}
+});
