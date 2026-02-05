@@ -179,7 +179,7 @@ const TheForm = memo(
 
     // 处理 category 全选
     const handleCategorySelectAll = (
-      category: string,
+      _: string,
       businessMap: Record<string, typeof availablePermissions>,
     ) => {
       const allPermissionsInCategory = Object.values(businessMap).flat();
@@ -215,7 +215,7 @@ const TheForm = memo(
 
     // 检查 category 是否全选
     const isCategoryAllSelected = (
-      category: string,
+      _: string,
       businessMap: Record<string, typeof availablePermissions>,
     ) => {
       const allPermissionsInCategory = Object.values(businessMap).flat();
