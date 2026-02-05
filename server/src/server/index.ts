@@ -6,11 +6,13 @@ import corsHandler from "@/middleware/cors";
 import nodeServer from "@/middleware/nodeServer/index";
 import routeRegister from "@/api/index";
 import serverTiming from "@/middleware/serverTiming";
+import serveStaticFiles from "@/middleware/serveStatic";
 import type { AppBindings, NodeHonoContext } from "@/types/app";
 import initDatabase from "@/db/init";
 
 async function createApp() {
   const app = new OpenAPIHono<AppBindings>();
+  serveStaticFiles(app);
   logHandler(app);
   errorHandler(app);
   corsHandler(app);
@@ -19,7 +21,8 @@ async function createApp() {
   //   bearerAuthHandler(app);
   //   pathHandler(app);
   docRegister(app);
-  await routeRegister(app);
+  const subApp = await routeRegister();
+  app.route(process.env.BASE_API_PATH, subApp);
 
   // 初始化数据库数据（超级管理员角色和账号）
   // 同时初始化多语言缓存
@@ -29,7 +32,7 @@ async function createApp() {
 
   nodeServer(app);
   //   normalRouter(app);
-  app.get("/", (c: NodeHonoContext) => {
+  app.get("/healthCheck", (c: NodeHonoContext) => {
     const { logger } = c.var;
     logger.info("gotcha");
     return c.json({
