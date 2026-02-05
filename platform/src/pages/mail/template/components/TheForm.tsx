@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useImperativeHandle, memo } from 'react';
+import React, { useState, forwardRef, useImperativeHandle, memo, Suspense, lazy } from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
 import {
   Button,
@@ -12,13 +12,16 @@ import {
   useTheme,
   IconButton,
   Typography,
+  CircularProgress,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import JoditEditor from '@/components/JoditEditor/index';
+import { useResponsive } from '@/hooks/useResponsive';
+
+// 动态导入 JoditEditor，实现代码分割
+const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
 import * as MailTemplateAPI from '@/api/mail/template';
 import type { AddMailTemplateReq } from '@/api/mail/type';
 import type { Props } from '../index';
-import { useResponsive } from '@/hooks/useResponsive';
 import { showSnackbar } from '@/components/Notification';
 
 const DEFAULT_FORM: AddMailTemplateReq = {
@@ -208,12 +211,20 @@ const TheForm = memo(
                 <Typography variant="body2" color="text.secondary" mb={2}>
                   {t('template.table.contentHelp')}
                 </Typography>
-                <JoditEditor
-                  value={form.content || ''}
-                  onChange={(html) => setForm({ ...form, content: html })}
-                  placeholder={t('form.pleaseEnter')}
-                  height={isMobile ? 300 : 450}
-                />
+                <Suspense
+                  fallback={
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                      <CircularProgress />
+                    </Box>
+                  }
+                >
+                  <JoditEditor
+                    value={form.content || ''}
+                    onChange={(html) => setForm({ ...form, content: html })}
+                    placeholder={t('form.pleaseEnter')}
+                    height={isMobile ? 300 : 450}
+                  />
+                </Suspense>
               </Box>
 
               <TextField
