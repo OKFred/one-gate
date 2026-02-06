@@ -158,7 +158,7 @@ const TheTable = memo(
         render: (row) => (
           <MuiLink
             component={RouterLink}
-            to={`/system/role-permission?roleId=${row.id}`}
+            to={`/system/role_permission?roleId=${row.id}`}
             color="primary"
           >
             {row.permissionCount || 0}
