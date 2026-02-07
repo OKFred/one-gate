@@ -21,6 +21,7 @@ import * as LanguageAPI from '@/api/i18n/language';
 import * as AuthAPI from '@/api/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ListAllLanguageRes } from '@/api/i18n/type';
+import { loginPath } from '@/routes';
 
 interface TopbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -109,7 +110,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const handleLogout = () => {
     handleClose();
     authUtils.logout();
-    navigate('/login');
+    navigate(loginPath);
   };
 
   // 获取用户名显示

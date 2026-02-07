@@ -12,6 +12,7 @@ import { showGlobalNotification, showSnackbar } from '@/components/Notification'
 import { authUtils } from '@/utils/auth';
 // 导入翻译函数创建器（非Hook版本，可在拦截器中使用）
 import { createTranslator } from '@/hooks/useTranslation';
+import { loginPath } from '@/routes';
 
 export type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
 
@@ -109,16 +110,15 @@ function setupInterceptors(service: AxiosInstance) {
 
       // 401 未授权：清理并跳转登录
       if (status === 401) {
-        if (window.location.pathname !== '/login') {
+        // 使用 hash 路由检查当前位置（因为项目使用了 HashRouter）
+        const currentHash = window.location.hash.slice(1); // 移除 # 前缀
+        if (!currentHash.startsWith(loginPath)) {
           showGlobalNotification({
             message: t('error.sessionExpired'),
             type: 'warning',
-            beforeClose: (action, instance, done) => {
-              console.log(action, instance);
+            beforeClose: (_, __, done) => {
               authUtils.logout();
-              if (window.location.pathname !== '/login') {
-                window.location.href = '/login';
-              }
+              window.location.hash = loginPath;
               done();
             },
           });

@@ -5,6 +5,8 @@ import { CircularProgress } from '@mui/material';
 import RootRedirect from './components/RootRedirect';
 
 const modules = import.meta.glob('./pages/!(error|login)/**/index.tsx');
+export const loginPath = '/login';
+export const homePath = '/home';
 
 const PageLoading = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { authUtils } from '@/utils/auth';
 import { CircularProgress, Box } from '@mui/material';
+import { homePath, loginPath } from '@/routes';
 
 const RootRedirect: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(true);
@@ -34,7 +35,7 @@ const RootRedirect: React.FC = () => {
   }
 
   // 根据登录状态重定向
-  return <Navigate to={isAuthenticated ? '/home' : '/login'} replace />;
+  return <Navigate to={isAuthenticated ? homePath : loginPath} replace />;
 };
 
 export default RootRedirect;

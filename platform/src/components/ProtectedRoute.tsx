@@ -5,6 +5,7 @@ import { checkTokenFn } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 import { useMenu } from '@/hooks/useMenu';
 import type { MenuNode } from '@/contexts/MenuContext';
+import { loginPath } from '@/routes';
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -64,7 +65,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // 未认证，重定向到登录页
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
   // 已认证，检查路径是否在菜单中
