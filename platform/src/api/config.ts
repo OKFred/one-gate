@@ -13,6 +13,9 @@ import { authUtils } from '@/utils/auth';
 // 导入翻译函数创建器（非Hook版本，可在拦截器中使用）
 import { createTranslator } from '@/hooks/useTranslation';
 import { loginPath } from '@/routes';
+import { RequestQueueManager } from './queue';
+
+const requestQueueManager = new RequestQueueManager();
 
 export type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
 
@@ -61,7 +64,15 @@ const service = axios.create({
 function setupInterceptors(service: AxiosInstance) {
   /** @description 添加请求拦截器 */
   service.interceptors.request.use(
-    (config: InternalAxiosRequestConfig & { path?: Record<string, unknown> }) => {
+    (
+      config: InternalAxiosRequestConfig & { path?: Record<string, unknown>; requestId?: string },
+    ) => {
+      // 创建 AbortController 并添加到队列
+      const controller = new AbortController();
+      const requestId = requestQueueManager.addRequest(controller);
+      config.requestId = requestId;
+      config.signal = controller.signal;
+
       // 自动添加认证token
       const token = authUtils.getUserInfo()?.token;
       if (token) {
@@ -89,6 +100,13 @@ function setupInterceptors(service: AxiosInstance) {
   /** @description 添加响应拦截器 */
   service.interceptors.response.use(
     function (response) {
+      // 从队列中移除已完成的请求
+      const requestId = (response.config as InternalAxiosRequestConfig & { requestId?: string })
+        .requestId;
+      if (requestId) {
+        requestQueueManager.removeRequest(requestId);
+      }
+
       if (response.status === 200) {
         // 检查响应数据中的 ok 字段
         if (!response.data || response.data?.ok === false) {
@@ -107,12 +125,17 @@ function setupInterceptors(service: AxiosInstance) {
       const langCode = authUtils.getUserInfo()?.langCode;
       const t = createTranslator(langCode);
       const status = error.response?.status;
+      const requestId = (error.config as InternalAxiosRequestConfig & { requestId?: string })
+        ?.requestId;
 
       // 401 未授权：清理并跳转登录
       if (status === 401) {
         // 使用 hash 路由检查当前位置（因为项目使用了 HashRouter）
         const currentHash = window.location.hash.slice(1); // 移除 # 前缀
         if (!currentHash.startsWith(loginPath)) {
+          // abort 队列中的所有其他请求
+          requestQueueManager.abortAllRequests(requestId);
+
           showGlobalNotification({
             message: t('error.sessionExpired'),
             type: 'warning',
@@ -124,8 +147,17 @@ function setupInterceptors(service: AxiosInstance) {
           });
         } else {
           console.log('当前已在登录页，无需重复跳转');
+          // 移除当前请求
+          if (requestId) {
+            requestQueueManager.removeRequest(requestId);
+          }
         }
         return Promise.reject(error);
+      }
+
+      // 移除当前请求
+      if (requestId) {
+        requestQueueManager.removeRequest(requestId);
       }
 
       // 其他业务错误：优先展示后端 message
