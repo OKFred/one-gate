@@ -175,6 +175,15 @@ export const initialMenuData = [
     sort: 1,
     business: "operation_maintenance.cache",
   },
+  {
+    id: 21,
+    name: "sidebar.menu.operation_maintenance.openapi",
+    icon: "material-symbols:api",
+    path: "/operation_maintenance/openapi",
+    parentId: 19,
+    sort: 2,
+    business: "operation_maintenance",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

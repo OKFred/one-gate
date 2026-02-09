@@ -4427,6 +4427,39 @@ export const initialTranslationData = [
     tValue: "Cache",
     isEnabled: true,
   },
+  {
+    application: "frontend",
+    business: "business.type",
+    langCode: "zh-CN",
+    tKey: "sidebar.menu.operation_maintenance.openapi",
+    tValue: "接口文档",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    langCode: "en-US",
+    tKey: "sidebar.menu.operation_maintenance.openapi",
+    tValue: "API Docs",
+    isEnabled: true,
+  },
+  // OpenAPI 文档页面翻译
+  {
+    application: "frontend",
+    business: "operation_maintenance",
+    langCode: "zh-CN",
+    tKey: "openapi.title",
+    tValue: "接口文档",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "operation_maintenance",
+    langCode: "en-US",
+    tKey: "openapi.title",
+    tValue: "API Documentation",
+    isEnabled: true,
+  },
   // 缓存页面翻译
   {
     application: "frontend",
