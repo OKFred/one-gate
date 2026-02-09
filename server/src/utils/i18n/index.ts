@@ -12,17 +12,17 @@ let cachedSupportedLanguages: string[] = [];
  * 刷新支持的语言列表缓存
  */
 export async function refreshSupportedLanguagesCache(): Promise<void> {
-  cachedSupportedLanguages = await getSupportedLanguages();
+  cachedSupportedLanguages = getSupportedLanguages();
 }
 
 /**
  * 创建翻译函数，用于处理消息的多语言替换
  * @param langCode - Accept-Language 请求头
- * @returns 翻译函数，从数据库缓存中读取翻译
+ * @returns 翻译函数，从内存缓存中读取翻译
  */
 export const createTranslator = (
   langCode?: string
-): ((key: string) => Promise<string>) => {
+): ((key: string) => string) => {
   // 如果缓存未初始化，先记录警告
   if (!isTranslationCacheInitialized()) {
     console.warn("⚠️  多语言缓存尚未初始化，将返回原始 key");
@@ -42,8 +42,8 @@ export const createTranslator = (
           : supportedLanguages[0]
         : defaultLang;
 
-  return async (key: string): Promise<string> => {
-    return await getTranslation(language, key, defaultLang);
+  return (key: string): string => {
+    return getTranslation(language, key, defaultLang);
   };
 };
 

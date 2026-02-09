@@ -15,10 +15,10 @@ const customNamespaces = new Map<string, KVNamespace>();
  */
 export function createKVNamespace(
   namespace: string,
-  defaultTTL?: number
+  expirationTtl?: number
 ): KVNamespace {
   if (!customNamespaces.has(namespace)) {
-    const kv = _createKVNamespace(namespace, defaultTTL);
+    const kv = _createKVNamespace(namespace, expirationTtl);
     customNamespaces.set(namespace, kv);
   }
   return customNamespaces.get(namespace)!;
@@ -29,6 +29,29 @@ export function createKVNamespace(
  */
 export function getKVNamespace(namespace: string): KVNamespace | null {
   return customNamespaces.get(namespace) || null;
+}
+
+/**
+ * 获取所有命名空间及其统计信息
+ */
+export async function getAllNamespaces(): Promise<
+  Array<{
+    name: string;
+    keyCount: number;
+    expirationTtl: number | null;
+  }>
+> {
+  const result = [];
+  for (const [name, kv] of customNamespaces.entries()) {
+    const stats = await kv.getStats();
+    const res = {
+      name,
+      keyCount: stats.keys,
+      expirationTtl: (kv as any).expirationTtl ?? null,
+    };
+    result.push(res);
+  }
+  return result;
 }
 
 /**

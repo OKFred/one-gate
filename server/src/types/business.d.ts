@@ -17,6 +17,10 @@ export type BusinessType = {
   "mail.action": "mail.action";
   /** 邮件日志 */
   "mail.log": "mail.log";
+  /** 运维 */
+  operationMaintenance: "operationMaintenance";
+  /** 运维缓存 */
+  "operationMaintenance.cache": "operationMaintenance.cache";
   /** 系统 */
   system: "system";
   /** 系统鉴权 */
