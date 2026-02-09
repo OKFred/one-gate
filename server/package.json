@@ -26,6 +26,7 @@
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.9.1",
+    "cache-manager": "^7.2.8",
     "drizzle-orm": "^0.44.4",
     "hono": "^4.11.4",
     "hono-openapi": "^0.4.6",

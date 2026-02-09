@@ -1,14 +1,11 @@
 /**
  * 多语言缓存管理模块
- * 从数据库加载多语言数据并缓存在内存中，提高访问性能
+ * 使用缓存抽象层实现，API 兼容 Cloudflare Workers KV
  */
 
 import translationService from "@/api/i18n/translation/service";
+import { CacheNamespaces } from "@/middleware/cache";
 
-// 缓存结构: { [langCode]: { [tKey]: tValue } }
-type TranslationCache = Record<string, Record<string, string>>;
-
-let TranslationCache: TranslationCache = {};
 let isInitialized = false;
 
 /**
@@ -16,7 +13,10 @@ let isInitialized = false;
  */
 export async function loadTranslationCache(): Promise<void> {
   try {
-    // 使用 listAll 获取所有启用的多语言数据
+    // 1. 清空旧缓存
+    await CacheNamespaces.I18nTranslation.clear();
+
+    // 2. 使用 listAll 获取所有启用的多语言数据
     const translations = await translationService.listAll.service({
       isEnabled: true,
       application: "backend", // 只加载后端的多语言数据
@@ -24,20 +24,24 @@ export async function loadTranslationCache(): Promise<void> {
       descend: false,
     });
 
-    // 构建缓存结构
-    const newCache: TranslationCache = {};
-    for (const item of translations) {
-      if (!newCache[item.langCode]) {
-        newCache[item.langCode] = {};
-      }
-      newCache[item.langCode][item.tKey] = item.tValue;
-    }
+    // 3. 按语言分组并批量写入缓存
+    // 缓存键格式: {langCode}:{tKey}
+    const languageSet = new Set<string>();
+    const cachePromises = translations.map((item) => {
+      const cacheKey = `${item.langCode}:${item.tKey}`;
+      languageSet.add(item.langCode);
+      return CacheNamespaces.I18nTranslation.put(cacheKey, item.tValue);
+    });
 
-    TranslationCache = newCache;
+    await Promise.all(cachePromises);
+
     isInitialized = true;
     console.log(
-      `✅ 多语言缓存加载成功: ${translations.length} 条记录，${Object.keys(newCache).length} 种语言`
+      `✅ 多语言缓存加载成功: ${translations.length} 条记录，${languageSet.size} 种语言`
     );
+
+    // 4. 通知 i18n/index.ts 刷新语言列表缓存
+    // 通过导出一个事件或回调来解耦
   } catch (error) {
     console.error("❌ 多语言缓存加载失败:", error);
     throw error;
@@ -56,25 +60,28 @@ export async function reloadTranslationCache(): Promise<void> {
 /**
  * 获取指定语言的翻译
  */
-export function getTranslation(
+export async function getTranslation(
   langCode: string,
   key: string,
   fallbackLangCode = process.env.LOCALE
-): string {
+): Promise<string> {
   if (!isInitialized) {
     console.warn("⚠️  多语言缓存未初始化，返回原始 key");
     return key;
   }
 
   // 先尝试获取指定语言的翻译
-  const translation = TranslationCache[langCode]?.[key];
+  const cacheKey = `${langCode}:${key}`;
+  const translation = await CacheNamespaces.I18nTranslation.get(cacheKey);
   if (translation) {
     return translation;
   }
 
   // 如果找不到，尝试使用回退语言
   if (langCode !== fallbackLangCode) {
-    const fallbackTranslation = TranslationCache[fallbackLangCode]?.[key];
+    const fallbackKey = `${fallbackLangCode}:${key}`;
+    const fallbackTranslation =
+      await CacheNamespaces.I18nTranslation.get(fallbackKey);
     if (fallbackTranslation) {
       return fallbackTranslation;
     }
@@ -87,8 +94,21 @@ export function getTranslation(
 /**
  * 获取所有支持的语言代码
  */
-export function getSupportedLanguages(): string[] {
-  return Object.keys(TranslationCache);
+export async function getSupportedLanguages(): Promise<string[]> {
+  // 通过遍历缓存键获取所有语言代码
+  const listResult = await CacheNamespaces.I18nTranslation.list({
+    limit: 10000,
+  });
+  const languages = new Set<string>();
+
+  for (const item of listResult.keys) {
+    const langCode = item.name.split(":")[0];
+    if (langCode) {
+      languages.add(langCode);
+    }
+  }
+
+  return Array.from(languages);
 }
 
 /**
@@ -101,14 +121,28 @@ export function isTranslationCacheInitialized(): boolean {
 /**
  * 获取缓存统计信息
  */
-export function getCacheStats() {
-  const languages = Object.keys(TranslationCache);
-  const stats = languages.map((lang) => ({
-    langCode: lang,
-    count: Object.keys(TranslationCache[lang]).length,
-  }));
+export async function getCacheStats() {
+  const stats = await CacheNamespaces.I18nTranslation.getStats();
+  const languages = await getSupportedLanguages();
+
+  // 统计每种语言的文案数量
+  const languageStats = await Promise.all(
+    languages.map(async (lang) => {
+      const listResult = await CacheNamespaces.I18nTranslation.list({
+        prefix: `${lang}:`,
+        limit: 10000,
+      });
+      return {
+        langCode: lang,
+        count: listResult.keys.length,
+      };
+    })
+  );
+
   return {
     totalLanguages: languages.length,
-    languages: stats,
+    totalKeys: stats.keys,
+    hitRate: stats.hitRate,
+    languages: languageStats,
   };
 }
