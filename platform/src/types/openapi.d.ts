@@ -2266,6 +2266,412 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/operation_maintenance/cache/listNamespaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出所有缓存命名空间 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cacheListNamespacesReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cacheListNamespacesRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/operation_maintenance/cache/listKeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出命名空间中的所有键名 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cacheListKeysReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cacheListKeysRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/operation_maintenance/cache/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取缓存值 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cacheGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cacheGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/operation_maintenance/cache/put": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设置缓存值 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cachePutReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cachePutRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/operation_maintenance/cache/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除缓存键 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cacheDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cacheDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/operation_maintenance/cache/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 清空命名空间 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cacheClearReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cacheClearRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/operation_maintenance/cache/getStats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取命名空间统计信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["operation_maintenance.cacheGetStatsReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["operation_maintenance.cacheGetStatsRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/auth/login": {
         parameters: {
             query?: never;
@@ -7178,6 +7584,246 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "operation_maintenance.cacheListNamespacesReq": Record<string, never>;
+        "operation_maintenance.cacheListNamespacesRes": {
+            ok: boolean;
+            data: {
+                namespaces: {
+                    /**
+                     * @description 命名空间名称
+                     * @example i18n_translation
+                     * @example user_session
+                     * @example data_permission
+                     */
+                    name: string;
+                    /**
+                     * @description 缓存键数量
+                     * @example 1250
+                     * @example 42
+                     */
+                    keyCount: number;
+                    /**
+                     * @description 过期时间（秒）
+                     * @example 3600
+                     * @example 1800
+                     */
+                    expirationTtl?: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "operation_maintenance.cacheListKeysReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 键名前缀过滤
+             * @example zh-CN:
+             * @example user:
+             * @example dept:1:
+             */
+            prefix?: string;
+            /**
+             * @description 返回结果数量限制
+             * @example 100
+             * @example 1000
+             */
+            limit?: number;
+        };
+        "operation_maintenance.cacheListKeysRes": {
+            ok: boolean;
+            data: {
+                keys: {
+                    /**
+                     * @description 缓存键名
+                     * @example zh-CN:common.save
+                     * @example user:12345
+                     * @example dept:1:data
+                     */
+                    name: string;
+                }[];
+                /**
+                 * @description 列表是否完整（所有结果已返回）
+                 * @example true
+                 * @example false
+                 */
+                list_complete: boolean;
+            };
+            message: string;
+        };
+        "operation_maintenance.cacheGetReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 缓存键名
+             * @example zh-CN:common.save
+             * @example user:12345
+             */
+            key: string;
+            /**
+             * @description 值类型
+             * @example json
+             * @example text
+             * @enum {string}
+             */
+            type?: "text" | "json";
+        };
+        "operation_maintenance.cacheGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 缓存值（可以是任意 JSON 可序列化数据）
+                 * @example 保存
+                 * @example {
+                 *       "userId": 12345,
+                 *       "username": "admin"
+                 *     }
+                 */
+                value?: unknown;
+                /**
+                 * @description 缓存键是否存在
+                 * @example true
+                 * @example false
+                 */
+                exists: boolean;
+            };
+            message: string;
+        };
+        "operation_maintenance.cachePutReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 缓存键名
+             * @example zh-CN:common.save
+             * @example user:12345
+             */
+            key: string;
+            /**
+             * @description 缓存值（任意 JSON 可序列化数据）
+             * @example 保存
+             * @example {
+             *       "userId": 12345
+             *     }
+             * @example [
+             *       1,
+             *       2,
+             *       3
+             *     ]
+             * @example 42
+             */
+            value: unknown;
+            /**
+             * @description 过期时间（秒），从当前时间开始计算
+             * @example 3600
+             * @example 1800
+             * @example 300
+             */
+            expirationTtl?: ((number | null) | null) | null;
+        };
+        "operation_maintenance.cachePutRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "operation_maintenance.cacheDeleteReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 缓存键名
+             * @example zh-CN:common.save
+             * @example user:12345
+             */
+            key: string;
+        };
+        "operation_maintenance.cacheDeleteRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "operation_maintenance.cacheClearReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+        };
+        "operation_maintenance.cacheClearRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "operation_maintenance.cacheGetStatsReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+        };
+        "operation_maintenance.cacheGetStatsRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 缓存命中次数
+                 * @example 15420
+                 * @example 0
+                 */
+                hits: number;
+                /**
+                 * @description 缓存未命中次数
+                 * @example 83
+                 * @example 0
+                 */
+                misses: number;
+                /**
+                 * @description 缓存键总数
+                 * @example 1250
+                 * @example 0
+                 */
+                keys: number;
+                /**
+                 * @description 缓存命中率
+                 * @example 99.46%
+                 * @example 0.00%
+                 */
+                hitRate: string;
             };
             message: string;
         };

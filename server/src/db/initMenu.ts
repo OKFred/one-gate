@@ -159,6 +159,22 @@ export const initialMenuData = [
     sort: 6,
     business: "system.role_permission",
   },
+  {
+    id: 19,
+    name: "sidebar.menu.operation_maintenance",
+    icon: "material-symbols:build",
+    sort: 6,
+    business: "operation_maintenance",
+  },
+  {
+    id: 20,
+    name: "sidebar.menu.operation_maintenance.cache",
+    icon: "material-symbols:database",
+    path: "/operation_maintenance/cache",
+    parentId: 19,
+    sort: 1,
+    business: "operation_maintenance.cache",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {
