@@ -9,7 +9,8 @@ import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheEditDialog, { type TheEditDialogRef } from './TheEditDialog';
 import * as RegionAPI from '@/api/i18n/region';
-import type { ListAllRegionRes } from '@/api/i18n/type';
+import * as LanguageAPI from '@/api/i18n/language';
+import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/i18n/type';
 
 // 暴露给父组件的方法
 export interface TheDetailsRef {
@@ -25,6 +26,7 @@ const TheDetails = memo(
     const [user, setUser] = useState<GetUserRes | null>(null);
     const editDialogRef = useRef<TheEditDialogRef>(null);
     const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
+    const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -37,7 +39,7 @@ const TheDetails = memo(
       }),
       [enabledRegions],
     );
-    // 获取启用的地区列表
+    // 获取启用的地区列表和语言列表
     useEffect(() => {
       const fetchRegions = async () => {
         try {
@@ -47,7 +49,16 @@ const TheDetails = memo(
           console.error('Failed to fetch regions:', error);
         }
       };
+      const fetchLanguages = async () => {
+        try {
+          const res = await LanguageAPI.listAllFn({ data: { isEnabled: true } });
+          setEnabledLanguages(res.data.data || []);
+        } catch (error) {
+          console.error('Failed to fetch languages:', error);
+        }
+      };
       fetchRegions();
+      fetchLanguages();
     }, []);
 
     const handleEdit = () => {
@@ -124,7 +135,9 @@ const TheDetails = memo(
                     {t('column.language')}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    {user.langCode || t('column.unassigned')}
+                    {enabledLanguages.find((lang) => lang.langCode === user.langCode)?.nativeName ||
+                      user.langCode ||
+                      t('column.unassigned')}
                   </Typography>
                 </Box>
 
