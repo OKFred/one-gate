@@ -21,7 +21,7 @@ import {
   type DepartmentGetVOLike,
   DepartmentBaseVO,
 } from "./db.table";
-import { asc, count, desc, eq, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, like, and, SQL, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -32,16 +32,77 @@ import {
   listResponseWrapper,
   orderByWrapper,
 } from "@/middleware/encapsulation/common.schema";
-import {
-  bodyAdapter,
-  bodyUserAdapter,
-} from "@/middleware/encapsulation/adapter";
+import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-import { exportDeletionRecord } from "@/api/system/compliance";
+import { exportDeletionRecord } from "@/api/operation_maintenance/compliance";
+
+const presetRules = {
+  /** 访问已启用的数据 */
+  accessEnabledData: () => {
+    return eq(departmentTable.isEnabled, true);
+  },
+  /** 允许访问自己创建的数据 */
+  accessOwnData: (userObj: UserObj) => {
+    return eq(departmentTable.creatorId, userObj.userId);
+  },
+  /** 允许访问同辈部门的数据 */
+  accessSiblingData: async (userObj: UserObj): Promise<SQL | undefined> => {
+    const siblingDepartments = await getSiblingDepartments(
+      userObj.departmentObj?.value
+    );
+    if (!siblingDepartments || siblingDepartments.length === 0) {
+      return undefined;
+    }
+    const siblingIds = siblingDepartments.map((dept) => dept.id);
+    return inArray(departmentTable.id, siblingIds);
+  },
+  /** 允许访问父部门及其子孙部门的数据 */
+  accessParentAndItsDescendants: async (
+    userObj: UserObj
+  ): Promise<SQL | undefined> => {
+    const parentAndDescendants = await getParentAndItsDescendants(
+      userObj.departmentObj?.value
+    );
+    if (!parentAndDescendants || parentAndDescendants.length === 0) {
+      return undefined;
+    }
+    const ids = parentAndDescendants.map((dept) => dept.id);
+    console.log("Parent and its descendants IDs:", ids);
+    return inArray(departmentTable.id, ids);
+  },
+};
+
+async function applyDataPermission(
+  userObj: UserObj,
+  filterNames: string[],
+  baseConditions: (SQL | undefined)[]
+): Promise<SQL | undefined> {
+  const whereConditions = [...baseConditions];
+  for (const filterName of filterNames) {
+    let filterCondition: SQL | undefined;
+    switch (filterName) {
+      case "parentAndItsDescendants":
+        filterCondition =
+          await presetRules.accessParentAndItsDescendants(userObj);
+        break;
+      default:
+        break;
+    }
+    if (filterCondition) {
+      whereConditions.push(filterCondition);
+    }
+  }
+  if (whereConditions.length === 0) {
+    return undefined;
+  }
+  return whereConditions.length === 1
+    ? whereConditions[0]
+    : and(...(whereConditions as SQL[]));
+}
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -89,11 +150,24 @@ const listAllRes = {
   },
 } as const satisfies JSONSchema;
 async function onListAll(
-  params: FromSchema<typeof listAllReq>
+  params: FromSchema<typeof listAllReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
   const { orderBy = "id", descend = true } = params;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
+
+  // 构建基础查询条件
+  const baseCondition = buildWhereCondition(params);
+  const baseConditions = baseCondition ? [baseCondition] : [];
+
+  // 应用数据权限过滤
+  const whereCondition = await applyDataPermission(
+    userObj,
+    ["parentAndItsDescendants"],
+    baseConditions
+  );
+
   // 查询所有匹配的数据
   const rows = await db
     .select({
@@ -104,7 +178,7 @@ async function onListAll(
       isEnabled: departmentTable.isEnabled,
     })
     .from(departmentTable)
-    .where(buildWhereCondition(params))
+    .where(whereCondition)
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(maxLimit);
   return rows;
@@ -117,7 +191,7 @@ const listAllApi = {
     method: "post",
     summary: "获取所有部门（不分页）",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onListAll,
 } satisfies API;
 
@@ -141,18 +215,31 @@ const listRes = {
   ),
 } as const satisfies JSONSchema;
 async function onList(
-  params: FromSchema<typeof listReq>
+  params: FromSchema<typeof listReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+
+  // 构建基础查询条件
+  const baseCondition = buildWhereCondition(params);
+  const baseConditions = baseCondition ? [baseCondition] : [];
+
+  // 应用数据权限过滤
+  const whereCondition = await applyDataPermission(
+    userObj,
+    ["parentAndItsDescendants"],
+    baseConditions
+  );
+
   // 查询总数
   const countResult = await db
     .select({ total: count(departmentTable.id) })
     .from(departmentTable)
-    .where(buildWhereCondition(params));
+    .where(whereCondition);
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -167,7 +254,7 @@ async function onList(
   const rows = await db
     .select()
     .from(departmentTable)
-    .where(buildWhereCondition(params))
+    .where(whereCondition)
     .orderBy(descend ? desc(orderField) : asc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -188,7 +275,7 @@ const listApi = {
     method: "post",
     summary: "获取部门列表",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onList,
 } satisfies API;
 
@@ -268,6 +355,23 @@ async function onUpdate(
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
+  // 先检查是否有权限访问该部门
+  const whereCondition = await applyDataPermission(
+    userObj,
+    ["parentAndItsDescendants"],
+    [eq(departmentTable.id, id)]
+  );
+
+  const existing = await db
+    .select()
+    .from(departmentTable)
+    .where(whereCondition)
+    .limit(1);
+
+  if (existing.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
   // 如果更新父部门，检查是否会造成循环引用
   if (rest.parentId) {
     // 不能将自己设为父部门
@@ -339,6 +443,23 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
+  // 先检查是否有权限访问该部门
+  const whereCondition = await applyDataPermission(
+    userObj,
+    ["parentAndItsDescendants"],
+    [eq(departmentTable.id, id)]
+  );
+
+  const recordToDelete = await db
+    .select()
+    .from(departmentTable)
+    .where(whereCondition)
+    .limit(1);
+
+  if (recordToDelete.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
   // 检查是否有子部门
   const children = await db
     .select()
@@ -348,17 +469,6 @@ async function onDelete(
 
   if (children.length > 0) {
     throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
-  }
-
-  // 获取要删除的记录（用于归档）
-  const recordToDelete = await db
-    .select()
-    .from(departmentTable)
-    .where(eq(departmentTable.id, id))
-    .limit(1);
-
-  if (recordToDelete.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
 
   // 执行删除操作
@@ -429,13 +539,22 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onGet(
-  params: FromSchema<typeof getReq>
+  params: FromSchema<typeof getReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
+
+  // 应用数据权限过滤
+  const whereCondition = await applyDataPermission(
+    userObj,
+    ["parentAndItsDescendants"],
+    [eq(departmentTable.id, id)]
+  );
+
   const rows = await db
     .select()
     .from(departmentTable)
-    .where(eq(departmentTable.id, id))
+    .where(whereCondition)
     .limit(1);
 
   if (rows.length === 0) {
@@ -452,7 +571,7 @@ const getApi = {
     method: "post",
     summary: "获取部门信息",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onGet,
 } satisfies API;
 
@@ -493,23 +612,29 @@ const treeRes = {
   items: departmentTreeItemSchema,
 } as const satisfies JSONSchema;
 async function onTree(
-  params: FromSchema<typeof treeReq>
+  params: FromSchema<typeof treeReq>,
+  userObj: UserObj
 ): Promise<DepartmentTreeItem[]> {
   const { showAll } = params;
 
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    if (showAll !== true) {
-      return eq(departmentTable.isEnabled, true); // 默认只查询启用的部门
-    }
-    return undefined;
-  };
+  // 构建基础查询条件
+  const baseConditions = [];
+  if (showAll !== true) {
+    baseConditions.push(eq(departmentTable.isEnabled, true)); // 默认只查询启用的部门
+  }
+
+  // 应用数据权限过滤
+  const whereCondition = await applyDataPermission(
+    userObj,
+    ["parentAndItsDescendants"],
+    baseConditions
+  );
 
   // 获取所有部门
   const allDepartments = await db
     .select()
     .from(departmentTable)
-    .where(buildWhereCondition())
+    .where(whereCondition)
     .orderBy(asc(departmentTable.id));
 
   // 递归构建树形结构
@@ -537,7 +662,7 @@ const treeApi = {
     method: "post",
     summary: "获取树形部门列表",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onTree,
 } satisfies API;
 
@@ -551,26 +676,120 @@ async function getDepartmentNameById(id: number): Promise<string | null> {
   return rows.length > 0 ? rows[0].name : null;
 }
 
-/** @description 获取部门和子部门的ID列表 */
-async function getDepartmentAndSubIds(departmentId: number): Promise<number[]> {
+/** @description 获取所有部门列表 */
+async function getAllDepartments(
+  isEnabled?: boolean
+): Promise<{ name: string; id: number; parentId: number }[]> {
   const allDepartments = await db
-    .select({ id: departmentTable.id, parentId: departmentTable.parentId })
+    .select({
+      name: departmentTable.name,
+      id: departmentTable.id,
+      parentId: departmentTable.parentId,
+    })
     .from(departmentTable)
-    .where(eq(departmentTable.isEnabled, true));
-  const resultIds: number[] = [];
-
-  function collectSubIds(parentId: number) {
-    resultIds.push(parentId);
-    allDepartments.forEach((dept) => {
-      if (dept.parentId === parentId) {
-        collectSubIds(dept.id);
-      }
-    });
-  }
-  collectSubIds(departmentId);
-  return resultIds;
+    .where(
+      isEnabled !== undefined
+        ? eq(departmentTable.isEnabled, isEnabled)
+        : undefined
+    );
+  return allDepartments;
 }
 
+/** @description 获取子孙部门的列表 */
+async function getDescendantDepartments(
+  departmentId: number
+): Promise<{ name: string; id: number; parentId: number }[] | null> {
+  if (!departmentId) return null;
+  const allDepartments = await getAllDepartments(true);
+  const thisDepartment = allDepartments.find(
+    (dept) => dept.id === departmentId
+  );
+  if (!thisDepartment) return null;
+  // 递归查找子部门
+  function findSubDepartments(id: number): typeof allDepartments {
+    const result = [];
+    for (const dept of allDepartments) {
+      if (dept.parentId === id) {
+        result.push(dept);
+        result.push(...findSubDepartments(dept.id));
+      }
+    }
+    return result;
+  }
+  return findSubDepartments(departmentId);
+}
+
+/** @description 获取祖先部门的列表 */
+async function getAncestorDepartments(departmentId: number): Promise<
+  | {
+      name: string;
+      id: number;
+      parentId: number;
+    }[]
+  | null
+> {
+  if (!departmentId) return null;
+  const allDepartments = await getAllDepartments(true);
+  const thisDepartment = allDepartments.find(
+    (dept) => dept.id === departmentId
+  );
+  if (!thisDepartment) return null;
+  // 递归查找祖先部门
+  const ancestors: { name: string; id: number; parentId: number }[] = [];
+  function findAncestors(id: number) {
+    const dept = allDepartments.find((d) => d.id === id);
+    if (dept && dept.parentId) {
+      const parentDept = allDepartments.find((d) => d.id === dept.parentId);
+      if (parentDept) {
+        ancestors.push(parentDept);
+        findAncestors(parentDept.id);
+      }
+    }
+  }
+  findAncestors(departmentId);
+  return ancestors;
+}
+
+/** @description 获取父母部门的列表 */
+async function getParentDepartment(
+  departmentId: number
+): Promise<{ name: string; id: number; parentId: number } | null> {
+  if (!departmentId) return null;
+  const allDepartments = await getAllDepartments(true);
+  const thisDepartment = allDepartments.find(
+    (dept) => dept.id === departmentId
+  );
+  if (!thisDepartment) return null;
+  const { parentId } = thisDepartment;
+  if (!parentId) return null;
+  const parentDept = allDepartments.find((dept) => dept.id === parentId);
+  if (!parentDept) return null;
+  return parentDept;
+}
+
+async function getParentAndItsDescendants(
+  departmentId: number
+): Promise<{ name: string; id: number; parentId: number }[] | null> {
+  const parentDepartment = await getParentDepartment(departmentId);
+  if (!parentDepartment) return null;
+  const descendants = await getDescendantDepartments(parentDepartment.id);
+  return [parentDepartment, ...(descendants || [])];
+}
+
+/** @description 获取同辈部门的列表 */
+async function getSiblingDepartments(
+  departmentId: number
+): Promise<{ name: string; id: number; parentId: number }[] | null> {
+  const parentDepartment = await getParentDepartment(departmentId);
+  if (!parentDepartment) return null;
+  const allDepartments = await getAllDepartments(true);
+  const siblings = allDepartments.filter(
+    (dept) => dept.parentId === parentDepartment.id && dept.id !== departmentId
+  );
+  return siblings;
+}
+
+/** @description 验证部门是否存在 */
 async function verifyDepartment(departmentId: number) {
   const departmentName = await getDepartmentNameById(departmentId);
   if (!departmentName) {
@@ -579,9 +798,13 @@ async function verifyDepartment(departmentId: number) {
 }
 
 export const utils = {
-  getDepartmentNameById,
   verifyDepartment,
-  getDepartmentAndSubIds,
+  getDepartmentNameById,
+  getDescendantDepartments,
+  getAncestorDepartments,
+  getParentDepartment,
+  getSiblingDepartments,
+  getParentAndItsDescendants,
 };
 
 export default {
