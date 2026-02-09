@@ -21,12 +21,12 @@ export type BusinessType = {
   operation_maintenance: "operation_maintenance";
   /** 运维缓存 */
   "operation_maintenance.cache": "operation_maintenance.cache";
+  /** 运维合规 */
+  "operation_maintenance.compliance": "operation_maintenance.compliance";
   /** 系统 */
   system: "system";
   /** 系统鉴权 */
   "system.auth": "system.auth";
-  /** 系统合规 */
-  "system.compliance": "system.compliance";
   /** 系统部门 */
   "system.department": "system.department";
   /** 系统菜单 */
