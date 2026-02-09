@@ -4416,7 +4416,7 @@ export const initialTranslationData = [
     business: "business.type",
     langCode: "zh-CN",
     tKey: "sidebar.menu.operation_maintenance.cache",
-    tValue: "缓存管理",
+    tValue: "缓存",
     isEnabled: true,
   },
   {
@@ -4424,7 +4424,7 @@ export const initialTranslationData = [
     business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.operation_maintenance.cache",
-    tValue: "Cache Management",
+    tValue: "Cache",
     isEnabled: true,
   },
   // 缓存页面翻译
