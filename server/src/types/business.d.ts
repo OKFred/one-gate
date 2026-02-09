@@ -18,9 +18,9 @@ export type BusinessType = {
   /** 邮件日志 */
   "mail.log": "mail.log";
   /** 运维 */
-  operationMaintenance: "operationMaintenance";
+  operation_maintenance: "operation_maintenance";
   /** 运维缓存 */
-  "operationMaintenance.cache": "operationMaintenance.cache";
+  "operation_maintenance.cache": "operation_maintenance.cache";
   /** 系统 */
   system: "system";
   /** 系统鉴权 */
