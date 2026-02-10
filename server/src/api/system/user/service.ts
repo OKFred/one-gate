@@ -29,7 +29,7 @@ import { utils as roleUtils } from "@/api/system/role/service";
 import regionService, { utils as regionUtils } from "@/api/i18n/region/service";
 import { utils as languageUtils } from "@/api/i18n/language/service";
 import type { PermissionInfo } from "@/api/system/permission/service";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import type { RequiredKeys } from "@/types/app";
@@ -573,10 +573,34 @@ async function getRegionObj(
   }
 }
 
+/**
+ * 检查部门列表中是否存在在职人员
+ * @param departmentIds 部门ID列表
+ * @returns 在职人员数量
+ */
+async function countEnabledEmployeesInDepartments(
+  departmentIds: number[]
+): Promise<number> {
+  if (!departmentIds || departmentIds.length === 0) return 0;
+
+  const result = await db
+    .select({ count: count(userTable.id) })
+    .from(userTable)
+    .where(
+      and(
+        inArray(userTable.departmentId, departmentIds),
+        eq(userTable.isEnabled, true)
+      )
+    );
+
+  return result[0]?.count || 0;
+}
+
 export const utils = {
   convertPassword,
   verifyUsernameAndPassword,
   updatePassword,
+  countEnabledEmployeesInDepartments,
 };
 
 export default {

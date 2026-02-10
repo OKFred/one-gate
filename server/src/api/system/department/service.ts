@@ -21,6 +21,7 @@ import {
   type DepartmentGetVOLike,
   DepartmentBaseVO,
 } from "./db.table";
+import { utils as userUtils } from "@/api/system/user/service";
 import { asc, count, desc, eq, like, and, SQL, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
@@ -49,17 +50,6 @@ const presetRules = {
   accessOwnData: (userObj: UserObj) => {
     return eq(departmentTable.creatorId, userObj.userId);
   },
-  /** 允许访问同辈部门的数据 */
-  accessSiblingData: async (userObj: UserObj): Promise<SQL | undefined> => {
-    const siblingDepartments = await getSiblingDepartments(
-      userObj.departmentObj?.value
-    );
-    if (!siblingDepartments || siblingDepartments.length === 0) {
-      return undefined;
-    }
-    const siblingIds = siblingDepartments.map((dept) => dept.id);
-    return inArray(departmentTable.id, siblingIds);
-  },
   /** 允许访问父部门及其子孙部门的数据 */
   accessParentAndItsDescendants: async (
     userObj: UserObj
@@ -71,7 +61,6 @@ const presetRules = {
       return undefined;
     }
     const ids = parentAndDescendants.map((dept) => dept.id);
-    console.log("Parent and its descendants IDs:", ids);
     return inArray(departmentTable.id, ids);
   },
 };
@@ -362,14 +351,19 @@ async function onUpdate(
     [eq(departmentTable.id, id)]
   );
 
-  const existing = await db
+  const rows = await db
     .select()
     .from(departmentTable)
     .where(whereCondition)
     .limit(1);
 
-  if (existing.length === 0) {
+  if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
+  // 如果要禁用部门，先检查是否满足禁用条件
+  if (rest.isEnabled === false && rows[0].isEnabled === true) {
+    await checkCanDisableDepartment(id);
   }
 
   // 如果更新父部门，检查是否会造成循环引用
@@ -450,17 +444,25 @@ async function onDelete(
     [eq(departmentTable.id, id)]
   );
 
-  const recordToDelete = await db
+  const rows = await db
     .select()
     .from(departmentTable)
     .where(whereCondition)
     .limit(1);
 
-  if (recordToDelete.length === 0) {
+  if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
 
-  // 检查是否有子部门
+  // 如果要删除部门，先检查是否满足删除条件
+  
+  // 1. 检查当前部门下是否存在在职人员
+  const employeeCount = await userUtils.countEnabledEmployeesInDepartments([id]);
+  if (employeeCount > 0) {
+    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_EMPLOYEES);
+  }
+
+  // 2. 检查是否有子部门
   const children = await db
     .select()
     .from(departmentTable)
@@ -489,8 +491,8 @@ async function onDelete(
         sourcePrimaryKey: String(id),
         deleteReason: "system",
         deleteType: "purge",
-        recordSnapshot: JSON.stringify(recordToDelete[0]),
-        remark: `部门"${recordToDelete[0].name}"被删除`,
+        recordSnapshot: JSON.stringify(rows[0]),
+        remark: `部门"${rows[0].name}"被删除`,
         restorable: true,
         restoreUntilTimeUtc: new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
@@ -794,6 +796,39 @@ async function verifyDepartment(departmentId: number) {
   const departmentName = await getDepartmentNameById(departmentId);
   if (!departmentName) {
     throw new BusinessError(BusinessErrorCode["DEPARTMENT_NOT_EXIST"]);
+  }
+}
+
+/** 检查部门是否可以被禁用 */
+async function checkCanDisableDepartment(departmentId: number): Promise<void> {
+  // 1. 检查当前部门及所有子孙部门下是否存在在职人员
+  const descendants = await getDescendantDepartments(departmentId);
+  const allDepartmentIds = [
+    departmentId,
+    ...(descendants?.map((d) => d.id) || []),
+  ];
+
+  // 查询这些部门下的在职人员数量
+  const employeeCount =
+    await userUtils.countEnabledEmployeesInDepartments(allDepartmentIds);
+
+  if (employeeCount > 0) {
+    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_EMPLOYEES);
+  }
+
+  // 2. 检查是否存在未禁用的子部门
+  const enabledChildren = await db
+    .select({ count: count(departmentTable.id) })
+    .from(departmentTable)
+    .where(
+      and(
+        eq(departmentTable.parentId, departmentId),
+        eq(departmentTable.isEnabled, true)
+      )
+    );
+
+  if (enabledChildren[0]?.count > 0) {
+    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_CHILDREN);
   }
 }
 
