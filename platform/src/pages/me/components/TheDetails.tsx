@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, memo, useRef, useEffect } from 'react';
-import { Card, CardContent, Typography, Box, Chip, Paper } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, Paper, Tooltip } from '@mui/material';
 import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { AUTH } from '@/hooks/usePermission';
@@ -151,8 +151,29 @@ const TheDetails = memo(
                       : t('column.noData')}
                   </Typography>
                 </Box>
-
-                <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('column.remark')}
+                  </Typography>
+                  <Tooltip title={user.remark || ''} placement="top" arrow>
+                    <Typography
+                      variant="body1"
+                      gutterBottom
+                      sx={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: 'vertical',
+                        wordBreak: 'break-word',
+                        cursor: user.remark ? 'pointer' : 'default',
+                      }}
+                    >
+                      {user.remark || t('column.noData')}
+                    </Typography>
+                  </Tooltip>
+                </Box>
+                <Box>
                   <Typography variant="body2" color="text.secondary">
                     {t('columns.updateTime')}
                   </Typography>

@@ -270,8 +270,9 @@ const profileApi = {
 const updateProfileReq = {
   type: "object",
   properties: {
-    /* 当前仅支持更新用户国家/地区 */
+    /* 当前仅支持更新用户国家/地区，以及备注 */
     regionObj: UserVO.regionObj,
+    remark: UserVO.remark,
   },
   required: [] as const,
   additionalProperties: false,
@@ -284,10 +285,13 @@ async function onUpdateProfile(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateProfileRes> | null> {
   const { userId: id } = userObj;
-  const { regionObj } = params;
+  const { regionObj, remark } = params;
   const regionId = regionObj ? regionObj.value : null;
   if (regionId) await regionUtils.verifyRegion(regionId);
-  const res = await userService.update.service({ id, regionObj }, userObj);
+  const res = await userService.update.service(
+    { id, regionObj, remark },
+    userObj
+  );
   return res;
 }
 const updateProfileApi = {

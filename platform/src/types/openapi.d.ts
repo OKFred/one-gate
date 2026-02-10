@@ -8023,6 +8023,8 @@ export interface components {
                  */
                 label: string;
             } | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
         };
         "system.authUpdateProfileRes": {
             ok: boolean;
