@@ -6,6 +6,8 @@ import { CircularProgress, Box } from '@mui/material';
 import { useMenu } from '@/hooks/useMenu';
 import type { MenuNode } from '@/contexts/MenuContext';
 import { loginPath } from '@/routes';
+import { useUserInfo } from '@/hooks/useUserInfo';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -14,6 +16,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const { userInfo } = useUserInfo();
+
   const { navItems, loading: menuLoading } = useMenu();
 
   function failedLogin() {
@@ -28,7 +32,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = authUtils.getUserInfo()?.token;
+      const token = userInfo?.token;
       if (!token) {
         failedLogin();
         setIsLoading(false);
@@ -45,7 +49,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       }
     };
     checkAuth();
-  }, []);
+  }, [userInfo?.token]);
 
   // 正在验证token或加载菜单
   if (isLoading || menuLoading) {

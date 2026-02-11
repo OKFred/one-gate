@@ -73,7 +73,7 @@ const TheForm = memo(
     const [departmentAnchorEl, setDepartmentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
     const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
-    const userInfo = useUserInfo();
+    const { userInfo } = useUserInfo();
     const [loading, setLoading] = useState(false);
 
     // 获取角色和部门数据

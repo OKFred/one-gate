@@ -29,7 +29,7 @@ interface TopbarProps {
 }
 
 const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
-  const userInfo = useUserInfo();
+  const { userInfo, getDisplayName, getAvatar } = useUserInfo();
   const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
   const [languagesLoaded, setLanguagesLoaded] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -108,18 +108,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     navigate(loginPath);
   };
 
-  // 获取用户名显示
-  const getUserDisplayName = () => {
-    if (!userInfo) return t('topbar.notLoggedIn');
-    return userInfo.username;
-  };
-
-  // 获取用户头像
-  const getUserAvatar = () => {
-    if (!userInfo) return '';
-    return userInfo.username.charAt(0).toUpperCase();
-  };
-
   // 切换主题
   const handleToggleTheme = () => {
     setDarkMode((prev) => !prev);
@@ -157,7 +145,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
         {userInfo && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              {getUserDisplayName()}
+              {getDisplayName(t('topbar.notLoggedIn'))}
             </Typography>
             <IconButton
               onClick={handleClick}
@@ -167,7 +155,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
               aria-haspopup="true"
               aria-expanded={open ? 'true' : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32 }}>{getUserAvatar()}</Avatar>
+              <Avatar sx={{ width: 32, height: 32 }}>{getAvatar()}</Avatar>
             </IconButton>
           </Box>
         )}
