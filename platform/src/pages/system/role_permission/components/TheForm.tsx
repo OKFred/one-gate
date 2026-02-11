@@ -23,9 +23,11 @@ import {
   ListItem,
   Checkbox,
   FormControlLabel,
+  ToggleButtonGroup,
+  ToggleButton,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { Close as CloseIcon, SwapVert as SwapVertIcon } from '@mui/icons-material';
 import * as RolePermissionAPI from '@/api/system/role_permission';
 import type {
   BatchAddRolePermissionReq,
@@ -62,6 +64,9 @@ const TheForm = memo(
     const [loading, setLoading] = useState(false);
     const [currentRolePermissions, setCurrentRolePermissions] = useState<GetPermissionsByRoleRes>(
       [],
+    );
+    const [groupByOrder, setGroupByOrder] = useState<'category-business' | 'business-category'>(
+      'category-business',
     );
 
     // 获取角色的当前权限
@@ -319,186 +324,411 @@ const TheForm = memo(
 
                   {isBatchMode ? (
                     // 批量添加模式：显示可用权限列表（按类别和业务分组，树状结构）
-                    <Paper variant="outlined" sx={{ p: 2, maxHeight: 300, overflow: 'auto' }}>
-                      {availablePermissions.length > 0 ? (
-                        (() => {
-                          // 按 category 和 business 进行二级分组
-                          const groupedPermissions = availablePermissions.reduce(
-                            (acc, permission) => {
-                              const category =
-                                permission.category || t('rolePermission.otherCategory');
-                              const business = permission.business || 'default';
-                              if (!acc[category]) acc[category] = {};
-                              if (!acc[category][business]) acc[category][business] = [];
-                              acc[category][business].push(permission);
-                              return acc;
-                            },
-                            {} as Record<string, Record<string, typeof availablePermissions>>,
-                          );
+                    <>
+                      <ToggleButtonGroup
+                        size="small"
+                        value={groupByOrder}
+                        exclusive
+                        onChange={(_, newValue) => {
+                          if (newValue !== null) setGroupByOrder(newValue);
+                        }}
+                        sx={{ display: 'flex' }}
+                        aria-label="group by order"
+                      >
+                        <ToggleButton value="category-business" aria-label="category first">
+                          <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                          {t('rolePermission.categoryFirst')}
+                        </ToggleButton>
+                        <ToggleButton value="business-category" aria-label="business first">
+                          <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                          {t('rolePermission.businessFirst')}
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                      <Paper variant="outlined" sx={{ p: 2, maxHeight: 300, overflow: 'auto' }}>
+                        {availablePermissions.length > 0 ? (
+                          (() => {
+                            if (groupByOrder === 'category-business') {
+                              // 按 category 和 business 进行二级分组
+                              const groupedPermissions = availablePermissions.reduce(
+                                (acc, permission) => {
+                                  const category =
+                                    permission.category || t('rolePermission.otherCategory');
+                                  const business = permission.business || 'default';
+                                  if (!acc[category]) acc[category] = {};
+                                  if (!acc[category][business]) acc[category][business] = [];
+                                  acc[category][business].push(permission);
+                                  return acc;
+                                },
+                                {} as Record<string, Record<string, typeof availablePermissions>>,
+                              );
 
-                          return Object.entries(groupedPermissions).map(
-                            ([category, businessMap], categoryIndex) => (
-                              <Box key={category} sx={{ mb: 2 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                  <Checkbox
-                                    size="small"
-                                    checked={isCategoryAllSelected(category, businessMap)}
-                                    onChange={() => handleCategorySelectAll(category, businessMap)}
-                                  />
-                                  <Chip
-                                    label={t('permission.category.' + category)}
-                                    sx={{ fontWeight: 'bold' }}
-                                    color={
-                                      (
-                                        [
-                                          'primary',
-                                          'secondary',
-                                          'info',
-                                          'success',
-                                          'warning',
-                                          'error',
-                                        ] as const
-                                      )[categoryIndex % 6]
-                                    }
-                                  />
-                                </Box>
-                                <Box sx={{ pl: 2 }}>
-                                  {Object.entries(businessMap).map(([business, perms]) => (
-                                    <Box key={`${category}-${business}`} sx={{ mb: 1.5 }}>
-                                      <Box
-                                        sx={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 1,
-                                          mb: 1,
-                                        }}
-                                      >
-                                        <Checkbox
-                                          size="small"
-                                          checked={isBusinessAllSelected(perms)}
-                                          onChange={() => handleBusinessSelectAll(perms)}
-                                        />
-                                        <Chip
-                                          label={t('businessType.' + business)}
-                                          size="small"
-                                          variant="outlined"
-                                        />
-                                      </Box>
-                                      <List dense sx={{ pl: 2 }}>
-                                        {perms.map((permission) => (
-                                          <ListItem key={permission.id} disablePadding>
-                                            <FormControlLabel
-                                              control={
-                                                <Checkbox
-                                                  checked={selectedPermissionIds.includes(
-                                                    permission.id,
-                                                  )}
-                                                  onChange={() =>
-                                                    handlePermissionToggle(permission.id)
+                              return Object.entries(groupedPermissions).map(
+                                ([category, businessMap], categoryIndex) => (
+                                  <Box key={category} sx={{ mb: 2 }}>
+                                    <Box
+                                      sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+                                    >
+                                      <Checkbox
+                                        size="small"
+                                        checked={isCategoryAllSelected(category, businessMap)}
+                                        onChange={() =>
+                                          handleCategorySelectAll(category, businessMap)
+                                        }
+                                      />
+                                      <Chip
+                                        label={t('permission.category.' + category)}
+                                        sx={{ fontWeight: 'bold' }}
+                                        color={
+                                          (
+                                            [
+                                              'primary',
+                                              'secondary',
+                                              'info',
+                                              'success',
+                                              'warning',
+                                              'error',
+                                            ] as const
+                                          )[categoryIndex % 6]
+                                        }
+                                      />
+                                    </Box>
+                                    <Box sx={{ pl: 2 }}>
+                                      {Object.entries(businessMap).map(([business, perms]) => (
+                                        <Box key={`${category}-${business}`} sx={{ mb: 1.5 }}>
+                                          <Box
+                                            sx={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 1,
+                                              mb: 1,
+                                            }}
+                                          >
+                                            <Checkbox
+                                              size="small"
+                                              checked={isBusinessAllSelected(perms)}
+                                              onChange={() => handleBusinessSelectAll(perms)}
+                                            />
+                                            <Chip
+                                              label={t('businessType.' + business)}
+                                              size="small"
+                                              variant="outlined"
+                                            />
+                                          </Box>
+                                          <List dense sx={{ pl: 2 }}>
+                                            {perms.map((permission) => (
+                                              <ListItem key={permission.id} disablePadding>
+                                                <FormControlLabel
+                                                  control={
+                                                    <Checkbox
+                                                      checked={selectedPermissionIds.includes(
+                                                        permission.id,
+                                                      )}
+                                                      onChange={() =>
+                                                        handlePermissionToggle(permission.id)
+                                                      }
+                                                      size="small"
+                                                    />
+                                                  }
+                                                  label={`${permission.name} (${permission.code})`}
+                                                  sx={{ width: '100%' }}
+                                                />
+                                              </ListItem>
+                                            ))}
+                                          </List>
+                                        </Box>
+                                      ))}
+                                    </Box>
+                                  </Box>
+                                ),
+                              );
+                            } else {
+                              // 按 business 和 category 进行二级分组
+                              const groupedPermissions = availablePermissions.reduce(
+                                (acc, permission) => {
+                                  const business = permission.business || 'default';
+                                  const category =
+                                    permission.category || t('rolePermission.otherCategory');
+                                  if (!acc[business]) acc[business] = {};
+                                  if (!acc[business][category]) acc[business][category] = [];
+                                  acc[business][category].push(permission);
+                                  return acc;
+                                },
+                                {} as Record<string, Record<string, typeof availablePermissions>>,
+                              );
+
+                              return Object.entries(groupedPermissions).map(
+                                ([business, categoryMap], businessIndex) => (
+                                  <Box key={business} sx={{ mb: 2 }}>
+                                    <Box
+                                      sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
+                                    >
+                                      <Checkbox
+                                        size="small"
+                                        checked={isCategoryAllSelected(business, categoryMap)}
+                                        onChange={() =>
+                                          handleCategorySelectAll(business, categoryMap)
+                                        }
+                                      />
+                                      <Chip
+                                        label={t('businessType.' + business)}
+                                        sx={{ fontWeight: 'bold' }}
+                                        color={
+                                          (
+                                            [
+                                              'primary',
+                                              'secondary',
+                                              'info',
+                                              'success',
+                                              'warning',
+                                              'error',
+                                            ] as const
+                                          )[businessIndex % 6]
+                                        }
+                                      />
+                                    </Box>
+                                    <Box sx={{ pl: 2 }}>
+                                      {Object.entries(categoryMap).map(([category, perms]) => (
+                                        <Box key={`${business}-${category}`} sx={{ mb: 1.5 }}>
+                                          <Box
+                                            sx={{
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              gap: 1,
+                                              mb: 1,
+                                            }}
+                                          >
+                                            <Checkbox
+                                              size="small"
+                                              checked={isBusinessAllSelected(perms)}
+                                              onChange={() => handleBusinessSelectAll(perms)}
+                                            />
+                                            <Chip
+                                              label={t('permission.category.' + category)}
+                                              size="small"
+                                              variant="outlined"
+                                            />
+                                          </Box>
+                                          <List dense sx={{ pl: 2 }}>
+                                            {perms.map((permission) => (
+                                              <ListItem key={permission.id} disablePadding>
+                                                <FormControlLabel
+                                                  control={
+                                                    <Checkbox
+                                                      checked={selectedPermissionIds.includes(
+                                                        permission.id,
+                                                      )}
+                                                      onChange={() =>
+                                                        handlePermissionToggle(permission.id)
+                                                      }
+                                                      size="small"
+                                                    />
+                                                  }
+                                                  label={`${permission.name} (${permission.code})`}
+                                                  sx={{ width: '100%' }}
+                                                />
+                                              </ListItem>
+                                            ))}
+                                          </List>
+                                        </Box>
+                                      ))}
+                                    </Box>
+                                  </Box>
+                                ),
+                              );
+                            }
+                          })()
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            {t('rolePermission.noAvailablePermissions')}
+                          </Typography>
+                        )}
+                      </Paper>
+                    </>
+                  ) : (
+                    // 编辑模式：显示当前权限（按 category 和 business 分组，树状结构）
+                    <>
+                      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                        <ToggleButtonGroup
+                          size="small"
+                          value={groupByOrder}
+                          exclusive
+                          onChange={(_, newValue) => {
+                            if (newValue !== null) setGroupByOrder(newValue);
+                          }}
+                          aria-label="group by order"
+                        >
+                          <ToggleButton value="category-business" aria-label="category first">
+                            <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                            {t('rolePermission.categoryFirst')}
+                          </ToggleButton>
+                          <ToggleButton value="business-category" aria-label="business first">
+                            <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                            {t('rolePermission.businessFirst')}
+                          </ToggleButton>
+                        </ToggleButtonGroup>
+                      </Box>
+                      <Paper variant="outlined" sx={{ p: 2 }}>
+                        {currentRolePermissions.length > 0 ? (
+                          (() => {
+                            if (groupByOrder === 'category-business') {
+                              // 按 category 和 business 进行二级分组
+                              const groupedPermissions = currentRolePermissions.reduce(
+                                (acc, rp) => {
+                                  const permission = allPermissions.find((p) => p.id === rp.id);
+                                  const category =
+                                    permission?.category || t('rolePermission.otherCategory');
+                                  const business = permission?.business || 'default';
+                                  if (!acc[category]) acc[category] = {};
+                                  if (!acc[category][business]) acc[category][business] = [];
+                                  acc[category][business].push(rp);
+                                  return acc;
+                                },
+                                {} as Record<string, Record<string, typeof currentRolePermissions>>,
+                              );
+
+                              return Object.entries(groupedPermissions).map(
+                                ([category, businessMap], categoryIndex) => (
+                                  <Box key={category} sx={{ mb: 2 }}>
+                                    <Chip
+                                      label={t('permission.category.' + category)}
+                                      sx={{ mb: 1, fontWeight: 'bold' }}
+                                      color={
+                                        (
+                                          [
+                                            'primary',
+                                            'secondary',
+                                            'info',
+                                            'success',
+                                            'warning',
+                                            'error',
+                                          ] as const
+                                        )[categoryIndex % 6]
+                                      }
+                                    />
+                                    <Box sx={{ pl: 2 }}>
+                                      {Object.entries(businessMap).map(([business, perms]) => (
+                                        <Box key={`${category}-${business}`} sx={{ mb: 1.5 }}>
+                                          <Chip
+                                            label={t('businessType.' + business)}
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ mb: 1 }}
+                                          />
+                                          <Box
+                                            sx={{
+                                              display: 'flex',
+                                              flexWrap: 'wrap',
+                                              gap: 0.5,
+                                              pl: 2,
+                                            }}
+                                          >
+                                            {perms.map((rp) => {
+                                              const permission = allPermissions.find(
+                                                (p) => p.id === rp.id,
+                                              );
+                                              return (
+                                                <Chip
+                                                  key={rp.id}
+                                                  label={
+                                                    permission
+                                                      ? `${permission.name} (${permission.code})`
+                                                      : 'Unknown'
                                                   }
                                                   size="small"
                                                 />
-                                              }
-                                              label={`${permission.name} (${permission.code})`}
-                                              sx={{ width: '100%' }}
-                                            />
-                                          </ListItem>
-                                        ))}
-                                      </List>
+                                              );
+                                            })}
+                                          </Box>
+                                        </Box>
+                                      ))}
                                     </Box>
-                                  ))}
-                                </Box>
-                              </Box>
-                            ),
-                          );
-                        })()
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          {t('rolePermission.noAvailablePermissions')}
-                        </Typography>
-                      )}
-                    </Paper>
-                  ) : (
-                    // 编辑模式：显示当前权限（按 category 和 business 分组，树状结构）
-                    <Paper variant="outlined" sx={{ p: 2 }}>
-                      {currentRolePermissions.length > 0 ? (
-                        (() => {
-                          // 按 category 和 business 进行二级分组
-                          const groupedPermissions = currentRolePermissions.reduce(
-                            (acc, rp) => {
-                              const permission = allPermissions.find((p) => p.id === rp.id);
-                              const category =
-                                permission?.category || t('rolePermission.otherCategory');
-                              const business = permission?.business || 'default';
-                              if (!acc[category]) acc[category] = {};
-                              if (!acc[category][business]) acc[category][business] = [];
-                              acc[category][business].push(rp);
-                              return acc;
-                            },
-                            {} as Record<string, Record<string, typeof currentRolePermissions>>,
-                          );
+                                  </Box>
+                                ),
+                              );
+                            } else {
+                              // 按 business 和 category 进行二级分组
+                              const groupedPermissions = currentRolePermissions.reduce(
+                                (acc, rp) => {
+                                  const permission = allPermissions.find((p) => p.id === rp.id);
+                                  const business = permission?.business || 'default';
+                                  const category =
+                                    permission?.category || t('rolePermission.otherCategory');
+                                  if (!acc[business]) acc[business] = {};
+                                  if (!acc[business][category]) acc[business][category] = [];
+                                  acc[business][category].push(rp);
+                                  return acc;
+                                },
+                                {} as Record<string, Record<string, typeof currentRolePermissions>>,
+                              );
 
-                          return Object.entries(groupedPermissions).map(
-                            ([category, businessMap], categoryIndex) => (
-                              <Box key={category} sx={{ mb: 2 }}>
-                                <Chip
-                                  label={t('permission.category.' + category)}
-                                  sx={{ mb: 1, fontWeight: 'bold' }}
-                                  color={
-                                    (
-                                      [
-                                        'primary',
-                                        'secondary',
-                                        'info',
-                                        'success',
-                                        'warning',
-                                        'error',
-                                      ] as const
-                                    )[categoryIndex % 6]
-                                  }
-                                />
-                                <Box sx={{ pl: 2 }}>
-                                  {Object.entries(businessMap).map(([business, perms]) => (
-                                    <Box key={`${category}-${business}`} sx={{ mb: 1.5 }}>
-                                      <Chip
-                                        label={t('businessType.' + business)}
-                                        size="small"
-                                        variant="outlined"
-                                        sx={{ mb: 1 }}
-                                      />
-                                      <Box
-                                        sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, pl: 2 }}
-                                      >
-                                        {perms.map((rp) => {
-                                          const permission = allPermissions.find(
-                                            (p) => p.id === rp.id,
-                                          );
-                                          return (
-                                            <Chip
-                                              key={rp.id}
-                                              label={
-                                                permission
-                                                  ? `${permission.name} (${permission.code})`
-                                                  : 'Unknown'
-                                              }
-                                              size="small"
-                                            />
-                                          );
-                                        })}
-                                      </Box>
+                              return Object.entries(groupedPermissions).map(
+                                ([business, categoryMap], businessIndex) => (
+                                  <Box key={business} sx={{ mb: 2 }}>
+                                    <Chip
+                                      label={t('businessType.' + business)}
+                                      sx={{ mb: 1, fontWeight: 'bold' }}
+                                      color={
+                                        (
+                                          [
+                                            'primary',
+                                            'secondary',
+                                            'info',
+                                            'success',
+                                            'warning',
+                                            'error',
+                                          ] as const
+                                        )[businessIndex % 6]
+                                      }
+                                    />
+                                    <Box sx={{ pl: 2 }}>
+                                      {Object.entries(categoryMap).map(([category, perms]) => (
+                                        <Box key={`${business}-${category}`} sx={{ mb: 1.5 }}>
+                                          <Chip
+                                            label={t('permission.category.' + category)}
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ mb: 1 }}
+                                          />
+                                          <Box
+                                            sx={{
+                                              display: 'flex',
+                                              flexWrap: 'wrap',
+                                              gap: 0.5,
+                                              pl: 2,
+                                            }}
+                                          >
+                                            {perms.map((rp) => {
+                                              const permission = allPermissions.find(
+                                                (p) => p.id === rp.id,
+                                              );
+                                              return (
+                                                <Chip
+                                                  key={rp.id}
+                                                  label={
+                                                    permission
+                                                      ? `${permission.name} (${permission.code})`
+                                                      : 'Unknown'
+                                                  }
+                                                  size="small"
+                                                />
+                                              );
+                                            })}
+                                          </Box>
+                                        </Box>
+                                      ))}
                                     </Box>
-                                  ))}
-                                </Box>
-                              </Box>
-                            ),
-                          );
-                        })()
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          {t('rolePermission.noPermissions')}
-                        </Typography>
-                      )}
-                    </Paper>
+                                  </Box>
+                                ),
+                              );
+                            }
+                          })()
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            {t('rolePermission.noPermissions')}
+                          </Typography>
+                        )}
+                      </Paper>
+                    </>
                   )}
 
                   {!isBatchMode && editId && (
