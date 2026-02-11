@@ -39,7 +39,7 @@ import type { AddUserReq, UpdateUserReq, TreeDepartmentRes } from '@/api/system/
 import type { Props } from '../index';
 import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
-import { authUtils, type UserInfo } from '@/utils/auth';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -73,14 +73,8 @@ const TheForm = memo(
     const [departmentAnchorEl, setDepartmentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
     const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const userInfo = useUserInfo();
     const [loading, setLoading] = useState(false);
-
-    // 加载用户信息
-    useEffect(() => {
-      const user = authUtils.getUserInfo();
-      setUserInfo(user);
-    }, []);
 
     // 获取角色和部门数据
     useEffect(() => {

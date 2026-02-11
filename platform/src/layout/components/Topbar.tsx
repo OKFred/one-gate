@@ -15,11 +15,12 @@ import Logout from '@mui/icons-material/Logout';
 import LanguageIcon from '@mui/icons-material/Language';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { authUtils, type UserInfo } from '@/utils/auth';
+import { authUtils } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 import * as LanguageAPI from '@/api/i18n/language';
 import * as AuthAPI from '@/api/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import type { ListAllLanguageRes } from '@/api/i18n/type';
 import { loginPath } from '@/routes';
 
@@ -28,7 +29,7 @@ interface TopbarProps {
 }
 
 const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const userInfo = useUserInfo();
   const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
   const [languagesLoaded, setLanguagesLoaded] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -42,12 +43,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const t = useTranslation();
-
-  // 加载用户信息
-  useEffect(() => {
-    const user = authUtils.getUserInfo();
-    setUserInfo(user);
-  }, []);
 
   // 应用主题设置
   useEffect(() => {
