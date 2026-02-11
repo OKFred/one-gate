@@ -15,10 +15,16 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Checkbox,
+  ListItemText,
+  OutlinedInput,
+  Chip,
+  Box,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as DepartmentAPI from '@/api/system/department';
-import type { AddDepartmentReq, ListAllDepartmentRes } from '@/api/system/type';
+import * as UserAPI from '@/api/system/user';
+import type { AddDepartmentReq, ListAllDepartmentRes, ListAllUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -48,6 +54,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: DepartmentFormData = {
   name: '',
   parentId: null,
+  managerIdArr: null,
   isEnabled: true,
   remark: null,
 };
@@ -71,6 +78,7 @@ const TheForm = memo(
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [allDepartments, setAllDepartments] = useState<DepartmentData[]>([]);
+    const [allUsers, setAllUsers] = useState<ListAllUserRes>([]);
 
     // 获取所有部门列表（扁平的）
     const fetchAllDepartments = useCallback(async () => {
@@ -80,6 +88,17 @@ const TheForm = memo(
         setAllDepartments(departments as DepartmentData[]);
       } catch (error) {
         console.error('获取部门列表失败:', error);
+      }
+    }, []);
+
+    // 获取所有用户列表
+    const fetchAllUsers = useCallback(async () => {
+      try {
+        const res = await UserAPI.listAllFn({ data: { isEnabled: true } });
+        const users = res.data.data || [];
+        setAllUsers(users);
+      } catch (error) {
+        console.error('获取用户列表失败:', error);
       }
     }, []);
 
@@ -188,6 +207,7 @@ const TheForm = memo(
           setError('');
           setDialogOpen(true);
           fetchAllDepartments();
+          fetchAllUsers();
         },
         openEdit: (department: DepartmentData) => {
           setEditingDepartment(department);
@@ -195,24 +215,26 @@ const TheForm = memo(
             id: department.id,
             name: department.name ?? '',
             parentId: department.parentId ?? null,
+            managerIdArr: department.managerIdArr ?? null,
             isEnabled: department.isEnabled ?? true,
             remark: department.remark ?? null,
           });
           setError('');
           setDialogOpen(true);
           fetchAllDepartments();
+          fetchAllUsers();
         },
         close: () => {
           setDialogOpen(false);
         },
       }),
-      [fetchAllDepartments],
+      [fetchAllDepartments, fetchAllUsers],
     );
 
     // 处理表单变化
     const handleFormChange = (
       field: keyof DepartmentFormData,
-      value: string | number | boolean | null,
+      value: string | number | boolean | number[] | null,
     ) => {
       setFormValues((prev) => ({ ...prev, [field]: value }));
     };
@@ -310,6 +332,35 @@ const TheForm = memo(
                   <MenuItem key={dept.id} value={dept.id.toString()}>
                     {'\u00A0\u00A0'.repeat(dept.level)}
                     {dept.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel id="manager-label">{t('department.table.managers')}</InputLabel>
+              <Select
+                labelId="manager-label"
+                label={t('department.table.managers')}
+                multiple
+                value={formValues.managerIdArr || []}
+                onChange={(e) => {
+                  const value = e.target.value as number[];
+                  handleFormChange('managerIdArr', value.length > 0 ? value : null);
+                }}
+                input={<OutlinedInput label={t('department.table.managers')} />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {(selected as number[]).map((userId) => {
+                      const user = allUsers.find((u) => u.id === userId);
+                      return <Chip key={userId} label={user?.username || userId} size="small" />;
+                    })}
+                  </Box>
+                )}
+              >
+                {allUsers.map((user) => (
+                  <MenuItem key={user.id} value={user.id}>
+                    <Checkbox checked={(formValues.managerIdArr || []).includes(user.id)} />
+                    <ListItemText primary={user.username} />
                   </MenuItem>
                 ))}
               </Select>

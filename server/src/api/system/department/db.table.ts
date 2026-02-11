@@ -30,6 +30,15 @@ const DepartmentBasePO = {
     description: "父部门ID，支持部门层级",
     minimum: 1,
   },
+  managerIdArr: {
+    type: ["array", "null"],
+    nullable: true,
+    description: "部门管理员ID数组",
+    items: {
+      type: "number",
+      minimum: 1,
+    },
+  },
   isEnabled: {
     type: "boolean",
     description: "是否启用",
@@ -83,6 +92,7 @@ export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 export const DepartmentAddKeys = [
   "name",
   "parentId",
+  "managerIdArr",
   "isEnabled",
   "remark",
 ] as const satisfies RequiredKeys<DepartmentAddVOLike>[];
@@ -114,6 +124,9 @@ export const departmentTable = sqliteTable("system_department", {
   id: integer("id").primaryKey().notNull(),
   name: text("name").notNull().unique(),
   parentId: integer("parent_id"),
+  managerIdArr: text("manager_id_arr", { mode: "json" }).$type<
+    number[] | null
+  >(),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
@@ -130,6 +143,7 @@ export async function tableInit() {
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
       parent_id INTEGER,
+      manager_id_arr TEXT,
       remark TEXT,
       is_enabled INTEGER NOT NULL,
       creator_id INTEGER NOT NULL,

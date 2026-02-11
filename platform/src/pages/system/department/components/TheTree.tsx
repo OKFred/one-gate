@@ -1,21 +1,21 @@
 import { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect } from 'react';
-import {
-  Box,
-  CircularProgress,
-  Typography,
-} from '@mui/material';
+import { Box, CircularProgress, Typography, Chip } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
   Apartment as ApartmentIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as DepartmentAPI from '@/api/system/department';
+import * as UserAPI from '@/api/system/user';
 import type { DepartmentData } from './TheForm';
+import type { ListAllUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import { showSnackbar } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
 import { TreeNodeActionButtons } from './TheActionButtons';
+import { useTranslation } from '@/hooks/useTranslation';
 
 // 暴露给父组件的方法
 export interface TheTreeRef {
@@ -26,11 +26,13 @@ export interface TheTreeRef {
 const TheTree = memo(
   forwardRef<TheTreeRef, Props>(({ localObj }, ref) => {
     const { formRef } = localObj;
+    const t = useTranslation();
 
     const [departments, setDepartments] = useState<DepartmentData[]>([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
+    const [allUsers, setAllUsers] = useState<ListAllUserRes>([]);
 
     // 将扁平的部门列表构造成树形结构（支持无限层级）
     const buildTree = useCallback((list: DepartmentData[]): DepartmentData[] => {
@@ -108,6 +110,10 @@ const TheTree = memo(
       async (searchFilters?: FilterState) => {
         setLoading(true);
         try {
+          // 获取用户列表
+          const userRes = await UserAPI.listAllFn({ data: { isEnabled: true } });
+          setAllUsers(userRes.data.data || []);
+
           const requestData = {
             descend: false,
             ...(searchFilters?.keyword && { keyword: searchFilters.keyword }),
@@ -141,7 +147,6 @@ const TheTree = memo(
           }
         } catch (err) {
           console.error(err);
-          showSnackbar({ message: '获取部门列表失败', type: 'error' });
         } finally {
           setLoading(false);
         }
@@ -171,62 +176,84 @@ const TheTree = memo(
     }, [fetchDepartments]);
 
     // 删除成功后的回调
-    const handleDeleteSuccess = useCallback(async (deptId: number) => {
-      setLoading(true);
-      try {
-        await DepartmentAPI.deleteFn({ data: { id: deptId } });
-        fetchDepartments(filters);
-        showSnackbar({ message: '部门删除成功', type: 'success' });
-      } catch (err) {
-        console.error(err);
-        showSnackbar({ message: '删除失败，该部门可能存在子部门或关联数据', type: 'error' });
-      } finally {
-        setLoading(false);
-      }
-    }, [fetchDepartments, filters]);
-
+    const handleDeleteSuccess = useCallback(
+      async (deptId: number) => {
+        setLoading(true);
+        try {
+          await DepartmentAPI.deleteFn({ data: { id: deptId } });
+          fetchDepartments(filters);
+          showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      },
+      [fetchDepartments, filters, t],
+    );
 
     // 渲染树节点（递归渲染无限层级）
     const renderTree = useCallback(
       (nodes: DepartmentData[]) =>
-        nodes.map((node) => (
-          <TreeItem
-            key={node.id}
-            itemId={node.id.toString()}
-            label={
-              <Box display="flex" alignItems="center" py={0.5}>
-                <ApartmentIcon sx={{ mr: 1, fontSize: 20, color: 'text.secondary' }} />
-                <Typography sx={{ flexGrow: 1 }}>
-                  {node.name}
-                  {node.remark && (
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ ml: 1 }}
-                    >
-                      ({node.remark})
-                    </Typography>
-                  )}
-                  {!node.isEnabled && (
-                    <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
-                      [已禁用]
-                    </Typography>
-                  )}
-                </Typography>
-                <TreeNodeActionButtons
-                  node={node}
-                  formRef={formRef}
-                  onDeleteSuccess={() => handleDeleteSuccess(node.id)}
-                />
-              </Box>
-            }
-          >
-            {/* 递归渲染子节点，支持无限层级 */}
-            {node.children && node.children.length > 0 && renderTree(node.children)}
-          </TreeItem>
-        )),
-      [formRef, handleDeleteSuccess],
+        nodes.map((node) => {
+          // 获取管理员信息
+          const managers = (node.managerIdArr || [])
+            .map((userId) => allUsers.find((u) => u.id === userId))
+            .filter(Boolean);
+
+          return (
+            <TreeItem
+              key={node.id}
+              itemId={node.id.toString()}
+              label={
+                <Box display="flex" alignItems="center" py={0.5}>
+                  <ApartmentIcon sx={{ mr: 1, fontSize: 20, color: 'text.secondary' }} />
+                  <Box sx={{ flexGrow: 1 }} alignItems="center" display="flex">
+                    {node.name}
+                    {node.remark && (
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ ml: 1 }}
+                      >
+                        ({node.remark})
+                      </Typography>
+                    )}
+                    {!node.isEnabled && (
+                      <Typography component="span" variant="body2" color="error" sx={{ ml: 1 }}>
+                        [{t('status.disabled')}]
+                      </Typography>
+                    )}
+                    {managers.length > 0 && (
+                      <Box component="span" sx={{ ml: 1, display: 'inline-flex', gap: 0.5 }}>
+                        {managers.map((manager) => (
+                          <Chip
+                            key={manager!.id}
+                            icon={<PersonIcon />}
+                            label={manager!.username}
+                            size="small"
+                            variant="outlined"
+                            sx={{ height: 20, fontSize: '0.75rem' }}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  </Box>
+                  <TreeNodeActionButtons
+                    node={node}
+                    formRef={formRef}
+                    onDeleteSuccess={() => handleDeleteSuccess(node.id)}
+                  />
+                </Box>
+              }
+            >
+              {/* 递归渲染子节点，支持无限层级 */}
+              {node.children && node.children.length > 0 && renderTree(node.children)}
+            </TreeItem>
+          );
+        }),
+      [formRef, handleDeleteSuccess, allUsers, t],
     );
 
     return (
@@ -245,7 +272,7 @@ const TheTree = memo(
           </SimpleTreeView>
         ) : (
           <Typography color="text.secondary" textAlign="center" py={4}>
-            暂无部门数据，点击上方按钮添加
+            {t('common.noData')}
           </Typography>
         )}
       </Box>

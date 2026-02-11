@@ -8153,6 +8153,8 @@ export interface components {
                 name?: string;
                 /** @description 父部门ID，支持部门层级 */
                 parentId?: ((number | null) | null) | null;
+                /** @description 部门管理员ID数组 */
+                managerIdArr?: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
                 /** @description 备注说明 */
@@ -8212,6 +8214,8 @@ export interface components {
                     name: string;
                     /** @description 父部门ID，支持部门层级 */
                     parentId: ((number | null) | null) | null;
+                    /** @description 部门管理员ID数组 */
+                    managerIdArr: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 备注说明 */
@@ -8242,6 +8246,8 @@ export interface components {
             name: string;
             /** @description 父部门ID，支持部门层级 */
             parentId: ((number | null) | null) | null;
+            /** @description 部门管理员ID数组 */
+            managerIdArr: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
             /** @description 备注说明 */
@@ -8285,6 +8291,8 @@ export interface components {
             name?: string;
             /** @description 父部门ID，支持部门层级 */
             parentId?: ((number | null) | null) | null;
+            /** @description 部门管理员ID数组 */
+            managerIdArr?: ((number[] | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @description 备注说明 */
@@ -8321,6 +8329,8 @@ export interface components {
                 name: string;
                 /** @description 父部门ID，支持部门层级 */
                 parentId: ((number | null) | null) | null;
+                /** @description 部门管理员ID数组 */
+                managerIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 备注说明 */
@@ -8361,6 +8371,8 @@ export interface components {
                 name: string;
                 /** @description 父部门ID，支持部门层级 */
                 parentId: ((number | null) | null) | null;
+                /** @description 部门管理员ID数组 */
+                managerIdArr: ((number[] | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 备注说明 */
@@ -8392,6 +8404,8 @@ export interface components {
                     name?: string;
                     /** @description 父部门ID，支持部门层级 */
                     parentId?: ((number | null) | null) | null;
+                    /** @description 部门管理员ID数组 */
+                    managerIdArr?: ((number[] | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled?: boolean;
                     /** @description 备注说明 */

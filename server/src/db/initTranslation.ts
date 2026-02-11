@@ -3243,6 +3243,22 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
+    business: "system.department",
+    langCode: "zh-CN",
+    tKey: "department.table.managers",
+    tValue: "部门管理员",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.department",
+    langCode: "en-US",
+    tKey: "department.table.managers",
+    tValue: "Department Managers",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
     business: "system.role",
     langCode: "zh-CN",
     tKey: "role.table.roleName",

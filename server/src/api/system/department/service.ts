@@ -103,11 +103,13 @@ const buildWhereCondition = ({
   if (hasValue(keyword)) {
     conditions.push(like(departmentTable.name, `%${keyword}%`));
   }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(departmentTable.isEnabled, isEnabled));
-  }
-  if (parentId !== undefined) {
-    conditions.push(eq(departmentTable.parentId, parentId));
+  for (const [field, value] of [
+    ["isEnabled", isEnabled],
+    ["parentId", parentId],
+  ] as const) {
+    if (value !== undefined) {
+      conditions.push(eq(departmentTable[field], value));
+    }
   }
   return conditions.length > 0
     ? conditions.length === 1
@@ -164,6 +166,7 @@ async function onListAll(
       name: departmentTable.name,
       remark: departmentTable.remark,
       parentId: departmentTable.parentId,
+      managerIdArr: departmentTable.managerIdArr,
       isEnabled: departmentTable.isEnabled,
     })
     .from(departmentTable)
@@ -286,7 +289,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { name, remark, parentId, isEnabled = true } = params;
+  const { name, remark, parentId, managerIdArr, isEnabled = true } = params;
   // 如果有父部门，检查父部门是否存在
   if (hasValue(parentId)) {
     const parent = await db
@@ -305,6 +308,7 @@ async function onAdd(
       name,
       remark,
       parentId,
+      managerIdArr,
       isEnabled,
       creatorId,
     })
@@ -455,9 +459,11 @@ async function onDelete(
   }
 
   // 如果要删除部门，先检查是否满足删除条件
-  
+
   // 1. 检查当前部门下是否存在在职人员
-  const employeeCount = await userUtils.countEnabledEmployeesInDepartments([id]);
+  const employeeCount = await userUtils.countEnabledEmployeesInDepartments([
+    id,
+  ]);
   if (employeeCount > 0) {
     throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_EMPLOYEES);
   }
