@@ -144,20 +144,15 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
+  const effectiveParams = userObj.isSuperAdmin
+    ? params
+    : { ...params, isEnabled: true };
+  const { orderBy = "id", descend = true } = effectiveParams;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
 
-  // 构建基础查询条件
-  const baseCondition = buildWhereCondition(params);
-  const baseConditions = baseCondition ? [baseCondition] : [];
-
-  // 应用数据权限过滤
-  const whereCondition = await applyDataPermission(
-    userObj,
-    ["parentAndItsDescendants"],
-    baseConditions
-  );
+  // 构建查询条件
+  const whereCondition = buildWhereCondition(effectiveParams);
 
   // 查询所有匹配的数据
   const rows = await db
@@ -210,22 +205,22 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
+  const effectiveParams = userObj.isSuperAdmin
+    ? params
+    : { ...params, isEnabled: true };
+  const {
+    orderBy = "id",
+    descend = true,
+    pageNo = 1,
+    pageSize = 10,
+  } = effectiveParams;
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 构建基础查询条件
-  const baseCondition = buildWhereCondition(params);
-  const baseConditions = baseCondition ? [baseCondition] : [];
-
-  // 应用数据权限过滤
-  const whereCondition = await applyDataPermission(
-    userObj,
-    ["parentAndItsDescendants"],
-    baseConditions
-  );
+  // 构建查询条件
+  const whereCondition = buildWhereCondition(effectiveParams);
 
   // 查询总数
   const countResult = await db
@@ -288,8 +283,24 @@ async function onAdd(
   params: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const { userId: creatorId } = userObj;
+  const { userId: creatorId, isSuperAdmin } = userObj;
   const { name, remark, parentId, managerIdArr, isEnabled = true } = params;
+
+  // 检查权限：超管或部门管理员才能添加部门
+  let canManage = true;
+  if (!isSuperAdmin) {
+    if (hasValue(parentId)) {
+      // 非超管用户只能在其作为管理员的部门下添加子部门
+      canManage = await canUserManageDepartment(creatorId, parentId);
+    } else {
+      // 没有父部门的情况下，非超管用户不能添加部门
+      canManage = false;
+    }
+  }
+  if (!canManage) {
+    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+  }
+
   // 如果有父部门，检查父部门是否存在
   if (hasValue(parentId)) {
     const parent = await db
@@ -345,15 +356,13 @@ async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const { userId: updaterId } = userObj;
+  const { userId: updaterId, isSuperAdmin } = userObj;
   const { id, ...rest } = params;
 
   // 先检查是否有权限访问该部门
-  const whereCondition = await applyDataPermission(
-    userObj,
-    ["parentAndItsDescendants"],
-    [eq(departmentTable.id, id)]
-  );
+  const whereCondition = isSuperAdmin
+    ? eq(departmentTable.id, id)
+    : and(eq(departmentTable.id, id), eq(departmentTable.isEnabled, true));
 
   const rows = await db
     .select()
@@ -363,6 +372,14 @@ async function onUpdate(
 
   if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
+  // 检查权限：超管或该部门的管理员才能更新
+  if (!isSuperAdmin) {
+    const canManage = await canUserManageDepartment(updaterId, id);
+    if (!canManage) {
+      throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+    }
   }
 
   // 如果要禁用部门，先检查是否满足禁用条件
@@ -442,11 +459,9 @@ async function onDelete(
   if (id === undefined) return null;
 
   // 先检查是否有权限访问该部门
-  const whereCondition = await applyDataPermission(
-    userObj,
-    ["parentAndItsDescendants"],
-    [eq(departmentTable.id, id)]
-  );
+  const whereCondition = userObj.isSuperAdmin
+    ? eq(departmentTable.id, id)
+    : and(eq(departmentTable.id, id), eq(departmentTable.isEnabled, true));
 
   const rows = await db
     .select()
@@ -465,7 +480,7 @@ async function onDelete(
     id,
   ]);
   if (employeeCount > 0) {
-    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_EMPLOYEES);
+    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER);
   }
 
   // 2. 检查是否有子部门
@@ -551,13 +566,9 @@ async function onGet(
   userObj: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-
-  // 应用数据权限过滤
-  const whereCondition = await applyDataPermission(
-    userObj,
-    ["parentAndItsDescendants"],
-    [eq(departmentTable.id, id)]
-  );
+  const whereCondition = userObj.isSuperAdmin
+    ? eq(departmentTable.id, id)
+    : and(eq(departmentTable.id, id), eq(departmentTable.isEnabled, true));
 
   const rows = await db
     .select()
@@ -625,18 +636,11 @@ async function onTree(
 ): Promise<DepartmentTreeItem[]> {
   const { showAll } = params;
 
-  // 构建基础查询条件
-  const baseConditions = [];
-  if (showAll !== true) {
-    baseConditions.push(eq(departmentTable.isEnabled, true)); // 默认只查询启用的部门
-  }
-
-  // 应用数据权限过滤
-  const whereCondition = await applyDataPermission(
-    userObj,
-    ["parentAndItsDescendants"],
-    baseConditions
-  );
+  // 构建查询条件：超管可以使用 showAll，非超管强制只查启用的部门
+  const shouldShowAll = userObj.isSuperAdmin && showAll === true;
+  const whereCondition = shouldShowAll
+    ? undefined
+    : eq(departmentTable.isEnabled, true);
 
   // 获取所有部门
   const allDepartments = await db
@@ -805,9 +809,46 @@ async function verifyDepartment(departmentId: number) {
   }
 }
 
+/** 检查用户是否是部门管理员 */
+async function isUserDepartmentManager(
+  userId: number,
+  departmentId: number
+): Promise<boolean> {
+  if (!departmentId) return false;
+  const dept = await db
+    .select({ managerIdArr: departmentTable.managerIdArr })
+    .from(departmentTable)
+    .where(eq(departmentTable.id, departmentId))
+    .limit(1);
+  if (dept.length === 0) return false;
+  return dept[0].managerIdArr?.includes(userId) ?? false;
+}
+
+/** 检查用户是否可以管理某个部门（包括其祖先部门） */
+async function canUserManageDepartment(
+  userId: number,
+  departmentId: number
+): Promise<boolean> {
+  if (!departmentId) return false;
+  // 检查该部门本身的管理员
+  if (await isUserDepartmentManager(userId, departmentId)) {
+    return true;
+  }
+  // 检查所有祖先部门的管理员
+  const ancestors = await getAncestorDepartments(departmentId);
+  if (ancestors) {
+    for (const ancestor of ancestors) {
+      if (await isUserDepartmentManager(userId, ancestor.id)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /** 检查部门是否可以被禁用 */
 async function checkCanDisableDepartment(departmentId: number): Promise<void> {
-  // 1. 检查当前部门及所有子孙部门下是否存在在职人员
+  // 1. 检查当前部门及所有子孙部门下是否存在已启用的用户
   const descendants = await getDescendantDepartments(departmentId);
   const allDepartmentIds = [
     departmentId,
@@ -819,7 +860,7 @@ async function checkCanDisableDepartment(departmentId: number): Promise<void> {
     await userUtils.countEnabledEmployeesInDepartments(allDepartmentIds);
 
   if (employeeCount > 0) {
-    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_EMPLOYEES);
+    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER);
   }
 
   // 2. 检查是否存在未禁用的子部门
@@ -846,6 +887,8 @@ export const utils = {
   getParentDepartment,
   getSiblingDepartments,
   getParentAndItsDescendants,
+  isUserDepartmentManager,
+  canUserManageDepartment,
 };
 
 export default {
