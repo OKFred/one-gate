@@ -34,7 +34,7 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import type { RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
+import { SALT_ROUNDS, SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -289,7 +289,9 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, departmentObj, regionObj, roleArr, langCode, ...rest } = params;
-  const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
+  const isEnabled = roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)
+    ? true
+    : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
     updaterId,
@@ -378,7 +380,8 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-  if (id === SUPER_ADMIN_ID) {
+  const thisUser = await onGet({ id });
+  if (thisUser?.roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)) {
     throw new BusinessError(BusinessErrorCode["PERMISSION_DENIED"]);
   }
   const res = await db

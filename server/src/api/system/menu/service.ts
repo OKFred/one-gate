@@ -517,12 +517,8 @@ async function onTree(
   params: FromSchema<typeof treeReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof treeRes> | null> {
-  const { roleArr } = userObj;
+  const { roleArr, isSuperAdmin } = userObj;
   const roleIds = roleArr.map((r) => r.value);
-
-  // 检查是否为超管角色
-  const isSuperAdminRole = roleIds.includes(SUPER_ADMIN_ROLE_ID);
-
   // 获取所有菜单
   const { showAll } = params;
   // 构建查询条件
@@ -544,9 +540,8 @@ async function onTree(
     .orderBy(asc(menuTable.sort));
 
   let filteredMenus = allMenus;
-
   // 如果不是超管角色，则根据用户角色过滤菜单
-  if (!isSuperAdminRole) {
+  if (!isSuperAdmin) {
     // 获取用户角色有权限的菜单ID列表
     const accessibleMenuIds =
       await rolePermissionUtils.getMenuIdsByRoleIds(roleIds);

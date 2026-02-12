@@ -1,7 +1,7 @@
 import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
 import userService from "@/api/system/user/service";
-import { SUPER_ADMIN_ID } from "@/db/init";
+import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import {
   BusinessError,
@@ -31,8 +31,7 @@ export const authMiddleware = async (c: NodeHonoContext) => {
   const permissions =
     await rolePermissionUtils.getPermissionsByRoleIds(roleIds);
   // 判断是否为超级管理员
-  const isSuperAdmin = userId === SUPER_ADMIN_ID;
-
+  const isSuperAdmin = roleIds.includes(SUPER_ADMIN_ROLE_ID);
   // 将用户信息添加到context中
   c.set("userObj", {
     token,
