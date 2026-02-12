@@ -156,7 +156,8 @@ const TheForm = memo(
               <TextField
                 label={t('cache.form.namespace')}
                 value={form.namespace}
-                disabled
+                disabled={isEditMode}
+                onChange={(e) => handleChange('namespace', e.target.value)}
                 fullWidth
                 required
               />

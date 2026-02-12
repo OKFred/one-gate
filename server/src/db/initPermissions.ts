@@ -66,6 +66,11 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
   },
   {
     category: "api",
+    code: "operation_maintenance.cache:api",
+    business: "operation_maintenance.cache",
+  },
+  {
+    category: "api",
     code: "mail.account:api",
     business: "mail.account",
   },
@@ -273,6 +278,26 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     category: "button",
     code: "system.auth:update_password",
     business: "system.auth",
+  },
+  {
+    category: "button",
+    code: "operation_maintenance.cache:add",
+    business: "operation_maintenance.cache",
+  },
+  {
+    category: "button",
+    code: "operation_maintenance.cache:edit",
+    business: "operation_maintenance.cache",
+  },
+  {
+    category: "button",
+    code: "operation_maintenance.cache:delete",
+    business: "operation_maintenance.cache",
+  },
+  {
+    category: "button",
+    code: "operation_maintenance.cache:view",
+    business: "operation_maintenance.cache",
   },
 ];
 

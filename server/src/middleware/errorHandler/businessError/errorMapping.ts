@@ -30,7 +30,7 @@ export const BusinessErrorCode = {
   /** @description 数据库操作错误 */
   DATABASE_ERROR: "DATABASE_ERROR",
   /** @description 部门下存在在职人员，无法禁用 */
-  DEPARTMENT_HAS_ENABLED_EMPLOYEES: "DEPARTMENT_HAS_ENABLED_EMPLOYEES",
+  DEPARTMENT_HAS_ENABLED_USER: "DEPARTMENT_HAS_ENABLED_USER",
   /** @description 部门下存在未禁用的子部门 */
   DEPARTMENT_HAS_ENABLED_CHILDREN: "DEPARTMENT_HAS_ENABLED_CHILDREN",
 } as const;
@@ -71,7 +71,7 @@ export const ERROR_PRESENTATION_MAP: Record<
   },
   PERMISSION_DENIED: {
     status: 403,
-    i18nKey: "errorHandler.forbidden",
+    i18nKey: "errorHandler.permissionDenied",
   },
   NOT_EXIST_OR_DISABLED: {
     status: 404,
@@ -101,8 +101,8 @@ export const ERROR_PRESENTATION_MAP: Record<
     status: 500,
     i18nKey: "errorHandler.databaseError",
   },
-  DEPARTMENT_HAS_ENABLED_EMPLOYEES: {
-    i18nKey: "errorHandler.departmentHasEnabledEmployees",
+  DEPARTMENT_HAS_ENABLED_USER: {
+    i18nKey: "errorHandler.departmentHasEnabledUser",
   },
   DEPARTMENT_HAS_ENABLED_CHILDREN: {
     i18nKey: "errorHandler.departmentHasEnabledChildren",

@@ -2,8 +2,6 @@ import { useState } from 'react';
 import {
   Button,
   Stack,
-  IconButton,
-  Tooltip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -20,7 +18,8 @@ import * as CacheAPI from '@/api/operation_maintenance/cache';
 import type { CacheFormRef } from './TheForm';
 import type { ListKeysRes } from '@/api/operation_maintenance/type';
 import { useTranslation } from '@/hooks/useTranslation';
-import { useResponsive } from '@/hooks/useResponsive';
+import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
+import { OPERATION_MAINTENANCE } from '@/hooks/usePermission';
 
 // 页面顶部操作按钮
 interface TheActionButtonsProps {
@@ -29,23 +28,20 @@ interface TheActionButtonsProps {
 
 export function TheActionButtons({ formRef }: TheActionButtonsProps) {
   const t = useTranslation();
-  const { isMobile } = useResponsive();
 
   const handleAdd = () => {
     formRef.current?.onOpen('', '');
   };
 
   return (
-    <Stack direction="row" spacing={1}>
-      <Button
-        variant="contained"
-        startIcon={!isMobile && <AddIcon />}
-        onClick={handleAdd}
-        size={isMobile ? 'small' : 'medium'}
-      >
-        {t('cache.actions.add')}
-      </Button>
-    </Stack>
+    <ResponsiveButton
+      variant="contained"
+      startIcon={<AddIcon />}
+      onClick={handleAdd}
+      permissionCodes={[OPERATION_MAINTENANCE.CACHE.ADD]}
+    >
+      {t('cache.actions.add')}
+    </ResponsiveButton>
   );
 }
 
@@ -95,23 +91,35 @@ export function CacheActionButtons({
   return (
     <>
       <Stack direction="row" spacing={0.5}>
-        <Tooltip title={t('common.view')}>
-          <IconButton size="small" color="info" onClick={handleView}>
-            <ViewIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <ResponsiveIconButton
+          size="small"
+          color="info"
+          onClick={handleView}
+          title={t('common.view')}
+          permissionCodes={[OPERATION_MAINTENANCE.CACHE.VIEW]}
+        >
+          <ViewIcon fontSize="small" />
+        </ResponsiveIconButton>
 
-        <Tooltip title={t('common.edit')}>
-          <IconButton size="small" color="primary" onClick={handleEdit}>
-            <EditIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <ResponsiveIconButton
+          size="small"
+          color="primary"
+          onClick={handleEdit}
+          title={t('common.edit')}
+          permissionCodes={[OPERATION_MAINTENANCE.CACHE.EDIT]}
+        >
+          <EditIcon fontSize="small" />
+        </ResponsiveIconButton>
 
-        <Tooltip title={t('common.delete')}>
-          <IconButton size="small" color="error" onClick={handleDeleteClick}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <ResponsiveIconButton
+          size="small"
+          color="error"
+          onClick={handleDeleteClick}
+          title={t('common.delete')}
+          permissionCodes={[OPERATION_MAINTENANCE.CACHE.DELETE]}
+        >
+          <DeleteIcon fontSize="small" />
+        </ResponsiveIconButton>
       </Stack>
 
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
