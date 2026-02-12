@@ -288,7 +288,7 @@ async function onUpdateProfile(
   const { regionObj, remark } = params;
   const regionId = regionObj ? regionObj.value : null;
   if (regionId) await regionUtils.verifyRegion(regionId);
-  const res = await userService.update.service(
+  const res = await userUtils.updateUserInfo(
     { id, regionObj, remark },
     userObj
   );
@@ -328,8 +328,7 @@ async function onUpdateLangCode(
   const { userId: id } = userObj;
   const { langCode } = params;
   const updateData = { id, langCode };
-  const res = await userService.update.service(updateData, userObj);
-  return res;
+  return await userUtils.updateLangCode(updateData, userObj);
 }
 const updateLangCodeApi = {
   req: updateLangCodeReq,

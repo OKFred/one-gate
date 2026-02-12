@@ -599,11 +599,71 @@ async function countEnabledEmployeesInDepartments(
   return result[0]?.count || 0;
 }
 
+/** 更新用户语言 */
+export async function updateLangCode(
+  updateData: {
+    id: number;
+    langCode: string;
+  },
+  userObj: UserObj
+): Promise<number> {
+  const res = await db
+    .update(userTable)
+    .set({
+      langCode: updateData.langCode,
+      updaterId: userObj.userId,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
+    })
+    .where(eq(userTable.id, updateData.id))
+    .returning({ id: userTable.id });
+  if (res?.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  return res[0].id;
+}
+
+/** 更新用户信息 */
+async function updateUserInfo(
+  updateData: {
+    id: number;
+    regionObj?: { value: number; label: string } | null;
+    remark?: string;
+  },
+  userObj: UserObj
+): Promise<number> {
+  const { id, regionObj, remark } = updateData;
+  const setData = {
+    updaterId: userObj.userId,
+    updateTimeUtc: getCurrentTimestampUtcSql(),
+    regionId: undefined,
+    remark: undefined,
+  };
+  if (regionObj !== undefined) {
+    const regionId = regionObj ? regionObj.value : null;
+    if (regionId) await regionUtils.verifyRegion(regionId);
+    setData.regionId = regionId;
+  }
+  if (remark !== undefined) {
+    setData.remark = remark;
+  }
+  const res = await db
+    .update(userTable)
+    .set(setData)
+    .where(eq(userTable.id, id))
+    .returning({ id: userTable.id });
+  if (res?.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  return res[0].id;
+}
+
 export const utils = {
+  countEnabledEmployeesInDepartments,
   convertPassword,
   verifyUsernameAndPassword,
   updatePassword,
-  countEnabledEmployeesInDepartments,
+  updateLangCode,
+  updateUserInfo,
 };
 
 export default {
