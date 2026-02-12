@@ -3,10 +3,7 @@ import service from "./service";
 import { BusinessKey } from "@/types/business";
 
 function createApp() {
-  return encapsulation(
-    service,
-    "operation_maintenance.cache" satisfies BusinessKey
-  );
+  return encapsulation(service, "maintenance.cache" satisfies BusinessKey);
 }
 
 export default createApp;

@@ -12,8 +12,8 @@ import {
   Typography,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import * as CacheAPI from '@/api/operation_maintenance/cache';
-import type { PutCacheReq, GetCacheRes } from '@/api/operation_maintenance/type';
+import * as CacheAPI from '@/api/maintenance/cache';
+import type { PutCacheReq, GetCacheRes } from '@/api/maintenance/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';

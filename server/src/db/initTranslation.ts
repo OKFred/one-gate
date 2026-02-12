@@ -4336,7 +4336,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     langCode: "zh-CN",
-    tKey: "businessType.operation_maintenance",
+    tKey: "businessType.maintenance",
     tValue: "运维",
     isEnabled: true,
   },
@@ -4344,7 +4344,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     langCode: "en-US",
-    tKey: "businessType.operation_maintenance",
+    tKey: "businessType.maintenance",
     tValue: "Operation Maintenance",
     isEnabled: true,
   },
@@ -4352,7 +4352,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     langCode: "zh-CN",
-    tKey: "businessType.operation_maintenance.cache",
+    tKey: "businessType.maintenance.cache",
     tValue: "运维缓存",
     isEnabled: true,
   },
@@ -4360,7 +4360,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     langCode: "en-US",
-    tKey: "businessType.operation_maintenance.cache",
+    tKey: "businessType.maintenance.cache",
     tValue: "Operation Maintenance Cache",
     isEnabled: true,
   },
@@ -4368,7 +4368,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     langCode: "zh-CN",
-    tKey: "businessType.operation_maintenance.compliance",
+    tKey: "businessType.maintenance.compliance",
     tValue: "运维合规",
     isEnabled: true,
   },
@@ -4376,7 +4376,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     langCode: "en-US",
-    tKey: "businessType.operation_maintenance.compliance",
+    tKey: "businessType.maintenance.compliance",
     tValue: "Operation Maintenance Compliance",
     isEnabled: true,
   },
@@ -4513,7 +4513,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     langCode: "zh-CN",
-    tKey: "sidebar.menu.operation_maintenance",
+    tKey: "sidebar.menu.maintenance",
     tValue: "运维",
     isEnabled: true,
   },
@@ -4521,7 +4521,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     langCode: "en-US",
-    tKey: "sidebar.menu.operation_maintenance",
+    tKey: "sidebar.menu.maintenance",
     tValue: "Operations",
     isEnabled: true,
   },
@@ -4529,7 +4529,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     langCode: "zh-CN",
-    tKey: "sidebar.menu.operation_maintenance.cache",
+    tKey: "sidebar.menu.maintenance.cache",
     tValue: "缓存",
     isEnabled: true,
   },
@@ -4537,7 +4537,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     langCode: "en-US",
-    tKey: "sidebar.menu.operation_maintenance.cache",
+    tKey: "sidebar.menu.maintenance.cache",
     tValue: "Cache",
     isEnabled: true,
   },
@@ -4545,7 +4545,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     langCode: "zh-CN",
-    tKey: "sidebar.menu.operation_maintenance.openapi",
+    tKey: "sidebar.menu.maintenance.openapi",
     tValue: "接口文档",
     isEnabled: true,
   },
@@ -4553,14 +4553,14 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     langCode: "en-US",
-    tKey: "sidebar.menu.operation_maintenance.openapi",
+    tKey: "sidebar.menu.maintenance.openapi",
     tValue: "API Docs",
     isEnabled: true,
   },
   // OpenAPI 文档页面翻译
   {
     application: "frontend",
-    business: "operation_maintenance",
+    business: "maintenance",
     langCode: "zh-CN",
     tKey: "openapi.title",
     tValue: "接口文档",
@@ -4568,7 +4568,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance",
+    business: "maintenance",
     langCode: "en-US",
     tKey: "openapi.title",
     tValue: "API Documentation",
@@ -4577,7 +4577,7 @@ export const initialTranslationData = [
   // 缓存页面翻译
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.title",
     tValue: "缓存管理",
@@ -4585,7 +4585,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.title",
     tValue: "Cache Management",
@@ -4593,7 +4593,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.columns.namespace",
     tValue: "命名空间",
@@ -4601,7 +4601,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.columns.namespace",
     tValue: "Namespace",
@@ -4609,7 +4609,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.columns.keyCount",
     tValue: "键数量",
@@ -4617,7 +4617,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.columns.keyCount",
     tValue: "Key Count",
@@ -4625,7 +4625,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.columns.ttl",
     tValue: "过期时间",
@@ -4633,7 +4633,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.columns.ttl",
     tValue: "TTL",
@@ -4641,7 +4641,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.columns.key",
     tValue: "键名",
@@ -4649,7 +4649,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.columns.key",
     tValue: "Key",
@@ -4657,7 +4657,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.filter.namespace",
     tValue: "命名空间",
@@ -4665,7 +4665,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.filter.namespace",
     tValue: "Namespace",
@@ -4673,7 +4673,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.filter.namespacePlaceholder",
     tValue: "输入命名空间名称",
@@ -4681,7 +4681,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.filter.namespacePlaceholder",
     tValue: "Enter namespace name",
@@ -4689,7 +4689,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.filter.keyPrefix",
     tValue: "键名前缀",
@@ -4697,7 +4697,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.filter.keyPrefix",
     tValue: "Key Prefix",
@@ -4705,7 +4705,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.filter.keyPrefixPlaceholder",
     tValue: "输入键名前缀筛选",
@@ -4713,7 +4713,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.filter.keyPrefixPlaceholder",
     tValue: "Enter key prefix to filter",
@@ -4721,7 +4721,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.currentNamespace",
     tValue: "当前命名空间",
@@ -4729,7 +4729,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.currentNamespace",
     tValue: "Current Namespace",
@@ -4737,7 +4737,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.actions.viewKeys",
     tValue: "查看键值",
@@ -4745,7 +4745,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.actions.viewKeys",
     tValue: "View Keys",
@@ -4753,7 +4753,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.actions.backToNamespaces",
     tValue: "返回命名空间列表",
@@ -4761,7 +4761,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.actions.backToNamespaces",
     tValue: "Back to Namespaces",
@@ -4769,7 +4769,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.actions.add",
     tValue: "添加缓存",
@@ -4777,7 +4777,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.actions.add",
     tValue: "Add Cache",
@@ -4785,7 +4785,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.addTitle",
     tValue: "添加缓存",
@@ -4793,7 +4793,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.addTitle",
     tValue: "Add Cache",
@@ -4801,7 +4801,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.editTitle",
     tValue: "编辑缓存",
@@ -4809,7 +4809,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.editTitle",
     tValue: "Edit Cache",
@@ -4817,7 +4817,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.namespace",
     tValue: "命名空间",
@@ -4825,7 +4825,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.namespace",
     tValue: "Namespace",
@@ -4833,7 +4833,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.key",
     tValue: "键名",
@@ -4841,7 +4841,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.key",
     tValue: "Key",
@@ -4849,7 +4849,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.keyPlaceholder",
     tValue: "输入缓存键名",
@@ -4857,7 +4857,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.keyPlaceholder",
     tValue: "Enter cache key",
@@ -4865,7 +4865,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.value",
     tValue: "值",
@@ -4873,7 +4873,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.value",
     tValue: "Value",
@@ -4881,7 +4881,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.valuePlaceholder",
     tValue: "输入缓存值",
@@ -4889,7 +4889,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.valuePlaceholder",
     tValue: "Enter cache value",
@@ -4897,7 +4897,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.valueHelp",
     tValue: "支持文本或 JSON 格式",
@@ -4905,7 +4905,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.valueHelp",
     tValue: "Supports text or JSON format",
@@ -4913,7 +4913,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.ttl",
     tValue: "过期时间（秒）",
@@ -4921,7 +4921,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.ttl",
     tValue: "TTL (seconds)",
@@ -4929,7 +4929,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.ttlPlaceholder",
     tValue: "留空则永久保存",
@@ -4937,7 +4937,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.ttlPlaceholder",
     tValue: "Leave empty for permanent",
@@ -4945,7 +4945,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.form.ttlHelp",
     tValue: "设置缓存过期时间，单位：秒",
@@ -4953,7 +4953,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.form.ttlHelp",
     tValue: "Set cache expiration time in seconds",
@@ -4961,7 +4961,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "zh-CN",
     tKey: "cache.deleteConfirm",
     tValue: "确定要删除此缓存项吗？",
@@ -4969,7 +4969,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "operation_maintenance.cache",
+    business: "maintenance.cache",
     langCode: "en-US",
     tKey: "cache.deleteConfirm",
     tValue: "Are you sure you want to delete this cache item?",

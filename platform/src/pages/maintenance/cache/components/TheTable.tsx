@@ -4,9 +4,9 @@ import ResponsiveList, {
   type TableColumn,
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
-import * as CacheAPI from '@/api/operation_maintenance/cache';
+import * as CacheAPI from '@/api/maintenance/cache';
 import { CacheActionButtons } from './TheActionButtons';
-import type { ListKeysRes, ListNamespacesRes } from '@/api/operation_maintenance/type';
+import type { ListKeysRes, ListNamespacesRes } from '@/api/maintenance/type';
 import type { Props } from '../index';
 import type { FilterState } from './TheFilter';
 import { useTranslation } from '@/hooks/useTranslation';

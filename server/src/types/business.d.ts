@@ -18,11 +18,13 @@ export type BusinessType = {
   /** 邮件日志 */
   "mail.log": "mail.log";
   /** 运维 */
-  operation_maintenance: "operation_maintenance";
+  maintenance: "maintenance";
   /** 运维缓存 */
-  "operation_maintenance.cache": "operation_maintenance.cache";
+  "maintenance.cache": "maintenance.cache";
+  /** 运维接口文档 */
+  "maintenance.api_docs": "maintenance.api_docs";
   /** 运维合规 */
-  "operation_maintenance.compliance": "operation_maintenance.compliance";
+  "maintenance.compliance": "maintenance.compliance";
   /** 系统 */
   system: "system";
   /** 系统鉴权 */

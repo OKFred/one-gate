@@ -39,7 +39,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-import { exportDeletionRecord } from "@/api/operation_maintenance/compliance";
+import { exportDeletionRecord } from "@/api/maintenance/compliance";
 
 const presetRules = {
   /** 访问已启用的数据 */

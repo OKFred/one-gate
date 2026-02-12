@@ -6,7 +6,7 @@ import { BusinessKey } from "@/types/business";
 function createApp() {
   return encapsulation(
     service,
-    "operation_maintenance.compliance" satisfies BusinessKey,
+    "maintenance.compliance" satisfies BusinessKey,
     () => {
       tableInit();
     }

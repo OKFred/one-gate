@@ -14,12 +14,12 @@ import {
   Delete as DeleteIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
-import * as CacheAPI from '@/api/operation_maintenance/cache';
+import * as CacheAPI from '@/api/maintenance/cache';
 import type { CacheFormRef } from './TheForm';
-import type { ListKeysRes } from '@/api/operation_maintenance/type';
+import type { ListKeysRes } from '@/api/maintenance/type';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
-import { OPERATION_MAINTENANCE } from '@/hooks/usePermission';
+import { MAINTENANCE } from '@/hooks/usePermission';
 
 // 页面顶部操作按钮
 interface TheActionButtonsProps {
@@ -38,7 +38,7 @@ export function TheActionButtons({ formRef }: TheActionButtonsProps) {
       variant="contained"
       startIcon={<AddIcon />}
       onClick={handleAdd}
-      permissionCodes={[OPERATION_MAINTENANCE.CACHE.ADD]}
+      permissionCodes={[MAINTENANCE.CACHE.ADD]}
     >
       {t('cache.actions.add')}
     </ResponsiveButton>
@@ -96,7 +96,7 @@ export function CacheActionButtons({
           color="info"
           onClick={handleView}
           title={t('common.view')}
-          permissionCodes={[OPERATION_MAINTENANCE.CACHE.VIEW]}
+          permissionCodes={[MAINTENANCE.CACHE.VIEW]}
         >
           <ViewIcon fontSize="small" />
         </ResponsiveIconButton>
@@ -106,7 +106,7 @@ export function CacheActionButtons({
           color="primary"
           onClick={handleEdit}
           title={t('common.edit')}
-          permissionCodes={[OPERATION_MAINTENANCE.CACHE.EDIT]}
+          permissionCodes={[MAINTENANCE.CACHE.EDIT]}
         >
           <EditIcon fontSize="small" />
         </ResponsiveIconButton>
@@ -116,7 +116,7 @@ export function CacheActionButtons({
           color="error"
           onClick={handleDeleteClick}
           title={t('common.delete')}
-          permissionCodes={[OPERATION_MAINTENANCE.CACHE.DELETE]}
+          permissionCodes={[MAINTENANCE.CACHE.DELETE]}
         >
           <DeleteIcon fontSize="small" />
         </ResponsiveIconButton>

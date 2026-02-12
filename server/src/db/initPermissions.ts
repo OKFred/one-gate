@@ -66,8 +66,8 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
   },
   {
     category: "api",
-    code: "operation_maintenance.cache:api",
-    business: "operation_maintenance.cache",
+    code: "maintenance.cache:api",
+    business: "maintenance.cache",
   },
   {
     category: "api",
@@ -281,23 +281,23 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
   },
   {
     category: "button",
-    code: "operation_maintenance.cache:add",
-    business: "operation_maintenance.cache",
+    code: "maintenance.cache:add",
+    business: "maintenance.cache",
   },
   {
     category: "button",
-    code: "operation_maintenance.cache:edit",
-    business: "operation_maintenance.cache",
+    code: "maintenance.cache:edit",
+    business: "maintenance.cache",
   },
   {
     category: "button",
-    code: "operation_maintenance.cache:delete",
-    business: "operation_maintenance.cache",
+    code: "maintenance.cache:delete",
+    business: "maintenance.cache",
   },
   {
     category: "button",
-    code: "operation_maintenance.cache:view",
-    business: "operation_maintenance.cache",
+    code: "maintenance.cache:view",
+    business: "maintenance.cache",
   },
 ];
 

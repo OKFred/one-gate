@@ -100,12 +100,12 @@ export const AUTH = {
   },
 };
 
-export const OPERATION_MAINTENANCE = {
+export const MAINTENANCE = {
   /** 缓存管理 */
   CACHE: {
-    ADD: 'operation_maintenance.cache:add',
-    EDIT: 'operation_maintenance.cache:edit',
-    DELETE: 'operation_maintenance.cache:delete',
-    VIEW: 'operation_maintenance.cache:view',
+    ADD: 'maintenance.cache:add',
+    EDIT: 'maintenance.cache:edit',
+    DELETE: 'maintenance.cache:delete',
+    VIEW: 'maintenance.cache:view',
   },
 };

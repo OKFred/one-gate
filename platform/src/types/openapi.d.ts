@@ -2266,7 +2266,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/listNamespaces": {
+    "/api/v1/maintenance/cache/listNamespaces": {
         parameters: {
             query?: never;
             header?: never;
@@ -2285,7 +2285,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cacheListNamespacesReq"];
+                    "application/json": components["schemas"]["maintenance.cacheListNamespacesReq"];
                 };
             };
             responses: {
@@ -2295,7 +2295,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cacheListNamespacesRes"];
+                        "application/json": components["schemas"]["maintenance.cacheListNamespacesRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2324,7 +2324,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/listKeys": {
+    "/api/v1/maintenance/cache/listKeys": {
         parameters: {
             query?: never;
             header?: never;
@@ -2343,7 +2343,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cacheListKeysReq"];
+                    "application/json": components["schemas"]["maintenance.cacheListKeysReq"];
                 };
             };
             responses: {
@@ -2353,7 +2353,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cacheListKeysRes"];
+                        "application/json": components["schemas"]["maintenance.cacheListKeysRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2382,7 +2382,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/get": {
+    "/api/v1/maintenance/cache/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2401,7 +2401,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cacheGetReq"];
+                    "application/json": components["schemas"]["maintenance.cacheGetReq"];
                 };
             };
             responses: {
@@ -2411,7 +2411,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cacheGetRes"];
+                        "application/json": components["schemas"]["maintenance.cacheGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2440,7 +2440,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/put": {
+    "/api/v1/maintenance/cache/put": {
         parameters: {
             query?: never;
             header?: never;
@@ -2459,7 +2459,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cachePutReq"];
+                    "application/json": components["schemas"]["maintenance.cachePutReq"];
                 };
             };
             responses: {
@@ -2469,7 +2469,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cachePutRes"];
+                        "application/json": components["schemas"]["maintenance.cachePutRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2498,7 +2498,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/delete": {
+    "/api/v1/maintenance/cache/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2517,7 +2517,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cacheDeleteReq"];
+                    "application/json": components["schemas"]["maintenance.cacheDeleteReq"];
                 };
             };
             responses: {
@@ -2527,7 +2527,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cacheDeleteRes"];
+                        "application/json": components["schemas"]["maintenance.cacheDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2556,7 +2556,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/clear": {
+    "/api/v1/maintenance/cache/clear": {
         parameters: {
             query?: never;
             header?: never;
@@ -2575,7 +2575,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cacheClearReq"];
+                    "application/json": components["schemas"]["maintenance.cacheClearReq"];
                 };
             };
             responses: {
@@ -2585,7 +2585,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cacheClearRes"];
+                        "application/json": components["schemas"]["maintenance.cacheClearRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2614,7 +2614,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/operation_maintenance/cache/getStats": {
+    "/api/v1/maintenance/cache/getStats": {
         parameters: {
             query?: never;
             header?: never;
@@ -2633,7 +2633,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["operation_maintenance.cacheGetStatsReq"];
+                    "application/json": components["schemas"]["maintenance.cacheGetStatsReq"];
                 };
             };
             responses: {
@@ -2643,7 +2643,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["operation_maintenance.cacheGetStatsRes"];
+                        "application/json": components["schemas"]["maintenance.cacheGetStatsRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7587,8 +7587,8 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cacheListNamespacesReq": Record<string, never>;
-        "operation_maintenance.cacheListNamespacesRes": {
+        "maintenance.cacheListNamespacesReq": Record<string, never>;
+        "maintenance.cacheListNamespacesRes": {
             ok: boolean;
             data: {
                 namespaces: {
@@ -7615,7 +7615,7 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cacheListKeysReq": {
+        "maintenance.cacheListKeysReq": {
             /**
              * @description 缓存命名空间名称
              * @example i18n_translation
@@ -7636,7 +7636,7 @@ export interface components {
              */
             limit?: number;
         };
-        "operation_maintenance.cacheListKeysRes": {
+        "maintenance.cacheListKeysRes": {
             ok: boolean;
             data: {
                 keys: {
@@ -7657,7 +7657,7 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cacheGetReq": {
+        "maintenance.cacheGetReq": {
             /**
              * @description 缓存命名空间名称
              * @example i18n_translation
@@ -7678,7 +7678,7 @@ export interface components {
              */
             type?: "text" | "json";
         };
-        "operation_maintenance.cacheGetRes": {
+        "maintenance.cacheGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -7699,7 +7699,7 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cachePutReq": {
+        "maintenance.cachePutReq": {
             /**
              * @description 缓存命名空间名称
              * @example i18n_translation
@@ -7734,7 +7734,7 @@ export interface components {
              */
             expirationTtl?: ((number | null) | null) | null;
         };
-        "operation_maintenance.cachePutRes": {
+        "maintenance.cachePutRes": {
             ok: boolean;
             data: {
                 /**
@@ -7745,7 +7745,7 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cacheDeleteReq": {
+        "maintenance.cacheDeleteReq": {
             /**
              * @description 缓存命名空间名称
              * @example i18n_translation
@@ -7759,7 +7759,7 @@ export interface components {
              */
             key: string;
         };
-        "operation_maintenance.cacheDeleteRes": {
+        "maintenance.cacheDeleteRes": {
             ok: boolean;
             data: {
                 /**
@@ -7770,7 +7770,7 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cacheClearReq": {
+        "maintenance.cacheClearReq": {
             /**
              * @description 缓存命名空间名称
              * @example i18n_translation
@@ -7778,7 +7778,7 @@ export interface components {
              */
             namespace: string;
         };
-        "operation_maintenance.cacheClearRes": {
+        "maintenance.cacheClearRes": {
             ok: boolean;
             data: {
                 /**
@@ -7789,7 +7789,7 @@ export interface components {
             };
             message: string;
         };
-        "operation_maintenance.cacheGetStatsReq": {
+        "maintenance.cacheGetStatsReq": {
             /**
              * @description 缓存命名空间名称
              * @example i18n_translation
@@ -7797,7 +7797,7 @@ export interface components {
              */
             namespace: string;
         };
-        "operation_maintenance.cacheGetStatsRes": {
+        "maintenance.cacheGetStatsRes": {
             ok: boolean;
             data: {
                 /**

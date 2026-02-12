@@ -1,4 +1,4 @@
-import * as CacheAPI from '@/api/operation_maintenance/cache';
+import * as CacheAPI from '@/api/maintenance/cache';
 
 // ==================== Cache ====================
 
