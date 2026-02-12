@@ -4522,7 +4522,7 @@ export const initialTranslationData = [
     business: "business.type",
     langCode: "en-US",
     tKey: "sidebar.menu.maintenance",
-    tValue: "Operations",
+    tValue: "Maintenance",
     isEnabled: true,
   },
   {
