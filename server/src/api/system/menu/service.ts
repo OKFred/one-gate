@@ -50,7 +50,6 @@ import rolePermissionService, {
 } from "@/api/system/role_permission/service";
 import { rolePermissionTable } from "@/api/system/role_permission/db.table";
 import { permissionTable } from "@/api/system/permission/db.table";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({

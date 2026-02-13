@@ -362,7 +362,7 @@ async function onUpdate(
   // 先检查是否有权限访问该部门
   const whereCondition = isSuperAdmin
     ? eq(departmentTable.id, id)
-    : and(eq(departmentTable.id, id), eq(departmentTable.isEnabled, true));
+    : and(eq(departmentTable.id, id), presetRules.accessEnabledData());
 
   const rows = await db
     .select()
@@ -461,7 +461,7 @@ async function onDelete(
   // 先检查是否有权限访问该部门
   const whereCondition = userObj.isSuperAdmin
     ? eq(departmentTable.id, id)
-    : and(eq(departmentTable.id, id), eq(departmentTable.isEnabled, true));
+    : and(eq(departmentTable.id, id), presetRules.accessEnabledData());
 
   const rows = await db
     .select()
@@ -568,7 +568,7 @@ async function onGet(
   const { id } = params;
   const whereCondition = userObj.isSuperAdmin
     ? eq(departmentTable.id, id)
-    : and(eq(departmentTable.id, id), eq(departmentTable.isEnabled, true));
+    : and(eq(departmentTable.id, id), presetRules.accessEnabledData());
 
   const rows = await db
     .select()
@@ -640,7 +640,7 @@ async function onTree(
   const shouldShowAll = userObj.isSuperAdmin && showAll === true;
   const whereCondition = shouldShowAll
     ? undefined
-    : eq(departmentTable.isEnabled, true);
+    : presetRules.accessEnabledData();
 
   // 获取所有部门
   const allDepartments = await db
@@ -870,7 +870,7 @@ async function checkCanDisableDepartment(departmentId: number): Promise<void> {
     .where(
       and(
         eq(departmentTable.parentId, departmentId),
-        eq(departmentTable.isEnabled, true)
+        presetRules.accessEnabledData()
       )
     );
 

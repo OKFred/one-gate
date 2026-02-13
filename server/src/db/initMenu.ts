@@ -200,7 +200,7 @@ type menuLike = {
  */
 export async function initMenu() {
   // 检查是否已有数据，没有则插入初始数据
-  const countResult = await menuService.listAll.service({});
+  const countResult = await menuService.listAll.service({ isEnabled: true });
   if (countResult.length === initialMenuData.length) return;
   for (const menu of initialMenuData) {
     await menuService.add.service(
