@@ -40,6 +40,8 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
+import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
+import { limitQuery } from "@/middleware/accessControl/onRead/queryLimiter";
 
 const presetRules = {
   /** 访问已启用的数据 */
@@ -94,28 +96,44 @@ async function applyDataPermission(
 }
 
 // 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
+const buildWhereCondition = async ({
   keyword,
   isEnabled,
   parentId,
 }: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled" | "parentId">) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(like(departmentTable.name, `%${keyword}%`));
-  }
-  for (const [field, value] of [
-    ["isEnabled", isEnabled],
-    ["parentId", parentId],
-  ] as const) {
-    if (value !== undefined) {
-      conditions.push(eq(departmentTable[field], value));
+  return await limitQuery(
+    and,
+    {
+      name: "关键词搜索",
+      operator: and,
+      limiters: [
+        () =>
+          hasValue(keyword)
+            ? like(departmentTable.name, `%${keyword}%`)
+            : undefined,
+      ],
+    },
+    {
+      name: "启用状态过滤",
+      operator: and,
+      limiters: [
+        () =>
+          isEnabled !== undefined
+            ? eq(departmentTable.isEnabled, isEnabled)
+            : undefined,
+      ],
+    },
+    {
+      name: "父部门过滤",
+      operator: and,
+      limiters: [
+        () =>
+          parentId !== undefined
+            ? eq(departmentTable.parentId, parentId)
+            : undefined,
+      ],
     }
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
+  );
 };
 
 const listAllReq = {
@@ -142,17 +160,15 @@ const listAllRes = {
 } as const satisfies JSONSchema;
 async function onListAll(
   params: FromSchema<typeof listAllReq>,
-  userObj: UserObj
+  userObj?: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  const effectiveParams = userObj.isSuperAdmin
-    ? params
-    : { ...params, isEnabled: true };
+  const effectiveParams = filterParams(params, userObj);
   const { orderBy = "id", descend = true } = effectiveParams;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
 
   // 构建查询条件
-  const whereCondition = buildWhereCondition(effectiveParams);
+  const whereCondition = await buildWhereCondition(effectiveParams);
 
   // 查询所有匹配的数据
   const rows = await db
@@ -203,11 +219,9 @@ const listRes = {
 } as const satisfies JSONSchema;
 async function onList(
   params: FromSchema<typeof listReq>,
-  userObj: UserObj
+  userObj?: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const effectiveParams = userObj.isSuperAdmin
-    ? params
-    : { ...params, isEnabled: true };
+  const effectiveParams = filterParams(params, userObj);
   const {
     orderBy = "id",
     descend = true,
@@ -220,7 +234,7 @@ async function onList(
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   // 构建查询条件
-  const whereCondition = buildWhereCondition(effectiveParams);
+  const whereCondition = await buildWhereCondition(effectiveParams);
 
   // 查询总数
   const countResult = await db
@@ -563,12 +577,30 @@ const getRes = {
 } as const satisfies JSONSchema;
 async function onGet(
   params: FromSchema<typeof getReq>,
-  userObj: UserObj
+  userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const whereCondition = userObj.isSuperAdmin
-    ? eq(departmentTable.id, id)
-    : and(eq(departmentTable.id, id), presetRules.accessEnabledData());
+
+  // 使用 limitQuery 构建查询条件
+  const whereCondition = await limitQuery(
+    and,
+    {
+      name: "ID匹配",
+      operator: and,
+      limiters: [() => eq(departmentTable.id, id)],
+    },
+    {
+      name: "读取权限",
+      operator: and,
+      limiters: [
+        // 当 userObj 存在且不是超级管理员时，只能访问已启用的数据
+        () =>
+          userObj && !userObj.isSuperAdmin
+            ? eq(departmentTable.isEnabled, true)
+            : undefined,
+      ],
+    }
+  );
 
   const rows = await db
     .select()
