@@ -22,7 +22,7 @@ import {
   DepartmentBaseVO,
 } from "./db.table";
 import { utils as userUtils } from "@/api/system/user/service";
-import { asc, count, desc, eq, like, and, SQL, inArray } from "drizzle-orm";
+import { asc, count, desc, eq, like, and, inArray, SQL } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -42,6 +42,10 @@ import {
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
 import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
 import { limitQuery } from "@/middleware/accessControl/onRead/queryLimiter";
+import {
+  guardOperation,
+  Guards,
+} from "@/middleware/accessControl/onWrite/operationGuard";
 
 const presetRules = {
   /** 访问已启用的数据 */
@@ -67,40 +71,11 @@ const presetRules = {
   },
 };
 
-async function applyDataPermission(
-  userObj: UserObj,
-  filterNames: string[],
-  baseConditions: (SQL | undefined)[]
-): Promise<SQL | undefined> {
-  const whereConditions = [...baseConditions];
-  for (const filterName of filterNames) {
-    let filterCondition: SQL | undefined;
-    switch (filterName) {
-      case "parentAndItsDescendants":
-        filterCondition =
-          await presetRules.accessParentAndItsDescendants(userObj);
-        break;
-      default:
-        break;
-    }
-    if (filterCondition) {
-      whereConditions.push(filterCondition);
-    }
-  }
-  if (whereConditions.length === 0) {
-    return undefined;
-  }
-  return whereConditions.length === 1
-    ? whereConditions[0]
-    : and(...(whereConditions as SQL[]));
-}
-
 // 构建查询条件(列表和全部通用)
-const buildWhereCondition = async ({
-  keyword,
-  isEnabled,
-  parentId,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled" | "parentId">) => {
+const buildWhereCondition = async (
+  { keyword, parentId }: { keyword?: string; parentId?: number },
+  userObj?: UserObj
+) => {
   return await limitQuery(
     and,
     {
@@ -114,13 +89,15 @@ const buildWhereCondition = async ({
       ],
     },
     {
-      name: "启用状态过滤",
+      name: "本人数据访问限制",
       operator: and,
       limiters: [
         () =>
-          isEnabled !== undefined
-            ? eq(departmentTable.isEnabled, isEnabled)
-            : undefined,
+          !userObj
+            ? undefined
+            : userObj.isSuperAdmin
+              ? undefined
+              : presetRules.accessOwnData(userObj),
       ],
     },
     {
@@ -168,7 +145,13 @@ async function onListAll(
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
 
   // 构建查询条件
-  const whereCondition = await buildWhereCondition(effectiveParams);
+  const whereCondition = await buildWhereCondition(
+    {
+      keyword: undefined,
+      parentId: undefined,
+    },
+    userObj
+  );
 
   // 查询所有匹配的数据
   const rows = await db
@@ -234,7 +217,7 @@ async function onList(
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   // 构建查询条件
-  const whereCondition = await buildWhereCondition(effectiveParams);
+  const whereCondition = await buildWhereCondition(effectiveParams, userObj);
 
   // 查询总数
   const countResult = await db
@@ -298,35 +281,24 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId, isSuperAdmin } = userObj;
-  const { name, remark, parentId, managerIdArr, isEnabled = true } = params;
+  const { name, remark, parentId, managerIdArr, isEnabled } = params;
 
-  // 检查权限：超管或部门管理员才能添加部门
-  let canManage = true;
-  if (!isSuperAdmin) {
-    if (hasValue(parentId)) {
-      // 非超管用户只能在其作为管理员的部门下添加子部门
-      canManage = await canUserManageDepartment(creatorId, parentId);
-    } else {
-      // 没有父部门的情况下，非超管用户不能添加部门
-      canManage = false;
-    }
-  }
-  if (!canManage) {
-    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-  }
+  await guardOperation([
+    Guards.condition(
+      "父部门存在校验",
+      async () => !!(await onGet({ id: parentId }, userObj)),
+      BusinessErrorCode.NOT_EXIST_OR_DISABLED
+    ),
+    Guards.condition(
+      "部门写入权限",
+      async () => {
+        if (isSuperAdmin) return true;
+        return await canUserManageDepartment(userObj.id, parentId);
+      },
+      BusinessErrorCode.PERMISSION_DENIED
+    ),
+  ]);
 
-  // 如果有父部门，检查父部门是否存在
-  if (hasValue(parentId)) {
-    const parent = await db
-      .select()
-      .from(departmentTable)
-      .where(eq(departmentTable.id, parentId))
-      .limit(1);
-
-    if (parent.length === 0) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
-  }
   const res = await db
     .insert(departmentTable)
     .values({
@@ -373,52 +345,57 @@ async function onUpdate(
   const { userId: updaterId, isSuperAdmin } = userObj;
   const { id, ...rest } = params;
 
-  // 先检查是否有权限访问该部门
-  const whereCondition = isSuperAdmin
-    ? eq(departmentTable.id, id)
-    : and(eq(departmentTable.id, id), presetRules.accessEnabledData());
-
-  const rows = await db
-    .select()
-    .from(departmentTable)
-    .where(whereCondition)
-    .limit(1);
-
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-
-  // 检查权限：超管或该部门的管理员才能更新
-  if (!isSuperAdmin) {
-    const canManage = await canUserManageDepartment(updaterId, id);
-    if (!canManage) {
-      throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-    }
-  }
-
-  // 如果要禁用部门，先检查是否满足禁用条件
-  if (rest.isEnabled === false && rows[0].isEnabled === true) {
-    await checkCanDisableDepartment(id);
-  }
-
-  // 如果更新父部门，检查是否会造成循环引用
-  if (rest.parentId) {
-    // 不能将自己设为父部门
-    if (rest.parentId === id) {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-
-    // 检查父部门是否存在
-    const parent = await db
-      .select()
-      .from(departmentTable)
-      .where(eq(departmentTable.id, rest.parentId))
-      .limit(1);
-
-    if (parent.length === 0) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
-  }
+  const rows = await onGet({ id }, userObj);
+  const row = rows[0];
+  await guardOperation([
+    Guards.condition(
+      "部门写入权限",
+      async () => {
+        if (isSuperAdmin) return true;
+        return await canUserManageDepartment(userObj.id, row.parentId);
+      },
+      BusinessErrorCode.PERMISSION_DENIED
+    ),
+    Guards.condition(
+      "部门禁用权限",
+      async () => {
+        if (row.isEnabled === true && rest.isEnabled === false) {
+          await guardOperation([
+            Guards.countIsZero(
+              "已启用用户",
+              async () => await userUtils.countDepartmentUsers([id], true),
+              BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER
+            ),
+            Guards.countIsZero(
+              "子女部门",
+              async () => {
+                const children = await getChildDepartments(id);
+                return children ? children.length : 0;
+              },
+              BusinessErrorCode.HAS_CHILDREN
+            ),
+          ]);
+        }
+        return true;
+      },
+      BusinessErrorCode.INVALID_PARAMS,
+      { reason: "部门不满足禁用条件" }
+    ),
+    Guards.condition(
+      "父部门存在校验",
+      async () => !!(await onGet({ id: rest.parentId }, userObj)),
+      BusinessErrorCode.NOT_EXIST_OR_DISABLED
+    ),
+    Guards.condition(
+      "部门父部门设置校验",
+      async () => {
+        if (rest.parentId === id) return false; // 不能将自己设为父部门
+        return true;
+      },
+      BusinessErrorCode.INVALID_PARAMS,
+      { reason: "无效的父部门设置" }
+    ),
+  ]);
 
   const updateData = {
     ...rest,
@@ -472,41 +449,23 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
-  // 先检查是否有权限访问该部门
-  const whereCondition = userObj.isSuperAdmin
-    ? eq(departmentTable.id, id)
-    : and(eq(departmentTable.id, id), presetRules.accessEnabledData());
-
-  const rows = await db
-    .select()
-    .from(departmentTable)
-    .where(whereCondition)
-    .limit(1);
-
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-
-  // 如果要删除部门，先检查是否满足删除条件
-
-  // 1. 检查当前部门下是否存在在职人员
-  const employeeCount = await userUtils.countEnabledEmployeesInDepartments([
-    id,
+  const rows = await onGet({ id }, userObj);
+  const row = rows[0];
+  await guardOperation([
+    Guards.countIsZero(
+      "已启用用户",
+      async () => await userUtils.countDepartmentUsers([id], true),
+      BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER
+    ),
+    Guards.countIsZero(
+      "子女部门",
+      async () => {
+        const children = await getChildDepartments(id);
+        return children ? children.length : 0;
+      },
+      BusinessErrorCode.HAS_CHILDREN
+    ),
   ]);
-  if (employeeCount > 0) {
-    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER);
-  }
-
-  // 2. 检查是否有子部门
-  const children = await db
-    .select()
-    .from(departmentTable)
-    .where(eq(departmentTable.parentId, id))
-    .limit(1);
-
-  if (children.length > 0) {
-    throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
-  }
 
   // 执行删除操作
   const result = await db
@@ -526,8 +485,8 @@ async function onDelete(
         sourcePrimaryKey: String(id),
         deleteReason: "system",
         deleteType: "purge",
-        recordSnapshot: JSON.stringify(rows[0]),
-        remark: `部门"${rows[0].name}"被删除`,
+        recordSnapshot: JSON.stringify(row),
+        remark: `部门"${row.name}"被删除`,
         restorable: true,
         restoreUntilTimeUtc: new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
@@ -580,8 +539,6 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-
-  // 使用 limitQuery 构建查询条件
   const whereCondition = await limitQuery(
     and,
     {
@@ -590,28 +547,26 @@ async function onGet(
       limiters: [() => eq(departmentTable.id, id)],
     },
     {
-      name: "读取权限",
+      name: "非超管访问限制",
       operator: and,
       limiters: [
-        // 当 userObj 存在且不是超级管理员时，只能访问已启用的数据
         () =>
-          userObj && !userObj.isSuperAdmin
-            ? eq(departmentTable.isEnabled, true)
-            : undefined,
+          !userObj
+            ? undefined
+            : userObj.isSuperAdmin
+              ? undefined
+              : presetRules.accessOwnData(userObj),
       ],
     }
   );
-
   const rows = await db
     .select()
     .from(departmentTable)
     .where(whereCondition)
     .limit(1);
-
-  if (rows.length === 0) {
+  if (!rows || rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-
   return rows[0];
 }
 const getApi = {
@@ -628,12 +583,7 @@ const getApi = {
 
 const treeReq = {
   type: "object",
-  properties: {
-    showAll: {
-      description: "是否显示所有部门（包括未启用的）",
-      type: "boolean",
-    },
-  },
+  properties: {},
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
@@ -666,13 +616,14 @@ async function onTree(
   params: FromSchema<typeof treeReq>,
   userObj: UserObj
 ): Promise<DepartmentTreeItem[]> {
-  const { showAll } = params;
-
-  // 构建查询条件：超管可以使用 showAll，非超管强制只查启用的部门
-  const shouldShowAll = userObj.isSuperAdmin && showAll === true;
-  const whereCondition = shouldShowAll
-    ? undefined
-    : presetRules.accessEnabledData();
+  const whereCondition = await limitQuery(and, {
+    name: "树读取权限",
+    operator: and,
+    limiters: [
+      () =>
+        userObj.isSuperAdmin ? undefined : presetRules.accessOwnData(userObj),
+    ],
+  });
 
   // 获取所有部门
   const allDepartments = await db
@@ -749,7 +700,7 @@ async function getDescendantDepartments(
     (dept) => dept.id === departmentId
   );
   if (!thisDepartment) return null;
-  // 递归查找子部门
+  // 递归查找子女部门
   function findSubDepartments(id: number): typeof allDepartments {
     const result = [];
     for (const dept of allDepartments) {
@@ -811,6 +762,19 @@ async function getParentDepartment(
   return parentDept;
 }
 
+/** @description 获取子女部门的列表 */
+async function getChildDepartments(
+  departmentId: number
+): Promise<{ name: string; id: number; parentId: number }[] | null> {
+  if (!departmentId) return null;
+  const allDepartments = await getAllDepartments(true);
+  const children = allDepartments.filter(
+    (dept) => dept.parentId === departmentId
+  );
+  return children.length > 0 ? children : null;
+}
+
+/** @description 获取父母部门及其所有子孙部门的列表 */
 async function getParentAndItsDescendants(
   departmentId: number
 ): Promise<{ name: string; id: number; parentId: number }[] | null> {
@@ -887,22 +851,24 @@ async function checkCanDisableDepartment(departmentId: number): Promise<void> {
     ...(descendants?.map((d) => d.id) || []),
   ];
 
-  // 查询这些部门下的在职人员数量
-  const employeeCount =
-    await userUtils.countEnabledEmployeesInDepartments(allDepartmentIds);
+  // 查询这些部门下的已启用用户数量
+  const employeeCount = await userUtils.countDepartmentUsers(
+    allDepartmentIds,
+    true
+  );
 
   if (employeeCount > 0) {
     throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER);
   }
 
-  // 2. 检查是否存在未禁用的子部门
+  // 2. 检查是否存在未禁用的子女部门
   const enabledChildren = await db
     .select({ count: count(departmentTable.id) })
     .from(departmentTable)
     .where(
       and(
         eq(departmentTable.parentId, departmentId),
-        presetRules.accessEnabledData()
+        eq(departmentTable.isEnabled, true)
       )
     );
 
@@ -917,6 +883,7 @@ export const utils = {
   getDescendantDepartments,
   getAncestorDepartments,
   getParentDepartment,
+  getChildDepartments,
   getSiblingDepartments,
   getParentAndItsDescendants,
   isUserDepartmentManager,

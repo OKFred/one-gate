@@ -577,25 +577,24 @@ async function getRegionObj(
 }
 
 /**
- * 检查部门列表中是否存在在职人员
+ * 检查部门下的人员数量
  * @param departmentIds 部门ID列表
- * @returns 在职人员数量
+ * @returns 人员数量
  */
-async function countEnabledEmployeesInDepartments(
-  departmentIds: number[]
+async function countDepartmentUsers(
+  departmentIds: number[],
+  isEnabled: boolean
 ): Promise<number> {
   if (!departmentIds || departmentIds.length === 0) return 0;
-
   const result = await db
     .select({ count: count(userTable.id) })
     .from(userTable)
     .where(
       and(
         inArray(userTable.departmentId, departmentIds),
-        eq(userTable.isEnabled, true)
+        eq(userTable.isEnabled, isEnabled)
       )
     );
-
   return result[0]?.count || 0;
 }
 
@@ -658,7 +657,7 @@ async function updateUserInfo(
 }
 
 export const utils = {
-  countEnabledEmployeesInDepartments,
+  countDepartmentUsers,
   convertPassword,
   verifyUsernameAndPassword,
   updatePassword,
