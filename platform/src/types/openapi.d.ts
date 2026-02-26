@@ -8352,10 +8352,7 @@ export interface components {
             };
             message: string;
         };
-        "system.departmentTreeReq": {
-            /** @description 是否显示所有部门（包括未启用的） */
-            showAll?: boolean;
-        };
+        "system.departmentTreeReq": Record<string, never>;
         "system.departmentTreeRes": {
             ok: boolean;
             data: {
