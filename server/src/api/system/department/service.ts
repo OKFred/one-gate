@@ -265,17 +265,17 @@ async function onAdd(
 
   await guardOperation([
     Guards.condition(
-      "父部门存在校验",
-      async () => !!(await onGet({ id: parentId }, userObj)),
-      BusinessErrorCode.NOT_EXIST_OR_DISABLED
-    ),
-    Guards.condition(
       "部门写入权限",
       async () => {
         if (isSuperAdmin) return true;
         return await canUserManageDepartment(userObj.id, parentId);
       },
       BusinessErrorCode.PERMISSION_DENIED
+    ),
+    Guards.condition(
+      "父部门存在校验",
+      async () => !!(await onGet({ id: parentId }, userObj)),
+      BusinessErrorCode.NOT_EXIST_OR_DISABLED
     ),
   ]);
 
@@ -336,9 +336,27 @@ async function onUpdate(
       BusinessErrorCode.PERMISSION_DENIED
     ),
     Guards.condition(
+      "父部门存在校验",
+      async () => {
+        if (!params.parentId) return true; // 没有设置父部门，无需校验
+        if (params.parentId === row.parentId) return true; // 父部门未修改，无需校验
+        return !!(await onGet({ id: params.parentId }, userObj));
+      },
+      BusinessErrorCode.NOT_EXIST_OR_DISABLED
+    ),
+    Guards.condition(
+      "部门父部门设置校验",
+      async () => {
+        if (params.parentId === id) return false; // 不能将自己设为父部门
+        return true;
+      },
+      BusinessErrorCode.INVALID_PARAMS,
+      { reason: "无效的父部门设置" }
+    ),
+    Guards.condition(
       "部门禁用权限",
       async () => {
-        if (row.isEnabled === true && rest.isEnabled === false) {
+        if (row.isEnabled === true && params.isEnabled === false) {
           await guardOperation([
             Guards.countIsZero(
               "已启用用户",
@@ -359,24 +377,6 @@ async function onUpdate(
       },
       BusinessErrorCode.INVALID_PARAMS,
       { reason: "部门不满足禁用条件" }
-    ),
-    Guards.condition(
-      "父部门存在校验",
-      async () => {
-        if (!rest.parentId) return true; // 没有设置父部门，无需校验
-        if (rest.parentId === row.parentId) return true; // 父部门未修改，无需校验
-        return !!(await onGet({ id: rest.parentId }, userObj));
-      },
-      BusinessErrorCode.NOT_EXIST_OR_DISABLED
-    ),
-    Guards.condition(
-      "部门父部门设置校验",
-      async () => {
-        if (rest.parentId === id) return false; // 不能将自己设为父部门
-        return true;
-      },
-      BusinessErrorCode.INVALID_PARAMS,
-      { reason: "无效的父部门设置" }
     ),
   ]);
 
