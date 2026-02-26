@@ -22,7 +22,7 @@ import {
   DepartmentBaseVO,
 } from "./db.table";
 import { utils as userUtils } from "@/api/system/user/service";
-import { asc, count, desc, eq, like, and, inArray, SQL } from "drizzle-orm";
+import { asc, count, desc, eq, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -48,34 +48,18 @@ import {
 } from "@/middleware/accessControl/onWrite/operationGuard";
 
 const presetRules = {
-  /** 访问已启用的数据 */
-  accessEnabledData: () => {
-    return eq(departmentTable.isEnabled, true);
-  },
   /** 允许访问自己创建的数据 */
-  accessOwnData: (userObj: UserObj) => {
+  sameCreator: (userObj: UserObj) => {
     return eq(departmentTable.creatorId, userObj.userId);
-  },
-  /** 允许访问父部门及其子孙部门的数据 */
-  accessParentAndItsDescendants: async (
-    userObj: UserObj
-  ): Promise<SQL | undefined> => {
-    const parentAndDescendants = await getParentAndItsDescendants(
-      userObj.departmentObj?.value
-    );
-    if (!parentAndDescendants || parentAndDescendants.length === 0) {
-      return undefined;
-    }
-    const ids = parentAndDescendants.map((dept) => dept.id);
-    return inArray(departmentTable.id, ids);
   },
 };
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = async (
-  { keyword, parentId }: { keyword?: string; parentId?: number },
+  condition?: { keyword?: string; parentId?: number },
   userObj?: UserObj
 ) => {
+  const { keyword, parentId } = condition || {};
   return await limitQuery(
     and,
     {
@@ -97,7 +81,7 @@ const buildWhereCondition = async (
             ? undefined
             : userObj.isSuperAdmin
               ? undefined
-              : presetRules.accessOwnData(userObj),
+              : presetRules.sameCreator(userObj),
       ],
     },
     {
@@ -145,13 +129,7 @@ async function onListAll(
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
 
   // 构建查询条件
-  const whereCondition = await buildWhereCondition(
-    {
-      keyword: undefined,
-      parentId: undefined,
-    },
-    userObj
-  );
+  const whereCondition = await buildWhereCondition(undefined, userObj);
 
   // 查询所有匹配的数据
   const rows = await db
@@ -555,7 +533,7 @@ async function onGet(
             ? undefined
             : userObj.isSuperAdmin
               ? undefined
-              : presetRules.accessOwnData(userObj),
+              : presetRules.sameCreator(userObj),
       ],
     }
   );
@@ -616,15 +594,7 @@ async function onTree(
   params: FromSchema<typeof treeReq>,
   userObj: UserObj
 ): Promise<DepartmentTreeItem[]> {
-  const whereCondition = await limitQuery(and, {
-    name: "树读取权限",
-    operator: and,
-    limiters: [
-      () =>
-        userObj.isSuperAdmin ? undefined : presetRules.accessOwnData(userObj),
-    ],
-  });
-
+  const whereCondition = await buildWhereCondition(undefined, userObj);
   // 获取所有部门
   const allDepartments = await db
     .select()
