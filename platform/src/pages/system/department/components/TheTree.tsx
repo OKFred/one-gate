@@ -1,4 +1,12 @@
-import { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  memo,
+  useCallback,
+  useEffect,
+} from 'react';
 import { Box, CircularProgress, Typography, Chip } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
@@ -33,6 +41,7 @@ const TheTree = memo(
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
     const [allUsers, setAllUsers] = useState<ListAllUserRes>([]);
+    const allUsersCacheRef = useRef<ListAllUserRes | null>(null);
 
     // 将扁平的部门列表构造成树形结构（支持无限层级）
     const buildTree = useCallback((list: DepartmentData[]): DepartmentData[] => {
@@ -110,9 +119,12 @@ const TheTree = memo(
       async (searchFilters?: FilterState) => {
         setLoading(true);
         try {
-          // 获取用户列表
-          const userRes = await UserAPI.listAllFn({ data: { isEnabled: true } });
-          setAllUsers(userRes.data.data || []);
+          // 获取用户列表（缓存，只请求一次）
+          if (allUsersCacheRef.current === null) {
+            const userRes = await UserAPI.listAllFn({ data: { isEnabled: true } });
+            allUsersCacheRef.current = userRes.data.data || [];
+            setAllUsers(allUsersCacheRef.current);
+          }
 
           const requestData = {
             descend: false,
