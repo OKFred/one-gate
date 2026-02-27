@@ -316,35 +316,45 @@ const TheForm = memo(
                 <>
                   <Divider sx={{ my: 2 }} />
 
-                  <Typography variant="h6" gutterBottom>
-                    {isBatchMode
-                      ? t('rolePermission.selectPermissions')
-                      : t('rolePermission.currentPermissions')}
-                  </Typography>
+                  <Box
+                    sx={{
+                      mb: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 2,
+                      flexWrap: isMobile ? 'wrap' : 'nowrap',
+                    }}
+                  >
+                    <Typography variant="h6">
+                      {isBatchMode
+                        ? t('rolePermission.selectPermissions')
+                        : t('rolePermission.currentPermissions')}
+                    </Typography>
+                    <ToggleButtonGroup
+                      size="small"
+                      value={groupByOrder}
+                      exclusive
+                      onChange={(_, newValue) => {
+                        if (newValue !== null) setGroupByOrder(newValue);
+                      }}
+                      aria-label="group by order"
+                    >
+                      <ToggleButton value="category-business" aria-label="category first">
+                        <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                        {t('rolePermission.categoryFirst')}
+                      </ToggleButton>
+                      <ToggleButton value="business-category" aria-label="business first">
+                        <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
+                        {t('rolePermission.businessFirst')}
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </Box>
 
                   {isBatchMode ? (
                     // 批量添加模式：显示可用权限列表（按类别和业务分组，树状结构）
                     <>
-                      <ToggleButtonGroup
-                        size="small"
-                        value={groupByOrder}
-                        exclusive
-                        onChange={(_, newValue) => {
-                          if (newValue !== null) setGroupByOrder(newValue);
-                        }}
-                        sx={{ display: 'flex' }}
-                        aria-label="group by order"
-                      >
-                        <ToggleButton value="category-business" aria-label="category first">
-                          <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                          {t('rolePermission.categoryFirst')}
-                        </ToggleButton>
-                        <ToggleButton value="business-category" aria-label="business first">
-                          <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                          {t('rolePermission.businessFirst')}
-                        </ToggleButton>
-                      </ToggleButtonGroup>
-                      <Paper variant="outlined" sx={{ p: 2, maxHeight: 300, overflow: 'auto' }}>
+                      <Paper variant="outlined" sx={{ p: 2, overflow: 'auto' }}>
                         {availablePermissions.length > 0 ? (
                           (() => {
                             if (groupByOrder === 'category-business') {
@@ -547,27 +557,7 @@ const TheForm = memo(
                   ) : (
                     // 编辑模式：显示当前权限（按 category 和 business 分组，树状结构）
                     <>
-                      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                        <ToggleButtonGroup
-                          size="small"
-                          value={groupByOrder}
-                          exclusive
-                          onChange={(_, newValue) => {
-                            if (newValue !== null) setGroupByOrder(newValue);
-                          }}
-                          aria-label="group by order"
-                        >
-                          <ToggleButton value="category-business" aria-label="category first">
-                            <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                            {t('rolePermission.categoryFirst')}
-                          </ToggleButton>
-                          <ToggleButton value="business-category" aria-label="business first">
-                            <SwapVertIcon sx={{ mr: 0.5, fontSize: '1rem' }} />
-                            {t('rolePermission.businessFirst')}
-                          </ToggleButton>
-                        </ToggleButtonGroup>
-                      </Box>
-                      <Paper variant="outlined" sx={{ p: 2 }}>
+                      <Paper variant="outlined" sx={{ p: 2, overflow: 'auto' }}>
                         {currentRolePermissions.length > 0 ? (
                           (() => {
                             if (groupByOrder === 'category-business') {
