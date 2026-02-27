@@ -89,7 +89,6 @@ function setupInterceptors(service: AxiosInstance) {
           _url = _url.replace(`{${key}}`, String(value));
         }
         config.url = _url;
-        console.log({ config });
       }
       return config;
     },
@@ -172,7 +171,9 @@ function setupInterceptors(service: AxiosInstance) {
 
 function handleErrorResponse(errorMessage: string) {
   showSnackbar({ message: errorMessage, type: 'error' });
-  console.error(errorMessage);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(errorMessage);
+  }
 }
 
 // 初始化拦截器

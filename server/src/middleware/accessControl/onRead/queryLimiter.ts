@@ -92,15 +92,23 @@ export async function limitQuery(
 
     // 执行该组内所有的 limiter 函数
     const conditions: (SQL | undefined)[] = [];
-    for (const limiter of limiters) {
+    for (const [index, limiter] of limiters.entries()) {
+      const limiterLabel = `${index + 1}/${limiters.length}`;
       try {
         const condition = await limiter();
         if (condition !== undefined) {
           conditions.push(condition);
+          console.log(
+            `[limitQuery] 规则组 "${name}" 的 limiter (${limiterLabel}) 结果: 生效`
+          );
+        } else {
+          console.log(
+            `[limitQuery] 规则组 "${name}" 的 limiter (${limiterLabel}) 结果: 跳过`
+          );
         }
       } catch (error) {
         console.error(
-          `[limitQuery] 规则组 "${name}" 中的 limiter 执行失败:`,
+          `[limitQuery] 规则组 "${name}" 的 limiter (${limiterLabel}) 执行失败:`,
           error
         );
         // 继续执行其他 limiter

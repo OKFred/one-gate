@@ -22,11 +22,10 @@ import {
   DepartmentBaseVO,
 } from "./db.table";
 import { utils as userUtils } from "@/api/system/user/service";
-import { asc, count, desc, eq, like, and, or, inArray } from "drizzle-orm";
+import { asc, count, desc, eq, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -41,63 +40,8 @@ import {
 } from "@/middleware/errorHandler/businessError/index";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
 import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
-import { limitQuery } from "@/middleware/accessControl/onRead/queryLimiter";
-import {
-  guardOperation,
-  Guards,
-} from "@/middleware/accessControl/onWrite/operationGuard";
-
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = async (
-  condition?: { id?: number; keyword?: string; parentId?: number },
-  userObj?: UserObj
-) => {
-  const { id, keyword, parentId } = condition || {};
-  return await limitQuery(
-    and,
-    {
-      name: "ID匹配",
-      operator: and,
-      limiters: [() => (hasValue(id) ? eq(departmentTable.id, id) : undefined)],
-    },
-    {
-      name: "关键词搜索",
-      operator: and,
-      limiters: [
-        () =>
-          hasValue(keyword)
-            ? like(departmentTable.name, `%${keyword}%`)
-            : undefined,
-      ],
-    },
-    {
-      name: "父部门过滤",
-      operator: and,
-      limiters: [
-        () =>
-          parentId !== undefined
-            ? eq(departmentTable.parentId, parentId)
-            : undefined,
-      ],
-    },
-    {
-      name: "本人数据访问限制",
-      operator: or,
-      limiters: [
-        () =>
-          !userObj || userObj.isSuperAdmin
-            ? undefined
-            : eq(departmentTable.creatorId, userObj.userId),
-        async () => {
-          if (!userObj || userObj.isSuperAdmin) return undefined;
-          const managedIds = await getManagedAndDescendantIds(userObj.userId);
-          if (managedIds.length === 0) return undefined;
-          return inArray(departmentTable.id, managedIds);
-        },
-      ],
-    }
-  );
-};
+import { guardOperation } from "@/middleware/accessControl/onWrite/operationGuard";
+import { buildWhereCondition, presetGuards } from "./permission";
 
 const listAllReq = {
   type: "object",
@@ -260,23 +204,12 @@ async function onAdd(
   params: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const { userId: creatorId, isSuperAdmin } = userObj;
+  const { userId: creatorId } = userObj;
   const { name, remark, parentId, managerIdArr, isEnabled } = params;
 
   await guardOperation([
-    Guards.condition(
-      "部门写入权限",
-      async () => {
-        if (isSuperAdmin) return true;
-        return await canUserManageDepartment(userObj.id, parentId);
-      },
-      BusinessErrorCode.PERMISSION_DENIED
-    ),
-    Guards.condition(
-      "父部门存在校验",
-      async () => !!(await onGet({ id: parentId }, userObj)),
-      BusinessErrorCode.NOT_EXIST_OR_DISABLED
-    ),
+    presetGuards.writePermission(userObj, parentId),
+    presetGuards.parentExists(parentId, userObj),
   ]);
 
   const res = await db
@@ -322,62 +255,15 @@ async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const { userId: updaterId, isSuperAdmin } = userObj;
+  const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
   const row = await onGet({ id }, userObj);
   await guardOperation([
-    Guards.condition(
-      "部门写入权限",
-      async () => {
-        if (isSuperAdmin) return true;
-        return await canUserManageDepartment(userObj.id, row.parentId);
-      },
-      BusinessErrorCode.PERMISSION_DENIED
-    ),
-    Guards.condition(
-      "父部门存在校验",
-      async () => {
-        if (!params.parentId) return true; // 没有设置父部门，无需校验
-        if (params.parentId === row.parentId) return true; // 父部门未修改，无需校验
-        return !!(await onGet({ id: params.parentId }, userObj));
-      },
-      BusinessErrorCode.NOT_EXIST_OR_DISABLED
-    ),
-    Guards.condition(
-      "部门父部门设置校验",
-      async () => {
-        if (params.parentId === id) return false; // 不能将自己设为父部门
-        return true;
-      },
-      BusinessErrorCode.INVALID_PARAMS,
-      { reason: "无效的父部门设置" }
-    ),
-    Guards.condition(
-      "部门禁用权限",
-      async () => {
-        if (row.isEnabled === true && params.isEnabled === false) {
-          await guardOperation([
-            Guards.countIsZero(
-              "已启用用户",
-              async () => await userUtils.countDepartmentUsers([id], true),
-              BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER
-            ),
-            Guards.countIsZero(
-              "子女部门",
-              async () => {
-                const children = await getChildDepartments(id);
-                return children ? children.length : 0;
-              },
-              BusinessErrorCode.HAS_CHILDREN
-            ),
-          ]);
-        }
-        return true;
-      },
-      BusinessErrorCode.INVALID_PARAMS,
-      { reason: "部门不满足禁用条件" }
-    ),
+    presetGuards.writePermission(userObj, row.parentId),
+    presetGuards.parentExistsIfChanged(params.parentId, row.parentId, userObj),
+    presetGuards.notSelfParent(id, params.parentId),
+    presetGuards.disableCondition(id, row.isEnabled, params.isEnabled),
   ]);
 
   const updateData = {
@@ -434,19 +320,8 @@ async function onDelete(
 
   const row = await onGet({ id }, userObj);
   await guardOperation([
-    Guards.countIsZero(
-      "已启用用户",
-      async () => await userUtils.countDepartmentUsers([id], true),
-      BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER
-    ),
-    Guards.countIsZero(
-      "子女部门",
-      async () => {
-        const children = await getChildDepartments(id);
-        return children ? children.length : 0;
-      },
-      BusinessErrorCode.HAS_CHILDREN
-    ),
+    presetGuards.noEnabledUsers(id),
+    presetGuards.noChildren(id),
   ]);
 
   // 执行删除操作
@@ -752,32 +627,6 @@ async function getSiblingDepartments(
   return siblings;
 }
 
-/**
- * 获取用户作为部门管理员可访问的所有部门ID（管理的部门本身 + 所有子孙部门）
- */
-async function getManagedAndDescendantIds(userId: number): Promise<number[]> {
-  const allDepts = await db.select().from(departmentTable);
-  // 找到用户直接管理的部门
-  const managedDepts = allDepts.filter((dept) =>
-    dept.managerIdArr?.includes(userId)
-  );
-  if (managedDepts.length === 0) return [];
-  const result = new Set<number>();
-  function findDescendants(id: number) {
-    for (const d of allDepts) {
-      if (d.parentId === id && !result.has(d.id)) {
-        result.add(d.id);
-        findDescendants(d.id);
-      }
-    }
-  }
-  for (const dept of managedDepts) {
-    result.add(dept.id);
-    findDescendants(dept.id);
-  }
-  return Array.from(result);
-}
-
 /** @description 验证部门是否存在 */
 async function verifyDepartment(departmentId: number) {
   const departmentName = await getDepartmentNameById(departmentId);
@@ -858,6 +707,32 @@ async function checkCanDisableDepartment(departmentId: number): Promise<void> {
   }
 }
 
+/**
+ * 获取用户作为部门管理员可访问的所有部门ID（管理的部门本身 + 所有子孙部门）
+ */
+async function getManagableIds(userId: number): Promise<number[]> {
+  const allDepts = await db.select().from(departmentTable);
+  // 找到用户直接管理的部门
+  const managedDepts = allDepts.filter((dept) =>
+    dept.managerIdArr?.includes(userId)
+  );
+  if (managedDepts.length === 0) return [];
+  const result = new Set<number>();
+  function findDescendants(id: number) {
+    for (const d of allDepts) {
+      if (d.parentId === id && !result.has(d.id)) {
+        result.add(d.id);
+        findDescendants(d.id);
+      }
+    }
+  }
+  for (const dept of managedDepts) {
+    result.add(dept.id);
+    findDescendants(dept.id);
+  }
+  return Array.from(result);
+}
+
 export const utils = {
   verifyDepartment,
   getDepartmentNameById,
@@ -867,9 +742,10 @@ export const utils = {
   getChildDepartments,
   getSiblingDepartments,
   getParentAndItsDescendants,
-  getManagedAndDescendantIds,
   isUserDepartmentManager,
   canUserManageDepartment,
+  getManagableIds,
+  checkCanDisableDepartment,
 };
 
 export default {
