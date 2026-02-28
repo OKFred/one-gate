@@ -1,4 +1,4 @@
-import departmentTable from "./db.table";
+import departmentTable from "./model";
 import { and, eq, inArray, like, or, SQL } from "drizzle-orm";
 import departmentService, { utils as departmentUtils } from "./service";
 import { type UserObj, utils as userUtils } from "../user/service";

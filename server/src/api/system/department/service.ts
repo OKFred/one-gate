@@ -20,7 +20,7 @@ import {
   type DepartmentDeleteVOLike,
   type DepartmentGetVOLike,
   DepartmentBaseVO,
-} from "./db.table";
+} from "./model";
 import { utils as userUtils } from "@/api/system/user/service";
 import { asc, count, desc, eq, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
