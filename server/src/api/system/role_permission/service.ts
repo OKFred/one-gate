@@ -166,7 +166,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { roleId, permissionId, resourceFilter, conditions } = obj;
+  const { roleId, permissionId } = obj;
 
   // 验证角色是否存在
   await roleService.get.service({ id: roleId });
@@ -179,24 +179,6 @@ async function onAdd(
     .limit(1);
   if (permissionExists.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-
-  // 验证 resourceFilter 格式
-  if (hasValue(resourceFilter)) {
-    try {
-      JSON.parse(resourceFilter);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
-
-  // 验证 conditions 格式
-  if (hasValue(conditions)) {
-    try {
-      JSON.parse(conditions);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
   }
 
   const result = await db
@@ -267,8 +249,6 @@ async function onBatchAdd(
   const values = permissionIds.map((permissionId) => ({
     roleId,
     permissionId,
-    resourceFilter: null,
-    conditions: null,
     creatorId,
   }));
 
@@ -313,30 +293,10 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, resourceFilter, conditions, ...rest } = params;
-
-  // 验证 resourceFilter 格式
-  if (hasValue(resourceFilter)) {
-    try {
-      JSON.parse(resourceFilter);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
-
-  // 验证 conditions 格式
-  if (hasValue(conditions)) {
-    try {
-      JSON.parse(conditions);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
+  const { id, ...rest } = params;
 
   const updateData = {
     ...rest,
-    resourceFilter,
-    conditions,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
@@ -638,8 +598,6 @@ async function addMenuPermissionToRole(
   const rolePermissionData = {
     roleId,
     permissionId,
-    resourceFilter: null,
-    conditions: null,
     creatorId,
   };
   await db.insert(rolePermissionTable).values(rolePermissionData);

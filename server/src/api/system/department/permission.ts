@@ -75,7 +75,7 @@ export const presetGuards = {
       async () => {
         if (userObj.isSuperAdmin) return true;
         return await departmentUtils.canUserManageDepartment(
-          userObj.id,
+          userObj.userId,
           parentId
         );
       },

@@ -28,25 +28,6 @@ const RolePermissionBasePO = {
     description: "权限ID",
     minimum: 1,
   },
-  resourceFilter: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "资源过滤器，JSON格式，用于实现资源级权限控制",
-    examples: [
-      '{"userId":"${currentUser.id}"}',
-      '{"deptId":"${currentUser.deptId}"}',
-    ],
-    maxLength: 1000,
-  },
-  conditions: {
-    type: ["string", "null"],
-    nullable: true,
-    description: "条件判断，JSON格式，用于动态权限控制",
-    examples: [
-      '{"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}',
-    ],
-    maxLength: 2000,
-  },
 } as const satisfies Partial<Record<keyof RolePermissionPOLike, JSONSchema>>;
 
 const RolePermissionPO = {
@@ -99,8 +80,6 @@ export type RolePermissionGetVOLike = Pick<RolePermissionVOLike, IndexKeyLike>;
 export const RolePermissionAddKeys = [
   "roleId",
   "permissionId",
-  "resourceFilter",
-  "conditions",
 ] as const satisfies RequiredKeys<RolePermissionAddVOLike>[];
 export const RolePermissionUpdateKeys = [
   ...IndexKey,
@@ -131,8 +110,6 @@ export const rolePermissionTable = sqliteTable("system_role_permission", {
   id: integer("id").primaryKey().notNull(),
   roleId: integer("role_id").notNull(),
   permissionId: integer("permission_id").notNull(),
-  resourceFilter: text("resource_filter"),
-  conditions: text("conditions"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
@@ -147,8 +124,6 @@ export async function tableInit() {
       id INTEGER PRIMARY KEY,
       role_id INTEGER NOT NULL,
       permission_id INTEGER NOT NULL,
-      resource_filter TEXT,
-      conditions TEXT,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

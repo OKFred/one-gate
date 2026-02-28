@@ -6,7 +6,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Stack,
   FormControl,
   InputLabel,
@@ -59,8 +58,6 @@ const TheForm = memo(
     const [editId, setEditId] = useState<number | null>(null);
     const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
     const [selectedPermissionIds, setSelectedPermissionIds] = useState<number[]>([]);
-    const [resourceFilter, setResourceFilter] = useState('');
-    const [conditions, setConditions] = useState('');
     const [loading, setLoading] = useState(false);
     const [currentRolePermissions, setCurrentRolePermissions] = useState<GetPermissionsByRoleRes>(
       [],
@@ -89,8 +86,6 @@ const TheForm = memo(
           setEditId(null);
           setSelectedRoleId(null);
           setSelectedPermissionIds([]);
-          setResourceFilter('');
-          setConditions('');
           setCurrentRolePermissions([]);
           setOpen(true);
         },
@@ -100,15 +95,11 @@ const TheForm = memo(
             setEditId(row.id);
             setSelectedRoleId(row.roleId);
             setSelectedPermissionIds([row.permissionId]);
-            setResourceFilter(row.resourceFilter || '');
-            setConditions(row.conditions || '');
             await fetchRolePermissions(row.roleId);
           } else {
             setEditId(null);
             setSelectedRoleId(null);
             setSelectedPermissionIds([]);
-            setResourceFilter('');
-            setConditions('');
             setCurrentRolePermissions([]);
           }
           setOpen(true);
@@ -123,8 +114,6 @@ const TheForm = memo(
       setIsBatchMode(false);
       setSelectedRoleId(null);
       setSelectedPermissionIds([]);
-      setResourceFilter('');
-      setConditions('');
       setCurrentRolePermissions([]);
     };
 
@@ -146,8 +135,6 @@ const TheForm = memo(
           // 更新单个角色权限关联
           const updateData: UpdateRolePermissionReq = {
             id: editId,
-            resourceFilter: resourceFilter || null,
-            conditions: conditions || null,
           };
           await RolePermissionAPI.updateFn({ data: updateData });
         }
@@ -718,40 +705,6 @@ const TheForm = memo(
                           </Typography>
                         )}
                       </Paper>
-                    </>
-                  )}
-
-                  {!isBatchMode && editId && (
-                    <>
-                      <Divider sx={{ my: 2 }} />
-
-                      <Typography variant="h6" gutterBottom>
-                        {t('rolePermission.advancedSettings')}
-                      </Typography>
-
-                      <TextField
-                        label={t('rolePermission.resourceFilter')}
-                        value={resourceFilter}
-                        onChange={(e) => setResourceFilter(e.target.value)}
-                        fullWidth
-                        multiline
-                        rows={3}
-                        size={isMobile ? 'medium' : 'medium'}
-                        placeholder='{"userId": "${currentUser.id}"}'
-                        helperText={t('rolePermission.resourceFilterHelp')}
-                      />
-
-                      <TextField
-                        label={t('rolePermission.conditions')}
-                        value={conditions}
-                        onChange={(e) => setConditions(e.target.value)}
-                        fullWidth
-                        multiline
-                        rows={3}
-                        size={isMobile ? 'medium' : 'medium'}
-                        placeholder='{"ipRange": ["192.168.1.0/24"]}'
-                        helperText={t('rolePermission.conditionsHelp')}
-                      />
                     </>
                   )}
                 </>
