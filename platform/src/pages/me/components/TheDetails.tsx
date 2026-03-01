@@ -71,7 +71,14 @@ const TheDetails = memo(
       <>
         <Card>
           <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Box
+              display="flex"
+              flexDirection={{ xs: 'column', sm: 'row' }}
+              justifyContent="space-between"
+              alignItems={{ xs: 'flex-start', sm: 'center' }}
+              gap={1}
+              mb={2}
+            >
               <Box display="flex" alignItems="center">
                 <AccountBoxIcon sx={{ mr: 1 }} />
                 <Typography variant="h6">{t('me.subtitle')}</Typography>
