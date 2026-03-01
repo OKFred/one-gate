@@ -9,6 +9,7 @@ import * as RolePermissionAPI from '@/api/system/role_permission';
 import type { ListAllPermissionRes, ListAllRolePermissionRes } from '@/api/system/type';
 import { RolePermissionActionButtons } from './TheActionButtons';
 import type { TheFormRef } from './TheForm';
+import type { FilterState } from './TheTable';
 
 // 权限分类标签颜色
 const CATEGORY_COLOR: Record<
@@ -42,7 +43,7 @@ interface CategoryNode {
 }
 
 export interface TheTreeRef {
-  refresh: (filters?: { roleId?: number | null; [key: string]: unknown }) => void;
+  refresh: (filters?: FilterState) => void;
 }
 
 interface Props {
