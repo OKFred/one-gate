@@ -4702,6 +4702,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/role_permission/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有角色权限关联（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["system.role_permissionListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["system.role_permissionListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/role_permission/list": {
         parameters: {
             query?: never;
@@ -9346,6 +9404,45 @@ export interface components {
             };
             message: string;
         };
+        "system.role_permissionListAllReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 角色ID */
+            roleId?: number;
+            /** @description 权限ID */
+            permissionId?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "roleId" | "permissionId" | "createTimeUtc";
+        };
+        "system.role_permissionListAllRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 角色ID */
+                roleId: number;
+                /** @description 权限ID */
+                permissionId: number;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            }[];
+            message: string;
+        };
         "system.role_permissionListReq": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -9392,17 +9489,6 @@ export interface components {
                     roleId: number;
                     /** @description 权限ID */
                     permissionId: number;
-                    /**
-                     * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-                     * @example {"userId":"${currentUser.id}"}
-                     * @example {"deptId":"${currentUser.deptId}"}
-                     */
-                    resourceFilter: ((string | null) | null) | null;
-                    /**
-                     * @description 条件判断，JSON格式，用于动态权限控制
-                     * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-                     */
-                    conditions: ((string | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -9426,17 +9512,6 @@ export interface components {
             roleId: number;
             /** @description 权限ID */
             permissionId: number;
-            /**
-             * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-             * @example {"userId":"${currentUser.id}"}
-             * @example {"deptId":"${currentUser.deptId}"}
-             */
-            resourceFilter: ((string | null) | null) | null;
-            /**
-             * @description 条件判断，JSON格式，用于动态权限控制
-             * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-             */
-            conditions: ((string | null) | null) | null;
         };
         "system.role_permissionAddRes": {
             ok: boolean;
@@ -9469,17 +9544,6 @@ export interface components {
             roleId?: number;
             /** @description 权限ID */
             permissionId?: number;
-            /**
-             * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-             * @example {"userId":"${currentUser.id}"}
-             * @example {"deptId":"${currentUser.deptId}"}
-             */
-            resourceFilter?: ((string | null) | null) | null;
-            /**
-             * @description 条件判断，JSON格式，用于动态权限控制
-             * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-             */
-            conditions?: ((string | null) | null) | null;
         };
         "system.role_permissionUpdateRes": {
             ok: boolean;
@@ -9537,17 +9601,6 @@ export interface components {
                 roleId: number;
                 /** @description 权限ID */
                 permissionId: number;
-                /**
-                 * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-                 * @example {"userId":"${currentUser.id}"}
-                 * @example {"deptId":"${currentUser.deptId}"}
-                 */
-                resourceFilter: ((string | null) | null) | null;
-                /**
-                 * @description 条件判断，JSON格式，用于动态权限控制
-                 * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-                 */
-                conditions: ((string | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**

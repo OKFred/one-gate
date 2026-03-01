@@ -30,6 +30,7 @@ import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import hasValue from "@/utils/hasValue";
 import {
+  listAllReqBase,
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
@@ -73,6 +74,57 @@ async function getCurrentPermissionCount(roleId: number): Promise<number> {
     .where(eq(rolePermissionTable.roleId, roleId));
   return countResult[0]?.count || 0;
 }
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    roleId: RolePermissionVO["roleId"],
+    permissionId: RolePermissionVO["permissionId"],
+    orderBy: orderByWrapper<(keyof RolePermissionPOLike)[]>(
+      RolePermissionSortableKeys
+    ),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...RolePermissionListVO,
+    },
+    required: [...RolePermissionListKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = rolePermissionTable[orderBy] || rolePermissionTable.id;
+  const maxLimit = 10000;
+
+  const rows = await db
+    .select()
+    .from(rolePermissionTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有角色权限关联（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
 
 const listReq = {
   type: "object",
@@ -632,6 +684,7 @@ export const utils = {
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   batchAdd: batchAddApi,
