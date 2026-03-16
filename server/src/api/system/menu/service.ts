@@ -21,11 +21,10 @@ import {
   type MenuGetVOLike,
   MenuBaseVO,
 } from "./model";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -41,38 +40,13 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { guardOperation } from "@/middleware/accessControl/onWrite/operationGuard";
+import { buildWhereCondition, presetGuards } from "./permission";
 import translationService from "@/api/i18n/translation/service";
-import permissionService, {
-  utils as permissionUtils,
-} from "@/api/system/permission/service";
-import rolePermissionService, {
-  utils as rolePermissionUtils,
-} from "@/api/system/role_permission/service";
+import { utils as permissionUtils } from "@/api/system/permission/service";
+import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import { rolePermissionTable } from "@/api/system/role_permission/db.table";
 import { permissionTable } from "@/api/system/permission/db.table";
-
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  business,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "business" | "isEnabled">) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(menuTable.name, `%${keyword}%`)));
-  }
-  if (hasValue(business)) {
-    conditions.push(eq(menuTable.business, business));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(menuTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
 
 const listAllReq = {
   type: "object",
@@ -104,6 +78,7 @@ async function onListAll(
   const orderField = menuTable[orderBy] || menuTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
   // 查询所有匹配的数据
+  const whereCondition = await buildWhereCondition(params);
   const rows = await db
     .select({
       id: menuTable.id,
@@ -117,7 +92,7 @@ async function onListAll(
       isEnabled: menuTable.isEnabled,
     })
     .from(menuTable)
-    .where(buildWhereCondition(params))
+    .where(whereCondition)
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(maxLimit);
   return rows;
@@ -162,11 +137,12 @@ async function onList(
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
+  const whereCondition = await buildWhereCondition(params);
   // 查询总数
   const countResult = await db
     .select({ total: count(menuTable.id).as("total") })
     .from(menuTable)
-    .where(buildWhereCondition(params));
+    .where(whereCondition);
   const total = countResult[0]?.total || 0;
   if (total === 0) {
     return {
@@ -181,7 +157,7 @@ async function onList(
   const rows = await db
     .select()
     .from(menuTable)
-    .where(buildWhereCondition(params))
+    .where(whereCondition)
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(finalPageSize)
     .offset(offset);
@@ -224,18 +200,8 @@ async function onAdd(
   const { userId: creatorId } = userObj;
   const { parentId, name } = params;
 
-  // 如果有父菜单，检查父菜单是否存在
-  if (hasValue(parentId)) {
-    const parent = await db
-      .select()
-      .from(menuTable)
-      .where(eq(menuTable.id, parentId))
-      .limit(1);
+  await guardOperation([presetGuards.parentExists(parentId)]);
 
-    if (parent.length === 0) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
-  }
   const updateData = {
     ...params,
     creatorId,
@@ -285,24 +251,23 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  // 如果更新父菜单，检查是否会造成循环引用
-  if (rest.parentId) {
-    // 不能将自己设为父菜单
-    if (rest.parentId === id) {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
 
-    // 检查父菜单是否存在
-    const parent = await db
-      .select()
-      .from(menuTable)
-      .where(eq(menuTable.id, rest.parentId))
-      .limit(1);
-
-    if (parent.length === 0) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
+  // 获取当前菜单记录，用于前置校验
+  const current = await db
+    .select()
+    .from(menuTable)
+    .where(eq(menuTable.id, id))
+    .limit(1);
+  if (!current[0]) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
+  const currentMenu = current[0];
+
+  await guardOperation([
+    presetGuards.notSelfParent(id, rest.parentId),
+    presetGuards.parentExistsIfChanged(rest.parentId, currentMenu.parentId),
+    presetGuards.disableCondition(id, currentMenu.isEnabled, rest.isEnabled),
+  ]);
 
   const updateData = {
     ...rest,
@@ -396,16 +361,7 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
-  // 检查是否有子菜单
-  const children = await db
-    .select()
-    .from(menuTable)
-    .where(eq(menuTable.parentId, id))
-    .limit(1);
-
-  if (children.length > 0) {
-    throw new BusinessError(BusinessErrorCode.HAS_CHILDREN);
-  }
+  await guardOperation([presetGuards.noChildren(id)]);
 
   const res = await db
     .delete(menuTable)
@@ -584,6 +540,28 @@ const treeApi = {
   adapter: bodyUserAdapter,
   service: onTree,
 } satisfies API;
+
+/** 获取菜单的直接子菜单列表 */
+async function getChildMenus(menuId: number) {
+  return await db
+    .select({ id: menuTable.id })
+    .from(menuTable)
+    .where(eq(menuTable.parentId, menuId));
+}
+
+/** 获取菜单的直接启用子菜单数量 */
+async function countEnabledChildMenus(menuId: number): Promise<number> {
+  const result = await db
+    .select({ total: count(menuTable.id).as("total") })
+    .from(menuTable)
+    .where(and(eq(menuTable.parentId, menuId), eq(menuTable.isEnabled, true)));
+  return result[0]?.total ?? 0;
+}
+
+export const utils = {
+  getChildMenus,
+  countEnabledChildMenus,
+};
 
 export default {
   listAll: listAllApi,
