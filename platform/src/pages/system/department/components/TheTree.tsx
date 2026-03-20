@@ -1,24 +1,13 @@
-import {
-  useState,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-  memo,
-  useCallback,
-  useEffect,
-} from 'react';
-import { Box, CircularProgress, Typography, Chip } from '@mui/material';
+import { useState, forwardRef, useImperativeHandle, memo, useCallback, useEffect } from 'react';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import {
   ExpandMore as ExpandMoreIcon,
   ChevronRight as ChevronRightIcon,
   Apartment as ApartmentIcon,
-  Person as PersonIcon,
 } from '@mui/icons-material';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import * as DepartmentAPI from '@/api/system/department';
-import * as UserAPI from '@/api/system/user';
 import type { DepartmentData } from './TheForm';
-import type { ListAllUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import { showSnackbar } from '@/components/Notification';
 import type { FilterState } from './TheFilter';
@@ -40,8 +29,6 @@ const TheTree = memo(
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState<FilterState>({ keyword: '', isEnabled: undefined });
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
-    const [allUsers, setAllUsers] = useState<ListAllUserRes>([]);
-    const allUsersCacheRef = useRef<ListAllUserRes | null>(null);
 
     // 将扁平的部门列表构造成树形结构（支持无限层级）
     const buildTree = useCallback((list: DepartmentData[]): DepartmentData[] => {
@@ -119,13 +106,6 @@ const TheTree = memo(
       async (searchFilters?: FilterState) => {
         setLoading(true);
         try {
-          // 获取用户列表（缓存，只请求一次）
-          if (allUsersCacheRef.current === null) {
-            const userRes = await UserAPI.listAllFn({ data: { isEnabled: true } });
-            allUsersCacheRef.current = userRes.data.data || [];
-            setAllUsers(allUsersCacheRef.current);
-          }
-
           const requestData = {
             descend: false,
             ...(searchFilters?.keyword && { keyword: searchFilters.keyword }),
@@ -208,11 +188,6 @@ const TheTree = memo(
     const renderTree = useCallback(
       (nodes: DepartmentData[]) =>
         nodes.map((node) => {
-          // 获取管理员信息
-          const managers = (node.managerIdArr || [])
-            .map((userId) => allUsers.find((u) => u.id === userId))
-            .filter(Boolean);
-
           return (
             <TreeItem
               key={node.id}
@@ -237,20 +212,6 @@ const TheTree = memo(
                         [{t('status.disabled')}]
                       </Typography>
                     )}
-                    {managers.length > 0 && (
-                      <Box component="span" sx={{ ml: 1, display: 'inline-flex', gap: 0.5 }}>
-                        {managers.map((manager) => (
-                          <Chip
-                            key={manager!.id}
-                            icon={<PersonIcon />}
-                            label={manager!.username}
-                            size="small"
-                            variant="outlined"
-                            sx={{ height: 20, fontSize: '0.75rem' }}
-                          />
-                        ))}
-                      </Box>
-                    )}
                   </Box>
                   <TreeNodeActionButtons
                     node={node}
@@ -265,7 +226,7 @@ const TheTree = memo(
             </TreeItem>
           );
         }),
-      [formRef, handleDeleteSuccess, allUsers, t],
+      [formRef, handleDeleteSuccess, t],
     );
 
     return (

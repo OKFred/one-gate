@@ -57,11 +57,11 @@ export const buildWhereCondition = async (
               return undefined;
 
             case DataScope.DEPT_AND_BELOW: {
-              // 用户可管理的部门及其子孙部门
-              const managedIds = await departmentUtils.getManagableIds(
-                userObj.userId
-              );
-              if (managedIds.length === 0) return eq(departmentTable.id, -1); // 无匹配
+              // 用户本部门及其子孙部门
+              const userDeptId = userObj.departmentObj?.value;
+              if (!userDeptId) return eq(departmentTable.id, -1); // 无匹配
+              const descendants = await departmentUtils.getDescendantDepartments(userDeptId);
+              const managedIds = [userDeptId, ...(descendants?.map(d => d.id) || [])];
               return inArray(departmentTable.id, managedIds);
             }
 
@@ -92,11 +92,13 @@ export const presetGuards = {
         switch (userObj.dataScope) {
           case DataScope.ALL:
             return true;
-          case DataScope.DEPT_AND_BELOW:
-            return await departmentUtils.canUserManageDepartment(
-              userObj.userId,
-              parentId
-            );
+          case DataScope.DEPT_AND_BELOW: {
+            const userDeptId = userObj.departmentObj?.value;
+            if (!userDeptId) return false;
+            if (parentId === userDeptId) return true;
+            const descendants = await departmentUtils.getDescendantDepartments(userDeptId);
+            return !!descendants?.some((d) => d.id === parentId);
+          }
           case DataScope.CUSTOM:
             return (userObj.customDeptIds ?? []).includes(parentId);
           case DataScope.SELF_ONLY:

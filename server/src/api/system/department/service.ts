@@ -84,7 +84,6 @@ async function onListAll(
       name: departmentTable.name,
       remark: departmentTable.remark,
       parentId: departmentTable.parentId,
-      managerIdArr: departmentTable.managerIdArr,
       isEnabled: departmentTable.isEnabled,
     })
     .from(departmentTable)
@@ -205,7 +204,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { name, remark, parentId, managerIdArr, isEnabled } = params;
+  const { name, remark, parentId, isEnabled } = params;
 
   await guardOperation([
     presetGuards.writePermission(userObj, parentId),
@@ -218,7 +217,6 @@ async function onAdd(
       name,
       remark,
       parentId,
-      managerIdArr,
       isEnabled,
       creatorId,
     })
@@ -635,43 +633,6 @@ async function verifyDepartment(departmentId: number) {
   }
 }
 
-/** 检查用户是否是部门管理员 */
-async function isUserDepartmentManager(
-  userId: number,
-  departmentId: number
-): Promise<boolean> {
-  if (!departmentId) return false;
-  const dept = await db
-    .select({ managerIdArr: departmentTable.managerIdArr })
-    .from(departmentTable)
-    .where(eq(departmentTable.id, departmentId))
-    .limit(1);
-  if (dept.length === 0) return false;
-  return dept[0].managerIdArr?.includes(userId) ?? false;
-}
-
-/** 检查用户是否可以管理某个部门（包括其祖先部门） */
-async function canUserManageDepartment(
-  userId: number,
-  departmentId: number
-): Promise<boolean> {
-  if (!departmentId) return false;
-  // 检查该部门本身的管理员
-  if (await isUserDepartmentManager(userId, departmentId)) {
-    return true;
-  }
-  // 检查所有祖先部门的管理员
-  const ancestors = await getAncestorDepartments(departmentId);
-  if (ancestors) {
-    for (const ancestor of ancestors) {
-      if (await isUserDepartmentManager(userId, ancestor.id)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 /** 检查部门是否可以被禁用 */
 async function checkCanDisableDepartment(departmentId: number): Promise<void> {
   // 1. 检查当前部门及所有子孙部门下是否存在已启用的用户
@@ -707,32 +668,6 @@ async function checkCanDisableDepartment(departmentId: number): Promise<void> {
   }
 }
 
-/**
- * 获取用户作为部门管理员可访问的所有部门ID（管理的部门本身 + 所有子孙部门）
- */
-async function getManagableIds(userId: number): Promise<number[]> {
-  const allDepts = await db.select().from(departmentTable);
-  // 找到用户直接管理的部门
-  const managedDepts = allDepts.filter((dept) =>
-    dept.managerIdArr?.includes(userId)
-  );
-  if (managedDepts.length === 0) return [];
-  const result = new Set<number>();
-  function findDescendants(id: number) {
-    for (const d of allDepts) {
-      if (d.parentId === id && !result.has(d.id)) {
-        result.add(d.id);
-        findDescendants(d.id);
-      }
-    }
-  }
-  for (const dept of managedDepts) {
-    result.add(dept.id);
-    findDescendants(dept.id);
-  }
-  return Array.from(result);
-}
-
 export const utils = {
   verifyDepartment,
   getDepartmentNameById,
@@ -742,9 +677,6 @@ export const utils = {
   getChildDepartments,
   getSiblingDepartments,
   getParentAndItsDescendants,
-  isUserDepartmentManager,
-  canUserManageDepartment,
-  getManagableIds,
   checkCanDisableDepartment,
 };
 
