@@ -3,6 +3,7 @@ import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
+import { DataScopeValues } from "@/types/dataScope";
 import {
   IndexPO,
   IndexVO,
@@ -39,6 +40,17 @@ const RoleBasePO = {
   permissionCount: {
     type: "integer",
     description: "权限数量",
+  },
+  dataScope: {
+    type: "string",
+    enum: DataScopeValues,
+    description: "数据访问范围",
+    default: "self_only",
+  },
+  customDeptIds: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效）",
   },
 } as const satisfies Partial<Record<keyof RolePOLike, JSONSchema>>;
 const RolePO = {
@@ -87,6 +99,8 @@ export const RoleAddKeys = [
   "remark",
   "isEnabled",
   "permissionCount",
+  "dataScope",
+  "customDeptIds",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];
 export const RoleUpdateKeys = [
   ...IndexKey,
@@ -120,6 +134,11 @@ export const roleTable = sqliteTable("system_role", {
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   permissionCount: integer("permission_count").notNull().default(0),
+  dataScope: text("data_scope")
+    .$type<import("@/types/dataScope").DataScopeValue>()
+    .notNull()
+    .default("self_only"),
+  customDeptIds: text("custom_dept_ids"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")
@@ -136,6 +155,8 @@ export async function tableInit() {
       remark TEXT,
       is_enabled INTEGER NOT NULL,
       permission_count INTEGER DEFAULT 0,
+      data_scope TEXT NOT NULL DEFAULT 'self_only',
+      custom_dept_ids TEXT,
       creator_id INTEGER NOT NULL,
       updater_id INTEGER,
       create_time_utc INTEGER DEFAULT (

@@ -10,6 +10,7 @@ import {
   Guards,
   type ValidationRule,
 } from "@/middleware/accessControl/onWrite/operationGuard";
+import { DataScope } from "@/types/dataScope";
 
 // 构建查询条件(列表和全部通用)
 export const buildWhereCondition = async (
@@ -45,22 +46,37 @@ export const buildWhereCondition = async (
       ],
     },
     {
-      name: "本人数据访问限制",
+      name: "数据访问范围限制",
       operator: or,
       limiters: [
-        // 超级管理员不受限制，普通用户只能访问自己创建的部门或自己可管理的部门
-        () =>
-          !userObj || userObj.isSuperAdmin
-            ? undefined
-            : eq(departmentTable.creatorId, userObj.userId),
-        // 获取用户可管理的部门ID列表，若列表非空则添加 in 条件限制
         async () => {
-          if (!userObj || userObj.isSuperAdmin) return undefined;
-          const managedIds = await departmentUtils.getManagableIds(
-            userObj.userId
-          );
-          if (managedIds.length === 0) return undefined;
-          return inArray(departmentTable.id, managedIds);
+          if (!userObj) return undefined;
+          switch (userObj.dataScope) {
+            case DataScope.ALL:
+              // 全部数据，不加任何限制
+              return undefined;
+
+            case DataScope.DEPT_AND_BELOW: {
+              // 用户可管理的部门及其子孙部门
+              const managedIds = await departmentUtils.getManagableIds(
+                userObj.userId
+              );
+              if (managedIds.length === 0) return eq(departmentTable.id, -1); // 无匹配
+              return inArray(departmentTable.id, managedIds);
+            }
+
+            case DataScope.CUSTOM: {
+              // 自定义部门列表
+              const ids = userObj.customDeptIds ?? [];
+              if (ids.length === 0) return eq(departmentTable.id, -1); // 无匹配
+              return inArray(departmentTable.id, ids);
+            }
+
+            case DataScope.SELF_ONLY:
+            default:
+              // 仅本人创建的数据
+              return eq(departmentTable.creatorId, userObj.userId);
+          }
         },
       ],
     }
@@ -73,11 +89,20 @@ export const presetGuards = {
     Guards.condition(
       "部门写入权限",
       async () => {
-        if (userObj.isSuperAdmin) return true;
-        return await departmentUtils.canUserManageDepartment(
-          userObj.userId,
-          parentId
-        );
+        switch (userObj.dataScope) {
+          case DataScope.ALL:
+            return true;
+          case DataScope.DEPT_AND_BELOW:
+            return await departmentUtils.canUserManageDepartment(
+              userObj.userId,
+              parentId
+            );
+          case DataScope.CUSTOM:
+            return (userObj.customDeptIds ?? []).includes(parentId);
+          case DataScope.SELF_ONLY:
+          default:
+            return false;
+        }
       },
       BusinessErrorCode.PERMISSION_DENIED
     ),

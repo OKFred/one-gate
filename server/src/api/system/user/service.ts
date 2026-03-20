@@ -410,6 +410,10 @@ export type UserObj = FromSchema<typeof getRes> & {
   userId: number;
   isSuperAdmin: boolean;
   permissions: PermissionInfo[];
+  /** 有效数据访问范围（由用户所持角色中最高优先级的 dataScope 决定） */
+  dataScope: import("@/types/dataScope").DataScopeValue;
+  /** 当 dataScope 为 "custom" 时，指定可访问的部门 ID 列表 */
+  customDeptIds: number[];
 };
 const getReq = {
   type: "object",

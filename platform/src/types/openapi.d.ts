@@ -9220,6 +9220,14 @@ export interface components {
                 /** @description 权限数量 */
                 permissionCount?: number;
                 /**
+                 * @description 数据访问范围
+                 * @default self_only
+                 * @enum {string}
+                 */
+                dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                customDeptIds?: ((string | null) | null) | null;
+                /**
                  * @description 角色名称
                  * @example 管理员
                  */
@@ -9278,6 +9286,14 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 权限数量 */
                     permissionCount: number;
+                    /**
+                     * @description 数据访问范围
+                     * @default self_only
+                     * @enum {string}
+                     */
+                    dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                    /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                    customDeptIds: ((string | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -9308,6 +9324,14 @@ export interface components {
             isEnabled: boolean;
             /** @description 权限数量 */
             permissionCount: number;
+            /**
+             * @description 数据访问范围
+             * @default self_only
+             * @enum {string}
+             */
+            dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+            /** @description 自定义部门ID列表（JSON序列化） */
+            customDeptIds: ((string | null) | null) | null;
         };
         "system.roleAddRes": {
             ok: boolean;
@@ -9335,6 +9359,13 @@ export interface components {
             isEnabled?: boolean;
             /** @description 权限数量 */
             permissionCount?: number;
+            /**
+             * @description 数据访问范围
+             * @enum {string}
+             */
+            dataScope?: "all" | "dept_and_below" | "self_only" | "custom";
+            /** @description 自定义部门ID列表（JSON序列化） */
+            customDeptIds?: ((string | null) | null) | null;
         };
         "system.roleUpdateRes": {
             ok: boolean;
@@ -9387,6 +9418,14 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 权限数量 */
                 permissionCount: number;
+                /**
+                 * @description 数据访问范围
+                 * @default self_only
+                 * @enum {string}
+                 */
+                dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                customDeptIds: ((string | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**
