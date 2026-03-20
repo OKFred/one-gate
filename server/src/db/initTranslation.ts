@@ -4523,6 +4523,22 @@ export const initialTranslationData = [
     tValue: "Custom Departments",
     isEnabled: true,
   },
+  {
+    application: "frontend",
+    business: "system.role",
+    langCode: "zh-CN",
+    tKey: "role.dataScope.customDeptIds",
+    tValue: "自定义部门ID",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.role",
+    langCode: "en-US",
+    tKey: "role.dataScope.customDeptIds",
+    tValue: "Custom Departments IDs",
+    isEnabled: true,
+  },
   // 运维菜单
   {
     application: "frontend",
