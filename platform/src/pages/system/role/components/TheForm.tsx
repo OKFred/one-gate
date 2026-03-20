@@ -291,8 +291,8 @@ const TheForm = memo(
                 >
                   <MenuItem value="all">{t('role.dataScope.all')}</MenuItem>
                   <MenuItem value="dept_and_below">{t('role.dataScope.dept_and_below')}</MenuItem>
-                  <MenuItem value="self_only">{t('role.dataScope.self_only')}</MenuItem>
                   <MenuItem value="custom">{t('role.dataScope.custom')}</MenuItem>
+                  <MenuItem value="self_only">{t('role.dataScope.self_only')}</MenuItem>
                 </Select>
               </FormControl>
 
