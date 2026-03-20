@@ -284,7 +284,7 @@ const TheTree = memo(
           </SimpleTreeView>
         ) : (
           <Typography color="text.secondary" textAlign="center" py={4}>
-            {t('common.noData')}
+            {t('column.noData')}
           </Typography>
         )}
       </Box>
