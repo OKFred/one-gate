@@ -298,17 +298,19 @@ const TheForm = memo(
 
               {form.dataScope === 'custom' && (
                 <FormControl fullWidth>
-                  <InputLabel id="custom-dept-label">{t('role.table.customDeptIds')}</InputLabel>
+                  <InputLabel id="custom-dept-label">
+                    {t('role.dataScope.customDeptIds')}
+                  </InputLabel>
                   <Select
                     labelId="custom-dept-label"
-                    label={t('role.table.customDeptIds')}
+                    label={t('role.dataScope.customDeptIds')}
                     multiple
                     value={selectedDeptIds}
                     onChange={(e) => {
                       const val = e.target.value as number[];
                       setSelectedDeptIds(val);
                     }}
-                    input={<OutlinedInput label={t('role.table.customDeptIds')} />}
+                    input={<OutlinedInput label={t('role.dataScope.customDeptIds')} />}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {(selected as number[]).map((deptId) => {
