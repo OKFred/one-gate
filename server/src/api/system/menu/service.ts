@@ -265,6 +265,7 @@ async function onUpdate(
 
   await guardOperation([
     presetGuards.notSelfParent(id, rest.parentId),
+    presetGuards.notDescendantParent(id, rest.parentId),
     presetGuards.parentExistsIfChanged(rest.parentId, currentMenu.parentId),
     presetGuards.disableCondition(id, currentMenu.isEnabled, rest.isEnabled),
   ]);
@@ -549,6 +550,47 @@ async function getChildMenus(menuId: number) {
     .where(eq(menuTable.parentId, menuId));
 }
 
+/** @description 获取所有菜单列表 */
+async function getAllMenus(
+  isEnabled?: boolean
+): Promise<{ name: string; id: number; parentId: number | null }[]> {
+  const allMenus = await db
+    .select({
+      name: menuTable.name,
+      id: menuTable.id,
+      parentId: menuTable.parentId,
+    })
+    .from(menuTable)
+    .where(
+      isEnabled !== undefined
+        ? eq(menuTable.isEnabled, isEnabled)
+        : undefined
+    );
+  return allMenus;
+}
+
+/** @description 获取子孙菜单的列表 */
+async function getDescendantMenus(
+  menuId: number
+): Promise<{ name: string; id: number; parentId: number | null }[] | null> {
+  if (!menuId) return null;
+  const allMenus = await getAllMenus();
+  const thisMenu = allMenus.find((m) => m.id === menuId);
+  if (!thisMenu) return null;
+  // 递归查找子孙菜单
+  function findSubMenus(id: number): typeof allMenus {
+    const result = [];
+    for (const m of allMenus) {
+      if (m.parentId === id) {
+        result.push(m);
+        result.push(...findSubMenus(m.id));
+      }
+    }
+    return result;
+  }
+  return findSubMenus(menuId);
+}
+
 /** 获取菜单的直接启用子菜单数量 */
 async function countEnabledChildMenus(menuId: number): Promise<number> {
   const result = await db
@@ -561,6 +603,8 @@ async function countEnabledChildMenus(menuId: number): Promise<number> {
 export const utils = {
   getChildMenus,
   countEnabledChildMenus,
+  getAllMenus,
+  getDescendantMenus,
 };
 
 export default {

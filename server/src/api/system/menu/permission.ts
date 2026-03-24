@@ -95,6 +95,23 @@ export const presetGuards = {
       { reason: "无效的父菜单设置" }
     ),
 
+  /** 禁止将子孙菜单设为父菜单（防止产生环路） */
+  notDescendantParent: (
+    id: number,
+    parentId: number | null | undefined
+  ): ValidationRule =>
+    Guards.condition(
+      "菜单父菜单环路校验",
+      async () => {
+        if (!parentId) return true;
+        const descendants = await menuUtils.getDescendantMenus(id);
+        if (!descendants) return true;
+        return !descendants.some((d) => d.id === parentId);
+      },
+      BusinessErrorCode.INVALID_PARAMS,
+      { reason: "不能将子孙菜单设为父菜单，会导致死循环" }
+    ),
+
   /** 菜单下无子菜单 */
   noChildren: (id: number): ValidationRule =>
     Guards.countIsZero(
