@@ -11,11 +11,19 @@ services:
       - PORT=3000
       - DB_FILE_NAME=file:/data.db
       - LOCALE=zh-CN
+      - BASE_API_PATH=/api/v1
+      - JWT_SECRET=your-secret-key-here-please-change-in-production
     volumes:
       - ./server/logs:/app/logs
       - ./data.db:/data.db
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

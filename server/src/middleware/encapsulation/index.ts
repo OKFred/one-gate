@@ -42,7 +42,6 @@ function componentMaker(
 }
 
 const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
-const BASE_API_PATH = process.env.BASE_API_PATH || "/api/v1";
 
 function routeMaker({
   pathInfo,

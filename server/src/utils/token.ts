@@ -1,7 +1,8 @@
 import crypto from "crypto";
 
 // 临时使用简单的token生成，生产环境建议使用JWT
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-here";
+const JWT_SECRET = process.env.JWT_SECRET;
+!JWT_SECRET && console.error("❌.MISSING ENV: JWT_SECRET");
 
 export interface TokenPayload {
   userId: number;
