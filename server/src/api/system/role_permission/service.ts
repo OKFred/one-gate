@@ -20,8 +20,8 @@ import {
   type RolePermissionDeleteVOLike,
   type RolePermissionGetVOLike,
   RolePermissionBaseVO,
-} from "./db.table";
-import { permissionTable } from "../permission/db.table";
+} from "./model";
+import { permissionTable } from "../permission/model";
 import roleService, { utils as roleUtils } from "../role/service";
 import permissionService from "../permission/service";
 import { asc, count, desc, eq, and, inArray, is } from "drizzle-orm";

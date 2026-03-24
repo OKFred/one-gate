@@ -19,7 +19,7 @@ import {
   type TranslationUpdateVOLike,
   type TranslationDeleteVOLike,
   type TranslationGetVOLike,
-} from "./db.table";
+} from "./model";
 import { asc, count, desc, eq, or, like, inArray, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";

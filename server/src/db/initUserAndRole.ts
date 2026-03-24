@@ -1,8 +1,8 @@
 import db from "@/db/index";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
-import { userTable } from "@/api/system/user/db.table";
-import { roleTable } from "@/api/system/role/db.table";
+import { userTable } from "@/api/system/user/model";
+import { roleTable } from "@/api/system/role/model";
 import {
   SUPER_ADMIN_ROLE_ID,
   SUPER_ADMIN,

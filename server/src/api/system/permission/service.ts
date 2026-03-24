@@ -22,7 +22,7 @@ import {
   PermissionBaseVO,
   PermissionUniqueKeys,
   PermissionUniqueVO,
-} from "./db.table";
+} from "./model";
 import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";

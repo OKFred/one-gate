@@ -4,7 +4,7 @@
  */
 
 import db from "@/db/index";
-import { permissionTable } from "@/api/system/permission/db.table";
+import { permissionTable } from "@/api/system/permission/model";
 import { count } from "drizzle-orm";
 import { PermissionAddLike } from "@/api/system/permission/service";
 import { initialTranslationData } from "./initTranslation";

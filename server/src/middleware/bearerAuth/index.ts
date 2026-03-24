@@ -3,7 +3,7 @@ import { NodeHonoContext } from "@/types/app";
 import userService from "@/api/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
-import { roleTable } from "@/api/system/role/db.table";
+import { roleTable } from "@/api/system/role/model";
 import { DataScope, type DataScopeValue } from "@/types/dataScope";
 import db from "@/db/index";
 import { inArray } from "drizzle-orm";
