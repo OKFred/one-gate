@@ -261,6 +261,7 @@ async function onUpdate(
     presetGuards.writePermission(userObj, row.parentId),
     presetGuards.parentExistsIfChanged(params.parentId, row.parentId, userObj),
     presetGuards.notSelfParent(id, params.parentId),
+    presetGuards.notDescendantParent(id, params.parentId),
     presetGuards.disableCondition(id, row.isEnabled, params.isEnabled),
   ]);
 

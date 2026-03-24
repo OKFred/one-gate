@@ -149,6 +149,23 @@ export const presetGuards = {
       { reason: "无效的父部门设置" }
     ),
 
+  /** 禁止将子孙部门设为父部门（防止产生环路） */
+  notDescendantParent: (
+    id: number,
+    parentId: number | null | undefined
+  ): ValidationRule =>
+    Guards.condition(
+      "部门父部门环路校验",
+      async () => {
+        if (!parentId) return true;
+        const descendants = await departmentUtils.getDescendantDepartments(id);
+        if (!descendants) return true;
+        return !descendants.some((d) => d.id === parentId);
+      },
+      BusinessErrorCode.INVALID_PARAMS,
+      { reason: "不能将子孙部门设为父部门，会导致死循环" }
+    ),
+
   /** 部门下无已启用用户 */
   noEnabledUsers: (id: number): ValidationRule =>
     Guards.countIsZero(
