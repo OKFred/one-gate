@@ -19,7 +19,7 @@ import {
   type RegionUpdateVOLike,
   type RegionDeleteVOLike,
   type RegionGetVOLike,
-} from "./db.table";
+} from "./model";
 import { asc, count, desc, eq, or, like, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";

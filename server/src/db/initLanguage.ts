@@ -1,4 +1,4 @@
-import { languageTable } from "@/api/i18n/language/db.table";
+import { languageTable } from "@/api/i18n/language/model";
 import db from "@/db/index";
 import { count } from "drizzle-orm";
 import { SUPER_ADMIN_ID } from "./init";

@@ -45,8 +45,8 @@ import { buildWhereCondition, presetGuards } from "./permission";
 import translationService from "@/api/i18n/translation/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
-import { rolePermissionTable } from "@/api/system/role_permission/db.table";
-import { permissionTable } from "@/api/system/permission/db.table";
+import { rolePermissionTable } from "@/api/system/role_permission/model";
+import { permissionTable } from "@/api/system/permission/model";
 
 const listAllReq = {
   type: "object",
@@ -562,9 +562,7 @@ async function getAllMenus(
     })
     .from(menuTable)
     .where(
-      isEnabled !== undefined
-        ? eq(menuTable.isEnabled, isEnabled)
-        : undefined
+      isEnabled !== undefined ? eq(menuTable.isEnabled, isEnabled) : undefined
     );
   return allMenus;
 }

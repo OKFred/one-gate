@@ -115,7 +115,7 @@ export const presetGuards = {
   /** 菜单下无子菜单 */
   noChildren: (id: number): ValidationRule =>
     Guards.countIsZero(
-      "子菜单",
+      "子菜单数量",
       async () => {
         const children = await menuUtils.getChildMenus(id);
         return children ? children.length : 0;
@@ -126,7 +126,7 @@ export const presetGuards = {
   /** 菜单下无已启用子菜单 */
   noEnabledChildren: (id: number): ValidationRule =>
     Guards.countIsZero(
-      "已启用子菜单",
+      "已启用子菜单数量",
       async () => await menuUtils.countEnabledChildMenus(id),
       BusinessErrorCode.HAS_CHILDREN
     ),

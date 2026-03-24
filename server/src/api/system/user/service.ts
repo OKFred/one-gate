@@ -23,7 +23,7 @@ import {
   type UserDeleteVOLike,
   type UserGetVOLike,
   UserBasePO,
-} from "./db.table";
+} from "./model";
 import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
 import regionService, { utils as regionUtils } from "@/api/i18n/region/service";

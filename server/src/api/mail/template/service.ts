@@ -22,7 +22,7 @@ import {
   MailTemplateBaseVO,
   MailTemplateUniqueKeys,
   MailTemplateUniqueVO,
-} from "./db.table";
+} from "./model";
 import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";

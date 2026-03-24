@@ -11,7 +11,7 @@ import {
   UserLoginResultKeys,
   UserTokenVO,
   UserVO,
-} from "../user/db.table";
+} from "../user/model";
 import {
   bodyAdapter,
   bodyUserAdapter,

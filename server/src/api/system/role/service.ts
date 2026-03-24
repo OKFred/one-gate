@@ -22,7 +22,7 @@ import {
   RoleBaseVO,
   RoleUniqueKeys,
   RoleUniqueVO,
-} from "./db.table";
+} from "./model";
 import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
 import { DataScope, DataScopeValues } from "@/types/dataScope";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";

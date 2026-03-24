@@ -1,5 +1,5 @@
 import encapsulation from "@/middleware/encapsulation";
-import { tableInit } from "./db.table";
+import { tableInit } from "./model";
 import service from "./service";
 import { BusinessKey } from "@/types/business";
 
