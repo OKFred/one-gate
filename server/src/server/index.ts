@@ -22,6 +22,7 @@ async function createApp() {
   //   pathHandler(app);
   docRegister(app);
   const subApp = await routeRegister();
+  !process.env.BASE_API_PATH && console.error("❌.MISSING ENV: BASE_API_PATH");
   app.route(process.env.BASE_API_PATH, subApp);
 
   // 初始化数据库数据（超级管理员角色和账号）
