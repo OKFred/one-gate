@@ -11,6 +11,7 @@ import {
   MenuItem,
   Stack,
   Button,
+  TextField,
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -38,7 +39,8 @@ const TheEditDialog = memo(
     const [user, setUser] = useState<GetUserRes | null>(null);
     const [regionObj, setRegionObj] = useState<{ value: number; label: string } | null>(null);
     const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
-    
+    const [remark, setRemark] = useState<string | null>(null);
+
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
@@ -46,6 +48,7 @@ const TheEditDialog = memo(
         open: (userData: GetUserRes) => {
           setUser(userData);
           setRegionObj(userData.regionObj || null);
+          setRemark(userData.remark || null);
           const latestRegions = localObj.detailsRef.current?.enabledRegions || [];
           setEnabledRegions(latestRegions);
           setOpen(true);
@@ -64,6 +67,7 @@ const TheEditDialog = memo(
       try {
         const updateData: UpdateProfileReq = {
           regionObj: regionObj,
+          remark: remark,
         };
         await AuthAPI.updateProfileFn({ data: { ...updateData } });
         showSnackbar({ type: 'success', message: t('dialog.operationSuccess') });
@@ -130,6 +134,17 @@ const TheEditDialog = memo(
                 })}
               </Select>
             </FormControl>
+            <TextField
+              label={t('column.remark')}
+              value={remark || ''}
+              onChange={(e) => setRemark(e.target.value || null)}
+              fullWidth
+              multiline
+              rows={3}
+              size={isMobile ? 'medium' : 'medium'}
+              inputProps={{ maxLength: 500 }}
+              helperText={`${(remark || '').length}/500`}
+            />
           </Stack>
         </DialogContent>
 

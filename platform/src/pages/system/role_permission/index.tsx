@@ -2,7 +2,7 @@ import { useRef, useMemo, useState, useEffect } from 'react';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheForm, { type TheFormRef } from './components/TheForm';
-import TheTable, { type TheTableRef } from './components/TheTable';
+import TheTree, { type TheTreeRef } from './components/TheTree';
 import TheFilter, { type TheFilterRef } from './components/TheFilter';
 import TheActionButtons from './components/TheActionButtons';
 import * as RolePermissionAPI from '@/api/system/role_permission';
@@ -29,7 +29,7 @@ export interface Props {
   localObj: LocalObj;
 }
 export interface LocalObj {
-  tableRef: React.RefObject<TheTableRef | null>;
+  tableRef: React.RefObject<TheTreeRef | null>;
   formRef: React.RefObject<TheFormRef | null>;
   filterRef: React.RefObject<TheFilterRef | null>;
   allRoles: ListAllRoleRes;
@@ -42,7 +42,7 @@ export interface LocalObj {
 
 export default function RolePermissionManagement() {
   const t = useTranslation();
-  const tableRef = useRef<TheTableRef>(null);
+  const tableRef = useRef<TheTreeRef>(null);
   const formRef = useRef<TheFormRef>(null);
   const filterRef = useRef<TheFilterRef>(null);
   const [allRoles, setAllRoles] = useState<ListAllRoleRes>([]);
@@ -152,7 +152,12 @@ export default function RolePermissionManagement() {
       >
         <TheFilter ref={localObj.filterRef} localObj={localObj} />
         <TheForm ref={localObj.formRef} localObj={localObj} />
-        <TheTable ref={localObj.tableRef} localObj={localObj} />
+        <TheTree
+          ref={localObj.tableRef}
+          initialRoleId={query.roleId ? Number(query.roleId) : null}
+          allPermissions={allPermissions}
+          formRef={localObj.formRef}
+        />
       </PageLayout>
 
       {/* 批量删除确认对话框 */}

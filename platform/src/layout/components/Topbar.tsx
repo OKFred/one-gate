@@ -15,20 +15,23 @@ import Logout from '@mui/icons-material/Logout';
 import LanguageIcon from '@mui/icons-material/Language';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
-import { authUtils, type UserInfo } from '@/utils/auth';
+import { authUtils } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 import * as LanguageAPI from '@/api/i18n/language';
 import * as AuthAPI from '@/api/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import type { ListAllLanguageRes } from '@/api/i18n/type';
+import { loginPath } from '@/routes';
 
 interface TopbarProps {
   setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { userInfo, getDisplayName, getAvatar } = useUserInfo();
   const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
+  const [languagesLoaded, setLanguagesLoaded] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     // 从 localStorage 读取主题设置
@@ -40,12 +43,6 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const t = useTranslation();
-
-  // 加载用户信息
-  useEffect(() => {
-    const user = authUtils.getUserInfo();
-    setUserInfo(user);
-  }, []);
 
   // 应用主题设置
   useEffect(() => {
@@ -59,24 +56,25 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     }
   }, [darkMode]);
 
-  // 加载语言列表
-  useEffect(() => {
-    const loadLanguages = async () => {
-      try {
-        const response = await LanguageAPI.listAllFn({
-          data: { isEnabled: true },
-        });
-        setLanguages(response.data.data);
-      } catch (error) {
-        console.error('Failed to load languages:', error);
-      }
-    };
-    loadLanguages();
-  }, []);
+  // 懒加载语言列表：只在用户第一次打开菜单时加载
+  const loadLanguages = async () => {
+    if (languagesLoaded) return;
+    try {
+      const response = await LanguageAPI.listAllFn({
+        data: { isEnabled: true },
+      });
+      setLanguages(response.data.data);
+      setLanguagesLoaded(true);
+    } catch (error) {
+      console.error('Failed to load languages:', error);
+    }
+  };
 
   // 处理用户菜单点击
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = async (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
+    // 菜单打开时才加载语言列表
+    await loadLanguages();
   };
 
   // 关闭用户菜单
@@ -107,19 +105,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const handleLogout = () => {
     handleClose();
     authUtils.logout();
-    navigate('/login');
-  };
-
-  // 获取用户名显示
-  const getUserDisplayName = () => {
-    if (!userInfo) return t('topbar.notLoggedIn');
-    return userInfo.username;
-  };
-
-  // 获取用户头像
-  const getUserAvatar = () => {
-    if (!userInfo) return '';
-    return userInfo.username.charAt(0).toUpperCase();
+    navigate(loginPath);
   };
 
   // 切换主题
@@ -159,7 +145,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
         {userInfo && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              {getUserDisplayName()}
+              {getDisplayName(t('topbar.notLoggedIn'))}
             </Typography>
             <IconButton
               onClick={handleClick}
@@ -169,7 +155,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
               aria-haspopup="true"
               aria-expanded={open ? 'true' : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32 }}>{getUserAvatar()}</Avatar>
+              <Avatar sx={{ width: 32, height: 32 }}>{getAvatar()}</Avatar>
             </IconButton>
           </Box>
         )}

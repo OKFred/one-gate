@@ -30,6 +30,7 @@ import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import hasValue from "@/utils/hasValue";
 import {
+  listAllReqBase,
   listReqBase,
   listResponseWrapper,
   orderByWrapper,
@@ -73,6 +74,57 @@ async function getCurrentPermissionCount(roleId: number): Promise<number> {
     .where(eq(rolePermissionTable.roleId, roleId));
   return countResult[0]?.count || 0;
 }
+
+const listAllReq = {
+  type: "object",
+  properties: {
+    ...listAllReqBase,
+    roleId: RolePermissionVO["roleId"],
+    permissionId: RolePermissionVO["permissionId"],
+    orderBy: orderByWrapper<(keyof RolePermissionPOLike)[]>(
+      RolePermissionSortableKeys
+    ),
+  },
+  required: [],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+const listAllRes = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      ...RolePermissionListVO,
+    },
+    required: [...RolePermissionListKeys],
+    additionalProperties: false,
+  },
+} as const satisfies JSONSchema;
+async function onListAll(
+  params: FromSchema<typeof listAllReq>
+): Promise<FromSchema<typeof listAllRes>> {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = rolePermissionTable[orderBy] || rolePermissionTable.id;
+  const maxLimit = 10000;
+
+  const rows = await db
+    .select()
+    .from(rolePermissionTable)
+    .where(buildWhereCondition(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(maxLimit);
+  return rows;
+}
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有角色权限关联（不分页）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onListAll,
+} satisfies API;
 
 const listReq = {
   type: "object",
@@ -166,7 +218,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { roleId, permissionId, resourceFilter, conditions } = obj;
+  const { roleId, permissionId } = obj;
 
   // 验证角色是否存在
   await roleService.get.service({ id: roleId });
@@ -179,24 +231,6 @@ async function onAdd(
     .limit(1);
   if (permissionExists.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-
-  // 验证 resourceFilter 格式
-  if (hasValue(resourceFilter)) {
-    try {
-      JSON.parse(resourceFilter);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
-
-  // 验证 conditions 格式
-  if (hasValue(conditions)) {
-    try {
-      JSON.parse(conditions);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
   }
 
   const result = await db
@@ -267,8 +301,6 @@ async function onBatchAdd(
   const values = permissionIds.map((permissionId) => ({
     roleId,
     permissionId,
-    resourceFilter: null,
-    conditions: null,
     creatorId,
   }));
 
@@ -313,30 +345,10 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, resourceFilter, conditions, ...rest } = params;
-
-  // 验证 resourceFilter 格式
-  if (hasValue(resourceFilter)) {
-    try {
-      JSON.parse(resourceFilter);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
-
-  // 验证 conditions 格式
-  if (hasValue(conditions)) {
-    try {
-      JSON.parse(conditions);
-    } catch {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
-    }
-  }
+  const { id, ...rest } = params;
 
   const updateData = {
     ...rest,
-    resourceFilter,
-    conditions,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
@@ -638,8 +650,6 @@ async function addMenuPermissionToRole(
   const rolePermissionData = {
     roleId,
     permissionId,
-    resourceFilter: null,
-    conditions: null,
     creatorId,
   };
   await db.insert(rolePermissionTable).values(rolePermissionData);
@@ -674,6 +684,7 @@ export const utils = {
 };
 
 export default {
+  listAll: listAllApi,
   list: listApi,
   add: addApi,
   batchAdd: batchAddApi,

@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { Chip, Link as MuiLink } from '@mui/material';
+import { Box, Chip, Link as MuiLink } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -146,6 +146,13 @@ const TheTable = memo(
         ),
       },
       {
+        title: t('role.table.dataScope'),
+        render: (row) => {
+          const scope = row.dataScope || 'self_only';
+          return t(`role.dataScope.${scope}`) || scope;
+        },
+      },
+      {
         title: t('columns.createTime'),
         render: (row) => formatTime(row.createTimeUtc),
       },
@@ -158,7 +165,7 @@ const TheTable = memo(
         render: (row) => (
           <MuiLink
             component={RouterLink}
-            to={`/system/role-permission?roleId=${row.id}`}
+            to={`/system/role_permission?roleId=${row.id}`}
             color="primary"
           >
             {row.permissionCount || 0}
@@ -193,11 +200,21 @@ const TheTable = memo(
       {
         type: 'tags',
         render: (row) => (
-          <Chip
-            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
-            color={row.isEnabled ? 'success' : 'default'}
-            size="small"
-          />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Chip
+              label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
+              color={row.isEnabled ? 'success' : 'default'}
+              size="small"
+            />
+            <Chip
+              label={
+                t(`role.dataScope.${row.dataScope || 'self_only'}`) || row.dataScope || 'self_only'
+              }
+              color="primary"
+              variant="outlined"
+              size="small"
+            />
+          </Box>
         ),
       },
     ];

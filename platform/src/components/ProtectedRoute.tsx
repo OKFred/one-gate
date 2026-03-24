@@ -5,6 +5,9 @@ import { checkTokenFn } from '@/api/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 import { useMenu } from '@/hooks/useMenu';
 import type { MenuNode } from '@/contexts/MenuContext';
+import { loginPath } from '@/routes';
+import { useUserInfo } from '@/hooks/useUserInfo';
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
@@ -13,6 +16,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const { userInfo } = useUserInfo();
+
   const { navItems, loading: menuLoading } = useMenu();
 
   function failedLogin() {
@@ -27,7 +32,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = authUtils.getUserInfo()?.token;
+      const token = userInfo?.token;
       if (!token) {
         failedLogin();
         setIsLoading(false);
@@ -44,7 +49,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       }
     };
     checkAuth();
-  }, []);
+  }, [userInfo?.token]);
 
   // 正在验证token或加载菜单
   if (isLoading || menuLoading) {
@@ -64,7 +69,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // 未认证，重定向到登录页
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
   // 已认证，检查路径是否在菜单中

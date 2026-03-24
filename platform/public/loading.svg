@@ -1,0 +1,27 @@
+<svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- 文字 -->
+  <text x="100" y="25" font-size="20" font-weight="bold" fill="#333">LOADING.....</text>
+
+  <!-- 进度条外框 -->
+  <rect x="50" y="40" width="200" height="20" fill="none" stroke="#333" stroke-width="3" rx="10" />
+
+  <!-- 进度条动画 -->
+  <g fill="#333">
+    <rect x="55" y="42" width="20" height="16">
+      <!-- The animation moves the rectangle from x=55 to x=230 -->
+      <animate attributeName="x" values="55; 230" dur="1s" repeatCount="indefinite" />
+    </rect>
+    <rect x="80" y="42" width="20" height="16">
+      <animate attributeName="x" values="80; 230" dur="1s" begin="0.2s" repeatCount="indefinite" />
+    </rect>
+    <rect x="105" y="42" width="20" height="16">
+      <animate attributeName="x" values="105; 230" dur="1s" begin="0.4s" repeatCount="indefinite" />
+    </rect>
+    <rect x="130" y="42" width="20" height="16">
+      <animate attributeName="x" values="130; 230" dur="1s" begin="0.6s" repeatCount="indefinite" />
+    </rect>
+    <rect x="155" y="42" width="20" height="16">
+      <animate attributeName="x" values="155; 230" dur="1s" begin="0.8s" repeatCount="indefinite" />
+    </rect>
+  </g>
+</svg>

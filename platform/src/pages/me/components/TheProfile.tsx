@@ -7,6 +7,7 @@ import { AUTH } from '@/hooks/usePermission';
 import type { GetUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import ThePasswordDialog, { type ThePasswordDialogRef } from './ThePasswordDialog';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 // 暴露给父组件的方法
 export interface TheProfileRef {
@@ -17,6 +18,8 @@ export interface TheProfileRef {
 const TheProfile = memo(
   forwardRef<TheProfileRef, Props>(({ localObj }, ref) => {
     const t = useTranslation();
+    const { getAvatar } = useUserInfo();
+
     const [user, setUser] = useState<GetUserRes | null>(null);
     const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
 
@@ -49,7 +52,7 @@ const TheProfile = memo(
                 bgcolor: 'primary.main',
               }}
             >
-              <PersonIcon sx={{ fontSize: 40 }} />
+              {getAvatar() || <PersonIcon sx={{ fontSize: 40 }} />}
             </Avatar>
 
             <Typography variant="h5" gutterBottom>

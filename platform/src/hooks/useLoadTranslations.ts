@@ -1,15 +1,21 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { listAllFn } from '@/api/i18n/translation';
 import { setTranslations } from './useTranslation';
 
 /**
  * 应用启动时加载多语言数据（不依赖登录状态）
+ * 返回一个布尔值，表示多语言是否已经加载完毕
  */
-export function useLoadTranslations() {
+export function useLoadTranslations(): boolean {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   useEffect(() => {
     const loadTranslationList = async () => {
       try {
-        const response = await listAllFn({ data: { isEnabled: true, application: 'frontend' } });
+        const response = await listAllFn({
+          data: { isEnabled: true, application: 'frontend' },
+          ignoreAbort: true,
+        });
 
         if (response.data?.ok && response.data?.data) {
           const i18nList = response.data.data as Array<{
@@ -38,9 +44,13 @@ export function useLoadTranslations() {
         }
       } catch (error) {
         console.error('❌ 加载多语言列表失败：', error);
+      } finally {
+        setIsLoaded(true);
       }
     };
 
     loadTranslationList();
   }, []);
+
+  return isLoaded;
 }

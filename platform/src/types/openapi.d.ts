@@ -2266,6 +2266,412 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maintenance/cache/listNamespaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出所有缓存命名空间 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cacheListNamespacesReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cacheListNamespacesRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/cache/listKeys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出命名空间中的所有键名 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cacheListKeysReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cacheListKeysRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/cache/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取缓存值 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cacheGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cacheGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/cache/put": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设置缓存值 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cachePutReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cachePutRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/cache/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除缓存键 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cacheDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cacheDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/cache/clear": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 清空命名空间 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cacheClearReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cacheClearRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/cache/getStats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取命名空间统计信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.cacheGetStatsReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.cacheGetStatsRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/auth/login": {
         parameters: {
             query?: never;
@@ -4268,6 +4674,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["system.roleGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/role_permission/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有角色权限关联（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["system.role_permissionListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["system.role_permissionListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7181,6 +7645,246 @@ export interface components {
             };
             message: string;
         };
+        "maintenance.cacheListNamespacesReq": Record<string, never>;
+        "maintenance.cacheListNamespacesRes": {
+            ok: boolean;
+            data: {
+                namespaces: {
+                    /**
+                     * @description 命名空间名称
+                     * @example i18n_translation
+                     * @example user_session
+                     * @example data_permission
+                     */
+                    name: string;
+                    /**
+                     * @description 缓存键数量
+                     * @example 1250
+                     * @example 42
+                     */
+                    keyCount: number;
+                    /**
+                     * @description 过期时间（秒）
+                     * @example 3600
+                     * @example 1800
+                     */
+                    expirationTtl?: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "maintenance.cacheListKeysReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 键名前缀过滤
+             * @example zh-CN:
+             * @example user:
+             * @example dept:1:
+             */
+            prefix?: string;
+            /**
+             * @description 返回结果数量限制
+             * @example 100
+             * @example 1000
+             */
+            limit?: number;
+        };
+        "maintenance.cacheListKeysRes": {
+            ok: boolean;
+            data: {
+                keys: {
+                    /**
+                     * @description 缓存键名
+                     * @example zh-CN:common.save
+                     * @example user:12345
+                     * @example dept:1:data
+                     */
+                    name: string;
+                }[];
+                /**
+                 * @description 列表是否完整（所有结果已返回）
+                 * @example true
+                 * @example false
+                 */
+                list_complete: boolean;
+            };
+            message: string;
+        };
+        "maintenance.cacheGetReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 缓存键名
+             * @example zh-CN:common.save
+             * @example user:12345
+             */
+            key: string;
+            /**
+             * @description 值类型
+             * @example json
+             * @example text
+             * @enum {string}
+             */
+            type?: "text" | "json";
+        };
+        "maintenance.cacheGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 缓存值（可以是任意 JSON 可序列化数据）
+                 * @example 保存
+                 * @example {
+                 *       "userId": 12345,
+                 *       "username": "admin"
+                 *     }
+                 */
+                value?: unknown;
+                /**
+                 * @description 缓存键是否存在
+                 * @example true
+                 * @example false
+                 */
+                exists: boolean;
+            };
+            message: string;
+        };
+        "maintenance.cachePutReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 缓存键名
+             * @example zh-CN:common.save
+             * @example user:12345
+             */
+            key: string;
+            /**
+             * @description 缓存值（任意 JSON 可序列化数据）
+             * @example 保存
+             * @example {
+             *       "userId": 12345
+             *     }
+             * @example [
+             *       1,
+             *       2,
+             *       3
+             *     ]
+             * @example 42
+             */
+            value: unknown;
+            /**
+             * @description 过期时间（秒），从当前时间开始计算
+             * @example 3600
+             * @example 1800
+             * @example 300
+             */
+            expirationTtl?: ((number | null) | null) | null;
+        };
+        "maintenance.cachePutRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "maintenance.cacheDeleteReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+            /**
+             * @description 缓存键名
+             * @example zh-CN:common.save
+             * @example user:12345
+             */
+            key: string;
+        };
+        "maintenance.cacheDeleteRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "maintenance.cacheClearReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+        };
+        "maintenance.cacheClearRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "maintenance.cacheGetStatsReq": {
+            /**
+             * @description 缓存命名空间名称
+             * @example i18n_translation
+             * @example user_session
+             */
+            namespace: string;
+        };
+        "maintenance.cacheGetStatsRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 缓存命中次数
+                 * @example 15420
+                 * @example 0
+                 */
+                hits: number;
+                /**
+                 * @description 缓存未命中次数
+                 * @example 83
+                 * @example 0
+                 */
+                misses: number;
+                /**
+                 * @description 缓存键总数
+                 * @example 1250
+                 * @example 0
+                 */
+                keys: number;
+                /**
+                 * @description 缓存命中率
+                 * @example 99.46%
+                 * @example 0.00%
+                 */
+                hitRate: string;
+            };
+            message: string;
+        };
         "system.authLoginReq": {
             /**
              * @description 用户名
@@ -7377,6 +8081,8 @@ export interface components {
                  */
                 label: string;
             } | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
         };
         "system.authUpdateProfileRes": {
             ok: boolean;
@@ -7694,10 +8400,7 @@ export interface components {
             };
             message: string;
         };
-        "system.departmentTreeReq": {
-            /** @description 是否显示所有部门（包括未启用的） */
-            showAll?: boolean;
-        };
+        "system.departmentTreeReq": Record<string, never>;
         "system.departmentTreeRes": {
             ok: boolean;
             data: {
@@ -8503,6 +9206,14 @@ export interface components {
                 /** @description 权限数量 */
                 permissionCount?: number;
                 /**
+                 * @description 数据访问范围
+                 * @default self_only
+                 * @enum {string}
+                 */
+                dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                customDeptIds?: ((string | null) | null) | null;
+                /**
                  * @description 角色名称
                  * @example 管理员
                  */
@@ -8561,6 +9272,14 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 权限数量 */
                     permissionCount: number;
+                    /**
+                     * @description 数据访问范围
+                     * @default self_only
+                     * @enum {string}
+                     */
+                    dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                    /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                    customDeptIds: ((string | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -8591,6 +9310,14 @@ export interface components {
             isEnabled: boolean;
             /** @description 权限数量 */
             permissionCount: number;
+            /**
+             * @description 数据访问范围
+             * @default self_only
+             * @enum {string}
+             */
+            dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+            /** @description 自定义部门ID列表（JSON序列化） */
+            customDeptIds: ((string | null) | null) | null;
         };
         "system.roleAddRes": {
             ok: boolean;
@@ -8618,6 +9345,13 @@ export interface components {
             isEnabled?: boolean;
             /** @description 权限数量 */
             permissionCount?: number;
+            /**
+             * @description 数据访问范围
+             * @enum {string}
+             */
+            dataScope?: "all" | "dept_and_below" | "self_only" | "custom";
+            /** @description 自定义部门ID列表（JSON序列化） */
+            customDeptIds?: ((string | null) | null) | null;
         };
         "system.roleUpdateRes": {
             ok: boolean;
@@ -8670,6 +9404,14 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 权限数量 */
                 permissionCount: number;
+                /**
+                 * @description 数据访问范围
+                 * @default self_only
+                 * @enum {string}
+                 */
+                dataScope: "all" | "dept_and_below" | "self_only" | "custom";
+                /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
+                customDeptIds: ((string | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**
@@ -8685,6 +9427,45 @@ export interface components {
                  */
                 updateTimeUtc: ((number | null) | null) | null;
             };
+            message: string;
+        };
+        "system.role_permissionListAllReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 角色ID */
+            roleId?: number;
+            /** @description 权限ID */
+            permissionId?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "roleId" | "permissionId" | "createTimeUtc";
+        };
+        "system.role_permissionListAllRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 角色ID */
+                roleId: number;
+                /** @description 权限ID */
+                permissionId: number;
+                /** @description 创建者ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新者ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            }[];
             message: string;
         };
         "system.role_permissionListReq": {
@@ -8733,17 +9514,6 @@ export interface components {
                     roleId: number;
                     /** @description 权限ID */
                     permissionId: number;
-                    /**
-                     * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-                     * @example {"userId":"${currentUser.id}"}
-                     * @example {"deptId":"${currentUser.deptId}"}
-                     */
-                    resourceFilter: ((string | null) | null) | null;
-                    /**
-                     * @description 条件判断，JSON格式，用于动态权限控制
-                     * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-                     */
-                    conditions: ((string | null) | null) | null;
                     /** @description 创建者ID */
                     creatorId: number;
                     /**
@@ -8767,17 +9537,6 @@ export interface components {
             roleId: number;
             /** @description 权限ID */
             permissionId: number;
-            /**
-             * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-             * @example {"userId":"${currentUser.id}"}
-             * @example {"deptId":"${currentUser.deptId}"}
-             */
-            resourceFilter: ((string | null) | null) | null;
-            /**
-             * @description 条件判断，JSON格式，用于动态权限控制
-             * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-             */
-            conditions: ((string | null) | null) | null;
         };
         "system.role_permissionAddRes": {
             ok: boolean;
@@ -8810,17 +9569,6 @@ export interface components {
             roleId?: number;
             /** @description 权限ID */
             permissionId?: number;
-            /**
-             * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-             * @example {"userId":"${currentUser.id}"}
-             * @example {"deptId":"${currentUser.deptId}"}
-             */
-            resourceFilter?: ((string | null) | null) | null;
-            /**
-             * @description 条件判断，JSON格式，用于动态权限控制
-             * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-             */
-            conditions?: ((string | null) | null) | null;
         };
         "system.role_permissionUpdateRes": {
             ok: boolean;
@@ -8878,17 +9626,6 @@ export interface components {
                 roleId: number;
                 /** @description 权限ID */
                 permissionId: number;
-                /**
-                 * @description 资源过滤器，JSON格式，用于实现资源级权限控制
-                 * @example {"userId":"${currentUser.id}"}
-                 * @example {"deptId":"${currentUser.deptId}"}
-                 */
-                resourceFilter: ((string | null) | null) | null;
-                /**
-                 * @description 条件判断，JSON格式，用于动态权限控制
-                 * @example {"ipRange":["192.168.1.0/24"],"timeRange":{"start":"09:00","end":"18:00"}}
-                 */
-                conditions: ((string | null) | null) | null;
                 /** @description 创建者ID */
                 creatorId: number;
                 /**

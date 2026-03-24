@@ -6,7 +6,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemButton from '@mui/material/ListItemButton';
 import Collapse from '@mui/material/Collapse';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useNavigate, useLocation } from 'react-router';
 import Icon from '@/components/Icon';
@@ -134,18 +133,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   // 侧边栏内容
   const drawerContent = (
-    <div>
-      <div className="h-64px flex items-center pl-20px color-white">
-        <Typography variant="h6" noWrap component="div">
-          {t('topbar.title')}
-        </Typography>
-      </div>
+    <Box sx={{ paddingTop: isMobile ? '0' : '64px' }}>
       {navItems && navItems.length > 0 ? (
         <List className="pb-0! pt-0!">
           {navItems.map((item) => renderSystemMenuTree(item, location.pathname))}
         </List>
       ) : null}
-    </div>
+    </Box>
   );
 
   // 移动端侧边栏 (temporary drawer, 全屏宽度)

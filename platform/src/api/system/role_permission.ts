@@ -1,6 +1,19 @@
 import { axiosPlus } from '../config';
 import type { AxiosConfig } from '../config';
 
+export const listAllFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/system/role_permission/listAll', 'post'>,
+    'url' | 'method'
+  >,
+) => {
+  return axiosPlus({
+    url: '/api/v1/system/role_permission/listAll',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const listFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/system/role_permission/list', 'post'>, 'url' | 'method'>,
 ) => {
@@ -22,7 +35,10 @@ export const addFn = (
 };
 
 export const batchAddFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/role_permission/batchAdd', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/system/role_permission/batchAdd', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/system/role_permission/batchAdd',
@@ -52,7 +68,10 @@ export const deleteFn = (
 };
 
 export const batchDeleteFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/role_permission/batchDelete', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/system/role_permission/batchDelete', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/system/role_permission/batchDelete',
@@ -72,7 +91,10 @@ export const getFn = (
 };
 
 export const getPermissionsByRoleFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/system/role_permission/getPermissionsByRole', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/system/role_permission/getPermissionsByRole', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/system/role_permission/getPermissionsByRole',

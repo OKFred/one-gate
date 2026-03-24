@@ -2,7 +2,7 @@ import { useRef, useMemo } from 'react';
 import { useTheme } from '@mui/material';
 import JoditEditor from 'jodit-react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { authUtils } from '@/utils/auth';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 interface JoditEditorComponentProps {
   value: string;
@@ -22,7 +22,7 @@ export default function JoditEditorComponent({
   const editor = useRef(null);
   const theme = useTheme();
   const t = useTranslation();
-  const userInfo = authUtils.getUserInfo();
+  const { userInfo } = useUserInfo();
   const isDarkMode = theme.palette.mode === 'dark';
 
   const finalPlaceholder = useMemo(() => {

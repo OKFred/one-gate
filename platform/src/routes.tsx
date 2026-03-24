@@ -1,38 +1,55 @@
 import { useRoutes } from 'react-router-dom';
-
-// 动态递归导入 pages 下除 error、login 的页面
-const modules = import.meta.glob('./pages/!(error|login)/**/index.tsx', { eager: true });
-import type { ComponentType } from 'react';
+import { lazy, Suspense, type ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
+import { CircularProgress } from '@mui/material';
+import RootRedirect from './components/RootRedirect';
 
-// 递归构建路由树
-function buildRouteTree(paths: [string, unknown][]): RouteObject[] {
+const modules = import.meta.glob('./pages/!(error|login)/**/index.tsx');
+export const loginPath = '/login';
+export const homePath = '/home';
+
+const PageLoading = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+    <CircularProgress />
+  </div>
+);
+
+function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[] {
   const routes: RouteObject[] = [];
 
-  for (const [filePath, mod] of paths) {
+  for (const [filePath, loader] of paths) {
     // ./pages/mail/template/index.tsx => mail/template
     const match = filePath.match(/\.\/pages\/(.*?)\/index\.tsx$/);
     if (!match) continue;
 
     const routePath = match[1];
-    const Comp = (mod as { default: ComponentType<Record<string, unknown>> }).default;
+    const LazyComp = lazy(() =>
+      loader().then((mod) => ({
+        default: (mod as { default: ComponentType<Record<string, unknown>> }).default,
+      })),
+    );
 
     routes.push({
       path: routePath,
-      element: <Comp />,
+      element: (
+        <Suspense fallback={<PageLoading />}>
+          <LazyComp />
+        </Suspense>
+      ),
     });
   }
 
   return routes;
 }
 
-const childrenRoutes = buildRouteTree(Object.entries(modules));
+const childrenRoutes = buildRouteTree(
+  Object.entries(modules) as [string, () => Promise<unknown>][],
+);
 
-import Layout from './layout';
-import Login from './pages/login';
-import NotFound from './pages/error/NotFound';
-import ProtectedRoute from './components/ProtectedRoute';
-import RootRedirect from './components/RootRedirect';
+const Layout = lazy(() => import('./layout'));
+const Login = lazy(() => import('./pages/login'));
+const NotFound = lazy(() => import('./pages/error/NotFound'));
+const ProtectedRoute = lazy(() => import('./components/ProtectedRoute'));
 
 export default function AppRoutes() {
   return useRoutes([
@@ -40,7 +57,14 @@ export default function AppRoutes() {
       path: '/',
       element: <RootRedirect />,
     },
-    { path: '/login', element: <Login /> },
+    {
+      path: '/login',
+      element: (
+        <Suspense fallback={<PageLoading />}>
+          <Login />
+        </Suspense>
+      ),
+    },
     {
       path: '/',
       element: (
@@ -50,6 +74,13 @@ export default function AppRoutes() {
       ),
       children: childrenRoutes,
     },
-    { path: '*', element: <NotFound /> },
+    {
+      path: '*',
+      element: (
+        <Suspense fallback={<PageLoading />}>
+          <NotFound />
+        </Suspense>
+      ),
+    },
   ]);
 }

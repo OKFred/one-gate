@@ -1,5 +1,5 @@
 import type { App, NodeHonoContext } from "@/types/app.ts";
-import { createTranslator, getTranslator } from "@/utils/i18n";
+import { getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
 import { type ContentfulStatusCode } from "hono/utils/http-status";

@@ -24,6 +24,7 @@ import {
   RoleUniqueVO,
 } from "./db.table";
 import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
+import { DataScope, DataScopeValues } from "@/types/dataScope";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -100,6 +101,7 @@ async function onListAll(
       name: roleTable.name,
       remark: roleTable.remark,
       isEnabled: roleTable.isEnabled,
+      dataScope: roleTable.dataScope,
     })
     .from(roleTable)
     .where(buildWhereCondition(params))
@@ -200,6 +202,17 @@ const addReq = {
   type: "object",
   properties: {
     ...RoleAddVO,
+    dataScope: {
+      type: "string",
+      enum: DataScopeValues,
+      description: "数据访问范围",
+      default: DataScope.SELF_ONLY,
+    },
+    customDeptIds: {
+      type: ["string", "null"],
+      nullable: true,
+      description: "自定义部门ID列表（JSON序列化）",
+    },
   } satisfies Partial<Record<keyof RoleAddVOLike, JSONSchema>>,
   required: [...RoleAddKeys] as const satisfies RequiredKeys<RoleAddVOLike>[],
   additionalProperties: false,
@@ -239,6 +252,16 @@ const updateReq = {
   type: "object",
   properties: {
     ...RoleUpdateVO,
+    dataScope: {
+      type: "string",
+      enum: DataScopeValues,
+      description: "数据访问范围",
+    },
+    customDeptIds: {
+      type: ["string", "null"],
+      nullable: true,
+      description: "自定义部门ID列表（JSON序列化）",
+    },
   },
   required: [
     ...RoleUpdateKeys,
@@ -254,10 +277,13 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled; // 禁止禁用超级管理员角色
+  // 禁止禁用超级管理员角色，且锁定其 dataScope 为 "all"
+  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled;
+  const dataScope = id === SUPER_ADMIN_ROLE_ID ? DataScope.ALL : rest.dataScope;
 
   const updateData = {
     ...rest,
+    dataScope,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
     isEnabled,
@@ -355,7 +381,12 @@ async function onGet(
   if (rows.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-  return rows[0];
+  const row = rows[0];
+  return {
+    ...row,
+    dataScope: (row.dataScope ??
+      DataScope.SELF_ONLY) as import("@/types/dataScope").DataScopeValue,
+  };
 }
 const getApi = {
   req: getReq,

@@ -29,12 +29,12 @@ import { utils as roleUtils } from "@/api/system/role/service";
 import regionService, { utils as regionUtils } from "@/api/i18n/region/service";
 import { utils as languageUtils } from "@/api/i18n/language/service";
 import type { PermissionInfo } from "@/api/system/permission/service";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import bcrypt from "bcrypt";
 import type { RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SALT_ROUNDS, SUPER_ADMIN_ID } from "@/db/init";
+import { SALT_ROUNDS, SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -289,7 +289,9 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, departmentObj, regionObj, roleArr, langCode, ...rest } = params;
-  const isEnabled = id === SUPER_ADMIN_ID ? true : params.isEnabled; // 禁止禁用超级管理员
+  const isEnabled = roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)
+    ? true
+    : params.isEnabled; // 禁止禁用超级管理员
   let updateData = {
     ...rest,
     updaterId,
@@ -378,7 +380,8 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-  if (id === SUPER_ADMIN_ID) {
+  const thisUser = await onGet({ id });
+  if (thisUser?.roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)) {
     throw new BusinessError(BusinessErrorCode["PERMISSION_DENIED"]);
   }
   const res = await db
@@ -407,6 +410,10 @@ export type UserObj = FromSchema<typeof getRes> & {
   userId: number;
   isSuperAdmin: boolean;
   permissions: PermissionInfo[];
+  /** 有效数据访问范围（由用户所持角色中最高优先级的 dataScope 决定） */
+  dataScope: import("@/types/dataScope").DataScopeValue;
+  /** 当 dataScope 为 "custom" 时，指定可访问的部门 ID 列表 */
+  customDeptIds: number[];
 };
 const getReq = {
   type: "object",
@@ -573,10 +580,93 @@ async function getRegionObj(
   }
 }
 
+/**
+ * 检查部门下的人员数量
+ * @param departmentIds 部门ID列表
+ * @returns 人员数量
+ */
+async function countDepartmentUsers(
+  departmentIds: number[],
+  isEnabled: boolean
+): Promise<number> {
+  if (!departmentIds || departmentIds.length === 0) return 0;
+  const result = await db
+    .select({ count: count(userTable.id) })
+    .from(userTable)
+    .where(
+      and(
+        inArray(userTable.departmentId, departmentIds),
+        eq(userTable.isEnabled, isEnabled)
+      )
+    );
+  return result[0]?.count || 0;
+}
+
+/** 更新用户语言 */
+export async function updateLangCode(
+  updateData: {
+    id: number;
+    langCode: string;
+  },
+  userObj: UserObj
+): Promise<number> {
+  const res = await db
+    .update(userTable)
+    .set({
+      langCode: updateData.langCode,
+      updaterId: userObj.userId,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
+    })
+    .where(eq(userTable.id, updateData.id))
+    .returning({ id: userTable.id });
+  if (res?.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  return res[0].id;
+}
+
+/** 更新用户信息 */
+async function updateUserInfo(
+  updateData: {
+    id: number;
+    regionObj?: { value: number; label: string } | null;
+    remark?: string;
+  },
+  userObj: UserObj
+): Promise<number> {
+  const { id, regionObj, remark } = updateData;
+  const setData = {
+    updaterId: userObj.userId,
+    updateTimeUtc: getCurrentTimestampUtcSql(),
+    regionId: undefined,
+    remark: undefined,
+  };
+  if (regionObj !== undefined) {
+    const regionId = regionObj ? regionObj.value : null;
+    if (regionId) await regionUtils.verifyRegion(regionId);
+    setData.regionId = regionId;
+  }
+  if (remark !== undefined) {
+    setData.remark = remark;
+  }
+  const res = await db
+    .update(userTable)
+    .set(setData)
+    .where(eq(userTable.id, id))
+    .returning({ id: userTable.id });
+  if (res?.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+  return res[0].id;
+}
+
 export const utils = {
+  countDepartmentUsers,
   convertPassword,
   verifyUsernameAndPassword,
   updatePassword,
+  updateLangCode,
+  updateUserInfo,
 };
 
 export default {

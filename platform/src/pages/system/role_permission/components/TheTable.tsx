@@ -1,5 +1,4 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, memo } from 'react';
-import { Chip } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -164,24 +163,6 @@ const TheTable = memo(
         render: (row) => getPermissionName(row.permissionId),
       },
       {
-        title: t('rolePermission.resourceFilter'),
-        render: (row) =>
-          row.resourceFilter ? (
-            <Chip label={t('rolePermission.hasFilter')} size="small" color="info" />
-          ) : (
-            '--'
-          ),
-      },
-      {
-        title: t('rolePermission.conditions'),
-        render: (row) =>
-          row.conditions ? (
-            <Chip label={t('rolePermission.hasConditions')} size="small" color="warning" />
-          ) : (
-            '--'
-          ),
-      },
-      {
         title: t('columns.createTime'),
         render: (row) =>
           row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
@@ -206,16 +187,6 @@ const TheTable = memo(
         type: 'subtitle',
         label: t('rolePermission.role'),
         render: (row) => getRoleName(row.roleId),
-      },
-      {
-        type: 'content',
-        label: t('rolePermission.resourceFilter'),
-        render: (row) => (row.resourceFilter ? t('rolePermission.hasFilter') : '--'),
-      },
-      {
-        type: 'content',
-        label: t('rolePermission.conditions'),
-        render: (row) => (row.conditions ? t('rolePermission.hasConditions') : '--'),
       },
       {
         type: 'content',

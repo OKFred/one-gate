@@ -124,11 +124,13 @@ const TheTable = memo(
 
     // 根据地区ID获取地区名称
     const getRegionName = useCallback(
-      (regionId: number | null | undefined): string => {
+      (regionId: number | null | undefined, langCode: string | null | undefined): string => {
         if (!regionId) return '--';
         const region = enabledRegions.find((r) => r.id === regionId);
         if (!region) return '--';
-        return region.alpha2Code || '--';
+        // 优先返回多语言标签，如果没有则返回 alpha2Code
+        const label = region.labels?.[langCode!] as string;
+        return label || region.alpha2Code || '--';
       },
       [enabledRegions],
     );
@@ -223,7 +225,7 @@ const TheTable = memo(
       { title: t('me.department'), render: (row) => getDepartmentName(row.departmentId) },
       { title: t('me.role'), render: (row) => getRoleNames(row.roleIdArr) },
       { title: t('column.language'), render: (row) => getLanguageName(row.langCode) },
-      { title: t('me.region'), render: (row) => getRegionName(row.regionId) },
+      { title: t('me.region'), render: (row) => getRegionName(row.regionId, row.langCode) },
       {
         title: t('columns.status'),
         render: (row) => (
@@ -270,7 +272,7 @@ const TheTable = memo(
       {
         type: 'content',
         label: t('me.region'),
-        render: (row) => getRegionName(row.regionId),
+        render: (row) => getRegionName(row.regionId, row.langCode),
       },
       {
         type: 'content',

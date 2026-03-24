@@ -17,12 +17,18 @@ export type BusinessType = {
   "mail.action": "mail.action";
   /** 邮件日志 */
   "mail.log": "mail.log";
+  /** 运维 */
+  maintenance: "maintenance";
+  /** 运维缓存 */
+  "maintenance.cache": "maintenance.cache";
+  /** 运维接口文档 */
+  "maintenance.api_docs": "maintenance.api_docs";
+  /** 运维合规 */
+  "maintenance.compliance": "maintenance.compliance";
   /** 系统 */
   system: "system";
   /** 系统鉴权 */
   "system.auth": "system.auth";
-  /** 系统合规 */
-  "system.compliance": "system.compliance";
   /** 系统部门 */
   "system.department": "system.department";
   /** 系统菜单 */

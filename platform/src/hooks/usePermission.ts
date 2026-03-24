@@ -99,3 +99,13 @@ export const AUTH = {
     UPDATE_PASSWORD: 'system.auth:update_password',
   },
 };
+
+export const MAINTENANCE = {
+  /** 缓存管理 */
+  CACHE: {
+    ADD: 'maintenance.cache:add',
+    EDIT: 'maintenance.cache:edit',
+    DELETE: 'maintenance.cache:delete',
+    VIEW: 'maintenance.cache:view',
+  },
+};

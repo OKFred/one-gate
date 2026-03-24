@@ -1,12 +1,14 @@
-import { forwardRef, useImperativeHandle, memo, useRef, useState } from 'react';
-import { Box, TextField, Typography, Stack } from '@mui/material';
-import JoditEditor from '@/components/JoditEditor/index';
+import { forwardRef, useImperativeHandle, memo, useRef, useState, lazy, Suspense } from 'react';
+import { Box, TextField, Typography, Stack, CircularProgress } from '@mui/material';
 import TheAccountList, { type TheAccountListRef } from './TheAccountList';
 import TheRecipientList, { type TheRecipientListRef } from './TheRecipientList';
 import TheTemplateSelect from './TheTemplateSelect';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { SendMailReq } from '@/api/mail/type';
+
+// 动态导入 JoditEditor，实现代码分割
+const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
 
 // 暴露给父组件的方法
 export interface TheSendFormRef {
@@ -103,12 +105,20 @@ const TheSendForm = memo(
           <Typography fontWeight={500} mb={1}>
             {t('send.dialog.contentLabel')}
           </Typography>
-          <JoditEditor
-            value={html}
-            onChange={setHtml}
-            placeholder={t('form.pleaseEnter')}
-            height={400}
-          />
+          <Suspense
+            fallback={
+              <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                <CircularProgress />
+              </Box>
+            }
+          >
+            <JoditEditor
+              value={html}
+              onChange={setHtml}
+              placeholder={t('form.pleaseEnter')}
+              height={400}
+            />
+          </Suspense>
         </Box>
       </Stack>
     );

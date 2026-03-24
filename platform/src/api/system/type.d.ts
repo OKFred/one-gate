@@ -203,6 +203,14 @@ export type DeletePermissionRes = Awaited<
 >['data']['data'];
 
 // ==================== RolePermission ====================
+// 获取所有角色权限关联（不分页）
+export type ListAllRolePermissionReq = NonNullable<
+  Parameters<typeof RolePermissionAPI.listAllFn>[0]['data']
+>;
+export type ListAllRolePermissionRes = Awaited<
+  ReturnType<typeof RolePermissionAPI.listAllFn>
+>['data']['data'];
+
 // 获取角色权限关联列表
 export type ListRolePermissionReq = NonNullable<
   Parameters<typeof RolePermissionAPI.listFn>[0]['data']

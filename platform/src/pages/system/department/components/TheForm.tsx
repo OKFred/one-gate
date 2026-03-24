@@ -11,10 +11,10 @@ import {
   Alert,
   FormControlLabel,
   Switch,
-  FormControl,
-  InputLabel,
   Select,
   MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as DepartmentAPI from '@/api/system/department';
@@ -71,7 +71,6 @@ const TheForm = memo(
     const [error, setError] = useState<string>('');
     const [loading, setLoading] = useState(false);
     const [allDepartments, setAllDepartments] = useState<DepartmentData[]>([]);
-
     // 获取所有部门列表（扁平的）
     const fetchAllDepartments = useCallback(async () => {
       try {
@@ -212,7 +211,7 @@ const TheForm = memo(
     // 处理表单变化
     const handleFormChange = (
       field: keyof DepartmentFormData,
-      value: string | number | boolean | null,
+      value: string | number | boolean | number[] | null,
     ) => {
       setFormValues((prev) => ({ ...prev, [field]: value }));
     };
@@ -314,6 +313,7 @@ const TheForm = memo(
                 ))}
               </Select>
             </FormControl>
+
             <FormControlLabel
               control={
                 <Switch

@@ -159,6 +159,31 @@ export const initialMenuData = [
     sort: 6,
     business: "system.role_permission",
   },
+  {
+    id: 19,
+    name: "sidebar.menu.maintenance",
+    icon: "material-symbols:build",
+    sort: 6,
+    business: "maintenance",
+  },
+  {
+    id: 20,
+    name: "sidebar.menu.maintenance.cache",
+    icon: "material-symbols:database",
+    path: "/maintenance/cache",
+    parentId: 19,
+    sort: 1,
+    business: "maintenance.cache",
+  },
+  {
+    id: 21,
+    name: "sidebar.menu.maintenance.openapi",
+    icon: "material-symbols:api",
+    path: "/maintenance/openapi",
+    parentId: 19,
+    sort: 2,
+    business: "maintenance",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {
@@ -175,7 +200,7 @@ type menuLike = {
  */
 export async function initMenu() {
   // 检查是否已有数据，没有则插入初始数据
-  const countResult = await menuService.listAll.service({});
+  const countResult = await menuService.listAll.service({ isEnabled: true });
   if (countResult.length === initialMenuData.length) return;
   for (const menu of initialMenuData) {
     await menuService.add.service(
