@@ -63,7 +63,7 @@ const TheSendForm = memo(
           setHtml('');
         },
       }),
-      [templateId, subject, html],
+      [templateId, subject, html, accountRef, recipientRef],
     );
 
     return (
@@ -81,7 +81,13 @@ const TheSendForm = memo(
               <TextField
                 label={t('send.dialog.subject')}
                 value={subject}
-                onChange={(e) => setSubject(e.target.value)}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  if (newValue !== subject) {
+                    setSubject(newValue);
+                    if (templateId !== 'none') setTemplateId('none');
+                  }
+                }}
                 size="small"
                 fullWidth
               />
@@ -114,7 +120,13 @@ const TheSendForm = memo(
           >
             <JoditEditor
               value={html}
-              onChange={setHtml}
+              onChange={(value) => {
+                // 只有当内容真正改变时才清除模板ID，避免编辑器初始化时的误触发
+                if (value !== html) {
+                  setHtml(value);
+                  if (templateId !== 'none') setTemplateId('none');
+                }
+              }}
               placeholder={t('form.pleaseEnter')}
               height={400}
             />
