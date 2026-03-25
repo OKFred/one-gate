@@ -13,12 +13,14 @@ import { findFirstValidPath } from '@/hooks/useFirstValidPath';
 import { useMenu } from '@/hooks/useMenu';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
+import { usePermission } from '@/hooks/usePermission';
 
 export default function TheForm() {
   const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const t = useTranslation();
   const { loadMenus } = useMenu();
+  const { refreshPermissions } = usePermission();
 
   // 状态管理
   const [credentials, setCredentials] = useState<LoginReq>({
@@ -52,8 +54,8 @@ export default function TheForm() {
       const loginData = response.data.data;
       const { userObj } = loginData;
       authUtils.setUserInfo(userObj);
-      // 重新加载菜单
-      const menus = await loadMenus();
+      // 重新加载权限和菜单
+      const [menus] = await Promise.all([loadMenus(), refreshPermissions()]);
       const nextPath = findFirstValidPath(menus);
       // 登录成功，跳转到首页
       navigate(nextPath);
