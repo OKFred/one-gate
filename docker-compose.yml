@@ -24,7 +24,7 @@ services:
           "-e",
           "require('http').get('http://localhost:3000/', (res) => { process.exit(res.statusCode ? 0 : 1) })",
         ]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
       start_period: 10s
