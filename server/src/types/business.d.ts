@@ -41,5 +41,7 @@ export type BusinessType = {
   "system.role_permission": "system.role_permission";
   /** 系统用户 */
   "system.user": "system.user";
+  /** 运维登录日志 */
+  "maintenance.audit_login": "maintenance.audit_login";
 };
 export type BusinessKey = keyof BusinessType;

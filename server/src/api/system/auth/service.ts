@@ -15,7 +15,9 @@ import {
 import {
   bodyAdapter,
   bodyUserAdapter,
+  bodyClientInfoAdapter,
 } from "@/middleware/encapsulation/adapter";
+import { utils as auditUtils } from "@/api/maintenance/audit_login/service";
 import type { API } from "@/middleware/encapsulation";
 import {
   BusinessError,
@@ -61,7 +63,8 @@ const loginRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 async function onLogin(
-  params: FromSchema<typeof loginReq>
+  params: FromSchema<typeof loginReq>,
+  clientInfo: { ip: string; userAgent: string }
 ): Promise<FromSchema<typeof loginRes> | null> {
   const { username, password: base64Password } = params;
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
@@ -85,6 +88,9 @@ async function onLogin(
     username,
   });
 
+  // 记录登录审计
+  await auditUtils.recordLogin(id, clientInfo.ip, clientInfo.userAgent);
+
   return {
     userObj: {
       id,
@@ -103,7 +109,7 @@ const loginApi = {
     method: "post",
     summary: "用户登录",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyClientInfoAdapter,
   service: onLogin,
 } satisfies API;
 
