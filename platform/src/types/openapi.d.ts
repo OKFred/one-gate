@@ -2266,6 +2266,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maintenance/audit_login/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取登录审计列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.audit_loginListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.audit_loginListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/maintenance/cache/listNamespaces": {
         parameters: {
             query?: never;
@@ -7642,6 +7700,89 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "maintenance.audit_loginListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 用户ID
+             * @example 1
+             */
+            userId?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "userId" | "loginTimeUtc" | "createTimeUtc";
+        };
+        "maintenance.audit_loginListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 用户ID
+                     * @example 1
+                     */
+                    userId: number;
+                    /**
+                     * @description 登录时间（UTC毫秒时间戳）
+                     * @example 1672531199000
+                     */
+                    loginTimeUtc: number;
+                    /**
+                     * @description 客户端IP地址
+                     * @example 127.0.0.1
+                     */
+                    ip?: ((string | null) | null) | null;
+                    /**
+                     * @description 客户端User-Agent
+                     * @example Mozilla/5.0...
+                     */
+                    userAgent?: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };

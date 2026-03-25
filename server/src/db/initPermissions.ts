@@ -71,6 +71,11 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
   },
   {
     category: "api",
+    code: "maintenance.audit_login:api",
+    business: "maintenance.audit_login",
+  },
+  {
+    category: "api",
     code: "mail.account:api",
     business: "mail.account",
   },

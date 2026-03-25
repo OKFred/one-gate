@@ -33,3 +33,13 @@ export type ClearCacheRes = Awaited<ReturnType<typeof CacheAPI.clearFn>>['data']
 // 获取统计信息
 export type GetStatsReq = NonNullable<Parameters<typeof CacheAPI.getStatsFn>[0]['data']>;
 export type GetStatsRes = Awaited<ReturnType<typeof CacheAPI.getStatsFn>>['data']['data'];
+
+// ==================== Audit Login ====================
+import * as AuditLoginAPI from '@/api/maintenance/auditLogin';
+
+export type ListLoginAuditReq = NonNullable<
+  Parameters<typeof AuditLoginAPI.listFn>[0]['data']
+>;
+export type ListLoginAuditRes = Awaited<
+  ReturnType<typeof AuditLoginAPI.listFn>
+>['data']['data'];
