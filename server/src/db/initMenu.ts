@@ -184,6 +184,15 @@ export const initialMenuData = [
     sort: 2,
     business: "maintenance",
   },
+  {
+    id: 22,
+    name: "sidebar.menu.maintenance.auditLogin",
+    icon: "material-symbols:history-edu",
+    path: "/maintenance/auditLogin",
+    parentId: 19,
+    sort: 3,
+    business: "maintenance.audit_login",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {
