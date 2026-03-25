@@ -93,7 +93,7 @@ const ThePasswordDialog = memo(
         confirmPassword: '',
       };
       let isValid = true;
-      const getRegExp = () => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{7,30}$/;
+      const getRegExp = () => /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&.]{7,30}$/;
       // 验证旧密码
       if (!formData.oldPassword) {
         newErrors.oldPassword = t('dialog.required');
