@@ -1,16 +1,16 @@
-import path from "path";
-import { fileURLToPath } from "url";
+import i18n from "./i18n/index";
+import mail from "./mail/index";
+import maintenance from "./maintenance/index";
+import system from "./system/index";
 import type { App, AppBindings } from "@/types/app.d";
-import subFolderBatchRegister from "@/api/subFolderBatchRegister";
 import { OpenAPIHono } from "@hono/zod-openapi";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-console.log(__dirname, __filename, path.basename(__filename));
 
 async function createApp(): Promise<App> {
   const app = new OpenAPIHono<AppBindings>();
-  const _app = await subFolderBatchRegister(app, "/", __dirname);
-  return _app;
+  app.route("/i18n", await i18n());
+  app.route("/mail", await mail());
+  app.route("/maintenance", await maintenance());
+  app.route("/system", await system());
+  return app;
 }
 export default createApp;
