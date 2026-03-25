@@ -3116,7 +3116,7 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     langCode: "zh-CN",
-    tKey: "me.changePassword.passwordFormatHint" /* ^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&]{7,30}$ */,
+    tKey: "me.changePassword.passwordFormatHint",
     tValue: "密码长度7位~30位，至少包含一个字母和一个数字",
     isEnabled: true,
   },
