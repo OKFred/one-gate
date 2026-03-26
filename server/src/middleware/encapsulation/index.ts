@@ -1,4 +1,5 @@
 import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
+import { getEnv } from "@/utils/env";
 import { validate } from "@cfworker/json-schema";
 import {
   BusinessError,
@@ -88,7 +89,7 @@ function routeMaker({
     }
     c.set("bodyObj", bodyObj);
     const result = await adapter(service)(c);
-    if (process.env.NODE_ENV !== "production") {
+    if (getEnv("NODE_ENV") !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
         resSchema as object,

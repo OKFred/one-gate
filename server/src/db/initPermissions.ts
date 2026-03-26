@@ -9,7 +9,8 @@ import { count } from "drizzle-orm";
 import { PermissionAddLike } from "@/api/system/permission/service";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
-const LOCALE = process.env.LOCALE || "zh-CN";
+import { getEnv } from "@/utils/env";
+const LOCALE = getEnv("LOCALE") || "zh-CN";
 /**
  * 基础权限种子数据
  */

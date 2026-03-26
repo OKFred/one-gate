@@ -1,9 +1,10 @@
 import type { App } from "@/types/app.ts";
+import { getEnv } from "@/utils/env";
 import { serve } from "@hono/node-server";
 
 export default function nodeServer(app: App) {
     // 启动服务器
-    const PORT = Number(process.env.PORT) || 3000;
+    const PORT = Number(getEnv("PORT")) || 3000;
     setTimeout(() => {
         serve({
             port: PORT,

@@ -9,9 +9,17 @@ import serverTiming from "@/middleware/serverTiming";
 import serveStaticFiles from "@/middleware/serveStatic";
 import type { AppBindings, NodeHonoContext } from "@/types/app";
 import initDatabase from "@/db/init";
+import { getEnv, setEnv } from "@/utils/env";
 
 async function createApp() {
   const app = new OpenAPIHono<AppBindings>();
+
+  // In Cloudflare Workers, inject the env bindings into our utility
+  app.use("*", async (c, next) => {
+    setEnv(c.env);
+    await next();
+  });
+
   serveStaticFiles(app);
   logHandler(app);
   errorHandler(app);
@@ -22,8 +30,9 @@ async function createApp() {
   //   pathHandler(app);
   docRegister(app);
   const subApp = await routeRegister();
-  !process.env.BASE_API_PATH && console.error("❌.MISSING ENV: BASE_API_PATH");
-  app.route(process.env.BASE_API_PATH, subApp);
+  const baseApiPath = getEnv("BASE_API_PATH");
+  !baseApiPath && console.error("❌.MISSING ENV: BASE_API_PATH");
+  app.route(baseApiPath || "", subApp);
 
   // 初始化数据库数据（超级管理员角色和账号）
   // 同时初始化多语言缓存

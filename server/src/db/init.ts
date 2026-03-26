@@ -3,6 +3,7 @@ import { initTranslation } from "./initTranslation";
 import { initCountryRegion } from "./initRegion";
 import { initLanguage } from "./initLanguage";
 import { loadTranslationCache } from "@/utils/i18n";
+import { getEnv } from "@/utils/env";
 import { initPermissions } from "./initPermissions";
 import { initSuperAdminRole, initSuperAdminUser } from "./initUserAndRole";
 
@@ -11,9 +12,9 @@ export const SUPER_ADMIN_ROLE_ID = 1;
 
 // 超级管理员配置
 export const SUPER_ADMIN = {
-  username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
-  password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
-  langCode: process.env.LOCALE,
+  username: getEnv("SUPER_ADMIN_USERNAME") || "superadmin",
+  password: getEnv("SUPER_ADMIN_PASSWORD") || "Admin@123456",
+  langCode: getEnv("LOCALE"),
   roleId: SUPER_ADMIN_ROLE_ID,
 };
 

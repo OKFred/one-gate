@@ -4,6 +4,7 @@ import {
   getSupportedLanguages,
   isTranslationCacheInitialized,
 } from "./cache";
+import { getEnv } from "../env";
 
 // 缓存支持的语言列表（避免每次都查询）
 let cachedSupportedLanguages: string[] = [];
@@ -32,7 +33,7 @@ export const createTranslator = (
   const supportedLanguages = cachedSupportedLanguages;
 
   // 如果没有支持的语言，回退到默认语言
-  const defaultLang = process.env.LOCALE;
+  const defaultLang = getEnv("LOCALE");
   const language =
     langCode && supportedLanguages.includes(langCode)
       ? langCode
