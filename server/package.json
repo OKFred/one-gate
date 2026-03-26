@@ -23,8 +23,6 @@
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.19.2",
     "@scalar/hono-api-reference": "^0.9.1",
-    "@types/bcrypt": "^6.0.0",
-    "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.9.1",
     "cache-manager": "^7.2.8",
     "drizzle-orm": "^0.44.4",

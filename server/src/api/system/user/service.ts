@@ -31,10 +31,10 @@ import { utils as languageUtils } from "@/api/i18n/language/service";
 import type { PermissionInfo } from "@/api/system/permission/service";
 import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
-import bcrypt from "bcrypt";
+import { hashPassword, verifyPassword } from "@/utils/crypto";
 import type { RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SALT_ROUNDS, SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -470,7 +470,7 @@ const getApi = {
 
 async function convertPassword(base64Password: string): Promise<string> {
   const plainPassword = Buffer.from(base64Password, "base64").toString("utf-8");
-  const hashedPassword = await bcrypt.hash(plainPassword, SALT_ROUNDS);
+  const hashedPassword = await hashPassword(plainPassword);
   return hashedPassword;
 }
 
@@ -486,7 +486,7 @@ async function verifyUsernameAndPassword({
 }> {
   const _userObj = await getUserObjByName(username);
   if (!_userObj) return { valid: false };
-  const isValid = await bcrypt.compare(password, _userObj.password);
+  const isValid = await verifyPassword(password, _userObj.password);
   if (!isValid) return { valid: false };
   const { password: _, ...rest } = _userObj; // 注意：不返回密码字段
   return {

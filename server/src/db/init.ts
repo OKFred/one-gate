@@ -6,7 +6,6 @@ import { loadTranslationCache } from "@/utils/i18n";
 import { initPermissions } from "./initPermissions";
 import { initSuperAdminRole, initSuperAdminUser } from "./initUserAndRole";
 
-export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
 export const SUPER_ADMIN_ROLE_ID = 1;
 

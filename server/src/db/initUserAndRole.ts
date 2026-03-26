@@ -1,12 +1,11 @@
 import db from "@/db/index";
-import bcrypt from "bcrypt";
+import { hashPassword } from "@/utils/crypto";
 import { eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/model";
 import { roleTable } from "@/api/system/role/model";
 import {
   SUPER_ADMIN_ROLE_ID,
   SUPER_ADMIN,
-  SALT_ROUNDS,
   SUPER_ADMIN_ID,
   SUPER_ADMIN_ROLE,
 } from "./init";
@@ -60,7 +59,7 @@ export async function initSuperAdminUser(roleId: number) {
     }
 
     // 加密密码
-    const hashedPassword = await bcrypt.hash(SUPER_ADMIN.password, SALT_ROUNDS);
+    const hashedPassword = await hashPassword(SUPER_ADMIN.password);
 
     // 创建超级管理员账号
     const result = await db
