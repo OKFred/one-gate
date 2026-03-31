@@ -183,33 +183,27 @@ export const translationTable = sqliteTable(
 );
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS i18n_translation (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      application TEXT NOT NULL,
-      business TEXT NOT NULL,
-      lang_code TEXT NOT NULL,
-      t_key TEXT NOT NULL,
-      t_value TEXT NOT NULL,
-      value_hash TEXT NOT NULL,
-      remark TEXT,
-      is_enabled INTEGER NOT NULL,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_value_hash ON i18n_translation(value_hash)
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tkey_langcode ON i18n_translation(t_key, lang_code)
-  `);
-  console.log("💾 表 i18n_translation 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/i18n_translation.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 i18n_translation 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 i18n_translation 失败:", err);
+  }
 }
 
 export default translationTable;

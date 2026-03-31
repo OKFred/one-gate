@@ -205,36 +205,27 @@ export const regionTable = sqliteTable(
 );
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS i18n_region (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      labels TEXT NOT NULL,
-      alpha2_code TEXT NOT NULL,
-      alpha3_code TEXT NOT NULL,
-      numeric INTEGER NOT NULL,
-      iso_3166_independent INTEGER NOT NULL,
-      business_languages TEXT,
-      is_enabled INTEGER NOT NULL,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_region_alpha2 ON i18n_region(alpha2_code)
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_region_alpha3 ON i18n_region(alpha3_code)
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_region_numeric ON i18n_region(numeric)
-  `);
-  console.log("💾 表 i18n_region 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/i18n_region.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 i18n_region 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 i18n_region 失败:", err);
+  }
 }
 
 export default regionTable;

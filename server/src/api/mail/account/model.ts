@@ -173,26 +173,27 @@ export const mailAccountTable = sqliteTable(
 );
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS mail_account (
-      id INTEGER PRIMARY KEY,
-      mail_address TEXT NOT NULL UNIQUE,
-      password TEXT NOT NULL,
-      nickname TEXT NOT NULL,
-      host TEXT NOT NULL,
-      port INTEGER NOT NULL,
-      is_enabled INTEGER NOT NULL,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  console.log("💾 表 mail_account 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/mail_account.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 mail_account 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 mail_account 失败:", err);
+  }
 }
 
 export default mailAccountTable;

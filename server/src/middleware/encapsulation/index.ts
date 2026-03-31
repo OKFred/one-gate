@@ -13,6 +13,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
 import { authMiddleware } from "../bearerAuth";
 import { checkPermission } from "../accessControl";
+import { getRuntimeKey } from "hono/adapter";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -151,7 +152,7 @@ export default function main(
   nameSpace: string,
   prerequisites?: Function
 ) {
-  if (prerequisites) {
+  if (prerequisites && getRuntimeKey() !== "workerd") {
     prerequisites(); //适配worker时需要调整
   }
   const app = new OpenAPIHono<AppBindings>();

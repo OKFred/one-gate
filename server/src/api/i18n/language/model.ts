@@ -151,27 +151,27 @@ export const languageTable = sqliteTable(
 );
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS i18n_language (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      lang_code TEXT NOT NULL,
-      native_name TEXT NOT NULL,
-      is_enabled INTEGER NOT NULL,
-      sort_order INTEGER NOT NULL,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_language_code ON i18n_language(lang_code)
-  `);
-  console.log("💾 表 i18n_language 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/i18n_language.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 i18n_language 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 i18n_language 失败:", err);
+  }
 }
 
 export default languageTable;

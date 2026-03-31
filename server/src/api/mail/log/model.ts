@@ -189,42 +189,27 @@ export const mailLogTable = sqliteTable(
 );
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS mail_log (
-      id INTEGER PRIMARY KEY,
-      mail_to TEXT NOT NULL,
-      mail_from TEXT NOT NULL,
-      title TEXT NOT NULL,
-      template_id TEXT,
-      template_params TEXT,
-      send_status INTEGER NOT NULL,
-      exception_code TEXT,
-      exception_details TEXT,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
 
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_mail_to_time ON mail_log(mail_to, create_time_utc)`
-  );
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_send_status ON mail_log(send_status)`
-  );
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_template_id ON mail_log(template_id)`
-  );
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_create_time ON mail_log(create_time_utc)`
-  );
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/mail_log.sql");
 
-  console.log("💾 表 mail_log 已初始化");
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 mail_log 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 mail_log 失败:", err);
+  }
 }
 
 export default mailLogTable;

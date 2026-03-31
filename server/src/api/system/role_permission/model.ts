@@ -119,31 +119,27 @@ export const rolePermissionTable = sqliteTable("system_role_permission", {
 });
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS system_role_permission (
-      id INTEGER PRIMARY KEY,
-      role_id INTEGER NOT NULL,
-      permission_id INTEGER NOT NULL,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER,
-      UNIQUE(role_id, permission_id)
-    )
-  `);
-  // 创建索引以优化查询
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_role_permission_role_id 
-    ON system_role_permission(role_id)
-  `);
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_role_permission_permission_id 
-    ON system_role_permission(permission_id)
-  `);
-  console.log("💾 表 system_role_permission 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/system_role_permission.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 system_role_permission 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 system_role_permission 失败:", err);
+  }
 }
 
 export default rolePermissionTable;

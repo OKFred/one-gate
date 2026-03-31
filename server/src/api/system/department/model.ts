@@ -125,23 +125,27 @@ export const departmentTable = sqliteTable("system_department", {
 });
 
 export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS system_department (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      parent_id INTEGER,
-      remark TEXT,
-      is_enabled INTEGER NOT NULL,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  console.log("💾 表 system_department 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/system_department.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 system_department 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 system_department 失败:", err);
+  }
 }
 
 export default departmentTable;

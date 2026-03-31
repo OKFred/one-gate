@@ -299,27 +299,27 @@ export const userTable = sqliteTable("system_user", {
 });
 
 export async function tableInit() {
-  await db.run(`
-        CREATE TABLE IF NOT EXISTS system_user (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            lang_code TEXT NOT NULL,
-            remark TEXT,
-            region_id INTEGER,
-            department_id INTEGER,
-            role_id_arr TEXT NOT NULL,
-            is_enabled INTEGER NOT NULL,
-            creator_id INTEGER NOT NULL,
-            updater_id INTEGER,
-            create_time_utc INTEGER DEFAULT (
-              CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-              CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-            ),
-            update_time_utc INTEGER
-        )
-    `);
-  console.log("💾 表 system_user 已初始化");
+  try {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const sqlPath = path.resolve(__dirname, "../../../db/sql/system_user.sql");
+
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    const sqlStatements = sql.split(";").filter((s) => s.trim());
+
+    for (const statement of sqlStatements) {
+      if (statement.trim()) {
+        await db.run(statement);
+      }
+    }
+    console.log("💾 表 system_user 已初始化");
+  } catch (err) {
+    console.error("❌ 初始化表 system_user 失败:", err);
+  }
 }
 
 export default userTable;
