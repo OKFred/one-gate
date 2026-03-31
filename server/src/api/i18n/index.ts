@@ -4,11 +4,11 @@ import translation from "./translation/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
-async function createApp(): Promise<App> {
+function createApp(): App {
   const app = new OpenAPIHono<AppBindings>();
-  app.route("/language", await language());
-  app.route("/region", await region());
-  app.route("/translation", await translation());
+  app.route("/language", language());
+  app.route("/region", region());
+  app.route("/translation", translation());
   return app;
 }
 export default createApp;

@@ -1,0 +1,10 @@
+# .dev.vars.example — committed to repo as reference
+# Copy to .dev.vars and fill in values for wrangler dev
+
+NODE_ENV=development
+BASE_API_PATH=/api/v1
+LOCALE=zh-CN
+JWT_SECRET=your-secret-key-here-please-change-in-production
+PORT=3000
+SUPER_ADMIN_USERNAME=superadmin
+SUPER_ADMIN_PASSWORD=Admin@123456

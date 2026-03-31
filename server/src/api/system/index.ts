@@ -8,15 +8,15 @@ import user from "./user/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
-async function createApp(): Promise<App> {
+function createApp(): App {
   const app = new OpenAPIHono<AppBindings>();
-  app.route("/auth", await auth());
-  app.route("/department", await department());
-  app.route("/menu", await menu());
-  app.route("/permission", await permission());
-  app.route("/role", await role());
-  app.route("/role_permission", await role_permission());
-  app.route("/user", await user());
+  app.route("/auth", auth());
+  app.route("/department", department());
+  app.route("/menu", menu());
+  app.route("/permission", permission());
+  app.route("/role", role());
+  app.route("/role_permission", role_permission());
+  app.route("/user", user());
   return app;
 }
 export default createApp;

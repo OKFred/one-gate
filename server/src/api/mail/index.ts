@@ -5,12 +5,12 @@ import template from "./template/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
-async function createApp(): Promise<App> {
+function createApp(): App {
   const app = new OpenAPIHono<AppBindings>();
-  app.route("/account", await account());
-  app.route("/action", await action());
-  app.route("/log", await log());
-  app.route("/template", await template());
+  app.route("/account", account());
+  app.route("/action", action());
+  app.route("/log", log());
+  app.route("/template", template());
   return app;
 }
 export default createApp;

@@ -2,21 +2,23 @@
   "name": "mail",
   "version": "1.0.1",
   "description": "send emails via nodemailer",
-  "main": "./src/index.js",
+  "main": "./src/node.js",
   "type": "module",
   "scripts": {
-    "dev": "npx tsx --watch -r dotenv/config ./src/index.ts",
-    "debug": "npx tsx --inspect-brk -r dotenv/config ./src/index.ts",
+    "dev": "npx tsx --watch -r dotenv/config ./src/node.ts",
+    "debug": "npx tsx --inspect-brk -r dotenv/config ./src/node.ts",
     "build": "npx tsgo && npx tsc-alias",
     "visualize": "node dependency-visualize.ts",
-    "start:ts": "node ./src/index.ts",
-    "start": "node ./dist/index.js"
+    "worker:dev": "wrangler dev --env development",
+    "worker:types": "wrangler types",
+    "start:ts": "node ./src/node.ts",
+    "start": "node ./dist/node.js"
   },
   "keywords": [],
   "author": "FZ",
   "license": "MIT",
   "repository": {},
-  "exports": "./dist/index.mjs",
+  "exports": "./dist/node.mjs",
   "dependencies": {
     "@cfworker/json-schema": "^4.1.1",
     "@hono/node-server": "^1.13.8",
@@ -60,15 +62,20 @@
     "json-schema-to-ts": "^3.1.1",
     "prettier": "^3.5.3",
     "tsc-alias": "^1.8.11",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "wrangler": "^4.77.0",
+    "@cloudflare/vitest-pool-workers": "^0.12.4",
+    "vitest": "~3.2.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "better-sqlite3",
       "bufferutil",
       "esbuild",
+      "sharp",
       "sqlite3",
-      "utf-8-validate"
+      "utf-8-validate",
+      "workerd"
     ]
   }
 }

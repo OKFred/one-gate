@@ -152,7 +152,7 @@ export default function main(
   prerequisites?: Function
 ) {
   if (prerequisites) {
-    prerequisites();
+    prerequisites(); //适配worker时需要调整
   }
   const app = new OpenAPIHono<AppBindings>();
   Array.from(Object.values(apiObj)).forEach((obj) => {
