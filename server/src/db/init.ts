@@ -30,34 +30,40 @@ export const SUPER_ADMIN_ROLE = {
 /**
  * 初始化数据库数据
  */
-export async function initDatabase() {
+export async function initDatabase(options?: { reset?: boolean }) {
   try {
-    console.log("⌛ 开始初始化数据库...");
+    console.log("⌛ 开始初始化数据库 (模式: " + (options?.reset ? "重置" : "同步") + ")...");
+    const results: Record<string, any> = {};
 
-    // 初始化超级管理员角色
-    const roleId = await initSuperAdminRole();
+    // 1. 初始化超级管理员角色
+    const roleResult = await initSuperAdminRole(options);
+    results.superAdminRole = roleResult.stats;
+    const roleId = roleResult.id;
 
-    // 初始化超级管理员账号
-    await initSuperAdminUser(roleId);
+    // 2. 初始化超级管理员账号
+    const userResult = await initSuperAdminUser(roleId, options);
+    results.superAdminUser = userResult.stats;
 
-    // 初始化语言
-    await initLanguage();
+    // 3. 初始化语言
+    results.language = await initLanguage(options);
 
-    // 初始化多语言
-    await initTranslation();
+    // 4. 初始化多语言
+    results.translation = await initTranslation(options);
 
-    // 加载多语言缓存
+    // 加载多语言缓存 (必须在语言和翻译初始化之后)
     await loadTranslationCache();
 
-    // 初始化权限数据
-    await initPermissions();
+    // 5. 初始化权限数据
+    results.permissions = await initPermissions(options);
 
-    // 初始化国家地区
-    await initCountryRegion();
+    // 6. 初始化国家地区
+    results.countryRegion = await initCountryRegion(options);
 
-    // 初始化菜单
-    await initMenu();
+    // 7. 初始化菜单
+    results.menu = await initMenu(options);
+
     console.log("✅ 数据库初始化完成");
+    return results;
   } catch (error) {
     console.error("❌ 数据库初始化失败:", error);
     throw error;

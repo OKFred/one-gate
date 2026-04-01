@@ -1,39 +1,64 @@
-import translationService, {
-  utils as translationUtils,
-} from "@/api/i18n/translation/service";
+import db from "@/db/index";
+import { translationTable } from "@/api/i18n/translation/model";
+import { utils as translationUtils } from "@/api/i18n/translation/service";
 import { SUPER_ADMIN_ID } from "./init";
+import { sql } from "drizzle-orm";
 
-/**
- * 初始化多语言数据
- */
-export async function initTranslation() {
-  const userObj = { userId: SUPER_ADMIN_ID }; // 系统初始化用户
-  const promises = initialTranslationData.map(async (item) => {
-    // 计算 hash 值
-    const valueHash = await translationUtils.calculateSHA256(item.tValue);
-    const params = {
-      application: item.application,
-      business: item.business,
-      langCode: item.langCode,
-      tKey: item.tKey,
-      tValue: item.tValue,
-      valueHash,
-      remark: null,
-      isEnabled: item.isEnabled,
-    };
-    return translationService.add.service(params, userObj, {
-      skipCacheReload: true,
-    });
-  });
+export async function initTranslation(options?: { reset?: boolean }) {
+  const stats = {
+    total: initialTranslationData.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
+  try {
+    if (options?.reset) {
+      await db.delete(translationTable);
+      console.log("🗑️  已重置多语言数据表");
+    }
 
-  const addResults = await Promise.allSettled(promises);
-  const successCount = addResults.filter(
-    (res) => res.status === "fulfilled"
-  ).length;
-  const totalCount = initialTranslationData.length;
-  console.log(
-    `🌐 多语言数据初始化完成: ${successCount}/${totalCount} 条记录已添加`
-  );
+    // 分批处理，避免一次性插入过大
+    const BATCH_SIZE = 100;
+    for (let i = 0; i < initialTranslationData.length; i += BATCH_SIZE) {
+      const batch = initialTranslationData.slice(i, i + BATCH_SIZE);
+      const mappedBatch = await Promise.all(
+        batch.map(async (item) => {
+          const valueHash = await translationUtils.calculateSHA256(item.tValue);
+          return {
+            application: item.application,
+            business: item.business,
+            langCode: item.langCode,
+            tKey: item.tKey,
+            tValue: item.tValue,
+            valueHash,
+            remark: null,
+            isEnabled: item.isEnabled,
+            creatorId: SUPER_ADMIN_ID,
+          };
+        })
+      );
+
+      await db
+        .insert(translationTable)
+        .values(mappedBatch)
+        .onConflictDoUpdate({
+          target: [translationTable.tKey, translationTable.langCode],
+          set: {
+            tValue: sql`excluded.t_value`,
+            valueHash: sql`excluded.value_hash`,
+            isEnabled: sql`excluded.is_enabled`,
+          },
+        });
+
+      stats.created += mappedBatch.length;
+    }
+
+    console.log(`🌐 多语言数据初始化完成: ${stats.total} 条记录已同步`);
+    return stats;
+  } catch (error) {
+    console.error("❌ 多语言数据初始化失败:", error);
+    throw error;
+  }
 }
 
 export const initialTranslationData = [
@@ -5340,6 +5365,22 @@ export const initialTranslationData = [
     langCode: "en-US",
     tKey: "businessType.maintenance.audit_login",
     tValue: "Login Audit",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "maintenance.init",
+    langCode: "zh-CN",
+    tKey: "maintenance.init.title",
+    tValue: "数据库初始化",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "maintenance.init",
+    langCode: "en-US",
+    tKey: "maintenance.init.title",
+    tValue: "Database Initialization",
     isEnabled: true,
   },
 ];

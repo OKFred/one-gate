@@ -5,11 +5,11 @@
 
 import db from "@/db/index";
 import { permissionTable } from "@/api/system/permission/model";
-import { count } from "drizzle-orm";
 import { PermissionAddLike } from "@/api/system/permission/service";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "@/utils/env";
+import { sql } from "drizzle-orm";
 const LOCALE = getEnv("LOCALE") || "zh-CN";
 /**
  * 基础权限种子数据
@@ -310,25 +310,25 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
 /**
  * 初始化权限数据
  */
-export async function initPermissions() {
+export async function initPermissions(options?: { reset?: boolean }) {
   console.log("🔐 开始初始化权限数据...");
+  const stats = {
+    total: permissionSeeds.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
 
   try {
-    // 检查权限表是否为空
-    const countResult = await db
-      .select({ total: count(permissionTable.id) })
-      .from(permissionTable);
-    const existingCount = countResult[0]?.total || 0;
-
-    if (existingCount > 0) {
-      console.log(`⚠️  权限表已存在 ${existingCount} 条数据，跳过初始化`);
-      return;
+    if (options?.reset) {
+      await db.delete(permissionTable);
+      console.log("🗑️  已重置权限数据表");
     }
-    // 插入权限数据
-    const creatorId = SUPER_ADMIN_ID; // 系统初始化
-    const insertedPermissions: { id: number; code: string }[] = [];
 
-    for (const seed of permissionSeeds) {
+    const creatorId = SUPER_ADMIN_ID; // 系统初始化
+
+    // 准备数据
+    const mappedData = permissionSeeds.map((seed) => {
       const getAPIName = () => {
         const tKeySubString = seed.code.replace(":api", "");
         const prefix = initialTranslationData.find(
@@ -344,6 +344,7 @@ export async function initPermissions() {
           ? `${prefix}${postfix}`
           : seed.code + "未知接口";
       };
+
       const getButtonName = () => {
         const [tKeySubString, action] = seed.code.split(":");
         const prefix = initialTranslationData.find(
@@ -360,33 +361,47 @@ export async function initPermissions() {
           ? `${prefix}${postfix}:${action}`
           : seed.code + "未知按钮";
       };
+
       const name =
         seed.category === "api"
           ? getAPIName()
           : seed.category === "button"
             ? getButtonName()
             : "未知权限";
-      // console.log(`🔐 正在插入权限: [${seed.code}] ${name}`);
-      const result = await db
-        .insert(permissionTable)
-        .values({
-          code: seed.code,
-          name,
-          category: seed.category,
-          resource: seed.resource || null,
-          business: seed.business || null,
-          remark: seed.remark || null,
-          isEnabled: true,
-          creatorId,
-        })
-        .returning({ id: permissionTable.id, code: permissionTable.code });
 
-      if (result[0]) {
-        insertedPermissions.push(result[0]);
-      }
+      return {
+        code: seed.code,
+        name,
+        category: seed.category,
+        resource: seed.resource || null,
+        business: seed.business || null,
+        remark: seed.remark || null,
+        isEnabled: true,
+        creatorId,
+      };
+    });
+
+    // 分批执行 Upsert
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+      const batch = mappedData.slice(i, i + BATCH_SIZE);
+      await db
+        .insert(permissionTable)
+        .values(batch as any)
+        .onConflictDoUpdate({
+          target: permissionTable.code,
+          set: {
+            name: sql`excluded.name`,
+            category: sql`excluded.category`,
+            resource: sql`excluded.resource`,
+            business: sql`excluded.business`,
+          },
+        });
+      stats.created += batch.length;
     }
 
-    console.log(`✅ 成功插入 ${insertedPermissions.length} 条权限数据`);
+    console.log(`✅ 成功同步 ${stats.created} 条权限数据`);
+    return stats;
   } catch (error) {
     console.error("❌ 权限初始化失败:", error);
     throw error;

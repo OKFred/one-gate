@@ -43,7 +43,11 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
+const routeWhitelist = [
+  "/system/auth/login",
+  "/i18n/translation/listAll",
+  "/maintenance/init/db",
+];
 
 function routeMaker({
   pathInfo,
@@ -77,9 +81,16 @@ function routeMaker({
         cause: ["Content-Type must be application/json"],
       });
     }
-    if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
+    const ignoreError = routeWhitelist.some((path) =>
+      c.req.path.includes(path)
+    );
+    try {
       await authMiddleware(c);
       await checkPermission(requiredPermissions)(c);
+    } catch (error) {
+      if (!ignoreError) {
+        throw error;
+      }
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");

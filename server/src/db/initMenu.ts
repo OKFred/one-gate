@@ -1,6 +1,7 @@
-import menuService from "@/api/system/menu/service";
-import { UserObj } from "@/types/app";
-import { SUPER_ADMIN_ID, SUPER_ADMIN } from "./init";
+import db from "@/db/index";
+import { menuTable } from "@/api/system/menu/model";
+import { sql } from "drizzle-orm";
+import { SUPER_ADMIN_ID } from "./init";
 import { BusinessKey } from "@/types/business";
 
 // name 字段使用多语言键，前端需要根据该键获取对应的翻译
@@ -204,27 +205,62 @@ type menuLike = {
   sort: number;
   business?: BusinessKey;
 };
+
 /**
  * 初始化菜单
  */
-export async function initMenu() {
-  // 检查是否已有数据，没有则插入初始数据
-  const countResult = await menuService.listAll.service({ isEnabled: true });
-  if (countResult.length === initialMenuData.length) return;
-  for (const menu of initialMenuData) {
-    await menuService.add.service(
-      {
-        name: menu.name,
-        icon: menu.icon,
-        sort: menu.sort,
-        path: menu.path || null,
-        parentId: menu.parentId || null,
-        business: menu.business || null,
-        remark: null,
-        isEnabled: true,
-      },
-      { userId: SUPER_ADMIN_ID, langCode: SUPER_ADMIN.langCode } as UserObj
-    );
+export async function initMenu(options?: { reset?: boolean }) {
+  console.log("🔐 开始初始化菜单数据...");
+  const stats = {
+    total: initialMenuData.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
+
+  try {
+    if (options?.reset) {
+      await db.delete(menuTable);
+      console.log("🗑️  已重置菜单数据表");
+    }
+
+    const creatorId = SUPER_ADMIN_ID;
+
+    // 准备数据
+    const mappedData = initialMenuData.map((menu) => ({
+      id: menu.id,
+      name: menu.name,
+      icon: menu.icon,
+      sort: menu.sort,
+      path: menu.path || null,
+      parentId: menu.parentId || null,
+      business: menu.business || null,
+      remark: null,
+      isEnabled: true,
+      creatorId,
+    }));
+
+    // 执行 Upsert (基于 ID，因为 initialMenuData 带有 ID)
+    await db
+      .insert(menuTable)
+      .values(mappedData)
+      .onConflictDoUpdate({
+        target: menuTable.id,
+        set: {
+          name: sql`excluded.name`,
+          icon: sql`excluded.icon`,
+          sort: sql`excluded.sort`,
+          path: sql`excluded.path`,
+          parentId: sql`excluded.parent_id`,
+          business: sql`excluded.business`,
+        },
+      });
+
+    stats.created = mappedData.length;
+    console.log(`✅ 成功同步 ${stats.created} 条菜单数据`);
+    return stats;
+  } catch (error) {
+    console.error("❌ 菜单初始化失败:", error);
+    throw error;
   }
-  console.log("💾 表 system_menu 初始数据已插入");
 }

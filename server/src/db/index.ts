@@ -35,13 +35,17 @@ export function getDb(): any {
   // Fallback to LibSQL (Local development / Node.js)
   try {
     const dbFile = getEnv("DB_FILE_NAME") || "local.db";
-    const client = createClient({ url: dbFile.startsWith("file:") ? dbFile : `file:${dbFile}` });
+    const client = createClient({
+      url: ":memory:" /* dbFile.startsWith("file:") ? dbFile : `file:${dbFile}` */,
+    });
     _db = drizzleLibsql(client);
     return _db;
   } catch (e) {
     // If in Worker, we might expect this to fail if called before middleware
     if (typeof process === "undefined" || !process.env) {
-       console.warn("getDb() called before D1 binding was set in Worker environment. Check middleware initialization.");
+      console.warn(
+        "getDb() called before D1 binding was set in Worker environment. Check middleware initialization."
+      );
     }
     console.error("Failed to initialize LibSQL database:", e);
     throw e;

@@ -1,7 +1,7 @@
 import db from "@/db/index";
 import { regionTable } from "@/api/i18n/region/model";
-import { count } from "drizzle-orm";
 import { SUPER_ADMIN_ID } from "./init";
+import { sql } from "drizzle-orm";
 
 export const initialRegionData = [
   {
@@ -2001,38 +2001,48 @@ export const initialRegionData = [
 /**
  * 初始化国家地区数据
  */
-export async function initCountryRegion() {
+export async function initCountryRegion(options?: { reset?: boolean }) {
+  const stats = { total: initialRegionData.length, created: 0, updated: 0, skipped: 0 };
+  console.log("🌍 开始初始化国家地区数据...");
   try {
-    const countResult = await db
-      .select({ total: count(regionTable.id).as("total") })
-      .from(regionTable);
-    if (countResult[0]?.total > 0) {
-      console.log("ℹ️  国家地区数据已存在，跳过初始化");
-      return;
+    if (options?.reset) {
+      await db.delete(regionTable);
+      console.log("🗑️  已重置国家地区数据表");
     }
 
-    const mappedData = initialRegionData.map((item) => ({
-      labels: {
-        "zh-CN": item.label_zhCN,
-        "en-US": item.label_enUS,
-      },
-      alpha2Code: item.alpha2Code,
-      alpha3Code: item.alpha3Code,
-      numeric: item.numeric,
-      iso3166Independent: item.ISO3166Independent,
-      businessLanguages: null,
-      isEnabled: true,
-      creatorId: SUPER_ADMIN_ID,
-    }));
+    // 分批处理
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < initialRegionData.length; i += BATCH_SIZE) {
+      const batch = initialRegionData.slice(i, i + BATCH_SIZE);
+      const mappedBatch = batch.map((item) => ({
+        labels: { "zh-CN": item.label_zhCN, "en-US": item.label_enUS },
+        alpha2Code: item.alpha2Code,
+        alpha3Code: item.alpha3Code,
+        numeric: item.numeric,
+        iso3166Independent: item.ISO3166Independent,
+        isEnabled: true,
+        creatorId: SUPER_ADMIN_ID,
+      }));
 
-    const chunkSize = 100;
-    for (let i = 0; i < mappedData.length; i += chunkSize) {
-      const chunk = mappedData.slice(i, i + chunkSize);
-      await db.insert(regionTable).values(chunk);
+      await db.insert(regionTable)
+        .values(mappedBatch)
+        .onConflictDoUpdate({
+          target: regionTable.numeric,
+          set: {
+            labels: sql`excluded.labels`,
+            alpha2Code: sql`excluded.alpha2_code`,
+            alpha3Code: sql`excluded.alpha3_code`,
+            iso3166Independent: sql`excluded.iso_3166_independent`,
+          }
+        });
+      
+      stats.created += mappedBatch.length;
     }
-    console.log(`💾 表 i18n_region 初始数据已插入 (${mappedData.length} 条)`);
+
+    console.log(`🌍 国家地区数据初始化完成: ${stats.total} 条记录已同步`);
+    return stats;
   } catch (error) {
-    console.error("❌ 国家地区数据初始化失败:", error);
+    console.error("❌ 国家地区初始化失败:", error);
     throw error;
   }
 }

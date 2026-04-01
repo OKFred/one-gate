@@ -8,3 +8,4 @@ JWT_SECRET=your-secret-key-here-please-change-in-production
 PORT=3000
 SUPER_ADMIN_USERNAME=superadmin
 SUPER_ADMIN_PASSWORD=Admin@123456
+X_INIT_TOKEN=your-random-setup-token-here
