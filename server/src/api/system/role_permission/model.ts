@@ -1,4 +1,4 @@
-import db from "@/db/index";
+import { baseTableInit } from "@/db/utils/schema";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -119,27 +119,7 @@ export const rolePermissionTable = sqliteTable("system_role_permission", {
 });
 
 export async function tableInit() {
-  try {
-    const fs = await import("node:fs");
-    const path = await import("node:path");
-    const { fileURLToPath } = await import("node:url");
-
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const sqlPath = path.resolve(__dirname, "../../../db/sql/system_role_permission.sql");
-
-    const sql = fs.readFileSync(sqlPath, "utf8");
-    const sqlStatements = sql.split(";").filter((s) => s.trim());
-
-    for (const statement of sqlStatements) {
-      if (statement.trim()) {
-        await db.run(statement);
-      }
-    }
-    console.log("💾 表 system_role_permission 已初始化");
-  } catch (err) {
-    console.error("❌ 初始化表 system_role_permission 失败:", err);
-  }
+  await baseTableInit("system_role_permission");
 }
 
 export default rolePermissionTable;
