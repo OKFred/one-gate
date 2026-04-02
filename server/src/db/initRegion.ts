@@ -2002,7 +2002,12 @@ export const initialRegionData = [
  * 初始化国家地区数据
  */
 export async function initCountryRegion(options?: { reset?: boolean }) {
-  const stats = { total: initialRegionData.length, created: 0, updated: 0, skipped: 0 };
+  const stats = {
+    total: initialRegionData.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
   console.log("🌍 开始初始化国家地区数据...");
   try {
     if (options?.reset) {
@@ -2010,9 +2015,10 @@ export async function initCountryRegion(options?: { reset?: boolean }) {
       console.log("🗑️  已重置国家地区数据表");
     }
 
-    // 分批处理
-    const BATCH_SIZE = 50;
+    // 分批处理 (增加安全性，解决 SQL 变量限制)
+    const BATCH_SIZE = 10;
     for (let i = 0; i < initialRegionData.length; i += BATCH_SIZE) {
+      // console.log(`🌍 正在同步地区批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(initialRegionData.length / BATCH_SIZE)}...`);
       const batch = initialRegionData.slice(i, i + BATCH_SIZE);
       const mappedBatch = batch.map((item) => ({
         labels: { "zh-CN": item.label_zhCN, "en-US": item.label_enUS },
@@ -2024,7 +2030,8 @@ export async function initCountryRegion(options?: { reset?: boolean }) {
         creatorId: SUPER_ADMIN_ID,
       }));
 
-      await db.insert(regionTable)
+      await db
+        .insert(regionTable)
         .values(mappedBatch)
         .onConflictDoUpdate({
           target: regionTable.numeric,
@@ -2033,9 +2040,9 @@ export async function initCountryRegion(options?: { reset?: boolean }) {
             alpha2Code: sql`excluded.alpha2_code`,
             alpha3Code: sql`excluded.alpha3_code`,
             iso3166Independent: sql`excluded.iso_3166_independent`,
-          }
+          },
         });
-      
+
       stats.created += mappedBatch.length;
     }
 

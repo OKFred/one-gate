@@ -37,7 +37,7 @@ const initRes = {
 } as const satisfies JSONSchema;
 
 async function onInit(c): Promise<FromSchema<typeof initRes>> {
-  const initToken = c.req.header()["X_INIT_TOKEN"];
+  const initToken = c.req.header()["x_init_token"];
   const { reset = false } = c.get("bodyObj");
   const user = c.get("userObj");
   // 1. 检查引导令牌 (冷启动场景)

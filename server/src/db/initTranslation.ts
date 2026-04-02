@@ -17,9 +17,10 @@ export async function initTranslation(options?: { reset?: boolean }) {
       console.log("🗑️  已重置多语言数据表");
     }
 
-    // 分批处理，避免一次性插入过大
-    const BATCH_SIZE = 100;
+    // 分批处理，极低批次 (10 行) 以适配 D1 极严格的变量限制 (约 90 个变量)
+    const BATCH_SIZE = 10;
     for (let i = 0; i < initialTranslationData.length; i += BATCH_SIZE) {
+      // console.log(`🌐 正在同步批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(initialTranslationData.length / BATCH_SIZE)}...`);
       const batch = initialTranslationData.slice(i, i + BATCH_SIZE);
       const mappedBatch = await Promise.all(
         batch.map(async (item) => {

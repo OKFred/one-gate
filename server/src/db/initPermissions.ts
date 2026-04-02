@@ -381,9 +381,10 @@ export async function initPermissions(options?: { reset?: boolean }) {
       };
     });
 
-    // 分批执行 Upsert
-    const BATCH_SIZE = 50;
+    // 分批处理 (增加安全性，解决 SQL 变量限制)
+    const BATCH_SIZE = 10;
     for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+      // console.log(`🔐 正在同步权限批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(mappedData.length / BATCH_SIZE)}...`);
       const batch = mappedData.slice(i, i + BATCH_SIZE);
       await db
         .insert(permissionTable)

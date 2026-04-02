@@ -240,21 +240,26 @@ export async function initMenu(options?: { reset?: boolean }) {
       creatorId,
     }));
 
-    // 执行 Upsert (基于 ID，因为 initialMenuData 带有 ID)
-    await db
-      .insert(menuTable)
-      .values(mappedData)
-      .onConflictDoUpdate({
-        target: menuTable.id,
-        set: {
-          name: sql`excluded.name`,
-          icon: sql`excluded.icon`,
-          sort: sql`excluded.sort`,
-          path: sql`excluded.path`,
-          parentId: sql`excluded.parent_id`,
-          business: sql`excluded.business`,
-        },
-      });
+    // 执行 Upsert (基于 ID，因为 initialMenuData 带有 ID)，分批处理
+    const BATCH_SIZE = 10;
+    for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+      // console.log(`📑 正在同步菜单批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(mappedData.length / BATCH_SIZE)}...`);
+      const batch = mappedData.slice(i, i + BATCH_SIZE);
+      await db
+        .insert(menuTable)
+        .values(batch)
+        .onConflictDoUpdate({
+          target: menuTable.id,
+          set: {
+            name: sql`excluded.name`,
+            icon: sql`excluded.icon`,
+            sort: sql`excluded.sort`,
+            path: sql`excluded.path`,
+            parentId: sql`excluded.parent_id`,
+            business: sql`excluded.business`,
+          },
+        });
+    }
 
     stats.created = mappedData.length;
     console.log(`✅ 成功同步 ${stats.created} 条菜单数据`);
