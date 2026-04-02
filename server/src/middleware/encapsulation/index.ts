@@ -1,4 +1,5 @@
 import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
+import { getEnv } from "@/utils/env";
 import { validate } from "@cfworker/json-schema";
 import {
   BusinessError,
@@ -12,6 +13,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
 import { authMiddleware } from "../bearerAuth";
 import { checkPermission } from "../accessControl";
+import { getRuntimeKey } from "hono/adapter";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -41,7 +43,11 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
+const routeWhitelist = [
+  "/system/auth/login",
+  "/i18n/translation/listAll",
+  "/maintenance/init/db",
+];
 
 function routeMaker({
   pathInfo,
@@ -75,9 +81,16 @@ function routeMaker({
         cause: ["Content-Type must be application/json"],
       });
     }
-    if (!routeWhitelist.some((path) => c.req.path.includes(path))) {
+    const ignoreError = routeWhitelist.some((path) =>
+      c.req.path.includes(path)
+    );
+    try {
       await authMiddleware(c);
       await checkPermission(requiredPermissions)(c);
+    } catch (error) {
+      if (!ignoreError) {
+        throw error;
+      }
     }
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
@@ -88,7 +101,7 @@ function routeMaker({
     }
     c.set("bodyObj", bodyObj);
     const result = await adapter(service)(c);
-    if (process.env.NODE_ENV !== "production") {
+    if (getEnv("NODE_ENV") !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
         resSchema as object,
@@ -150,8 +163,8 @@ export default function main(
   nameSpace: string,
   prerequisites?: Function
 ) {
-  if (prerequisites) {
-    prerequisites();
+  if (prerequisites && getRuntimeKey() !== "workerd") {
+    prerequisites(); //适配worker时需要调整
   }
   const app = new OpenAPIHono<AppBindings>();
   Array.from(Object.values(apiObj)).forEach((obj) => {

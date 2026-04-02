@@ -1,10 +1,4 @@
-import db from "@/db/index";
-import {
-  sqliteTable,
-  integer,
-  text,
-  index,
-} from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -85,10 +79,7 @@ const MailLogPO = {
 
 export type MailLogPOLike = InferSelectModel<typeof mailLogTable>;
 type MailLogSelectPOLike = InferInsertModel<typeof mailLogTable>;
-type MailLogAddPOLike = Omit<
-  MailLogPOLike,
-  IndexKeyLike | AuditAddOmitKeyLike
->;
+type MailLogAddPOLike = Omit<MailLogPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type MailLogUpdatePOLike = Partial<
   Omit<MailLogSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -187,44 +178,5 @@ export const mailLogTable = sqliteTable(
     index("idx_create_time").on(table.createTimeUtc),
   ]
 );
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS mail_log (
-      id INTEGER PRIMARY KEY,
-      mail_to TEXT NOT NULL,
-      mail_from TEXT NOT NULL,
-      title TEXT NOT NULL,
-      template_id TEXT,
-      template_params TEXT,
-      send_status INTEGER NOT NULL,
-      exception_code TEXT,
-      exception_details TEXT,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_mail_to_time ON mail_log(mail_to, create_time_utc)`
-  );
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_send_status ON mail_log(send_status)`
-  );
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_template_id ON mail_log(template_id)`
-  );
-  await db.run(
-    `CREATE INDEX IF NOT EXISTS idx_create_time ON mail_log(create_time_utc)`
-  );
-
-  console.log("💾 表 mail_log 已初始化");
-}
 
 export default mailLogTable;

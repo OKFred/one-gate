@@ -3,7 +3,7 @@ import { pinoLogger } from "hono-pino";
 import type { DebugLogOptions } from "hono-pino/debug-log";
 import pino from "pino";
 import { requestId } from "hono/request-id";
-import path from "path";
+// import path from "path";
 
 const options: DebugLogOptions = {
   colorEnabled: true,
@@ -12,8 +12,8 @@ const options: DebugLogOptions = {
 };
 
 export default function logHandler(app: App) {
-  const logDir = path.join(process.cwd(), "logs");
-  const logFile = path.join(logDir, "access.log");
+  // const logDir = path.join(process.cwd(), "logs");
+  // const logFile = path.join(logDir, "access.log");
   app.use(requestId());
   app.use(
     pinoLogger({

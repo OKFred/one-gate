@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import {
   sqliteTable,
   integer,
@@ -166,28 +165,5 @@ export const mailTemplateTable = sqliteTable(
   },
   (table) => [uniqueIndex("idx_template_name").on(table.name)]
 );
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS mail_template (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      title TEXT NOT NULL,
-      lang_code TEXT NOT NULL,
-      content TEXT NOT NULL,
-      category TEXT,
-      is_enabled INTEGER NOT NULL,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  console.log("💾 表 mail_template 已初始化");
-}
 
 export default mailTemplateTable;

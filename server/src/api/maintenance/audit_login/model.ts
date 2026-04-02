@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import { type InferSelectModel, type InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -135,32 +134,5 @@ export const loginAuditTable = sqliteTable(
     index("idx_login_audit_time").on(table.loginTimeUtc),
   ]
 );
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS maintenance_audit_login (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      user_id INTEGER NOT NULL,
-      login_time_utc INTEGER NOT NULL,
-      ip TEXT,
-      user_agent TEXT,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_login_audit_user_id ON maintenance_audit_login(user_id)
-  `);
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_login_audit_time ON maintenance_audit_login(login_time_utc)
-  `);
-  console.log("💾 表 maintenance_audit_login 已初始化");
-}
 
 export default loginAuditTable;

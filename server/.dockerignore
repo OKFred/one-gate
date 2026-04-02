@@ -1,5 +1,10 @@
 logs/
 node_modules/
 dist/
-.env
 *.db
+
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
+.wrangler/

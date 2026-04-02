@@ -1,89 +1,85 @@
 import db from "@/db/index";
-import bcrypt from "bcrypt";
-import { eq } from "drizzle-orm";
+import { hashPassword } from "@/utils/crypto";
+import { sql, eq } from "drizzle-orm";
 import { userTable } from "@/api/system/user/model";
 import { roleTable } from "@/api/system/role/model";
 import {
   SUPER_ADMIN_ROLE_ID,
   SUPER_ADMIN,
-  SALT_ROUNDS,
   SUPER_ADMIN_ID,
   SUPER_ADMIN_ROLE,
 } from "./init";
 
 /**
- * 初始化超级管理员角色
+ * 准备超级管理员角色同步语句
  */
-export async function initSuperAdminRole() {
-  try {
-    // 检查超级管理员角色是否已存在
-    const existingRole = await db
-      .select()
-      .from(roleTable)
-      .where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID))
-      .limit(1);
+export async function prepareSuperAdminRole(options?: { reset?: boolean }) {
+  const stats = { total: 1, created: 0, updated: 0, skipped: 0 };
+  const queries: any[] = [];
 
-    if (existingRole.length > 0) {
-      console.log("ℹ️  超级管理员角色已存在，跳过初始化");
-      return SUPER_ADMIN_ROLE_ID;
-    }
-
-    // 创建超级管理员角色
-    const result = await db
-      .insert(roleTable)
-      .values(SUPER_ADMIN_ROLE)
-      .returning({ id: roleTable.id });
-
-    console.log(`✅ 超级管理员角色初始化成功 (ID: ${result[0].id})`);
-    return result[0].id;
-  } catch (error) {
-    console.error("❌ 超级管理员角色初始化失败:", error);
-    throw error;
+  if (options?.reset) {
+    queries.push(db.delete(roleTable).where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID)));
   }
+
+  queries.push(
+    db.insert(roleTable)
+      .values({ ...SUPER_ADMIN_ROLE, id: SUPER_ADMIN_ROLE_ID })
+      .onConflictDoUpdate({
+        target: roleTable.id,
+        set: {
+          name: SUPER_ADMIN_ROLE.name,
+          isEnabled: SUPER_ADMIN_ROLE.isEnabled,
+          dataScope: SUPER_ADMIN_ROLE.dataScope,
+        },
+      })
+  );
+
+  stats.created = 1;
+  return { queries, stats };
 }
 
 /**
- * 初始化超级管理员账号
+ * 准备超级管理员账号同步语句
  */
-export async function initSuperAdminUser(roleId: number) {
-  try {
-    // 检查超级管理员账号是否已存在
-    const existingUser = await db
-      .select()
-      .from(userTable)
-      .where(eq(userTable.username, SUPER_ADMIN.username))
-      .limit(1);
+export async function prepareSuperAdminUser(
+  roleId: number,
+  options?: { reset?: boolean }
+) {
+  const stats = { total: 1, created: 0, updated: 0, skipped: 0 };
+  const queries: any[] = [];
 
-    if (existingUser.length > 0) {
-      console.log("ℹ️  超级管理员账号已存在，跳过初始化");
-      return existingUser[0].id;
-    }
+  if (options?.reset) {
+    queries.push(
+      db.delete(userTable)
+        .where(eq(userTable.username, SUPER_ADMIN.username))
+    );
+  }
 
-    // 加密密码
-    const hashedPassword = await bcrypt.hash(SUPER_ADMIN.password, SALT_ROUNDS);
+  // 加密密码 (异步准备工作)
+  const hashedPassword = await hashPassword(SUPER_ADMIN.password);
 
-    // 创建超级管理员账号
-    const result = await db
-      .insert(userTable)
+  queries.push(
+    db.insert(userTable)
       .values({
         username: SUPER_ADMIN.username,
         password: hashedPassword,
         langCode: SUPER_ADMIN.langCode,
-        roleIdArr: [roleId], // 关联超级管理员角色
+        roleIdArr: [roleId],
         isEnabled: true,
         creatorId: SUPER_ADMIN_ID,
         remark: "系统初始化创建的超级管理员账号",
       })
-      .returning({ id: userTable.id });
+      .onConflictDoUpdate({
+        target: userTable.username,
+        set: {
+          password: hashedPassword,
+          langCode: SUPER_ADMIN.langCode,
+          roleIdArr: sql`excluded.role_id_arr`,
+          isEnabled: true,
+        },
+      })
+  );
 
-    console.log(
-      `✅ 超级管理员账号初始化成功 (用户名: ${SUPER_ADMIN.username})`
-    );
-    console.log(`⚠️ 默认密码: ${SUPER_ADMIN.password?.replace(/./g, "*")}`);
-    console.log(`⚠️  请在首次登录后立即修改密码！`);
-    return result[0].id;
-  } catch (error) {
-    console.error("超级管理员账号初始化失败:", error);
-    throw error;
-  }
+  stats.created = 1;
+  return { queries, stats };
 }

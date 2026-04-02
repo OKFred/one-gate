@@ -1,3 +1,5 @@
+import { getRuntimeKey } from "hono/adapter";
+import { getEnv } from "@/utils/env";
 import type { App, NodeHonoContext } from "@/types/app.ts";
 import { getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
@@ -61,7 +63,7 @@ export default function errorHandler(app: App) {
       {
         ok: false,
         message: t("errorHandler.unknownError"),
-        data: process.env.NODE_ENV !== "production" ? e.message : null,
+        data: getEnv("NODE_ENV") !== "production" ? e.message : null,
       },
       { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
     );
@@ -69,12 +71,13 @@ export default function errorHandler(app: App) {
 }
 
 /**
- * @description: 未捕获异常处理事件上报
+ * @description: 未捕获异常处理
  */
-process.on("uncaughtException", function (err) {
-  console.error("uncaughtException:", err);
-  console.log("uncaughtException:" + err);
-});
+getRuntimeKey() !== "workerd" &&
+  process.on("uncaughtException", function (err) {
+    console.error("uncaughtException:", err);
+    console.log("uncaughtException:" + err);
+  });
 
-process.env.NODE_ENV === "production" &&
+getEnv("NODE_ENV") === "production" &&
   console.log("🚀 Server started in production mode");

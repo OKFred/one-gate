@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -225,34 +224,5 @@ export const complianceArchiveTable = sqliteTable("compliance_archives", {
     .default(getCurrentTimestampUtcSql()),
   updateTimeUtc: integer("update_time_utc"),
 });
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS compliance_archives (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      source_system TEXT NOT NULL DEFAULT 'self',
-      source_database TEXT NOT NULL DEFAULT 'self',
-      source_table TEXT NOT NULL,
-      source_primary_key TEXT NOT NULL,
-      delete_reason TEXT,
-      delete_type TEXT,
-      record_snapshot TEXT,
-      remark TEXT,
-      restorable INTEGER NOT NULL,
-      restore_until_time_utc INTEGER,
-      restored_time_utc INTEGER,
-      restorer_id INTEGER,
-      compliance_note TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  console.log("💾 表 compliance_archives 已初始化");
-}
 
 export default complianceArchiveTable;

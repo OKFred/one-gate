@@ -98,19 +98,19 @@ export async function limitQuery(
         const condition = await limiter();
         if (condition !== undefined) {
           conditions.push(condition);
-          console.log(
+          /* console.log(
             `[limitQuery] 规则组 "${name}" 的 limiter (${limiterLabel}) 结果: 生效`
-          );
+          ); */
         } else {
-          console.log(
+          /* console.log(
             `[limitQuery] 规则组 "${name}" 的 limiter (${limiterLabel}) 结果: 跳过`
-          );
+          ); */
         }
       } catch (error) {
-        console.error(
+        /* console.error(
           `[limitQuery] 规则组 "${name}" 的 limiter (${limiterLabel}) 执行失败:`,
           error
-        );
+        ); */
         // 继续执行其他 limiter
       }
     }

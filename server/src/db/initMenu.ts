@@ -1,6 +1,7 @@
-import menuService from "@/api/system/menu/service";
-import { UserObj } from "@/types/app";
-import { SUPER_ADMIN_ID, SUPER_ADMIN } from "./init";
+import db from "@/db/index";
+import { menuTable } from "@/api/system/menu/model";
+import { sql } from "drizzle-orm";
+import { SUPER_ADMIN_ID } from "./init";
 import { BusinessKey } from "@/types/business";
 
 // name 字段使用多语言键，前端需要根据该键获取对应的翻译
@@ -204,27 +205,58 @@ type menuLike = {
   sort: number;
   business?: BusinessKey;
 };
+
 /**
- * 初始化菜单
+ * 准备菜单数据同步语句
  */
-export async function initMenu() {
-  // 检查是否已有数据，没有则插入初始数据
-  const countResult = await menuService.listAll.service({ isEnabled: true });
-  if (countResult.length === initialMenuData.length) return;
-  for (const menu of initialMenuData) {
-    await menuService.add.service(
-      {
-        name: menu.name,
-        icon: menu.icon,
-        sort: menu.sort,
-        path: menu.path || null,
-        parentId: menu.parentId || null,
-        business: menu.business || null,
-        remark: null,
-        isEnabled: true,
-      },
-      { userId: SUPER_ADMIN_ID, langCode: SUPER_ADMIN.langCode } as UserObj
+export async function prepareMenu(options?: { reset?: boolean }) {
+  const stats = {
+    total: initialMenuData.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
+  const queries: any[] = [];
+
+  if (options?.reset) {
+    queries.push(db.delete(menuTable));
+  }
+
+  const creatorId = SUPER_ADMIN_ID;
+
+  const mappedData = initialMenuData.map((item) => ({
+    id: item.id,
+    name: item.name,
+    icon: item.icon || null,
+    sort: item.sort,
+    path: item.path || null,
+    parentId: item.parentId || null,
+    business: item.business || null,
+    isEnabled: true,
+    creatorId,
+  }));
+
+  // 基于 ID 执行 Upsert，使用 db.batch() 合并请求
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+    const batch = mappedData.slice(i, i + BATCH_SIZE);
+    queries.push(
+      db.insert(menuTable)
+        .values(batch)
+        .onConflictDoUpdate({
+          target: menuTable.id,
+          set: {
+            name: sql`excluded.name`,
+            icon: sql`excluded.icon`,
+            sort: sql`excluded.sort`,
+            path: sql`excluded.path`,
+            parentId: sql`excluded.parent_id`,
+            business: sql`excluded.business`,
+          },
+        })
     );
   }
-  console.log("💾 表 system_menu 初始数据已插入");
+
+  stats.created = mappedData.length;
+  return { queries, stats };
 }

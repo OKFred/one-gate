@@ -21,8 +21,8 @@ export function bodyUserAdapter<TRes>(
   handler: (body, userObj) => Promise<TRes>
 ) {
   return async (c: NodeHonoContext): Promise<TRes> => {
-    const bodyObj = c.get("bodyObj")
-    const userObj = c.get("userObj")
+    const bodyObj = c.get("bodyObj");
+    const userObj = c.get("userObj");
     return await handler(bodyObj, userObj);
   };
 }
@@ -32,12 +32,24 @@ export function bodyUserAdapter<TRes>(
  * @returns service 函数
  */
 export function bodyClientInfoAdapter<TRes>(
-  handler: (body, clientInfo: { ip: string; userAgent: string }) => Promise<TRes>
+  handler: (
+    body,
+    clientInfo: { ip: string; userAgent: string }
+  ) => Promise<TRes>
 ) {
   return async (c: NodeHonoContext): Promise<TRes> => {
     const bodyObj = c.get("bodyObj");
-    const ip = c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "unknown";
+    const ip =
+      c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "unknown";
     const userAgent = c.req.header("user-agent") || "unknown";
     return await handler(bodyObj, { ip, userAgent });
+  };
+}
+
+export function rawAdapter<TRes>(
+  handler: (c: NodeHonoContext) => Promise<TRes>
+) {
+  return async (c: NodeHonoContext): Promise<TRes> => {
+    return await handler(c);
   };
 }

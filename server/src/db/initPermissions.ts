@@ -5,11 +5,12 @@
 
 import db from "@/db/index";
 import { permissionTable } from "@/api/system/permission/model";
-import { count } from "drizzle-orm";
 import { PermissionAddLike } from "@/api/system/permission/service";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
-const LOCALE = process.env.LOCALE || "zh-CN";
+import { getEnv } from "@/utils/env";
+import { sql } from "drizzle-orm";
+const LOCALE = getEnv("LOCALE") || "zh-CN";
 /**
  * 基础权限种子数据
  */
@@ -307,91 +308,101 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
 ];
 
 /**
- * 初始化权限数据
+ * 准备系统权限数据同步语句
  */
-export async function initPermissions() {
-  console.log("🔐 开始初始化权限数据...");
+export async function preparePermissions(options?: { reset?: boolean }) {
+  const stats = {
+    total: permissionSeeds.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
 
-  try {
-    // 检查权限表是否为空
-    const countResult = await db
-      .select({ total: count(permissionTable.id) })
-      .from(permissionTable);
-    const existingCount = countResult[0]?.total || 0;
+  const queries: any[] = [];
 
-    if (existingCount > 0) {
-      console.log(`⚠️  权限表已存在 ${existingCount} 条数据，跳过初始化`);
-      return;
-    }
-    // 插入权限数据
-    const creatorId = SUPER_ADMIN_ID; // 系统初始化
-    const insertedPermissions: { id: number; code: string }[] = [];
-
-    for (const seed of permissionSeeds) {
-      const getAPIName = () => {
-        const tKeySubString = seed.code.replace(":api", "");
-        const prefix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "businessType." + tKeySubString &&
-            item.langCode === LOCALE
-        )?.tValue;
-        const postfix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "permission.category.api" && item.langCode === LOCALE
-        )?.tValue;
-        return prefix && postfix
-          ? `${prefix}${postfix}`
-          : seed.code + "未知接口";
-      };
-      const getButtonName = () => {
-        const [tKeySubString, action] = seed.code.split(":");
-        const prefix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "businessType." + tKeySubString &&
-            item.langCode === LOCALE
-        )?.tValue;
-        const postfix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "permission.category.button" &&
-            item.langCode === LOCALE
-        )?.tValue;
-        return prefix && postfix
-          ? `${prefix}${postfix}:${action}`
-          : seed.code + "未知按钮";
-      };
-      const name =
-        seed.category === "api"
-          ? getAPIName()
-          : seed.category === "button"
-            ? getButtonName()
-            : "未知权限";
-      // console.log(`🔐 正在插入权限: [${seed.code}] ${name}`);
-      const result = await db
-        .insert(permissionTable)
-        .values({
-          code: seed.code,
-          name,
-          category: seed.category,
-          resource: seed.resource || null,
-          business: seed.business || null,
-          remark: seed.remark || null,
-          isEnabled: true,
-          creatorId,
-        })
-        .returning({ id: permissionTable.id, code: permissionTable.code });
-
-      if (result[0]) {
-        insertedPermissions.push(result[0]);
-      }
-    }
-
-    console.log(`✅ 成功插入 ${insertedPermissions.length} 条权限数据`);
-  } catch (error) {
-    console.error("❌ 权限初始化失败:", error);
-    throw error;
+  if (options?.reset) {
+    queries.push(db.delete(permissionTable));
   }
+
+  const creatorId = SUPER_ADMIN_ID; // 系统初始化
+
+  // 准备数据
+  const mappedData = permissionSeeds.map((seed) => {
+    const getAPIName = () => {
+      const tKeySubString = seed.code!.replace(":api", "");
+      const prefix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "businessType." + tKeySubString &&
+          item.langCode === LOCALE
+      )?.tValue;
+      const postfix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "permission.category.api" && item.langCode === LOCALE
+      )?.tValue;
+      return prefix && postfix
+        ? `${prefix}${postfix}`
+        : seed.code + "未知接口";
+    };
+
+    const getButtonName = () => {
+      const [tKeySubString, action] = seed.code!.split(":");
+      const prefix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "businessType." + tKeySubString &&
+          item.langCode === LOCALE
+      )?.tValue;
+      const postfix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "permission.category.button" &&
+          item.langCode === LOCALE
+      )?.tValue;
+      return prefix && postfix
+        ? `${prefix}${postfix}:${action}`
+        : seed.code + "未知按钮";
+    };
+
+    const name =
+      seed.category === "api"
+        ? getAPIName()
+        : seed.category === "button"
+          ? getButtonName()
+          : "未知权限";
+
+    return {
+      code: seed.code!,
+      name,
+      category: seed.category!,
+      resource: seed.resource || null,
+      business: seed.business || null,
+      remark: seed.remark || null,
+      isEnabled: true,
+      creatorId,
+    };
+  });
+
+  // 分批执行以规避 SQL 变量限制
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+    const batch = mappedData.slice(i, i + BATCH_SIZE);
+    queries.push(
+      db.insert(permissionTable)
+        .values(batch as any)
+        .onConflictDoUpdate({
+          target: permissionTable.code,
+          set: {
+            name: sql`excluded.name`,
+            category: sql`excluded.category`,
+            resource: sql`excluded.resource`,
+            business: sql`excluded.business`,
+          },
+        })
+    );
+  }
+
+  stats.created = mappedData.length;
+  return { queries, stats };
 }
 
 export default {
-  initPermissions,
+  preparePermissions,
 };

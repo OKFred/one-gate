@@ -1,12 +1,9 @@
 import encapsulation from "@/middleware/encapsulation";
-import { tableInit } from "./model";
 import service from "./service";
 import { BusinessKey } from "@/types/business";
 
 function createApp() {
-  return encapsulation(service, "mail.account" satisfies BusinessKey, () => {
-    tableInit();
-  });
+  return encapsulation(service, "mail.account" satisfies BusinessKey);
 }
 
 export default createApp;

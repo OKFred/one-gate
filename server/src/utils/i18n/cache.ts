@@ -4,6 +4,7 @@
  */
 
 import translationService from "@/api/i18n/translation/service";
+import { getEnv } from "@/utils/env";
 
 let isInitialized = false;
 
@@ -68,7 +69,7 @@ export async function reloadTranslationCache(): Promise<void> {
 export function getTranslation(
   langCode: string,
   key: string,
-  fallbackLangCode = process.env.LOCALE
+  fallbackLangCode = getEnv("LOCALE")
 ): string {
   if (!isInitialized) {
     console.warn("⚠️  多语言缓存未初始化，返回原始 key");

@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -123,25 +122,5 @@ export const departmentTable = sqliteTable("system_department", {
     .default(getCurrentTimestampUtcSql()),
   updateTimeUtc: integer("update_time_utc"),
 });
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS system_department (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      parent_id INTEGER,
-      remark TEXT,
-      is_enabled INTEGER NOT NULL,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  console.log("💾 表 system_department 已初始化");
-}
 
 export default departmentTable;

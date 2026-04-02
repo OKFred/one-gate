@@ -1,20 +1,24 @@
-import { initMenu } from "./initMenu";
-import { initTranslation } from "./initTranslation";
-import { initCountryRegion } from "./initRegion";
-import { initLanguage } from "./initLanguage";
+import db from "@/db/index";
+import { prepareMenu } from "./initMenu";
+import { prepareTranslation } from "./initTranslation";
+import { prepareCountryRegion } from "./initRegion";
+import { prepareLanguage } from "./initLanguage";
 import { loadTranslationCache } from "@/utils/i18n";
-import { initPermissions } from "./initPermissions";
-import { initSuperAdminRole, initSuperAdminUser } from "./initUserAndRole";
+import { getEnv } from "@/utils/env";
+import { preparePermissions } from "./initPermissions";
+import {
+  prepareSuperAdminRole,
+  prepareSuperAdminUser,
+} from "./initUserAndRole";
 
-export const SALT_ROUNDS = 12;
 export const SUPER_ADMIN_ID = 1;
 export const SUPER_ADMIN_ROLE_ID = 1;
 
 // 超级管理员配置
 export const SUPER_ADMIN = {
-  username: process.env.SUPER_ADMIN_USERNAME || "superadmin",
-  password: process.env.SUPER_ADMIN_PASSWORD || "Admin@123456",
-  langCode: process.env.LOCALE,
+  username: getEnv("SUPER_ADMIN_USERNAME") || "superadmin",
+  password: getEnv("SUPER_ADMIN_PASSWORD") || "Admin@123456",
+  langCode: getEnv("LOCALE"),
   roleId: SUPER_ADMIN_ROLE_ID,
 };
 
@@ -28,36 +32,61 @@ export const SUPER_ADMIN_ROLE = {
 };
 
 /**
- * 初始化数据库数据
+ * 初始化数据库数据 (全局原子事务模式)
  */
-export async function initDatabase() {
+export async function initDatabase(options?: { reset?: boolean }) {
   try {
-    console.log("⌛ 开始初始化数据库...");
+    console.log(
+      "⌛ 开始全局原子初始化 (模式: " +
+        (options?.reset ? "重置" : "同步") +
+        ")..."
+    );
 
-    // 初始化超级管理员角色
-    const roleId = await initSuperAdminRole();
+    // 1. 异步准备各模块的语句 (耗时操作如密码加密、哈希计算在这里并行或顺序执行)
+    const [roleRes, userRes, langRes, transRes, permRes, regionRes, menuRes] =
+      await Promise.all([
+        prepareSuperAdminRole(options),
+        prepareSuperAdminUser(SUPER_ADMIN_ROLE_ID, options),
+        prepareLanguage(options),
+        prepareTranslation(options), // 内部包含异步的 SHA256 计算
+        preparePermissions(options),
+        prepareCountryRegion(options),
+        prepareMenu(options),
+      ]);
 
-    // 初始化超级管理员账号
-    await initSuperAdminUser(roleId);
+    // 2. 汇总所有查询语句
+    const allQueries = [
+      ...roleRes.queries,
+      ...userRes.queries,
+      ...langRes.queries,
+      ...transRes.queries,
+      ...permRes.queries,
+      ...regionRes.queries,
+      ...menuRes.queries,
+    ];
 
-    // 初始化语言
-    await initLanguage();
+    console.log(`📦 正在执行全局 Batch 事务 (${allQueries.length} 条 SQL)...`);
 
-    // 初始化多语言
-    await initTranslation();
+    // 3. 执行单一 Batch 提交 (保证全局事务一致性)
+    if (allQueries.length > 0) {
+      await db.batch(allQueries as any);
+    }
 
-    // 加载多语言缓存
+    // 4. 后置处理：加载多语言缓存 (必须在事务成功后)
     await loadTranslationCache();
 
-    // 初始化权限数据
-    await initPermissions();
+    console.log("✅ 全局原子初始化完成");
 
-    // 初始化国家地区
-    await initCountryRegion();
-
-    // 初始化菜单
-    await initMenu();
-    console.log("✅ 数据库初始化完成");
+    // 返回统计汇总
+    return {
+      superAdminRole: roleRes.stats,
+      superAdminUser: userRes.stats,
+      language: langRes.stats,
+      translation: transRes.stats,
+      permissions: permRes.stats,
+      countryRegion: regionRes.stats,
+      menu: menuRes.stats,
+    };
   } catch (error) {
     console.error("❌ 数据库初始化失败:", error);
     throw error;

@@ -109,12 +109,14 @@ export const presetGuards = {
       BusinessErrorCode.PERMISSION_DENIED
     ),
 
-  /** 校验父部门存在且可访问（用于新增，parentId 必须有效） */
+  /** 校验父部门存在且可访问（用于新增，parentId 可为空表示根部门） */
   parentExists: (parentId: number | null, userObj: UserObj): ValidationRule =>
     Guards.condition(
       "父部门存在校验",
-      async () =>
-        !!(await departmentService.get.service({ id: parentId }, userObj)),
+      async () => {
+        if (!parentId) return true; // parentId 为 null, undefined 或 0 时视为根部门
+        return !!(await departmentService.get.service({ id: parentId }, userObj));
+      },
       BusinessErrorCode.NOT_EXIST_OR_DISABLED
     ),
 

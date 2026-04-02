@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -117,33 +116,5 @@ export const rolePermissionTable = sqliteTable("system_role_permission", {
     .default(getCurrentTimestampUtcSql()),
   updateTimeUtc: integer("update_time_utc"),
 });
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS system_role_permission (
-      id INTEGER PRIMARY KEY,
-      role_id INTEGER NOT NULL,
-      permission_id INTEGER NOT NULL,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER,
-      UNIQUE(role_id, permission_id)
-    )
-  `);
-  // 创建索引以优化查询
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_role_permission_role_id 
-    ON system_role_permission(role_id)
-  `);
-  await db.run(`
-    CREATE INDEX IF NOT EXISTS idx_role_permission_permission_id 
-    ON system_role_permission(permission_id)
-  `);
-  console.log("💾 表 system_role_permission 已初始化");
-}
 
 export default rolePermissionTable;

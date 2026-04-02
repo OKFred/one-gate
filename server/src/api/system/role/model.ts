@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -146,27 +145,5 @@ export const roleTable = sqliteTable("system_role", {
     .default(getCurrentTimestampUtcSql()),
   updateTimeUtc: integer("update_time_utc"),
 });
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS system_role (
-      id INTEGER PRIMARY KEY,
-      name TEXT NOT NULL UNIQUE,
-      remark TEXT,
-      is_enabled INTEGER NOT NULL,
-      permission_count INTEGER DEFAULT 0,
-      data_scope TEXT NOT NULL DEFAULT 'self_only',
-      custom_dept_ids TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  console.log("💾 表 system_role 已初始化");
-}
 
 export default roleTable;

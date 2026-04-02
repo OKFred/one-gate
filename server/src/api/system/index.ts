@@ -1,16 +1,22 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import type { App } from "@/types/app.d";
-import type { AppBindings } from "@/types/app.d";
+import auth from "./auth/index";
+import department from "./department/index";
+import menu from "./menu/index";
+import permission from "./permission/index";
+import role from "./role/index";
+import role_permission from "./role_permission/index";
+import user from "./user/index";
+import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import subFolderBatchRegister from "@/api/subFolderBatchRegister";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-async function createApp(): Promise<App> {
-    const app = new OpenAPIHono<AppBindings>();
-    const _app = await subFolderBatchRegister(app, "/", __dirname);
-    return _app;
+function createApp(): App {
+  const app = new OpenAPIHono<AppBindings>();
+  app.route("/auth", auth());
+  app.route("/department", department());
+  app.route("/menu", menu());
+  app.route("/permission", permission());
+  app.route("/role", role());
+  app.route("/role_permission", role_permission());
+  app.route("/user", user());
+  return app;
 }
 export default createApp;

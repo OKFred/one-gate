@@ -1,16 +1,16 @@
-import path from "path";
-import { fileURLToPath } from "url";
-import type { App } from "@/types/app.d";
-import type { AppBindings } from "@/types/app.d";
+import audit_login from "./audit_login/index";
+import cache from "./cache/index";
+import compliance from "./compliance/index";
+import init from "./init/index";
+import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import subFolderBatchRegister from "@/api/subFolderBatchRegister";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-async function createApp(): Promise<App> {
-    const app = new OpenAPIHono<AppBindings>();
-    const _app = await subFolderBatchRegister(app, "/", __dirname);
-    return _app;
+function createApp(): App {
+  const app = new OpenAPIHono<AppBindings>();
+  app.route("/audit_login", audit_login());
+  app.route("/cache", cache());
+  app.route("/compliance", compliance());
+  app.route("/init", init());
+  return app;
 }
 export default createApp;

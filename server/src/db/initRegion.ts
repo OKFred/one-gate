@@ -1,7 +1,7 @@
 import db from "@/db/index";
 import { regionTable } from "@/api/i18n/region/model";
-import { count } from "drizzle-orm";
 import { SUPER_ADMIN_ID } from "./init";
+import { sql } from "drizzle-orm";
 
 export const initialRegionData = [
   {
@@ -2001,38 +2001,51 @@ export const initialRegionData = [
 /**
  * 初始化国家地区数据
  */
-export async function initCountryRegion() {
-  try {
-    const countResult = await db
-      .select({ total: count(regionTable.id).as("total") })
-      .from(regionTable);
-    if (countResult[0]?.total > 0) {
-      console.log("ℹ️  国家地区数据已存在，跳过初始化");
-      return;
-    }
+/**
+ * 准备国家地区数据同步语句
+ */
+export async function prepareCountryRegion(options?: { reset?: boolean }) {
+  const stats = {
+    total: initialRegionData.length,
+    created: 0,
+    updated: 0,
+    skipped: 0,
+  };
+  const queries: any[] = [];
 
-    const mappedData = initialRegionData.map((item) => ({
-      labels: {
-        "zh-CN": item.label_zhCN,
-        "en-US": item.label_enUS,
-      },
+  if (options?.reset) {
+    queries.push(db.delete(regionTable));
+  }
+
+  // 分批处理以规避 SQL 变量限制
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < initialRegionData.length; i += BATCH_SIZE) {
+    const batch = initialRegionData.slice(i, i + BATCH_SIZE);
+    const mappedBatch = batch.map((item) => ({
+      labels: { "zh-CN": item.label_zhCN, "en-US": item.label_enUS },
       alpha2Code: item.alpha2Code,
       alpha3Code: item.alpha3Code,
       numeric: item.numeric,
       iso3166Independent: item.ISO3166Independent,
-      businessLanguages: null,
       isEnabled: true,
       creatorId: SUPER_ADMIN_ID,
     }));
 
-    const chunkSize = 100;
-    for (let i = 0; i < mappedData.length; i += chunkSize) {
-      const chunk = mappedData.slice(i, i + chunkSize);
-      await db.insert(regionTable).values(chunk);
-    }
-    console.log(`💾 表 i18n_region 初始数据已插入 (${mappedData.length} 条)`);
-  } catch (error) {
-    console.error("❌ 国家地区数据初始化失败:", error);
-    throw error;
+    queries.push(
+      db.insert(regionTable)
+        .values(mappedBatch)
+        .onConflictDoUpdate({
+          target: regionTable.numeric,
+          set: {
+            labels: sql`excluded.labels`,
+            alpha2Code: sql`excluded.alpha2_code`,
+            alpha3Code: sql`excluded.alpha3_code`,
+            iso3166Independent: sql`excluded.iso_3166_independent`,
+          },
+        })
+    );
   }
+
+  stats.created = initialRegionData.length;
+  return { queries, stats };
 }

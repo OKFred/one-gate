@@ -1,4 +1,3 @@
-import db from "@/db/index";
 import {
   sqliteTable,
   integer,
@@ -203,38 +202,5 @@ export const regionTable = sqliteTable(
     uniqueIndex("idx_region_alpha3").on(table.alpha3Code),
   ]
 );
-
-export async function tableInit() {
-  await db.run(`
-    CREATE TABLE IF NOT EXISTS i18n_region (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      labels TEXT NOT NULL,
-      alpha2_code TEXT NOT NULL,
-      alpha3_code TEXT NOT NULL,
-      numeric INTEGER NOT NULL,
-      iso_3166_independent INTEGER NOT NULL,
-      business_languages TEXT,
-      is_enabled INTEGER NOT NULL,
-      remark TEXT,
-      creator_id INTEGER NOT NULL,
-      updater_id INTEGER,
-      create_time_utc INTEGER DEFAULT (
-        CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-        CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-      ),
-      update_time_utc INTEGER
-    )
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_region_alpha2 ON i18n_region(alpha2_code)
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_region_alpha3 ON i18n_region(alpha3_code)
-  `);
-  await db.run(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_region_numeric ON i18n_region(numeric)
-  `);
-  console.log("💾 表 i18n_region 已初始化");
-}
 
 export default regionTable;

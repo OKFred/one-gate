@@ -18,7 +18,7 @@ RUN pnpm install
 COPY . .
 RUN pnpm run build
 
-EXPOSE 3000
+EXPOSE 8787
 
 # 执行启动命令
 CMD ["pnpm", "run" ,"start"]

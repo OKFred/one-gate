@@ -1,30 +1,31 @@
 {
-  "name": "mail",
+  "name": "server",
   "version": "1.0.1",
-  "description": "send emails via nodemailer",
-  "main": "./src/index.js",
+  "description": "rbac server",
+  "main": "./src/node.js",
   "type": "module",
   "scripts": {
-    "dev": "npx tsx --watch -r dotenv/config ./src/index.ts",
-    "debug": "npx tsx --inspect-brk -r dotenv/config ./src/index.ts",
+    "dev": "npx tsx --watch -r dotenv/config ./src/node.ts",
+    "debug": "npx tsx --inspect-brk -r dotenv/config ./src/node.ts",
     "build": "npx tsgo && npx tsc-alias",
     "visualize": "node dependency-visualize.ts",
-    "start:ts": "node ./src/index.ts",
-    "start": "node ./dist/index.js"
+    "worker:dev": "wrangler dev --env development",
+    "worker:types": "wrangler types",
+    "start:ts": "node ./src/node.ts",
+    "start": "node ./dist/node.js",
+    "db:init": "npx tsx -r dotenv/config ./src/db/initTable.ts"
   },
   "keywords": [],
   "author": "FZ",
   "license": "MIT",
   "repository": {},
-  "exports": "./dist/index.mjs",
+  "exports": "./dist/node.mjs",
   "dependencies": {
     "@cfworker/json-schema": "^4.1.1",
     "@hono/node-server": "^1.13.8",
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.19.2",
     "@scalar/hono-api-reference": "^0.9.1",
-    "@types/bcrypt": "^6.0.0",
-    "bcrypt": "^6.0.0",
     "better-sqlite3": "^11.9.1",
     "cache-manager": "^7.2.8",
     "drizzle-orm": "^0.44.4",
@@ -38,12 +39,14 @@
     "pako": "^2.1.0",
     "pino": "^9.9.0",
     "pino-roll": "^3.1.0",
+    "worker-mailer": "^1.2.1",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.32"
   },
   "devDependencies": {
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
+    "@cloudflare/vitest-pool-workers": "^0.12.4",
     "@eslint/js": "^9.22.0",
     "@libsql/client": "^0.15.12",
     "@types/babel__traverse": "^7.28.0",
@@ -62,16 +65,19 @@
     "json-schema-to-ts": "^3.1.1",
     "prettier": "^3.5.3",
     "tsc-alias": "^1.8.11",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "~3.2.0",
+    "wrangler": "^4.77.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "bcrypt",
       "better-sqlite3",
       "bufferutil",
       "esbuild",
+      "sharp",
       "sqlite3",
-      "utf-8-validate"
+      "utf-8-validate",
+      "workerd"
     ]
   }
 }
