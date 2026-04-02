@@ -207,46 +207,41 @@ type menuLike = {
 };
 
 /**
- * 初始化菜单
+ * 准备菜单数据同步语句
  */
-export async function initMenu(options?: { reset?: boolean }) {
-  console.log("🔐 开始初始化菜单数据...");
+export async function prepareMenu(options?: { reset?: boolean }) {
   const stats = {
     total: initialMenuData.length,
     created: 0,
     updated: 0,
     skipped: 0,
   };
+  const queries: any[] = [];
 
-  try {
-    if (options?.reset) {
-      await db.delete(menuTable);
-      console.log("🗑️  已重置菜单数据表");
-    }
+  if (options?.reset) {
+    queries.push(db.delete(menuTable));
+  }
 
-    const creatorId = SUPER_ADMIN_ID;
+  const creatorId = SUPER_ADMIN_ID;
 
-    // 准备数据
-    const mappedData = initialMenuData.map((menu) => ({
-      id: menu.id,
-      name: menu.name,
-      icon: menu.icon,
-      sort: menu.sort,
-      path: menu.path || null,
-      parentId: menu.parentId || null,
-      business: menu.business || null,
-      remark: null,
-      isEnabled: true,
-      creatorId,
-    }));
+  const mappedData = initialMenuData.map((item) => ({
+    id: item.id,
+    name: item.name,
+    icon: item.icon || null,
+    sort: item.sort,
+    path: item.path || null,
+    parentId: item.parentId || null,
+    business: item.business || null,
+    isEnabled: true,
+    creatorId,
+  }));
 
-    // 执行 Upsert (基于 ID，因为 initialMenuData 带有 ID)，分批处理
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
-      // console.log(`📑 正在同步菜单批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(mappedData.length / BATCH_SIZE)}...`);
-      const batch = mappedData.slice(i, i + BATCH_SIZE);
-      await db
-        .insert(menuTable)
+  // 基于 ID 执行 Upsert，使用 db.batch() 合并请求
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+    const batch = mappedData.slice(i, i + BATCH_SIZE);
+    queries.push(
+      db.insert(menuTable)
         .values(batch)
         .onConflictDoUpdate({
           target: menuTable.id,
@@ -258,14 +253,10 @@ export async function initMenu(options?: { reset?: boolean }) {
             parentId: sql`excluded.parent_id`,
             business: sql`excluded.business`,
           },
-        });
-    }
-
-    stats.created = mappedData.length;
-    console.log(`✅ 成功同步 ${stats.created} 条菜单数据`);
-    return stats;
-  } catch (error) {
-    console.error("❌ 菜单初始化失败:", error);
-    throw error;
+        })
+    );
   }
+
+  stats.created = mappedData.length;
+  return { queries, stats };
 }

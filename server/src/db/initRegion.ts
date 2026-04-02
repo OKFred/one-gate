@@ -2001,37 +2001,38 @@ export const initialRegionData = [
 /**
  * 初始化国家地区数据
  */
-export async function initCountryRegion(options?: { reset?: boolean }) {
+/**
+ * 准备国家地区数据同步语句
+ */
+export async function prepareCountryRegion(options?: { reset?: boolean }) {
   const stats = {
     total: initialRegionData.length,
     created: 0,
     updated: 0,
     skipped: 0,
   };
-  console.log("🌍 开始初始化国家地区数据...");
-  try {
-    if (options?.reset) {
-      await db.delete(regionTable);
-      console.log("🗑️  已重置国家地区数据表");
-    }
+  const queries: any[] = [];
 
-    // 分批处理 (增加安全性，解决 SQL 变量限制)
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < initialRegionData.length; i += BATCH_SIZE) {
-      // console.log(`🌍 正在同步地区批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(initialRegionData.length / BATCH_SIZE)}...`);
-      const batch = initialRegionData.slice(i, i + BATCH_SIZE);
-      const mappedBatch = batch.map((item) => ({
-        labels: { "zh-CN": item.label_zhCN, "en-US": item.label_enUS },
-        alpha2Code: item.alpha2Code,
-        alpha3Code: item.alpha3Code,
-        numeric: item.numeric,
-        iso3166Independent: item.ISO3166Independent,
-        isEnabled: true,
-        creatorId: SUPER_ADMIN_ID,
-      }));
+  if (options?.reset) {
+    queries.push(db.delete(regionTable));
+  }
 
-      await db
-        .insert(regionTable)
+  // 分批处理以规避 SQL 变量限制
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < initialRegionData.length; i += BATCH_SIZE) {
+    const batch = initialRegionData.slice(i, i + BATCH_SIZE);
+    const mappedBatch = batch.map((item) => ({
+      labels: { "zh-CN": item.label_zhCN, "en-US": item.label_enUS },
+      alpha2Code: item.alpha2Code,
+      alpha3Code: item.alpha3Code,
+      numeric: item.numeric,
+      iso3166Independent: item.ISO3166Independent,
+      isEnabled: true,
+      creatorId: SUPER_ADMIN_ID,
+    }));
+
+    queries.push(
+      db.insert(regionTable)
         .values(mappedBatch)
         .onConflictDoUpdate({
           target: regionTable.numeric,
@@ -2041,15 +2042,10 @@ export async function initCountryRegion(options?: { reset?: boolean }) {
             alpha3Code: sql`excluded.alpha3_code`,
             iso3166Independent: sql`excluded.iso_3166_independent`,
           },
-        });
-
-      stats.created += mappedBatch.length;
-    }
-
-    console.log(`🌍 国家地区数据初始化完成: ${stats.total} 条记录已同步`);
-    return stats;
-  } catch (error) {
-    console.error("❌ 国家地区初始化失败:", error);
-    throw error;
+        })
+    );
   }
+
+  stats.created = initialRegionData.length;
+  return { queries, stats };
 }

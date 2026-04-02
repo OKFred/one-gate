@@ -18,33 +18,33 @@ export const initialLanguageData = [
 ];
 
 /**
- * 初始化语言数据
+ * 准备语言数据同步语句
  */
-export async function initLanguage(options?: { reset?: boolean }) {
+export async function prepareLanguage(options?: { reset?: boolean }) {
   const stats = {
     total: initialLanguageData.length,
     created: 0,
     updated: 0,
     skipped: 0,
   };
-  try {
-    if (options?.reset) {
-      await db.delete(languageTable);
-      console.log("🗑️  已重置语言数据表");
-    }
+  const queries: any[] = [];
 
-    const mappedData = initialLanguageData.map((item) => ({
-      langCode: item.langCode,
-      nativeName: item.nativeName,
-      isEnabled: item.isEnabled,
-      sortOrder: item.sortOrder,
-      remark: null,
-      creatorId: SUPER_ADMIN_ID,
-    }));
+  if (options?.reset) {
+    queries.push(db.delete(languageTable));
+  }
 
-    for (const data of mappedData) {
-      await db
-        .insert(languageTable)
+  const mappedData = initialLanguageData.map((item) => ({
+    langCode: item.langCode,
+    nativeName: item.nativeName,
+    isEnabled: item.isEnabled,
+    sortOrder: item.sortOrder,
+    remark: null,
+    creatorId: SUPER_ADMIN_ID,
+  }));
+
+  for (const data of mappedData) {
+    queries.push(
+      db.insert(languageTable)
         .values(data)
         .onConflictDoUpdate({
           target: languageTable.langCode,
@@ -54,17 +54,9 @@ export async function initLanguage(options?: { reset?: boolean }) {
             sortOrder: data.sortOrder,
           },
         })
-        .returning({ id: languageTable.id });
-
-      // Note: In SQLite returning might not distinguish between insert/update easily without extra checks
-      // But for stats we can just count them.
-      stats.created++;
-    }
-
-    console.log(`💾 语言数据初始化完成: ${stats.total} 条记录已同步`);
-    return stats;
-  } catch (error) {
-    console.error("❌ 语言数据初始化失败:", error);
-    throw error;
+    );
+    stats.created++;
   }
+
+  return { queries, stats };
 }

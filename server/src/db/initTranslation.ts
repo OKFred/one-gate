@@ -4,44 +4,48 @@ import { utils as translationUtils } from "@/api/i18n/translation/service";
 import { SUPER_ADMIN_ID } from "./init";
 import { sql } from "drizzle-orm";
 
-export async function initTranslation(options?: { reset?: boolean }) {
+/**
+ * 准备多语言数据同步语句
+ */
+export async function prepareTranslation(options?: { reset?: boolean }) {
   const stats = {
     total: initialTranslationData.length,
     created: 0,
     updated: 0,
     skipped: 0,
   };
-  try {
-    if (options?.reset) {
-      await db.delete(translationTable);
-      console.log("🗑️  已重置多语言数据表");
-    }
 
-    // 分批处理，极低批次 (10 行) 以适配 D1 极严格的变量限制 (约 90 个变量)
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < initialTranslationData.length; i += BATCH_SIZE) {
-      // console.log(`🌐 正在同步批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(initialTranslationData.length / BATCH_SIZE)}...`);
-      const batch = initialTranslationData.slice(i, i + BATCH_SIZE);
-      const mappedBatch = await Promise.all(
-        batch.map(async (item) => {
-          const valueHash = await translationUtils.calculateSHA256(item.tValue);
-          return {
-            application: item.application,
-            business: item.business,
-            langCode: item.langCode,
-            tKey: item.tKey,
-            tValue: item.tValue,
-            valueHash,
-            remark: null,
-            isEnabled: item.isEnabled,
-            creatorId: SUPER_ADMIN_ID,
-          };
-        })
-      );
+  const queries: any[] = [];
 
-      await db
-        .insert(translationTable)
-        .values(mappedBatch)
+  if (options?.reset) {
+    queries.push(db.delete(translationTable));
+  }
+
+  // 1. 预处理所有数据的哈希值 (并行处理)
+  const mappedData = await Promise.all(
+    initialTranslationData.map(async (item) => {
+      const valueHash = await translationUtils.calculateSHA256(item.tValue);
+      return {
+        application: item.application,
+        business: item.business,
+        langCode: item.langCode,
+        tKey: item.tKey,
+        tValue: item.tValue,
+        valueHash,
+        remark: null,
+        isEnabled: item.isEnabled,
+        creatorId: SUPER_ADMIN_ID,
+      };
+    })
+  );
+
+  // 2. 将数据拆分为小批次以规避 SQL 变量限制
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+    const batch = mappedData.slice(i, i + BATCH_SIZE);
+    queries.push(
+      db.insert(translationTable)
+        .values(batch)
         .onConflictDoUpdate({
           target: [translationTable.tKey, translationTable.langCode],
           set: {
@@ -49,17 +53,12 @@ export async function initTranslation(options?: { reset?: boolean }) {
             valueHash: sql`excluded.value_hash`,
             isEnabled: sql`excluded.is_enabled`,
           },
-        });
-
-      stats.created += mappedBatch.length;
-    }
-
-    console.log(`🌐 多语言数据初始化完成: ${stats.total} 条记录已同步`);
-    return stats;
-  } catch (error) {
-    console.error("❌ 多语言数据初始化失败:", error);
-    throw error;
+        })
+    );
   }
+
+  stats.created = mappedData.length;
+  return { queries, stats };
 }
 
 export const initialTranslationData = [

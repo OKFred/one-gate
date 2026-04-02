@@ -308,10 +308,9 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
 ];
 
 /**
- * 初始化权限数据
+ * 准备系统权限数据同步语句
  */
-export async function initPermissions(options?: { reset?: boolean }) {
-  console.log("🔐 开始初始化权限数据...");
+export async function preparePermissions(options?: { reset?: boolean }) {
   const stats = {
     total: permissionSeeds.length,
     created: 0,
@@ -319,75 +318,74 @@ export async function initPermissions(options?: { reset?: boolean }) {
     skipped: 0,
   };
 
-  try {
-    if (options?.reset) {
-      await db.delete(permissionTable);
-      console.log("🗑️  已重置权限数据表");
-    }
+  const queries: any[] = [];
 
-    const creatorId = SUPER_ADMIN_ID; // 系统初始化
+  if (options?.reset) {
+    queries.push(db.delete(permissionTable));
+  }
 
-    // 准备数据
-    const mappedData = permissionSeeds.map((seed) => {
-      const getAPIName = () => {
-        const tKeySubString = seed.code.replace(":api", "");
-        const prefix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "businessType." + tKeySubString &&
-            item.langCode === LOCALE
-        )?.tValue;
-        const postfix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "permission.category.api" && item.langCode === LOCALE
-        )?.tValue;
-        return prefix && postfix
-          ? `${prefix}${postfix}`
-          : seed.code + "未知接口";
-      };
+  const creatorId = SUPER_ADMIN_ID; // 系统初始化
 
-      const getButtonName = () => {
-        const [tKeySubString, action] = seed.code.split(":");
-        const prefix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "businessType." + tKeySubString &&
-            item.langCode === LOCALE
-        )?.tValue;
-        const postfix = initialTranslationData.find(
-          (item) =>
-            item.tKey === "permission.category.button" &&
-            item.langCode === LOCALE
-        )?.tValue;
-        return prefix && postfix
-          ? `${prefix}${postfix}:${action}`
-          : seed.code + "未知按钮";
-      };
+  // 准备数据
+  const mappedData = permissionSeeds.map((seed) => {
+    const getAPIName = () => {
+      const tKeySubString = seed.code!.replace(":api", "");
+      const prefix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "businessType." + tKeySubString &&
+          item.langCode === LOCALE
+      )?.tValue;
+      const postfix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "permission.category.api" && item.langCode === LOCALE
+      )?.tValue;
+      return prefix && postfix
+        ? `${prefix}${postfix}`
+        : seed.code + "未知接口";
+    };
 
-      const name =
-        seed.category === "api"
-          ? getAPIName()
-          : seed.category === "button"
-            ? getButtonName()
-            : "未知权限";
+    const getButtonName = () => {
+      const [tKeySubString, action] = seed.code!.split(":");
+      const prefix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "businessType." + tKeySubString &&
+          item.langCode === LOCALE
+      )?.tValue;
+      const postfix = initialTranslationData.find(
+        (item) =>
+          item.tKey === "permission.category.button" &&
+          item.langCode === LOCALE
+      )?.tValue;
+      return prefix && postfix
+        ? `${prefix}${postfix}:${action}`
+        : seed.code + "未知按钮";
+    };
 
-      return {
-        code: seed.code,
-        name,
-        category: seed.category,
-        resource: seed.resource || null,
-        business: seed.business || null,
-        remark: seed.remark || null,
-        isEnabled: true,
-        creatorId,
-      };
-    });
+    const name =
+      seed.category === "api"
+        ? getAPIName()
+        : seed.category === "button"
+          ? getButtonName()
+          : "未知权限";
 
-    // 分批处理 (增加安全性，解决 SQL 变量限制)
-    const BATCH_SIZE = 10;
-    for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
-      // console.log(`🔐 正在同步权限批次 ${Math.floor(i / BATCH_SIZE) + 1} / ${Math.ceil(mappedData.length / BATCH_SIZE)}...`);
-      const batch = mappedData.slice(i, i + BATCH_SIZE);
-      await db
-        .insert(permissionTable)
+    return {
+      code: seed.code!,
+      name,
+      category: seed.category!,
+      resource: seed.resource || null,
+      business: seed.business || null,
+      remark: seed.remark || null,
+      isEnabled: true,
+      creatorId,
+    };
+  });
+
+  // 分批执行以规避 SQL 变量限制
+  const BATCH_SIZE = 10;
+  for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
+    const batch = mappedData.slice(i, i + BATCH_SIZE);
+    queries.push(
+      db.insert(permissionTable)
         .values(batch as any)
         .onConflictDoUpdate({
           target: permissionTable.code,
@@ -397,18 +395,14 @@ export async function initPermissions(options?: { reset?: boolean }) {
             resource: sql`excluded.resource`,
             business: sql`excluded.business`,
           },
-        });
-      stats.created += batch.length;
-    }
-
-    console.log(`✅ 成功同步 ${stats.created} 条权限数据`);
-    return stats;
-  } catch (error) {
-    console.error("❌ 权限初始化失败:", error);
-    throw error;
+        })
+    );
   }
+
+  stats.created = mappedData.length;
+  return { queries, stats };
 }
 
 export default {
-  initPermissions,
+  preparePermissions,
 };

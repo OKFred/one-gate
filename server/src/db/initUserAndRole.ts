@@ -11,19 +11,18 @@ import {
 } from "./init";
 
 /**
- * 初始化超级管理员角色
+ * 准备超级管理员角色同步语句
  */
-export async function initSuperAdminRole(options?: { reset?: boolean }) {
+export async function prepareSuperAdminRole(options?: { reset?: boolean }) {
   const stats = { total: 1, created: 0, updated: 0, skipped: 0 };
-  try {
-    if (options?.reset) {
-      await db.delete(roleTable).where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID));
-      console.log("🗑️  已重置超级管理员角色");
-    }
+  const queries: any[] = [];
 
-    // 使用 Upsert
-    const result = await db
-      .insert(roleTable)
+  if (options?.reset) {
+    queries.push(db.delete(roleTable).where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID)));
+  }
+
+  queries.push(
+    db.insert(roleTable)
       .values({ ...SUPER_ADMIN_ROLE, id: SUPER_ADMIN_ROLE_ID })
       .onConflictDoUpdate({
         target: roleTable.id,
@@ -33,39 +32,34 @@ export async function initSuperAdminRole(options?: { reset?: boolean }) {
           dataScope: SUPER_ADMIN_ROLE.dataScope,
         },
       })
-      .returning({ id: roleTable.id });
+  );
 
-    stats.created = 1;
-    console.log(`✅ 超级管理员角色同步成功 (ID: ${result[0].id})`);
-    return { id: result[0].id, stats };
-  } catch (error) {
-    console.error("❌ 超级管理员角色初始化失败:", error);
-    throw error;
-  }
+  stats.created = 1;
+  return { queries, stats };
 }
 
 /**
- * 初始化超级管理员账号
+ * 准备超级管理员账号同步语句
  */
-export async function initSuperAdminUser(
+export async function prepareSuperAdminUser(
   roleId: number,
   options?: { reset?: boolean }
 ) {
   const stats = { total: 1, created: 0, updated: 0, skipped: 0 };
-  try {
-    if (options?.reset) {
-      await db
-        .delete(userTable)
-        .where(eq(userTable.username, SUPER_ADMIN.username));
-      console.log("🗑️  已重置超级管理员账号");
-    }
+  const queries: any[] = [];
 
-    // 加密密码
-    const hashedPassword = await hashPassword(SUPER_ADMIN.password);
+  if (options?.reset) {
+    queries.push(
+      db.delete(userTable)
+        .where(eq(userTable.username, SUPER_ADMIN.username))
+    );
+  }
 
-    // 使用 Upsert
-    const result = await db
-      .insert(userTable)
+  // 加密密码 (异步准备工作)
+  const hashedPassword = await hashPassword(SUPER_ADMIN.password);
+
+  queries.push(
+    db.insert(userTable)
       .values({
         username: SUPER_ADMIN.username,
         password: hashedPassword,
@@ -84,13 +78,8 @@ export async function initSuperAdminUser(
           isEnabled: true,
         },
       })
-      .returning({ id: userTable.id });
+  );
 
-    stats.created = 1;
-    console.log(`✅ 超级管理员账号同步成功 (用户名: ${SUPER_ADMIN.username})`);
-    return { id: result[0].id, stats };
-  } catch (error) {
-    console.error("超级管理员账号初始化失败:", error);
-    throw error;
-  }
+  stats.created = 1;
+  return { queries, stats };
 }
