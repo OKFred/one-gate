@@ -56,8 +56,8 @@ export type AxiosConfig<U, M> = Omit<
 
 /** @description  axios 实例 */
 const service = axios.create({
-  /*   baseURL: "http://localhost:3000", */
-  timeout: process.env.NODE_ENV !== 'production' ? 180000 : 30000,
+  baseURL: import.meta.env.MODE === 'production' ? import.meta.env.VITE_SERVER_URL : '',
+  timeout: import.meta.env.MODE !== 'production' ? 180000 : 30000,
 });
 
 // 初始化拦截器（只执行一次）
