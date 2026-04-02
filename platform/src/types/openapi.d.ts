@@ -2730,6 +2730,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maintenance/init/db": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 初始化/同步数据库基础数据
+         * @description 同步系统所需的权限、菜单、多语言、地区等基础数据。支持增量同步或完全重置。安全验证：请求头 X_INIT_TOKEN 或超级管理员账号登录。
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.initDbReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.initDbRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/auth/login": {
         parameters: {
             query?: never;
@@ -8023,6 +8084,23 @@ export interface components {
                  * @example 0.00%
                  */
                 hitRate: string;
+            };
+            message: string;
+        };
+        "maintenance.initDbReq": {
+            /**
+             * @description 是否重置数据（清空表后重新插入）
+             * @default false
+             */
+            reset: boolean;
+        };
+        "maintenance.initDbRes": {
+            ok: boolean;
+            data: {
+                /** @description 各模块初始化结果统计 */
+                results: {
+                    [key: string]: unknown;
+                };
             };
             message: string;
         };

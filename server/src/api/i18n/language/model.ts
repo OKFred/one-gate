@@ -1,4 +1,3 @@
-import { baseTableInit } from "@/db/utils/schema";
 import {
   sqliteTable,
   integer,
@@ -149,9 +148,5 @@ export const languageTable = sqliteTable(
   },
   (table) => [uniqueIndex("idx_language_code").on(table.langCode)]
 );
-
-export async function tableInit() {
-  await baseTableInit("i18n_language");
-}
 
 export default languageTable;

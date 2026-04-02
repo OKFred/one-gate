@@ -62,6 +62,9 @@ importers:
       pino-roll:
         specifier: ^3.1.0
         version: 3.1.0
+      worker-mailer:
+        specifier: ^1.2.1
+        version: 1.2.1
       xmldom:
         specifier: ^0.6.0
         version: 0.6.0
@@ -2633,6 +2636,9 @@ packages:
     resolution: {integrity: sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==}
     engines: {node: '>=0.10.0'}
 
+  worker-mailer@1.2.1:
+    resolution: {integrity: sha512-gS2ei/mrpRqNs+AHmqxhT6vFPwCLw2qnz5ShmyGD0ULaU0Q9hxnFAcx9jhAip/MnD6+MjgnQu6hQQgA8mlOkVA==}
+
   workerd@1.20260310.1:
     resolution: {integrity: sha512-yawXhypXXHtArikJj15HOMknNGikpBbSg2ZDe6lddUbqZnJXuCVSkgc/0ArUeVMG1jbbGvpst+REFtKwILvRTQ==}
     engines: {node: '>=16'}
@@ -3538,7 +3544,7 @@ snapshots:
       '@typescript-eslint/types': 8.28.0
       '@typescript-eslint/typescript-estree': 8.28.0(typescript@5.8.3)
       '@typescript-eslint/visitor-keys': 8.28.0
-      debug: 4.4.0
+      debug: 4.4.3
       eslint: 9.23.0
       typescript: 5.8.3
     transitivePeerDependencies:
@@ -4105,7 +4111,7 @@ snapshots:
   gel@2.0.1:
     dependencies:
       '@petamoriken/float16': 3.9.2
-      debug: 4.4.0
+      debug: 4.4.3
       env-paths: 3.0.0
       semver: 7.7.4
       shell-quote: 1.8.2
@@ -4815,6 +4821,8 @@ snapshots:
       stackback: 0.0.2
 
   word-wrap@1.2.5: {}
+
+  worker-mailer@1.2.1: {}
 
   workerd@1.20260310.1:
     optionalDependencies:

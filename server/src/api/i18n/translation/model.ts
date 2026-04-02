@@ -1,4 +1,3 @@
-import { baseTableInit } from "@/db/utils/schema";
 import {
   sqliteTable,
   integer,
@@ -182,8 +181,5 @@ export const translationTable = sqliteTable(
   ]
 );
 
-export async function tableInit() {
-  await baseTableInit("i18n_translation");
-}
 
 export default translationTable;

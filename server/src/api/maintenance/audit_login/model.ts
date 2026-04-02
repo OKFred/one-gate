@@ -1,4 +1,3 @@
-import { baseTableInit } from "@/db/utils/schema";
 import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import { type InferSelectModel, type InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
@@ -135,9 +134,5 @@ export const loginAuditTable = sqliteTable(
     index("idx_login_audit_time").on(table.loginTimeUtc),
   ]
 );
-
-export async function tableInit() {
-  await baseTableInit("maintenance_audit_login");
-}
 
 export default loginAuditTable;

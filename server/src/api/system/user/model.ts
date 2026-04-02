@@ -1,4 +1,3 @@
-import { baseTableInit } from "@/db/utils/schema";
 import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -297,9 +296,5 @@ export const userTable = sqliteTable("system_user", {
     .default(getCurrentTimestampUtcSql()),
   updateTimeUtc: integer("update_time_utc"),
 });
-
-export async function tableInit() {
-  await baseTableInit("system_user");
-}
 
 export default userTable;

@@ -4,6 +4,7 @@ import mailAccountService from "../account/service";
 import mailTemplateService from "../template/service";
 import mailLogService from "../log/service";
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import { getRuntimeKey } from "hono/adapter";
 
 const sendReq = {
   type: "object",
@@ -141,54 +142,94 @@ async function onSend(
   }
 
   // 4. 发送邮件
-  const nodemailer = await import("nodemailer");
-  const transporter = nodemailer.default.createTransport({
-    host: accountObj.host,
-    port: accountObj.port,
-    secure: accountObj.port === 465, // true for 465, false for other ports
-    auth: {
-      user: accountObj.mailAddress,
-      pass: accountObj.password,
-    },
-  });
-
   let sendStatus = false;
   let exceptionCode: string | undefined = undefined;
   let exceptionDetails: string | undefined = undefined;
   let accepted: { name: string; address: string }[] = [];
   let rejected: { name: string; address: string }[] = [];
 
-  try {
-    const info = await transporter.sendMail({
-      from: {
-        name: accountObj.nickname || accountObj.mailAddress,
-        address: accountObj.mailAddress,
+  const runtime = getRuntimeKey();
+
+  if (runtime === "workerd") {
+    // Cloudflare Workers 运行环境：使用 worker-mailer
+    try {
+      const { WorkerMailer } = await import("worker-mailer");
+      await WorkerMailer.send(
+        {
+          host: accountObj.host,
+          port: accountObj.port,
+          secure: accountObj.port === 465,
+          credentials: {
+            username: accountObj.mailAddress,
+            password: accountObj.password,
+          },
+        },
+        {
+          from: {
+            name: accountObj.nickname || accountObj.mailAddress,
+            email: accountObj.mailAddress,
+          },
+          to: receiverArr.map((r) => ({ name: r.name, email: r.address })),
+          subject: finalSubject,
+          html: finalHtml,
+        }
+      );
+
+      // worker-mailer 目前返回的是 boolean 或具体信息，这里假设发送成功即进入 accepted
+      // 注意：worker-mailer 的 send 返回结构可能根据版本不同，这里先统一映射
+      accepted = receiverArr.map((r) => ({ name: r.name, address: r.address }));
+      sendStatus = true;
+    } catch (error: any) {
+      sendStatus = false;
+      exceptionCode = error.code || "WORKER_MAILER_ERROR";
+      exceptionDetails =
+        error.stack || error.message || "Unknown error in Workers mailer";
+    }
+  } else {
+    // Node.js 运行环境：保持使用 nodemailer
+    const nodemailer = await import("nodemailer");
+    const transporter = nodemailer.default.createTransport({
+      host: accountObj.host,
+      port: accountObj.port,
+      secure: accountObj.port === 465, // true for 465, false for other ports
+      auth: {
+        user: accountObj.mailAddress,
+        pass: accountObj.password,
       },
-      to: receiverArr,
-      subject: finalSubject,
-      html: finalHtml,
     });
 
-    accepted = info.accepted.map((address) => {
-      if (typeof address === "string") {
-        return { name: address, address };
-      }
-      return address as { name: string; address: string };
-    });
+    try {
+      const info = await transporter.sendMail({
+        from: {
+          name: accountObj.nickname || accountObj.mailAddress,
+          address: accountObj.mailAddress,
+        },
+        to: receiverArr,
+        subject: finalSubject,
+        html: finalHtml,
+      });
 
-    rejected = info.rejected.map((address) => {
-      if (typeof address === "string") {
-        return { name: address, address };
-      }
-      return address as { name: string; address: string };
-    });
+      accepted = info.accepted.map((address) => {
+        if (typeof address === "string") {
+          return { name: address, address };
+        }
+        return address as { name: string; address: string };
+      });
 
-    sendStatus = true;
-  } catch (error: any) {
-    sendStatus = false;
-    exceptionCode = error.code || "UNKNOWN_ERROR";
-    exceptionDetails = error.response || error.message || "Unknown error";
-    // 即使发送失败，也继续记录日志
+      rejected = info.rejected.map((address) => {
+        if (typeof address === "string") {
+          return { name: address, address };
+        }
+        return address as { name: string; address: string };
+      });
+
+      sendStatus = true;
+    } catch (error: any) {
+      sendStatus = false;
+      exceptionCode = error.code || "NODEMAILER_ERROR";
+      exceptionDetails =
+        error.response || error.message || "Unknown error in Node mailer";
+    }
   }
 
   // 5. 记录日志

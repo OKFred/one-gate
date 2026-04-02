@@ -1,10 +1,4 @@
-import { baseTableInit } from "@/db/utils/schema";
-import {
-  sqliteTable,
-  integer,
-  text,
-  index,
-} from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -85,10 +79,7 @@ const MailLogPO = {
 
 export type MailLogPOLike = InferSelectModel<typeof mailLogTable>;
 type MailLogSelectPOLike = InferInsertModel<typeof mailLogTable>;
-type MailLogAddPOLike = Omit<
-  MailLogPOLike,
-  IndexKeyLike | AuditAddOmitKeyLike
->;
+type MailLogAddPOLike = Omit<MailLogPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
 type MailLogUpdatePOLike = Partial<
   Omit<MailLogSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -187,9 +178,5 @@ export const mailLogTable = sqliteTable(
     index("idx_create_time").on(table.createTimeUtc),
   ]
 );
-
-export async function tableInit() {
-  await baseTableInit("mail_log");
-}
 
 export default mailLogTable;

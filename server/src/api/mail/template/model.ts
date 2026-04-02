@@ -1,4 +1,3 @@
-import { baseTableInit } from "@/db/utils/schema";
 import {
   sqliteTable,
   integer,
@@ -166,9 +165,5 @@ export const mailTemplateTable = sqliteTable(
   },
   (table) => [uniqueIndex("idx_template_name").on(table.name)]
 );
-
-export async function tableInit() {
-  await baseTableInit("mail_template");
-}
 
 export default mailTemplateTable;

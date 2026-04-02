@@ -1,4 +1,3 @@
-import { baseTableInit } from "@/db/utils/schema";
 import {
   sqliteTable,
   integer,
@@ -203,9 +202,5 @@ export const regionTable = sqliteTable(
     uniqueIndex("idx_region_alpha3").on(table.alpha3Code),
   ]
 );
-
-export async function tableInit() {
-  await baseTableInit("i18n_region");
-}
 
 export default regionTable;
