@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, memo, forwardRef, useImperativeHandle, useRef } from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Box, CircularProgress, Typography, Chip, Alert } from '@mui/material';
@@ -54,6 +55,7 @@ interface Props {
 
 const TheTree = memo(
   forwardRef<TheTreeRef, Props>(({ initialRoleId, allPermissions, formRef }, ref) => {
+    const t = useTranslation();
     const [roleId, setRoleId] = useState<number | null | undefined>(initialRoleId ?? null);
     const refreshKeyRef = useRef(0);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -88,9 +90,6 @@ const TheTree = memo(
             setRolePermissions(res.data.data || []);
           }
         })
-        .catch(() => {
-          if (!cancelled) setError('加载失败');
-        })
         .finally(() => {
           if (!cancelled) setLoading(false);
         });
@@ -116,8 +115,8 @@ const TheTree = memo(
         const perm = permissionMap.get(rp.permissionId);
         if (!perm) continue;
 
-        const category = perm.category || 'other';
-        const business = perm.business || '未分组';
+        const category = perm.category!;
+        const business = perm.business!;
 
         if (!categoryMap.has(category)) {
           categoryMap.set(category, new Map());
@@ -152,7 +151,7 @@ const TheTree = memo(
       return (
         <Box sx={{ p: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            请先选择角色
+            {t('system.rolePermission.tree.selectRole')}
           </Typography>
         </Box>
       );
@@ -162,7 +161,7 @@ const TheTree = memo(
       return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 2 }}>
           <CircularProgress size={16} />
-          <Typography variant="body2">加载中...</Typography>
+          <Typography variant="body2">{t('common.loading')}</Typography>
         </Box>
       );
     }
@@ -179,7 +178,7 @@ const TheTree = memo(
       return (
         <Box sx={{ p: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            该角色暂无权限
+            {t('rolePermission.noPermissions')}
           </Typography>
         </Box>
       );
