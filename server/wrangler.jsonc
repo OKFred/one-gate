@@ -7,6 +7,8 @@
   "name": "hodor",
   "main": "src/worker.ts",
   "compatibility_date": "2026-03-17",
+  "workers_dev": false,
+  "preview_urls": false,
   "observability": {
     "enabled": true,
   },
@@ -52,21 +54,21 @@
       "vars": {
         "NODE_ENV": "development",
         "BASE_API_PATH": "/api/v1",
-        "LOCALE": "zh-CN"
+        "LOCALE": "zh-CN",
       },
       "d1_databases": [
         {
           "binding": "DB",
           "database_name": "hodor_db",
-          "database_id": "00000000-0000-0000-0000-000000000000"
-        }
+          "database_id": "00000000-0000-0000-0000-000000000000",
+        },
       ],
       "kv_namespaces": [
         {
           "binding": "KV",
-          "id": "00000000000000000000000000000000"
-        }
-      ]
-    }
-  }
+          "id": "00000000000000000000000000000000",
+        },
+      ],
+    },
+  },
 }
