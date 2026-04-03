@@ -4,7 +4,7 @@ dist/
 *.db
 
 .dev.vars*
-!.dev.vars.example
 .env*
 !.env.example
 .wrangler/
+wrangler.jsonc
