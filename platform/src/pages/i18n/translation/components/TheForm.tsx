@@ -281,7 +281,7 @@ const TheForm = memo(
                   <Alert severity="warning" sx={{ mt: 2 }} icon={<WarningIcon />}>
                     <Box sx={{ mb: 1 }}>
                       <strong>
-                        {t('translation.duplicateWarning').replace(
+                        {t('translation.dialog.duplicateWarning').replace(
                           '{count}',
                           String(duplicateInfo.duplicates.length),
                         )}
