@@ -20,7 +20,7 @@ function createApp() {
   //   basicAuthHandler(app);
   //   bearerAuthHandler(app);
   //   pathHandler(app);
-  docRegister(app);
+  getEnv("NODE_ENV") !== "production" && docRegister(app);
   const subApp = routeRegister();
   const baseApiPath = getEnv("BASE_API_PATH");
   !baseApiPath && console.error("❌.MISSING ENV: BASE_API_PATH");
