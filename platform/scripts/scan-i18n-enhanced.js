@@ -221,8 +221,8 @@ async function main() {
 
   const defaultOutputPath =
     outputFormat === 'json'
-      ? join(baseDir, 'i18n-scan-report.json')
-      : join(baseDir, 'i18n-scan-report.md');
+      ? join(__dirname, 'i18n-scan-report.json')
+      : join(__dirname, 'i18n-scan-report.md');
 
   const finalOutputPath = outputPath || defaultOutputPath;
 
