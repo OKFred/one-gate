@@ -44,7 +44,8 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
   for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
     const batch = mappedData.slice(i, i + BATCH_SIZE);
     queries.push(
-      db.insert(translationTable)
+      db
+        .insert(translationTable)
         .values(batch)
         .onConflictDoUpdate({
           target: [translationTable.tKey, translationTable.langCode],
@@ -5381,6 +5382,22 @@ export const initialTranslationData = [
     langCode: "en-US",
     tKey: "maintenance.init.title",
     tValue: "Database Initialization",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission.tree",
+    langCode: "zh-CN",
+    tKey: "system.rolePermission.tree.selectRole",
+    tValue: "请先选择角色",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission.tree",
+    langCode: "en-US",
+    tKey: "system.rolePermission.tree.selectRole",
+    tValue: "Please select a role first",
     isEnabled: true,
   },
 ];
