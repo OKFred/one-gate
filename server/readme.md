@@ -23,7 +23,7 @@ Ensure you have the following installed:
 
 Table structures are no longer automatically created at startup. Execute the appropriate command based on your target environment:
 
-- **Node/Local File Mode** (for `xxx.db`):
+- **Node/Local File Mode** (Please create a db file, and set up the environment variable called DB_FILE_NAME):
 
   ```bash
   pnpm run db:init node

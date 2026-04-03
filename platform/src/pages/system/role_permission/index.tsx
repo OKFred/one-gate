@@ -168,7 +168,7 @@ export default function RolePermissionManagement() {
         fullWidth
         fullScreen={isMobile}
       >
-        <DialogTitle>{t('dialog.confirmDelete')}</DialogTitle>
+        <DialogTitle>{t('common.confirmDelete')}</DialogTitle>
         <DialogContent>
           <Typography>
             {t('rolePermission.confirmBatchDelete').replace(

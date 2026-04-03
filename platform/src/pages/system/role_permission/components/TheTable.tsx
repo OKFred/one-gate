@@ -185,7 +185,7 @@ const TheTable = memo(
       { type: 'title', render: (row) => getPermissionName(row.permissionId) },
       {
         type: 'subtitle',
-        label: t('rolePermission.role'),
+        label: t('me.role'),
         render: (row) => getRoleName(row.roleId),
       },
       {

@@ -34,12 +34,9 @@ export function getDb(): any {
 
   // Fallback to LibSQL (Local development / Node.js)
   try {
-    const dbFile = /* getEnv("DB_FILE_NAME") || */ "xxx.db";
-    const client = createClient({
-      url: /* ":memory:" */ dbFile.startsWith("file:")
-        ? dbFile
-        : `file:${dbFile}`,
-    });
+    const fileName = getEnv("DB_FILE_NAME");
+    const url = fileName || ":memory:";
+    const client = createClient({ url });
     _db = drizzleLibsql(client);
     return _db;
   } catch (e) {
