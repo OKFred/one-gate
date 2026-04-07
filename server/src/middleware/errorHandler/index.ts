@@ -79,5 +79,4 @@ getRuntimeKey() !== "workerd" &&
     console.log("uncaughtException:" + err);
   });
 
-getEnv("NODE_ENV") === "production" &&
-  console.log("🚀 Server started in production mode");
+console.log(`🚀 Server started in ${getEnv("NODE_ENV")} mode`);
