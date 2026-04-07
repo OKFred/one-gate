@@ -43,6 +43,21 @@ pnpm run dev
 
 _前端默认运行在 `http://localhost:5173`。_
 
+## 🐳 应用部署 (Docker)
+
+我们提供了一个跨平台的交互式部署脚本：
+
+```bash
+# 启动交互式部署 (Build & Push & Compose)
+npx tsx deploy.js
+```
+
+该脚本会自动执行以下步骤：
+1. 提示输入你的 **Docker Registry 项目地址**。
+2. 自动构建并推送 `:server` 和 `:platform` 镜像。
+3. 将输入的地址保存到根目录的 `.env` 中，方便下次使用。
+4. 运行 `docker compose up -d` 启动服务。
+
 ## 📂 核心目录
 
 - `platform/`: 前端 React 源代码。

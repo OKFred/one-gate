@@ -43,6 +43,21 @@ pnpm run dev
 
 _Frontend will be available at `http://localhost:5173`._
 
+## 🐳 Deployment (Docker)
+
+We provide a cross-platform interactive deployment script:
+
+```bash
+# Run the interactive deployment (Build & Push & Compose)
+npx tsx deploy.js
+```
+
+This script will:
+1. Prompt for your **Docker Registry URL**.
+2. Automatically build and push `:server` and `:platform` images.
+3. Save the URL to your local `.env` for future use.
+4. Run `docker compose up -d` to start the services.
+
 ## 📂 Key Directories
 
 - `platform/`: React frontend source code.
