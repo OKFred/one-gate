@@ -5,8 +5,8 @@
   "main": "./src/node.js",
   "type": "module",
   "scripts": {
-    "dev": "npx tsx --watch -r dotenv/config ./src/node.ts",
-    "debug": "npx tsx --inspect-brk -r dotenv/config ./src/node.ts",
+    "dev": "npx tsx --watch --env-file=.env.development ./src/node.ts",
+    "debug": "npx tsx --inspect-brk --env-file=.env.development ./src/node.ts",
     "build": "npx tsgo && npx tsc-alias",
     "visualize": "node dependency-visualize.ts",
     "worker:dev": "wrangler dev --env development",
