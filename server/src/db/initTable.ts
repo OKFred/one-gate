@@ -90,16 +90,27 @@ async function runWranglerInit(target: "local" | "remote") {
  * 这样就可以直接用 pnpm run db:init node 而不需要 -- 了
  */
 function parseArgs() {
-  const args = process.argv.slice(2).map((a) => a.toLowerCase());
+  const args = process.argv.slice(2);
+  const lowerArgs = args.map((a) => a.toLowerCase());
+
+  // 检测 --env=filename 或 env=filename
+  const envArg = args.find(
+    (a) => a.startsWith("--env=") || a.toLowerCase().startsWith("env=")
+  );
+  const envFile = envArg ? envArg.split("=")[1] : null;
 
   return {
-    isNode: args.includes("node"),
-    isWorker: args.includes("worker"),
-    isRemote: args.includes("remote"),
+    isNode: lowerArgs.includes("node"),
+    isWorker: lowerArgs.includes("worker"),
+    isRemote: lowerArgs.includes("remote"),
     isLocal:
-      args.includes("local") ||
-      (!args.includes("remote") && args.includes("worker")),
-    showHelp: args.length === 0 || args.includes("help") || args.includes("h"),
+      lowerArgs.includes("local") ||
+      (!lowerArgs.includes("remote") && lowerArgs.includes("worker")),
+    envFile,
+    showHelp:
+      lowerArgs.length === 0 ||
+      lowerArgs.includes("help") ||
+      lowerArgs.includes("h"),
   };
 }
 
@@ -118,10 +129,12 @@ function printHelp() {
 选项:
   local              (针对 worker) 指定 [本地] 环境 (默认)
   remote             (针对 worker) 指定 [远程] 环境
+  --env=<filename>   手动加载环境配置文件 (如 --env=.env.development)
   help               显示此帮助信息
 
 示例:
   pnpm run db:init node
+  pnpm run db:init node --env=.env.development
   pnpm run db:init worker
   pnpm run db:init worker remote
   `);
@@ -136,6 +149,18 @@ async function main() {
   if (flags.showHelp) {
     printHelp();
     return;
+  }
+
+  // 加载指定的环境文件 (Node 20.6+)
+  if (flags.envFile) {
+    const fullPath = path.resolve(process.cwd(), flags.envFile);
+    if (fs.existsSync(fullPath)) {
+      console.log(`📡 加载环境配置: ${flags.envFile}`);
+      process.loadEnvFile(fullPath);
+    } else {
+      console.error(`❌ 未找到环境配置文件: ${flags.envFile}`);
+      process.exit(1);
+    }
   }
 
   if (flags.isNode) {

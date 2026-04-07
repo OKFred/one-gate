@@ -23,12 +23,12 @@ services:
           "CMD",
           "node",
           "-e",
-          "require('http').get('http://localhost:8787/', (res) => { process.exit(res.statusCode ? 0 : 1) })",
+          "require('http').get('http://localhost:8787/healthCheck', (res) => { process.exit(res.statusCode ? 0 : 1) })",
         ]
-      interval: 60s
+      interval: 120s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
   # 前端应用和Nginx代理
   frontend:
