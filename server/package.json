@@ -8,12 +8,11 @@
     "dev": "npx tsx --watch --env-file=.dev.vars ./src/node.ts",
     "debug": "npx tsx --inspect-brk --env-file=.dev.vars ./src/node.ts",
     "build": "npx tsgo && npx tsc-alias",
+    "start": "node ./dist/node.js",
     "visualize": "npx tsx scripts/dependency-visualize.ts",
     "worker:dev": "wrangler dev",
     "worker:types": "wrangler types",
     "worker:deploy": "wrangler deploy",
-    "start:ts": "node ./src/node.ts",
-    "start": "node ./dist/node.js",
     "db:init": "npx tsx -r dotenv/config ./src/db/initTable.ts"
   },
   "keywords": [],
@@ -68,7 +67,7 @@
     "tsc-alias": "^1.8.11",
     "typescript": "^5.8.2",
     "vitest": "~3.2.0",
-    "wrangler": "^4.77.0"
+    "wrangler": "^4.80.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
