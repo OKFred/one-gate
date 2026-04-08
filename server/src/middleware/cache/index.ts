@@ -66,7 +66,7 @@ export class CacheNamespaces {
 }
 
 // 导出类型和工具
-export { KVNamespace } from "./kv";
+export type { KVNamespace } from "./kv";
 export type {
   KVGetOptions,
   KVPutOptions,
