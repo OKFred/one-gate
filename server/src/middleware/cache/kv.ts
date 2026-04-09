@@ -1,6 +1,6 @@
 /**
  * KV 缓存抽象层
- * API 设计参考 Cloudflare Workers KV，支持内存与 Cloudflare KV 适配
+ * API 设计参考 Cloudflare Workers KV，便于后续迁移到 CF Workers
  */
 
 import { createCache, type Cache } from "cache-manager";
@@ -11,29 +11,12 @@ import type {
   KVListResult,
   CacheStats,
 } from "./types";
-import { getEnv } from "@/utils/env";
-
-export interface KVNamespace {
-  get<T = string>(
-    key: string,
-    options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
-  ): Promise<T | null>;
-  put(
-    key: string,
-    value: string | object | ArrayBuffer,
-    options?: KVPutOptions
-  ): Promise<void>;
-  delete(key: string): Promise<void>;
-  list(options?: KVListOptions): Promise<KVListResult>;
-  getStats(): Promise<CacheStats>;
-  resetStats(): void;
-  clear(): Promise<void>;
-}
 
 /**
- * 内存实现的 KV 缓存命名空间（用于本地开发）
+ * KV 缓存命名空间
+ * 类似 Cloudflare Workers 的 KVNamespace
  */
-export class MemoryKVNamespace implements KVNamespace {
+export class KVNamespace {
   private cache: Cache;
   private keyPrefix: string;
   private stats = {
@@ -49,6 +32,12 @@ export class MemoryKVNamespace implements KVNamespace {
     });
   }
 
+  /**
+   * 获取缓存值
+   * @param key - 键名
+   * @param options - 获取选项
+   * @returns 缓存值，不存在时返回 null
+   */
   async get<T = string>(
     key: string,
     options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
@@ -83,9 +72,16 @@ export class MemoryKVNamespace implements KVNamespace {
       default:
         return value as T;
       // 注意：arrayBuffer 和 stream 在内存缓存中暂不支持
+      // 迁移到 CF Workers 时会自动支持
     }
   }
 
+  /**
+   * 设置缓存值
+   * @param key - 键名
+   * @param value - 缓存值
+   * @param options - 设置选项
+   */
   async put(
     key: string,
     value: string | object | ArrayBuffer,
@@ -98,7 +94,7 @@ export class MemoryKVNamespace implements KVNamespace {
     if (typeof value === "string") {
       serializedValue = value;
     } else if (value instanceof ArrayBuffer) {
-      // ArrayBuffer 转 base64
+      // ArrayBuffer 转 base64（迁移到 CF Workers 时会自动支持原生）
       serializedValue = Buffer.from(value).toString("base64");
     } else {
       serializedValue = JSON.stringify(value);
@@ -120,11 +116,19 @@ export class MemoryKVNamespace implements KVNamespace {
     await this.cache.set(fullKey, serializedValue, ttl);
   }
 
+  /**
+   * 删除缓存值
+   * @param key - 键名
+   */
   async delete(key: string): Promise<void> {
     const fullKey = this.keyPrefix + key;
     await this.cache.del(fullKey);
   }
 
+  /**
+   * 列出缓存键（支持迭代）
+   * @param options - 列出选项
+   */
   async list(options?: KVListOptions): Promise<KVListResult> {
     const keys: { name: string }[] = [];
     const prefix = options?.prefix
@@ -159,6 +163,9 @@ export class MemoryKVNamespace implements KVNamespace {
     };
   }
 
+  /**
+   * 获取缓存统计信息
+   */
   async getStats(): Promise<CacheStats> {
     const total = this.stats.hits + this.stats.misses;
     const listResult = await this.list({ limit: 10000 });
@@ -170,152 +177,24 @@ export class MemoryKVNamespace implements KVNamespace {
     };
   }
 
+  /**
+   * 重置统计信息
+   */
   resetStats(): void {
     this.stats.hits = 0;
     this.stats.misses = 0;
   }
 
+  /**
+   * 清空命名空间下的所有缓存
+   */
   async clear(): Promise<void> {
     await this.cache.clear();
   }
 }
 
 /**
- * Cloudflare Workers 原生实现的 KV 缓存命名空间
- */
-export class WorkerKVNamespace implements KVNamespace {
-  private kv: any; // Cloudflare KVNamespace
-  private keyPrefix: string;
-  private stats = {
-    hits: 0,
-    misses: 0,
-  };
-
-  constructor(kv: any, namespace: string = "default") {
-    this.kv = kv;
-    this.keyPrefix = `${namespace}:`;
-  }
-
-  async get<T = string>(
-    key: string,
-    options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
-  ): Promise<T | null> {
-    const fullKey = this.keyPrefix + key;
-
-    let type: string = "text";
-    if (typeof options === "string") {
-      type = options;
-    } else if (options?.type) {
-      type = options.type;
-    }
-
-    let value = null;
-    try {
-      value = await this.kv.get(fullKey, { 
-        type: type === "json" ? "json" : "text",
-        cacheTtl: typeof options === "object" ? options.cacheTtl : undefined 
-      });
-    } catch (e) {
-      console.error("WorkerKVNamespace get error", e);
-    }
-
-    if (value === null) {
-      this.stats.misses++;
-      return null;
-    }
-
-    this.stats.hits++;
-    return value as T;
-  }
-
-  async put(
-    key: string,
-    value: string | object | ArrayBuffer,
-    options?: KVPutOptions
-  ): Promise<void> {
-    const fullKey = this.keyPrefix + key;
-
-    let serializedValue: string | ArrayBuffer;
-    if (typeof value === "string" || value instanceof ArrayBuffer) {
-      serializedValue = value;
-    } else {
-      serializedValue = JSON.stringify(value);
-    }
-
-    await this.kv.put(fullKey, serializedValue, {
-      expiration: options?.expiration,
-      expirationTtl: options?.expirationTtl,
-      metadata: options?.metadata,
-    });
-  }
-
-  async delete(key: string): Promise<void> {
-    const fullKey = this.keyPrefix + key;
-    await this.kv.delete(fullKey);
-  }
-
-  async list(options?: KVListOptions): Promise<KVListResult> {
-    const prefix = options?.prefix
-      ? this.keyPrefix + options.prefix
-      : this.keyPrefix;
-    
-    // Cloudflare limitation: max limit is 1000
-    const limit = Math.min(options?.limit || 1000, 1000);
-
-    const result = await this.kv.list({
-      prefix,
-      limit,
-      cursor: options?.cursor,
-    });
-
-    const keys = result.keys.map((k: any) => ({
-      ...k,
-      name: k.name.substring(this.keyPrefix.length),
-    }));
-
-    return {
-      keys,
-      list_complete: result.list_complete,
-      cursor: result.cursor,
-    };
-  }
-
-  async getStats(): Promise<CacheStats> {
-    const total = this.stats.hits + this.stats.misses;
-    // To align with Memory implementation, listing up to 1000 keys
-    const listResult = await this.list({ limit: 1000 });
-    return {
-      hits: this.stats.hits,
-      misses: this.stats.misses,
-      keys: listResult.keys.length,
-      hitRate: total > 0 ? this.stats.hits / total : 0,
-    };
-  }
-
-  resetStats(): void {
-    this.stats.hits = 0;
-    this.stats.misses = 0;
-  }
-
-  async clear(): Promise<void> {
-    let cursor: string | undefined;
-    do {
-      const result = await this.list({ cursor, limit: 1000 });
-      for (const key of result.keys) {
-        await this.delete(key.name);
-      }
-      cursor = result.cursor;
-      if (result.list_complete) {
-        break;
-      }
-    } while (cursor);
-  }
-}
-
-/**
  * 创建 KV 命名空间
- * 根据环境变量中是否有 KV binding 自动选择原生或内存实现
- * 
  * @param namespace - 命名空间名称
  * @param ttlSeconds - 默认 TTL（秒）
  * @returns KV 命名空间实例
@@ -324,9 +203,5 @@ export function createKVNamespace(
   namespace: string,
   ttlSeconds?: number
 ): KVNamespace {
-  const kvBinding = getEnv("KV");
-  if (kvBinding) {
-    return new WorkerKVNamespace(kvBinding, namespace);
-  }
-  return new MemoryKVNamespace(namespace, ttlSeconds);
+  return new KVNamespace(namespace, ttlSeconds);
 }
