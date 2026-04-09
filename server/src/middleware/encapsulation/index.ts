@@ -114,7 +114,7 @@ function routeMaker({
       }
     }
     return c.json(
-      { ok: true, message: "OK", data: result },
+      { ok: true, message: "OK", data: result, reqId: c.get("requestId") },
       StatusCodes.OK as ContentfulStatusCode
     );
   };
