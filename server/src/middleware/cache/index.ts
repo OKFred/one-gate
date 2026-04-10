@@ -1,77 +1,200 @@
 /**
  * 缓存抽象层
- * 提供类似 Cloudflare Workers KV 的 API，便于后续迁移
+ * 提供类似 Cloudflare Workers KV 的 API
  */
-
-import { KVNamespace, createKVNamespace as _createKVNamespace } from "./kv";
-
-/**
- * 自定义命名空间注册表
- */
-const customNamespaces = new Map<string, KVNamespace>();
-
-/**
- * 创建并注册命名空间
- */
-export function createKVNamespace(
-  namespace: string,
-  expirationTtl?: number
-): KVNamespace {
-  if (!customNamespaces.has(namespace)) {
-    const kv = _createKVNamespace(namespace, expirationTtl);
-    customNamespaces.set(namespace, kv);
-  }
-  return customNamespaces.get(namespace)!;
-}
-
-/**
- * 获取已注册的自定义缓存命名空间
- */
-export function getKVNamespace(namespace: string): KVNamespace | null {
-  return customNamespaces.get(namespace) || null;
-}
-
-/**
- * 获取所有命名空间及其统计信息
- */
-export async function getAllNamespaces(): Promise<
-  Array<{
-    name: string;
-    keyCount: number;
-    expirationTtl: number | null;
-  }>
-> {
-  const result = [];
-  for (const [name, kv] of customNamespaces.entries()) {
-    const stats = await kv.getStats();
-    const res = {
-      name,
-      keyCount: stats.keys,
-      expirationTtl: (kv as any).expirationTtl ?? null,
-    };
-    result.push(res);
-  }
-  return result;
-}
-
-/**
- * 预定义的缓存命名空间
- */
-export class CacheNamespaces {
-  /**
-   * 多语言翻译缓存
-   * 用于缓存多语言文案
-   */
-  static readonly I18nTranslation = createKVNamespace("i18n_translation");
-}
-
-// 导出类型和工具
-export { KVNamespace } from "./kv";
-export type {
+import { createCache, type Cache } from "cache-manager";
+import { getEnv } from "@/utils/env";
+import type {
   KVGetOptions,
   KVPutOptions,
   KVListOptions,
   KVListResult,
-  KVKey,
-  CacheStats,
 } from "./types";
+
+/**
+ * KV 存储类
+ * 封装了对 Cloudflare Workers KV 和 cache-manager 的统一访问
+ */
+export class KVStorage {
+  private cache: Cache | null = null;
+  private realKV: any = null;
+
+  constructor(bindingName: string = "KV", ttlSeconds: number = 3600) {
+    // 尝试从环境变量获取真实的 KV 绑定
+    const envKV = getEnv(bindingName);
+    if (
+      envKV &&
+      typeof (envKV as any)?.get === "function" &&
+      typeof (envKV as any)?.put === "function"
+    ) {
+      this.realKV = envKV;
+    } else {
+      // 如果没有真实 KV，回退到 cache-manager (内存)
+      this.cache = createCache({
+        ttl: ttlSeconds * 1000,
+      });
+    }
+  }
+
+  /**p
+   * 获取缓存值
+   */
+  async get<T = string>(
+    key: string,
+    options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
+  ): Promise<T | null> {
+    let value: any;
+
+    if (this.realKV) {
+      value = await this.realKV.get(key, options);
+    } else if (this.cache) {
+      value = await this.cache.get<string>(key);
+    }
+
+    if (value === undefined || value === null) {
+      return null;
+    }
+
+    // 如果是真实 KV，它已经处理好了类型转换
+    if (this.realKV) return value;
+
+    // 处理 cache-manager 的类型参数
+    let type: string = "text";
+    if (typeof options === "string") {
+      type = options;
+    } else if (options?.type) {
+      type = options.type;
+    }
+
+    switch (type) {
+      case "json":
+        try {
+          return JSON.parse(value as string) as T;
+        } catch {
+          return null;
+        }
+      case "text":
+      default:
+        return value as T;
+    }
+  }
+
+  /**
+   * 设置缓存值
+   */
+  async put(
+    key: string,
+    value: string | object | ArrayBuffer,
+    options?: KVPutOptions
+  ): Promise<void> {
+    if (this.realKV) {
+      await this.realKV.put(key, value, options);
+      return;
+    }
+
+    if (this.cache) {
+      // 处理不同类型的值 (用于内存缓存)
+      let serializedValue: string;
+      if (typeof value === "string") {
+        serializedValue = value;
+      } else if (value instanceof ArrayBuffer) {
+        serializedValue = Buffer.from(value).toString("base64");
+      } else {
+        serializedValue = JSON.stringify(value);
+      }
+
+      // 计算 TTL (毫秒)
+      let ttl: number | undefined;
+      if (options?.expirationTtl !== undefined) {
+        ttl = options.expirationTtl * 1000;
+      } else if (options?.expiration !== undefined) {
+        const now = Math.floor(Date.now() / 1000);
+        ttl = (options.expiration - now) * 1000;
+        if (ttl <= 0) return;
+      }
+
+      await this.cache.set(key, serializedValue, ttl);
+    }
+  }
+
+  /**
+   * 删除缓存值
+   */
+  async delete(key: string): Promise<void> {
+    if (this.realKV) {
+      await this.realKV.delete(key);
+    } else if (this.cache) {
+      await this.cache.del(key);
+    }
+  }
+
+  /**
+   * 列出缓存键
+   */
+  async list(options?: KVListOptions): Promise<KVListResult> {
+    if (this.realKV) {
+      return await this.realKV.list(options);
+    }
+
+    const keys: { name: string }[] = [];
+    const prefix = options?.prefix || "";
+    const limit = options?.limit || 1000;
+
+    if (this.cache) {
+      try {
+        const store = (this.cache as any).stores?.[0];
+        if (store?.iterator) {
+          let count = 0;
+          for await (const [key] of store.iterator({})) {
+            if (key.startsWith(prefix)) {
+              keys.push({ name: key });
+              count++;
+              if (count >= limit) break;
+            }
+          }
+        }
+      } catch (error) {
+        console.warn("Iterator not supported or error occurred:", error);
+      }
+    }
+
+    return {
+      keys,
+      list_complete: keys.length < limit,
+    };
+  }
+
+  /**
+   * 清空所有缓存
+   */
+  async clear(): Promise<void> {
+    if (this.realKV) {
+      // CF Workers KV 不支持直接 clear，需要分页列出并删除
+      let list = await this.realKV.list();
+      while (list.keys.length > 0) {
+        await Promise.all(
+          list.keys.map((k: any) => this.realKV.delete(k.name))
+        );
+        if (list.list_complete) break;
+        list = await this.realKV.list({ cursor: list.cursor });
+      }
+    } else if (this.cache) {
+      await this.cache.clear();
+    }
+  }
+}
+
+/**
+ * 创建或获取 KV 存储实例
+ */
+export function getKVStorage(
+  bindingName: string = "KV",
+  ttlSeconds?: number
+): KVStorage {
+  return new KVStorage(bindingName, ttlSeconds);
+}
+
+/**
+ * 全局统一的 KV 存储实例
+ */
+export const kv = getKVStorage("KV");

@@ -20,7 +20,6 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 // 筛选状态类型
 export interface FilterState {
-  namespace: string;
   keywordPrefix: string;
 }
 
@@ -39,7 +38,6 @@ const TheFilter = memo(
     const [isSearching, setIsSearching] = useState(false); // 搜索状态
     const [filterCount, setFilterCount] = useState(0); // 结果数量
     const [filters, setFilters] = useState<FilterState>({
-      namespace: '',
       keywordPrefix: '',
     });
 
@@ -84,14 +82,8 @@ const TheFilter = memo(
       }
     }, [keywordInput, debouncedSearch, filters.keywordPrefix]);
 
-    const handleFilterChange = (key: keyof FilterState, value: string) => {
-      if (key === 'keywordPrefix') {
-        setKeywordInput(value);
-      } else {
-        const newFilters = { ...filters, [key]: value };
-        setFilters(newFilters);
-        refreshTable(newFilters);
-      }
+    const handleFilterChange = (_: keyof FilterState, value: string) => {
+      setKeywordInput(value);
     };
 
     return (
@@ -124,14 +116,6 @@ const TheFilter = memo(
 
         <Collapse in={expanded}>
           <Stack spacing={2}>
-            <TextField
-              label={t('cache.filter.namespace')}
-              value={filters.namespace}
-              onChange={(e) => handleFilterChange('namespace', e.target.value)}
-              fullWidth
-              size="small"
-              placeholder={t('cache.filter.namespacePlaceholder')}
-            />
 
             <TextField
               label={t('cache.filter.keyPrefix')}

@@ -1,27 +1,5 @@
 import type { JSONSchema } from "json-schema-to-ts";
 
-/**
- * 命名空间信息 VO
- */
-export const NamespaceVO = {
-  name: {
-    type: "string",
-    description: "命名空间名称",
-    examples: ["i18n_translation", "user_session", "data_permission"],
-    maxLength: 100,
-  },
-  keyCount: {
-    type: "number",
-    description: "缓存键数量",
-    examples: [1250, 42],
-  },
-  expirationTtl: {
-    type: ["number", "null"],
-    nullable: true,
-    description: "过期时间（秒）",
-    examples: [3600, 1800],
-  },
-} as const satisfies Record<string, JSONSchema>;
 
 /**
  * 缓存键 VO
@@ -81,13 +59,6 @@ export const StatsVO = {
  * 公共请求参数字段
  */
 export const RequestParamFields = {
-  namespace: {
-    type: "string",
-    description: "缓存命名空间名称",
-    examples: ["i18n_translation", "user_session"],
-    minLength: 1,
-    maxLength: 100,
-  },
   key: {
     type: "string",
     description: "缓存键名",

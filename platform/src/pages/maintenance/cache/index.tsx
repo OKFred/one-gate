@@ -1,8 +1,8 @@
 import { useRef, useMemo } from 'react';
 import { PageLayout } from '@/components/Responsive/index';
-import TheForm, { type CacheFormRef } from './components/TheForm';
 import TheTable, { type CacheTableRef } from './components/TheTable';
 import TheFilter, { type CacheFilterRef } from './components/TheFilter';
+import TheDetail, { type TheDetailRef } from './components/TheDetail';
 import { TheActionButtons } from './components/TheActionButtons';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -12,22 +12,22 @@ export interface Props {
 
 export interface LocalObj {
   tableRef: React.RefObject<CacheTableRef | null>;
-  formRef: React.RefObject<CacheFormRef | null>;
+  detailRef: React.RefObject<TheDetailRef | null>;
   filterRef: React.RefObject<CacheFilterRef | null>;
 }
 
 export default function CacheManagementPage() {
   const t = useTranslation();
   const tableRef = useRef<CacheTableRef>(null);
-  const formRef = useRef<CacheFormRef>(null);
+  const detailRef = useRef<TheDetailRef>(null);
   const filterRef = useRef<CacheFilterRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
+  const localObj: LocalObj = useMemo(() => ({ tableRef, detailRef, filterRef }), []);
 
   return (
-    <PageLayout title={t('cache.title')} actions={<TheActionButtons formRef={formRef} />}>
+    <PageLayout title={t('cache.title')} actions={<TheActionButtons tableRef={tableRef} />}>
       <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheForm ref={localObj.formRef} localObj={localObj} />
       <TheTable ref={localObj.tableRef} localObj={localObj} />
+      <TheDetail ref={localObj.detailRef} localObj={localObj} />
     </PageLayout>
   );
 }

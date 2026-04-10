@@ -3,7 +3,6 @@ import { prepareMenu } from "./initMenu";
 import { prepareTranslation } from "./initTranslation";
 import { prepareCountryRegion } from "./initRegion";
 import { prepareLanguage } from "./initLanguage";
-import { loadTranslationCache } from "@/utils/i18n";
 import { getEnv } from "@/utils/env";
 import { preparePermissions } from "./initPermissions";
 import {
@@ -71,9 +70,6 @@ export async function initDatabase(options?: { reset?: boolean }) {
     if (allQueries.length > 0) {
       await db.batch(allQueries as any);
     }
-
-    // 4. 后置处理：加载多语言缓存 (必须在事务成功后)
-    await loadTranslationCache();
 
     console.log("✅ 全局原子初始化完成");
 

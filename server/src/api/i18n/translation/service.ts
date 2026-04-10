@@ -41,7 +41,7 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 
-import { reloadTranslationCache } from "@/utils/i18n";
+import { kv } from "@/middleware/cache";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -240,8 +240,7 @@ const addRes = {
 } as const satisfies JSONSchema;
 async function onAdd(
   params: FromSchema<typeof addReq>,
-  userObj: Pick<UserObj, "userId">,
-  options?: { skipCacheReload?: boolean }
+  userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
   // 检查 tKey 是否与其他记录冲突
@@ -255,9 +254,9 @@ async function onAdd(
     .values(addData)
     .returning({ id: translationTable.id });
 
-  // 触发多语言缓存重新加载（除非明确跳过）
-  if (!options?.skipCacheReload) {
-    await reloadTranslationCache();
+  // 如果是后端应用，同步更新 KV 缓存
+  if (params.application === "backend") {
+    await cacheSync(params, "add");
   }
 
   return result[0]?.id;
@@ -289,8 +288,7 @@ const updateRes = {
 } as const satisfies JSONSchema;
 async function onUpdate(
   params: FromSchema<typeof updateReq>,
-  userObj: UserObj,
-  options?: { skipCacheReload?: boolean }
+  userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
@@ -314,10 +312,20 @@ async function onUpdate(
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
-
-  // 触发多语言缓存重新加载（除非明确跳过）
-  if (!options?.skipCacheReload) {
-    await reloadTranslationCache();
+  // 如果涉及前端/后端文案，同步更新 KV 缓存
+  if (
+    params.application === "backend" ||
+    previousRecord.application === "backend"
+  ) {
+    const current = await onGet({ id });
+    if (!current) {
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+    }
+    if (current.application === "backend") {
+      await cacheSync(current, "update");
+    } else {
+      await cacheSync(current, "delete");
+    }
   }
 
   return res[0].id;
@@ -349,10 +357,10 @@ const deleteRes = {
 } as const satisfies JSONSchema;
 
 async function onDelete(
-  params: FromSchema<typeof deleteReq>,
-  options?: { skipCacheReload?: boolean }
+  params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
+  const record = await onGet({ id }).catch(() => null);
   const result = await db
     .delete(translationTable)
     .where(eq(translationTable.id, id))
@@ -361,9 +369,9 @@ async function onDelete(
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
 
-  // 触发多语言缓存重新加载（除非明确跳过）
-  if (!options?.skipCacheReload) {
-    await reloadTranslationCache();
+  // 获取删除前的信息以更新 KV
+  if (record && record.application === "backend") {
+    await cacheSync(record, "delete");
   }
 
   return result[0].id;
@@ -553,6 +561,21 @@ async function calculateSHA256(text: string): Promise<string> {
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function cacheSync(
+  record: FromSchema<typeof addReq>,
+  operation: "add" | "update" | "delete"
+) {
+  if (record.application !== "backend") return;
+  const cacheKey = `${record.langCode}:${record.tKey}`;
+  if (operation === "add") {
+    await kv.put(cacheKey, record.tValue);
+  } else if (operation === "update") {
+    await kv.put(cacheKey, record.tValue);
+  } else if (operation === "delete") {
+    await kv.delete(cacheKey);
+  }
 }
 
 export const utils = {

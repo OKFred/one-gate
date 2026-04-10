@@ -9,38 +9,33 @@ import {
   DialogContentText,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Edit as EditIcon,
+  Refresh as RefreshIcon,
   Delete as DeleteIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
 import * as CacheAPI from '@/api/maintenance/cache';
-import type { CacheFormRef } from './TheForm';
+import type { TheDetailRef } from './TheDetail';
 import type { ListKeysRes } from '@/api/maintenance/type';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
 import { MAINTENANCE } from '@/hooks/usePermission';
+import type { CacheTableRef } from './TheTable';
 
 // 页面顶部操作按钮
 interface TheActionButtonsProps {
-  formRef: React.RefObject<CacheFormRef | null>;
+  tableRef: React.RefObject<CacheTableRef | null>;
 }
 
-export function TheActionButtons({ formRef }: TheActionButtonsProps) {
+export function TheActionButtons({ tableRef }: TheActionButtonsProps) {
   const t = useTranslation();
 
-  const handleAdd = () => {
-    formRef.current?.onOpen('', '');
+  const handleRefresh = () => {
+    tableRef.current?.refresh();
   };
 
   return (
-    <ResponsiveButton
-      variant="contained"
-      startIcon={<AddIcon />}
-      onClick={handleAdd}
-      permissionCodes={[MAINTENANCE.CACHE.ADD]}
-    >
-      {t('cache.actions.add')}
+    <ResponsiveButton variant="outlined" startIcon={<RefreshIcon />} onClick={handleRefresh}>
+      {t('table.refresh')}
     </ResponsiveButton>
   );
 }
@@ -48,15 +43,13 @@ export function TheActionButtons({ formRef }: TheActionButtonsProps) {
 // 表格行内操作按钮
 interface CacheActionButtonsProps {
   cacheKey: ListKeysRes['keys'][0];
-  namespace: string;
-  formRef: React.RefObject<CacheFormRef | null>;
+  detailRef: React.RefObject<TheDetailRef | null>;
   onDeleteSuccess: () => void;
 }
 
 export function CacheActionButtons({
   cacheKey,
-  namespace,
-  formRef,
+  detailRef,
   onDeleteSuccess,
 }: CacheActionButtonsProps) {
   const t = useTranslation();
@@ -64,11 +57,7 @@ export function CacheActionButtons({
   const [deleting, setDeleting] = useState(false);
 
   const handleView = () => {
-    formRef.current?.onOpen(namespace, cacheKey.name);
-  };
-
-  const handleEdit = () => {
-    formRef.current?.onOpen(namespace, cacheKey.name);
+    detailRef.current?.open(cacheKey.name);
   };
 
   const handleDeleteClick = () => {
@@ -78,7 +67,7 @@ export function CacheActionButtons({
   const handleDeleteConfirm = async () => {
     setDeleting(true);
     try {
-      await CacheAPI.deleteFn({ data: { namespace, key: cacheKey.name } });
+      await CacheAPI.deleteFn({ data: { key: cacheKey.name } });
       setDeleteDialogOpen(false);
       onDeleteSuccess();
     } catch (error) {
@@ -99,16 +88,6 @@ export function CacheActionButtons({
           permissionCodes={[MAINTENANCE.CACHE.VIEW]}
         >
           <ViewIcon fontSize="small" />
-        </ResponsiveIconButton>
-
-        <ResponsiveIconButton
-          size="small"
-          color="primary"
-          onClick={handleEdit}
-          title={t('common.edit')}
-          permissionCodes={[MAINTENANCE.CACHE.EDIT]}
-        >
-          <EditIcon fontSize="small" />
         </ResponsiveIconButton>
 
         <ResponsiveIconButton

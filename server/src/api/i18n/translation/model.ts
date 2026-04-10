@@ -181,5 +181,4 @@ export const translationTable = sqliteTable(
   ]
 );
 
-
 export default translationTable;
