@@ -16,12 +16,12 @@ type HTTPExceptionConstructorParams = Required<
 type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // 提取第二个参数的类型
 
 export default function errorHandler(app: App) {
-  app.notFound((c: NodeHonoContext) => {
-    const t = getTranslator(c);
+  app.notFound(async (c: NodeHonoContext) => {
+    const t = await getTranslator(c);
     return c.json(
       {
         ok: false,
-        message: t("errorHandler.notFound"),
+        message: await t("errorHandler.notFound"),
         data: null,
       },
       { status: StatusCodes.NOT_FOUND as ContentfulStatusCode }
@@ -39,8 +39,8 @@ export default function errorHandler(app: App) {
     additionalProperties: false,
   });
 
-  app.onError((e, c: NodeHonoContext) => {
-    const t = getTranslator(c);
+  app.onError(async (e, c: NodeHonoContext) => {
+    const t = await getTranslator(c);
     const sqlError = convertSqlErrorToBusinessError(e);
     if (sqlError) {
       throw toHttpException(sqlError);
@@ -52,17 +52,17 @@ export default function errorHandler(app: App) {
       return c.json(
         {
           ok: false,
-          message: t(e.message),
+          message: await t(e.message),
           data: e.cause as HTTPExceptionOptions["cause"],
         },
         { status: e.status as ContentfulStatusCode }
       );
     }
-    c.var.logger.error(t("errorHandler.serverError") + ": " + e.stack);
+    c.var.logger.error((await t("errorHandler.serverError")) + ": " + e.stack);
     return c.json(
       {
         ok: false,
-        message: t("errorHandler.unknownError"),
+        message: await t("errorHandler.unknownError"),
         data: getEnv("NODE_ENV") !== "production" ? e.message : null,
       },
       { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
@@ -79,5 +79,4 @@ getRuntimeKey() !== "workerd" &&
     console.log("uncaughtException:" + err);
   });
 
-getEnv("NODE_ENV") === "production" &&
-  console.log("🚀 Server started in production mode");
+console.log(`🚀 Server started in ${getEnv("NODE_ENV")} mode`);

@@ -6,14 +6,8 @@ services:
     restart: unless-stopped
     ports:
       - "8787:8787"
-    environment:
-      - NODE_ENV=production
-      - PORT=8787
-      - DB_FILE_NAME=file:/data.db
-      - LOCALE=zh-CN
-      - BASE_API_PATH=/api/v1
-      - JWT_SECRET=your-secret-key-here-please-change-in-production
-      - X_INIT_TOKEN=your-random-setup-token-here
+    env_file:
+      - ./server/.env
     volumes:
       - ./server/logs:/app/logs
       - ./data.db:/data.db

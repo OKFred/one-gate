@@ -2324,64 +2324,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cache/listNamespaces": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 列出所有缓存命名空间 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["maintenance.cacheListNamespacesReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["maintenance.cacheListNamespacesRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/maintenance/cache/listKeys": {
         parameters: {
             query?: never;
@@ -2391,7 +2333,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 列出命名空间中的所有键名 */
+        /** 列出所有键名 */
         post: {
             parameters: {
                 query?: never;
@@ -2623,7 +2565,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 清空命名空间 */
+        /** 清空所有缓存键 */
         post: {
             parameters: {
                 query?: never;
@@ -2644,64 +2586,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["maintenance.cacheClearRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/maintenance/cache/getStats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取命名空间统计信息 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["maintenance.cacheGetStatsReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["maintenance.cacheGetStatsRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7847,41 +7731,7 @@ export interface components {
             };
             message: string;
         };
-        "maintenance.cacheListNamespacesReq": Record<string, never>;
-        "maintenance.cacheListNamespacesRes": {
-            ok: boolean;
-            data: {
-                namespaces: {
-                    /**
-                     * @description 命名空间名称
-                     * @example i18n_translation
-                     * @example user_session
-                     * @example data_permission
-                     */
-                    name: string;
-                    /**
-                     * @description 缓存键数量
-                     * @example 1250
-                     * @example 42
-                     */
-                    keyCount: number;
-                    /**
-                     * @description 过期时间（秒）
-                     * @example 3600
-                     * @example 1800
-                     */
-                    expirationTtl?: ((number | null) | null) | null;
-                }[];
-            };
-            message: string;
-        };
         "maintenance.cacheListKeysReq": {
-            /**
-             * @description 缓存命名空间名称
-             * @example i18n_translation
-             * @example user_session
-             */
-            namespace: string;
             /**
              * @description 键名前缀过滤
              * @example zh-CN:
@@ -7919,12 +7769,6 @@ export interface components {
         };
         "maintenance.cacheGetReq": {
             /**
-             * @description 缓存命名空间名称
-             * @example i18n_translation
-             * @example user_session
-             */
-            namespace: string;
-            /**
              * @description 缓存键名
              * @example zh-CN:common.save
              * @example user:12345
@@ -7960,12 +7804,6 @@ export interface components {
             message: string;
         };
         "maintenance.cachePutReq": {
-            /**
-             * @description 缓存命名空间名称
-             * @example i18n_translation
-             * @example user_session
-             */
-            namespace: string;
             /**
              * @description 缓存键名
              * @example zh-CN:common.save
@@ -8007,12 +7845,6 @@ export interface components {
         };
         "maintenance.cacheDeleteReq": {
             /**
-             * @description 缓存命名空间名称
-             * @example i18n_translation
-             * @example user_session
-             */
-            namespace: string;
-            /**
              * @description 缓存键名
              * @example zh-CN:common.save
              * @example user:12345
@@ -8030,14 +7862,7 @@ export interface components {
             };
             message: string;
         };
-        "maintenance.cacheClearReq": {
-            /**
-             * @description 缓存命名空间名称
-             * @example i18n_translation
-             * @example user_session
-             */
-            namespace: string;
-        };
+        "maintenance.cacheClearReq": Record<string, never>;
         "maintenance.cacheClearRes": {
             ok: boolean;
             data: {
@@ -8046,44 +7871,6 @@ export interface components {
                  * @example true
                  */
                 success: boolean;
-            };
-            message: string;
-        };
-        "maintenance.cacheGetStatsReq": {
-            /**
-             * @description 缓存命名空间名称
-             * @example i18n_translation
-             * @example user_session
-             */
-            namespace: string;
-        };
-        "maintenance.cacheGetStatsRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description 缓存命中次数
-                 * @example 15420
-                 * @example 0
-                 */
-                hits: number;
-                /**
-                 * @description 缓存未命中次数
-                 * @example 83
-                 * @example 0
-                 */
-                misses: number;
-                /**
-                 * @description 缓存键总数
-                 * @example 1250
-                 * @example 0
-                 */
-                keys: number;
-                /**
-                 * @description 缓存命中率
-                 * @example 99.46%
-                 * @example 0.00%
-                 */
-                hitRate: string;
             };
             message: string;
         };

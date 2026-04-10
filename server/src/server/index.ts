@@ -13,13 +13,13 @@ function createApp() {
   const app = new OpenAPIHono<AppBindings>();
 
   serveStaticFiles(app);
-  logHandler(app);
   errorHandler(app);
   corsHandler(app);
   serverTiming(app);
   //   basicAuthHandler(app);
   //   bearerAuthHandler(app);
   //   pathHandler(app);
+  logHandler(app);
   getEnv("NODE_ENV") !== "production" && docRegister(app);
   const subApp = routeRegister();
   const baseApiPath = getEnv("BASE_API_PATH");

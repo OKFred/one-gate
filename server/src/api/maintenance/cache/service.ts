@@ -1,17 +1,8 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { API } from "@/middleware/encapsulation";
 import { bodyAdapter } from "@/middleware/encapsulation/adapter";
+import { kv } from "@/middleware/cache/index";
 import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
-import {
-  getKVNamespace,
-  createKVNamespace,
-  getAllNamespaces,
-} from "@/middleware/cache/index";
-import {
-  NamespaceVO,
   CacheKeyVO,
   GetValueVO,
   StatsVO,
@@ -20,64 +11,15 @@ import {
 } from "./schema";
 
 /**
- * 列出所有命名空间
- */
-const listNamespacesReq = {
-  type: "object",
-  properties: {},
-  required: [],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const listNamespacesRes = {
-  type: "object",
-  properties: {
-    namespaces: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: {
-          ...NamespaceVO,
-        },
-        required: ["name", "keyCount"],
-        additionalProperties: false,
-      },
-    },
-  },
-  required: ["namespaces"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-async function onListNamespaces(): Promise<
-  FromSchema<typeof listNamespacesRes>
-> {
-  const namespaces = await getAllNamespaces();
-  return { namespaces };
-}
-
-const listNamespaces = {
-  req: listNamespacesReq,
-  res: listNamespacesRes,
-  pathInfo: {
-    path: "/listNamespaces",
-    method: "post",
-    summary: "列出所有缓存命名空间",
-  } as const,
-  adapter: bodyAdapter,
-  service: onListNamespaces,
-} satisfies API;
-
-/**
- * 列出指定命名空间的所有 keys
+ * 列出所有 keys
  */
 const listKeysReq = {
   type: "object",
   properties: {
-    namespace: RequestParamFields.namespace,
     prefix: RequestParamFields.prefix,
     limit: RequestParamFields.limit,
   },
-  required: ["namespace"],
+  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -104,13 +46,7 @@ const listKeysRes = {
 async function onListKeys(
   params: FromSchema<typeof listKeysReq>
 ): Promise<FromSchema<typeof listKeysRes>> {
-  const { namespace, prefix, limit } = params;
-  const kv = getKVNamespace(namespace);
-  if (!kv) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED, {
-      namespace,
-    });
-  }
+  const { prefix, limit } = params;
   const result = await kv.list({ prefix, limit });
   return result;
 }
@@ -121,7 +57,7 @@ const listKeys = {
   pathInfo: {
     path: "/listKeys",
     method: "post",
-    summary: "列出命名空间中的所有键名",
+    summary: "列出所有键名",
   } as const,
   adapter: bodyAdapter,
   service: onListKeys,
@@ -133,11 +69,10 @@ const listKeys = {
 const getReq = {
   type: "object",
   properties: {
-    namespace: RequestParamFields.namespace,
     key: RequestParamFields.key,
     type: RequestParamFields.type,
   },
-  required: ["namespace", "key"],
+  required: ["key"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -153,13 +88,7 @@ const getRes = {
 async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes>> {
-  const { namespace, key, type = "json" } = params;
-  const kv = getKVNamespace(namespace);
-  if (!kv) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED, {
-      namespace,
-    });
-  }
+  const { key, type = "json" } = params;
   const value = await kv.get(key, { type: type as "text" | "json" });
   return {
     value,
@@ -185,12 +114,11 @@ const get = {
 const putReq = {
   type: "object",
   properties: {
-    namespace: RequestParamFields.namespace,
     key: RequestParamFields.key,
     value: RequestParamFields.value,
     expirationTtl: RequestParamFields.expirationTtl,
   },
-  required: ["namespace", "key", "value"],
+  required: ["key", "value"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -206,12 +134,7 @@ const putRes = {
 async function onPut(
   params: FromSchema<typeof putReq>
 ): Promise<FromSchema<typeof putRes>> {
-  const { namespace, key, value, expirationTtl } = params;
-  let kv = getKVNamespace(namespace);
-  if (!kv) {
-    // 自动创建命名空间
-    kv = createKVNamespace(namespace);
-  }
+  const { key, value, expirationTtl } = params;
   // value 来自 JSON Schema 验证，类型安全
   await kv.put(key, value as string | object, { expirationTtl });
   return { success: true };
@@ -235,10 +158,9 @@ const put = {
 const deleteReq = {
   type: "object",
   properties: {
-    namespace: RequestParamFields.namespace,
     key: RequestParamFields.key,
   },
-  required: ["namespace", "key"],
+  required: ["key"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -254,13 +176,7 @@ const deleteRes = {
 async function onDelete(
   params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes>> {
-  const { namespace, key } = params;
-  const kv = getKVNamespace(namespace);
-  if (!kv) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED, {
-      namespace,
-    });
-  }
+  const { key } = params;
   await kv.delete(key);
   return { success: true };
 }
@@ -278,14 +194,12 @@ const deleteKey = {
 } satisfies API;
 
 /**
- * 清空指定命名空间
+ * 清空所有缓存
  */
 const clearReq = {
   type: "object",
-  properties: {
-    namespace: RequestParamFields.namespace,
-  },
-  required: ["namespace"],
+  properties: {},
+  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -298,16 +212,7 @@ const clearRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-async function onClear(
-  params: FromSchema<typeof clearReq>
-): Promise<FromSchema<typeof clearRes>> {
-  const { namespace } = params;
-  const kv = getKVNamespace(namespace);
-  if (!kv) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED, {
-      namespace,
-    });
-  }
+async function onClear(): Promise<FromSchema<typeof clearRes>> {
   await kv.clear();
   return { success: true };
 }
@@ -318,70 +223,16 @@ const clear = {
   pathInfo: {
     path: "/clear",
     method: "post",
-    summary: "清空命名空间",
+    summary: "清空所有缓存键",
   } as const,
   adapter: bodyAdapter,
   service: onClear,
 } satisfies API;
 
-/**
- * 获取命名空间统计信息
- */
-const getStatsReq = {
-  type: "object",
-  properties: {
-    namespace: RequestParamFields.namespace,
-  },
-  required: ["namespace"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const getStatsRes = {
-  type: "object",
-  properties: {
-    ...StatsVO,
-  },
-  required: ["hits", "misses", "keys", "hitRate"],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-async function onGetStats(
-  params: FromSchema<typeof getStatsReq>
-): Promise<FromSchema<typeof getStatsRes>> {
-  const { namespace } = params;
-  const kv = getKVNamespace(namespace);
-  if (!kv) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED, {
-      namespace,
-    });
-  }
-  const stats = await kv.getStats();
-  return {
-    hits: stats.hits,
-    misses: stats.misses,
-    keys: stats.keys,
-    hitRate: stats.hitRate.toFixed(2) + "%",
-  };
-}
-
-const getStats = {
-  req: getStatsReq,
-  res: getStatsRes,
-  pathInfo: {
-    path: "/getStats",
-    method: "post",
-    summary: "获取命名空间统计信息",
-  } as const,
-  adapter: bodyAdapter,
-  service: onGetStats,
-} satisfies API;
-
 export default {
-  listNamespaces,
   listKeys,
   get,
   put,
   delete: deleteKey,
   clear,
-  getStats,
 };

@@ -94,25 +94,3 @@ export interface KVKey {
    */
   metadata?: Record<string, unknown>;
 }
-
-/**
- * 缓存统计信息
- */
-export interface CacheStats {
-  /**
-   * 缓存命中次数
-   */
-  hits: number;
-  /**
-   * 缓存未命中次数
-   */
-  misses: number;
-  /**
-   * 缓存键数量
-   */
-  keys: number;
-  /**
-   * 缓存命中率
-   */
-  hitRate: number;
-}

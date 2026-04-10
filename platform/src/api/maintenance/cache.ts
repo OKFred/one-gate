@@ -1,19 +1,6 @@
 import { axiosPlus } from '../config';
 import type { AxiosConfig } from '../config';
 
-export const listNamespacesFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/maintenance/cache/listNamespaces', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/maintenance/cache/listNamespaces',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
 export const listKeysFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/maintenance/cache/listKeys', 'post'>, 'url' | 'method'>,
 ) => {
@@ -59,16 +46,6 @@ export const clearFn = (
 ) => {
   return axiosPlus({
     url: '/api/v1/maintenance/cache/clear',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const getStatsFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/maintenance/cache/getStats', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/maintenance/cache/getStats',
     method: 'post',
     ...axiosConfig,
   });

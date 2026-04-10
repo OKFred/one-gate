@@ -4,7 +4,8 @@ import { serve } from "@hono/node-server";
 
 export default function nodeServer(app: App) {
   // 启动服务器
-  const PORT = Number(getEnv("PORT")) || 3000;
+  const PORT = Number(getEnv("PORT"));
+  if (!PORT) throw new Error("Env:PORT is missing");
   serve({
     port: PORT,
     fetch: app.fetch,

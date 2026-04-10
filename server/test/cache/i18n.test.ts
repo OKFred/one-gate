@@ -1,10 +1,10 @@
 // @ts-nocheck
 /**
- * 多语言缓存测试
- * 运行: npx tsx src/middleware/cache/__tests__/i18n.test.ts
+ * 多语言缓存测试 (全局单实例版)
+ * 运行: npx tsx test/cache/i18n.test.ts
  */
 
-import { CacheNamespaces } from "../../src/middleware/cache/index";
+import { kv } from "../../src/middleware/cache/index";
 
 /**
  * 模拟数据：多语言翻译
@@ -24,32 +24,36 @@ const mockTranslations = [
   { langCode: "ja-JP", tKey: "common.cancel", tValue: "キャンセル" },
 ];
 
+// 前缀常量，模拟原来的 I18nTranslation 命名空间
+const I18N_PREFIX = "i18n:";
+
 /**
  * 测试基础功能
  */
 async function testBasicOperations() {
   console.log("\n=== 测试多语言缓存基础功能 ===\n");
 
-  // 1. 清空缓存
-  await CacheNamespaces.I18nTranslation.clear();
-  console.log("1. 已清空缓存\n");
+  // 1. 清空 i18n 相关缓存
+  const keys = await kv.list({ prefix: I18N_PREFIX });
+  for (const k of keys.keys) {
+    await kv.delete(k.name);
+  }
+  console.log("1. 已清空 i18n 相关的测试缓存\n");
 
   // 2. 批量写入翻译数据
   console.log("2. 批量写入翻译数据...");
   const writePromises = mockTranslations.map((item) => {
-    const cacheKey = `${item.langCode}:${item.tKey}`;
-    return CacheNamespaces.I18nTranslation.put(cacheKey, item.tValue);
+    const cacheKey = `${I18N_PREFIX}${item.langCode}:${item.tKey}`;
+    return kv.put(cacheKey, item.tValue);
   });
   await Promise.all(writePromises);
   console.log(`  已写入 ${mockTranslations.length} 条翻译\n`);
 
   // 3. 读取翻译
   console.log("3. 测试读取翻译:");
-  const zhSave = await CacheNamespaces.I18nTranslation.get("zh-CN:common.save");
-  const enSave = await CacheNamespaces.I18nTranslation.get("en-US:common.save");
-  const jaCancel = await CacheNamespaces.I18nTranslation.get(
-    "ja-JP:common.cancel"
-  );
+  const zhSave = await kv.get(`${I18N_PREFIX}zh-CN:common.save`);
+  const enSave = await kv.get(`${I18N_PREFIX}en-US:common.save`);
+  const jaCancel = await kv.get(`${I18N_PREFIX}ja-JP:common.cancel`);
 
   console.log(`  zh-CN:common.save => "${zhSave}"`);
   console.log(`  en-US:common.save => "${enSave}"`);
@@ -69,7 +73,7 @@ async function testListOperations() {
 
   // 1. 列出所有键
   console.log("1. 列出所有翻译键:");
-  const allKeys = await CacheNamespaces.I18nTranslation.list({ limit: 100 });
+  const allKeys = await kv.list({ prefix: I18N_PREFIX, limit: 100 });
   console.log(`  总共 ${allKeys.keys.length} 个键`);
   console.log(
     `  前 5 个: ${allKeys.keys
@@ -80,8 +84,8 @@ async function testListOperations() {
 
   // 2. 按前缀过滤（列出所有中文翻译）
   console.log("2. 列出所有中文翻译 (zh-CN:*):");
-  const zhKeys = await CacheNamespaces.I18nTranslation.list({
-    prefix: "zh-CN:",
+  const zhKeys = await kv.list({
+    prefix: `${I18N_PREFIX}zh-CN:`,
     limit: 100,
   });
   console.log(`  找到 ${zhKeys.keys.length} 个中文翻译`);
@@ -90,12 +94,12 @@ async function testListOperations() {
   });
   console.log();
 
-  // 3. 按前缀过滤（列出所有 common.* 键）
+  // 3. 按语言统计翻译数量
   console.log("3. 统计每种语言的翻译数量:");
   const languages = ["zh-CN", "en-US", "ja-JP"];
   for (const lang of languages) {
-    const result = await CacheNamespaces.I18nTranslation.list({
-      prefix: `${lang}:`,
+    const result = await kv.list({
+      prefix: `${I18N_PREFIX}${lang}:`,
       limit: 100,
     });
     console.log(`  ${lang}: ${result.keys.length} 条`);
@@ -109,13 +113,16 @@ async function testListOperations() {
 async function testGetSupportedLanguages() {
   console.log("\n=== 测试获取支持的语言 ===\n");
 
-  const listResult = await CacheNamespaces.I18nTranslation.list({
+  const listResult = await kv.list({
+    prefix: I18N_PREFIX,
     limit: 1000,
   });
   const languages = new Set<string>();
 
   for (const item of listResult.keys) {
-    const langCode = item.name.split(":")[0];
+    // 移除前缀后提取语言代码: i18n:zh-CN:common.save -> zh-CN
+    const parts = item.name.replace(I18N_PREFIX, "").split(":");
+    const langCode = parts[0];
     if (langCode) {
       languages.add(langCode);
     }
@@ -132,35 +139,6 @@ async function testGetSupportedLanguages() {
 }
 
 /**
- * 测试缓存统计
- */
-async function testCacheStats() {
-  console.log("\n=== 测试缓存统计 ===\n");
-
-  // 重置统计
-  CacheNamespaces.I18nTranslation.resetStats();
-
-  // 模拟一些读取操作
-  await CacheNamespaces.I18nTranslation.get("zh-CN:common.save"); // 命中
-  await CacheNamespaces.I18nTranslation.get("zh-CN:common.cancel"); // 命中
-  await CacheNamespaces.I18nTranslation.get("zh-CN:not.exist"); // 未命中
-  await CacheNamespaces.I18nTranslation.get("en-US:common.save"); // 命中
-
-  const stats = await CacheNamespaces.I18nTranslation.getStats();
-
-  console.log("缓存统计:");
-  console.log(`  总键数: ${stats.keys}`);
-  console.log(`  命中次数: ${stats.hits}`);
-  console.log(`  未命中次数: ${stats.misses}`);
-  console.log(`  命中率: ${(stats.hitRate * 100).toFixed(2)}%`);
-
-  console.assert(stats.keys > 0, "❌ 键数统计错误");
-  console.assert(stats.hits === 3, "❌ 命中次数错误");
-  console.assert(stats.misses === 1, "❌ 未命中次数错误");
-  console.log("  ✅ 统计测试通过\n");
-}
-
-/**
  * 测试回退逻辑
  */
 async function testFallbackLogic() {
@@ -173,17 +151,16 @@ async function testFallbackLogic() {
     fallbackLangCode: string = "en-US"
   ): Promise<string> {
     // 先尝试获取指定语言的翻译
-    const cacheKey = `${langCode}:${key}`;
-    const translation = await CacheNamespaces.I18nTranslation.get(cacheKey);
+    const cacheKey = `${I18N_PREFIX}${langCode}:${key}`;
+    const translation = await kv.get(cacheKey);
     if (translation) {
       return translation;
     }
 
     // 如果找不到，尝试使用回退语言
     if (langCode !== fallbackLangCode) {
-      const fallbackKey = `${fallbackLangCode}:${key}`;
-      const fallbackTranslation =
-        await CacheNamespaces.I18nTranslation.get(fallbackKey);
+      const fallbackKey = `${I18N_PREFIX}${fallbackLangCode}:${key}`;
+      const fallbackTranslation = await kv.get(fallbackKey);
       if (fallbackTranslation) {
         return fallbackTranslation;
       }
@@ -227,7 +204,7 @@ async function testPerformance() {
     const lang = i % 2 === 0 ? "zh-CN" : "en-US";
     const keys = ["common.save", "common.cancel", "common.delete"];
     const key = keys[i % keys.length];
-    promises.push(CacheNamespaces.I18nTranslation.get(`${lang}:${key}`));
+    promises.push(kv.get(`${I18N_PREFIX}${lang}:${key}`));
   }
 
   await Promise.all(promises);
@@ -245,14 +222,13 @@ async function testPerformance() {
  * 运行所有测试
  */
 async function runAllTests() {
-  console.log("🧪 开始测试多语言缓存\n");
+  console.log("🧪 开始测试多语言缓存 (全局单实例)\n");
   console.log("=".repeat(50));
 
   try {
     await testBasicOperations();
     await testListOperations();
     await testGetSupportedLanguages();
-    await testCacheStats();
     await testFallbackLogic();
     await testPerformance();
 
