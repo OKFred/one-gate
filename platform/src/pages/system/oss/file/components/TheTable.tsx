@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import { IconButton, Box, Tooltip } from '@mui/material';
 import { Download, Delete, ContentCopy } from '@mui/icons-material';
+import { showSnackbar } from '@/components/Notification';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -53,7 +54,8 @@ const TheTable = memo(
 
     useEffect(() => {
       fetchList(state.filters);
-    }, [fetchList, state.filters]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchList]);
 
     useImperativeHandle(ref, () => ({
       refresh: (newFilters?: FilterState) => {
@@ -69,12 +71,12 @@ const TheTable = memo(
 
         if (copyToClipboard) {
           await navigator.clipboard.writeText(url);
-          alert(t('dialog.operationSuccess'));
+          showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
         } else {
           window.open(url, '_blank');
         }
       } catch (e) {
-        console.error(e);
+        console.log(e);
       }
     };
 
@@ -83,8 +85,9 @@ const TheTable = memo(
       try {
         await OSSFileAPI.deleteFn({ data: { key } });
         fetchList(state.filters);
+        showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
       } catch (e) {
-        console.error(e);
+        console.log(e);
       }
     };
 
@@ -96,6 +99,28 @@ const TheTable = memo(
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
+    const renderActions = (row: NonNullable<ListFileRes['list']>[number]) => (
+      <Box>
+        <Tooltip title={t('oss.file.download')}>
+          <IconButton size="small" color="primary" onClick={() => handleGetDownloadUrl(row.key!)}>
+            <Download />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t('oss.file.copyUrl')}>
+          <IconButton
+            size="small"
+            color="info"
+            onClick={() => handleGetDownloadUrl(row.key!, true)}
+          >
+            <ContentCopy />
+          </IconButton>
+        </Tooltip>
+        <IconButton size="small" color="error" onClick={() => handleDelete(row.key!)}>
+          <Delete />
+        </IconButton>
+      </Box>
+    );
+
     const columns: TableColumn<NonNullable<ListFileRes['list']>[number]>[] = [
       { title: t('oss.file.key'), render: (row) => row.key },
       { title: t('oss.file.size'), render: (row) => formatSize(row.size!) },
@@ -106,31 +131,7 @@ const TheTable = memo(
       {
         title: t('table.actions'),
         align: 'center',
-        render: (row) => (
-          <Box>
-            <Tooltip title={t('oss.file.download')}>
-              <IconButton
-                size="small"
-                color="primary"
-                onClick={() => handleGetDownloadUrl(row.key!)}
-              >
-                <Download />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title={t('oss.file.copyUrl')}>
-              <IconButton
-                size="small"
-                color="info"
-                onClick={() => handleGetDownloadUrl(row.key!, true)}
-              >
-                <ContentCopy />
-              </IconButton>
-            </Tooltip>
-            <IconButton size="small" color="error" onClick={() => handleDelete(row.key!)}>
-              <Delete />
-            </IconButton>
-          </Box>
-        ),
+        render: renderActions,
       },
     ];
 
@@ -151,10 +152,11 @@ const TheTable = memo(
         keyExtractor={(row) => row.key!}
         columns={columns}
         cardFields={cardFields}
-        page={0}
-        total={0}
-        pageSize={0}
-        onPageChange={function (): void {}}
+        cardActions={renderActions}
+        page={1}
+        total={state.list?.length || 0}
+        pageSize={state.list?.length || 10}
+        onPageChange={() => {}}
       />
     );
   }),
