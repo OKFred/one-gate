@@ -5675,6 +5675,22 @@ export const initialTranslationData = [
     tValue: "Get Download Link",
     isEnabled: true,
   },
+  {
+    application: "frontend",
+    business: "system.oss_config",
+    langCode: "zh-CN",
+    tKey: "oss.config.accountId",
+    tValue: "账户ID",
+    isEnabled: true,
+  },
+  {
+    application: "frontend",
+    business: "system.oss_config",
+    langCode: "en-US",
+    tKey: "oss.config.accountId",
+    tValue: "Account ID",
+    isEnabled: true,
+  },
   // Menu
   {
     application: "frontend",
