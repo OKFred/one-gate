@@ -5551,7 +5551,7 @@ export const initialTranslationData = [
     business: "system.oss_config",
     langCode: "zh-CN",
     tKey: "oss.config.isDefault",
-    tValue: "设为默认",
+    tValue: "默认",
     isEnabled: true,
   },
   {
