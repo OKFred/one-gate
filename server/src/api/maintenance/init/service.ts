@@ -19,7 +19,12 @@ const initReq = {
       description: "是否重置数据（清空表后重新插入）",
       default: false,
     },
+    skipSuper: {
+      type: "boolean",
+      description: "是否跳过初始化管理员账号",
+    },
   },
+  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -38,7 +43,7 @@ const initRes = {
 
 async function onInit(c): Promise<FromSchema<typeof initRes>> {
   const initToken = c.req.header()["x_init_token"];
-  const { reset = false } = c.get("bodyObj");
+  const { reset = false, skipSuper = false } = c.get("bodyObj");
   const user = c.get("userObj");
   // 1. 检查引导令牌 (冷启动场景)
   const expectedToken = getEnv("X_INIT_TOKEN");
@@ -52,7 +57,7 @@ async function onInit(c): Promise<FromSchema<typeof initRes>> {
     throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   }
 
-  const results = await initDatabase({ reset });
+  const results = await initDatabase({ reset, skipSuper });
   return { results };
 }
 

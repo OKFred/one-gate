@@ -5,6 +5,7 @@ import type { RouteConfig } from "@hono/zod-openapi";
 import { ParameterObject, RequestBodyObject } from "openapi3-ts/oas31";
 export type { UserObj } from "@/api/system/user/service";
 import type { UserObj } from "@/api/system/user/service";
+import type { StorageProvider } from "@/utils/storage/types";
 export type RawRouteConfig = RouteConfig & {
   method: Exclude<RouteConfig["method"], "head" | "trace">;
   request?: {
@@ -25,6 +26,7 @@ export type AppBindings = {
     bodyObj?: any;
     userObj?: UserObj;
     timing?: TimingVariables;
+    storage: StorageProvider;
   };
   Bindings: Env;
 };
@@ -38,6 +40,7 @@ export type NodeHonoContext = Context<AppBindings> & {
   // req: { pathArr: string[] };
   var: {
     logger: import("pino").Logger;
+    storage: StorageProvider;
   };
 };
 export type App = OpenAPIHono<AppBindings>;

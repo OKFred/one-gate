@@ -1,0 +1,118 @@
+import { forwardRef, useImperativeHandle, useState, memo } from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Box,
+  LinearProgress,
+  Typography,
+} from '@mui/material';
+import { useTranslation } from '@/hooks/useTranslation';
+import * as OSSFileAPI from '@/api/oss/file';
+import type { Props } from '../index';
+
+export interface TheUploadDialogRef {
+  open: () => void;
+}
+
+const TheUploadDialog = memo(
+  forwardRef<TheUploadDialogRef, Props>(({ localObj }, ref) => {
+    const { tableRef } = localObj;
+    const t = useTranslation();
+    const [visible, setVisible] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [file, setFile] = useState<File | null>(null);
+
+    useImperativeHandle(ref, () => ({
+      open: () => {
+        setFile(null);
+        setProgress(0);
+        setVisible(true);
+      },
+    }));
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+        setFile(e.target.files[0]);
+      }
+    };
+
+    const handleUpload = async () => {
+      if (!file) return;
+      setUploading(true);
+      try {
+        // 1. 获取预签名 URL
+        const res = await OSSFileAPI.getUploadUrlFn({
+          data: {
+            expiresIn: 60 * 60,
+            key: file.name,
+            contentType: file.type || 'application/octet-stream',
+          },
+        });
+        const uploadUrl = res.data?.data?.url;
+        if (!uploadUrl) throw new Error('Failed to get upload URL');
+
+        // 2. 直接上传到 OSS
+        await OSSFileAPI.directUploadFn(uploadUrl, file, file.type, (percent) => {
+          setProgress(percent);
+        });
+
+        // 成功处理
+        setVisible(false);
+        tableRef.current?.refresh();
+      } catch (e) {
+        console.error(e);
+        alert(t('status.failure'));
+      } finally {
+        setUploading(false);
+        setProgress(0);
+      }
+    };
+
+    return (
+      <Dialog
+        open={visible}
+        onClose={() => !uploading && setVisible(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>{t('oss.file.upload')}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1, textAlign: 'center' }}>
+            {!uploading ? (
+              <Button variant="outlined" component="label" fullWidth sx={{ py: 4 }}>
+                {file ? file.name : t('form.select')}
+                <input type="file" hidden onChange={handleFileChange} />
+              </Button>
+            ) : (
+              <Box sx={{ width: '100%', mt: 2 }}>
+                <LinearProgress variant="determinate" value={progress} />
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  {progress}%
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setVisible(false)} disabled={uploading}>
+            {t('dialog.cancel')}
+          </Button>
+          <Button
+            onClick={handleUpload}
+            variant="contained"
+            disabled={!file || uploading}
+            loading={uploading}
+          >
+            {t('dialog.confirm')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }),
+);
+
+export default TheUploadDialog;

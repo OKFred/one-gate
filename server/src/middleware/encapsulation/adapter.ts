@@ -26,6 +26,21 @@ export function bodyUserAdapter<TRes>(
     return await handler(bodyObj, userObj);
   };
 }
+
+/**
+ * 快捷适配器：需要 body, user 和 context
+ * @param handler 业务逻辑函数，接收 body, userObj 和 c 参数
+ * @returns service 函数
+ */
+export function bodyUserContextAdapter<TRes>(
+  handler: (body: any, userObj: any, c: NodeHonoContext) => Promise<TRes>
+) {
+  return async (c: NodeHonoContext): Promise<TRes> => {
+    const bodyObj = c.get("bodyObj");
+    const userObj = c.get("userObj");
+    return await handler(bodyObj, userObj, c);
+  };
+}
 /**
  * 快捷适配器：需要 body 和 clientInfo (ip, userAgent)
  * @param handler 业务逻辑函数，接收 body 和 clientInfo 参数

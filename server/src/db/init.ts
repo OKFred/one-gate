@@ -33,7 +33,10 @@ export const SUPER_ADMIN_ROLE = {
 /**
  * 初始化数据库数据 (全局原子事务模式)
  */
-export async function initDatabase(options?: { reset?: boolean }) {
+export async function initDatabase(options?: {
+  reset?: boolean;
+  skipSuper?: boolean;
+}) {
   try {
     console.log(
       "⌛ 开始全局原子初始化 (模式: " +
@@ -44,8 +47,12 @@ export async function initDatabase(options?: { reset?: boolean }) {
     // 1. 异步准备各模块的语句 (耗时操作如密码加密、哈希计算在这里并行或顺序执行)
     const [roleRes, userRes, langRes, transRes, permRes, regionRes, menuRes] =
       await Promise.all([
-        prepareSuperAdminRole(options),
-        prepareSuperAdminUser(SUPER_ADMIN_ROLE_ID, options),
+        !options?.skipSuper
+          ? prepareSuperAdminRole(options)
+          : { queries: [], stats: {} },
+        !options?.skipSuper
+          ? prepareSuperAdminUser(SUPER_ADMIN_ROLE_ID, options)
+          : { queries: [], stats: {} },
         prepareLanguage(options),
         prepareTranslation(options), // 内部包含异步的 SHA256 计算
         preparePermissions(options),

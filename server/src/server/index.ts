@@ -6,6 +6,7 @@ import corsHandler from "@/middleware/cors";
 import routeRegister from "@/api/index";
 import serverTiming from "@/middleware/serverTiming";
 import serveStaticFiles from "@/middleware/serveStatic";
+import { storageMiddleware } from "@/utils/storage";
 import type { AppBindings, NodeHonoContext } from "@/types/app";
 import { getEnv } from "@/utils/env";
 
@@ -13,6 +14,7 @@ function createApp() {
   const app = new OpenAPIHono<AppBindings>();
 
   serveStaticFiles(app);
+  app.use("*", storageMiddleware());
   errorHandler(app);
   corsHandler(app);
   serverTiming(app);
