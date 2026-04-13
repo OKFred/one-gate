@@ -119,10 +119,11 @@ const TheDetails = memo(
                   </Typography>
                   <Typography variant="body1" gutterBottom>
                     {String(
-                      user.regionObj?.value &&
+                      (user.regionObj?.value &&
                         enabledRegions?.find((region) => region.id === user.regionObj?.value)
-                          ?.labels?.[user.langCode],
-                    ) || t('column.unassigned')}
+                          ?.labels?.[user.langCode]) ||
+                        t('column.unassigned'),
+                    )}
                   </Typography>
                 </Box>
 

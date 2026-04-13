@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as OSSFileAPI from '@/api/oss/file';
+import { showSnackbar } from '@/components/Notification';
 import type { Props } from '../index';
 
 export interface TheUploadDialogRef {
@@ -63,9 +64,9 @@ const TheUploadDialog = memo(
         // 成功处理
         setVisible(false);
         tableRef.current?.refresh();
+        showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
       } catch (e) {
-        console.error(e);
-        alert(t('status.failure'));
+        console.log(e);
       } finally {
         setUploading(false);
         setProgress(0);

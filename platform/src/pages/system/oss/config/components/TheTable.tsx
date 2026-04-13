@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import { Box, Chip, IconButton, Tooltip } from '@mui/material';
 import { Edit, Delete, PlayCircleOutline } from '@mui/icons-material';
+import { showSnackbar } from '@/components/Notification';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
@@ -62,7 +63,8 @@ const TheTable = memo(
 
     useEffect(() => {
       fetchList(state.filters, 1);
-    }, [fetchList, state.filters]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [fetchList]);
 
     useImperativeHandle(ref, () => ({
       refresh: (newFilters?: FilterState) => {
@@ -73,11 +75,9 @@ const TheTable = memo(
     const handleVerify = async (id: number) => {
       try {
         await OSSConfigAPI.verifyFn({ data: { id } });
-        // 可以加上一个全局 Toast 提示，这里先 console
-        alert(t('status.success'));
+        showSnackbar({ message: t('status.success'), type: 'success' });
       } catch (e) {
         console.log(e);
-        alert(t('status.failure'));
       }
     };
 
@@ -144,6 +144,22 @@ const TheTable = memo(
       { type: 'title', render: (row) => row.name },
       { type: 'subtitle', render: (row) => row.provider },
       { type: 'content', label: t('oss.config.bucket'), render: (row) => row.bucket },
+      {
+        type: 'tags',
+        render: (row) => (
+          <>
+            {row.isDefault && (
+              <Chip label={t('oss.config.isDefault')} color="success" size="small" />
+            )}
+            <Chip
+              label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
+              color={row.isEnabled ? 'primary' : 'error'}
+              size="small"
+              variant="outlined"
+            />
+          </>
+        ),
+      },
     ];
 
     return (
@@ -156,6 +172,21 @@ const TheTable = memo(
         keyExtractor={(row) => row.id}
         columns={columns}
         cardFields={cardFields}
+        cardActions={(row) => (
+          <Box>
+            <Tooltip title={t('oss.config.verify')}>
+              <IconButton size="small" color="info" onClick={() => handleVerify(row.id)}>
+                <PlayCircleOutline />
+              </IconButton>
+            </Tooltip>
+            <IconButton size="small" color="primary" onClick={() => formRef.current?.open(row.id)}>
+              <Edit />
+            </IconButton>
+            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
+              <Delete />
+            </IconButton>
+          </Box>
+        )}
         onPageChange={(p) => fetchList(state.filters, p)}
       />
     );
