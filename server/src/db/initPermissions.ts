@@ -330,32 +330,31 @@ export async function preparePermissions(options?: { reset?: boolean }) {
   const mappedData = permissionSeeds.map((seed) => {
     const getAPIName = () => {
       const tKeySubString = seed.code!.replace(":api", "");
-      const prefix = initialTranslationData.find(
-        (item) =>
-          item.tKey === "businessType." + tKeySubString &&
-          item.langCode === LOCALE
-      )?.tValue;
-      const postfix = initialTranslationData.find(
-        (item) =>
-          item.tKey === "permission.category.api" && item.langCode === LOCALE
-      )?.tValue;
-      return prefix && postfix
-        ? `${prefix}${postfix}`
-        : seed.code + "未知接口";
+      const trans = initialTranslationData.find(
+        (item) => item.tKey === "businessType." + tKeySubString
+      );
+      const prefix = trans?.langCodes?.[LOCALE] || trans?.tValue;
+
+      const postfixTrans = initialTranslationData.find(
+        (item) => item.tKey === "permission.category.api"
+      );
+      const postfix = postfixTrans?.langCodes?.[LOCALE] || postfixTrans?.tValue;
+
+      return prefix && postfix ? `${prefix}${postfix}` : seed.code + "未知接口";
     };
 
     const getButtonName = () => {
       const [tKeySubString, action] = seed.code!.split(":");
-      const prefix = initialTranslationData.find(
-        (item) =>
-          item.tKey === "businessType." + tKeySubString &&
-          item.langCode === LOCALE
-      )?.tValue;
-      const postfix = initialTranslationData.find(
-        (item) =>
-          item.tKey === "permission.category.button" &&
-          item.langCode === LOCALE
-      )?.tValue;
+      const trans = initialTranslationData.find(
+        (item) => item.tKey === "businessType." + tKeySubString
+      );
+      const prefix = trans?.langCodes?.[LOCALE] || trans?.tValue;
+
+      const postfixTrans = initialTranslationData.find(
+        (item) => item.tKey === "permission.category.button"
+      );
+      const postfix = postfixTrans?.langCodes?.[LOCALE] || postfixTrans?.tValue;
+
       return prefix && postfix
         ? `${prefix}${postfix}:${action}`
         : seed.code + "未知按钮";
@@ -385,7 +384,8 @@ export async function preparePermissions(options?: { reset?: boolean }) {
   for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
     const batch = mappedData.slice(i, i + BATCH_SIZE);
     queries.push(
-      db.insert(permissionTable)
+      db
+        .insert(permissionTable)
         .values(batch as any)
         .onConflictDoUpdate({
           target: permissionTable.code,

@@ -8,8 +8,20 @@ import { sql } from "drizzle-orm";
  * 准备多语言数据同步语句
  */
 export async function prepareTranslation(options?: { reset?: boolean }) {
+  // 0. 数据扁平化处理
+  const flattenedData = [];
+  for (const item of initialTranslationData) {
+    for (const [langCode, tValue] of Object.entries(item.langCodes)) {
+      flattenedData.push({
+        ...item,
+        langCode,
+        tValue,
+      });
+    }
+  }
+
   const stats = {
-    total: initialTranslationData.length,
+    total: flattenedData.length,
     created: 0,
     updated: 0,
     skipped: 0,
@@ -23,7 +35,7 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
 
   // 1. 预处理所有数据的哈希值 (并行处理)
   const mappedData = await Promise.all(
-    initialTranslationData.map(async (item) => {
+    flattenedData.map(async (item) => {
       const valueHash = await translationUtils.calculateSHA256(item.tValue);
       return {
         application: item.application,
@@ -3930,12 +3942,11 @@ export const initialTranslationData = [
       "en-US": "File Center",
     },
   },
-];
-
-type newType = {
+] as const satisfies {
   application: string;
   business: string;
   tKey: string;
+  tValue: string;
   langCodes: Record<string, string>;
   isEnabled: boolean;
-};
+}[];
