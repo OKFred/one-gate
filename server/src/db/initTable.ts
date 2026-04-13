@@ -19,6 +19,7 @@ const TABLES = [
   "mail_account",
   "mail_template",
   "mail_log",
+  "oss_config",
   "maintenance_audit_login",
   "maintenance_compliance",
 ];

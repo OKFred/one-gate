@@ -158,7 +158,9 @@ async function onSend(
         {
           host: accountObj.host,
           port: accountObj.port,
-          secure: accountObj.port === 465,
+          authType: "plain",
+          secure: [465, 587].includes(accountObj.port),
+          startTls: [587].includes(accountObj.port),
           credentials: {
             username: accountObj.mailAddress,
             password: accountObj.password,

@@ -194,6 +194,31 @@ export const initialMenuData = [
     sort: 3,
     business: "maintenance.audit_login",
   },
+  {
+    id: 23,
+    name: "sidebar.menu.oss",
+    icon: "material-symbols:cloud",
+    sort: 7,
+    business: "system.oss_config",
+  },
+  {
+    id: 24,
+    name: "sidebar.menu.oss.config",
+    icon: "material-symbols:settings-suggest",
+    path: "/system/oss/config",
+    parentId: 23,
+    sort: 1,
+    business: "system.oss_config",
+  },
+  {
+    id: 25,
+    name: "sidebar.menu.oss.file",
+    icon: "material-symbols:folder-shared",
+    path: "/system/oss/file",
+    parentId: 23,
+    sort: 2,
+    business: "system.oss_file",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {
@@ -241,7 +266,8 @@ export async function prepareMenu(options?: { reset?: boolean }) {
   for (let i = 0; i < mappedData.length; i += BATCH_SIZE) {
     const batch = mappedData.slice(i, i + BATCH_SIZE);
     queries.push(
-      db.insert(menuTable)
+      db
+        .insert(menuTable)
         .values(batch)
         .onConflictDoUpdate({
           target: menuTable.id,
