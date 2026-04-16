@@ -3724,7 +3724,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.title",
     tValue: "OSS 配置",
     isEnabled: true,
@@ -3735,7 +3735,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.name",
     tValue: "配置名称",
     isEnabled: true,
@@ -3746,7 +3746,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.provider",
     tValue: "提供商",
     isEnabled: true,
@@ -3757,7 +3757,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.endpoint",
     tValue: "Endpoint",
     isEnabled: true,
@@ -3768,7 +3768,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.region",
     tValue: "区域",
     isEnabled: true,
@@ -3779,7 +3779,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.accessKey",
     tValue: "Access Key",
     isEnabled: true,
@@ -3790,7 +3790,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.secretKey",
     tValue: "Secret Key",
     isEnabled: true,
@@ -3801,7 +3801,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.bucket",
     tValue: "存储桶",
     isEnabled: true,
@@ -3812,7 +3812,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.isDefault",
     tValue: "默认",
     isEnabled: true,
@@ -3823,7 +3823,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.verify",
     tValue: "验证连接",
     isEnabled: true,
@@ -3834,7 +3834,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_file",
+    business: "oss.file",
     tKey: "oss.file.title",
     tValue: "文件中心",
     isEnabled: true,
@@ -3845,7 +3845,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_file",
+    business: "oss.file",
     tKey: "oss.file.upload",
     tValue: "上传文件",
     isEnabled: true,
@@ -3856,7 +3856,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_file",
+    business: "oss.file",
     tKey: "oss.file.key",
     tValue: "文件对象",
     isEnabled: true,
@@ -3867,7 +3867,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_file",
+    business: "oss.file",
     tKey: "oss.file.size",
     tValue: "大小",
     isEnabled: true,
@@ -3878,7 +3878,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_file",
+    business: "oss.file",
     tKey: "oss.file.lastModified",
     tValue: "最后修改",
     isEnabled: true,
@@ -3889,7 +3889,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_file",
+    business: "oss.file",
     tKey: "oss.file.getDownloadUrl",
     tValue: "获取下载链接",
     isEnabled: true,
@@ -3900,7 +3900,7 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "system.oss_config",
+    business: "oss.config",
     tKey: "oss.config.accountId",
     tValue: "账户ID",
     isEnabled: true,

@@ -9,6 +9,17 @@ import {
   bodyAdapter,
   bodyUserContextAdapter,
 } from "@/middleware/encapsulation/adapter";
+import type { FromSchema } from "json-schema-to-ts";
+import {
+  getUploadUrlReq,
+  getUploadUrlRes,
+  getDownloadUrlReq,
+  getDownloadUrlRes,
+  listReq,
+  listRes,
+  deleteReq,
+  deleteRes,
+} from "./model";
 
 // 获取存储实例辅助函数
 async function getActiveStorage(env: any) {
@@ -34,21 +45,11 @@ async function getActiveStorage(env: any) {
 }
 
 // 1. 生成上传预签名 URL
-const getUploadUrlReq = {
-  type: "object",
-  properties: {
-    key: { type: "string", description: "文件名/路径" },
-    contentType: {
-      type: "string",
-      description: "文件类型",
-      default: "application/octet-stream",
-    },
-    expiresIn: { type: "number", description: "过期时间(秒)", default: 3600 },
-  },
-  required: ["key"],
-} as const;
-
-async function onGetUploadUrl(params: any, userObj: any, c: any) {
+async function onGetUploadUrl(
+  params: FromSchema<typeof getUploadUrlReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof getUploadUrlRes>> {
   const storage = await getActiveStorage(c.env);
   const url = await storage.getPresignedPutUrl(params.key, {
     contentType: params.contentType,
@@ -59,10 +60,7 @@ async function onGetUploadUrl(params: any, userObj: any, c: any) {
 
 const getUploadUrlApi = {
   req: getUploadUrlReq,
-  res: {
-    type: "object",
-    properties: { url: { type: "string" }, key: { type: "string" } },
-  },
+  res: getUploadUrlRes,
   pathInfo: {
     path: "/getUploadUrl",
     method: "post",
@@ -73,16 +71,11 @@ const getUploadUrlApi = {
 } satisfies API;
 
 // 2. 生成下载预签名 URL
-const getDownloadUrlReq = {
-  type: "object",
-  properties: {
-    key: { type: "string", description: "文件名/路径" },
-    expiresIn: { type: "number", description: "过期时间(秒)", default: 3600 },
-  },
-  required: ["key"],
-} as const;
-
-async function onGetDownloadUrl(params: any, userObj: any, c: any) {
+async function onGetDownloadUrl(
+  params: FromSchema<typeof getDownloadUrlReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof getDownloadUrlRes>> {
   const storage = await getActiveStorage(c.env);
   const url = await storage.getPresignedGetUrl(params.key, {
     expiresIn: params.expiresIn,
@@ -92,10 +85,7 @@ async function onGetDownloadUrl(params: any, userObj: any, c: any) {
 
 const getDownloadUrlApi = {
   req: getDownloadUrlReq,
-  res: {
-    type: "object",
-    properties: { url: { type: "string" }, key: { type: "string" } },
-  },
+  res: getDownloadUrlRes,
   pathInfo: {
     path: "/getDownloadUrl",
     method: "post",
@@ -105,54 +95,36 @@ const getDownloadUrlApi = {
   service: onGetDownloadUrl,
 } satisfies API;
 
-// 3. 列出文件 (新增)
-const listReq = {
-  type: "object",
-  properties: {
-    prefix: { type: "string", description: "前缀/路径", default: "" },
-  },
-} as const;
-
-async function onList(params: any, userObj: any, c: any) {
+// 3. 列出文件
+async function onList(
+  params: FromSchema<typeof listReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof listRes>> {
   const storage = await getActiveStorage(c.env);
   const list = await storage.list(params.prefix);
-  return { list };
+  return {
+    list: list.map((item) => ({
+      ...item,
+      lastModified: item.lastModified?.toISOString(),
+    })),
+  };
 }
 
 const listApi = {
   req: listReq,
-  res: {
-    type: "object",
-    properties: {
-      list: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            key: { type: "string" },
-            size: { type: "number" },
-            lastModified: { type: "string", format: "date-time" },
-            contentType: { type: "string" },
-          },
-        },
-      },
-    },
-  },
+  res: listRes,
   pathInfo: { path: "/list", method: "post", summary: "列出存储桶中的文件" },
   adapter: bodyUserContextAdapter,
   service: onList,
 } satisfies API;
 
-// 4. 删除文件 (新增)
-const deleteReq = {
-  type: "object",
-  properties: {
-    key: { type: "string", description: "文件名/路径" },
-  },
-  required: ["key"],
-} as const;
-
-async function onDelete(params: any, userObj: any, c: any) {
+// 4. 删除文件
+async function onDelete(
+  params: FromSchema<typeof deleteReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof deleteRes>> {
   const storage = await getActiveStorage(c.env);
   await storage.delete(params.key);
   return { key: params.key };
@@ -160,7 +132,7 @@ async function onDelete(params: any, userObj: any, c: any) {
 
 const deleteApi = {
   req: deleteReq,
-  res: { type: "object", properties: { key: { type: "string" } } },
+  res: deleteRes,
   pathInfo: { path: "/delete", method: "post", summary: "删除存储桶中的文件" },
   adapter: bodyUserContextAdapter,
   service: onDelete,
