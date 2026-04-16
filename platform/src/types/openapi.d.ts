@@ -2694,7 +2694,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configListAllReq"];
+                    "application/json": components["schemas"]["oss.configListAllReq"];
                 };
             };
             responses: {
@@ -2704,7 +2704,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configListAllRes"];
+                        "application/json": components["schemas"]["oss.configListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2752,7 +2752,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configListReq"];
+                    "application/json": components["schemas"]["oss.configListReq"];
                 };
             };
             responses: {
@@ -2762,7 +2762,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configListRes"];
+                        "application/json": components["schemas"]["oss.configListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2810,7 +2810,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configAddReq"];
+                    "application/json": components["schemas"]["oss.configAddReq"];
                 };
             };
             responses: {
@@ -2820,7 +2820,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configAddRes"];
+                        "application/json": components["schemas"]["oss.configAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2868,7 +2868,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configUpdateReq"];
+                    "application/json": components["schemas"]["oss.configUpdateReq"];
                 };
             };
             responses: {
@@ -2878,7 +2878,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configUpdateRes"];
+                        "application/json": components["schemas"]["oss.configUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2926,7 +2926,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configGetReq"];
+                    "application/json": components["schemas"]["oss.configGetReq"];
                 };
             };
             responses: {
@@ -2936,7 +2936,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configGetRes"];
+                        "application/json": components["schemas"]["oss.configGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2984,7 +2984,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configDeleteReq"];
+                    "application/json": components["schemas"]["oss.configDeleteReq"];
                 };
             };
             responses: {
@@ -2994,7 +2994,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configDeleteRes"];
+                        "application/json": components["schemas"]["oss.configDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3042,7 +3042,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_configVerifyReq"];
+                    "application/json": components["schemas"]["oss.configVerifyReq"];
                 };
             };
             responses: {
@@ -3052,7 +3052,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_configVerifyRes"];
+                        "application/json": components["schemas"]["oss.configVerifyRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3100,7 +3100,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_fileGetUploadUrlReq"];
+                    "application/json": components["schemas"]["oss.fileGetUploadUrlReq"];
                 };
             };
             responses: {
@@ -3110,7 +3110,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_fileGetUploadUrlRes"];
+                        "application/json": components["schemas"]["oss.fileGetUploadUrlRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3158,7 +3158,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_fileGetDownloadUrlReq"];
+                    "application/json": components["schemas"]["oss.fileGetDownloadUrlReq"];
                 };
             };
             responses: {
@@ -3168,7 +3168,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_fileGetDownloadUrlRes"];
+                        "application/json": components["schemas"]["oss.fileGetDownloadUrlRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3216,7 +3216,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_fileListReq"];
+                    "application/json": components["schemas"]["oss.fileListReq"];
                 };
             };
             responses: {
@@ -3226,7 +3226,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_fileListRes"];
+                        "application/json": components["schemas"]["oss.fileListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3274,7 +3274,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["system.oss_fileDeleteReq"];
+                    "application/json": components["schemas"]["oss.fileDeleteReq"];
                 };
             };
             responses: {
@@ -3284,7 +3284,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["system.oss_fileDeleteRes"];
+                        "application/json": components["schemas"]["oss.fileDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8531,7 +8531,7 @@ export interface components {
             };
             message: string;
         };
-        "system.oss_configListAllReq": {
+        "oss.configListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -8539,7 +8539,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "system.oss_configListAllRes": {
+        "oss.configListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -8564,7 +8564,7 @@ export interface components {
             }[];
             message: string;
         };
-        "system.oss_configListReq": {
+        "oss.configListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -8587,7 +8587,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "system.oss_configListRes": {
+        "oss.configListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -8656,7 +8656,7 @@ export interface components {
             };
             message: string;
         };
-        "system.oss_configAddReq": {
+        "oss.configAddReq": {
             /**
              * @description 配置名称
              * @example My S3 Storage
@@ -8692,7 +8692,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "system.oss_configAddRes": {
+        "oss.configAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -8701,7 +8701,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "system.oss_configUpdateReq": {
+        "oss.configUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -8742,7 +8742,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "system.oss_configUpdateRes": {
+        "oss.configUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -8751,14 +8751,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "system.oss_configGetReq": {
+        "oss.configGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "system.oss_configGetRes": {
+        "oss.configGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -8817,14 +8817,14 @@ export interface components {
             };
             message: string;
         };
-        "system.oss_configDeleteReq": {
+        "oss.configDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "system.oss_configDeleteRes": {
+        "oss.configDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -8833,19 +8833,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "system.oss_configVerifyReq": {
+        "oss.configVerifyReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "system.oss_configVerifyRes": {
+        "oss.configVerifyRes": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "system.oss_fileGetUploadUrlReq": {
+        "oss.fileGetUploadUrlReq": {
             /** @description 文件名/路径 */
             key: string;
             /**
@@ -8859,15 +8859,15 @@ export interface components {
              */
             expiresIn: number;
         };
-        "system.oss_fileGetUploadUrlRes": {
+        "oss.fileGetUploadUrlRes": {
             ok: boolean;
             data: {
-                url?: string;
-                key?: string;
+                url: string;
+                key: string;
             };
             message: string;
         };
-        "system.oss_fileGetDownloadUrlReq": {
+        "oss.fileGetDownloadUrlReq": {
             /** @description 文件名/路径 */
             key: string;
             /**
@@ -8876,42 +8876,41 @@ export interface components {
              */
             expiresIn: number;
         };
-        "system.oss_fileGetDownloadUrlRes": {
+        "oss.fileGetDownloadUrlRes": {
             ok: boolean;
             data: {
-                url?: string;
-                key?: string;
+                url: string;
+                key: string;
             };
             message: string;
         };
-        "system.oss_fileListReq": {
+        "oss.fileListReq": {
             /**
              * @description 前缀/路径
              * @default
              */
             prefix: string;
         };
-        "system.oss_fileListRes": {
+        "oss.fileListRes": {
             ok: boolean;
             data: {
-                list?: {
-                    key?: string;
+                list: {
+                    key: string;
                     size?: number;
-                    /** Format: date-time */
                     lastModified?: string;
                     contentType?: string;
                 }[];
             };
             message: string;
         };
-        "system.oss_fileDeleteReq": {
+        "oss.fileDeleteReq": {
             /** @description 文件名/路径 */
             key: string;
         };
-        "system.oss_fileDeleteRes": {
+        "oss.fileDeleteRes": {
             ok: boolean;
             data: {
-                key?: string;
+                key: string;
             };
             message: string;
         };

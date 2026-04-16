@@ -42,9 +42,9 @@ export type BusinessType = {
   /** 系统用户 */
   "system.user": "system.user";
   /** OSS 配置 */
-  "oss.config": "oss.config";
+  "system.oss_config": "system.oss_config";
   /** OSS 文件 */
-  "oss.file": "oss.file";
+  "system.oss_file": "system.oss_file";
   /** 运维登录日志 */
   "maintenance.audit_login": "maintenance.audit_login";
   /** 运维初始化 */
