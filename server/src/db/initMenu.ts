@@ -199,7 +199,7 @@ export const initialMenuData = [
     name: "sidebar.menu.oss",
     icon: "material-symbols:cloud",
     sort: 7,
-    business: "system.oss_config",
+    business: "oss.config",
   },
   {
     id: 24,
@@ -208,7 +208,7 @@ export const initialMenuData = [
     path: "/system/oss/config",
     parentId: 23,
     sort: 1,
-    business: "system.oss_config",
+    business: "oss.config",
   },
   {
     id: 25,
@@ -217,7 +217,7 @@ export const initialMenuData = [
     path: "/system/oss/file",
     parentId: 23,
     sort: 2,
-    business: "system.oss_file",
+    business: "oss.file",
   },
 ] satisfies menuLike[];
 
