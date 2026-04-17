@@ -49,5 +49,9 @@ export type BusinessType = {
   "maintenance.audit_login": "maintenance.audit_login";
   /** 运维初始化 */
   "maintenance.init": "maintenance.init";
+  /** 企业 */
+  enterprise: "enterprise";
+  /** 企业考勤 */
+  "enterprise.attendance": "enterprise.attendance";
 };
 export type BusinessKey = keyof BusinessType;

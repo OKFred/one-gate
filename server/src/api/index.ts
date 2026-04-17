@@ -2,6 +2,7 @@ import i18n from "./i18n/index";
 import mail from "./mail/index";
 import maintenance from "./maintenance/index";
 import oss from "./oss/index";
+import enterprise from "./enterprise/index";
 import system from "./system/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
@@ -13,6 +14,7 @@ function createApp(): App {
   app.route("/maintenance", maintenance());
   app.route("/oss", oss());
   app.route("/system", system());
+  app.route("/enterprise", enterprise());
   return app;
 }
 export default createApp;

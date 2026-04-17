@@ -109,3 +109,12 @@ export const MAINTENANCE = {
     VIEW: 'maintenance.cache:view',
   },
 };
+
+export const ENTERPRISE = {
+  /** 考勤管理 */
+  ATTENDANCE: {
+    ADD: 'enterprise.attendance:add',
+    EDIT: 'enterprise.attendance:edit',
+    DELETE: 'enterprise.attendance:delete',
+  },
+};

@@ -3942,6 +3942,50 @@ export const initialTranslationData = [
       "en-US": "File Center",
     },
   },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.enterprise",
+    tValue: "企业管理",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "企业管理",
+      "en-US": "Enterprise",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.enterprise.attendance",
+    tValue: "考勤管理",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "考勤管理",
+      "en-US": "Attendance",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "businessType.enterprise.attendance",
+    tValue: "企业考勤",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "企业考勤",
+      "en-US": "Enterprise Attendance",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.title",
+    tValue: "考勤管理",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "考勤管理",
+      "en-US": "Attendance Management",
+    },
+  },
 ] as const satisfies {
   application: string;
   business: string;
