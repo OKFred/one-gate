@@ -8,7 +8,6 @@ import {
   TextField,
   Stack,
   Box,
-  useTheme,
   IconButton,
   MenuItem,
   FormControl,
@@ -22,12 +21,23 @@ import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import dayjs from 'dayjs';
+import type { AddAttendanceReq, AttendanceObj } from '@/api/enterprise/type';
+import type { ListAllUserRes } from '@/api/system/type';
 
 export interface TheFormRef {
-  onOpen: (row?: any) => void;
+  onOpen: (row?: AttendanceObj) => void;
 }
 
-const DEFAULT_FORM = {
+export interface AttendanceFormModel {
+  employeeId: number | string;
+  date: string;
+  checkInTime: string | null;
+  checkOutTime: string | null;
+  status: number;
+  remark: string;
+}
+
+const DEFAULT_FORM: AttendanceFormModel = {
   employeeId: '',
   date: dayjs().format('YYYY-MM-DD'),
   checkInTime: null,
@@ -39,43 +49,46 @@ const DEFAULT_FORM = {
 const TheForm = memo(
   forwardRef<TheFormRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
-    const theme = useTheme();
     const { isMobile } = useResponsive();
     const t = useTranslation();
 
     const [open, setOpen] = useState(false);
     const [editId, setEditId] = useState<number | null>(null);
-    const [form, setForm] = useState<any>(DEFAULT_FORM);
+    const [form, setForm] = useState<AttendanceFormModel>(DEFAULT_FORM);
     const [loading, setLoading] = useState(false);
-    const [users, setUsers] = useState<any[]>([]);
+    const [users, setUsers] = useState<ListAllUserRes>([]);
 
     useEffect(() => {
       if (open) {
-        UserAPI.listAllFn({ data: {} }).then(res => {
+        UserAPI.listAllFn({ data: {} }).then((res) => {
           setUsers(res.data?.data || []);
         });
       }
     }, [open]);
 
-    useImperativeHandle(ref, () => ({
-      onOpen: (row?: any) => {
-        if (row) {
-          setEditId(row.id);
-          setForm({
-            employeeId: row.employeeObj?.value || row.employeeId,
-            date: row.date,
-            checkInTime: row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : null,
-            checkOutTime: row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : null,
-            status: row.status,
-            remark: row.remark || '',
-          });
-        } else {
-          setEditId(null);
-          setForm(DEFAULT_FORM);
-        }
-        setOpen(true);
-      },
-    }), []);
+    useImperativeHandle(
+      ref,
+      () => ({
+        onOpen: (row?: AttendanceObj) => {
+          if (row) {
+            setEditId(row.id);
+            setForm({
+              employeeId: row.employeeObj?.value || row.employeeId || '',
+              date: row.date,
+              checkInTime: row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : null,
+              checkOutTime: row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : null,
+              status: row.status,
+              remark: row.remark || '',
+            });
+          } else {
+            setEditId(null);
+            setForm(DEFAULT_FORM);
+          }
+          setOpen(true);
+        },
+      }),
+      [],
+    );
 
     const handleCancel = () => {
       setOpen(false);
@@ -90,12 +103,14 @@ const TheForm = memo(
       try {
         const payload = {
           ...form,
-          // Convert time strings back to timestamps if necessary, 
-          // but our backend expects numbers. 
-          // We'll combine date + time for checkIn/Out.
-          checkInTime: form.checkInTime ? dayjs(`${form.date} ${form.checkInTime}`).valueOf() : null,
-          checkOutTime: form.checkOutTime ? dayjs(`${form.date} ${form.checkOutTime}`).valueOf() : null,
-        };
+          employeeId: Number(form.employeeId),
+          checkInTime: form.checkInTime
+            ? dayjs(`${form.date} ${form.checkInTime}`).valueOf()
+            : null,
+          checkOutTime: form.checkOutTime
+            ? dayjs(`${form.date} ${form.checkOutTime}`).valueOf()
+            : null,
+        } as AddAttendanceReq;
 
         if (editId) {
           await AttendanceAPI.updateFn({ data: { id: editId, ...payload } });
@@ -112,15 +127,11 @@ const TheForm = memo(
     };
 
     return (
-      <Dialog
-        open={open}
-        onClose={handleCancel}
-        maxWidth="sm"
-        fullWidth
-        fullScreen={isMobile}
-      >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>{editId ? '编辑考勤' : '新增考勤'}</Box>
+      <Dialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth fullScreen={isMobile}>
+        <DialogTitle
+          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        >
+          <Box>{editId ? t('dialog.edit') : t('dialog.add')}</Box>
           {isMobile && (
             <IconButton onClick={handleCancel}>
               <CloseIcon />
@@ -132,10 +143,10 @@ const TheForm = memo(
           <form onSubmit={handleSubmit}>
             <Stack spacing={3}>
               <FormControl fullWidth required>
-                <InputLabel>员工</InputLabel>
+                <InputLabel>{t('enterprise.attendance.employee')}</InputLabel>
                 <Select
                   value={form.employeeId}
-                  label="员工"
+                  label={t('enterprise.attendance.employee')}
                   onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
                 >
                   {users.map((u) => (
@@ -147,7 +158,7 @@ const TheForm = memo(
               </FormControl>
 
               <TextField
-                label="日期"
+                label={t('enterprise.attendance.date')}
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
@@ -158,7 +169,7 @@ const TheForm = memo(
 
               <Stack direction="row" spacing={2}>
                 <TextField
-                  label="签到时间"
+                  label={t('enterprise.attendance.checkInTime')}
                   type="time"
                   value={form.checkInTime || ''}
                   onChange={(e) => setForm({ ...form, checkInTime: e.target.value })}
@@ -167,7 +178,7 @@ const TheForm = memo(
                   inputProps={{ step: 1 }}
                 />
                 <TextField
-                  label="签退时间"
+                  label={t('enterprise.attendance.checkOutTime')}
                   type="time"
                   value={form.checkOutTime || ''}
                   onChange={(e) => setForm({ ...form, checkOutTime: e.target.value })}
@@ -178,21 +189,21 @@ const TheForm = memo(
               </Stack>
 
               <FormControl fullWidth>
-                <InputLabel>状态</InputLabel>
+                <InputLabel>{t('enterprise.attendance.status')}</InputLabel>
                 <Select
                   value={form.status}
-                  label="状态"
+                  label={t('enterprise.attendance.status')}
                   onChange={(e) => setForm({ ...form, status: e.target.value })}
                 >
-                  <MenuItem value={0}>正常</MenuItem>
-                  <MenuItem value={1}>迟到</MenuItem>
-                  <MenuItem value={2}>早退</MenuItem>
-                  <MenuItem value={3}>旷工</MenuItem>
+                  <MenuItem value={0}>{t('enterprise.attendance.status.normal')}</MenuItem>
+                  <MenuItem value={1}>{t('enterprise.attendance.status.late')}</MenuItem>
+                  <MenuItem value={2}>{t('enterprise.attendance.status.earlyLeave')}</MenuItem>
+                  <MenuItem value={3}>{t('enterprise.attendance.status.absent')}</MenuItem>
                 </Select>
               </FormControl>
 
               <TextField
-                label="备注"
+                label={t('column.remark')}
                 value={form.remark}
                 onChange={(e) => setForm({ ...form, remark: e.target.value })}
                 fullWidth
@@ -205,8 +216,12 @@ const TheForm = memo(
         </DialogContent>
 
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={handleCancel} disabled={loading}>取消</Button>
-          <Button onClick={handleSubmit} variant="contained" disabled={loading}>保存</Button>
+          <Button onClick={handleCancel} disabled={loading}>
+            {t('dialog.cancel')}
+          </Button>
+          <Button onClick={handleSubmit} variant="contained" disabled={loading}>
+            {t('dialog.save')}
+          </Button>
         </DialogActions>
       </Dialog>
     );

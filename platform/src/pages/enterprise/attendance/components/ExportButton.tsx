@@ -2,24 +2,40 @@ import { Button } from '@mui/material';
 import { FileDownload as DownloadIcon } from '@mui/icons-material';
 import { memo } from 'react';
 import dayjs from 'dayjs';
+import { useTranslation } from '@/hooks/useTranslation';
+import type { AttendanceObj } from '@/api/enterprise/type';
 
 interface ExportButtonProps {
-  data: any[];
+  data: AttendanceObj[];
   fileName: string;
 }
 
 const ExportButton = memo(({ data, fileName }: ExportButtonProps) => {
+  const t = useTranslation();
   const handleExport = () => {
     if (!data || data.length === 0) return;
 
-    const headers = ['ID', 'Employee', 'Date', 'Check-In', 'Check-Out', 'Status', 'Remark'];
+    const headers = [
+      t('columns.id'),
+      t('enterprise.attendance.employee'),
+      t('enterprise.attendance.date'),
+      t('enterprise.attendance.checkInTime'),
+      t('enterprise.attendance.checkOutTime'),
+      t('enterprise.attendance.status'),
+      t('enterprise.attendance.remark'),
+    ];
     const csvContent = [
       headers.join(','),
       ...data.map((row) => {
         const checkIn = row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '-';
         const checkOut = row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '-';
-        const statusMap: Record<number, string> = { 0: 'Normal', 1: 'Late', 2: 'Early Leave', 3: 'Absent' };
-        
+        const statusMap: Record<number, string> = {
+          0: t('enterprise.attendance.status.normal'),
+          1: t('enterprise.attendance.status.late'),
+          2: t('enterprise.attendance.status.earlyLeave'),
+          3: t('enterprise.attendance.status.absent'),
+        };
+
         return [
           row.id,
           `"${row.employeeObj?.label || '-'}"`,
@@ -50,7 +66,7 @@ const ExportButton = memo(({ data, fileName }: ExportButtonProps) => {
       sx={{ mb: 1, ml: 'auto', display: 'flex' }}
       size="small"
     >
-      导出 CSV
+      {t('enterprise.attendance.exportCsv')}
     </Button>
   );
 });

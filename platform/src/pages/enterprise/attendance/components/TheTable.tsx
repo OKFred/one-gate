@@ -11,9 +11,10 @@ import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { FilterState } from './TheFilter';
 import ExportButton from './ExportButton';
+import type { ListAttendanceRes, ListAttendanceReq, AttendanceObj } from '@/api/enterprise/type';
 
 export interface TableState {
-  list: any[];
+  list: ListAttendanceRes['list'];
   loading: boolean;
   page: number;
   pageSize: number;
@@ -53,10 +54,10 @@ const TheTable = memo(
       async (searchFilters: FilterState, currentPage: number = 1) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
-          const requestData = {
+          const requestData: ListAttendanceReq = {
+            ...searchFilters,
             pageNo: currentPage,
             pageSize: state.pageSize,
-            ...searchFilters,
           };
 
           const res = await AttendanceAPI.listFn({ data: requestData });
@@ -112,34 +113,40 @@ const TheTable = memo(
     };
 
     const getStatusChip = (status: number) => {
-      const statusMap: Record<number, { label: string; color: any }> = {
-        0: { label: '正常', color: 'success' },
-        1: { label: '迟到', color: 'warning' },
-        2: { label: '早退', color: 'info' },
-        3: { label: '旷工', color: 'error' },
+      const statusMap: Record<
+        number,
+        { label: string; color: Parameters<typeof Chip>[0]['color'] }
+      > = {
+        0: { label: t('enterprise.attendance.status.normal'), color: 'success' },
+        1: { label: t('enterprise.attendance.status.late'), color: 'warning' },
+        2: { label: t('enterprise.attendance.status.earlyLeave'), color: 'info' },
+        3: { label: t('enterprise.attendance.status.absent'), color: 'error' },
       };
-      const { label, color } = statusMap[status] || { label: '未知', color: 'default' };
+      const { label, color } = statusMap[status] || { label: t('column.noData'), color: 'default' };
       return <Chip label={label} color={color} size="small" />;
     };
 
-    const columns: TableColumn<any>[] = [
-      { title: 'ID', render: (row) => row.id },
-      { title: '员工', render: (row) => row.employeeObj?.label || '-' },
-      { title: '日期', render: (row) => row.date },
-      { 
-        title: '签到时间', 
-        render: (row) => row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '-' 
+    const columns: TableColumn<AttendanceObj>[] = [
+      { title: t('columns.id'), render: (row) => row.id },
+      {
+        title: t('enterprise.attendance.employee'),
+        render: (row) => row.employeeObj?.label || '-',
       },
-      { 
-        title: '签退时间', 
-        render: (row) => row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '-' 
+      { title: t('enterprise.attendance.date'), render: (row) => row.date },
+      {
+        title: t('enterprise.attendance.checkInTime'),
+        render: (row) => (row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '-'),
       },
       {
-        title: '状态',
+        title: t('enterprise.attendance.checkOutTime'),
+        render: (row) => (row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '-'),
+      },
+      {
+        title: t('enterprise.attendance.status'),
         render: (row) => getStatusChip(row.status),
       },
       {
-        title: t('table.actions') || '操作',
+        title: t('table.actions'),
         align: 'center',
         render: (row) => (
           <AttendanceActionButtons
@@ -152,13 +159,18 @@ const TheTable = memo(
       },
     ];
 
-    const cardFields: CardField<any>[] = [
+    const cardFields: CardField<AttendanceObj>[] = [
       { type: 'title', render: (row) => row.employeeObj?.label },
-      { type: 'subtitle', label: '日期', render: (row) => row.date },
-      { 
-        type: 'content', 
-        label: '时间', 
-        render: (row) => `${row.checkInTime ? dayjs(row.checkInTime).format('HH:mm') : '-'} ~ ${row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm') : '-'}` 
+      { type: 'subtitle', label: t('enterprise.attendance.date'), render: (row) => row.date },
+      {
+        type: 'content',
+        label: t('enterprise.attendance.checkInTime'),
+        render: (row) => (row.checkInTime ? dayjs(row.checkInTime).format('HH:mm') : '-'),
+      },
+      {
+        type: 'content',
+        label: t('enterprise.attendance.checkOutTime'),
+        render: (row) => (row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm') : '-'),
       },
       {
         type: 'tags',

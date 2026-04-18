@@ -60,6 +60,23 @@ cd server && pnpm run db:init node
 
 ## 4. 前端开发流程 (Page)
 
+### Step 4.0: 定义 TypeScript 类型
+
+在 `platform/src/api/[module]/type.d.ts` 中根据 API 函数自动推导类型：
+
+```typescript
+import * as ModuleAPI from './module';
+
+export type ListReq = NonNullable<Parameters<typeof ModuleAPI.listFn>[0]['data']>;
+export type ListRes = Awaited<ReturnType<typeof ModuleAPI.listFn>>['data']['data'];
+export type AddReq = NonNullable<Parameters<typeof ModuleAPI.addFn>[0]['data']>;
+export type UpdateReq = NonNullable<Parameters<typeof ModuleAPI.updateFn>[0]['data']>;
+export type GetRes = Awaited<ReturnType<typeof ModuleAPI.getFn>>['data']['data'];
+
+/** 业务对象类型 */
+export type [Module]Obj = ListRes['list'][number];
+```
+
 ### Step 4.1: 定义 API 客户端
 
 在 `platform/src/api/[module]/[sub_module].ts` 中定义 Axios 调用函数，通常包括 `listFn`, `addFn`, `updateFn`, `deleteFn`, `getFn`。
@@ -98,3 +115,31 @@ cd server && pnpm run db:init node
 - **代码复用**: 优先参考 `i18n/language` 或 `system/user` 模块的实现模式。
 - **安全性**: 所有写操作 API 必须校验权限，读操作尽可能通过子查询或 Join 丰富 VO 数据。
 - **交互**: 操作成功后必须调用 `tableRef.current?.refresh()` 刷新数据。
+
+---
+
+## 7. TypeScript & 类型规范
+
+为了确保系统的稳定性和可维护性，必须遵循以下类型规范：
+
+### 7.1 严禁使用 `any`
+- 在组件、State、Props 和 API 调用中禁止出现 `any`。
+- 如果类型复杂或来自第三方库，使用 `unknown` 或具体的工具类型（如 `Parameters` / `ReturnType`）进行推导。
+
+### 7.2 显式类型转换 (Explicit Casting)
+- 在提交表单 Payload 时，应显式转换为 API 定义的请求类型：
+  ```typescript
+  const payload = { ...form } as AddReq;
+  await API.addFn({ data: payload });
+  ```
+
+### 7.3 MUI 组件样式属性类型
+- 当需要定义 MUI 组件属性（如 `color`, `variant`）的变量时，应使用其定义的字面量类型，而非 `string`：
+  ```typescript
+  const color: Parameters<typeof Chip>[0]['color'] = 'success';
+  ```
+
+### 7.4 命名约定
+- **接口请求**: `[Action][Module]Req` (例如 `ListAttendanceReq`).
+- **接口响应**: `[Action][Module]Res` (例如 `ListAttendanceRes`).
+- **实体对象**: `[Module]Obj` (代表列表中的单行数据，例如 `AttendanceObj`).

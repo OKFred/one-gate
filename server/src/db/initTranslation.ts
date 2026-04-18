@@ -3986,6 +3986,127 @@ export const initialTranslationData = [
       "en-US": "Attendance Management",
     },
   },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.employee",
+    tValue: "员工",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "员工",
+      "en-US": "Employee",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.date",
+    tValue: "考勤日期",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "考勤日期",
+      "en-US": "Attendance Date",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.checkInTime",
+    tValue: "签到时间",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "签到时间",
+      "en-US": "Check-in Time",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.checkOutTime",
+    tValue: "签退时间",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "签退时间",
+      "en-US": "Check-out Time",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.status",
+    tValue: "考勤状态",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "考勤状态",
+      "en-US": "Attendance Status",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.status.normal",
+    tValue: "正常",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "正常",
+      "en-US": "Normal",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.status.late",
+    tValue: "迟到",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "迟到",
+      "en-US": "Late",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.status.earlyLeave",
+    tValue: "早退",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "早退",
+      "en-US": "Early Leave",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.status.absent",
+    tValue: "旷工",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "旷工",
+      "en-US": "Absent",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.exportCsv",
+    tValue: "导出 CSV",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "导出 CSV",
+      "en-US": "Export CSV",
+    },
+  },
+  {
+    application: "frontend",
+    business: "enterprise.attendance",
+    tKey: "enterprise.attendance.detailTitle",
+    tValue: "考勤详情",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "考勤详情",
+      "en-US": "Attendance Details",
+    },
+  },
 ] as const satisfies {
   application: string;
   business: string;

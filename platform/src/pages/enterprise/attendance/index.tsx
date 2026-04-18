@@ -27,7 +27,7 @@ export default function AttendancePage() {
 
   return (
     <PageLayout 
-      title={t("enterprise.attendance.title") || "考勤管理"} 
+      title={t("enterprise.attendance.title")} 
       actions={<TheActionButtons formRef={formRef} />}
     >
       <TheFilter ref={localObj.filterRef} localObj={localObj} />

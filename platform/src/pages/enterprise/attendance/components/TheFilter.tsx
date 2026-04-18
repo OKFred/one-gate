@@ -19,19 +19,16 @@ import {
   ExpandMore,
   Search as SearchIcon,
   CalendarMonth,
-  Person,
 } from '@mui/icons-material';
 import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { ListAttendanceReq } from '@/api/enterprise/type';
 
-export interface FilterState {
+export interface FilterState extends Omit<ListAttendanceReq, 'pageNo' | 'pageSize'> {
   keyword: string;
-  orderBy: string;
+  orderBy: NonNullable<ListAttendanceReq['orderBy']>;
   descend: boolean;
-  status?: number;
-  employeeId?: number;
-  date?: string;
 }
 
 export interface TheFilterRef {
@@ -55,16 +52,23 @@ const TheFilter = memo(
       date: '',
     });
 
-    useImperativeHandle(ref, () => ({
-      updateCount: (count: number) => {
-        setFilterCount(count);
-        setIsSearching(false);
-      },
-    }), []);
+    useImperativeHandle(
+      ref,
+      () => ({
+        updateCount: (count: number) => {
+          setFilterCount(count);
+          setIsSearching(false);
+        },
+      }),
+      [],
+    );
 
-    const refreshTable = useCallback((newFilters: FilterState) => {
-      tableRef.current?.refresh(newFilters);
-    }, [tableRef]);
+    const refreshTable = useCallback(
+      (newFilters: FilterState) => {
+        tableRef.current?.refresh(newFilters);
+      },
+      [tableRef],
+    );
 
     const debouncedSearch = useCallback(() => {
       const newFilters = { ...filters, keyword: keywordInput };
@@ -82,8 +86,8 @@ const TheFilter = memo(
       }
     }, [keywordInput, debouncedSearch, filters.keyword]);
 
-    const handleFilterChange = (key: keyof FilterState, value: any) => {
-      if (key === 'keyword') {
+    const handleFilterChange = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+      if (key === 'keyword' && typeof value === 'string') {
         setKeywordInput(value);
       } else {
         const newFilters = { ...filters, [key]: value };
@@ -122,10 +126,10 @@ const TheFilter = memo(
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             <FilterIcon color="action" />
-            <Typography variant="h6">{t('filter.title') || '筛选'}</Typography>
+            <Typography variant="h6">{t('filter.title')}</Typography>
             {!isSearching && filterCount > 0 && (
               <Chip
-                label={`${filterCount} 条结果`}
+                label={t('filter.results').replace('{count}', filterCount.toString())}
                 size="small"
                 color="primary"
                 variant="outlined"
@@ -135,7 +139,7 @@ const TheFilter = memo(
           <Box display="flex" alignItems="center" gap={1}>
             {hasActiveFilters() && (
               <Chip
-                label={t('filter.clear') || '清空筛选'}
+                label={t('filter.clear')}
                 size="small"
                 variant="outlined"
                 onClick={clearFilters}
@@ -152,7 +156,7 @@ const TheFilter = memo(
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
               <TextField
-                label={t('filter.keywordLabel') || '备注关键词'}
+                label={t('filter.keywordLabel')}
                 value={keywordInput}
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
@@ -168,7 +172,7 @@ const TheFilter = memo(
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField
-                  label="考勤日期"
+                  label={t('enterprise.attendance.date')}
                   type="date"
                   value={filters.date}
                   onChange={(e) => handleFilterChange('date', e.target.value)}
@@ -183,49 +187,52 @@ const TheFilter = memo(
                     ),
                   }}
                 />
-                
+
                 <FormControl size="small" fullWidth>
-                  <InputLabel>状态</InputLabel>
+                  <InputLabel>{t('enterprise.attendance.status')}</InputLabel>
                   <Select
                     value={filters.status === undefined ? 'all' : filters.status}
-                    label="状态"
+                    label={t('enterprise.attendance.status')}
                     onChange={(e) => {
                       const val = e.target.value;
-                      handleFilterChange('status', val === 'all' ? undefined : Number(val));
+                      handleFilterChange(
+                        'status',
+                        val === 'all' ? undefined : (Number(val) as 0 | 1 | 2 | 3),
+                      );
                     }}
                   >
-                    <MenuItem value="all">全部</MenuItem>
-                    <MenuItem value={0}>正常</MenuItem>
-                    <MenuItem value={1}>迟到</MenuItem>
-                    <MenuItem value={2}>早退</MenuItem>
-                    <MenuItem value={3}>旷工</MenuItem>
+                    <MenuItem value="all">{t('filter.all')}</MenuItem>
+                    <MenuItem value={0}>{t('enterprise.attendance.status.normal')}</MenuItem>
+                    <MenuItem value={1}>{t('enterprise.attendance.status.late')}</MenuItem>
+                    <MenuItem value={2}>{t('enterprise.attendance.status.earlyLeave')}</MenuItem>
+                    <MenuItem value={3}>{t('enterprise.attendance.status.absent')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('filter.orderBy') || '排序字段'}</InputLabel>
+                  <InputLabel>{t('filter.orderBy')}</InputLabel>
                   <Select
                     value={filters.orderBy}
-                    label={t('filter.orderBy') || '排序字段'}
+                    label={t('filter.orderBy')}
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
-                    <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="date">日期</MenuItem>
-                    <MenuItem value="createTimeUtc">创建时间</MenuItem>
+                    <MenuItem value="id">{t('columns.id')}</MenuItem>
+                    <MenuItem value="date">{t('enterprise.attendance.date')}</MenuItem>
+                    <MenuItem value="createTimeUtc">{t('columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>
 
                 <FormControl size="small" fullWidth>
-                  <InputLabel>{t('filter.sortOrder') || '排序方向'}</InputLabel>
+                  <InputLabel>{t('filter.sortOrder')}</InputLabel>
                   <Select
                     value={filters.descend ? 'desc' : 'asc'}
-                    label={t('filter.sortOrder') || '排序方向'}
+                    label={t('filter.sortOrder')}
                     onChange={(e) => handleFilterChange('descend', e.target.value === 'desc')}
                   >
-                    <MenuItem value="asc">升序</MenuItem>
-                    <MenuItem value="desc">降序</MenuItem>
+                    <MenuItem value="asc">{t('filter.asc')}</MenuItem>
+                    <MenuItem value="desc">{t('filter.desc')}</MenuItem>
                   </Select>
                 </FormControl>
               </Stack>
