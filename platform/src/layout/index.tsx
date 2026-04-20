@@ -25,7 +25,7 @@ export default React.memo(function ResponsiveLayout() {
       <Box sx={{ width: '100vw', minHeight: '100vh' }}>
         <CssBaseline />
         <Topbar setSidebarOpen={setSidebarOpen} />
-        <Box sx={{ display: 'flex', pt: { xs: 7, sm: 8 } }}>
+        <Box sx={{ display: 'flex', pt: 8 }}>
           <Sidebar open={sidebarOpen} onClose={handleSidebarClose} />
           <Content sidebarOpen={sidebarOpen} />
         </Box>
