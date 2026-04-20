@@ -131,9 +131,8 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
     );
   };
 
-  // 侧边栏内容
   const drawerContent = (
-    <Box sx={{ paddingTop: isMobile ? '0' : '64px' }}>
+    <Box sx={{ paddingTop: { xs: 0, sm: '64px' } }}>
       {navItems && navItems.length > 0 ? (
         <List className="pb-0! pt-0!">
           {navItems.map((item) => renderSystemMenuTree(item, location.pathname))}

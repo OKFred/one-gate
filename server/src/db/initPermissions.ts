@@ -305,6 +305,26 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     code: "maintenance.cache:view",
     business: "maintenance.cache",
   },
+  {
+    category: "api",
+    code: "enterprise.attendance:api",
+    business: "enterprise.attendance",
+  },
+  {
+    category: "button",
+    code: "enterprise.attendance:add",
+    business: "enterprise.attendance",
+  },
+  {
+    category: "button",
+    code: "enterprise.attendance:edit",
+    business: "enterprise.attendance",
+  },
+  {
+    category: "button",
+    code: "enterprise.attendance:delete",
+    business: "enterprise.attendance",
+  },
 ];
 
 /**

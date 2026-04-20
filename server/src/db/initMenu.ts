@@ -219,6 +219,22 @@ export const initialMenuData = [
     sort: 2,
     business: "oss.file",
   },
+  {
+    id: 26,
+    name: "sidebar.menu.enterprise",
+    icon: "material-symbols:enterprise",
+    sort: 8,
+    business: "enterprise",
+  },
+  {
+    id: 27,
+    name: "sidebar.menu.enterprise.attendance",
+    icon: "material-symbols:calendar-month",
+    path: "/enterprise/attendance",
+    parentId: 26,
+    sort: 1,
+    business: "enterprise.attendance",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

@@ -22,6 +22,7 @@ const TABLES = [
   "oss_config",
   "maintenance_audit_login",
   "maintenance_compliance",
+  "enterprise_attendance",
 ];
 
 /**

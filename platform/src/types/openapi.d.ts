@@ -6213,6 +6213,354 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enterprise/attendance/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有考勤记录（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/attendance/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取考勤记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/attendance/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/attendance/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/attendance/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/attendance/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取考勤记录详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11100,6 +11448,419 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "enterprise.attendanceListAllReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+             * @enum {number}
+             */
+            status?: 0 | 1 | 2 | 3;
+            /**
+             * @description 员工ID
+             * @example 1
+             */
+            employeeId?: number;
+            /**
+             * @description 考勤日期
+             * @example 2024-04-18
+             */
+            date?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "employeeId" | "date" | "status" | "createTimeUtc";
+        };
+        "enterprise.attendanceListAllRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 员工ID
+                 * @example 1
+                 */
+                employeeId: number;
+                /**
+                 * @description 考勤日期
+                 * @example 2024-04-18
+                 */
+                date: string;
+                /**
+                 * @description 签到时间
+                 * @example 1672531200000
+                 */
+                checkInTime?: ((number | null) | null) | null;
+                /**
+                 * @description 签退时间
+                 * @example 1672560000000
+                 */
+                checkOutTime?: ((number | null) | null) | null;
+                /**
+                 * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+                 * @enum {number}
+                 */
+                status: 0 | 1 | 2 | 3;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
+                /** @description 员工对象 */
+                employeeObj?: (({
+                    /**
+                     * @description 员工ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 员工名称
+                     * @example 张三
+                     */
+                    label: string;
+                } | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新者ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            }[];
+            message: string;
+        };
+        "enterprise.attendanceListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+             * @enum {number}
+             */
+            status?: 0 | 1 | 2 | 3;
+            /**
+             * @description 员工ID
+             * @example 1
+             */
+            employeeId?: number;
+            /**
+             * @description 考勤日期
+             * @example 2024-04-18
+             */
+            date?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "employeeId" | "date" | "status" | "createTimeUtc";
+        };
+        "enterprise.attendanceListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 员工ID
+                     * @example 1
+                     */
+                    employeeId?: number;
+                    /**
+                     * @description 考勤日期
+                     * @example 2024-04-18
+                     */
+                    date: string;
+                    /**
+                     * @description 签到时间
+                     * @example 1672531200000
+                     */
+                    checkInTime?: ((number | null) | null) | null;
+                    /**
+                     * @description 签退时间
+                     * @example 1672560000000
+                     */
+                    checkOutTime?: ((number | null) | null) | null;
+                    /**
+                     * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+                     * @enum {number}
+                     */
+                    status: 0 | 1 | 2 | 3;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 员工对象 */
+                    employeeObj: (({
+                        /**
+                         * @description 员工ID
+                         * @example 1
+                         */
+                        value: number;
+                        /**
+                         * @description 员工名称
+                         * @example 张三
+                         */
+                        label: string;
+                    } | null) | null) | null;
+                    /** @description 创建者ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新者ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "enterprise.attendanceAddReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description 员工ID
+             * @example 1
+             */
+            employeeId: number;
+            /**
+             * @description 考勤日期
+             * @example 2024-04-18
+             */
+            date: string;
+            /**
+             * @description 签到时间
+             * @example 1672531200000
+             */
+            checkInTime?: ((number | null) | null) | null;
+            /**
+             * @description 签退时间
+             * @example 1672560000000
+             */
+            checkOutTime?: ((number | null) | null) | null;
+            /**
+             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+             * @enum {number}
+             */
+            status: 0 | 1 | 2 | 3;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+            /** @description 员工对象 */
+            employeeObj?: (({
+                /**
+                 * @description 员工ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 员工名称
+                 * @example 张三
+                 */
+                label: string;
+            } | null) | null) | null;
+            /** @description 创建者ID */
+            creatorId?: number;
+            /**
+             * @description 创建时间
+             * @example 1672531199000
+             */
+            createTimeUtc?: number;
+            /** @description 更新者ID */
+            updaterId?: ((number | null) | null) | null;
+            /**
+             * @description 更新时间
+             * @example 1672531199000
+             */
+            updateTimeUtc?: ((number | null) | null) | null;
+        };
+        "enterprise.attendanceAddRes": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.attendanceUpdateReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 员工ID
+             * @example 1
+             */
+            employeeId?: number;
+            /**
+             * @description 考勤日期
+             * @example 2024-04-18
+             */
+            date?: string;
+            /**
+             * @description 签到时间
+             * @example 1672531200000
+             */
+            checkInTime?: ((number | null) | null) | null;
+            /**
+             * @description 签退时间
+             * @example 1672560000000
+             */
+            checkOutTime?: ((number | null) | null) | null;
+            /**
+             * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+             * @enum {number}
+             */
+            status?: 0 | 1 | 2 | 3;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+            /** @description 员工对象 */
+            employeeObj?: (({
+                /**
+                 * @description 员工ID
+                 * @example 1
+                 */
+                value: number;
+                /**
+                 * @description 员工名称
+                 * @example 张三
+                 */
+                label: string;
+            } | null) | null) | null;
+            /** @description 创建者ID */
+            creatorId?: number;
+            /**
+             * @description 创建时间
+             * @example 1672531199000
+             */
+            createTimeUtc?: number;
+            /** @description 更新者ID */
+            updaterId?: ((number | null) | null) | null;
+            /**
+             * @description 更新时间
+             * @example 1672531199000
+             */
+            updateTimeUtc?: ((number | null) | null) | null;
+        };
+        "enterprise.attendanceUpdateRes": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.attendanceDeleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.attendanceDeleteRes": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.attendanceGetReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.attendanceGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 员工ID
+                 * @example 1
+                 */
+                employeeId: number;
+                /**
+                 * @description 考勤日期
+                 * @example 2024-04-18
+                 */
+                date: string;
+                /**
+                 * @description 签到时间
+                 * @example 1672531200000
+                 */
+                checkInTime?: ((number | null) | null) | null;
+                /**
+                 * @description 签退时间
+                 * @example 1672560000000
+                 */
+                checkOutTime?: ((number | null) | null) | null;
+                /**
+                 * @description 考勤状态 (0:正常, 1:迟到, 2:早退, 3:旷工)
+                 * @enum {number}
+                 */
+                status: 0 | 1 | 2 | 3;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
+                /** @description 员工对象 */
+                employeeObj?: (({
+                    /**
+                     * @description 员工ID
+                     * @example 1
+                     */
+                    value: number;
+                    /**
+                     * @description 员工名称
+                     * @example 张三
+                     */
+                    label: string;
+                } | null) | null) | null;
+                /** @description 创建者ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新者ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
             };
             message: string;
         };
