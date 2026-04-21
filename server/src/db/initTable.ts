@@ -70,7 +70,7 @@ async function runWranglerInit(target: "local" | "remote") {
       console.log(`📄 正在同步: ${file}...`);
       const targetFlag = target === "remote" ? "--remote" : "--local";
       execSync(
-        `npx wrangler d1 execute hodor_db ${targetFlag} --file=${filePath}`,
+        `npx wrangler d1 execute hodor_db ${targetFlag} --file=${filePath} --yes`,
         {
           stdio: "inherit",
         }
