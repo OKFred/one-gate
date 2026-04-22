@@ -17,38 +17,55 @@ import type {
  */
 export class KVStorage {
   private cache: Cache | null = null;
-  private realKV: any = null;
+  private bindingName: string;
+  private ttlSeconds: number;
 
   constructor(bindingName: string = "KV", ttlSeconds: number = 3600) {
+    this.bindingName = bindingName;
+    this.ttlSeconds = ttlSeconds;
+  }
+
+  /**
+   * 获取底层存储执行器
+   * 优先使用环境变量中的真实 KV，否则回退到内存缓存
+   */
+  private getExecutor(): { realKV?: any; cache?: Cache } {
     // 尝试从环境变量获取真实的 KV 绑定
-    const envKV = getEnv(bindingName);
+    const envKV = getEnv(this.bindingName);
+
     if (
       envKV &&
       typeof (envKV as any)?.get === "function" &&
       typeof (envKV as any)?.put === "function"
     ) {
-      this.realKV = envKV;
-    } else {
-      // 如果没有真实 KV，回退到 cache-manager (内存)
+      console.log({ KV_KEY: this.bindingName, MSG: "KV_IN_USE" });
+      return { realKV: envKV };
+    }
+
+    // 如果没有真实 KV，回退到 cache-manager (内存)
+    if (!this.cache) {
       this.cache = createCache({
-        ttl: ttlSeconds * 1000,
+        ttl: this.ttlSeconds * 1000,
       });
     }
+
+    return { cache: this.cache };
   }
 
-  /**p
+  /**
    * 获取缓存值
    */
   async get<T = string>(
     key: string,
     options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
   ): Promise<T | null> {
+    const { realKV, cache } = this.getExecutor();
     let value: any;
 
-    if (this.realKV) {
-      value = await this.realKV.get(key, options);
-    } else if (this.cache) {
-      value = await this.cache.get<string>(key);
+    if (realKV) {
+      value = await realKV.get(key, options);
+    } else if (cache) {
+      value = await cache.get<string>(key);
     }
 
     if (value === undefined || value === null) {
@@ -56,7 +73,7 @@ export class KVStorage {
     }
 
     // 如果是真实 KV，它已经处理好了类型转换
-    if (this.realKV) return value;
+    if (realKV) return value;
 
     // 处理 cache-manager 的类型参数
     let type: string = "text";
@@ -87,12 +104,14 @@ export class KVStorage {
     value: string | object | ArrayBuffer,
     options?: KVPutOptions
   ): Promise<void> {
-    if (this.realKV) {
-      await this.realKV.put(key, value, options);
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
+      await realKV.put(key, value, options);
       return;
     }
 
-    if (this.cache) {
+    if (cache) {
       // 处理不同类型的值 (用于内存缓存)
       let serializedValue: string;
       if (typeof value === "string") {
@@ -113,7 +132,7 @@ export class KVStorage {
         if (ttl <= 0) return;
       }
 
-      await this.cache.set(key, serializedValue, ttl);
+      await cache.set(key, serializedValue, ttl);
     }
   }
 
@@ -121,10 +140,12 @@ export class KVStorage {
    * 删除缓存值
    */
   async delete(key: string): Promise<void> {
-    if (this.realKV) {
-      await this.realKV.delete(key);
-    } else if (this.cache) {
-      await this.cache.del(key);
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
+      await realKV.delete(key);
+    } else if (cache) {
+      await cache.del(key);
     }
   }
 
@@ -132,17 +153,19 @@ export class KVStorage {
    * 列出缓存键
    */
   async list(options?: KVListOptions): Promise<KVListResult> {
-    if (this.realKV) {
-      return await this.realKV.list(options);
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
+      return await realKV.list(options);
     }
 
     const keys: { name: string }[] = [];
     const prefix = options?.prefix || "";
     const limit = options?.limit || 1000;
 
-    if (this.cache) {
+    if (cache) {
       try {
-        const store = (this.cache as any).stores?.[0];
+        const store = (cache as any).stores?.[0];
         if (store?.iterator) {
           let count = 0;
           for await (const [key] of store.iterator({})) {
@@ -168,18 +191,18 @@ export class KVStorage {
    * 清空所有缓存
    */
   async clear(): Promise<void> {
-    if (this.realKV) {
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
       // CF Workers KV 不支持直接 clear，需要分页列出并删除
-      let list = await this.realKV.list();
+      let list = await realKV.list();
       while (list.keys.length > 0) {
-        await Promise.all(
-          list.keys.map((k: any) => this.realKV.delete(k.name))
-        );
+        await Promise.all(list.keys.map((k: any) => realKV.delete(k.name)));
         if (list.list_complete) break;
-        list = await this.realKV.list({ cursor: list.cursor });
+        list = await realKV.list({ cursor: list.cursor });
       }
-    } else if (this.cache) {
-      await this.cache.clear();
+    } else if (cache) {
+      await cache.clear();
     }
   }
 }
