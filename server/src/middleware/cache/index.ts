@@ -4,12 +4,17 @@
  */
 import { createCache, type Cache } from "cache-manager";
 import { getEnv } from "@/utils/env";
+import { getRuntimeKey } from "hono/adapter";
 import type {
   KVGetOptions,
   KVPutOptions,
   KVListOptions,
   KVListResult,
 } from "./types";
+
+// 内部存储，用于缓存 KV 绑定和实例
+const _kvBindings = new Map<string, any>();
+const _kvInstances = new Map<string, KVStorage>();
 
 /**
  * KV 存储类
@@ -27,22 +32,32 @@ export class KVStorage {
 
   /**
    * 获取底层存储执行器
-   * 优先使用环境变量中的真实 KV，否则回退到内存缓存
+   * 根据运行时决定使用 KV 或内存缓存
    */
   private getExecutor(): { realKV?: any; cache?: Cache } {
-    // 尝试从环境变量获取真实的 KV 绑定
-    const envKV = getEnv(this.bindingName);
+    const runtime = getRuntimeKey();
 
-    if (
-      envKV &&
-      typeof (envKV as any)?.get === "function" &&
-      typeof (envKV as any)?.put === "function"
-    ) {
-      console.log({ KV_KEY: this.bindingName, MSG: "KV_IN_USE" });
-      return { realKV: envKV };
+    if (runtime === "workerd") {
+      // 1. 尝试从内部绑定存储获取
+      const binding = _kvBindings.get(this.bindingName);
+
+      // 2. 尝试从环境变量获取绑定
+      const envKV = binding || getEnv(this.bindingName);
+
+      if (
+        envKV &&
+        typeof (envKV as any)?.get === "function" &&
+        typeof (envKV as any)?.put === "function"
+      ) {
+        console.log({ KV_KEY: this.bindingName, MSG: "KV_IN_USE" });
+        return { realKV: envKV };
+      }
+
+      // Worker 环境下，如果没有 KV 也不要 fallback
+      return {};
     }
 
-    // 如果没有真实 KV，回退到 cache-manager (内存)
+    // Node.js 或其他环境使用 cache-manager
     if (!this.cache) {
       this.cache = createCache({
         ttl: this.ttlSeconds * 1000,
@@ -208,16 +223,43 @@ export class KVStorage {
 }
 
 /**
+ * 设置 KV 绑定
+ */
+export function setKVBinding(kvBinding: any, name: string = "KV") {
+  if (!kvBinding) return;
+  _kvBindings.set(name, kvBinding);
+}
+
+/**
  * 创建或获取 KV 存储实例
  */
 export function getKVStorage(
   bindingName: string = "KV",
   ttlSeconds?: number
 ): KVStorage {
-  return new KVStorage(bindingName, ttlSeconds);
+  const cacheKey = `${bindingName}:${ttlSeconds || "default"}`;
+  if (!_kvInstances.has(cacheKey)) {
+    _kvInstances.set(cacheKey, new KVStorage(bindingName, ttlSeconds));
+  }
+  return _kvInstances.get(cacheKey)!;
 }
 
 /**
- * 全局统一的 KV 存储实例
+ * 获取全局默认的 KV 存储实例
  */
-export const kv = getKVStorage("KV");
+export function getKV(): KVStorage {
+  return getKVStorage("KV");
+}
+
+/**
+ * 全局统一的 KV 存储实例 (Proxy 对象)
+ * 允许在顶层导入，但在调用时才解析底层存储
+ */
+export const kv = new Proxy({} as KVStorage, {
+  get(_, prop) {
+    const target = getKV();
+    const value = (target as any)[prop];
+    return typeof value === "function" ? value.bind(target) : value;
+  },
+});
+

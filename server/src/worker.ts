@@ -27,6 +27,7 @@ if (!globalThis.DOMParser) {
 
 import createApp from "@/server/index";
 import { setD1Binding } from "@/db/index";
+import { setKVBinding } from "@/middleware/cache/index";
 import { setEnv } from "@/utils/env";
 
 let app: any = null;
@@ -36,9 +37,12 @@ export default {
    * Cloudflare Workers fetch handler.
    */
   async fetch(request: Request, env: any, ctx: any) {
-    // 1. Inject bindings into the database layer
+    // 1. Inject bindings into the database and cache layers
     if (env.DB) {
       setD1Binding(env.DB);
+    }
+    if (env.KV) {
+      setKVBinding(env.KV);
     }
 
     // 2. Set environment variables globally
