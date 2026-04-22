@@ -634,41 +634,6 @@ async function verifyDepartment(departmentId: number) {
   }
 }
 
-/** 检查部门是否可以被禁用 */
-async function checkCanDisableDepartment(departmentId: number): Promise<void> {
-  // 1. 检查当前部门及所有子孙部门下是否存在已启用的用户
-  const descendants = await getDescendantDepartments(departmentId);
-  const allDepartmentIds = [
-    departmentId,
-    ...(descendants?.map((d) => d.id) || []),
-  ];
-
-  // 查询这些部门下的已启用用户数量
-  const employeeCount = await userUtils.countDepartmentUsers(
-    allDepartmentIds,
-    true
-  );
-
-  if (employeeCount > 0) {
-    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_USER);
-  }
-
-  // 2. 检查是否存在未禁用的子女部门
-  const enabledChildren = await db
-    .select({ count: count(departmentTable.id) })
-    .from(departmentTable)
-    .where(
-      and(
-        eq(departmentTable.parentId, departmentId),
-        eq(departmentTable.isEnabled, true)
-      )
-    );
-
-  if (enabledChildren[0]?.count > 0) {
-    throw new BusinessError(BusinessErrorCode.DEPARTMENT_HAS_ENABLED_CHILDREN);
-  }
-}
-
 export const utils = {
   verifyDepartment,
   getDepartmentNameById,
@@ -678,7 +643,6 @@ export const utils = {
   getChildDepartments,
   getSiblingDepartments,
   getParentAndItsDescendants,
-  checkCanDisableDepartment,
 };
 
 export default {
