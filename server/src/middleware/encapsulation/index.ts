@@ -108,7 +108,7 @@ function routeMaker({
         "2020-12"
       );
       if (!resValid) {
-        c.var.logger.error(
+        c.var.logger?.error(
           "Response schema validation failed:\n" + JSON.stringify(resErrors)
         );
       }

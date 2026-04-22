@@ -58,7 +58,14 @@ export default function errorHandler(app: App) {
         { status: e.status as ContentfulStatusCode }
       );
     }
-    c.var.logger.error((await t("errorHandler.serverError")) + ": " + e.stack);
+    const stack = e instanceof Error ? e.stack : String(e);
+    const serverErrorMsg = await t("errorHandler.serverError");
+    const msg = `${serverErrorMsg}: ${stack}`;
+    if (c.var.logger) {
+      c.var.logger.error(msg);
+    } else {
+      console.error(msg);
+    }
     return c.json(
       {
         ok: false,
