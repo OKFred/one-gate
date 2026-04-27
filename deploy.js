@@ -78,6 +78,27 @@ async function main() {
 
   console.log(`\n📦 即将构建并推送至: ${registryUrl}\n`);
 
+  // 自动生成 VERSION 并注入 server/.env
+  try {
+    const { execSync } = await import("node:child_process");
+    const version = execSync('git log -1 --format="%cd-%h" --date=format:"%Y%m%d%H%M%S"', { encoding: "utf-8" }).trim();
+    if (version) {
+      const envFilePath = path.resolve(__dirname, "server/.env");
+      if (fs.existsSync(envFilePath)) {
+        let envContent = fs.readFileSync(envFilePath, "utf-8");
+        if (envContent.match(/^VERSION=/m)) {
+          envContent = envContent.replace(/^VERSION=.*$/m, `VERSION=${version}`);
+        } else {
+          envContent = envContent.trimEnd() + `\nVERSION=${version}\n`;
+        }
+        fs.writeFileSync(envFilePath, envContent);
+      }
+      console.log(`📦 VERSION 已注入: ${version}`);
+    }
+  } catch (e) {
+    console.warn("⚠️  无法生成 VERSION:", e.message);
+  }
+
   const apps = [
     { name: "server", dir: "./server" },
     { name: "platform", dir: "./platform" },

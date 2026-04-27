@@ -1,7 +1,7 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { API } from "@/middleware/encapsulation";
 import { bodyAdapter } from "@/middleware/encapsulation/adapter";
-import { kv } from "@/middleware/cache/index";
+import { kv } from "@/middleware/cache";
 import {
   CacheKeyVO,
   GetValueVO,

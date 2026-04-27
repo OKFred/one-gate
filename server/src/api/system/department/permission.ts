@@ -60,8 +60,12 @@ export const buildWhereCondition = async (
               // 用户本部门及其子孙部门
               const userDeptId = userObj.departmentObj?.value;
               if (!userDeptId) return eq(departmentTable.id, -1); // 无匹配
-              const descendants = await departmentUtils.getDescendantDepartments(userDeptId);
-              const managedIds = [userDeptId, ...(descendants?.map(d => d.id) || [])];
+              const descendants =
+                await departmentUtils.getDescendantDepartments(userDeptId);
+              const managedIds = [
+                userDeptId,
+                ...(descendants?.map((d) => d.id) || []),
+              ];
               return inArray(departmentTable.id, managedIds);
             }
 
@@ -96,7 +100,8 @@ export const presetGuards = {
             const userDeptId = userObj.departmentObj?.value;
             if (!userDeptId) return false;
             if (parentId === userDeptId) return true;
-            const descendants = await departmentUtils.getDescendantDepartments(userDeptId);
+            const descendants =
+              await departmentUtils.getDescendantDepartments(userDeptId);
             return !!descendants?.some((d) => d.id === parentId);
           }
           case DataScope.CUSTOM:
@@ -115,7 +120,10 @@ export const presetGuards = {
       "父部门存在校验",
       async () => {
         if (!parentId) return true; // parentId 为 null, undefined 或 0 时视为根部门
-        return !!(await departmentService.get.service({ id: parentId }, userObj));
+        return !!(await departmentService.get.service(
+          { id: parentId },
+          userObj
+        ));
       },
       BusinessErrorCode.NOT_EXIST_OR_DISABLED
     ),

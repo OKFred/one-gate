@@ -4,6 +4,7 @@
  */
 import { createCache, type Cache } from "cache-manager";
 import { getEnv } from "@/utils/env";
+import { getRuntimeKey } from "hono/adapter";
 import type {
   KVGetOptions,
   KVPutOptions,
@@ -11,44 +12,75 @@ import type {
   KVListResult,
 } from "./types";
 
+// 内部存储，用于缓存 KV 绑定和实例
+const _kvBindings = new Map<string, any>();
+const _kvInstances = new Map<string, KVStorage>();
+
 /**
  * KV 存储类
  * 封装了对 Cloudflare Workers KV 和 cache-manager 的统一访问
  */
 export class KVStorage {
   private cache: Cache | null = null;
-  private realKV: any = null;
+  private bindingName: string;
+  private ttlSeconds: number;
 
   constructor(bindingName: string = "KV", ttlSeconds: number = 3600) {
-    // 尝试从环境变量获取真实的 KV 绑定
-    const envKV = getEnv(bindingName);
-    if (
-      envKV &&
-      typeof (envKV as any)?.get === "function" &&
-      typeof (envKV as any)?.put === "function"
-    ) {
-      this.realKV = envKV;
-    } else {
-      // 如果没有真实 KV，回退到 cache-manager (内存)
-      this.cache = createCache({
-        ttl: ttlSeconds * 1000,
-      });
-    }
+    this.bindingName = bindingName;
+    this.ttlSeconds = ttlSeconds;
   }
 
-  /**p
+  /**
+   * 获取底层存储执行器
+   * 根据运行时决定使用 KV 或内存缓存
+   */
+  private getExecutor(): { realKV?: any; cache?: Cache } {
+    const runtime = getRuntimeKey();
+
+    if (runtime === "workerd") {
+      // 1. 尝试从内部绑定存储获取
+      const binding = _kvBindings.get(this.bindingName);
+
+      // 2. 尝试从环境变量获取绑定
+      const envKV = binding || getEnv(this.bindingName);
+
+      if (
+        envKV &&
+        typeof (envKV as any)?.get === "function" &&
+        typeof (envKV as any)?.put === "function"
+      ) {
+        console.log({ KV_KEY: this.bindingName, MSG: "KV_IN_USE" });
+        return { realKV: envKV };
+      }
+
+      // Worker 环境下，如果没有 KV 也不要 fallback
+      return {};
+    }
+
+    // Node.js 或其他环境使用 cache-manager
+    if (!this.cache) {
+      this.cache = createCache({
+        ttl: this.ttlSeconds * 1000,
+      });
+    }
+
+    return { cache: this.cache };
+  }
+
+  /**
    * 获取缓存值
    */
   async get<T = string>(
     key: string,
     options?: KVGetOptions | "text" | "json" | "arrayBuffer" | "stream"
   ): Promise<T | null> {
+    const { realKV, cache } = this.getExecutor();
     let value: any;
 
-    if (this.realKV) {
-      value = await this.realKV.get(key, options);
-    } else if (this.cache) {
-      value = await this.cache.get<string>(key);
+    if (realKV) {
+      value = await realKV.get(key, options);
+    } else if (cache) {
+      value = await cache.get<string>(key);
     }
 
     if (value === undefined || value === null) {
@@ -56,7 +88,7 @@ export class KVStorage {
     }
 
     // 如果是真实 KV，它已经处理好了类型转换
-    if (this.realKV) return value;
+    if (realKV) return value;
 
     // 处理 cache-manager 的类型参数
     let type: string = "text";
@@ -87,12 +119,14 @@ export class KVStorage {
     value: string | object | ArrayBuffer,
     options?: KVPutOptions
   ): Promise<void> {
-    if (this.realKV) {
-      await this.realKV.put(key, value, options);
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
+      await realKV.put(key, value, options);
       return;
     }
 
-    if (this.cache) {
+    if (cache) {
       // 处理不同类型的值 (用于内存缓存)
       let serializedValue: string;
       if (typeof value === "string") {
@@ -113,7 +147,7 @@ export class KVStorage {
         if (ttl <= 0) return;
       }
 
-      await this.cache.set(key, serializedValue, ttl);
+      await cache.set(key, serializedValue, ttl);
     }
   }
 
@@ -121,10 +155,12 @@ export class KVStorage {
    * 删除缓存值
    */
   async delete(key: string): Promise<void> {
-    if (this.realKV) {
-      await this.realKV.delete(key);
-    } else if (this.cache) {
-      await this.cache.del(key);
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
+      await realKV.delete(key);
+    } else if (cache) {
+      await cache.del(key);
     }
   }
 
@@ -132,17 +168,19 @@ export class KVStorage {
    * 列出缓存键
    */
   async list(options?: KVListOptions): Promise<KVListResult> {
-    if (this.realKV) {
-      return await this.realKV.list(options);
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
+      return await realKV.list(options);
     }
 
     const keys: { name: string }[] = [];
     const prefix = options?.prefix || "";
     const limit = options?.limit || 1000;
 
-    if (this.cache) {
+    if (cache) {
       try {
-        const store = (this.cache as any).stores?.[0];
+        const store = (cache as any).stores?.[0];
         if (store?.iterator) {
           let count = 0;
           for await (const [key] of store.iterator({})) {
@@ -168,20 +206,28 @@ export class KVStorage {
    * 清空所有缓存
    */
   async clear(): Promise<void> {
-    if (this.realKV) {
+    const { realKV, cache } = this.getExecutor();
+
+    if (realKV) {
       // CF Workers KV 不支持直接 clear，需要分页列出并删除
-      let list = await this.realKV.list();
+      let list = await realKV.list();
       while (list.keys.length > 0) {
-        await Promise.all(
-          list.keys.map((k: any) => this.realKV.delete(k.name))
-        );
+        await Promise.all(list.keys.map((k: any) => realKV.delete(k.name)));
         if (list.list_complete) break;
-        list = await this.realKV.list({ cursor: list.cursor });
+        list = await realKV.list({ cursor: list.cursor });
       }
-    } else if (this.cache) {
-      await this.cache.clear();
+    } else if (cache) {
+      await cache.clear();
     }
   }
+}
+
+/**
+ * 设置 KV 绑定
+ */
+export function setKVBinding(kvBinding: any, name: string = "KV") {
+  if (!kvBinding) return;
+  _kvBindings.set(name, kvBinding);
 }
 
 /**
@@ -191,10 +237,29 @@ export function getKVStorage(
   bindingName: string = "KV",
   ttlSeconds?: number
 ): KVStorage {
-  return new KVStorage(bindingName, ttlSeconds);
+  const cacheKey = `${bindingName}:${ttlSeconds || "default"}`;
+  if (!_kvInstances.has(cacheKey)) {
+    _kvInstances.set(cacheKey, new KVStorage(bindingName, ttlSeconds));
+  }
+  return _kvInstances.get(cacheKey)!;
 }
 
 /**
- * 全局统一的 KV 存储实例
+ * 获取全局默认的 KV 存储实例
  */
-export const kv = getKVStorage("KV");
+export function getKV(): KVStorage {
+  return getKVStorage("KV");
+}
+
+/**
+ * 全局统一的 KV 存储实例 (Proxy 对象)
+ * 允许在顶层导入，但在调用时才解析底层存储
+ */
+export const kv = new Proxy({} as KVStorage, {
+  get(_, prop) {
+    const target = getKV();
+    const value = (target as any)[prop];
+    return typeof value === "function" ? value.bind(target) : value;
+  },
+});
+
