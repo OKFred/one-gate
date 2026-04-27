@@ -1,0 +1,56 @@
+#!/bin/sh
+# =============================================================================
+# pre-commit hook: Auto-generate VERSION from latest git commit
+# FORMAT: YYYYMMDDHHmmss-shortHash (e.g. 20260423001706-720a6a5e)
+# =============================================================================
+
+# Get the latest commit's date and short hash
+VERSION=$(git log -1 --format="%cd-%h" --date=format:"%Y%m%d%H%M%S" 2>/dev/null)
+
+if [ -z "$VERSION" ]; then
+  echo "⚠️  No git history found, skipping VERSION update"
+  exit 0
+fi
+
+echo "📦 Updating VERSION to: $VERSION"
+
+# --- 1. Update wrangler.jsonc (committed, used by Cloudflare Worker) ---
+WRANGLER_FILE="server/wrangler.jsonc"
+if [ -f "$WRANGLER_FILE" ]; then
+  if grep -q '"VERSION"' "$WRANGLER_FILE"; then
+    # Replace existing VERSION line
+    sed -i.bak "s/\"VERSION\":.*$/\"VERSION\": \"$VERSION\",/" "$WRANGLER_FILE"
+  else
+    # Insert VERSION after LOCALE line
+    sed -i.bak "/\"LOCALE\"/a\\    \"VERSION\": \"$VERSION\"," "$WRANGLER_FILE"
+  fi
+  rm -f "${WRANGLER_FILE}.bak"
+  git add "$WRANGLER_FILE"
+  echo "  ✅ wrangler.jsonc updated"
+fi
+
+# --- 2. Update server/.env (local Node.js, not committed) ---
+ENV_FILE="server/.env"
+if [ -f "$ENV_FILE" ]; then
+  if grep -q "^VERSION=" "$ENV_FILE"; then
+    sed -i.bak "s/^VERSION=.*/VERSION=$VERSION/" "$ENV_FILE"
+  else
+    echo "VERSION=$VERSION" >> "$ENV_FILE"
+  fi
+  rm -f "${ENV_FILE}.bak"
+  echo "  ✅ .env updated"
+fi
+
+# --- 3. Update server/.dev.vars (local wrangler dev, not committed) ---
+DEV_VARS_FILE="server/.dev.vars"
+if [ -f "$DEV_VARS_FILE" ]; then
+  if grep -q "^VERSION=" "$DEV_VARS_FILE"; then
+    sed -i.bak "s/^VERSION=.*/VERSION=$VERSION/" "$DEV_VARS_FILE"
+  else
+    echo "VERSION=$VERSION" >> "$DEV_VARS_FILE"
+  fi
+  rm -f "${DEV_VARS_FILE}.bak"
+  echo "  ✅ .dev.vars updated"
+fi
+
+echo "✨ VERSION update complete"

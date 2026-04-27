@@ -36,6 +36,13 @@ function createApp() {
       message: "I am OK!",
     });
   });
+  app.get("/version.json", (c: NodeHonoContext) => {
+    return c.json({
+      ok: true,
+      data: getEnv("VERSION") || "unknown",
+      message: "Version OK!",
+    });
+  });
   return app;
 }
 export default createApp;
