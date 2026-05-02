@@ -10,9 +10,9 @@
     "build": "npx tsgo && npx tsc-alias",
     "start": "node ./dist/node.js",
     "visualize": "npx tsx scripts/dependency-visualize.ts",
-    "worker:dev": "wrangler dev",
-    "worker:types": "wrangler types",
-    "worker:deploy": "wrangler deploy",
+    "worker:dev": "npx wrangler dev",
+    "worker:types": "npx wrangler types",
+    "worker:deploy": "npx wrangler deploy",
     "db:init": "npx tsx -r dotenv/config ./src/db/initTable.ts"
   },
   "keywords": [],
@@ -63,7 +63,7 @@
     "tsc-alias": "^1.8.11",
     "typescript": "^5.8.2",
     "vitest": "~3.2.0",
-    "wrangler": "^4.80.0"
+    "wrangler": "^4.87.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
