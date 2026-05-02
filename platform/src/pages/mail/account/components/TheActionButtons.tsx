@@ -7,14 +7,22 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  CircularProgress,
 } from '@mui/material';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  QuestionMark as VerifyIcon,
+} from '@mui/icons-material';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
 import * as AccountAPI from '@/api/mail/account';
+import * as ActionAPI from '@/api/mail/action';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
 import { useTranslation } from '@/hooks/useTranslation';
 import { MAIL } from '@/hooks/usePermission';
+import { showSnackbar } from '@/components/Notification';
 
 // ==================== 新增账户按钮 ====================
 
@@ -61,6 +69,20 @@ export const AccountActionButtons = memo(({ row, formRef, onDeleteSuccess }: Row
   const t = useTranslation();
   // 删除确认对话框状态
   const [deleteDialog, setDeleteDialog] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+
+  // 处理验证
+  const handleVerify = useCallback(async () => {
+    if (row.id) {
+      try {
+        setVerifying(true);
+        await ActionAPI.verifyFn({ data: { accountId: row.id } });
+        showSnackbar({ message: '验证成功', type: 'success' });
+      } finally {
+        setVerifying(false);
+      }
+    }
+  }, [row.id]);
 
   // 处理编辑
   const handleEdit = useCallback(() => {
@@ -89,6 +111,15 @@ export const AccountActionButtons = memo(({ row, formRef, onDeleteSuccess }: Row
   return (
     <>
       <Stack direction="row" spacing={1} justifyContent="center">
+        <ResponsiveIconButton
+          onClick={handleVerify}
+          color="success"
+          size="small"
+          disabled={verifying}
+          permissionCodes={[MAIL.ACCOUNT.EDIT]}
+        >
+          {verifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />}
+        </ResponsiveIconButton>
         <ResponsiveIconButton
           onClick={handleEdit}
           color="primary"

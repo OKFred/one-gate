@@ -43,7 +43,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-
+import mailActionService from "../action/service";
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
@@ -375,58 +375,6 @@ const getApi = {
   service: onGet,
 } satisfies API;
 
-const verifyReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...MailAccountGetKeys,
-  ] as const satisfies RequiredKeys<MailAccountGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const verifyRes = {
-  type: "boolean",
-  description: "验证结果，true 表示验证成功",
-} as const satisfies JSONSchema;
-async function onVerify(
-  obj: FromSchema<typeof verifyReq>
-): Promise<FromSchema<typeof verifyRes>> {
-  const { id } = obj;
-  const rows = await db
-    .select()
-    .from(mailAccountTable)
-    .where(eq(mailAccountTable.id, id))
-    .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  const account = rows[0];
-  const nodemailer = await import("nodemailer");
-  const transporter = nodemailer.default.createTransport({
-    host: account.host,
-    port: account.port,
-    secure: account.port === 465, // true for 465, false for other ports
-    auth: {
-      user: account.mailAddress,
-      pass: account.password,
-    },
-  });
-  await transporter.verify();
-  return true;
-}
-const verifyApi = {
-  req: verifyReq,
-  res: verifyRes,
-  pathInfo: {
-    path: "/verify",
-    method: "post",
-    summary: "验证邮件账户",
-  } as const,
-  adapter: bodyAdapter,
-  service: onVerify,
-} satisfies API;
-
 async function getMailAccountsByIds(
   ids: number[]
 ): Promise<{ value: number; label: string }[]> {
@@ -438,21 +386,8 @@ async function getMailAccountsByIds(
   return rows;
 }
 
-async function verifyMailAccounts(mailAccountIdArr: number[]) {
-  const rows = await getMailAccountsByIds(mailAccountIdArr);
-  if (rows.length !== mailAccountIdArr.length) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  const returnedIds = rows.map((r) => r.value);
-  const allExist = mailAccountIdArr.every((id) => returnedIds.includes(id));
-  if (!allExist) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-}
-
 export const utils = {
   getMailAccountsByIds,
-  verifyMailAccounts,
 };
 
 export default {
@@ -462,5 +397,4 @@ export default {
   update: updateApi,
   delete: deleteApi,
   get: getApi,
-  verify: verifyApi,
 };

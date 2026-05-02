@@ -3857,6 +3857,28 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "oss.file",
+    tKey: "oss.file.download",
+    tValue: "下载文件",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "下载文件",
+      "en-US": "Download File",
+    },
+  },
+  {
+    application: "frontend",
+    business: "oss.file",
+    tKey: "oss.file.copyUrl",
+    tValue: "复制链接",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "复制链接",
+      "en-US": "Copy URL",
+    },
+  },
+  {
+    application: "frontend",
+    business: "oss.file",
     tKey: "oss.file.key",
     tValue: "文件对象",
     isEnabled: true,
