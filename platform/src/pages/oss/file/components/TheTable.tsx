@@ -115,9 +115,11 @@ const TheTable = memo(
             <ContentCopy />
           </IconButton>
         </Tooltip>
-        <IconButton size="small" color="error" onClick={() => handleDelete(row.key!)}>
-          <Delete />
-        </IconButton>
+        <Tooltip title={t('common.delete')}>
+          <IconButton size="small" color="error" onClick={() => handleDelete(row.key!)}>
+            <Delete />
+          </IconButton>
+        </Tooltip>
       </Box>
     );
 
