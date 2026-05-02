@@ -3081,122 +3081,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/getUploadUrl": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取文件上传预签名 URL */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["oss.fileGetUploadUrlReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["oss.fileGetUploadUrlRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/oss/file/getDownloadUrl": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取文件下载预签名 URL */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["oss.fileGetDownloadUrlReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["oss.fileGetDownloadUrlRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/oss/file/list": {
         parameters: {
             query?: never;
@@ -3206,7 +3090,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 列出存储桶中的文件 */
+        /** 列出存储桶中的文件(分页) */
         post: {
             parameters: {
                 query?: never;
@@ -3255,6 +3139,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/oss/file/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有文件（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["oss.fileListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["oss.fileListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oss/file/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取文件详情及下载链接 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["oss.fileGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["oss.fileGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oss/file/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取新建文件上传凭证 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["oss.fileAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["oss.fileAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oss/file/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取覆盖文件上传凭证 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["oss.fileUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["oss.fileUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/oss/file/delete": {
         parameters: {
             query?: never;
@@ -3264,7 +3380,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除存储桶中的文件 */
+        /** 删除文件 */
         post: {
             parameters: {
                 query?: never;
@@ -9193,8 +9309,78 @@ export interface components {
             data: boolean;
             message: string;
         };
-        "oss.fileGetUploadUrlReq": {
-            /** @description 文件名/路径 */
+        "oss.fileListReq": {
+            /** @description 前缀/路径搜索 (对应 prefix) */
+            keyword?: string;
+            /**
+             * @description 每页数量 (对应 limit)
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 下一页游标 */
+            cursor?: string;
+        };
+        "oss.fileListRes": {
+            ok: boolean;
+            data: {
+                list: {
+                    /** @description 文件路径/键名 */
+                    key: string;
+                    /** @description 文件大小 (字节) */
+                    size?: number;
+                    /** @description 最后修改时间 */
+                    lastModified?: string;
+                    /** @description MIME类型 */
+                    contentType?: string;
+                }[];
+                pageSize: number;
+                /** @description 下一页游标 */
+                cursor?: string;
+                /** @description 是否还有更多数据 */
+                hasMore: boolean;
+            };
+            message: string;
+        };
+        "oss.fileListAllReq": {
+            /** @description 前缀/路径搜索 (对应 prefix) */
+            keyword?: string;
+        };
+        "oss.fileListAllRes": {
+            ok: boolean;
+            data: {
+                /** @description 文件路径/键名 */
+                key: string;
+                /** @description 文件大小 (字节) */
+                size?: number;
+                /** @description 最后修改时间 */
+                lastModified?: string;
+                /** @description MIME类型 */
+                contentType?: string;
+            }[];
+            message: string;
+        };
+        "oss.fileGetReq": {
+            /** @description 文件路径/键名 */
+            key: string;
+        };
+        "oss.fileGetRes": {
+            ok: boolean;
+            data: {
+                /** @description 文件路径/键名 */
+                key: string;
+                /** @description 文件大小 (字节) */
+                size?: number;
+                /** @description 最后修改时间 */
+                lastModified?: string;
+                /** @description MIME类型 */
+                contentType?: string;
+                /** @description 临时下载链接 */
+                downloadUrl: string;
+            };
+            message: string;
+        };
+        "oss.fileAddReq": {
+            /** @description 文件路径/键名 */
             key: string;
             /**
              * @description 文件类型
@@ -9202,57 +9388,45 @@ export interface components {
              */
             contentType: string;
             /**
-             * @description 过期时间(秒)
+             * @description 凭证过期时间(秒)
              * @default 3600
              */
             expiresIn: number;
         };
-        "oss.fileGetUploadUrlRes": {
+        "oss.fileAddRes": {
             ok: boolean;
             data: {
+                /** @description 上传预签名URL */
                 url: string;
                 key: string;
             };
             message: string;
         };
-        "oss.fileGetDownloadUrlReq": {
-            /** @description 文件名/路径 */
+        "oss.fileUpdateReq": {
+            /** @description 文件路径/键名 */
             key: string;
             /**
-             * @description 过期时间(秒)
+             * @description 文件类型
+             * @default application/octet-stream
+             */
+            contentType: string;
+            /**
+             * @description 凭证过期时间(秒)
              * @default 3600
              */
             expiresIn: number;
         };
-        "oss.fileGetDownloadUrlRes": {
+        "oss.fileUpdateRes": {
             ok: boolean;
             data: {
+                /** @description 上传预签名URL */
                 url: string;
                 key: string;
-            };
-            message: string;
-        };
-        "oss.fileListReq": {
-            /**
-             * @description 前缀/路径
-             * @default
-             */
-            prefix: string;
-        };
-        "oss.fileListRes": {
-            ok: boolean;
-            data: {
-                list: {
-                    key: string;
-                    size?: number;
-                    lastModified?: string;
-                    contentType?: string;
-                }[];
             };
             message: string;
         };
         "oss.fileDeleteReq": {
-            /** @description 文件名/路径 */
+            /** @description 文件路径/键名 */
             key: string;
         };
         "oss.fileDeleteRes": {

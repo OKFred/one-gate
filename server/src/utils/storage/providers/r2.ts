@@ -8,6 +8,8 @@ import {
   StorageProvider,
   StorageObjectMetadata,
   PresignedUrlOptions,
+  StorageListOptions,
+  StorageListResult,
 } from "../types";
 
 /**
@@ -98,12 +100,21 @@ export class R2Provider implements StorageProvider {
     };
   }
 
-  async list(prefix?: string): Promise<StorageObjectMetadata[]> {
-    const response = await this.bucket.list({ prefix });
-    return response.objects.map((obj: any) => ({
+  async list(options?: StorageListOptions): Promise<StorageListResult> {
+    const response = await this.bucket.list({
+      prefix: options?.prefix,
+      limit: options?.limit,
+      cursor: options?.cursor,
+    });
+    const objects = response.objects.map((obj: any) => ({
       key: obj.key,
       size: obj.size,
       lastModified: obj.uploaded,
     }));
+    return {
+      objects,
+      cursor: response.cursor,
+      isTruncated: response.truncated,
+    };
   }
 }

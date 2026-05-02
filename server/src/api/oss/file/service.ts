@@ -5,30 +5,43 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import type { API } from "@/middleware/encapsulation";
-import {
-  bodyAdapter,
-  bodyUserContextAdapter,
-} from "@/middleware/encapsulation/adapter";
+import { bodyUserContextAdapter } from "@/middleware/encapsulation/adapter";
 import type { FromSchema } from "json-schema-to-ts";
 import {
-  getUploadUrlReq,
-  getUploadUrlRes,
-  getDownloadUrlReq,
-  getDownloadUrlRes,
   listReq,
   listRes,
+  listAllReq,
+  listAllRes,
+  getReq,
+  getRes,
+  addReq,
+  addRes,
+  updateReq,
+  updateRes,
   deleteReq,
   deleteRes,
 } from "./model";
+
+// 辅助函数：移除对象中值为 undefined 的属性，避免 JSON Schema 校验失败
+function cleanUndefined(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(cleanUndefined);
+  }
+  if (obj !== null && typeof obj === "object") {
+    return Object.fromEntries(
+      Object.entries(obj)
+        .filter(([_, v]) => v !== undefined)
+        .map(([k, v]) => [k, cleanUndefined(v)])
+    );
+  }
+  return obj;
+}
 
 // 获取存储实例辅助函数
 async function getActiveStorage(env: any) {
   const config = await getDefaultConfig();
   if (!config)
-    throw new BusinessError(
-      BusinessErrorCode.NOT_EXIST_OR_DISABLED
-      /* "未配置默认存储"*/
-    );
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
 
   return getStorage(
     {
@@ -44,12 +57,119 @@ async function getActiveStorage(env: any) {
   );
 }
 
-// 1. 生成上传预签名 URL
-async function onGetUploadUrl(
-  params: FromSchema<typeof getUploadUrlReq>,
+// 1. 分页列出文件
+async function onList(
+  params: FromSchema<typeof listReq>,
   userObj: any,
   c: any
-): Promise<FromSchema<typeof getUploadUrlRes>> {
+): Promise<FromSchema<typeof listRes>> {
+  const storage = await getActiveStorage(c.env);
+  const result = await storage.list({
+    prefix: params.keyword,
+    limit: params.pageSize,
+    cursor: params.cursor,
+  });
+
+  return cleanUndefined({
+    list: result.objects.map((item) => ({
+      key: item.key,
+      size: item.size,
+      lastModified: item.lastModified?.toISOString(),
+      contentType: item.contentType,
+    })),
+    pageSize: params.pageSize || 10,
+    cursor: result.cursor,
+    hasMore: result.isTruncated,
+  });
+}
+
+const listApi = {
+  req: listReq,
+  res: listRes,
+  pathInfo: { path: "/list", method: "post", summary: "列出存储桶中的文件(分页)" },
+  adapter: bodyUserContextAdapter,
+  service: onList,
+} satisfies API;
+
+// 2. 获取全部文件
+async function onListAll(
+  params: FromSchema<typeof listAllReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof listAllRes>> {
+  const storage = await getActiveStorage(c.env);
+  const allObjects = [];
+  let cursor: string | undefined = undefined;
+  let hasMore = true;
+
+  while (hasMore) {
+    const result = await storage.list({
+      prefix: params.keyword,
+      limit: 1000,
+      cursor,
+    });
+    allObjects.push(...result.objects);
+    cursor = result.cursor;
+    hasMore = result.isTruncated;
+  }
+
+  return cleanUndefined(
+    allObjects.map((item) => ({
+      key: item.key,
+      size: item.size,
+      lastModified: item.lastModified?.toISOString(),
+      contentType: item.contentType,
+    }))
+  );
+}
+
+const listAllApi = {
+  req: listAllReq,
+  res: listAllRes,
+  pathInfo: { path: "/listAll", method: "post", summary: "获取所有文件（不分页）" },
+  adapter: bodyUserContextAdapter,
+  service: onListAll,
+} satisfies API;
+
+// 3. 获取单文件详情 (含下载链接)
+async function onGet(
+  params: FromSchema<typeof getReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof getRes>> {
+  const storage = await getActiveStorage(c.env);
+  const meta = await storage.head(params.key);
+  if (!meta) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
+  const downloadUrl = await storage.getPresignedGetUrl(params.key, {
+    expiresIn: 3600,
+  });
+
+  return cleanUndefined({
+    key: meta.key,
+    size: meta.size,
+    lastModified: meta.lastModified?.toISOString(),
+    contentType: meta.contentType,
+    downloadUrl,
+  });
+}
+
+const getApi = {
+  req: getReq,
+  res: getRes,
+  pathInfo: { path: "/get", method: "post", summary: "获取文件详情及下载链接" },
+  adapter: bodyUserContextAdapter,
+  service: onGet,
+} satisfies API;
+
+// 4. 新增文件 (获取上传 URL)
+async function onAdd(
+  params: FromSchema<typeof addReq>,
+  userObj: any,
+  c: any
+): Promise<FromSchema<typeof addRes>> {
   const storage = await getActiveStorage(c.env);
   const url = await storage.getPresignedPutUrl(params.key, {
     contentType: params.contentType,
@@ -58,68 +178,33 @@ async function onGetUploadUrl(
   return { url, key: params.key };
 }
 
-const getUploadUrlApi = {
-  req: getUploadUrlReq,
-  res: getUploadUrlRes,
-  pathInfo: {
-    path: "/getUploadUrl",
-    method: "post",
-    summary: "获取文件上传预签名 URL",
-  },
+const addApi = {
+  req: addReq,
+  res: addRes,
+  pathInfo: { path: "/add", method: "post", summary: "获取新建文件上传凭证" },
   adapter: bodyUserContextAdapter,
-  service: onGetUploadUrl,
+  service: onAdd,
 } satisfies API;
 
-// 2. 生成下载预签名 URL
-async function onGetDownloadUrl(
-  params: FromSchema<typeof getDownloadUrlReq>,
+// 5. 更新文件 (覆盖)
+async function onUpdate(
+  params: FromSchema<typeof updateReq>,
   userObj: any,
   c: any
-): Promise<FromSchema<typeof getDownloadUrlRes>> {
-  const storage = await getActiveStorage(c.env);
-  const url = await storage.getPresignedGetUrl(params.key, {
-    expiresIn: params.expiresIn,
-  });
-  return { url, key: params.key };
+): Promise<FromSchema<typeof updateRes>> {
+  // 对于 OSS 来说，更新其实和新增一样，都是拿 PUT URL 去覆盖同名文件
+  return onAdd(params, userObj, c);
 }
 
-const getDownloadUrlApi = {
-  req: getDownloadUrlReq,
-  res: getDownloadUrlRes,
-  pathInfo: {
-    path: "/getDownloadUrl",
-    method: "post",
-    summary: "获取文件下载预签名 URL",
-  },
+const updateApi = {
+  req: updateReq,
+  res: updateRes,
+  pathInfo: { path: "/update", method: "post", summary: "获取覆盖文件上传凭证" },
   adapter: bodyUserContextAdapter,
-  service: onGetDownloadUrl,
+  service: onUpdate,
 } satisfies API;
 
-// 3. 列出文件
-async function onList(
-  params: FromSchema<typeof listReq>,
-  userObj: any,
-  c: any
-): Promise<FromSchema<typeof listRes>> {
-  const storage = await getActiveStorage(c.env);
-  const list = await storage.list(params.prefix);
-  return {
-    list: list.map((item) => ({
-      ...item,
-      lastModified: item.lastModified?.toISOString(),
-    })),
-  };
-}
-
-const listApi = {
-  req: listReq,
-  res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "列出存储桶中的文件" },
-  adapter: bodyUserContextAdapter,
-  service: onList,
-} satisfies API;
-
-// 4. 删除文件
+// 6. 删除文件
 async function onDelete(
   params: FromSchema<typeof deleteReq>,
   userObj: any,
@@ -133,14 +218,16 @@ async function onDelete(
 const deleteApi = {
   req: deleteReq,
   res: deleteRes,
-  pathInfo: { path: "/delete", method: "post", summary: "删除存储桶中的文件" },
+  pathInfo: { path: "/delete", method: "post", summary: "删除文件" },
   adapter: bodyUserContextAdapter,
   service: onDelete,
 } satisfies API;
 
 export default {
-  getUploadUrl: getUploadUrlApi,
-  getDownloadUrl: getDownloadUrlApi,
   list: listApi,
+  listAll: listAllApi,
+  get: getApi,
+  add: addApi,
+  update: updateApi,
   delete: deleteApi,
 };

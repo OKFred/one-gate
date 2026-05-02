@@ -16,6 +16,18 @@ export interface PresignedUrlOptions {
   contentType?: string;
 }
 
+export interface StorageListOptions {
+  prefix?: string;
+  limit?: number;
+  cursor?: string;
+}
+
+export interface StorageListResult {
+  objects: StorageObjectMetadata[];
+  cursor?: string;
+  isTruncated: boolean;
+}
+
 export interface StorageProvider {
   /**
    * 生成预签名上传链接 (PUT)
@@ -57,5 +69,5 @@ export interface StorageProvider {
   /**
    * 列出对象
    */
-  list(prefix?: string): Promise<StorageObjectMetadata[]>;
+  list(options?: StorageListOptions): Promise<StorageListResult>;
 }

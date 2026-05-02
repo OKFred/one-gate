@@ -22,25 +22,44 @@ const TheTable = memo(
     const { filterRef } = localObj;
     const t = useTranslation();
     const [state, setState] = useState({
-      list: [] as ListFileRes['list'],
+      list: [] as NonNullable<ListFileRes['list']>,
       loading: false,
       filters: { prefix: '' } as FilterState,
+      page: 1,
+      pageSize: 10,
+      hasMore: false,
+      cursors: [undefined] as (string | undefined)[],
     });
 
     const fetchList = useCallback(
-      async (filters: FilterState) => {
+      async (filters: FilterState, page: number = 1, pageSize: number = 10, cursors: (string | undefined)[] = [undefined]) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
+          const cursor = cursors[page - 1];
           const res = await OSSFileAPI.listFn({
             data: {
-              prefix: filters.prefix,
+              keyword: filters.prefix,
+              pageSize,
+              cursor,
             },
           });
           const list = res.data?.data?.list || [];
+          const nextCursor = res.data?.data?.cursor;
+          const hasMore = !!res.data?.data?.hasMore;
+          
+          const nextCursors = [...cursors];
+          if (hasMore) {
+            nextCursors[page] = nextCursor;
+          }
+
           setState((prev) => ({
             ...prev,
             list,
             filters,
+            page,
+            pageSize,
+            hasMore,
+            cursors: nextCursors,
             loading: false,
           }));
           filterRef.current?.updateCount(list.length);
@@ -59,14 +78,14 @@ const TheTable = memo(
 
     useImperativeHandle(ref, () => ({
       refresh: (newFilters?: FilterState) => {
-        fetchList(newFilters || state.filters);
+        fetchList(newFilters || state.filters, 1, state.pageSize, [undefined]);
       },
     }));
 
     const handleGetDownloadUrl = async (key: string, copyToClipboard: boolean = false) => {
       try {
-        const res = await OSSFileAPI.getDownloadUrlFn({ data: { key, expiresIn: 60 * 60 } });
-        const url = res.data?.data?.url;
+        const res = await OSSFileAPI.getFn({ data: { key } });
+        const url = res.data?.data?.downloadUrl;
         if (!url) return;
 
         if (copyToClipboard) {
@@ -84,7 +103,7 @@ const TheTable = memo(
       if (!confirm(t('oss.file.deleteConfirm'))) return;
       try {
         await OSSFileAPI.deleteFn({ data: { key } });
-        fetchList(state.filters);
+        fetchList(state.filters, state.page, state.pageSize, state.cursors);
         showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
       } catch (e) {
         console.log(e);
@@ -155,10 +174,11 @@ const TheTable = memo(
         columns={columns}
         cardFields={cardFields}
         cardActions={renderActions}
-        page={1}
-        total={state.list?.length || 0}
-        pageSize={state.list?.length || 10}
-        onPageChange={() => {}}
+        page={state.page}
+        total={state.hasMore ? state.page * state.pageSize + 1 : state.page * state.pageSize}
+        pageSize={state.pageSize}
+        onPageChange={(page) => fetchList(state.filters, page, state.pageSize, state.cursors)}
+        onPageSizeChange={(pageSize) => fetchList(state.filters, 1, pageSize, [undefined])}
       />
     );
   }),

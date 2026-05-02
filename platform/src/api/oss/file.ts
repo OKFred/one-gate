@@ -2,34 +2,56 @@ import type { AxiosConfig } from '@/api/config';
 import { axiosPlus } from '@/api/config';
 import axios from 'axios';
 
-/** 获取上传预签名 URL */
-export const getUploadUrlFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/getUploadUrl', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/oss/file/getUploadUrl',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-/** 获取下载预签名 URL */
-export const getDownloadUrlFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/getDownloadUrl', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/oss/file/getDownloadUrl',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-/** 列出文件 */
+/** 分页获取文件列表 */
 export const listFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/list', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
     url: '/api/v1/oss/file/list',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+/** 获取全部文件列表 */
+export const listAllFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/listAll', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/oss/file/listAll',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+/** 获取文件详情(含下载链接) */
+export const getFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/get', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/oss/file/get',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+/** 获取新增文件预签名URL */
+export const addFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/add', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/oss/file/add',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+/** 获取更新(覆盖)文件预签名URL */
+export const updateFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/update', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/oss/file/update',
     method: 'post',
     ...axiosConfig,
   });

@@ -38,7 +38,7 @@ const TheUploadDialog = memo(
         setPath('');
         setVisible(true);
         // Fetch existing paths for autocomplete options
-        OSSFileAPI.listFn({ data: { prefix: '' } })
+        OSSFileAPI.listFn({ data: { keyword: '', pageSize: 100 } })
           .then((res) => {
             const list = res.data?.data?.list || [];
             const paths = new Set<string>();
@@ -73,7 +73,7 @@ const TheUploadDialog = memo(
         const finalKey = path ? `${path.replace(/\/+$/, '')}/${file.name}` : file.name;
 
         // 1. 获取预签名 URL
-        const res = await OSSFileAPI.getUploadUrlFn({
+        const res = await OSSFileAPI.addFn({
           data: {
             expiresIn: 60 * 60,
             key: finalKey,
