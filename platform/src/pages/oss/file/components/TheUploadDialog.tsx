@@ -8,6 +8,8 @@ import {
   Box,
   LinearProgress,
   Typography,
+  Autocomplete,
+  TextField,
 } from '@mui/material';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as OSSFileAPI from '@/api/oss/file';
@@ -26,12 +28,35 @@ const TheUploadDialog = memo(
     const [uploading, setUploading] = useState(false);
     const [progress, setProgress] = useState(0);
     const [file, setFile] = useState<File | null>(null);
+    const [path, setPath] = useState('');
+    const [pathOptions, setPathOptions] = useState<string[]>([]);
 
     useImperativeHandle(ref, () => ({
       open: () => {
         setFile(null);
         setProgress(0);
+        setPath('');
         setVisible(true);
+        // Fetch existing paths for autocomplete options
+        OSSFileAPI.listFn({ data: { prefix: '' } })
+          .then((res) => {
+            const list = res.data?.data?.list || [];
+            const paths = new Set<string>();
+            list.forEach((item) => {
+              if (item.key) {
+                const parts = item.key.split('/');
+                if (parts.length > 1) {
+                  let currentPath = '';
+                  for (let i = 0; i < parts.length - 1; i++) {
+                    currentPath += (currentPath ? '/' : '') + parts[i];
+                    paths.add(currentPath);
+                  }
+                }
+              }
+            });
+            setPathOptions(Array.from(paths));
+          })
+          .catch(console.error);
       },
     }));
 
@@ -45,11 +70,13 @@ const TheUploadDialog = memo(
       if (!file) return;
       setUploading(true);
       try {
+        const finalKey = path ? `${path.replace(/\/+$/, '')}/${file.name}` : file.name;
+
         // 1. 获取预签名 URL
         const res = await OSSFileAPI.getUploadUrlFn({
           data: {
             expiresIn: 60 * 60,
-            key: file.name,
+            key: finalKey,
             contentType: file.type || 'application/octet-stream',
           },
         });
@@ -83,6 +110,32 @@ const TheUploadDialog = memo(
         <DialogTitle>{t('oss.file.upload')}</DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 1, textAlign: 'center' }}>
+            <Box sx={{ mb: 3, textAlign: 'left' }}>
+              <Autocomplete
+                freeSolo
+                options={pathOptions}
+                value={path}
+                onChange={(_, newValue) => setPath(newValue || '')}
+                onInputChange={(_, newInputValue) => setPath(newInputValue)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={
+                      t('oss.file.path') === 'oss.file.path'
+                        ? '上传路径 (可选)'
+                        : t('oss.file.path')
+                    }
+                    placeholder={
+                      t('oss.file.pathPlaceholder') === 'oss.file.pathPlaceholder'
+                        ? '留空为根目录，或输入/选择文件夹'
+                        : t('oss.file.pathPlaceholder')
+                    }
+                    size="small"
+                    fullWidth
+                  />
+                )}
+              />
+            </Box>
             {!uploading ? (
               <Button variant="outlined" component="label" fullWidth sx={{ py: 4 }}>
                 {file ? file.name : t('form.select')}
