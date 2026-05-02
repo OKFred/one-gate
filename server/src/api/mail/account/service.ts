@@ -43,7 +43,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-
+import mailActionService from "../action/service";
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
@@ -393,27 +393,7 @@ async function onVerify(
   obj: FromSchema<typeof verifyReq>
 ): Promise<FromSchema<typeof verifyRes>> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(mailAccountTable)
-    .where(eq(mailAccountTable.id, id))
-    .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  const account = rows[0];
-  const nodemailer = await import("nodemailer");
-  const transporter = nodemailer.default.createTransport({
-    host: account.host,
-    port: account.port,
-    secure: account.port === 465, // true for 465, false for other ports
-    auth: {
-      user: account.mailAddress,
-      pass: account.password,
-    },
-  });
-  await transporter.verify();
-  return true;
+  return await mailActionService.verify.service({ accountId: id });
 }
 const verifyApi = {
   req: verifyReq,

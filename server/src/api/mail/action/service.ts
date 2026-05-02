@@ -3,8 +3,12 @@ import type { UserObj } from "@/types/app";
 import mailAccountService from "../account/service";
 import mailTemplateService from "../template/service";
 import mailLogService from "../log/service";
-import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
+import {
+  bodyUserAdapter,
+  bodyAdapter,
+} from "@/middleware/encapsulation/adapter";
 import { getRuntimeKey } from "hono/adapter";
+import { BusinessError } from "@/middleware/errorHandler/businessError";
 
 const sendReq = {
   type: "object",
@@ -273,6 +277,86 @@ const sendApi = {
   service: onSend,
 };
 
+const verifyReq = {
+  type: "object",
+  properties: {
+    accountId: {
+      type: "number",
+      description: "邮箱账号ID",
+      examples: [1],
+    },
+  },
+  required: ["accountId"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const verifyRes = {
+  type: "boolean",
+  description: "验证结果，true 表示验证成功",
+} as const satisfies JSONSchema;
+
+async function onVerify(
+  bodyObj: FromSchema<typeof verifyReq>
+): Promise<FromSchema<typeof verifyRes>> {
+  const { accountId } = bodyObj;
+
+  const accountObj = await mailAccountService.get.service({ id: accountId });
+  if (!accountObj) {
+    throw new Error("未找到该邮件账户");
+  }
+  const runtime = getRuntimeKey();
+  if (runtime === "workerd") {
+    // Cloudflare Workers 运行环境
+    try {
+      const { WorkerMailer } = await import("worker-mailer");
+      const mailer = await WorkerMailer.connect({
+        host: accountObj.host,
+        port: accountObj.port,
+        authType: "plain",
+        secure: [465, 587].includes(accountObj.port),
+        startTls: [587].includes(accountObj.port),
+        credentials: {
+          username: accountObj.mailAddress,
+          password: accountObj.password,
+        },
+      });
+      return true;
+    } catch (error: any) {
+      // cannot connect to the specified addres
+      // 526 Authentication failure
+      throw new BusinessError(error.message);
+    }
+  } else {
+    // Node.js 运行环境
+    const nodemailer = await import("nodemailer");
+    const transporter = nodemailer.default.createTransport({
+      host: accountObj.host,
+      port: accountObj.port,
+      secure: accountObj.port === 465, // true for 465, false for other ports
+      auth: {
+        user: accountObj.mailAddress,
+        pass: accountObj.password,
+      },
+    });
+
+    await transporter.verify();
+    return true;
+  }
+}
+
+const verifyApi = {
+  req: verifyReq,
+  res: verifyRes,
+  pathInfo: {
+    path: "/verify",
+    method: "post",
+    summary: "验证邮件账户",
+  } as const,
+  adapter: bodyAdapter,
+  service: onVerify,
+};
+
 export default {
   send: sendApi,
+  verify: verifyApi,
 };
