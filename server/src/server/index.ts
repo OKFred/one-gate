@@ -21,7 +21,7 @@ function createApp() {
   //   basicAuthHandler(app);
   //   bearerAuthHandler(app);
   //   pathHandler(app);
-  logHandler(app);
+  // logHandler(app);
   getEnv("NODE_ENV") !== "production" && docRegister(app);
   const subApp = routeRegister();
   const baseApiPath = getEnv("BASE_API_PATH");

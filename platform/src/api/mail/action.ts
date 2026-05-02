@@ -10,3 +10,13 @@ export const sendFn = (
     method: 'post',
   });
 };
+
+export const verifyFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/mail/action/verify', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/mail/action/verify',
+    method: 'post',
+    ...axiosConfig,
+  });
+};

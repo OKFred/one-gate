@@ -1454,64 +1454,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 验证邮件账户 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["mail.accountVerifyReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["mail.accountVerifyRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/mail/action/send": {
         parameters: {
             query?: never;
@@ -8035,19 +7977,6 @@ export interface components {
                  */
                 updateTimeUtc: ((number | null) | null) | null;
             };
-            message: string;
-        };
-        "mail.accountVerifyReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "mail.accountVerifyRes": {
-            ok: boolean;
-            /** @description 验证结果，true 表示验证成功 */
-            data: boolean;
             message: string;
         };
         "mail.actionSendReq": {

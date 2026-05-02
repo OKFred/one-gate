@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
 import * as AccountAPI from '@/api/mail/account';
+import * as ActionAPI from '@/api/mail/action';
 import type { TheFormRef } from './TheForm';
 import type { TableState } from './TheTable';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -75,7 +76,7 @@ export const AccountActionButtons = memo(({ row, formRef, onDeleteSuccess }: Row
     if (row.id) {
       try {
         setVerifying(true);
-        await AccountAPI.verifyFn({ data: { id: row.id } });
+        await ActionAPI.verifyFn({ data: { accountId: row.id } });
         showSnackbar({ message: '验证成功', type: 'success' });
       } finally {
         setVerifying(false);

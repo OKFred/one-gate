@@ -60,13 +60,3 @@ export const deleteFn = (
     ...axiosConfig,
   });
 };
-
-export const verifyFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/mail/account/verify', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/mail/account/verify',
-    method: 'post',
-    ...axiosConfig,
-  });
-};

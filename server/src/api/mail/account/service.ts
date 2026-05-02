@@ -375,38 +375,6 @@ const getApi = {
   service: onGet,
 } satisfies API;
 
-const verifyReq = {
-  type: "object",
-  properties: {
-    ...IndexVO,
-  },
-  required: [
-    ...MailAccountGetKeys,
-  ] as const satisfies RequiredKeys<MailAccountGetVOLike>[],
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-const verifyRes = {
-  type: "boolean",
-  description: "验证结果，true 表示验证成功",
-} as const satisfies JSONSchema;
-async function onVerify(
-  obj: FromSchema<typeof verifyReq>
-): Promise<FromSchema<typeof verifyRes>> {
-  const { id } = obj;
-  return await mailActionService.verify.service({ accountId: id });
-}
-const verifyApi = {
-  req: verifyReq,
-  res: verifyRes,
-  pathInfo: {
-    path: "/verify",
-    method: "post",
-    summary: "验证邮件账户",
-  } as const,
-  adapter: bodyAdapter,
-  service: onVerify,
-} satisfies API;
-
 async function getMailAccountsByIds(
   ids: number[]
 ): Promise<{ value: number; label: string }[]> {
@@ -418,21 +386,8 @@ async function getMailAccountsByIds(
   return rows;
 }
 
-async function verifyMailAccounts(mailAccountIdArr: number[]) {
-  const rows = await getMailAccountsByIds(mailAccountIdArr);
-  if (rows.length !== mailAccountIdArr.length) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  const returnedIds = rows.map((r) => r.value);
-  const allExist = mailAccountIdArr.every((id) => returnedIds.includes(id));
-  if (!allExist) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-}
-
 export const utils = {
   getMailAccountsByIds,
-  verifyMailAccounts,
 };
 
 export default {
@@ -442,5 +397,4 @@ export default {
   update: updateApi,
   delete: deleteApi,
   get: getApi,
-  verify: verifyApi,
 };
