@@ -41,6 +41,11 @@ export default function errorHandler(app: App) {
 
   app.onError(async (e, c: NodeHonoContext) => {
     const t = await getTranslator(c);
+    if (c.var.logger) {
+      c.var.logger.error(e);
+    } else {
+      console.error(e);
+    }
     const sqlError = convertSqlErrorToBusinessError(e);
     if (sqlError) {
       throw toHttpException(sqlError);
