@@ -1,14 +1,34 @@
-import { forwardRef, useImperativeHandle, useState, memo, useEffect } from 'react';
-import { Box, TextField, Typography, Chip } from '@mui/material';
-import { useTranslation } from '@/hooks/useTranslation';
+import {
+  Paper,
+  TextField,
+  Stack,
+  Chip,
+  Box,
+  Typography,
+  IconButton,
+  Collapse,
+  InputAdornment,
+} from '@mui/material';
+import {
+  FilterList as FilterIcon,
+  ExpandLess,
+  ExpandMore,
+  Search as SearchIcon,
+} from '@mui/icons-material';
+import { useState, useEffect, useCallback, memo, forwardRef, useImperativeHandle } from 'react';
 import type { Props } from '../index';
+import { useTranslation } from '@/hooks/useTranslation';
 
+// 筛选状态类型
 export interface FilterState {
   prefix: string;
 }
 
+// 暴露给父组件的方法
 export interface TheFilterRef {
+  /** 更新筛选结果数量 */
   updateCount: (count: number) => void;
+  /** 重置过滤器 */
   reset: () => void;
 }
 
@@ -16,64 +36,129 @@ const TheFilter = memo(
   forwardRef<TheFilterRef, Props>(({ localObj }, ref) => {
     const { tableRef } = localObj;
     const t = useTranslation();
-    const [count, setCount] = useState(0);
-    const [prefixInput, setPrefixInput] = useState('');
-    const [state, setState] = useState<FilterState>({
+    const [expanded, setExpanded] = useState(true);
+    const [keywordInput, setKeywordInput] = useState(''); // 内部输入状态
+    const [isSearching, setIsSearching] = useState(false); // 搜索状态
+    const [filterCount, setFilterCount] = useState(0); // 结果数量
+    const [filters, setFilters] = useState<FilterState>({
       prefix: '',
     });
 
-    useImperativeHandle(ref, () => ({
-      updateCount: (val: number) => setCount(val),
-      reset: () => {
-        const resetState: FilterState = { prefix: '' };
-        setPrefixInput('');
-        setState(resetState);
-        tableRef.current?.refresh(resetState);
-      },
-    }));
+    // 暴露给父组件的方法
+    useImperativeHandle(
+      ref,
+      () => ({
+        updateCount: (count: number) => {
+          setFilterCount(count);
+          setIsSearching(false);
+        },
+        reset: () => {
+          clearFilters();
+        },
+      }),
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [],
+    );
 
-    // Handle prefix debounce
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        if (prefixInput !== state.prefix) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          setState((_prev) => {
-            const updated = { prefix: prefixInput };
-            tableRef.current?.refresh(updated);
-            return updated;
-          });
+    // 调用表格刷新
+    const refreshTable = useCallback(
+      (newFilters: FilterState) => {
+        if (tableRef.current) {
+          tableRef.current.refresh(newFilters);
         }
-      }, 500);
-      return () => clearTimeout(timer);
-    }, [prefixInput, state.prefix, tableRef]);
+      },
+      [tableRef],
+    );
+
+    // 防抖执行搜索
+    const debouncedSearch = useCallback(() => {
+      const newFilters = { ...filters, prefix: keywordInput };
+      setFilters(newFilters);
+      refreshTable(newFilters);
+    }, [keywordInput, filters, refreshTable]);
+
+    // 关键词输入防抖
+    useEffect(() => {
+      if (keywordInput !== filters.prefix) {
+        setIsSearching(true);
+        const timer = setTimeout(() => {
+          debouncedSearch();
+        }, 500); // 500ms 防抖延迟
+
+        return () => clearTimeout(timer);
+      }
+    }, [keywordInput, debouncedSearch, filters.prefix]);
+
+    const handleFilterChange = (value: string) => {
+      setKeywordInput(value);
+    };
+
+    const clearFilters = () => {
+      const emptyFilters: FilterState = {
+        prefix: '',
+      };
+      setKeywordInput(''); // 清空输入框
+      setFilters(emptyFilters);
+      refreshTable(emptyFilters);
+    };
+
+    const hasActiveFilters = () => {
+      return !!keywordInput;
+    };
 
     return (
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Typography variant="subtitle2" fontWeight="bold" color="text.secondary">
-            {t('filter.title')}
-          </Typography>
-          {count > 0 && (
-            <Chip
-              label={t('filter.results').replace('{count}', count.toString())}
-              size="small"
-              color="primary"
-              variant="outlined"
-              sx={{ height: 20, fontSize: '0.75rem' }}
-            />
-          )}
+      <Paper sx={{ p: 2, mb: 2, position: 'relative' }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Box display="flex" alignItems="center" gap={1}>
+            <FilterIcon color="action" />
+            <Typography variant="h6">{t('filter.title')}</Typography>
+            {!isSearching && filterCount > 0 && (
+              <Chip
+                label={t('filter.results').replace('{count}', filterCount.toString())}
+                size="small"
+                color="primary"
+                variant="outlined"
+              />
+            )}
+          </Box>
+          <Box display="flex" alignItems="center" gap={1}>
+            {hasActiveFilters() && (
+              <Chip
+                label={t('filter.clear')}
+                size="small"
+                variant="outlined"
+                onClick={clearFilters}
+                onDelete={clearFilters}
+              />
+            )}
+            <IconButton onClick={() => setExpanded(!expanded)} size="small">
+              {expanded ? <ExpandLess /> : <ExpandMore />}
+            </IconButton>
+          </Box>
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-          <TextField
-            size="small"
-            label={t('filter.keywordLabel')}
-            value={prefixInput}
-            onChange={(e) => setPrefixInput(e.target.value)}
-            sx={{ width: { xs: '100%', sm: 300 } }}
-          />
-        </Box>
-      </Box>
+        <Collapse in={expanded}>
+          <Box sx={{ mt: 2 }}>
+            <Stack spacing={2}>
+              <TextField
+                label={t('filter.keywordLabel')}
+                placeholder={t('oss.file.pathPlaceholder') === 'oss.file.pathPlaceholder' ? '搜索前缀 / 路径 / 文件名' : t('oss.file.pathPlaceholder')}
+                value={keywordInput}
+                onChange={(e) => handleFilterChange(e.target.value)}
+                size="small"
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon color="action" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Stack>
+          </Box>
+        </Collapse>
+      </Paper>
     );
   }),
 );

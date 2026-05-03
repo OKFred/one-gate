@@ -11,6 +11,8 @@ import {
   StorageProvider,
   StorageObjectMetadata,
   PresignedUrlOptions,
+  StorageListOptions,
+  StorageListResult,
 } from "../types";
 
 export class S3Provider implements StorageProvider {
@@ -114,16 +116,23 @@ export class S3Provider implements StorageProvider {
     }
   }
 
-  async list(prefix?: string): Promise<StorageObjectMetadata[]> {
+  async list(options?: StorageListOptions): Promise<StorageListResult> {
     const command = new ListObjectsV2Command({
       Bucket: this.bucket,
-      Prefix: prefix,
+      Prefix: options?.prefix,
+      MaxKeys: options?.limit,
+      ContinuationToken: options?.cursor,
     });
     const response = await this.client.send(command);
-    return (response.Contents || []).map((item) => ({
+    const objects = (response.Contents || []).map((item) => ({
       key: item.Key!,
       size: item.Size,
       lastModified: item.LastModified,
     }));
+    return {
+      objects,
+      cursor: response.NextContinuationToken,
+      isTruncated: !!response.IsTruncated,
+    };
   }
 }
