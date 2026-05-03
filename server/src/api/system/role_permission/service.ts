@@ -288,32 +288,44 @@ async function onBatchAdd(
   // 验证角色是否存在
   await roleService.get.service({ id: roleId });
 
-  // 验证权限是否存在
-  const permissionsExist = await db
-    .select({ id: permissionTable.id })
-    .from(permissionTable)
-    .where(inArray(permissionTable.id, permissionIds));
-  if (permissionsExist.length !== permissionIds.length) {
+  // 验证权限是否存在 (分片查询以避免变量限制)
+  const checkChunkSize = 100;
+  let allExistingPermissions: { id: number }[] = [];
+  for (let i = 0; i < permissionIds.length; i += checkChunkSize) {
+    const chunk = permissionIds.slice(i, i + checkChunkSize);
+    const chunkExist = await db
+      .select({ id: permissionTable.id })
+      .from(permissionTable)
+      .where(inArray(permissionTable.id, chunk));
+    allExistingPermissions = allExistingPermissions.concat(chunkExist);
+  }
+  
+  if (allExistingPermissions.length !== permissionIds.length) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
 
-  // 批量插入
-  const values = permissionIds.map((permissionId) => ({
-    roleId,
-    permissionId,
-    creatorId,
-  }));
+  // 批量插入，分片处理以避免 D1 变量限制 (通常为 100)
+  // 每行 3 个变量，取 25 行为一组 (75 变量)
+  const chunkSize = 25;
+  const batches = [];
+  for (let i = 0; i < permissionIds.length; i += chunkSize) {
+    const chunk = permissionIds.slice(i, i + chunkSize);
+    const values = chunk.map((permissionId) => ({
+      roleId,
+      permissionId,
+      creatorId,
+    }));
+    batches.push(db.insert(rolePermissionTable).values(values).returning({ id: rolePermissionTable.id }));
+  }
 
-  const result = await db
-    .insert(rolePermissionTable)
-    .values(values)
-    .returning({ id: rolePermissionTable.id });
+  const results = batches.length > 0 ? await db.batch(batches as any) : [];
+  const totalAdded = results.reduce((acc: number, curr: any) => acc + curr.length, 0);
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
-  return result.length;
+  return totalAdded;
 }
 const batchAddApi = {
   req: batchAddReq,
@@ -456,21 +468,33 @@ async function onBatchDelete(
 ): Promise<FromSchema<typeof batchDeleteRes>> {
   const { roleId, permissionIds } = obj;
 
-  const result = await db
-    .delete(rolePermissionTable)
-    .where(
-      and(
-        eq(rolePermissionTable.roleId, roleId),
-        inArray(rolePermissionTable.permissionId, permissionIds)
-      )
-    )
-    .returning({ id: rolePermissionTable.id });
+  // 分片删除以避免 D1 变量限制 (通常为 100)
+  // inArray 会产生 N 个变量，取 50 为一组
+  const chunkSize = 50;
+  const batches = [];
+  for (let i = 0; i < permissionIds.length; i += chunkSize) {
+    const chunk = permissionIds.slice(i, i + chunkSize);
+    batches.push(
+      db
+        .delete(rolePermissionTable)
+        .where(
+          and(
+            eq(rolePermissionTable.roleId, roleId),
+            inArray(rolePermissionTable.permissionId, chunk)
+          )
+        )
+        .returning({ id: rolePermissionTable.id })
+    );
+  }
+
+  const results = batches.length > 0 ? await db.batch(batches as any) : [];
+  const totalDeleted = results.reduce((acc: number, curr: any) => acc + curr.length, 0);
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
-  return result.length;
+  return totalDeleted;
 }
 const batchDeleteApi = {
   req: batchDeleteReq,
