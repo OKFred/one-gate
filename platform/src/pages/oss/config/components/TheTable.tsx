@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { Box, Chip, IconButton, Tooltip } from '@mui/material';
+import { Box, Chip, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { Edit, Delete, PlayCircleOutline } from '@mui/icons-material';
 import { showSnackbar } from '@/components/Notification';
 import ResponsiveList, {
@@ -11,6 +11,7 @@ import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { FilterState } from './TheFilter';
 import type { ListConfigRes } from '@/api/oss/type';
+import type { TheFormRef } from './TheForm';
 
 export interface TheTableRef {
   refresh: (filters?: FilterState) => void;
@@ -72,24 +73,13 @@ const TheTable = memo(
       },
     }));
 
-    const handleVerify = async (id: number) => {
-      try {
-        await OSSConfigAPI.verifyFn({ data: { id } });
-        showSnackbar({ message: t('status.success'), type: 'success' });
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    const handleDelete = async (id: number) => {
-      if (!confirm(t('table.deleteConfirm'))) return;
-      try {
-        await OSSConfigAPI.deleteFn({ data: { id } });
-        fetchList(state.filters, state.page);
-      } catch (e) {
-        console.error(e);
-      }
-    };
+    const renderActions = (row: ListConfigRes['list'][number]) => (
+      <ConfigActionButtons
+        row={row}
+        formRef={formRef}
+        onRefresh={() => fetchList(state.filters, state.page)}
+      />
+    );
 
     const columns: TableColumn<ListConfigRes['list'][number]>[] = [
       { title: t('oss.config.name'), render: (row) => row.name },
@@ -122,21 +112,7 @@ const TheTable = memo(
       {
         title: t('table.actions'),
         align: 'center',
-        render: (row) => (
-          <Box>
-            <Tooltip title={t('oss.config.verify')}>
-              <IconButton size="small" color="info" onClick={() => handleVerify(row.id)}>
-                <PlayCircleOutline />
-              </IconButton>
-            </Tooltip>
-            <IconButton size="small" color="primary" onClick={() => formRef.current?.open(row.id)}>
-              <Edit />
-            </IconButton>
-            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
-              <Delete />
-            </IconButton>
-          </Box>
-        ),
+        render: renderActions,
       },
     ];
 
@@ -172,25 +148,80 @@ const TheTable = memo(
         keyExtractor={(row) => row.id}
         columns={columns}
         cardFields={cardFields}
-        cardActions={(row) => (
-          <Box>
-            <Tooltip title={t('oss.config.verify')}>
-              <IconButton size="small" color="info" onClick={() => handleVerify(row.id)}>
-                <PlayCircleOutline />
-              </IconButton>
-            </Tooltip>
-            <IconButton size="small" color="primary" onClick={() => formRef.current?.open(row.id)}>
-              <Edit />
-            </IconButton>
-            <IconButton size="small" color="error" onClick={() => handleDelete(row.id)}>
-              <Delete />
-            </IconButton>
-          </Box>
-        )}
+        cardActions={renderActions}
         onPageChange={(p) => fetchList(state.filters, p)}
       />
     );
   }),
 );
+
+interface ConfigActionButtonsProps {
+  row: ListConfigRes['list'][number];
+  formRef: React.RefObject<TheFormRef | null>;
+  onRefresh: () => void;
+}
+
+const ConfigActionButtons = memo(({ row, formRef, onRefresh }: ConfigActionButtonsProps) => {
+  const t = useTranslation();
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const handleVerify = async (id: number) => {
+    try {
+      await OSSConfigAPI.verifyFn({ data: { id } });
+      showSnackbar({ message: t('status.success'), type: 'success' });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDelete = useCallback(() => {
+    setDeleteConfirmOpen(true);
+  }, []);
+
+  const handleConfirmDelete = async () => {
+    try {
+      await OSSConfigAPI.deleteFn({ data: { id: row.id } });
+      onRefresh();
+      showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setDeleteConfirmOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <Box>
+        <Tooltip title={t('oss.config.verify')}>
+          <IconButton size="small" color="info" onClick={() => handleVerify(row.id)}>
+            <PlayCircleOutline />
+          </IconButton>
+        </Tooltip>
+        <IconButton size="small" color="primary" onClick={() => formRef.current?.open(row.id)}>
+          <Edit />
+        </IconButton>
+        <IconButton size="small" color="error" onClick={() => handleDelete()}>
+          <Delete />
+        </IconButton>
+      </Box>
+
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('table.deleteConfirm')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined">
+            {t('dialog.cancel')}
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            {t('dialog.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+});
 
 export default TheTable;

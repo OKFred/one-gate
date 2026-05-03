@@ -1,5 +1,5 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { IconButton, Box, Tooltip } from '@mui/material';
+import { IconButton, Box, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { Download, Delete, ContentCopy } from '@mui/icons-material';
 import { showSnackbar } from '@/components/Notification';
 import ResponsiveList, {
@@ -82,34 +82,6 @@ const TheTable = memo(
       },
     }));
 
-    const handleGetDownloadUrl = async (key: string, copyToClipboard: boolean = false) => {
-      try {
-        const res = await OSSFileAPI.getFn({ data: { key } });
-        const url = res.data?.data?.downloadUrl;
-        if (!url) return;
-
-        if (copyToClipboard) {
-          await navigator.clipboard.writeText(url);
-          showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
-        } else {
-          window.open(url, '_blank');
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    const handleDelete = async (key: string) => {
-      if (!confirm(t('oss.file.deleteConfirm'))) return;
-      try {
-        await OSSFileAPI.deleteFn({ data: { key } });
-        fetchList(state.filters, state.page, state.pageSize, state.cursors);
-        showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
     const formatSize = (bytes: number) => {
       if (!bytes) return '0 B';
       const k = 1024;
@@ -119,27 +91,10 @@ const TheTable = memo(
     };
 
     const renderActions = (row: NonNullable<ListFileRes['list']>[number]) => (
-      <Box>
-        <Tooltip title={t('oss.file.download')}>
-          <IconButton size="small" color="primary" onClick={() => handleGetDownloadUrl(row.key!)}>
-            <Download />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('oss.file.copyUrl')}>
-          <IconButton
-            size="small"
-            color="info"
-            onClick={() => handleGetDownloadUrl(row.key!, true)}
-          >
-            <ContentCopy />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t('common.delete')}>
-          <IconButton size="small" color="error" onClick={() => handleDelete(row.key!)}>
-            <Delete />
-          </IconButton>
-        </Tooltip>
-      </Box>
+      <FileActionButtons
+        row={row}
+        onDeleteSuccess={() => fetchList(state.filters, state.page, state.pageSize, state.cursors)}
+      />
     );
 
     const columns: TableColumn<NonNullable<ListFileRes['list']>[number]>[] = [
@@ -183,5 +138,89 @@ const TheTable = memo(
     );
   }),
 );
+
+interface FileActionButtonsProps {
+  row: NonNullable<ListFileRes['list']>[number];
+  onDeleteSuccess: () => void;
+}
+
+const FileActionButtons = memo(({ row, onDeleteSuccess }: FileActionButtonsProps) => {
+  const t = useTranslation();
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+
+  const handleGetDownloadUrl = async (key: string, copyToClipboard: boolean = false) => {
+    try {
+      const res = await OSSFileAPI.getFn({ data: { key } });
+      const url = res.data?.data?.downloadUrl;
+      if (!url) return;
+
+      if (copyToClipboard) {
+        await navigator.clipboard.writeText(url);
+        showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
+      } else {
+        window.open(url, '_blank');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDelete = useCallback(() => {
+    setDeleteConfirmOpen(true);
+  }, []);
+
+  const handleConfirmDelete = async () => {
+    try {
+      await OSSFileAPI.deleteFn({ data: { key: row.key } });
+      onDeleteSuccess();
+      showSnackbar({ message: t('dialog.operationSuccess'), type: 'success' });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setDeleteConfirmOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <Box>
+        <Tooltip title={t('oss.file.download')}>
+          <IconButton size="small" color="primary" onClick={() => handleGetDownloadUrl(row.key!)}>
+            <Download />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t('oss.file.copyUrl')}>
+          <IconButton
+            size="small"
+            color="info"
+            onClick={() => handleGetDownloadUrl(row.key!, true)}
+          >
+            <ContentCopy />
+          </IconButton>
+        </Tooltip>
+        <Tooltip title={t('common.delete')}>
+          <IconButton size="small" color="error" onClick={() => handleDelete()}>
+            <Delete />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      <Dialog open={deleteConfirmOpen} onClose={() => setDeleteConfirmOpen(false)}>
+        <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{t('oss.file.deleteConfirm')}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirmOpen(false)} variant="outlined">
+            {t('dialog.cancel')}
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            {t('dialog.delete')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+});
 
 export default TheTable;
