@@ -1,8 +1,13 @@
 import db from "@/db/index";
 import { menuTable } from "@/api/system/menu/model";
+import { permissionTable } from "@/api/system/permission/model";
 import { sql } from "drizzle-orm";
 import { SUPER_ADMIN_ID } from "./init";
 import { BusinessKey } from "@/types/business";
+import { initialTranslationData } from "./initTranslation";
+import { getEnv } from "@/utils/env";
+
+const LOCALE = getEnv("LOCALE") || "zh-CN";
 
 // name 字段使用多语言键，前端需要根据该键获取对应的翻译
 export const initialMenuData = [
@@ -300,5 +305,57 @@ export async function prepareMenu(options?: { reset?: boolean }) {
   }
 
   stats.created = mappedData.length;
+
+  // 准备菜单权限数据
+  const permissionMappedData = initialMenuData.map((item) => {
+    const getPermissionName = () => {
+      const tKeySubString = item.business || "";
+      const trans = initialTranslationData.find(
+        (t) => t.tKey === "businessType." + tKeySubString
+      );
+      const prefix = trans?.langCodes?.[LOCALE] || "未知菜单权限";
+
+      const postfixTrans = initialTranslationData.find(
+        (t) => t.tKey === "permission.category.menu"
+      );
+      const postfix = postfixTrans?.langCodes?.[LOCALE];
+
+      return postfix ? `${prefix}${postfix}` : item.name + "未知菜单";
+    };
+
+    return {
+      code: `${item.name}:menu`,
+      name: getPermissionName(),
+      category: "menu" as const,
+      resource: `${item.id}`,
+      business: item.business || null,
+      remark: null,
+      isEnabled: true,
+      creatorId,
+    };
+  });
+  console.log(
+    "unknown",
+    permissionMappedData.filter((item) => item.name.includes("未知"))
+  );
+  // 基于 Code 执行 Upsert，使用 db.batch() 合并请求
+  for (let i = 0; i < permissionMappedData.length; i += BATCH_SIZE) {
+    const batch = permissionMappedData.slice(i, i + BATCH_SIZE);
+    queries.push(
+      db
+        .insert(permissionTable)
+        .values(batch as any)
+        .onConflictDoUpdate({
+          target: permissionTable.code,
+          set: {
+            name: sql`excluded.name`,
+            category: sql`excluded.category`,
+            resource: sql`excluded.resource`,
+            business: sql`excluded.business`,
+          },
+        })
+    );
+  }
+
   return { queries, stats };
 }

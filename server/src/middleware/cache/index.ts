@@ -49,7 +49,6 @@ export class KVStorage {
         typeof (envKV as any)?.get === "function" &&
         typeof (envKV as any)?.put === "function"
       ) {
-        console.log({ KV_KEY: this.bindingName, MSG: "KV_IN_USE" });
         return { realKV: envKV };
       }
 
@@ -262,4 +261,3 @@ export const kv = new Proxy({} as KVStorage, {
     return typeof value === "function" ? value.bind(target) : value;
   },
 });
-

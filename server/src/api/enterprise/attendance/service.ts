@@ -32,6 +32,8 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@/api/system/user/service";
+import { validateAttendance } from "./prevention";
+import { AttendanceQualify, validateQualify } from "./qualify";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -91,8 +93,10 @@ const listAllRes = {
 } as const satisfies JSONSchema;
 
 async function onListAll(
-  params: FromSchema<typeof listAllReq>
+  params: FromSchema<typeof listAllReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
+  validateQualify(userObj, AttendanceQualify.LIST);
   const { orderBy = "id", descend = true } = params;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
   const rows = await db
@@ -101,8 +105,8 @@ async function onListAll(
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(10000);
-    
-  return rows.map(row => ({
+
+  return rows.map((row) => ({
     ...row,
     employeeObj: null, // Simplified for listAll or handle it if needed
   })) as any;
@@ -116,7 +120,7 @@ const listAllApi = {
     method: "post",
     summary: "获取所有考勤记录（不分页）",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onListAll,
 } satisfies API;
 
@@ -143,8 +147,10 @@ const listRes = {
 } as const satisfies JSONSchema;
 
 async function onList(
-  params: FromSchema<typeof listReq>
+  params: FromSchema<typeof listReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
+  validateQualify(userObj, AttendanceQualify.LIST);
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
@@ -205,7 +211,7 @@ const listApi = {
     method: "post",
     summary: "获取考勤记录列表",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onList,
 } satisfies API;
 
@@ -227,7 +233,13 @@ async function onAdd(
   userObj: UserObj
 ): Promise<number | null> {
   const { userId: creatorId } = userObj;
-  const { employeeId, date, checkInTime, checkOutTime, status, remark } = params;
+  const { employeeId, date, checkInTime, checkOutTime, status, remark } =
+    params;
+
+  validateQualify(userObj, AttendanceQualify.ADD);
+
+  // 校验时间冲突
+  validateAttendance({ checkInTime, checkOutTime });
 
   const res = await db
     .insert(attendanceTable)
@@ -266,12 +278,15 @@ const updateReq = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-async function onUpdate(
-  params: any,
-  userObj: UserObj
-): Promise<number | null> {
+async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   const { userId: updaterId } = userObj;
-  const { id, employeeId, date, checkInTime, checkOutTime, status, remark } = params;
+  const { id, employeeId, date, checkInTime, checkOutTime, status, remark } =
+    params;
+
+  validateQualify(userObj, AttendanceQualify.UPDATE);
+
+  // 校验时间冲突
+  validateAttendance({ checkInTime, checkOutTime });
 
   const res = await db
     .update(attendanceTable)
@@ -316,8 +331,10 @@ const deleteReq = {
 } as const satisfies JSONSchema;
 
 async function onDelete(
-  params: FromSchema<typeof deleteReq>
+  params: FromSchema<typeof deleteReq>,
+  userObj: UserObj
 ): Promise<number | null> {
+  validateQualify(userObj, AttendanceQualify.DELETE);
   const { id } = params;
   const res = await db
     .delete(attendanceTable)
@@ -338,7 +355,7 @@ const deleteApi = {
     method: "post",
     summary: "删除考勤记录",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onDelete,
 } satisfies API;
 
@@ -361,8 +378,10 @@ const getRes = {
 } as const satisfies JSONSchema;
 
 async function onGet(
-  params: FromSchema<typeof getReq>
+  params: FromSchema<typeof getReq>,
+  userObj: UserObj
 ): Promise<any> {
+  validateQualify(userObj, AttendanceQualify.GET);
   const { id } = params;
   const rows = await db
     .select({
@@ -398,7 +417,7 @@ const getApi = {
     method: "post",
     summary: "获取考勤记录详情",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onGet,
 } satisfies API;
 
