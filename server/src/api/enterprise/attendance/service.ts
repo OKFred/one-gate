@@ -27,12 +27,9 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@/api/system/user/service";
-import { validateAttendance } from "./prevention";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventTimeTravel } from "./prevention";
 import { validateQualify } from "./qualify";
 
 // 构建查询条件
@@ -239,7 +236,7 @@ async function onAdd(
   validateQualify(userObj, "add");
 
   // 校验时间冲突
-  validateAttendance({ checkInTime, checkOutTime });
+  preventTimeTravel({ checkInTime, checkOutTime });
 
   const res = await db
     .insert(attendanceTable)
@@ -286,7 +283,7 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   validateQualify(userObj, "edit");
 
   // 校验时间冲突
-  validateAttendance({ checkInTime, checkOutTime });
+  preventTimeTravel({ checkInTime, checkOutTime });
 
   const res = await db
     .update(attendanceTable)
@@ -302,11 +299,9 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
     })
     .where(eq(attendanceTable.id, id))
     .returning({ id: attendanceTable.id });
-
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const [row] = res;
+  preventEmpty(row);
+  return row.id;
 }
 
 const updateApi = {
@@ -341,10 +336,9 @@ async function onDelete(
     .where(eq(attendanceTable.id, id))
     .returning({ id: attendanceTable.id });
 
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const [row] = res;
+  preventEmpty(row);
+  return row.id;
 }
 
 const deleteApi = {
@@ -393,11 +387,10 @@ async function onGet(
     .where(eq(attendanceTable.id, id))
     .limit(1);
 
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
+  const [row] = rows;
+  preventEmpty(row);
 
-  const { attendance, employeeName } = rows[0];
+  const { attendance, employeeName } = row;
   const { employeeId, ...rest } = attendance;
 
   return {

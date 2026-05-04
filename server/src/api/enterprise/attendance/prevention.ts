@@ -6,7 +6,7 @@ export const ErrorCodes = {
 } as const;
 
 /** 考勤校验逻辑 */
-export const validateAttendance = (data: {
+export const preventTimeTravel = (data: {
   checkInTime?: number | null;
   checkOutTime?: number | null;
 }) => {
