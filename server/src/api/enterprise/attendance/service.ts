@@ -32,7 +32,7 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@/api/system/user/service";
-import { validateAttendance } from "./qualify";
+import { validateAttendance } from "./prevention";
 
 // 构建查询条件
 const buildWhereCondition = ({
