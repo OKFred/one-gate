@@ -420,6 +420,9 @@ async function onGetButtonPermission(
   params: FromSchema<typeof getButtonPermissionReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof getButtonPermissionRes> | null> {
+  // 必须手动触发加载，因为该接口本身不走 RBAC 校验
+  await userObj.ensureLoaded();
+
   const buttonPermissions = userObj.permissions.filter(
     (p) => p.category === "button"
   );
