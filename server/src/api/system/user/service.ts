@@ -409,6 +409,8 @@ export type UserObj = FromSchema<typeof getRes> & {
   token: string;
   userId: number;
   isSuperAdmin: boolean;
+  /** 用户持有的角色 ID 列表 */
+  roleIds: number[];
   permissions: PermissionInfo[];
   /** 权限码集合，用于高效查找 */
   permissionCodes: Set<string>;
@@ -416,6 +418,10 @@ export type UserObj = FromSchema<typeof getRes> & {
   dataScope: import("@/types/dataScope").DataScopeValue;
   /** 当 dataScope 为 "custom" 时，指定可访问的部门 ID 列表 */
   customDeptIds: number[];
+  /** 内部状态标识：权限和数据范围是否已加载 */
+  _isLoaded?: boolean;
+  /** 确保权限和数据范围已加载的异步方法 */
+  ensureLoaded: () => Promise<void>;
 };
 const getReq = {
   type: "object",

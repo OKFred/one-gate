@@ -12,7 +12,6 @@ import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
 import { authMiddleware } from "../bearerAuth";
-import { checkPermission } from "../accessControl";
 import { can } from "../auth/permission";
 
 function componentMaker(
@@ -57,22 +56,13 @@ function routeMaker({
   reqSchema,
   resSchema,
   componentArr,
-  requiredPermissions,
   permission,
 }: API & {
   nameSpace: string;
   reqSchema: JSONSchema;
   resSchema: JSONSchema;
   componentArr: ReturnType<typeof componentMaker>[];
-  requiredPermissions?: string[];
 }) {
-  // 默认给接口都加上命名空间前缀作为权限标识
-  const permissionCode = nameSpace + ":api" + pathInfo.path;
-  if (!requiredPermissions) {
-    requiredPermissions = [permissionCode];
-  } else {
-    requiredPermissions.push(permissionCode);
-  }
   const controller = async (c: NodeHonoContext) => {
     //获取request header content type
     //如果不是 application/json 则报错
@@ -87,7 +77,6 @@ function routeMaker({
     );
     try {
       await authMiddleware(c);
-      await checkPermission(requiredPermissions)(c);
       // 基于 action 的权限检查（RBAC）
       if (permission) {
         const userObj = c.get("userObj");
@@ -163,7 +152,6 @@ export interface API {
   pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
   adapter: Function;
   service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
-  requiredPermissions?: string[];
   /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
   permission?: { action: string };
 }

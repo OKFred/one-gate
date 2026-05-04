@@ -21,6 +21,9 @@ export async function can(
   action: string,
   resource: string
 ): Promise<boolean> {
+  // 核心：确保权限数据已加载
+  await user.ensureLoaded();
+
   if (user.isSuperAdmin) return true;
 
   // 1. 尝试直接查找 (例如 enterprise.attendance:add)

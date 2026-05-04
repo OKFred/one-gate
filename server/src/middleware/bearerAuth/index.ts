@@ -1,6 +1,6 @@
 import { tokenUtils } from "@/utils/token";
 import { NodeHonoContext } from "@/types/app";
-import userService from "@/api/system/user/service";
+import userService, { UserObj } from "@/api/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import { roleTable } from "@/api/system/role/model";
@@ -38,55 +38,70 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   const { id: userId, ...rest } = user;
-  // 加载用户权限
   const roleIds = user.roleArr?.map((r) => r.value) || [];
-  const permissions =
-    await rolePermissionUtils.getPermissionsByRoleIds(roleIds);
-  // 判断是否为超级管理员（保留，用于接口访问控制）
   const isSuperAdmin = roleIds.includes(SUPER_ADMIN_ROLE_ID);
 
-  // 计算有效 dataScope：查询所有角色的 dataScope，取优先级最高的
-  let effectiveDataScope: DataScopeValue = DataScope.SELF_ONLY;
-  const mergedCustomDeptIds: number[] = [];
-
-  if (roleIds.length > 0) {
-    const roles = await db
-      .select({
-        dataScope: roleTable.dataScope,
-        customDeptIds: roleTable.customDeptIds,
-      })
-      .from(roleTable)
-      .where(inArray(roleTable.id, roleIds));
-
-    for (const role of roles) {
-      const scopeVal = (role.dataScope ??
-        DataScope.SELF_ONLY) as DataScopeValue;
-      // 取优先级最高的 dataScope
-      if (SCOPE_PRIORITY[scopeVal] > SCOPE_PRIORITY[effectiveDataScope]) {
-        effectiveDataScope = scopeVal;
-      }
-      // 合并自定义部门 ID
-      if (scopeVal === DataScope.CUSTOM && role.customDeptIds) {
-        try {
-          const ids: number[] = JSON.parse(role.customDeptIds);
-          mergedCustomDeptIds.push(...ids);
-        } catch {
-          // 忽略解析失败
-        }
-      }
-    }
-  }
-
-  // 将用户信息添加到context中
-  c.set("userObj", {
+  // 构建初始 userObj（此时 permissions 和 dataScope 尚未计算）
+  const userObj: UserObj = {
     token,
     userId,
     id: userId,
     isSuperAdmin,
-    permissions,
-    permissionCodes: new Set(permissions.map((p) => p.code)),
-    dataScope: effectiveDataScope,
-    customDeptIds: [...new Set(mergedCustomDeptIds)], // 去重
+    roleIds,
     ...rest,
-  });
+    _isLoaded: false,
+    permissions: [],
+    permissionCodes: new Set<string>(),
+    dataScope: DataScope.SELF_ONLY,
+    customDeptIds: [],
+
+    async ensureLoaded() {
+      if (this._isLoaded) return;
+
+      // 1. 加载用户权限
+      const permissions = await rolePermissionUtils.getPermissionsByRoleIds(
+        this.roleIds
+      );
+      this.permissions = permissions;
+      this.permissionCodes = new Set(permissions.map((p) => p.code));
+
+      // 2. 计算有效 dataScope：查询所有角色的 dataScope，取优先级最高的
+      let effectiveDataScope: DataScopeValue = DataScope.SELF_ONLY;
+      const mergedCustomDeptIds: number[] = [];
+
+      if (this.roleIds.length > 0) {
+        const roles = await db
+          .select({
+            dataScope: roleTable.dataScope,
+            customDeptIds: roleTable.customDeptIds,
+          })
+          .from(roleTable)
+          .where(inArray(roleTable.id, this.roleIds));
+
+        for (const role of roles) {
+          const scopeVal = (role.dataScope ??
+            DataScope.SELF_ONLY) as DataScopeValue;
+          // 取优先级最高的 dataScope
+          if (SCOPE_PRIORITY[scopeVal] > SCOPE_PRIORITY[effectiveDataScope]) {
+            effectiveDataScope = scopeVal;
+          }
+          // 合并自定义部门 ID
+          if (scopeVal === DataScope.CUSTOM && role.customDeptIds) {
+            try {
+              const ids: number[] = JSON.parse(role.customDeptIds);
+              mergedCustomDeptIds.push(...ids);
+            } catch {
+              // 忽略解析失败
+            }
+          }
+        }
+      }
+      this.dataScope = effectiveDataScope;
+      this.customDeptIds = [...new Set(mergedCustomDeptIds)];
+      this._isLoaded = true;
+    },
+  };
+
+  // 将用户信息添加到context中
+  c.set("userObj", userObj);
 };
