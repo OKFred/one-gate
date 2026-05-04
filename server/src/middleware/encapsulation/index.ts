@@ -158,14 +158,7 @@ export interface API {
   requiredPermissions?: string[];
 }
 
-export default function main(
-  apiObj: Record<string, API>,
-  nameSpace: string,
-  prerequisites?: Function
-) {
-  if (prerequisites && getRuntimeKey() !== "workerd") {
-    prerequisites(); //适配worker时需要调整
-  }
+export default function main(apiObj: Record<string, API>, nameSpace: string) {
   const app = new OpenAPIHono<AppBindings>();
   Array.from(Object.values(apiObj)).forEach((obj) => {
     const { req, res, pathInfo } = obj;

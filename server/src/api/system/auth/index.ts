@@ -3,9 +3,7 @@ import service from "./service";
 import { BusinessKey } from "@/types/business";
 
 function createApp() {
-  return encapsulation(service, "system.auth" satisfies BusinessKey, () => {
-    // SystemAuth 不需要初始化表
-  });
+  return encapsulation(service, "system.auth" satisfies BusinessKey);
 }
 
 export default createApp;
