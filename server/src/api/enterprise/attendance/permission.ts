@@ -13,7 +13,7 @@ export const resource = "enterprise.attendance";
  * @param userObj 用户对象
  * @param action 动作类型 ('read', 'add', 'edit', 'delete' 等)
  */
-export const validateQualify = (userObj: UserObj, action: string) => {
+export const can = async (userObj: UserObj, action: string) => {
   if (!globalCan(userObj, action, resource)) {
     throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
   }

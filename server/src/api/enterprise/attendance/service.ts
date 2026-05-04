@@ -30,7 +30,7 @@ import type { API } from "@/middleware/encapsulation";
 import type { UserObj } from "@/api/system/user/service";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import { preventTimeTravel } from "./prevention";
-import { validateQualify } from "./qualify";
+import { can } from "./permission";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -93,7 +93,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  validateQualify(userObj, "read");
+  await can(userObj, "read");
   const { orderBy = "id", descend = true } = params;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
   const rows = await db
@@ -147,7 +147,7 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  validateQualify(userObj, "read");
+  await can(userObj, "read");
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
@@ -233,7 +233,7 @@ async function onAdd(
   const { employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
 
-  validateQualify(userObj, "add");
+  await can(userObj, "add");
 
   // 校验时间冲突
   preventTimeTravel({ checkInTime, checkOutTime });
@@ -280,7 +280,7 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   const { id, employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
 
-  validateQualify(userObj, "edit");
+  await can(userObj, "edit");
 
   // 校验时间冲突
   preventTimeTravel({ checkInTime, checkOutTime });
@@ -329,7 +329,7 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>,
   userObj: UserObj
 ): Promise<number | null> {
-  validateQualify(userObj, "delete");
+  await can(userObj, "delete");
   const { id } = params;
   const res = await db
     .delete(attendanceTable)
@@ -375,7 +375,7 @@ async function onGet(
   params: FromSchema<typeof getReq>,
   userObj: UserObj
 ): Promise<any> {
-  validateQualify(userObj, "read");
+  await can(userObj, "read");
   const { id } = params;
   const rows = await db
     .select({

@@ -22,7 +22,7 @@ export function can(user: UserObj, action: string, resource: string): boolean {
   const directCode = `${resource}:${action}`;
   if (user.permissionCodes.has(directCode)) return true;
 
-  // 2. 如果是通用动作，尝试映射查找
+  // 2. 如果是通用动作，尝试映射查找（例如：action是'read'，尝试查找enterprise.attendance:list、enterprise.attendance:get、enterprise.attendance:view）
   const mappedActions = ACTION_MAP[action] || [];
   for (const ma of mappedActions) {
     if (user.permissionCodes.has(`${resource}:${ma}`)) return true;
