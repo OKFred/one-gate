@@ -13,9 +13,14 @@ const ACTION_MAP: Record<string, string[]> = {
  * @param user 用户对象
  * @param action 动作 (如 'read', 'add', 'edit', 'delete')
  * @param resource 资源标识符 (如 'enterprise.attendance')
+ * @remark 暂时先作为异步，便于后续拓展
  * @returns 是否拥有权限
  */
-export function can(user: UserObj, action: string, resource: string): boolean {
+export async function can(
+  user: UserObj,
+  action: string,
+  resource: string
+): Promise<boolean> {
   if (user.isSuperAdmin) return true;
 
   // 1. 尝试直接查找 (例如 enterprise.attendance:add)

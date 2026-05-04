@@ -3,7 +3,7 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError";
 import type { UserObj } from "@/api/system/user/service";
-import { can as globalCan } from "@/middleware/auth/qualify";
+import { can as globalCan } from "@/middleware/auth/permission";
 
 /** 考勤资源标识符 (对应权限表中的前缀) */
 export const resource = "enterprise.attendance";
