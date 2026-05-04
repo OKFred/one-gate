@@ -161,8 +161,12 @@ const TheForm = memo(
           });
         } else {
           // 添加用户
+          const addData = {
+            ...formData,
+            password: globalThis.btoa((formData as AddUserReq).password),
+          };
           await UserAPI.addFn({
-            data: formData as AddUserReq,
+            data: addData as AddUserReq,
           });
         }
         handleCancel();
