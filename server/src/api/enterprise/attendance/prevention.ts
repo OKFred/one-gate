@@ -1,7 +1,7 @@
 import { BusinessError } from "@/middleware/errorHandler/businessError";
 
 /** 考勤校验相关错误码 */
-export const ErrorVO = {
+export const ErrorCodes = {
   TIME_CONFLICT: "errorHandler.checkOutTimeEarly",
 } as const;
 
@@ -15,6 +15,6 @@ export const validateAttendance = (data: {
     data.checkOutTime &&
     data.checkOutTime <= data.checkInTime
   ) {
-    throw new BusinessError(ErrorVO.TIME_CONFLICT);
+    throw new BusinessError(ErrorCodes.TIME_CONFLICT);
   }
 };
