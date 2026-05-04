@@ -62,7 +62,10 @@ const AttendancePO = {
 
 export type AttendancePOLike = InferSelectModel<typeof attendanceTable>;
 type AttendanceSelectPOLike = InferInsertModel<typeof attendanceTable>;
-type AttendanceAddPOLike = Omit<AttendancePOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type AttendanceAddPOLike = Omit<
+  AttendancePOLike,
+  IndexKeyLike | AuditAddOmitKeyLike
+>;
 type AttendanceUpdatePOLike = Partial<
   Omit<AttendanceSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -104,11 +107,8 @@ export const AttendanceVO = {
   ...AuditVO,
 } as const satisfies Partial<Record<keyof AttendanceVOLike, JSONSchema>>;
 
-export const ErrorVO = {
-  TIME_CONFLICT: "errorHandler.checkOutTimeEarly", // 签退时间早于签到时间
-} as const;
-
-export type AttendanceVOLike = Omit<AttendancePOLike, "employeeId"> & AttendanceDTOLike;
+export type AttendanceVOLike = Omit<AttendancePOLike, "employeeId"> &
+  AttendanceDTOLike;
 
 //----------------- Required Keys ----------------//
 export const AttendanceAddKeys = [
@@ -125,9 +125,9 @@ export const AttendanceDeleteKeys = [
   ...IndexKey,
 ] as const satisfies RequiredKeys<Pick<AttendancePOLike, IndexKeyLike>>[];
 
-export const AttendanceGetKeys = [
-  ...IndexKey,
-] as const satisfies RequiredKeys<Pick<AttendancePOLike, IndexKeyLike>>[];
+export const AttendanceGetKeys = [...IndexKey] as const satisfies RequiredKeys<
+  Pick<AttendancePOLike, IndexKeyLike>
+>[];
 
 export const AttendanceListKeys = [
   ...IndexKey,

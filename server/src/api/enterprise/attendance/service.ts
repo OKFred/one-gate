@@ -9,7 +9,6 @@ import {
   AttendanceSortableKeys,
   type AttendancePOLike,
   type AttendanceVOLike,
-  ErrorVO,
 } from "./model";
 import { userTable } from "@/api/system/user/model";
 import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
@@ -33,22 +32,7 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@/api/system/user/service";
-
-/**
- * 校验考勤数据逻辑
- */
-const validateAttendance = (data: {
-  checkInTime?: number | null;
-  checkOutTime?: number | null;
-}) => {
-  if (
-    data.checkInTime &&
-    data.checkOutTime &&
-    data.checkOutTime <= data.checkInTime
-  ) {
-    throw new BusinessError(ErrorVO.TIME_CONFLICT);
-  }
-};
+import { validateAttendance } from "./qualify";
 
 // 构建查询条件
 const buildWhereCondition = ({
