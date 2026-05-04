@@ -51,6 +51,7 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
         business: item.business,
         langCode: item.langCode,
         tKey: item.tKey,
+        tValue: item.tValue,
         valueHash,
         remark: null,
         isEnabled: item.isEnabled,
@@ -70,6 +71,7 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
         .onConflictDoUpdate({
           target: [translationTable.tKey, translationTable.langCode],
           set: {
+            tValue: sql`excluded.t_value`,
             valueHash: sql`excluded.value_hash`,
             isEnabled: sql`excluded.is_enabled`,
           },
@@ -2827,6 +2829,46 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "系统用户",
       "en-US": "System User",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.oss.config",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "存储配置",
+      "en-US": "OSS Config",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.oss.file",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "文件管理",
+      "en-US": "File Management",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.enterprise",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "企业管理",
+      "en-US": "Enterprise",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.enterprise.attendance",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "考勤管理",
+      "en-US": "Attendance",
     },
   },
   {

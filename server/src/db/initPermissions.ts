@@ -353,12 +353,12 @@ export async function preparePermissions(options?: { reset?: boolean }) {
       const trans = initialTranslationData.find(
         (item) => item.tKey === "businessType." + tKeySubString
       );
-      const prefix = trans?.langCodes?.[LOCALE] || trans?.tValue;
+      const prefix = trans?.langCodes?.[LOCALE];
 
       const postfixTrans = initialTranslationData.find(
         (item) => item.tKey === "permission.category.api"
       );
-      const postfix = postfixTrans?.langCodes?.[LOCALE] || postfixTrans?.tValue;
+      const postfix = postfixTrans?.langCodes?.[LOCALE];
 
       return prefix && postfix ? `${prefix}${postfix}` : seed.code + "未知接口";
     };
@@ -368,12 +368,12 @@ export async function preparePermissions(options?: { reset?: boolean }) {
       const trans = initialTranslationData.find(
         (item) => item.tKey === "businessType." + tKeySubString
       );
-      const prefix = trans?.langCodes?.[LOCALE] || trans?.tValue;
+      const prefix = trans?.langCodes?.[LOCALE];
 
       const postfixTrans = initialTranslationData.find(
         (item) => item.tKey === "permission.category.button"
       );
-      const postfix = postfixTrans?.langCodes?.[LOCALE] || postfixTrans?.tValue;
+      const postfix = postfixTrans?.langCodes?.[LOCALE];
 
       return prefix && postfix
         ? `${prefix}${postfix}:${action}`
