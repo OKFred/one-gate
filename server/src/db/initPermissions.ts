@@ -311,6 +311,11 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     business: "enterprise.attendance",
   },
   {
+    category: "api",
+    code: "enterprise.attendance:read",
+    business: "enterprise.attendance",
+  },
+  {
     category: "button",
     code: "enterprise.attendance:add",
     business: "enterprise.attendance",

@@ -121,7 +121,15 @@ export class KVStorage {
     const { realKV, cache } = this.getExecutor();
 
     if (realKV) {
-      await realKV.put(key, value, options);
+      let finalValue = value;
+      if (
+        typeof value === "object" &&
+        !(value instanceof ArrayBuffer) &&
+        !(value instanceof ReadableStream)
+      ) {
+        finalValue = JSON.stringify(value);
+      }
+      await realKV.put(key, finalValue as any, options);
       return;
     }
 

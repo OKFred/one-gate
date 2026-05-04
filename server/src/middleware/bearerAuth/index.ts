@@ -11,6 +11,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "../errorHandler/businessError";
+import { kv } from "../cache";
 
 /** DataScope 优先级（值越大越优先） */
 const SCOPE_PRIORITY: Record<DataScopeValue, number> = {
@@ -58,14 +59,38 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     async ensureLoaded() {
       if (this._isLoaded) return;
 
-      // 1. 加载用户权限
+      const cacheKey = `auth:bundle:${this.userId}`;
+
+      // 1. 尝试从缓存获取权限和数据范围包
+      try {
+        const cached = await kv.get<{
+          permissions: any[];
+          dataScope: DataScopeValue;
+          customDeptIds: number[];
+        }>(cacheKey, "json");
+
+        if (cached) {
+          this.permissions = cached.permissions;
+          this.permissionCodes = new Set(cached.permissions.map((p) => p.code));
+          this.dataScope = cached.dataScope;
+          this.customDeptIds = cached.customDeptIds;
+          this._isLoaded = true;
+          return;
+        }
+      } catch (error) {
+        // 缓存读取报错（如 KV 限额已满），记录日志并回退到数据库
+        console.error("Auth Cache Read Error:", error);
+      }
+
+      // 2. 缓存未命中或报错，回退到数据库加载逻辑
+      // 2.1 加载用户权限
       const permissions = await rolePermissionUtils.getPermissionsByRoleIds(
         this.roleIds
       );
       this.permissions = permissions;
       this.permissionCodes = new Set(permissions.map((p) => p.code));
 
-      // 2. 计算有效 dataScope：查询所有角色的 dataScope，取优先级最高的
+      // 2.2 计算有效 dataScope：查询所有角色的 dataScope，取优先级最高的
       let effectiveDataScope: DataScopeValue = DataScope.SELF_ONLY;
       const mergedCustomDeptIds: number[] = [];
 
@@ -98,6 +123,27 @@ export const authMiddleware = async (c: NodeHonoContext) => {
       }
       this.dataScope = effectiveDataScope;
       this.customDeptIds = [...new Set(mergedCustomDeptIds)];
+
+      // 3. 异步回写缓存 (有效期 1 小时)
+      const putTask = kv
+        .put(
+          cacheKey,
+          {
+            permissions: this.permissions,
+            dataScope: this.dataScope,
+            customDeptIds: this.customDeptIds,
+          },
+          { expirationTtl: 3600 }
+        )
+        .catch((err) => {
+          console.error("Auth Cache Write Error:", err);
+        });
+
+      // 如果有 executionCtx (Cloudflare Workers)，则使用 waitUntil 确保任务执行
+      if (c.executionCtx) {
+        c.executionCtx.waitUntil(putTask);
+      }
+
       this._isLoaded = true;
     },
   };
