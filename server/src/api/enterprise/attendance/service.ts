@@ -30,7 +30,6 @@ import type { API } from "@/middleware/encapsulation";
 import type { UserObj } from "@/api/system/user/service";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import { preventTimeTravel } from "./prevention";
-import { can } from "./permission";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -93,7 +92,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  await can(userObj, "read");
+
   const { orderBy = "id", descend = true } = params;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
   const rows = await db
@@ -119,6 +118,7 @@ const listAllApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -147,7 +147,7 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  await can(userObj, "read");
+
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
@@ -210,6 +210,7 @@ const listApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -232,8 +233,6 @@ async function onAdd(
   const { userId: creatorId } = userObj;
   const { employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
-
-  await can(userObj, "add");
 
   // 校验时间冲突
   preventTimeTravel({ checkInTime, checkOutTime });
@@ -264,6 +263,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -279,8 +279,6 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   const { userId: updaterId } = userObj;
   const { id, employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
-
-  await can(userObj, "edit");
 
   // 校验时间冲突
   preventTimeTravel({ checkInTime, checkOutTime });
@@ -314,6 +312,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -329,7 +328,7 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>,
   userObj: UserObj
 ): Promise<number | null> {
-  await can(userObj, "delete");
+
   const { id } = params;
   const res = await db
     .delete(attendanceTable)
@@ -351,6 +350,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -375,7 +375,7 @@ async function onGet(
   params: FromSchema<typeof getReq>,
   userObj: UserObj
 ): Promise<any> {
-  await can(userObj, "read");
+
   const { id } = params;
   const rows = await db
     .select({
@@ -412,6 +412,7 @@ const getApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 export default {

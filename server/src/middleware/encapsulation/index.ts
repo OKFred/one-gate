@@ -13,7 +13,7 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
 import { authMiddleware } from "../bearerAuth";
 import { checkPermission } from "../accessControl";
-import { getRuntimeKey } from "hono/adapter";
+import { can } from "../auth/permission";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -58,6 +58,7 @@ function routeMaker({
   resSchema,
   componentArr,
   requiredPermissions,
+  permission,
 }: API & {
   nameSpace: string;
   reqSchema: JSONSchema;
@@ -87,6 +88,13 @@ function routeMaker({
     try {
       await authMiddleware(c);
       await checkPermission(requiredPermissions)(c);
+      // 基于 action 的权限检查（RBAC）
+      if (permission) {
+        const userObj = c.get("userObj");
+        if (userObj && !(await can(userObj, permission.action, nameSpace))) {
+          throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+        }
+      }
     } catch (error) {
       if (!ignoreError) {
         throw error;
@@ -156,6 +164,8 @@ export interface API {
   adapter: Function;
   service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
   requiredPermissions?: string[];
+  /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
+  permission?: { action: string };
 }
 
 export default function main(apiObj: Record<string, API>, nameSpace: string) {
