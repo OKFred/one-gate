@@ -84,6 +84,7 @@ export const authMiddleware = async (c: NodeHonoContext) => {
     id: userId,
     isSuperAdmin,
     permissions,
+    permissionCodes: new Set(permissions.map((p) => p.code)),
     dataScope: effectiveDataScope,
     customDeptIds: [...new Set(mergedCustomDeptIds)], // 去重
     ...rest,
