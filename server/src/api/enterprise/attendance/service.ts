@@ -9,6 +9,7 @@ import {
   AttendanceSortableKeys,
   type AttendancePOLike,
   type AttendanceVOLike,
+  ErrorVO,
 } from "./model";
 import { userTable } from "@/api/system/user/model";
 import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
@@ -32,6 +33,22 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@/api/system/user/service";
+
+/**
+ * 校验考勤数据逻辑
+ */
+const validateAttendance = (data: {
+  checkInTime?: number | null;
+  checkOutTime?: number | null;
+}) => {
+  if (
+    data.checkInTime &&
+    data.checkOutTime &&
+    data.checkOutTime <= data.checkInTime
+  ) {
+    throw new BusinessError(ErrorVO.TIME_CONFLICT);
+  }
+};
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -101,8 +118,8 @@ async function onListAll(
     .where(buildWhereCondition(params))
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(10000);
-    
-  return rows.map(row => ({
+
+  return rows.map((row) => ({
     ...row,
     employeeObj: null, // Simplified for listAll or handle it if needed
   })) as any;
@@ -227,7 +244,11 @@ async function onAdd(
   userObj: UserObj
 ): Promise<number | null> {
   const { userId: creatorId } = userObj;
-  const { employeeId, date, checkInTime, checkOutTime, status, remark } = params;
+  const { employeeId, date, checkInTime, checkOutTime, status, remark } =
+    params;
+
+  // 校验时间冲突
+  validateAttendance({ checkInTime, checkOutTime });
 
   const res = await db
     .insert(attendanceTable)
@@ -266,12 +287,13 @@ const updateReq = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-async function onUpdate(
-  params: any,
-  userObj: UserObj
-): Promise<number | null> {
+async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   const { userId: updaterId } = userObj;
-  const { id, employeeId, date, checkInTime, checkOutTime, status, remark } = params;
+  const { id, employeeId, date, checkInTime, checkOutTime, status, remark } =
+    params;
+
+  // 校验时间冲突
+  validateAttendance({ checkInTime, checkOutTime });
 
   const res = await db
     .update(attendanceTable)
@@ -360,9 +382,7 @@ const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-async function onGet(
-  params: FromSchema<typeof getReq>
-): Promise<any> {
+async function onGet(params: FromSchema<typeof getReq>): Promise<any> {
   const { id } = params;
   const rows = await db
     .select({

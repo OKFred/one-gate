@@ -104,6 +104,10 @@ export const AttendanceVO = {
   ...AuditVO,
 } as const satisfies Partial<Record<keyof AttendanceVOLike, JSONSchema>>;
 
+export const ErrorVO = {
+  TIME_CONFLICT: "errorHandler.checkOutTimeEarly", // 签退时间早于签到时间
+} as const;
+
 export type AttendanceVOLike = Omit<AttendancePOLike, "employeeId"> & AttendanceDTOLike;
 
 //----------------- Required Keys ----------------//

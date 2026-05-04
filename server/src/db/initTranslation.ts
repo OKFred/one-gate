@@ -4,6 +4,15 @@ import { utils as translationUtils } from "@/api/i18n/translation/service";
 import { SUPER_ADMIN_ID } from "./init";
 import { sql } from "drizzle-orm";
 
+export type BatchTranslationItem = {
+  application: string;
+  business: string;
+  tKey: string;
+  // tValue: string;
+  langCodes: Record<string, string>;
+  isEnabled: boolean;
+};
+
 /**
  * 准备多语言数据同步语句
  */
@@ -42,7 +51,6 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
         business: item.business,
         langCode: item.langCode,
         tKey: item.tKey,
-        tValue: item.tValue,
         valueHash,
         remark: null,
         isEnabled: item.isEnabled,
@@ -62,7 +70,6 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
         .onConflictDoUpdate({
           target: [translationTable.tKey, translationTable.langCode],
           set: {
-            tValue: sql`excluded.t_value`,
             valueHash: sql`excluded.value_hash`,
             isEnabled: sql`excluded.is_enabled`,
           },
@@ -79,7 +86,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "table.deleteConfirm",
-    tValue: "确定要删除吗？此操作不可撤销。",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确定要删除吗？此操作不可撤销。",
@@ -91,7 +97,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.results",
-    tValue: "{count} 个结果",
     isEnabled: true,
     langCodes: {
       "zh-CN": "{count} 个结果",
@@ -102,7 +107,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "form.missingCredentials",
-    tValue: "请输入用户名和密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "请输入用户名和密码",
@@ -113,7 +117,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "form.pleaseEnter",
-    tValue: "请输入",
     isEnabled: true,
     langCodes: {
       "zh-CN": "请输入",
@@ -124,7 +127,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "form.select",
-    tValue: "请选择",
     isEnabled: true,
     langCodes: {
       "zh-CN": "请选择",
@@ -135,7 +137,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "status.success",
-    tValue: "成功",
     isEnabled: true,
     langCodes: {
       "zh-CN": "成功",
@@ -146,7 +147,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "status.failure",
-    tValue: "失败",
     isEnabled: true,
     langCodes: {
       "zh-CN": "失败",
@@ -157,7 +157,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "table.refresh",
-    tValue: "刷新",
     isEnabled: true,
     langCodes: {
       "zh-CN": "刷新",
@@ -168,7 +167,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "status.enabled",
-    tValue: "启用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "启用",
@@ -179,7 +177,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "status.disabled",
-    tValue: "禁用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "禁用",
@@ -190,7 +187,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.cancel",
-    tValue: "取消",
     isEnabled: true,
     langCodes: {
       "zh-CN": "取消",
@@ -201,7 +197,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "table.pageSizeLabel",
-    tValue: "每页条数",
     isEnabled: true,
     langCodes: {
       "zh-CN": "每页条数",
@@ -212,7 +207,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.noData",
-    tValue: "暂无数据",
     isEnabled: true,
     langCodes: {
       "zh-CN": "暂无数据",
@@ -223,7 +217,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.language",
-    tValue: "语言",
     isEnabled: true,
     langCodes: {
       "zh-CN": "语言",
@@ -234,7 +227,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.category",
-    tValue: "分类",
     isEnabled: true,
     langCodes: {
       "zh-CN": "分类",
@@ -245,7 +237,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.close",
-    tValue: "关闭",
     isEnabled: true,
     langCodes: {
       "zh-CN": "关闭",
@@ -256,7 +247,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.id",
-    tValue: "ID",
     isEnabled: true,
     langCodes: {
       "zh-CN": "ID",
@@ -267,7 +257,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.status",
-    tValue: "状态",
     isEnabled: true,
     langCodes: {
       "zh-CN": "状态",
@@ -278,7 +267,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.createTime",
-    tValue: "创建时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "创建时间",
@@ -289,7 +277,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.updateTime",
-    tValue: "更新时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "更新时间",
@@ -300,7 +287,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.permissionCount",
-    tValue: "权限数量",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限数量",
@@ -311,7 +297,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "table.actions",
-    tValue: "操作",
     isEnabled: true,
     langCodes: {
       "zh-CN": "操作",
@@ -322,7 +307,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.add",
-    tValue: "新增",
     isEnabled: true,
     langCodes: {
       "zh-CN": "新增",
@@ -333,7 +317,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.edit",
-    tValue: "编辑",
     isEnabled: true,
     langCodes: {
       "zh-CN": "编辑",
@@ -344,7 +327,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.delete",
-    tValue: "删除",
     isEnabled: true,
     langCodes: {
       "zh-CN": "删除",
@@ -355,7 +337,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.save",
-    tValue: "保存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "保存",
@@ -366,7 +347,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.confirm",
-    tValue: "确定",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确定",
@@ -377,7 +357,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.yes",
-    tValue: "是",
     isEnabled: true,
     langCodes: {
       "zh-CN": "是",
@@ -388,7 +367,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.no",
-    tValue: "否",
     isEnabled: true,
     langCodes: {
       "zh-CN": "否",
@@ -399,7 +377,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.deleteConfirmTitle",
-    tValue: "确认删除",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确认删除",
@@ -410,7 +387,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.title",
-    tValue: "搜索与筛选",
     isEnabled: true,
     langCodes: {
       "zh-CN": "搜索与筛选",
@@ -421,7 +397,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.clear",
-    tValue: "清除筛选",
     isEnabled: true,
     langCodes: {
       "zh-CN": "清除筛选",
@@ -432,7 +407,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.keywordLabel",
-    tValue: "关键字搜索",
     isEnabled: true,
     langCodes: {
       "zh-CN": "关键字搜索",
@@ -443,7 +417,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.orderBy",
-    tValue: "排序字段",
     isEnabled: true,
     langCodes: {
       "zh-CN": "排序字段",
@@ -454,7 +427,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.sortOrder",
-    tValue: "排序方式",
     isEnabled: true,
     langCodes: {
       "zh-CN": "排序方式",
@@ -465,7 +437,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.asc",
-    tValue: "升序",
     isEnabled: true,
     langCodes: {
       "zh-CN": "升序",
@@ -476,7 +447,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.desc",
-    tValue: "降序",
     isEnabled: true,
     langCodes: {
       "zh-CN": "降序",
@@ -487,7 +457,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.unassigned",
-    tValue: "未分配",
     isEnabled: true,
     langCodes: {
       "zh-CN": "未分配",
@@ -498,7 +467,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.name",
-    tValue: "名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "名称",
@@ -509,7 +477,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "column.remark",
-    tValue: "备注",
     isEnabled: true,
     langCodes: {
       "zh-CN": "备注",
@@ -520,7 +487,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.keyword",
-    tValue: "关键词",
     isEnabled: true,
     langCodes: {
       "zh-CN": "关键词",
@@ -531,7 +497,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.enabledStatus",
-    tValue: "启用状态",
     isEnabled: true,
     langCodes: {
       "zh-CN": "启用状态",
@@ -542,7 +507,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.all",
-    tValue: "全部",
     isEnabled: true,
     langCodes: {
       "zh-CN": "全部",
@@ -553,7 +517,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "filter.condition",
-    tValue: "筛选条件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "筛选条件",
@@ -564,7 +527,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.operationSuccess",
-    tValue: "操作成功",
     isEnabled: true,
     langCodes: {
       "zh-CN": "操作成功",
@@ -575,7 +537,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.required",
-    tValue: "该项为必填项",
     isEnabled: true,
     langCodes: {
       "zh-CN": "该项为必填项",
@@ -586,7 +547,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "page.details",
-    tValue: "详情",
     isEnabled: true,
     langCodes: {
       "zh-CN": "详情",
@@ -597,7 +557,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.titie.error",
-    tValue: "错误提示",
     isEnabled: true,
     langCodes: {
       "zh-CN": "错误提示",
@@ -608,7 +567,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.titie.warning",
-    tValue: "警告",
     isEnabled: true,
     langCodes: {
       "zh-CN": "警告",
@@ -619,7 +577,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.titie.success",
-    tValue: "成功",
     isEnabled: true,
     langCodes: {
       "zh-CN": "成功",
@@ -630,7 +587,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "dialog.titie.info",
-    tValue: "提示",
     isEnabled: true,
     langCodes: {
       "zh-CN": "提示",
@@ -641,7 +597,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.home",
-    tValue: "主页",
     isEnabled: true,
     langCodes: {
       "zh-CN": "主页",
@@ -652,7 +607,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.me",
-    tValue: "我的",
     isEnabled: true,
     langCodes: {
       "zh-CN": "我的",
@@ -663,7 +617,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.mail",
-    tValue: "邮件管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件管理",
@@ -674,7 +627,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.mail.template",
-    tValue: "模板",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板",
@@ -685,7 +637,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.mail.log",
-    tValue: "日志",
     isEnabled: true,
     langCodes: {
       "zh-CN": "日志",
@@ -696,7 +647,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.mail.send",
-    tValue: "发送",
     isEnabled: true,
     langCodes: {
       "zh-CN": "发送",
@@ -707,7 +657,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.mail.account",
-    tValue: "账户",
     isEnabled: true,
     langCodes: {
       "zh-CN": "账户",
@@ -718,7 +667,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.system",
-    tValue: "系统管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统管理",
@@ -729,7 +677,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.system.role",
-    tValue: "角色",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色",
@@ -740,7 +687,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.user",
-    tValue: "用户",
     isEnabled: true,
     langCodes: {
       "zh-CN": "用户",
@@ -751,7 +697,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.system.department",
-    tValue: "部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "部门",
@@ -762,7 +707,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.menu",
-    tValue: "菜单",
     isEnabled: true,
     langCodes: {
       "zh-CN": "菜单",
@@ -773,7 +717,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.system.permission",
-    tValue: "权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限",
@@ -784,7 +727,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.system.rolePermission",
-    tValue: "角色权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色权限",
@@ -795,7 +737,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.i18n",
-    tValue: "国际化",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国际化",
@@ -806,7 +747,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.language",
-    tValue: "语言",
     isEnabled: true,
     langCodes: {
       "zh-CN": "语言",
@@ -817,7 +757,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.translation",
-    tValue: "翻译",
     isEnabled: true,
     langCodes: {
       "zh-CN": "翻译",
@@ -828,7 +767,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.i18n.region",
-    tValue: "国家地区",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国家地区",
@@ -839,7 +777,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "topbar.title",
-    tValue: "条条大道通罗马",
     isEnabled: true,
     langCodes: {
       "zh-CN": "条条大道通罗马",
@@ -850,7 +787,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "topbar.profile",
-    tValue: "个人设置",
     isEnabled: true,
     langCodes: {
       "zh-CN": "个人设置",
@@ -861,7 +797,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "topbar.logout",
-    tValue: "退出登录",
     isEnabled: true,
     langCodes: {
       "zh-CN": "退出登录",
@@ -872,7 +807,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "topbar.notLoggedIn",
-    tValue: "未登录",
     isEnabled: true,
     langCodes: {
       "zh-CN": "未登录",
@@ -883,7 +817,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "login.username",
-    tValue: "用户名",
     isEnabled: true,
     langCodes: {
       "zh-CN": "用户名",
@@ -894,7 +827,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "login.password",
-    tValue: "密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "密码",
@@ -905,7 +837,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "login.signIn",
-    tValue: "登录",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录",
@@ -916,7 +847,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "login.wechatSignIn",
-    tValue: "微信登录",
     isEnabled: true,
     langCodes: {
       "zh-CN": "微信登录",
@@ -927,7 +857,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "login.wechatWIP",
-    tValue: "微信登录功能正在开发中...",
     isEnabled: true,
     langCodes: {
       "zh-CN": "微信登录功能正在开发中...",
@@ -938,7 +867,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "login.forgotPassword",
-    tValue: "忘记密码？",
     isEnabled: true,
     langCodes: {
       "zh-CN": "忘记密码？",
@@ -949,7 +877,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "dialog.message",
-    tValue: "页面未找到",
     isEnabled: true,
     langCodes: {
       "zh-CN": "页面未找到",
@@ -960,7 +887,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "dialog.goBackHome",
-    tValue: "返回首页",
     isEnabled: true,
     langCodes: {
       "zh-CN": "返回首页",
@@ -971,7 +897,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.databaseBusy",
-    tValue: "数据库繁忙或锁定",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数据库繁忙或锁定",
@@ -982,7 +907,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.databaseError",
-    tValue: "数据库操作错误",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数据库操作错误",
@@ -993,7 +917,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.notFound",
-    tValue: "未找到请求的资源",
     isEnabled: true,
     langCodes: {
       "zh-CN": "未找到请求的资源",
@@ -1004,7 +927,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.targetNotExist",
-    tValue: "目标不存在",
     isEnabled: true,
     langCodes: {
       "zh-CN": "目标不存在",
@@ -1015,7 +937,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.forbidden",
-    tValue: "禁止访问",
     isEnabled: true,
     langCodes: {
       "zh-CN": "禁止访问",
@@ -1026,7 +947,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.permissionDenied",
-    tValue: "权限不足",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限不足",
@@ -1037,7 +957,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.validationFailed",
-    tValue: "请求校验失败",
     isEnabled: true,
     langCodes: {
       "zh-CN": "请求校验失败",
@@ -1048,7 +967,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.serverError",
-    tValue: "服务器异常",
     isEnabled: true,
     langCodes: {
       "zh-CN": "服务器异常",
@@ -1059,7 +977,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.unknownError",
-    tValue: "未知异常",
     isEnabled: true,
     langCodes: {
       "zh-CN": "未知异常",
@@ -1070,7 +987,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.undefinedError",
-    tValue: "未定义的错误类型",
     isEnabled: true,
     langCodes: {
       "zh-CN": "未定义的错误类型",
@@ -1081,7 +997,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.duplicatedData",
-    tValue: "数据重复",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数据重复",
@@ -1092,7 +1007,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.invalidParams",
-    tValue: "无效的参数",
     isEnabled: true,
     langCodes: {
       "zh-CN": "无效的参数",
@@ -1103,7 +1017,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.departmentNotExist",
-    tValue: "部门不存在或已被禁用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "部门不存在或已被禁用",
@@ -1114,7 +1027,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.roleNotExist",
-    tValue: "角色不存在或已被禁用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色不存在或已被禁用",
@@ -1125,7 +1037,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.hasChildren",
-    tValue: "存在子节点，请检查后重试",
     isEnabled: true,
     langCodes: {
       "zh-CN": "存在子节点，请检查后重试",
@@ -1136,7 +1047,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.departmentHasEnabledUser",
-    tValue: "当前部门或子部门下存在已启用的用户，无法禁用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "当前部门或子部门下存在已启用的用户，无法禁用",
@@ -1147,8 +1057,18 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.checkOutTimeEarly",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "签退时间早于或等于签到时间",
+      "en-US":
+        "Check-out time cannot be earlier than or equal to check-in time",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.departmentHasEnabledChildren",
-    tValue: "当前部门下存在未禁用的子部门，请先禁用子部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "当前部门下存在未禁用的子部门，请先禁用子部门",
@@ -1160,7 +1080,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.notAuthenticated",
-    tValue: "用户未认证或token无效",
     isEnabled: true,
     langCodes: {
       "zh-CN": "用户未认证或token无效",
@@ -1171,7 +1090,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.notExistOrDisabled",
-    tValue: "数据不存在或已被禁用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数据不存在或已被禁用",
@@ -1182,7 +1100,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.notYetImplemented",
-    tValue: "功能暂未实现",
     isEnabled: true,
     langCodes: {
       "zh-CN": "功能暂未实现",
@@ -1193,7 +1110,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.wrongPassword",
-    tValue: "密码错误",
     isEnabled: true,
     langCodes: {
       "zh-CN": "密码错误",
@@ -1204,7 +1120,6 @@ export const initialTranslationData = [
     application: "backend",
     business: "business.exception",
     tKey: "errorHandler.loginFailed",
-    tValue: "登录失败，请检查用户名和密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录失败，请检查用户名和密码",
@@ -1215,7 +1130,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.exception",
     tKey: "error.requestFailed",
-    tValue: "请求失败",
     isEnabled: true,
     langCodes: {
       "zh-CN": "请求失败",
@@ -1226,7 +1140,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.exception",
     tKey: "error.sessionExpired",
-    tValue: "登录已过期，请重新登录",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录已过期，请重新登录",
@@ -1237,7 +1150,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.exception",
     tKey: "error.networkError",
-    tValue: "网络错误",
     isEnabled: true,
     langCodes: {
       "zh-CN": "网络错误",
@@ -1248,7 +1160,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "home.title",
-    tValue: "欢迎使用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "欢迎使用",
@@ -1259,7 +1170,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "home.subtitle",
-    tValue: "一站式信息管理解决方案",
     isEnabled: true,
     langCodes: {
       "zh-CN": "一站式信息管理解决方案",
@@ -1270,7 +1180,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.accounts",
-    tValue: "邮件账户",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件账户",
@@ -1281,7 +1190,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.templates",
-    tValue: "邮件模板",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件模板",
@@ -1292,7 +1200,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.todaySent",
-    tValue: "今日发送",
     isEnabled: true,
     langCodes: {
       "zh-CN": "今日发送",
@@ -1303,7 +1210,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.title",
-    tValue: "快速开始",
     isEnabled: true,
     langCodes: {
       "zh-CN": "快速开始",
@@ -1314,7 +1220,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.configureAccounts",
-    tValue: "🔧 配置邮件账户：在邮件账户管理中添加您的SMTP配置",
     isEnabled: true,
     langCodes: {
       "zh-CN": "🔧 配置邮件账户：在邮件账户管理中添加您的SMTP配置",
@@ -1325,7 +1230,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.createTemplate",
-    tValue: "📝 创建邮件模板：设计可重复使用的邮件模板",
     isEnabled: true,
     langCodes: {
       "zh-CN": "📝 创建邮件模板：设计可重复使用的邮件模板",
@@ -1336,7 +1240,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.sendMail",
-    tValue: "📧 发送邮件：使用模板快速发送邮件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "📧 发送邮件：使用模板快速发送邮件",
@@ -1347,7 +1250,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "quickStart.viewLogs",
-    tValue: "📊 查看日志：监控邮件发送状态和历史记录",
     isEnabled: true,
     langCodes: {
       "zh-CN": "📊 查看日志：监控邮件发送状态和历史记录",
@@ -1358,7 +1260,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.title",
-    tValue: "翻译管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "翻译管理",
@@ -1369,7 +1270,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.table.application",
-    tValue: "应用",
     isEnabled: true,
     langCodes: {
       "zh-CN": "应用",
@@ -1380,7 +1280,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.table.business",
-    tValue: "业务",
     isEnabled: true,
     langCodes: {
       "zh-CN": "业务",
@@ -1391,7 +1290,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.table.langCode",
-    tValue: "语言代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "语言代码",
@@ -1402,7 +1300,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.table.tKey",
-    tValue: "翻译键",
     isEnabled: true,
     langCodes: {
       "zh-CN": "翻译键",
@@ -1413,7 +1310,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.table.tValue",
-    tValue: "翻译值",
     isEnabled: true,
     langCodes: {
       "zh-CN": "翻译值",
@@ -1424,7 +1320,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.dialog.duplicateWarning",
-    tValue: "发现{count}个相同的翻译文案：",
     isEnabled: true,
     langCodes: {
       "zh-CN": "发现{count}个相同的翻译文案：",
@@ -1435,7 +1330,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.translation",
     tKey: "translation.dialog.duplicateSuggestion",
-    tValue: "💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键",
     isEnabled: true,
     langCodes: {
       "zh-CN": "💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键",
@@ -1447,7 +1341,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.region",
     tKey: "region.title",
-    tValue: "国家地区管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国家地区管理",
@@ -1458,7 +1351,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.region",
     tKey: "region.table.alpha2Code",
-    tValue: "ISO两位代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "ISO两位代码",
@@ -1469,7 +1361,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.region",
     tKey: "region.table.alpha3Code",
-    tValue: "ISO三位代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "ISO三位代码",
@@ -1480,7 +1371,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.region",
     tKey: "region.table.numeric",
-    tValue: "数字代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数字代码",
@@ -1491,7 +1381,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.region",
     tKey: "region.table.iso3166Independent",
-    tValue: "是否ISO3166独立主权国家",
     isEnabled: true,
     langCodes: {
       "zh-CN": "是否ISO3166独立主权国家",
@@ -1502,7 +1391,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.region",
     tKey: "region.table.businessLanguages",
-    tValue: "业务语言",
     isEnabled: true,
     langCodes: {
       "zh-CN": "业务语言",
@@ -1513,7 +1401,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.language",
     tKey: "language.title",
-    tValue: "语言管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "语言管理",
@@ -1524,7 +1411,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.language",
     tKey: "language.table.langCode",
-    tValue: "语言代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "语言代码",
@@ -1535,7 +1421,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "i18n.language",
     tKey: "language.table.nativeName",
-    tValue: "本地名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "本地名称",
@@ -1546,7 +1431,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.account",
     tKey: "account.title",
-    tValue: "邮件账户管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件账户管理",
@@ -1557,7 +1441,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.account",
     tKey: "account.table.nickname",
-    tValue: "昵称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "昵称",
@@ -1568,7 +1451,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.account",
     tKey: "account.table.email",
-    tValue: "邮箱",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮箱",
@@ -1579,7 +1461,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.account",
     tKey: "account.table.host",
-    tValue: "主机",
     isEnabled: true,
     langCodes: {
       "zh-CN": "主机",
@@ -1590,7 +1471,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.account",
     tKey: "account.table.port",
-    tValue: "端口",
     isEnabled: true,
     langCodes: {
       "zh-CN": "端口",
@@ -1601,7 +1481,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.account",
     tKey: "account.table.password",
-    tValue: "密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "密码",
@@ -1612,7 +1491,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.customFrom",
-    tValue: "或直接输入发件邮箱",
     isEnabled: true,
     langCodes: {
       "zh-CN": "或直接输入发件邮箱",
@@ -1623,7 +1501,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.customFromHelp",
-    tValue: "如果没有配置的账户，可以直接输入邮箱地址",
     isEnabled: true,
     langCodes: {
       "zh-CN": "如果没有配置的账户，可以直接输入邮箱地址",
@@ -1634,7 +1511,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.recipientName",
-    tValue: "姓名",
     isEnabled: true,
     langCodes: {
       "zh-CN": "姓名",
@@ -1645,7 +1521,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.recipientEmail",
-    tValue: "邮箱",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮箱",
@@ -1656,7 +1531,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.addRecipient",
-    tValue: "添加收件人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "添加收件人",
@@ -1667,7 +1541,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.removeRecipient",
-    tValue: "移除收件人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "移除收件人",
@@ -1678,7 +1551,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.subject",
-    tValue: "主题",
     isEnabled: true,
     langCodes: {
       "zh-CN": "主题",
@@ -1689,7 +1561,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.contentLoaded",
-    tValue: "模板内容已加载，您可以在此基础上编辑...",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板内容已加载，您可以在此基础上编辑...",
@@ -1700,7 +1571,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.action.send",
-    tValue: "发送",
     isEnabled: true,
     langCodes: {
       "zh-CN": "发送",
@@ -1711,7 +1581,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.title",
-    tValue: "邮件模板管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件模板管理",
@@ -1722,7 +1591,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.title",
-    tValue: "发送邮件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "发送邮件",
@@ -1733,7 +1601,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.recipients",
-    tValue: "收件人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "收件人",
@@ -1744,7 +1611,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.addRecipient",
-    tValue: "添加收件人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "添加收件人",
@@ -1755,7 +1621,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.noTemplate",
-    tValue: "不使用模板 - 手动编写内容",
     isEnabled: true,
     langCodes: {
       "zh-CN": "不使用模板 - 手动编写内容",
@@ -1766,7 +1631,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.templateName",
-    tValue: "模板名",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板名",
@@ -1777,7 +1641,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.creator",
-    tValue: "创建人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "创建人",
@@ -1788,7 +1651,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.category",
-    tValue: "分类",
     isEnabled: true,
     langCodes: {
       "zh-CN": "分类",
@@ -1799,7 +1661,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.action",
     tKey: "send.dialog.contentLabel",
-    tValue: "邮件内容",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件内容",
@@ -1810,7 +1671,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.name",
-    tValue: "模板名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板名称",
@@ -1821,7 +1681,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.nameHelp",
-    tValue: "邮件模板的唯一标识名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件模板的唯一标识名称",
@@ -1832,7 +1691,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.subject",
-    tValue: "邮件标题",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件标题",
@@ -1843,7 +1701,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.subjectHelp",
-    tValue: "邮件的主题行",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件的主题行",
@@ -1854,7 +1711,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.langCodeHelp",
-    tValue: "模板使用的语言代码（可选）",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板使用的语言代码（可选）",
@@ -1865,7 +1721,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.category",
-    tValue: "模板分类",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板分类",
@@ -1876,7 +1731,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.categoryHelp",
-    tValue: "模板的分类标签（可选）",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板的分类标签（可选）",
@@ -1887,7 +1741,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.contentLabel",
-    tValue: "邮件内容",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件内容",
@@ -1898,7 +1751,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.contentHelp",
-    tValue: "使用富文本编辑器编写邮件模板内容，支持HTML格式",
     isEnabled: true,
     langCodes: {
       "zh-CN": "使用富文本编辑器编写邮件模板内容，支持HTML格式",
@@ -1909,7 +1761,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.table.title",
-    tValue: "邮件标题",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件标题",
@@ -1920,7 +1771,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "dialog.title.preview",
-    tValue: "预览",
     isEnabled: true,
     langCodes: {
       "zh-CN": "预览",
@@ -1931,7 +1781,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.preview.basicInfo",
-    tValue: "基本信息",
     isEnabled: true,
     langCodes: {
       "zh-CN": "基本信息",
@@ -1942,7 +1791,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.template",
     tKey: "template.preview.tags",
-    tValue: "标签",
     isEnabled: true,
     langCodes: {
       "zh-CN": "标签",
@@ -1953,7 +1801,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.templateParams",
-    tValue: "模板参数",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板参数",
@@ -1964,7 +1811,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.errorCode",
-    tValue: "错误代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "错误代码",
@@ -1975,7 +1821,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.errorDetails",
-    tValue: "错误详情",
     isEnabled: true,
     langCodes: {
       "zh-CN": "错误详情",
@@ -1986,7 +1831,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.title",
-    tValue: "邮件发送日志",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件发送日志",
@@ -1997,7 +1841,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.basicInfo",
-    tValue: "基本信息",
     isEnabled: true,
     langCodes: {
       "zh-CN": "基本信息",
@@ -2008,7 +1851,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.timeInfo",
-    tValue: "时间信息",
     isEnabled: true,
     langCodes: {
       "zh-CN": "时间信息",
@@ -2019,7 +1861,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.templateInfo",
-    tValue: "模板信息",
     isEnabled: true,
     langCodes: {
       "zh-CN": "模板信息",
@@ -2030,7 +1871,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.errorInfo",
-    tValue: "错误信息",
     isEnabled: true,
     langCodes: {
       "zh-CN": "错误信息",
@@ -2041,7 +1881,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.subject",
-    tValue: "标题",
     isEnabled: true,
     langCodes: {
       "zh-CN": "标题",
@@ -2052,7 +1891,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.recipient",
-    tValue: "收件人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "收件人",
@@ -2063,7 +1901,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.sender",
-    tValue: "发件人",
     isEnabled: true,
     langCodes: {
       "zh-CN": "发件人",
@@ -2074,7 +1911,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "mail.log",
     tKey: "log.table.sendTime",
-    tValue: "发送时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "发送时间",
@@ -2085,7 +1921,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.title",
-    tValue: "我的",
     isEnabled: true,
     langCodes: {
       "zh-CN": "我的",
@@ -2096,7 +1931,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.changePassword.title",
-    tValue: "修改密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "修改密码",
@@ -2107,7 +1941,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.changePassword.confirmPasswordRequired",
-    tValue: "确认密码必填",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确认密码必填",
@@ -2118,7 +1951,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.table.currentPassword",
-    tValue: "当前密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "当前密码",
@@ -2129,7 +1961,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.table.newPassword",
-    tValue: "新密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "新密码",
@@ -2140,7 +1971,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.table.confirmPassword",
-    tValue: "确认新密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确认新密码",
@@ -2151,7 +1981,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.subtitle",
-    tValue: "个人信息",
     isEnabled: true,
     langCodes: {
       "zh-CN": "个人信息",
@@ -2162,7 +1991,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.region",
-    tValue: "国家/地区",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国家/地区",
@@ -2173,7 +2001,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.department",
-    tValue: "部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "部门",
@@ -2184,7 +2011,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.role",
-    tValue: "角色",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色",
@@ -2195,7 +2021,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.accountStatus",
-    tValue: "账户状态",
     isEnabled: true,
     langCodes: {
       "zh-CN": "账户状态",
@@ -2206,7 +2031,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.changePassword.passwordFormatHint",
-    tValue: "密码长度7位~30位，至少包含一个字母和一个数字",
     isEnabled: true,
     langCodes: {
       "zh-CN": "密码长度7位~30位，至少包含一个字母和一个数字",
@@ -2218,7 +2042,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.changePassword.sameAsOldPassword",
-    tValue: "新密码不能与当前密码相同",
     isEnabled: true,
     langCodes: {
       "zh-CN": "新密码不能与当前密码相同",
@@ -2229,7 +2052,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.changePassword.passwordMismatch",
-    tValue: "新密码与确认密码不匹配",
     isEnabled: true,
     langCodes: {
       "zh-CN": "新密码与确认密码不匹配",
@@ -2240,7 +2062,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.auth",
     tKey: "me.changePassword.success",
-    tValue: "密码修改成功",
     isEnabled: true,
     langCodes: {
       "zh-CN": "密码修改成功",
@@ -2251,7 +2072,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.user",
     tKey: "user.title",
-    tValue: "用户管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "用户管理",
@@ -2262,7 +2082,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.user",
     tKey: "user.table.password",
-    tValue: "密码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "密码",
@@ -2273,7 +2092,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.department",
     tKey: "department.title",
-    tValue: "部门管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "部门管理",
@@ -2284,7 +2102,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.department",
     tKey: "department.table.name",
-    tValue: "名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "名称",
@@ -2295,7 +2112,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.department",
     tKey: "department.table.managers",
-    tValue: "部门管理员",
     isEnabled: true,
     langCodes: {
       "zh-CN": "部门管理员",
@@ -2306,7 +2122,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.table.roleName",
-    tValue: "角色名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色名称",
@@ -2317,7 +2132,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.table.permissions",
-    tValue: "权限列表",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限列表",
@@ -2328,7 +2142,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.table.permissionsHelper",
-    tValue: "权限列表为JSON数组格式",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限列表为JSON数组格式",
@@ -2339,7 +2152,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.dialog.addSubMenu",
-    tValue: "添加子菜单",
     isEnabled: true,
     langCodes: {
       "zh-CN": "添加子菜单",
@@ -2350,7 +2162,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.menuName",
-    tValue: "菜单名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "菜单名称",
@@ -2361,7 +2172,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.customIcon",
-    tValue: "自定义图标 (Iconify格式)",
     isEnabled: true,
     langCodes: {
       "zh-CN": "自定义图标 (Iconify格式)",
@@ -2372,7 +2182,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.iconHelper",
-    tValue: "例如: material-symbols:home",
     isEnabled: true,
     langCodes: {
       "zh-CN": "例如: material-symbols:home",
@@ -2383,7 +2192,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.routePath",
-    tValue: "路由路径",
     isEnabled: true,
     langCodes: {
       "zh-CN": "路由路径",
@@ -2394,7 +2202,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.pathHelper",
-    tValue: "例如: /system/menu",
     isEnabled: true,
     langCodes: {
       "zh-CN": "例如: /system/menu",
@@ -2405,7 +2212,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.parentMenu",
-    tValue: "父菜单",
     isEnabled: true,
     langCodes: {
       "zh-CN": "父菜单",
@@ -2416,7 +2222,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.topLevelMenu",
-    tValue: "无 (顶级菜单)",
     isEnabled: true,
     langCodes: {
       "zh-CN": "无 (顶级菜单)",
@@ -2427,7 +2232,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.sort",
-    tValue: "排序",
     isEnabled: true,
     langCodes: {
       "zh-CN": "排序",
@@ -2438,7 +2242,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.sortHelper",
-    tValue: "数字越小越靠前",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数字越小越靠前",
@@ -2449,7 +2252,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.table.menuNameRequired",
-    tValue: "菜单名称不能为空",
     isEnabled: true,
     langCodes: {
       "zh-CN": "菜单名称不能为空",
@@ -2460,7 +2262,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.department",
     tKey: "department.table.parentDepartment",
-    tValue: "上级部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "上级部门",
@@ -2471,7 +2272,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.department",
     tKey: "department.table.topLevelDepartment",
-    tValue: "无（顶级部门）",
     isEnabled: true,
     langCodes: {
       "zh-CN": "无（顶级部门）",
@@ -2482,7 +2282,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.department",
     tKey: "department.dialog.addChild",
-    tValue: "添加子部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "添加子部门",
@@ -2493,7 +2292,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.menu",
     tKey: "menu.title",
-    tValue: "菜单管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "菜单管理",
@@ -2504,7 +2302,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.title",
-    tValue: "角色管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色管理",
@@ -2515,7 +2312,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.title",
-    tValue: "权限管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限管理",
@@ -2526,7 +2322,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.code",
-    tValue: "权限代码",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限代码",
@@ -2537,7 +2332,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.name",
-    tValue: "权限名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限名称",
@@ -2548,7 +2342,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.category",
-    tValue: "权限类别",
     isEnabled: true,
     langCodes: {
       "zh-CN": "权限类别",
@@ -2559,7 +2352,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.category.menu",
-    tValue: "菜单",
     isEnabled: true,
     langCodes: {
       "zh-CN": "菜单",
@@ -2570,7 +2362,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.category.button",
-    tValue: "按钮",
     isEnabled: true,
     langCodes: {
       "zh-CN": "按钮",
@@ -2581,7 +2372,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.category.api",
-    tValue: "接口",
     isEnabled: true,
     langCodes: {
       "zh-CN": "接口",
@@ -2592,7 +2382,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.resource",
-    tValue: "资源路径",
     isEnabled: true,
     langCodes: {
       "zh-CN": "资源路径",
@@ -2603,7 +2392,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.permission",
     tKey: "permission.business",
-    tValue: "业务",
     isEnabled: true,
     langCodes: {
       "zh-CN": "业务",
@@ -2614,7 +2402,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.title",
-    tValue: "角色权限管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "角色权限管理",
@@ -2625,7 +2412,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.batchAdd",
-    tValue: "批量添加权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "批量添加权限",
@@ -2636,7 +2422,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.selectRole",
-    tValue: "选择角色",
     isEnabled: true,
     langCodes: {
       "zh-CN": "选择角色",
@@ -2647,7 +2432,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.selectPermissions",
-    tValue: "选择权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "选择权限",
@@ -2658,7 +2442,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.availablePermissions",
-    tValue: "可用权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "可用权限",
@@ -2669,7 +2452,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.noAvailablePermissions",
-    tValue: "暂无可用权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "暂无可用权限",
@@ -2680,7 +2462,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.currentPermissions",
-    tValue: "当前权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "当前权限",
@@ -2691,7 +2472,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.assignedPermission",
-    tValue: "已分配权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "已分配权限",
@@ -2702,7 +2482,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.noPermissions",
-    tValue: "暂无权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "暂无权限",
@@ -2713,7 +2492,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.advancedSettings",
-    tValue: "高级设置",
     isEnabled: true,
     langCodes: {
       "zh-CN": "高级设置",
@@ -2724,7 +2502,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.categoryFirst",
-    tValue: "类别优先",
     isEnabled: true,
     langCodes: {
       "zh-CN": "类别优先",
@@ -2735,7 +2512,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.businessFirst",
-    tValue: "业务优先",
     isEnabled: true,
     langCodes: {
       "zh-CN": "业务优先",
@@ -2746,7 +2522,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.otherCategory",
-    tValue: "其他",
     isEnabled: true,
     langCodes: {
       "zh-CN": "其他",
@@ -2757,7 +2532,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.keyword",
-    tValue: "关键词",
     isEnabled: true,
     langCodes: {
       "zh-CN": "关键词",
@@ -2768,7 +2542,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.keywordPlaceholder",
-    tValue: "搜索角色或权限名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "搜索角色或权限名称",
@@ -2779,7 +2552,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.filterByRole",
-    tValue: "按角色筛选",
     isEnabled: true,
     langCodes: {
       "zh-CN": "按角色筛选",
@@ -2790,7 +2562,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.filterByPermission",
-    tValue: "按权限筛选",
     isEnabled: true,
     langCodes: {
       "zh-CN": "按权限筛选",
@@ -2801,7 +2572,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.batchDelete",
-    tValue: "批量删除",
     isEnabled: true,
     langCodes: {
       "zh-CN": "批量删除",
@@ -2812,7 +2582,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.confirmBatchDelete",
-    tValue: "确定要删除选中的 {count} 个角色权限关联吗？",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确定要删除选中的 {count} 个角色权限关联吗？",
@@ -2824,7 +2593,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.selectedItems",
-    tValue: "选中项目",
     isEnabled: true,
     langCodes: {
       "zh-CN": "选中项目",
@@ -2835,7 +2603,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.andMore",
-    tValue: "等 {count} 个",
     isEnabled: true,
     langCodes: {
       "zh-CN": "等 {count} 个",
@@ -2846,7 +2613,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.hasFilter",
-    tValue: "有过滤条件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "有过滤条件",
@@ -2857,7 +2623,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission",
     tKey: "rolePermission.hasConditions",
-    tValue: "有附加条件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "有附加条件",
@@ -2868,7 +2633,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.i18n",
-    tValue: "国际化",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国际化",
@@ -2879,7 +2643,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.i18n.language",
-    tValue: "国际化语言",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国际化语言",
@@ -2890,7 +2653,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.i18n.region",
-    tValue: "国际化地区",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国际化地区",
@@ -2901,7 +2663,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.i18n.translation",
-    tValue: "国际化翻译",
     isEnabled: true,
     langCodes: {
       "zh-CN": "国际化翻译",
@@ -2912,7 +2673,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.mail",
-    tValue: "邮件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件",
@@ -2923,7 +2683,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.mail.account",
-    tValue: "邮件账户",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件账户",
@@ -2934,7 +2693,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.mail.template",
-    tValue: "邮件模板",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件模板",
@@ -2945,7 +2703,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.mail.action",
-    tValue: "邮件操作",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件操作",
@@ -2956,7 +2713,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.mail.log",
-    tValue: "邮件日志",
     isEnabled: true,
     langCodes: {
       "zh-CN": "邮件日志",
@@ -2967,7 +2723,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.maintenance",
-    tValue: "运维",
     isEnabled: true,
     langCodes: {
       "zh-CN": "运维",
@@ -2978,7 +2733,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.maintenance.cache",
-    tValue: "运维缓存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "运维缓存",
@@ -2989,7 +2743,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.maintenance.compliance",
-    tValue: "运维合规",
     isEnabled: true,
     langCodes: {
       "zh-CN": "运维合规",
@@ -3000,7 +2753,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system",
-    tValue: "系统",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统",
@@ -3011,7 +2763,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.auth",
-    tValue: "系统鉴权",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统鉴权",
@@ -3022,7 +2773,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.department",
-    tValue: "系统部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统部门",
@@ -3033,7 +2783,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.menu",
-    tValue: "系统菜单",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统菜单",
@@ -3044,7 +2793,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.permission",
-    tValue: "系统权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统权限",
@@ -3055,7 +2803,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.role",
-    tValue: "系统角色",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统角色",
@@ -3066,7 +2813,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.role_permission",
-    tValue: "系统角色权限",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统角色权限",
@@ -3077,7 +2823,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "infra.businessType",
     tKey: "businessType.system.user",
-    tValue: "系统用户",
     isEnabled: true,
     langCodes: {
       "zh-CN": "系统用户",
@@ -3088,7 +2833,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.table.dataScope",
-    tValue: "数据范围",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数据范围",
@@ -3099,7 +2843,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.dataScope.all",
-    tValue: "全部数据",
     isEnabled: true,
     langCodes: {
       "zh-CN": "全部数据",
@@ -3110,7 +2853,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.dataScope.dept_and_below",
-    tValue: "本部门及以下数据",
     isEnabled: true,
     langCodes: {
       "zh-CN": "本部门及以下数据",
@@ -3121,7 +2863,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.dataScope.self_only",
-    tValue: "仅本人数据",
     isEnabled: true,
     langCodes: {
       "zh-CN": "仅本人数据",
@@ -3132,7 +2873,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.dataScope.custom",
-    tValue: "自定义部门",
     isEnabled: true,
     langCodes: {
       "zh-CN": "自定义部门",
@@ -3143,7 +2883,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.role",
     tKey: "role.dataScope.customDeptIds",
-    tValue: "自定义部门ID",
     isEnabled: true,
     langCodes: {
       "zh-CN": "自定义部门ID",
@@ -3154,7 +2893,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.maintenance",
-    tValue: "运维",
     isEnabled: true,
     langCodes: {
       "zh-CN": "运维",
@@ -3165,7 +2903,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.maintenance.cache",
-    tValue: "缓存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "缓存",
@@ -3176,7 +2913,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.maintenance.openapi",
-    tValue: "接口文档",
     isEnabled: true,
     langCodes: {
       "zh-CN": "接口文档",
@@ -3187,7 +2923,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance",
     tKey: "openapi.title",
-    tValue: "接口文档",
     isEnabled: true,
     langCodes: {
       "zh-CN": "接口文档",
@@ -3198,7 +2933,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.title",
-    tValue: "缓存管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "缓存管理",
@@ -3209,7 +2943,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.columns.namespace",
-    tValue: "命名空间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "命名空间",
@@ -3220,7 +2953,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.columns.keyCount",
-    tValue: "键数量",
     isEnabled: true,
     langCodes: {
       "zh-CN": "键数量",
@@ -3231,7 +2963,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.columns.ttl",
-    tValue: "过期时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "过期时间",
@@ -3242,7 +2973,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.columns.key",
-    tValue: "键名",
     isEnabled: true,
     langCodes: {
       "zh-CN": "键名",
@@ -3253,7 +2983,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.filter.namespace",
-    tValue: "命名空间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "命名空间",
@@ -3264,7 +2993,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.filter.namespacePlaceholder",
-    tValue: "输入命名空间名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "输入命名空间名称",
@@ -3275,7 +3003,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.filter.keyPrefix",
-    tValue: "键名前缀",
     isEnabled: true,
     langCodes: {
       "zh-CN": "键名前缀",
@@ -3286,7 +3013,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.filter.keyPrefixPlaceholder",
-    tValue: "输入键名前缀筛选",
     isEnabled: true,
     langCodes: {
       "zh-CN": "输入键名前缀筛选",
@@ -3297,7 +3023,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.currentNamespace",
-    tValue: "当前命名空间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "当前命名空间",
@@ -3308,7 +3033,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.actions.viewKeys",
-    tValue: "查看键值",
     isEnabled: true,
     langCodes: {
       "zh-CN": "查看键值",
@@ -3319,7 +3043,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.actions.backToNamespaces",
-    tValue: "返回命名空间列表",
     isEnabled: true,
     langCodes: {
       "zh-CN": "返回命名空间列表",
@@ -3330,7 +3053,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.actions.add",
-    tValue: "添加缓存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "添加缓存",
@@ -3341,7 +3063,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.addTitle",
-    tValue: "添加缓存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "添加缓存",
@@ -3352,7 +3073,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.editTitle",
-    tValue: "编辑缓存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "编辑缓存",
@@ -3363,7 +3083,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.namespace",
-    tValue: "命名空间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "命名空间",
@@ -3374,7 +3093,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.key",
-    tValue: "键名",
     isEnabled: true,
     langCodes: {
       "zh-CN": "键名",
@@ -3385,7 +3103,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.keyPlaceholder",
-    tValue: "输入缓存键名",
     isEnabled: true,
     langCodes: {
       "zh-CN": "输入缓存键名",
@@ -3396,7 +3113,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.value",
-    tValue: "值",
     isEnabled: true,
     langCodes: {
       "zh-CN": "值",
@@ -3407,7 +3123,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.valuePlaceholder",
-    tValue: "输入缓存值",
     isEnabled: true,
     langCodes: {
       "zh-CN": "输入缓存值",
@@ -3418,7 +3133,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.valueHelp",
-    tValue: "支持文本或 JSON 格式",
     isEnabled: true,
     langCodes: {
       "zh-CN": "支持文本或 JSON 格式",
@@ -3429,7 +3143,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.ttl",
-    tValue: "过期时间（秒）",
     isEnabled: true,
     langCodes: {
       "zh-CN": "过期时间（秒）",
@@ -3440,7 +3153,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.ttlPlaceholder",
-    tValue: "留空则永久保存",
     isEnabled: true,
     langCodes: {
       "zh-CN": "留空则永久保存",
@@ -3451,7 +3163,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.form.ttlHelp",
-    tValue: "设置缓存过期时间，单位：秒",
     isEnabled: true,
     langCodes: {
       "zh-CN": "设置缓存过期时间，单位：秒",
@@ -3462,7 +3173,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.cache",
     tKey: "cache.deleteConfirm",
-    tValue: "确定要删除此缓存项吗？",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确定要删除此缓存项吗？",
@@ -3473,7 +3183,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.filter",
-    tValue: "筛选",
     isEnabled: true,
     langCodes: {
       "zh-CN": "筛选",
@@ -3484,7 +3193,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.results",
-    tValue: "个结果",
     isEnabled: true,
     langCodes: {
       "zh-CN": "个结果",
@@ -3495,7 +3203,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.searching",
-    tValue: "搜索中...",
     isEnabled: true,
     langCodes: {
       "zh-CN": "搜索中...",
@@ -3506,7 +3213,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.permanent",
-    tValue: "永久",
     isEnabled: true,
     langCodes: {
       "zh-CN": "永久",
@@ -3517,7 +3223,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.view",
-    tValue: "查看",
     isEnabled: true,
     langCodes: {
       "zh-CN": "查看",
@@ -3528,7 +3233,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.edit",
-    tValue: "编辑",
     isEnabled: true,
     langCodes: {
       "zh-CN": "编辑",
@@ -3539,7 +3243,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.delete",
-    tValue: "删除",
     isEnabled: true,
     langCodes: {
       "zh-CN": "删除",
@@ -3550,7 +3253,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.cancel",
-    tValue: "取消",
     isEnabled: true,
     langCodes: {
       "zh-CN": "取消",
@@ -3561,7 +3263,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.submit",
-    tValue: "提交",
     isEnabled: true,
     langCodes: {
       "zh-CN": "提交",
@@ -3572,7 +3273,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.submitting",
-    tValue: "提交中...",
     isEnabled: true,
     langCodes: {
       "zh-CN": "提交中...",
@@ -3583,7 +3283,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.loading",
-    tValue: "加载中...",
     isEnabled: true,
     langCodes: {
       "zh-CN": "加载中...",
@@ -3594,7 +3293,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.deleting",
-    tValue: "删除中...",
     isEnabled: true,
     langCodes: {
       "zh-CN": "删除中...",
@@ -3605,7 +3303,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "common.confirmDelete",
-    tValue: "确认删除",
     isEnabled: true,
     langCodes: {
       "zh-CN": "确认删除",
@@ -3616,7 +3313,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "components",
     tKey: "columns.actions",
-    tValue: "操作",
     isEnabled: true,
     langCodes: {
       "zh-CN": "操作",
@@ -3627,7 +3323,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "sidebar.menu.maintenance.auditLogin",
-    tValue: "登录审计",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录审计",
@@ -3638,7 +3333,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "maintenance.auditLogin.title",
-    tValue: "登录审计日志",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录审计日志",
@@ -3649,7 +3343,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "maintenance.auditLogin.column.userId",
-    tValue: "用户ID",
     isEnabled: true,
     langCodes: {
       "zh-CN": "用户ID",
@@ -3660,7 +3353,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "maintenance.auditLogin.column.loginTime",
-    tValue: "登录时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录时间",
@@ -3671,7 +3363,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "maintenance.auditLogin.column.ip",
-    tValue: "IP地址",
     isEnabled: true,
     langCodes: {
       "zh-CN": "IP地址",
@@ -3682,7 +3373,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "maintenance.auditLogin.column.userAgent",
-    tValue: "浏览器/设备",
     isEnabled: true,
     langCodes: {
       "zh-CN": "浏览器/设备",
@@ -3693,7 +3383,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.audit_login",
     tKey: "businessType.maintenance.audit_login",
-    tValue: "登录审计",
     isEnabled: true,
     langCodes: {
       "zh-CN": "登录审计",
@@ -3704,7 +3393,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "maintenance.init",
     tKey: "maintenance.init.title",
-    tValue: "数据库初始化",
     isEnabled: true,
     langCodes: {
       "zh-CN": "数据库初始化",
@@ -3715,7 +3403,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system.rolePermission.tree",
     tKey: "system.rolePermission.tree.selectRole",
-    tValue: "请先选择角色",
     isEnabled: true,
     langCodes: {
       "zh-CN": "请先选择角色",
@@ -3726,7 +3413,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.title",
-    tValue: "OSS 配置",
     isEnabled: true,
     langCodes: {
       "zh-CN": "OSS 配置",
@@ -3737,7 +3423,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.name",
-    tValue: "配置名称",
     isEnabled: true,
     langCodes: {
       "zh-CN": "配置名称",
@@ -3748,7 +3433,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.provider",
-    tValue: "提供商",
     isEnabled: true,
     langCodes: {
       "zh-CN": "提供商",
@@ -3759,7 +3443,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.endpoint",
-    tValue: "Endpoint",
     isEnabled: true,
     langCodes: {
       "zh-CN": "Endpoint",
@@ -3770,7 +3453,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.region",
-    tValue: "区域",
     isEnabled: true,
     langCodes: {
       "zh-CN": "区域",
@@ -3781,7 +3463,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.accessKey",
-    tValue: "Access Key",
     isEnabled: true,
     langCodes: {
       "zh-CN": "Access Key",
@@ -3792,7 +3473,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.secretKey",
-    tValue: "Secret Key",
     isEnabled: true,
     langCodes: {
       "zh-CN": "Secret Key",
@@ -3803,7 +3483,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.bucket",
-    tValue: "存储桶",
     isEnabled: true,
     langCodes: {
       "zh-CN": "存储桶",
@@ -3814,7 +3493,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.isDefault",
-    tValue: "默认",
     isEnabled: true,
     langCodes: {
       "zh-CN": "默认",
@@ -3825,7 +3503,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.verify",
-    tValue: "验证连接",
     isEnabled: true,
     langCodes: {
       "zh-CN": "验证连接",
@@ -3836,7 +3513,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.title",
-    tValue: "文件中心",
     isEnabled: true,
     langCodes: {
       "zh-CN": "文件中心",
@@ -3847,7 +3523,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.upload",
-    tValue: "上传文件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "上传文件",
@@ -3858,7 +3533,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.download",
-    tValue: "下载文件",
     isEnabled: true,
     langCodes: {
       "zh-CN": "下载文件",
@@ -3869,7 +3543,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.copyUrl",
-    tValue: "复制链接",
     isEnabled: true,
     langCodes: {
       "zh-CN": "复制链接",
@@ -3880,7 +3553,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.key",
-    tValue: "文件对象",
     isEnabled: true,
     langCodes: {
       "zh-CN": "文件对象",
@@ -3891,7 +3563,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.size",
-    tValue: "大小",
     isEnabled: true,
     langCodes: {
       "zh-CN": "大小",
@@ -3902,7 +3573,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.lastModified",
-    tValue: "最后修改",
     isEnabled: true,
     langCodes: {
       "zh-CN": "最后修改",
@@ -3913,7 +3583,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.file",
     tKey: "oss.file.getDownloadUrl",
-    tValue: "获取下载链接",
     isEnabled: true,
     langCodes: {
       "zh-CN": "获取下载链接",
@@ -3924,7 +3593,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "oss.config",
     tKey: "oss.config.accountId",
-    tValue: "账户ID",
     isEnabled: true,
     langCodes: {
       "zh-CN": "账户ID",
@@ -3935,7 +3603,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system",
     tKey: "sidebar.menu.oss",
-    tValue: "存储管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "存储管理",
@@ -3946,7 +3613,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system",
     tKey: "sidebar.menu.oss.config",
-    tValue: "配置管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "配置管理",
@@ -3957,7 +3623,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "system",
     tKey: "sidebar.menu.oss.file",
-    tValue: "文件中心",
     isEnabled: true,
     langCodes: {
       "zh-CN": "文件中心",
@@ -3968,7 +3633,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.enterprise",
-    tValue: "企业管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "企业管理",
@@ -3979,7 +3643,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "sidebar.menu.enterprise.attendance",
-    tValue: "考勤管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "考勤管理",
@@ -3990,7 +3653,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "business.type",
     tKey: "businessType.enterprise.attendance",
-    tValue: "企业考勤",
     isEnabled: true,
     langCodes: {
       "zh-CN": "企业考勤",
@@ -4001,7 +3663,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.title",
-    tValue: "考勤管理",
     isEnabled: true,
     langCodes: {
       "zh-CN": "考勤管理",
@@ -4012,7 +3673,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.employee",
-    tValue: "员工",
     isEnabled: true,
     langCodes: {
       "zh-CN": "员工",
@@ -4023,7 +3683,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.date",
-    tValue: "考勤日期",
     isEnabled: true,
     langCodes: {
       "zh-CN": "考勤日期",
@@ -4034,7 +3693,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.checkInTime",
-    tValue: "签到时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "签到时间",
@@ -4045,7 +3703,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.checkOutTime",
-    tValue: "签退时间",
     isEnabled: true,
     langCodes: {
       "zh-CN": "签退时间",
@@ -4056,7 +3713,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.status",
-    tValue: "考勤状态",
     isEnabled: true,
     langCodes: {
       "zh-CN": "考勤状态",
@@ -4067,7 +3723,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.status.normal",
-    tValue: "正常",
     isEnabled: true,
     langCodes: {
       "zh-CN": "正常",
@@ -4078,7 +3733,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.status.late",
-    tValue: "迟到",
     isEnabled: true,
     langCodes: {
       "zh-CN": "迟到",
@@ -4089,7 +3743,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.status.earlyLeave",
-    tValue: "早退",
     isEnabled: true,
     langCodes: {
       "zh-CN": "早退",
@@ -4100,7 +3753,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.status.absent",
-    tValue: "旷工",
     isEnabled: true,
     langCodes: {
       "zh-CN": "旷工",
@@ -4111,7 +3763,6 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.exportCsv",
-    tValue: "导出 CSV",
     isEnabled: true,
     langCodes: {
       "zh-CN": "导出 CSV",
@@ -4122,18 +3773,10 @@ export const initialTranslationData = [
     application: "frontend",
     business: "enterprise.attendance",
     tKey: "enterprise.attendance.detailTitle",
-    tValue: "考勤详情",
     isEnabled: true,
     langCodes: {
       "zh-CN": "考勤详情",
       "en-US": "Attendance Details",
     },
   },
-] as const satisfies {
-  application: string;
-  business: string;
-  tKey: string;
-  tValue: string;
-  langCodes: Record<string, string>;
-  isEnabled: boolean;
-}[];
+] as const satisfies BatchTranslationItem[];
