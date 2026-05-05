@@ -51,6 +51,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { kv } from "@/middleware/cache";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -349,6 +350,7 @@ async function onUpdate(
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
+  kv.delete(`auth:bundle:${id}`).catch(() => {});
   return res[0].id;
 }
 const updateApi = {
@@ -391,6 +393,7 @@ async function onDelete(
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
   }
+  kv.delete(`auth:bundle:${id}`).catch(() => {});
   return res[0].id;
 }
 const deleteApi = {

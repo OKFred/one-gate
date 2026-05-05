@@ -47,6 +47,7 @@ import {
 import { PermissionInfo } from "@/api/system/permission/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import { kv } from "@/middleware/cache";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -73,6 +74,11 @@ async function getCurrentPermissionCount(roleId: number): Promise<number> {
     .from(rolePermissionTable)
     .where(eq(rolePermissionTable.roleId, roleId));
   return countResult[0]?.count || 0;
+}
+
+/** 更新全局权限版本号，强制所有用户缓存失效 */
+async function invalidateAuthCache() {
+  await kv.put("auth:global_version", Date.now().toString()).catch(() => {});
 }
 
 const listAllReq = {
@@ -245,6 +251,9 @@ async function onAdd(
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
+  // 触发全局缓存失效
+  await invalidateAuthCache();
+
   return result[0]?.id;
 }
 const addApi = {
@@ -325,6 +334,9 @@ async function onBatchAdd(
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
+  // 触发全局缓存失效
+  await invalidateAuthCache();
+
   return totalAdded;
 }
 const batchAddApi = {
@@ -373,6 +385,8 @@ async function onUpdate(
   if (!res || res.length === 0) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
+  // 触发全局缓存失效
+  await invalidateAuthCache();
   return res[0].id;
 }
 const updateApi = {
@@ -428,6 +442,9 @@ async function onDelete(
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
+
+  // 触发全局缓存失效
+  await invalidateAuthCache();
 
   return result[0].id;
 }
@@ -493,6 +510,9 @@ async function onBatchDelete(
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
+
+  // 触发全局缓存失效
+  await invalidateAuthCache();
 
   return totalDeleted;
 }
