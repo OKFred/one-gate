@@ -40,13 +40,50 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-import { guardOperation } from "@/middleware/accessControl/onWrite/operationGuard";
-import { buildWhereCondition, presetGuards } from "./permission";
+import { SQL, like } from "drizzle-orm";
+import {
+  preventMissingParent,
+  preventSelfParent,
+  preventCircularParent,
+  preventDeleteWithChildren,
+  preventDisableWithEnabledChildren,
+} from "./prevention";
+import hasValue from "@/utils/hasValue";
 import translationService from "@/api/i18n/translation/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import { rolePermissionTable } from "@/api/system/role_permission/model";
 import { permissionTable } from "@/api/system/permission/model";
+
+// 构建查询条件(列表和全部通用)
+export const buildWhereCondition = (condition?: {
+  id?: number;
+  keyword?: string;
+  business?: string | null;
+  isEnabled?: boolean;
+}) => {
+  const { id, keyword, business, isEnabled } = condition || {};
+  const conditions = [];
+
+  if (hasValue(id)) {
+    conditions.push(eq(menuTable.id, id!));
+  }
+  if (hasValue(keyword)) {
+    conditions.push(or(like(menuTable.name, `%${keyword}%`)));
+  }
+  if (hasValue(business)) {
+    conditions.push(eq(menuTable.business, business!));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(menuTable.isEnabled, isEnabled));
+  }
+
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
 
 const listAllReq = {
   type: "object",
@@ -78,7 +115,7 @@ async function onListAll(
   const orderField = menuTable[orderBy] || menuTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
   // 查询所有匹配的数据
-  const whereCondition = await buildWhereCondition(params);
+  const whereCondition = buildWhereCondition(params);
   const rows = await db
     .select({
       id: menuTable.id,
@@ -137,7 +174,7 @@ async function onList(
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const whereCondition = await buildWhereCondition(params);
+  const whereCondition = buildWhereCondition(params);
   // 查询总数
   const countResult = await db
     .select({ total: count(menuTable.id).as("total") })
@@ -200,7 +237,8 @@ async function onAdd(
   const { userId: creatorId } = userObj;
   const { parentId, name } = params;
 
-  await guardOperation([presetGuards.parentExists(parentId)]);
+  // 前置校验
+  await preventMissingParent(parentId);
 
   const updateData = {
     ...params,
@@ -263,12 +301,17 @@ async function onUpdate(
   }
   const currentMenu = current[0];
 
-  await guardOperation([
-    presetGuards.notSelfParent(id, rest.parentId),
-    presetGuards.notDescendantParent(id, rest.parentId),
-    presetGuards.parentExistsIfChanged(rest.parentId, currentMenu.parentId),
-    presetGuards.disableCondition(id, currentMenu.isEnabled, rest.isEnabled),
-  ]);
+  // 前置校验
+  preventSelfParent(id, rest.parentId);
+  await preventMissingParent(rest.parentId);
+  await preventCircularParent(id, rest.parentId);
+  if (currentMenu.isEnabled !== undefined) {
+    await preventDisableWithEnabledChildren(
+      id,
+      currentMenu.isEnabled,
+      rest.isEnabled
+    );
+  }
 
   const updateData = {
     ...rest,
@@ -362,7 +405,8 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
-  await guardOperation([presetGuards.noChildren(id)]);
+  // 前置校验
+  await preventDeleteWithChildren(id);
 
   const res = await db
     .delete(menuTable)

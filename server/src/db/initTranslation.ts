@@ -1101,6 +1101,56 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.menu.parentNotExist",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "父菜单不存在或已被禁用",
+      "en-US": "Parent menu does not exist or has been disabled",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.selfParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "父菜单不能是自己",
+      "en-US": "Parent menu cannot be itself",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.circularParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "不能将子孙菜单设为父菜单，会导致环路",
+      "en-US": "Cannot set descendant menu as parent, it causes a circular loop",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.hasChildren",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该菜单下存在子菜单，无法直接删除",
+      "en-US": "Sub-menus exist, cannot delete",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.hasEnabledChildren",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该菜单下存在已启用的子菜单，请先禁用子菜单",
+      "en-US": "Enabled sub-menus exist, please disable them first",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.notYetImplemented",
     isEnabled: true,
     langCodes: {
