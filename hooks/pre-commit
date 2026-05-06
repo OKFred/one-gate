@@ -53,4 +53,9 @@ if [ -f "$DEV_VARS_FILE" ]; then
   echo "  ✅ .dev.vars updated"
 fi
 
+# --- 4. Format changed files ---
+echo "🧹 Formatting changed files..."
+cd server && npx lint-staged
+cd ..
+
 echo "✨ VERSION update complete"
