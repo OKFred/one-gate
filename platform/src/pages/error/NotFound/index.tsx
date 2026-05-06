@@ -15,7 +15,13 @@ const NotFound: React.FC = () => {
       <Typography variant="h5" color="text.secondary" gutterBottom>
         {t('dialog.message')}
       </Typography>
-      <Button variant="contained" color="primary" component={RouterLink} to={firstValidPath} sx={{ mt: 20 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        component={RouterLink}
+        to={firstValidPath}
+        sx={{ mt: 20 }}
+      >
         {t('dialog.goBackHome')}
       </Button>
     </div>

@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  Snackbar,
-  Alert,
-  ThemeProvider,
-  createTheme,
-  type AlertColor,
-} from '@mui/material';
+import { Snackbar, Alert, ThemeProvider, createTheme, type AlertColor } from '@mui/material';
 
 const theme = createTheme();
 
@@ -59,12 +53,7 @@ export const SnackbarNotification = ({
           onExited: onExited,
         }}
       >
-        <Alert 
-          onClose={handleClose} 
-          severity={type} 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
+        <Alert onClose={handleClose} severity={type} variant="filled" sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>

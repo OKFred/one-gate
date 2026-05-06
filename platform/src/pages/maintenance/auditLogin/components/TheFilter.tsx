@@ -168,7 +168,9 @@ const TheFilter = memo(
                   >
                     <MenuItem value="id">{t('columns.id')}</MenuItem>
                     <MenuItem value="userId">{t('maintenance.auditLogin.column.userId')}</MenuItem>
-                    <MenuItem value="loginTimeUtc">{t('maintenance.auditLogin.column.loginTime')}</MenuItem>
+                    <MenuItem value="loginTimeUtc">
+                      {t('maintenance.auditLogin.column.loginTime')}
+                    </MenuItem>
                     <MenuItem value="createTimeUtc">{t('columns.createTime')}</MenuItem>
                   </Select>
                 </FormControl>

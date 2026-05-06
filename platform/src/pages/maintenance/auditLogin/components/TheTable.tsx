@@ -137,7 +137,14 @@ const TheTable = memo(
       {
         title: t('maintenance.auditLogin.column.userAgent'),
         render: (row) => (
-          <div style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div
+            style={{
+              maxWidth: '300px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
             {row.userAgent || '-'}
           </div>
         ),

@@ -21,8 +21,8 @@ export default function AuditLoginPage() {
   const localObj: LocalObj = useMemo(() => ({ tableRef, filterRef }), []);
 
   return (
-    <PageLayout 
-      title={t('maintenance.auditLogin.title')} 
+    <PageLayout
+      title={t('maintenance.auditLogin.title')}
       actions={<TheActionButtons tableRef={tableRef} />}
     >
       <TheFilter ref={localObj.filterRef} localObj={localObj} />

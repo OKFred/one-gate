@@ -1,43 +1,41 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/roma.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open The Gate</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/x-icon" href="/roma.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Open The Gate</title>
-</head>
+  <body>
+    <div id="root"></div>
+    <div class="loading-container">
+      <img src="/loading.gif" alt="loading" />
+    </div>
+    <script>
+      window.onload = function () {
+        document.querySelector('.loading-container').style.display = 'none';
+        document.getElementById('root').style.display = 'block';
+      };
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+  <style>
+    #app {
+      display: none;
+    }
 
-<body>
-  <div id="root"></div>
-  <div class="loading-container">
-    <img src="/loading.gif" alt="loading" />
-  </div>
-  <script>
-    window.onload = function () {
-      document.querySelector(".loading-container").style.display = "none";
-      document.getElementById("root").style.display = "block";
-    };
-  </script>
-  <script type="module" src="/src/main.tsx"></script>
-</body>
-<style>
-  #app {
-    display: none;
-  }
-
-  /* 默认隐藏 Vue */
-  .loading-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-  }
-</style>
-
+    /* 默认隐藏 Vue */
+    .loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+    }
+  </style>
 </html>

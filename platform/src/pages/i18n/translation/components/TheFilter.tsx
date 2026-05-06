@@ -253,9 +253,7 @@ const TheFilter = memo(
                     onChange={(e) => handleFilterChange('orderBy', e.target.value)}
                   >
                     <MenuItem value="id">ID</MenuItem>
-                    <MenuItem value="application">
-                      {t('translation.table.application')}
-                    </MenuItem>
+                    <MenuItem value="application">{t('translation.table.application')}</MenuItem>
                     <MenuItem value="business">{t('translation.table.business')}</MenuItem>
                     <MenuItem value="langCode">{t('translation.table.langCode')}</MenuItem>
                     <MenuItem value="tKey">{t('translation.table.tKey')}</MenuItem>

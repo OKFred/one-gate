@@ -142,7 +142,11 @@ const TheFilter = memo(
             <Stack spacing={2}>
               <TextField
                 label={t('filter.keywordLabel')}
-                placeholder={t('oss.file.pathPlaceholder') === 'oss.file.pathPlaceholder' ? '搜索前缀 / 路径 / 文件名' : t('oss.file.pathPlaceholder')}
+                placeholder={
+                  t('oss.file.pathPlaceholder') === 'oss.file.pathPlaceholder'
+                    ? '搜索前缀 / 路径 / 文件名'
+                    : t('oss.file.pathPlaceholder')
+                }
                 value={keywordInput}
                 onChange={(e) => handleFilterChange(e.target.value)}
                 size="small"
