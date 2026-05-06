@@ -92,7 +92,6 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-
   const { orderBy = "id", descend = true } = params;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
   const rows = await db
@@ -147,7 +146,6 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
@@ -196,7 +194,7 @@ async function onList(
     totalPage: Math.ceil(total / pageSize),
     currentPage: pageNo,
     pageSize,
-    list: list as any,
+    list,
   };
 }
 
@@ -328,7 +326,6 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>,
   userObj: UserObj
 ): Promise<number | null> {
-
   const { id } = params;
   const res = await db
     .delete(attendanceTable)
@@ -375,7 +372,6 @@ async function onGet(
   params: FromSchema<typeof getReq>,
   userObj: UserObj
 ): Promise<any> {
-
   const { id } = params;
   const rows = await db
     .select({
