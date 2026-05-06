@@ -40,8 +40,7 @@ function cleanUndefined(obj: any): any {
 // 获取存储实例辅助函数
 async function getActiveStorage(env: any) {
   const config = await getDefaultConfig();
-  if (!config)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  if (!config) throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
 
   return getStorage(
     {
@@ -86,7 +85,11 @@ async function onList(
 const listApi = {
   req: listReq,
   res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "列出存储桶中的文件(分页)" },
+  pathInfo: {
+    path: "/list",
+    method: "post",
+    summary: "列出存储桶中的文件(分页)",
+  },
   adapter: bodyUserContextAdapter,
   service: onList,
 } satisfies API;
@@ -126,7 +129,11 @@ async function onListAll(
 const listAllApi = {
   req: listAllReq,
   res: listAllRes,
-  pathInfo: { path: "/listAll", method: "post", summary: "获取所有文件（不分页）" },
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有文件（不分页）",
+  },
   adapter: bodyUserContextAdapter,
   service: onListAll,
 } satisfies API;
@@ -199,7 +206,11 @@ async function onUpdate(
 const updateApi = {
   req: updateReq,
   res: updateRes,
-  pathInfo: { path: "/update", method: "post", summary: "获取覆盖文件上传凭证" },
+  pathInfo: {
+    path: "/update",
+    method: "post",
+    summary: "获取覆盖文件上传凭证",
+  },
   adapter: bodyUserContextAdapter,
   service: onUpdate,
 } satisfies API;

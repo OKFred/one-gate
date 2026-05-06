@@ -1,5 +1,8 @@
 import { getEnv } from "@/utils/env";
-import { drizzle as drizzleLibsql, type LibSQLDatabase } from "drizzle-orm/libsql";
+import {
+  drizzle as drizzleLibsql,
+  type LibSQLDatabase,
+} from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { drizzle as drizzleD1, type DrizzleD1Database } from "drizzle-orm/d1";
 

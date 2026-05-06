@@ -308,7 +308,7 @@ async function onBatchAdd(
       .where(inArray(permissionTable.id, chunk));
     allExistingPermissions = allExistingPermissions.concat(chunkExist);
   }
-  
+
   if (allExistingPermissions.length !== permissionIds.length) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -324,11 +324,19 @@ async function onBatchAdd(
       permissionId,
       creatorId,
     }));
-    batches.push(db.insert(rolePermissionTable).values(values).returning({ id: rolePermissionTable.id }));
+    batches.push(
+      db
+        .insert(rolePermissionTable)
+        .values(values)
+        .returning({ id: rolePermissionTable.id })
+    );
   }
 
   const results = batches.length > 0 ? await db.batch(batches as any) : [];
-  const totalAdded = results.reduce((acc: number, curr: any) => acc + curr.length, 0);
+  const totalAdded = results.reduce(
+    (acc: number, curr: any) => acc + curr.length,
+    0
+  );
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
@@ -505,7 +513,10 @@ async function onBatchDelete(
   }
 
   const results = batches.length > 0 ? await db.batch(batches as any) : [];
-  const totalDeleted = results.reduce((acc: number, curr: any) => acc + curr.length, 0);
+  const totalDeleted = results.reduce(
+    (acc: number, curr: any) => acc + curr.length,
+    0
+  );
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);

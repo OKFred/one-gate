@@ -12,7 +12,11 @@ export const listReq = {
   type: "object",
   properties: {
     keyword: { type: "string", description: "前缀/路径搜索 (对应 prefix)" },
-    pageSize: { type: "number", description: "每页数量 (对应 limit)", default: 10 },
+    pageSize: {
+      type: "number",
+      description: "每页数量 (对应 limit)",
+      default: 10,
+    },
     cursor: { type: "string", description: "下一页游标" },
   },
   additionalProperties: false,
@@ -85,7 +89,11 @@ export const addReq = {
       description: "文件类型",
       default: "application/octet-stream",
     },
-    expiresIn: { type: "number", description: "凭证过期时间(秒)", default: 3600 },
+    expiresIn: {
+      type: "number",
+      description: "凭证过期时间(秒)",
+      default: 3600,
+    },
   },
   required: ["key"],
   additionalProperties: false,

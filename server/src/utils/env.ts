@@ -4,7 +4,8 @@
  */
 
 // Initialized with process.env for Node.js compatibility
-let envStore: Record<string, any> = typeof process !== 'undefined' ? process.env : {};
+let envStore: Record<string, any> =
+  typeof process !== "undefined" ? process.env : {};
 
 /**
  * Update the internal environment store.

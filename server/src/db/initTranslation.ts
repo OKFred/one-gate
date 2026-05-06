@@ -1125,7 +1125,8 @@ export const initialTranslationData = [
     isEnabled: true,
     langCodes: {
       "zh-CN": "不能将子孙菜单设为父菜单，会导致环路",
-      "en-US": "Cannot set descendant menu as parent, it causes a circular loop",
+      "en-US":
+        "Cannot set descendant menu as parent, it causes a circular loop",
     },
   },
   {

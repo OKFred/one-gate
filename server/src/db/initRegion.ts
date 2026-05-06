@@ -2032,7 +2032,8 @@ export async function prepareCountryRegion(options?: { reset?: boolean }) {
     }));
 
     queries.push(
-      db.insert(regionTable)
+      db
+        .insert(regionTable)
         .values(mappedBatch)
         .onConflictDoUpdate({
           target: regionTable.numeric,

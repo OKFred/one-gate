@@ -3,9 +3,9 @@ import { sql } from "drizzle-orm";
 /**
  * 获取当前UTC时间的SQL表达式（毫秒级时间戳）
  * 用于在数据库操作中设置时间戳字段（createTimeUtc、updateTimeUtc）
- * 
+ *
  * @returns Drizzle ORM的SQL表达式对象
- * 
+ *
  * @example
  * 用作默认值：
  * ```typescript
@@ -13,7 +13,7 @@ import { sql } from "drizzle-orm";
  *   .notNull()
  *   .default(getCurrentTimestampUtcSql())
  * ```
- * 
+ *
  * @example
  * 用于更新操作：
  * ```typescript

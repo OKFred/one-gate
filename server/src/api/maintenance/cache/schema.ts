@@ -1,6 +1,5 @@
 import type { JSONSchema } from "json-schema-to-ts";
 
-
 /**
  * 缓存键 VO
  */
