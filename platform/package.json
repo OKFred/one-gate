@@ -6,10 +6,16 @@
   "scripts": {
     "dev": "vite --mode=development",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
     "i18n:scan": "node ./scripts/scan-i18n.js",
-    "i18n:scan:json": "node ./scripts/scan-i18n-enhanced.js --json"
+    "i18n:scan:json": "node ./scripts/scan-i18n-enhanced.js --json",
+    "format": "prettier --write .",
+    "lint": "eslint . --fix"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,json,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -41,6 +47,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "lint-staged": "^17.0.2",
     "openapi-typescript": "^7.9.1",
     "prettier": "^3.6.2",
     "typescript": "~5.8.3",
