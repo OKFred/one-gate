@@ -21,7 +21,7 @@ import {
   type MenuGetVOLike,
   MenuBaseVO,
 } from "./model";
-import { asc, count, desc, eq, or, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, and, like } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -37,17 +37,13 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
-import { SQL, like } from "drizzle-orm";
-import {
   preventMissingParent,
   preventSelfParent,
   preventCircularParent,
   preventDeleteWithChildren,
   preventDisableWithEnabledChildren,
 } from "./prevention";
+import { preventEmpty } from "@/middleware/auth/prevention";
 import hasValue from "@/utils/hasValue";
 import translationService from "@/api/i18n/translation/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
@@ -296,12 +292,10 @@ async function onUpdate(
     .from(menuTable)
     .where(eq(menuTable.id, id))
     .limit(1);
-  if (!current[0]) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
   const currentMenu = current[0];
 
   // 前置校验
+  preventEmpty(currentMenu);
   preventSelfParent(id, rest.parentId);
   await preventMissingParent(rest.parentId);
   await preventCircularParent(id, rest.parentId);
@@ -376,12 +370,9 @@ async function onUpdate(
   // 使用 batch 确保菜单表和权限表的更新一致性（在 D1 中 batch 具有原子性）
   const batchResults = await db.batch(batchQueries as any);
   const updateResList = batchResults[0] as { id: number }[];
-
-  if (!updateResList || updateResList.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-
-  return updateResList[0].id;
+  const result = updateResList[0];
+  preventEmpty(result);
+  return result?.id;
 }
 const updateApi = {
   req: updateReq,
@@ -421,10 +412,9 @@ async function onDelete(
     .delete(menuTable)
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const result = res[0];
+  preventEmpty(result);
+  return result?.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -464,10 +454,9 @@ async function onGet(
     .where(eq(menuTable.id, id))
     .limit(1);
 
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const result = rows[0];
+  preventEmpty(result);
+  return result?.id;
 }
 const getApi = {
   req: getReq,
