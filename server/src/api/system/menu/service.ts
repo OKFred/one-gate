@@ -456,7 +456,7 @@ async function onGet(
 
   const result = rows[0];
   preventEmpty(result);
-  return result?.id;
+  return result;
 }
 const getApi = {
   req: getReq,
