@@ -319,60 +319,69 @@ async function onUpdate(
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  // 使用事务确保菜单表和权限表的更新一致性
-  const result = await db.transaction(async (tx) => {
-    const res = await tx
+  // 提前准备权限更新所需数据
+  const { name } = rest;
+  let permissionId: number | null = null;
+  let permissionName: string | undefined;
+
+  if (name !== undefined) {
+    permissionId = await permissionUtils.getPermissionIdByMenuId(id);
+    const translationList = await translationService.listAll.service({
+      isEnabled: true,
+    });
+    const prefix =
+      translationList.find(
+        (t) =>
+          t.tKey === (rest.business ?? currentMenu.business) &&
+          t.langCode === userObj.langCode
+      )?.tValue || "未知菜单权限";
+    const postfix = translationList.find(
+      (item) =>
+        item.tKey === "permission.category.menu" &&
+        item.langCode === userObj.langCode
+    )?.tValue;
+    permissionName = postfix ? `${prefix}${postfix}` : name + "未知菜单";
+  }
+
+  // 构造 batch 任务
+  const batchQueries: any[] = [
+    db
       .update(menuTable)
       .set(updateData)
       .where(eq(menuTable.id, id))
-      .returning({ id: menuTable.id });
+      .returning({ id: menuTable.id }),
+  ];
 
-    if (!res || res.length === 0) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
-
-    // 如果更新了菜单名称，需要更新权限记录的名称
-    const { name } = rest;
-    if (name !== undefined) {
-      // 处理权限更新
-      const permissionId = await permissionUtils.getPermissionIdByMenuId(id);
-      const permissionName = await translationService.listAll
-        .service({
-          isEnabled: true,
+  if (permissionId && name !== undefined) {
+    // 删除现有的角色权限关联
+    batchQueries.push(
+      db
+        .delete(rolePermissionTable)
+        .where(eq(rolePermissionTable.permissionId, permissionId))
+    );
+    // 更新权限信息
+    batchQueries.push(
+      db
+        .update(permissionTable)
+        .set({
+          code: `${name}:menu`,
+          name: permissionName,
+          updaterId,
+          updateTimeUtc: getCurrentTimestampUtcSql(),
         })
-        .then((translationList) => {
-          const prefix =
-            translationList.find(
-              (t) => t.tKey === rest.business && t.langCode === userObj.langCode
-            )?.tValue || "未知菜单权限";
-          const postfix = translationList.find(
-            (item) =>
-              item.tKey === "permission.category.menu" &&
-              item.langCode === userObj.langCode
-          )?.tValue;
-          return postfix ? `${prefix}${postfix}` : name + "未知菜单";
-        });
-      if (permissionId) {
-        // 删除现有的角色权限关联
-        await tx
-          .delete(rolePermissionTable)
-          .where(eq(rolePermissionTable.permissionId, permissionId));
-        await tx
-          .update(permissionTable)
-          .set({
-            code: `${name}:menu`,
-            name: permissionName,
-            updaterId,
-            updateTimeUtc: getCurrentTimestampUtcSql(),
-          })
-          .where(eq(permissionTable.id, permissionId));
-      }
-    }
+        .where(eq(permissionTable.id, permissionId))
+    );
+  }
 
-    return res[0].id;
-  });
+  // 使用 batch 确保菜单表和权限表的更新一致性（在 D1 中 batch 具有原子性）
+  const batchResults = await db.batch(batchQueries as any);
+  const updateResList = batchResults[0] as { id: number }[];
 
-  return result;
+  if (!updateResList || updateResList.length === 0) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+
+  return updateResList[0].id;
 }
 const updateApi = {
   req: updateReq,
