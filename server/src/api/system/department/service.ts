@@ -21,8 +21,7 @@ import {
   type DepartmentGetVOLike,
   DepartmentBaseVO,
 } from "./model";
-import { utils as userUtils } from "@/api/system/user/service";
-import { asc, count, desc, eq, and } from "drizzle-orm";
+import { asc, count, desc, eq, and, like } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -40,8 +39,15 @@ import {
 } from "@/middleware/errorHandler/businessError/index";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
 import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
-import { guardOperation } from "@/middleware/accessControl/onWrite/operationGuard";
-import { buildWhereCondition, presetGuards } from "./permission";
+import hasValue from "@/utils/hasValue";
+import {
+  preventMissingParent,
+  preventSelfParent,
+  preventCircularParent,
+  preventDisable,
+  preventHasEnabledUsers,
+  preventHasChildren,
+} from "./prevention";
 
 const listAllReq = {
   type: "object",
@@ -75,7 +81,7 @@ async function onListAll(
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
 
   // 构建查询条件
-  const whereCondition = await buildWhereCondition(undefined, userObj);
+  const whereCondition = buildWhereCondition({});
 
   // 查询所有匹配的数据
   const rows = await db
@@ -140,7 +146,7 @@ async function onList(
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   // 构建查询条件
-  const whereCondition = await buildWhereCondition(effectiveParams, userObj);
+  const whereCondition = buildWhereCondition(effectiveParams);
 
   // 查询总数
   const countResult = await db
@@ -206,10 +212,8 @@ async function onAdd(
   const { userId: creatorId } = userObj;
   const { name, remark, parentId, isEnabled } = params;
 
-  await guardOperation([
-    presetGuards.writePermission(userObj, parentId),
-    presetGuards.parentExists(parentId, userObj),
-  ]);
+  // 前置校验
+  await preventMissingParent(parentId);
 
   const res = await db
     .insert(departmentTable)
@@ -256,14 +260,16 @@ async function onUpdate(
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
+  // 前置校验
   const row = await onGet({ id }, userObj);
-  await guardOperation([
-    presetGuards.writePermission(userObj, row.parentId),
-    presetGuards.parentExistsIfChanged(params.parentId, row.parentId, userObj),
-    presetGuards.notSelfParent(id, params.parentId),
-    presetGuards.notDescendantParent(id, params.parentId),
-    presetGuards.disableCondition(id, row.isEnabled, params.isEnabled),
-  ]);
+  if (!row) throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+
+  if (params.parentId !== undefined && params.parentId !== row.parentId) {
+    await preventMissingParent(params.parentId);
+  }
+  preventSelfParent(id, params.parentId);
+  await preventCircularParent(id, params.parentId);
+  await preventDisable(id, row.isEnabled, params.isEnabled);
 
   const updateData = {
     ...rest,
@@ -317,11 +323,12 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
+  // 前置校验
   const row = await onGet({ id }, userObj);
-  await guardOperation([
-    presetGuards.noEnabledUsers(id),
-    presetGuards.noChildren(id),
-  ]);
+  if (!row) throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+
+  await preventHasEnabledUsers(id);
+  await preventHasChildren(id);
 
   // 执行删除操作
   const result = await db
@@ -395,7 +402,7 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const whereCondition = await buildWhereCondition({ id }, userObj);
+  const whereCondition = buildWhereCondition({ id });
   const rows = await db
     .select()
     .from(departmentTable)
@@ -453,7 +460,7 @@ async function onTree(
   params: FromSchema<typeof treeReq>,
   userObj: UserObj
 ): Promise<DepartmentTreeItem[]> {
-  const whereCondition = await buildWhereCondition(undefined, userObj);
+  const whereCondition = await buildWhereCondition({});
   // 获取所有部门
   const allDepartments = await db
     .select()
@@ -490,8 +497,35 @@ const treeApi = {
   service: onTree,
 } satisfies API;
 
+/**
+ * 构建查询条件（列表和全部通用）
+ */
+export const buildWhereCondition = (condition?: {
+  id?: number;
+  keyword?: string;
+  parentId?: number;
+}) => {
+  const { id, keyword, parentId } = condition || {};
+  const conditions = [];
+
+  // 1. 基础过滤
+  if (hasValue(id)) conditions.push(eq(departmentTable.id, id));
+  if (hasValue(keyword))
+    conditions.push(like(departmentTable.name, `%${keyword}%`));
+  if (parentId !== undefined)
+    conditions.push(eq(departmentTable.parentId, parentId));
+
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
+
 /** @description 根据ID获取部门名称 */
-async function getDepartmentNameById(id: number): Promise<string | null> {
+export async function getDepartmentNameById(
+  id: number
+): Promise<string | null> {
   const rows = await db
     .select({ name: departmentTable.name })
     .from(departmentTable)
@@ -520,7 +554,7 @@ async function getAllDepartments(
 }
 
 /** @description 获取子孙部门的列表 */
-async function getDescendantDepartments(
+export async function getDescendantDepartments(
   departmentId: number
 ): Promise<{ name: string; id: number; parentId: number }[] | null> {
   if (!departmentId) return null;
@@ -544,7 +578,7 @@ async function getDescendantDepartments(
 }
 
 /** @description 获取祖先部门的列表 */
-async function getAncestorDepartments(departmentId: number): Promise<
+export async function getAncestorDepartments(departmentId: number): Promise<
   | {
       name: string;
       id: number;
@@ -575,7 +609,7 @@ async function getAncestorDepartments(departmentId: number): Promise<
 }
 
 /** @description 获取父母部门的列表 */
-async function getParentDepartment(
+export async function getParentDepartment(
   departmentId: number
 ): Promise<{ name: string; id: number; parentId: number } | null> {
   if (!departmentId) return null;
@@ -592,7 +626,7 @@ async function getParentDepartment(
 }
 
 /** @description 获取子女部门的列表 */
-async function getChildDepartments(
+export async function getChildDepartments(
   departmentId: number
 ): Promise<{ name: string; id: number; parentId: number }[] | null> {
   if (!departmentId) return null;
@@ -604,7 +638,7 @@ async function getChildDepartments(
 }
 
 /** @description 获取父母部门及其所有子孙部门的列表 */
-async function getParentAndItsDescendants(
+export async function getParentAndItsDescendants(
   departmentId: number
 ): Promise<{ name: string; id: number; parentId: number }[] | null> {
   const parentDepartment = await getParentDepartment(departmentId);
@@ -614,7 +648,7 @@ async function getParentAndItsDescendants(
 }
 
 /** @description 获取同辈部门的列表 */
-async function getSiblingDepartments(
+export async function getSiblingDepartments(
   departmentId: number
 ): Promise<{ name: string; id: number; parentId: number }[] | null> {
   const parentDepartment = await getParentDepartment(departmentId);
@@ -627,13 +661,12 @@ async function getSiblingDepartments(
 }
 
 /** @description 验证部门是否存在 */
-async function verifyDepartment(departmentId: number) {
+export async function verifyDepartment(departmentId: number) {
   const departmentName = await getDepartmentNameById(departmentId);
   if (!departmentName) {
     throw new BusinessError(BusinessErrorCode["DEPARTMENT_NOT_EXIST"]);
   }
 }
-
 export const utils = {
   verifyDepartment,
   getDepartmentNameById,

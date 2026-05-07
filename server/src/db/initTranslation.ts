@@ -1081,6 +1081,27 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.department.selfParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "不能将部门自身设为父部门",
+      "en-US": "A department cannot be its own parent",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.department.descendantParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "不能将子孙部门设为父部门，会导致死循环",
+      "en-US":
+        "A descendant department cannot be set as a parent, it would cause a circular reference",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.notAuthenticated",
     isEnabled: true,
     langCodes: {
