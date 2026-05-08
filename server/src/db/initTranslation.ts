@@ -1058,6 +1058,26 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.system.user.superAdminDeleteProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员用户禁止删除",
+      "en-US": "Super admin user cannot be deleted",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.system.user.superAdminDisableProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员用户禁止禁用",
+      "en-US": "Super admin user cannot be disabled",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.hasChildren",
     isEnabled: true,
     langCodes: {

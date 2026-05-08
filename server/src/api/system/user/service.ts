@@ -34,7 +34,14 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { hashPassword, verifyPassword } from "@/utils/crypto";
 import type { RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import {
+  preventSuperAdminDelete,
+  preventSuperAdminDisable,
+  preventMissingDepartment,
+  preventMissingRoles,
+  preventMissingRegion,
+  preventInvalidLangCode,
+} from "./prevention";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -54,10 +61,11 @@ import {
 import { kv } from "@/middleware/cache";
 
 // 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+export const buildWhereCondition = (condition?: {
+  keyword?: string;
+  isEnabled?: boolean;
+}) => {
+  const { keyword, isEnabled } = condition || {};
   const conditions = [];
   if (hasValue(keyword)) {
     conditions.push(or(like(userTable.username, `%${keyword}%`)));
@@ -235,9 +243,12 @@ async function onAdd(
   const regionId = regionObj ? regionObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
-  if (departmentId) await departmentUtils.verifyDepartment(departmentId);
-  if (regionId) await regionUtils.verifyRegion(regionId);
-  await roleUtils.verifyRoles(roleIdArr);
+
+  // 前置校验
+  await preventMissingDepartment(departmentId);
+  await preventMissingRegion(regionId);
+  await preventMissingRoles(roleIdArr);
+  await preventInvalidLangCode(langCode);
 
   // 插入用户数据
   const res = await db
@@ -290,57 +301,30 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, departmentObj, regionObj, roleArr, langCode, ...rest } = params;
-  const isEnabled = roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)
-    ? true
-    : params.isEnabled; // 禁止禁用超级管理员
+
+  // 前置校验
+  if (roleArr !== undefined) {
+    const roleIdArr = roleArr.map((o) => o.value);
+    preventSuperAdminDisable(roleIdArr, params.isEnabled);
+    await preventMissingRoles(roleIdArr);
+  }
+  if (langCode !== undefined) await preventInvalidLangCode(langCode);
+  if (departmentObj !== undefined)
+    await preventMissingDepartment(departmentObj?.value ?? null);
+  if (regionObj !== undefined)
+    await preventMissingRegion(regionObj?.value ?? null);
+
   let updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
     password: undefined,
-    departmentId: undefined,
-    regionId: undefined,
-    roleIdArr: undefined,
-    isEnabled: undefined,
-    langCode: undefined,
+    departmentId: departmentObj?.value,
+    regionId: regionObj?.value,
+    roleIdArr: roleArr?.map((o) => o.value),
+    isEnabled: params.isEnabled,
+    langCode,
   };
-  if (langCode !== undefined) {
-    await languageUtils.verifyLangCode(langCode);
-    updateData = {
-      ...updateData,
-      langCode,
-    };
-  }
-  if (departmentObj !== undefined) {
-    const departmentId = departmentObj ? departmentObj.value : null;
-    if (departmentId) await departmentUtils.verifyDepartment(departmentId);
-    updateData = {
-      ...updateData,
-      departmentId,
-    };
-  }
-  if (regionObj !== undefined) {
-    const regionId = regionObj ? regionObj.value : null;
-    if (regionId) await regionUtils.verifyRegion(regionId);
-    updateData = {
-      ...updateData,
-      regionId,
-    };
-  }
-  if (roleArr !== undefined) {
-    const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
-    await roleUtils.verifyRoles(roleIdArr);
-    updateData = {
-      ...updateData,
-      roleIdArr,
-    };
-  }
-  if (isEnabled !== undefined) {
-    updateData = {
-      ...updateData,
-      isEnabled,
-    };
-  }
 
   const res = await db
     .update(userTable)
@@ -383,9 +367,9 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
   const thisUser = await onGet({ id });
-  if (thisUser?.roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)) {
-    throw new BusinessError(BusinessErrorCode["PERMISSION_DENIED"]);
-  }
+
+  // 前置校验
+  preventSuperAdminDelete(thisUser?.roleArr.map((r) => r.value) ?? []);
   const res = await db
     .delete(userTable)
     .where(eq(userTable.id, id))
