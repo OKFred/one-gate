@@ -1038,6 +1038,26 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.system.role.superAdminDeleteProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员角色禁止删除",
+      "en-US": "Super admin role cannot be deleted",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.system.role.superAdminUpdateProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员角色核心属性禁止修改",
+      "en-US": "Core attributes of super admin role cannot be modified",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.hasChildren",
     isEnabled: true,
     langCodes: {

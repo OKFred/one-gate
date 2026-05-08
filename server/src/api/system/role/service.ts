@@ -28,7 +28,11 @@ import { DataScope, DataScopeValues } from "@/types/dataScope";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import {
+  preventSuperAdminDelete,
+  preventSuperAdminUpdate,
+  preventMissingRoles,
+} from "./prevention";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -47,10 +51,11 @@ import {
 } from "@/middleware/errorHandler/businessError/index";
 
 // 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+export const buildWhereCondition = (condition?: {
+  keyword?: string;
+  isEnabled?: boolean;
+}) => {
+  const { keyword, isEnabled } = condition || {};
   const conditions = [];
   if (hasValue(keyword)) {
     conditions.push(or(like(roleTable.name, `%${keyword}%`)));
@@ -277,16 +282,14 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  // 禁止禁用超级管理员角色，且锁定其 dataScope 为 "all"
-  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled;
-  const dataScope = id === SUPER_ADMIN_ROLE_ID ? DataScope.ALL : rest.dataScope;
+
+  // 前置校验
+  preventSuperAdminUpdate(id, params);
 
   const updateData = {
     ...rest,
-    dataScope,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
-    isEnabled,
   };
 
   const res = await db
@@ -329,9 +332,9 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  if (id === SUPER_ADMIN_ROLE_ID) {
-    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-  }
+
+  // 前置校验
+  preventSuperAdminDelete(id);
   const result = await db
     .delete(roleTable)
     .where(eq(roleTable.id, id))
@@ -412,17 +415,7 @@ async function getRolesByIds(
 }
 
 async function verifyRoles(roleIdArr: number[]) {
-  const rows = await getRolesByIds(roleIdArr);
-  // 检查返回的角色数量是否与请求的数量一致
-  if (rows.length !== roleIdArr.length) {
-    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
-  }
-  // 检查每个请求的角色ID是否都在返回结果中
-  const returnedRoleIds = rows.map((r) => r.value);
-  const allRolesExist = roleIdArr.every((id) => returnedRoleIds.includes(id));
-  if (!allRolesExist) {
-    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
-  }
+  await preventMissingRoles(roleIdArr);
 }
 
 /** 更新角色的权限数量 */
