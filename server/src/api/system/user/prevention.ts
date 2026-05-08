@@ -15,6 +15,8 @@ import { utils as languageUtils } from "@/api/i18n/language/service";
 export const ErrorCodes = {
   SUPER_ADMIN_DELETE: "errorHandler.system.user.superAdminDeleteProhibited",
   SUPER_ADMIN_DISABLE: "errorHandler.system.user.superAdminDisableProhibited",
+  ASSIGN_SUPER_ADMIN_ROLE:
+    "errorHandler.system.user.assignSuperAdminRoleProhibited",
 } as const;
 
 /**
@@ -22,6 +24,15 @@ export const ErrorCodes = {
  */
 const isSuperAdmin = (roleIdArr: number[]) => {
   return roleIdArr.includes(SUPER_ADMIN_ROLE_ID);
+};
+
+/**
+ * 禁止分配超级管理员角色给普通用户
+ */
+export const preventAssignSuperAdminRole = (roleIdArr: number[]) => {
+  if (isSuperAdmin(roleIdArr)) {
+    throw new BusinessError(ErrorCodes.ASSIGN_SUPER_ADMIN_ROLE);
+  }
 };
 
 /**

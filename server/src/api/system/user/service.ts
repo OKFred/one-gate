@@ -37,6 +37,7 @@ import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   preventSuperAdminDelete,
   preventSuperAdminDisable,
+  preventAssignSuperAdminRole,
   preventMissingDepartment,
   preventMissingRoles,
   preventMissingRegion,
@@ -245,6 +246,7 @@ async function onAdd(
   const password = await convertPassword(base64Password);
 
   // 前置校验
+  preventAssignSuperAdminRole(roleIdArr);
   await preventMissingDepartment(departmentId);
   await preventMissingRegion(regionId);
   await preventMissingRoles(roleIdArr);
@@ -305,6 +307,7 @@ async function onUpdate(
   // 前置校验
   if (roleArr !== undefined) {
     const roleIdArr = roleArr.map((o) => o.value);
+    preventAssignSuperAdminRole(roleIdArr);
     preventSuperAdminDisable(roleIdArr, params.isEnabled);
     await preventMissingRoles(roleIdArr);
   }

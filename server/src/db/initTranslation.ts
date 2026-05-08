@@ -1078,6 +1078,16 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.system.user.assignSuperAdminRoleProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "禁止分配超级管理员角色",
+      "en-US": "Assigning super admin role is prohibited",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.hasChildren",
     isEnabled: true,
     langCodes: {
