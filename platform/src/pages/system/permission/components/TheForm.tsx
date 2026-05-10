@@ -43,7 +43,7 @@ export interface TheFormRef {
 const DEFAULT_FORM: AddPermissionReq | UpdatePermissionReq = {
   code: '',
   name: '',
-  category: 'api',
+  category: 'action',
   resource: '',
   business: null,
   remark: null,
@@ -66,8 +66,7 @@ const TheForm = memo(
     const PERMISSION_TYPES = useMemo(
       () => [
         { value: 'menu', label: t('permission.category.menu') },
-        { value: 'button', label: t('permission.category.button') },
-        { value: 'api', label: t('permission.category.api') },
+        { value: 'action', label: t('permission.category.action') },
       ],
       [t],
     );

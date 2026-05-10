@@ -27,7 +27,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 // 筛选状态类型
 export interface FilterState {
   keyword: string;
-  category?: 'menu' | 'button' | 'api';
+  category?: 'menu' | 'action';
   isEnabled: boolean | undefined;
   orderBy: NonNullable<ListPermissionReq['orderBy']>;
   descend: boolean;
@@ -192,8 +192,7 @@ const TheFilter = memo(
                       <em>{t('filter.all')}</em>
                     </MenuItem>
                     <MenuItem value="menu">{t('permission.category.menu')}</MenuItem>
-                    <MenuItem value="button">{t('permission.category.button')}</MenuItem>
-                    <MenuItem value="api">{t('permission.category.api')}</MenuItem>
+                    <MenuItem value="action">{t('permission.category.action')}</MenuItem>
                   </Select>
                 </FormControl>
 

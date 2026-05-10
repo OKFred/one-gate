@@ -4036,4 +4036,24 @@ export const initialTranslationData = [
         "Failed to initialize storage instance. Please check configuration or environment.",
     },
   },
+  {
+    application: "frontend",
+    business: "system.permission",
+    tKey: "permission.category.menu",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "菜单",
+      "en-US": "Menu",
+    },
+  },
+  {
+    application: "frontend",
+    business: "system.permission",
+    tKey: "permission.category.action",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "动作",
+      "en-US": "Action",
+    },
+  },
 ] as const satisfies BatchTranslationItem[];
