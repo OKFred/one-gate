@@ -200,5 +200,5 @@ export async function exportDeletionRecord(
 }
 
 export default {
-  list: listApi,
+  // list: listApi,
 };
