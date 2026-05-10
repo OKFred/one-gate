@@ -421,7 +421,7 @@ async function onGetButtonPermission(
   await userObj.ensureLoaded();
 
   const buttonPermissions = userObj.permissions.filter(
-    (p) => p.category === "button"
+    (p) => p.category !== "menu"
   );
   return { permissions: buttonPermissions };
 }

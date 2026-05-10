@@ -34,8 +34,8 @@ const PermissionBasePO = {
   },
   category: {
     type: "string",
-    enum: ["menu", "button", "api"],
-    description: "权限类别：menu-菜单，button-按钮，api-接口",
+    enum: ["menu", "action"],
+    description: "权限类别：menu-菜单，action-动作",
   },
   resource: {
     type: ["string", "null"],
@@ -148,7 +148,7 @@ export const permissionTable = sqliteTable("system_permission", {
   id: integer("id").primaryKey().notNull(),
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
-  category: text("category").notNull(), // menu, button, api
+  category: text("category").notNull(), // menu, action
   resource: text("resource"),
   business: text("business"),
   remark: text("remark"),

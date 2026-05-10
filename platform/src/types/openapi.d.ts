@@ -9705,10 +9705,10 @@ export interface components {
                      */
                     name: string;
                     /**
-                     * @description 权限类别：menu-菜单，button-按钮，api-接口
+                     * @description 权限类别：menu-菜单，action-动作
                      * @enum {string}
                      */
-                    category: "menu" | "button" | "api";
+                    category: "menu" | "action";
                     /**
                      * @description 资源路径
                      * @example /api/users/:id
@@ -10419,10 +10419,10 @@ export interface components {
              */
             name?: string;
             /**
-             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，action-动作
              * @enum {string}
              */
-            category?: "menu" | "button" | "api";
+            category?: "menu" | "action";
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
@@ -10443,10 +10443,10 @@ export interface components {
                  */
                 name?: string;
                 /**
-                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @description 权限类别：menu-菜单，action-动作
                  * @enum {string}
                  */
-                category?: "menu" | "button" | "api";
+                category?: "menu" | "action";
                 /**
                  * @description 资源路径
                  * @example /api/users/:id
@@ -10499,10 +10499,10 @@ export interface components {
              */
             name?: string;
             /**
-             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，action-动作
              * @enum {string}
              */
-            category?: "menu" | "button" | "api";
+            category?: "menu" | "action";
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
@@ -10538,10 +10538,10 @@ export interface components {
                      */
                     name: string;
                     /**
-                     * @description 权限类别：menu-菜单，button-按钮，api-接口
+                     * @description 权限类别：menu-菜单，action-动作
                      * @enum {string}
                      */
-                    category: "menu" | "button" | "api";
+                    category: "menu" | "action";
                     /**
                      * @description 资源路径
                      * @example /api/users/:id
@@ -10586,10 +10586,10 @@ export interface components {
              */
             name: string;
             /**
-             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，action-动作
              * @enum {string}
              */
-            category: "menu" | "button" | "api";
+            category: "menu" | "action";
             /**
              * @description 资源路径
              * @example /api/users/:id
@@ -10631,10 +10631,10 @@ export interface components {
              */
             name?: string;
             /**
-             * @description 权限类别：menu-菜单，button-按钮，api-接口
+             * @description 权限类别：menu-菜单，action-动作
              * @enum {string}
              */
-            category?: "menu" | "button" | "api";
+            category?: "menu" | "action";
             /**
              * @description 资源路径
              * @example /api/users/:id
@@ -10701,10 +10701,10 @@ export interface components {
                  */
                 name: string;
                 /**
-                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @description 权限类别：menu-菜单，action-动作
                  * @enum {string}
                  */
-                category: "menu" | "button" | "api";
+                category: "menu" | "action";
                 /**
                  * @description 资源路径
                  * @example /api/users/:id
@@ -11219,10 +11219,10 @@ export interface components {
                  */
                 name: string;
                 /**
-                 * @description 权限类别：menu-菜单，button-按钮，api-接口
+                 * @description 权限类别：menu-菜单，action-动作
                  * @enum {string}
                  */
-                category: "menu" | "button" | "api";
+                category: "menu" | "action";
                 /**
                  * @description 资源路径
                  * @example /api/users/:id

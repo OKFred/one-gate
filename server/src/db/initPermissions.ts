@@ -11,322 +11,223 @@ import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "@/utils/env";
 import { sql } from "drizzle-orm";
 const LOCALE = getEnv("LOCALE") || "zh-CN";
+
 /**
  * 基础权限种子数据
  */
 const permissionSeeds: Partial<PermissionAddLike>[] = [
+  // system.user
+  { category: "action", code: "system.user:read", business: "system.user" },
+  { category: "action", code: "system.user:add", business: "system.user" },
+  { category: "action", code: "system.user:edit", business: "system.user" },
+  { category: "action", code: "system.user:delete", business: "system.user" },
+  { category: "action", code: "system.user:export", business: "system.user" },
+
+  // system.role
+  { category: "action", code: "system.role:read", business: "system.role" },
+  { category: "action", code: "system.role:add", business: "system.role" },
+  { category: "action", code: "system.role:edit", business: "system.role" },
+  { category: "action", code: "system.role:delete", business: "system.role" },
+
+  // system.permission
   {
-    category: "api",
-    code: "system.auth:api",
-    business: "system.auth",
-  },
-  {
-    category: "api",
-    code: "system.user:api",
-    business: "system.user",
-  },
-  {
-    category: "api",
-    code: "system.role:api",
-    business: "system.role",
-  },
-  {
-    category: "api",
-    code: "system.permission:api",
+    category: "action",
+    code: "system.permission:read",
     business: "system.permission",
   },
   {
-    category: "api",
-    code: "system.role_permission:api",
-    business: "system.role_permission",
-  },
-  {
-    category: "api",
-    code: "system.department:api",
-    business: "system.department",
-  },
-  {
-    category: "api",
-    code: "system.menu:api",
-    business: "system.menu",
-  },
-  {
-    category: "api",
-    code: "i18n.language:api",
-    business: "i18n.language",
-  },
-  {
-    category: "api",
-    code: "i18n.region:api",
-    business: "i18n.region",
-  },
-  {
-    category: "api",
-    code: "i18n.translation:api",
-    business: "i18n.translation",
-  },
-  {
-    category: "api",
-    code: "maintenance.cache:api",
-    business: "maintenance.cache",
-  },
-  {
-    category: "api",
-    code: "maintenance.audit_login:api",
-    business: "maintenance.audit_login",
-  },
-  {
-    category: "api",
-    code: "mail.account:api",
-    business: "mail.account",
-  },
-  {
-    category: "api",
-    code: "mail.template:api",
-    business: "mail.template",
-  },
-  {
-    category: "api",
-    code: "mail.log:api",
-    business: "mail.log",
-  },
-  {
-    category: "api",
-    code: "mail.action:api",
-    business: "mail.action",
-  },
-  {
-    category: "button",
-    code: "system.user:add",
-    business: "system.user",
-  },
-  {
-    category: "button",
-    code: "system.user:edit",
-    business: "system.user",
-  },
-  {
-    category: "button",
-    code: "system.user:delete",
-    business: "system.user",
-  },
-  {
-    category: "button",
-    code: "system.user:export",
-    business: "system.user",
-  },
-  {
-    category: "button",
-    code: "system.role:add",
-    business: "system.role",
-  },
-  {
-    category: "button",
-    code: "system.role:edit",
-    business: "system.role",
-  },
-  {
-    category: "button",
-    code: "system.role:delete",
-    business: "system.role",
-  },
-  {
-    category: "button",
+    category: "action",
     code: "system.permission:add",
     business: "system.permission",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.permission:edit",
     business: "system.permission",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.permission:delete",
     business: "system.permission",
   },
+
+  // system.department
   {
-    category: "button",
+    category: "action",
+    code: "system.department:read",
+    business: "system.department",
+  },
+  {
+    category: "action",
     code: "system.department:add",
     business: "system.department",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.department:edit",
     business: "system.department",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.department:delete",
     business: "system.department",
   },
+
+  // system.menu
+  { category: "action", code: "system.menu:read", business: "system.menu" },
+  { category: "action", code: "system.menu:add", business: "system.menu" },
+  { category: "action", code: "system.menu:edit", business: "system.menu" },
+  { category: "action", code: "system.menu:delete", business: "system.menu" },
+
+  // system.role_permission
   {
-    category: "button",
-    code: "system.menu:add",
-    business: "system.menu",
+    category: "action",
+    code: "system.role_permission:read",
+    business: "system.role_permission",
   },
   {
-    category: "button",
-    code: "system.menu:edit",
-    business: "system.menu",
-  },
-  {
-    category: "button",
-    code: "system.menu:delete",
-    business: "system.menu",
-  },
-  {
-    category: "button",
+    category: "action",
     code: "system.role_permission:add",
     business: "system.role_permission",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.role_permission:edit",
     business: "system.role_permission",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.role_permission:delete",
     business: "system.role_permission",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.role_permission:batch-delete",
     business: "system.role_permission",
   },
+
+  // i18n.language
+  { category: "action", code: "i18n.language:read", business: "i18n.language" },
+  { category: "action", code: "i18n.language:add", business: "i18n.language" },
+  { category: "action", code: "i18n.language:edit", business: "i18n.language" },
   {
-    category: "button",
-    code: "i18n.language:add",
-    business: "i18n.language",
-  },
-  {
-    category: "button",
-    code: "i18n.language:edit",
-    business: "i18n.language",
-  },
-  {
-    category: "button",
+    category: "action",
     code: "i18n.language:delete",
     business: "i18n.language",
   },
+
+  // i18n.region
+  { category: "action", code: "i18n.region:read", business: "i18n.region" },
+  { category: "action", code: "i18n.region:add", business: "i18n.region" },
+  { category: "action", code: "i18n.region:edit", business: "i18n.region" },
+  { category: "action", code: "i18n.region:delete", business: "i18n.region" },
+
+  // i18n.translation
   {
-    category: "button",
-    code: "i18n.region:add",
-    business: "i18n.region",
+    category: "action",
+    code: "i18n.translation:read",
+    business: "i18n.translation",
   },
   {
-    category: "button",
-    code: "i18n.region:edit",
-    business: "i18n.region",
-  },
-  {
-    category: "button",
-    code: "i18n.region:delete",
-    business: "i18n.region",
-  },
-  {
-    category: "button",
+    category: "action",
     code: "i18n.translation:add",
     business: "i18n.translation",
   },
   {
-    category: "button",
+    category: "action",
     code: "i18n.translation:edit",
     business: "i18n.translation",
   },
   {
-    category: "button",
+    category: "action",
     code: "i18n.translation:delete",
     business: "i18n.translation",
   },
+
+  // mail.account
+  { category: "action", code: "mail.account:read", business: "mail.account" },
+  { category: "action", code: "mail.account:add", business: "mail.account" },
+  { category: "action", code: "mail.account:edit", business: "mail.account" },
+  { category: "action", code: "mail.account:delete", business: "mail.account" },
+
+  // mail.template
+  { category: "action", code: "mail.template:read", business: "mail.template" },
+  { category: "action", code: "mail.template:add", business: "mail.template" },
+  { category: "action", code: "mail.template:edit", business: "mail.template" },
   {
-    category: "button",
-    code: "mail.account:add",
-    business: "mail.account",
-  },
-  {
-    category: "button",
-    code: "mail.account:edit",
-    business: "mail.account",
-  },
-  {
-    category: "button",
-    code: "mail.account:delete",
-    business: "mail.account",
-  },
-  {
-    category: "button",
-    code: "mail.template:add",
-    business: "mail.template",
-  },
-  {
-    category: "button",
-    code: "mail.template:edit",
-    business: "mail.template",
-  },
-  {
-    category: "button",
+    category: "action",
     code: "mail.template:delete",
     business: "mail.template",
   },
+
+  // mail.log
+  { category: "action", code: "mail.log:read", business: "mail.log" },
+  { category: "action", code: "mail.log:view", business: "mail.log" },
+
+  // system.auth
   {
-    category: "button",
-    code: "mail.log:view",
-    business: "mail.log",
-  },
-  {
-    category: "button",
+    category: "action",
     code: "system.auth:update_profile",
     business: "system.auth",
   },
   {
-    category: "button",
+    category: "action",
     code: "system.auth:update_password",
     business: "system.auth",
   },
+
+  // maintenance.cache
   {
-    category: "button",
+    category: "action",
+    code: "maintenance.cache:read",
+    business: "maintenance.cache",
+  },
+  {
+    category: "action",
     code: "maintenance.cache:add",
     business: "maintenance.cache",
   },
   {
-    category: "button",
+    category: "action",
     code: "maintenance.cache:edit",
     business: "maintenance.cache",
   },
   {
-    category: "button",
+    category: "action",
     code: "maintenance.cache:delete",
     business: "maintenance.cache",
   },
   {
-    category: "button",
+    category: "action",
     code: "maintenance.cache:view",
     business: "maintenance.cache",
   },
+
+  // maintenance.audit_login
   {
-    category: "api",
-    code: "enterprise.attendance:api",
-    business: "enterprise.attendance",
+    category: "action",
+    code: "maintenance.audit_login:read",
+    business: "maintenance.audit_login",
   },
+
+  // enterprise.attendance
   {
-    category: "api",
+    category: "action",
     code: "enterprise.attendance:read",
     business: "enterprise.attendance",
   },
   {
-    category: "button",
+    category: "action",
     code: "enterprise.attendance:add",
     business: "enterprise.attendance",
   },
   {
-    category: "button",
+    category: "action",
     code: "enterprise.attendance:edit",
     business: "enterprise.attendance",
   },
   {
-    category: "button",
+    category: "action",
     code: "enterprise.attendance:delete",
     business: "enterprise.attendance",
   },
@@ -353,44 +254,32 @@ export async function preparePermissions(options?: { reset?: boolean }) {
 
   // 准备数据
   const mappedData = permissionSeeds.map((seed) => {
-    const getAPIName = () => {
-      const tKeySubString = seed.code!.replace(":api", "");
-      const trans = initialTranslationData.find(
-        (item) => item.tKey === "businessType." + tKeySubString
-      );
-      const prefix = trans?.langCodes?.[LOCALE];
-
-      const postfixTrans = initialTranslationData.find(
-        (item) => item.tKey === "permission.category.api"
-      );
-      const postfix = postfixTrans?.langCodes?.[LOCALE];
-
-      return prefix && postfix ? `${prefix}${postfix}` : seed.code + "未知接口";
-    };
-
-    const getButtonName = () => {
+    const getActionName = () => {
       const [tKeySubString, action] = seed.code!.split(":");
       const trans = initialTranslationData.find(
         (item) => item.tKey === "businessType." + tKeySubString
       );
       const prefix = trans?.langCodes?.[LOCALE];
 
-      const postfixTrans = initialTranslationData.find(
-        (item) => item.tKey === "permission.category.button"
-      );
-      const postfix = postfixTrans?.langCodes?.[LOCALE];
+      // fallback 简单的多语言翻译
+      const actionNameMap: Record<string, string> = {
+        read: "查看",
+        list: "列表",
+        add: "新增",
+        edit: "编辑",
+        delete: "删除",
+        export: "导出",
+        view: "浏览",
+        "batch-delete": "批量删除",
+        update_profile: "更新资料",
+        update_password: "更新密码",
+      };
 
-      return prefix && postfix
-        ? `${prefix}${postfix}:${action}`
-        : seed.code + "未知按钮";
+      const actionName = actionNameMap[action] || action;
+      return prefix ? `${prefix}-${actionName}` : seed.code + "未知动作";
     };
 
-    const name =
-      seed.category === "api"
-        ? getAPIName()
-        : seed.category === "button"
-          ? getButtonName()
-          : "未知权限";
+    const name = seed.category === "action" ? getActionName() : "未知权限";
 
     return {
       code: seed.code!,
