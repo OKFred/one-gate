@@ -1,6 +1,6 @@
 import { getRuntimeKey } from "hono/adapter";
 import { getEnv } from "@/utils/env";
-import type { App, NodeHonoContext } from "@/types/app.ts";
+import type { App, Context } from "@/types/app.ts";
 import { getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
@@ -16,7 +16,7 @@ type HTTPExceptionConstructorParams = Required<
 type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // 提取第二个参数的类型
 
 export default function errorHandler(app: App) {
-  app.notFound(async (c: NodeHonoContext) => {
+  app.notFound(async (c: Context) => {
     const t = await getTranslator(c);
     return c.json(
       {
@@ -39,7 +39,7 @@ export default function errorHandler(app: App) {
     additionalProperties: false,
   });
 
-  app.onError(async (e, c: NodeHonoContext) => {
+  app.onError(async (e, c: Context) => {
     const t = await getTranslator(c);
     if (c.var.logger) {
       c.var.logger.error(e);

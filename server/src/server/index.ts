@@ -7,7 +7,7 @@ import routeRegister from "@/api/index";
 import serverTiming from "@/middleware/serverTiming";
 import serveStaticFiles from "@/middleware/serveStatic";
 import { storageMiddleware } from "@/utils/storage";
-import type { AppBindings, NodeHonoContext } from "@/types/app";
+import type { AppBindings, Context } from "@/types/app";
 import { getEnv } from "@/utils/env";
 
 function createApp() {
@@ -29,14 +29,14 @@ function createApp() {
   app.route(baseApiPath || "", subApp);
 
   //   normalRouter(app);
-  app.get("/healthCheck", (c: NodeHonoContext) => {
+  app.get("/healthCheck", (c: Context) => {
     return c.json({
       ok: true,
       data: new Date().toLocaleString(),
       message: "I am OK!",
     });
   });
-  app.get("/version.json", (c: NodeHonoContext) => {
+  app.get("/version.json", (c: Context) => {
     return c.json({
       ok: true,
       data: getEnv("VERSION") || "unknown",

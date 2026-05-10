@@ -1,5 +1,5 @@
 import { tokenUtils } from "@/utils/token";
-import { NodeHonoContext } from "@/types/app";
+import { Context } from "@/types/app";
 import userService, { UserObj } from "@/api/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
@@ -21,7 +21,7 @@ const SCOPE_PRIORITY: Record<DataScopeValue, number> = {
   [DataScope.SELF_ONLY]: 1,
 };
 
-export const authMiddleware = async (c: NodeHonoContext) => {
+export const authMiddleware = async (c: Context) => {
   // 从Authorization header中获取token
   const authHeader = c.req.header("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {

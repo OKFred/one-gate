@@ -50,7 +50,7 @@ export function getStorage(config: OssConfig, env: any = {}): StorageProvider {
  */
 export const storageMiddleware = (app: App) => {
   app.use("*", async (c: Context, next) => {
-    c.set("OSS", async () => await ossUtils.getActiveStorage(c.env));
+    c.set("getOSS", async () => await ossUtils.getActiveStorage(c.env));
     await next();
   });
 };

@@ -1,4 +1,4 @@
-import type { NodeHonoContext } from "@/types/app";
+import type { Context } from "@/types/app";
 import { getTranslation } from "./shared";
 import { getEnv } from "../env";
 
@@ -7,7 +7,7 @@ import { getEnv } from "../env";
  * @param c - Hono 上下文对象
  * @returns 异步翻译函数
  */
-export const getTranslator = async (c: NodeHonoContext) => {
+export const getTranslator = async (c: Context) => {
   const langCode =
     c.get("userObj")?.langCode ||
     c.req.header("locale") ||

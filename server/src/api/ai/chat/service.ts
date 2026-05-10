@@ -1,11 +1,11 @@
-import { NodeHonoContext } from "@/types/app";
+import { Context } from "@/types/app";
 
-const chat = async (c: NodeHonoContext) => {
+const chat = async (c: Context) => {
   const { logger } = c.var;
   const params = c.req.query();
   const { q } = params;
   logger.info("gotcha");
-  async function ask(prompt) {
+  async function ask(prompt: string) {
     // TODO: 后续让用户自己配置模型地址
     const res = await fetch("/v1/chat/completions", {
       method: "POST",
@@ -19,7 +19,9 @@ const chat = async (c: NodeHonoContext) => {
         // max_tokens: 256,
       }),
     });
-    const json = await res.json();
+    const json = (await res.json()) as {
+      choices: { message: { content: string } }[];
+    };
     return json.choices[0].message.content;
   }
   const data = await ask(q);

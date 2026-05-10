@@ -1,4 +1,4 @@
-import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
+import type { AppBindings, Context, RawRouteConfig } from "@/types/app";
 import { getEnv } from "@/utils/env";
 import { validate } from "@cfworker/json-schema";
 import {
@@ -63,7 +63,7 @@ function routeMaker({
   resSchema: JSONSchema;
   componentArr: ReturnType<typeof componentMaker>[];
 }) {
-  const controller = async (c: NodeHonoContext) => {
+  const controller = async (c: Context) => {
     //获取request header content type
     //如果不是 application/json 则报错
     const contentType = c.req.header("content-type");
@@ -151,7 +151,7 @@ export interface API {
   res: JSONSchema;
   pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
   adapter: Function;
-  service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
+  service: (c: Context | any, ...args: any[]) => Promise<any>;
   /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
   permission?: { action: string };
 }

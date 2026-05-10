@@ -1,4 +1,4 @@
-import type { NodeHonoContext } from "@/types/app";
+import type { Context } from "@/types/app";
 
 /**
  * 快捷适配器：只需要 body
@@ -6,7 +6,7 @@ import type { NodeHonoContext } from "@/types/app";
  * @returns service 函数
  */
 export function bodyAdapter<TRes>(handler: (body) => Promise<TRes>) {
-  return async (c: NodeHonoContext): Promise<TRes> => {
+  return async (c: Context): Promise<TRes> => {
     const bodyObj = c.get("bodyObj");
     return await handler(bodyObj);
   };
@@ -20,7 +20,7 @@ export function bodyAdapter<TRes>(handler: (body) => Promise<TRes>) {
 export function bodyUserAdapter<TRes>(
   handler: (body, userObj) => Promise<TRes>
 ) {
-  return async (c: NodeHonoContext): Promise<TRes> => {
+  return async (c: Context): Promise<TRes> => {
     const bodyObj = c.get("bodyObj");
     const userObj = c.get("userObj");
     return await handler(bodyObj, userObj);
@@ -33,9 +33,9 @@ export function bodyUserAdapter<TRes>(
  * @returns service 函数
  */
 export function bodyUserContextAdapter<TRes>(
-  handler: (body: any, userObj: any, c: NodeHonoContext) => Promise<TRes>
+  handler: (body: any, userObj: any, c: Context) => Promise<TRes>
 ) {
-  return async (c: NodeHonoContext): Promise<TRes> => {
+  return async (c: Context): Promise<TRes> => {
     const bodyObj = c.get("bodyObj");
     const userObj = c.get("userObj");
     return await handler(bodyObj, userObj, c);
@@ -52,7 +52,7 @@ export function bodyClientInfoAdapter<TRes>(
     clientInfo: { ip: string; userAgent: string }
   ) => Promise<TRes>
 ) {
-  return async (c: NodeHonoContext): Promise<TRes> => {
+  return async (c: Context): Promise<TRes> => {
     const bodyObj = c.get("bodyObj");
     const ip =
       c.req.header("x-forwarded-for") || c.req.header("x-real-ip") || "unknown";
@@ -61,10 +61,8 @@ export function bodyClientInfoAdapter<TRes>(
   };
 }
 
-export function rawAdapter<TRes>(
-  handler: (c: NodeHonoContext) => Promise<TRes>
-) {
-  return async (c: NodeHonoContext): Promise<TRes> => {
+export function rawAdapter<TRes>(handler: (c: Context) => Promise<TRes>) {
+  return async (c: Context): Promise<TRes> => {
     return await handler(c);
   };
 }

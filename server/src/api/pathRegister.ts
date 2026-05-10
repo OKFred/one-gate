@@ -1,4 +1,4 @@
-import { App, NodeHonoContext, RawRouteConfig } from "@/types/app";
+import { App, Context, RawRouteConfig } from "@/types/app";
 
 /**
  * @description Register a route to the app
@@ -6,7 +6,7 @@ import { App, NodeHonoContext, RawRouteConfig } from "@/types/app";
 function main(
   app: App,
   pathObj: RawRouteConfig,
-  controller: (c: NodeHonoContext) => Promise<Response>
+  controller: (c: Context) => Promise<Response>
 ) {
   const { path, method } = pathObj;
   const regExp = /\{(\w+)\}/g;
