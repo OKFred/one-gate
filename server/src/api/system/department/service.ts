@@ -34,7 +34,6 @@ import {
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
-import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
 import hasValue from "@/utils/hasValue";
 import {
   BusinessError,
@@ -98,8 +97,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj?: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  const effectiveParams = filterParams(params, userObj);
-  const { orderBy = "id", descend = true } = effectiveParams;
+  const { orderBy = "id", descend = true } = params;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
 
@@ -156,20 +154,14 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj?: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const effectiveParams = filterParams(params, userObj);
-  const {
-    orderBy = "id",
-    descend = true,
-    pageNo = 1,
-    pageSize = 10,
-  } = effectiveParams;
+  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = departmentTable[orderBy] || departmentTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   // 构建查询条件
-  const whereCondition = buildWhereCondition(effectiveParams);
+  const whereCondition = buildWhereCondition(params);
 
   // 查询总数
   const countResult = await db
