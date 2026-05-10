@@ -3984,4 +3984,35 @@ export const initialTranslationData = [
       "en-US": "Attendance Details",
     },
   },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.i18n.language.duplicateLangCode",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该语言代码已存在",
+      "en-US": "Language code already exists",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.i18n.region.duplicateCode",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该国家/地区代码已存在（alpha2、alpha3 或 numeric 重复）",
+      "en-US":
+        "Region code already exists (duplicate alpha2, alpha3, or numeric)",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.i18n.translation.duplicateTKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该翻译键在同一语言下已存在",
+      "en-US": "Translation key already exists for this language",
+    },
+  },
 ] as const satisfies BatchTranslationItem[];

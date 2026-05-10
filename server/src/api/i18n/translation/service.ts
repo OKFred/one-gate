@@ -36,10 +36,8 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventDuplicateTKey } from "./prevention";
 
 import { kv } from "@/middleware/cache";
 
@@ -243,8 +241,7 @@ async function onAdd(
   userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  // 检查 tKey 是否与其他记录冲突
-  await uniqueCheck(params);
+  await preventDuplicateTKey(params);
   const addData = {
     ...params,
     creatorId,
@@ -292,13 +289,9 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  // 检查 tKey 是否与其他记录冲突
-  await uniqueCheck(params, id);
-  const previousRecord = await onGet({ id });
-  if (!previousRecord) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  let updateData = {
+  await preventDuplicateTKey(params, id);
+  const previousRecord = await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
+  const updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
@@ -309,26 +302,23 @@ async function onUpdate(
     .set(updateData)
     .where(eq(translationTable.id, id))
     .returning({ id: translationTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  // 如果涉及前端/后端文案，同步更新 KV 缓存
+  preventEmpty(res[0]);
+
+  // 如果涉及后端文案，同步更新 KV 缓存
   if (
     params.application === "backend" ||
     previousRecord.application === "backend"
   ) {
     const current = await onGet({ id });
-    if (!current) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
     if (current.application === "backend") {
       await cacheSync(current, "update");
     } else {
       await cacheSync(current, "delete");
     }
   }
-
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -360,21 +350,20 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-  const record = await onGet({ id }).catch(() => null);
+  // 先取出记录（若不存在则 preventEmpty 抛出），用于删除后的缓存同步
+  const record = await onGet({ id });
   const result = await db
     .delete(translationTable)
     .where(eq(translationTable.id, id))
     .returning({ id: translationTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-
+  const row = result[0];
+  preventEmpty(row);
   // 获取删除前的信息以更新 KV
-  if (record && record.application === "backend") {
+  if (record.application === "backend") {
     await cacheSync(record, "delete");
   }
 
-  return result[0].id;
+  return row.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -410,17 +399,16 @@ const getRes = {
 } as const satisfies JSONSchema;
 async function onGet(
   params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+): Promise<FromSchema<typeof getRes>> {
   const { id } = params;
   const rows = await db
     .select()
     .from(translationTable)
     .where(eq(translationTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 const getApi = {
   req: getReq,
@@ -528,31 +516,6 @@ const checkDuplicateApi = {
   adapter: bodyAdapter,
   service: onCheckDuplicate,
 } satisfies API;
-
-async function uniqueCheck(
-  obj: FromSchema<typeof updateReq | typeof addReq>,
-  excludeId?: number
-) {
-  if (hasValue(obj.tKey)) {
-    const existingRecord = await db
-      .select({ id: translationTable.id })
-      .from(translationTable)
-      .where(
-        and(
-          eq(translationTable.tKey, obj.tKey),
-          eq(translationTable.langCode, obj.langCode),
-          excludeId ? ne(translationTable.id, excludeId) : undefined
-        )
-      )
-      .limit(1);
-    if (existingRecord.length > 0) {
-      throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA, {
-        tKey: obj.tKey,
-        langCode: obj.langCode,
-      });
-    }
-  }
-}
 
 /** SHA256 哈希计算 */
 async function calculateSHA256(text: string): Promise<string> {

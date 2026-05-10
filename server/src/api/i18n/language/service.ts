@@ -20,7 +20,7 @@ import {
   type LanguageDeleteVOLike,
   type LanguageGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, or, like, and, ne } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and, SQL } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -36,17 +36,16 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventDuplicateLangCode } from "./prevention";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
   isEnabled,
 }: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [] as any[];
+  const conditions = [] as SQL<unknown>[];
+
   if (hasValue(keyword)) {
     conditions.push(
       or(
@@ -215,7 +214,7 @@ async function onAdd(
   userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  await uniqueCheck(params);
+  await preventDuplicateLangCode(params.langCode);
 
   const addData = {
     ...params,
@@ -258,11 +257,8 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await uniqueCheck(params);
-  const previousRecord = await onGet({ id });
-  if (!previousRecord) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  await preventDuplicateLangCode(params.langCode, id);
+  await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
   const updateData = {
     ...rest,
     updaterId,
@@ -274,10 +270,9 @@ async function onUpdate(
     .set(updateData)
     .where(eq(languageTable.id, id))
     .returning({ id: languageTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -312,10 +307,9 @@ async function onDelete(
     .delete(languageTable)
     .where(eq(languageTable.id, id))
     .returning({ id: languageTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return result[0].id;
+  const row = result[0];
+  preventEmpty(row);
+  return row.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -351,17 +345,16 @@ const getRes = {
 } as const satisfies JSONSchema;
 async function onGet(
   params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+): Promise<FromSchema<typeof getRes>> {
   const { id } = params;
   const rows = await db
     .select()
     .from(languageTable)
     .where(eq(languageTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 const getApi = {
   req: getReq,
@@ -375,26 +368,6 @@ const getApi = {
   service: onGet,
 } satisfies API;
 
-async function uniqueCheck(
-  obj: FromSchema<typeof updateReq | typeof addReq>
-): Promise<void> {
-  if (hasValue(obj.langCode)) {
-    const records = await db
-      .select({ id: languageTable.id })
-      .from(languageTable)
-      .where(
-        and(
-          eq(languageTable.langCode, obj.langCode),
-          "id" in obj ? ne(languageTable.id, obj.id) : undefined
-        )
-      )
-      .limit(1);
-    if (records.length > 0) {
-      throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
-    }
-  }
-}
-
 async function verifyLangCode(langCode: string): Promise<void> {
   const record = await db
     .select({ id: languageTable.id })
@@ -406,9 +379,8 @@ async function verifyLangCode(langCode: string): Promise<void> {
       )
     )
     .limit(1);
-  if (record.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  const row = record[0];
+  preventEmpty(row);
 }
 
 export const utils = {
