@@ -1,8 +1,5 @@
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError";
-import { type UserObj } from "@/types/app";
+import { BusinessError } from "@/middleware/errorHandler/businessError";
+import { preventEmpty } from "@/middleware/auth/prevention";
 import { utils as departmentUtils } from "./service";
 import { utils as userUtils } from "@/api/system/user/service";
 
@@ -16,7 +13,6 @@ export const ErrorCodes = {
   HAS_ENABLED_USER: "errorHandler.departmentHasEnabledUser",
   HAS_CHILDREN: "errorHandler.hasChildren",
   PERMISSION_DENIED: "errorHandler.permissionDenied",
-  NOT_EXIST_OR_DISABLED: "errorHandler.notExistOrDisabled",
 } as const;
 
 /**
@@ -25,9 +21,7 @@ export const ErrorCodes = {
 export const preventMissingParent = async (parentId: number | null) => {
   if (!parentId) return;
   const exists = await departmentUtils.getDepartmentNameById(parentId);
-  if (!exists) {
-    throw new BusinessError(ErrorCodes.NOT_EXIST_OR_DISABLED);
-  }
+  preventEmpty(exists);
 };
 
 /**

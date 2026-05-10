@@ -1252,6 +1252,36 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
+    business: "system.rolePermission",
+    tKey: "errorHandler.system.rolePermission.recordNotFound",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "角色权限记录不存在",
+      "en-US": "Role permission record not found",
+    },
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission",
+    tKey: "errorHandler.system.rolePermission.roleNotFound",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关联角色不存在",
+      "en-US": "Associated role not found",
+    },
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission",
+    tKey: "errorHandler.system.rolePermission.permissionNotFound",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关联权限不存在",
+      "en-US": "Associated permission not found",
+    },
+  },
+  {
+    application: "frontend",
     business: "business.exception",
     tKey: "error.requestFailed",
     isEnabled: true,

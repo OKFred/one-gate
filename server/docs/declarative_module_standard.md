@@ -82,6 +82,21 @@ async function onUpdate(params, userObj) {
 }
 ```
 
+### 3. 结果空值拦截 (`preventEmpty`)
+
+当数据库操作（如 `update`、`delete`、`get`）未找到记录时，严禁手动抛出 `BusinessErrorCode.NOT_EXIST_OR_DISABLED`。统一采用 `preventEmpty` 拦截器。
+
+- **逻辑一致性**：确保全系统对于“资源不存在”的反馈信号统一。
+- **代码整洁**：减少冗余的 `if-throw` 块。
+
+```typescript
+// ✅ 推荐
+const res = await db.update(...).returning();
+const row = res[0];
+preventEmpty(row);
+return row.id;
+```
+
 ---
 
 ## 四、 改造流程 (Workflow)

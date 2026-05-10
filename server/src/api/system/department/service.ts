@@ -33,13 +33,10 @@ import {
 } from "@/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
 import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
 import hasValue from "@/utils/hasValue";
+import { BusinessError } from "@/middleware/errorHandler/businessError/index";
 import {
   preventMissingParent,
   preventSelfParent,
@@ -47,7 +44,31 @@ import {
   preventDisable,
   preventHasEnabledUsers,
   preventHasChildren,
+  ErrorCodes,
 } from "./prevention";
+import { preventEmpty } from "@/middleware/auth/prevention";
+
+// 构建查询条件（列表和全部通用）
+export const buildWhereCondition = (condition?: {
+  id?: number;
+  keyword?: string;
+  parentId?: number;
+}) => {
+  const { id, keyword, parentId } = condition || {};
+  const conditions = [];
+
+  if (hasValue(id)) conditions.push(eq(departmentTable.id, id));
+  if (hasValue(keyword))
+    conditions.push(like(departmentTable.name, `%${keyword}%`));
+  if (parentId !== undefined)
+    conditions.push(eq(departmentTable.parentId, parentId));
+
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
 
 const listAllReq = {
   type: "object",
@@ -262,7 +283,7 @@ async function onUpdate(
 
   // 前置校验
   const row = await onGet({ id }, userObj);
-  if (!row) throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  preventEmpty(row);
 
   if (params.parentId !== undefined && params.parentId !== row.parentId) {
     await preventMissingParent(params.parentId);
@@ -283,10 +304,9 @@ async function onUpdate(
     .where(eq(departmentTable.id, id))
     .returning({ id: departmentTable.id });
 
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const updateRow = res[0];
+  preventEmpty(updateRow);
+  return updateRow.id;
 }
 const updateApi = {
   req: updateReq,
@@ -325,7 +345,7 @@ async function onDelete(
 
   // 前置校验
   const row = await onGet({ id }, userObj);
-  if (!row) throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  preventEmpty(row);
 
   await preventHasEnabledUsers(id);
   await preventHasChildren(id);
@@ -336,9 +356,8 @@ async function onDelete(
     .where(eq(departmentTable.id, id))
     .returning({ id: departmentTable.id });
 
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  const deleteRow = result[0];
+  preventEmpty(deleteRow);
 
   // 归档删除记录
   try {
@@ -402,16 +421,14 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const whereCondition = buildWhereCondition({ id });
   const rows = await db
     .select()
     .from(departmentTable)
     .where(whereCondition)
     .limit(1);
-  if (!rows || rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 const getApi = {
   req: getReq,
@@ -496,31 +513,6 @@ const treeApi = {
   adapter: bodyUserAdapter,
   service: onTree,
 } satisfies API;
-
-/**
- * 构建查询条件（列表和全部通用）
- */
-export const buildWhereCondition = (condition?: {
-  id?: number;
-  keyword?: string;
-  parentId?: number;
-}) => {
-  const { id, keyword, parentId } = condition || {};
-  const conditions = [];
-
-  // 1. 基础过滤
-  if (hasValue(id)) conditions.push(eq(departmentTable.id, id));
-  if (hasValue(keyword))
-    conditions.push(like(departmentTable.name, `%${keyword}%`));
-  if (parentId !== undefined)
-    conditions.push(eq(departmentTable.parentId, parentId));
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
 
 /** @description 根据ID获取部门名称 */
 export async function getDepartmentNameById(
@@ -662,10 +654,12 @@ export async function getSiblingDepartments(
 
 /** @description 验证部门是否存在 */
 export async function verifyDepartment(departmentId: number) {
-  const departmentName = await getDepartmentNameById(departmentId);
-  if (!departmentName) {
-    throw new BusinessError(BusinessErrorCode["DEPARTMENT_NOT_EXIST"]);
-  }
+  const rows = await db
+    .select({ name: departmentTable.name })
+    .from(departmentTable)
+    .where(eq(departmentTable.id, departmentId))
+    .limit(1);
+  preventEmpty(rows[0]);
 }
 export const utils = {
   verifyDepartment,

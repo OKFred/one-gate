@@ -55,10 +55,7 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
 import { kv } from "@/middleware/cache";
 
 // 构建查询条件(列表和全部通用)
@@ -267,10 +264,9 @@ async function onAdd(
       creatorId,
     })
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const userRow = res[0];
+  preventEmpty(userRow);
+  return userRow.id;
 }
 const addApi = {
   req: addReq,
@@ -334,11 +330,10 @@ async function onUpdate(
     .set(updateData)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
+  const row = res[0];
+  preventEmpty(row);
   kv.delete(`auth:bundle:${id}`).catch(() => {});
-  return res[0].id;
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -377,11 +372,10 @@ async function onDelete(
     .delete(userTable)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
+  const deleteRow = res[0];
+  preventEmpty(deleteRow);
   kv.delete(`auth:bundle:${id}`).catch(() => {});
-  return res[0].id;
+  return deleteRow.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -438,10 +432,9 @@ async function onGet(
     .from(userTable)
     .where(eq(userTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  const { password, departmentId, regionId, roleIdArr, ...rest } = rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  const { password, departmentId, regionId, roleIdArr, ...rest } = row;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
     regionId,
@@ -509,10 +502,9 @@ async function updatePassword(
     })
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (res?.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 async function getUserObjByName(username: string): Promise<UserVOLike | null> {
@@ -521,10 +513,8 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-  if (userArr.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
   const userObj = userArr[0];
+  preventEmpty(userObj);
   const { departmentId, regionId, roleIdArr, ...rest } = userObj;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
@@ -617,10 +607,9 @@ export async function updateLangCode(
     })
     .where(eq(userTable.id, updateData.id))
     .returning({ id: userTable.id });
-  if (res?.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 /** 更新用户信息 */
@@ -652,10 +641,9 @@ async function updateUserInfo(
     .set(setData)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (res?.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 export const utils = {
