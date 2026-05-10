@@ -36,7 +36,10 @@ import type { API } from "@/middleware/encapsulation";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
 import { filterParams } from "@/middleware/accessControl/onRead/paramFilter";
 import hasValue from "@/utils/hasValue";
-import { BusinessError } from "@/middleware/errorHandler/businessError/index";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError/index";
 import {
   preventMissingParent,
   preventSelfParent,
@@ -44,7 +47,6 @@ import {
   preventDisable,
   preventHasEnabledUsers,
   preventHasChildren,
-  ErrorCodes,
 } from "./prevention";
 import { preventEmpty } from "@/middleware/auth/prevention";
 
@@ -424,7 +426,7 @@ async function onGet(
   const rows = await db
     .select()
     .from(departmentTable)
-    .where(whereCondition)
+    .where(eq(departmentTable.id, id))
     .limit(1);
   const row = rows[0];
   preventEmpty(row);

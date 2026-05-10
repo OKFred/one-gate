@@ -23,11 +23,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
-import {
-  preventLoginFailure,
-  preventWrongPassword,
-  preventUnauthenticated,
-} from "./prevention";
+import { preventLoginFailure, preventWrongPassword } from "./prevention";
 
 // 普通登录
 const loginReq = {
@@ -192,10 +188,6 @@ async function onRefreshToken(
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
   const { token } = userObj;
   const newToken = tokenUtils.refreshToken(token);
-
-  // 前置校验
-  preventUnauthenticated(newToken);
-
   return { token: newToken! };
 }
 const refreshTokenApi = {

@@ -1281,6 +1281,17 @@ export const initialTranslationData = [
     },
   },
   {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.mail.action.sendFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "邮件发送失败，请检查配置或网络连接",
+      "en-US":
+        "Mail sending failed, please check configuration or network connection",
+    },
+  },
+  {
     application: "frontend",
     business: "business.exception",
     tKey: "error.requestFailed",
