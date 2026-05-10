@@ -20,7 +20,7 @@ import {
   type RegionDeleteVOLike,
   type RegionGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -41,7 +41,6 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import { preventDuplicateRegionCode } from "./prevention";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -218,7 +217,7 @@ async function onAdd(
   userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  await preventDuplicateRegionCode(params);
+
   const addData = {
     ...params,
     labels: params.labels as { [key: string]: string },
@@ -261,7 +260,6 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await preventDuplicateRegionCode(params, id);
   await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
   const updateData: any = {
     ...rest,
@@ -380,8 +378,44 @@ async function verifyRegion(regionId: number): Promise<void> {
   }
 }
 
+async function verifyRegionCodeUnique(
+  obj: {
+    alpha2Code?: string | null;
+    alpha3Code?: string | null;
+    numeric?: number | null;
+  },
+  excludeId?: number
+) {
+  const conditions = [] as any[];
+  if (hasValue(obj.alpha2Code)) {
+    conditions.push(eq(regionTable.alpha2Code, obj.alpha2Code!));
+  }
+  if (hasValue(obj.alpha3Code)) {
+    conditions.push(eq(regionTable.alpha3Code, obj.alpha3Code!));
+  }
+  if (hasValue(obj.numeric)) {
+    conditions.push(eq(regionTable.numeric, obj.numeric!));
+  }
+  if (conditions.length === 0) return true;
+
+  const matchClause =
+    conditions.length === 1 ? conditions[0] : or(...conditions);
+  const records = await db
+    .select({ id: regionTable.id })
+    .from(regionTable)
+    .where(
+      and(
+        matchClause,
+        excludeId !== undefined ? ne(regionTable.id, excludeId) : undefined
+      )
+    )
+    .limit(1);
+  return records.length === 0;
+}
+
 export const utils = {
   verifyRegion,
+  verifyRegionCodeUnique,
 };
 
 export default {

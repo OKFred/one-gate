@@ -20,7 +20,7 @@ import {
   type LanguageDeleteVOLike,
   type LanguageGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, or, like, and, SQL } from "drizzle-orm";
+import { asc, count, desc, eq, or, like, and, SQL, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -37,7 +37,6 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import { preventDuplicateLangCode } from "./prevention";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
@@ -214,7 +213,6 @@ async function onAdd(
   userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  await preventDuplicateLangCode(params.langCode);
 
   const addData = {
     ...params,
@@ -257,8 +255,8 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await preventDuplicateLangCode(params.langCode, id);
   await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
+
   const updateData = {
     ...rest,
     updaterId,
@@ -383,8 +381,23 @@ async function verifyLangCode(langCode: string): Promise<void> {
   preventEmpty(row);
 }
 
+async function verifyLangCodeUnique(langCode: string, excludeId?: number) {
+  const record = await db
+    .select({ id: languageTable.id })
+    .from(languageTable)
+    .where(
+      and(
+        eq(languageTable.langCode, langCode),
+        excludeId !== undefined ? ne(languageTable.id, excludeId) : undefined
+      )
+    )
+    .limit(1);
+  return record.length === 0;
+}
+
 export const utils = {
   verifyLangCode,
+  verifyLangCodeUnique,
 };
 
 export default {

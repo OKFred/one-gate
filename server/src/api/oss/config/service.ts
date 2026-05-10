@@ -20,7 +20,7 @@ import {
   type OssConfigDeleteVOLike,
   type OssConfigGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, and, or, like, not } from "drizzle-orm";
+import { asc, count, desc, eq, and, or, like, not, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -38,7 +38,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import { preventDuplicateName, preventStorageInitFailure } from "./prevention";
+import { preventStorageInitFailure } from "./prevention";
 import { getStorage } from "@/utils/storage";
 
 // 构建查询条件
@@ -191,7 +191,6 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  await preventDuplicateName(obj.name);
 
   // 如果设置为默认建议，则取消其他默认建议
   if (obj.isDefault) {
@@ -227,11 +226,8 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<number | null> {
   const { userId: updaterId } = userObj;
-  const { id, name, ...rest } = params;
-
-  if (name) {
-    await preventDuplicateName(name, id);
-  }
+  const { id, ...rest } = params;
+  await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
 
   if (params.isDefault) {
     await db
@@ -361,6 +357,28 @@ export async function getDefaultConfig() {
     .limit(1);
   return rows[0] || null;
 }
+
+/**
+ * 校验名称是否唯一
+ */
+async function verifyNameUnique(name: string, excludeId?: number) {
+  const records = await db
+    .select({ id: ossConfigTable.id })
+    .from(ossConfigTable)
+    .where(
+      and(
+        eq(ossConfigTable.name, name),
+        excludeId !== undefined ? ne(ossConfigTable.id, excludeId) : undefined
+      )
+    )
+    .limit(1);
+  return records.length === 0;
+}
+
+export const utils = {
+  getDefaultConfig,
+  verifyNameUnique,
+};
 
 export default {
   listAll: listAllApi,

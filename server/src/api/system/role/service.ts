@@ -421,10 +421,19 @@ async function updatePermissionCount(
     .set({ permissionCount: newCount })
     .where(eq(roleTable.id, roleId));
 }
+async function verifyRoleExists(roleId: number) {
+  const rows = await db
+    .select({ id: roleTable.id })
+    .from(roleTable)
+    .where(eq(roleTable.id, roleId))
+    .limit(1);
+  return rows.length > 0;
+}
 
 export const utils = {
   getRolesByIds,
   verifyRoles,
+  verifyRoleExists,
   updatePermissionCount,
 };
 

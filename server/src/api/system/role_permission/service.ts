@@ -720,10 +720,36 @@ async function getMenuIdsByRoleIds(roleIds: number[]) {
   return rows.map((row) => parseInt(row.menuId)).filter((id) => !isNaN(id));
 }
 
+async function verifyRecordExists(id: number) {
+  const rows = await db
+    .select({ id: rolePermissionTable.id })
+    .from(rolePermissionTable)
+    .where(eq(rolePermissionTable.id, id))
+    .limit(1);
+  return rows.length > 0;
+}
+
+async function verifyRoleExists(roleId: number) {
+  return await roleUtils.verifyRoleExists(roleId);
+}
+
+async function verifyPermissionExists(permissionId: number) {
+  const count = await permissionUtils.countPermissionsByIds([permissionId]);
+  return count > 0;
+}
+
+async function countPermissionsByIds(ids: number[]) {
+  return await permissionUtils.countPermissionsByIds(ids);
+}
+
 export const utils = {
   addMenuPermissionToRole,
   getMenuIdsByRoleIds,
   getPermissionsByRoleIds,
+  verifyRecordExists,
+  verifyRoleExists,
+  verifyPermissionExists,
+  countPermissionsByIds,
 };
 
 export default {

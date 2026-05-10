@@ -37,7 +37,6 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import { preventDuplicateTKey } from "./prevention";
 
 import { kv } from "@/middleware/cache";
 
@@ -241,7 +240,7 @@ async function onAdd(
   userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  await preventDuplicateTKey(params);
+
   const addData = {
     ...params,
     creatorId,
@@ -289,8 +288,8 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await preventDuplicateTKey(params, id);
   const previousRecord = await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
+
   const updateData = {
     ...rest,
     updaterId,
@@ -541,9 +540,28 @@ async function cacheSync(
   }
 }
 
+async function verifyTKeyUnique(
+  obj: { tKey?: string; langCode?: string },
+  excludeId?: number
+) {
+  const existing = await db
+    .select({ id: translationTable.id })
+    .from(translationTable)
+    .where(
+      and(
+        eq(translationTable.tKey, obj.tKey!),
+        eq(translationTable.langCode, obj.langCode!),
+        excludeId !== undefined ? ne(translationTable.id, excludeId) : undefined
+      )
+    )
+    .limit(1);
+  return existing.length === 0;
+}
+
 export const utils = {
   getTranslationsByIds,
   calculateSHA256,
+  verifyTKeyUnique,
 };
 
 export default {

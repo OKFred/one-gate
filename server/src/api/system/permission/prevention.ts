@@ -1,7 +1,5 @@
 import { BusinessError } from "@/middleware/errorHandler/businessError";
-import db from "@/db/index";
-import { permissionTable } from "./model";
-import { eq, inArray } from "drizzle-orm";
+import { utils as permissionUtils } from "./service";
 
 /**
  * 权限模块错误码映射
@@ -14,12 +12,8 @@ export const ErrorCodes = {
  * 校验权限记录是否存在
  */
 export const preventMissingPermission = async (id: number) => {
-  const rows = await db
-    .select({ id: permissionTable.id })
-    .from(permissionTable)
-    .where(eq(permissionTable.id, id))
-    .limit(1);
-  if (rows.length === 0) {
+  const count = await permissionUtils.countPermissionsByIds([id]);
+  if (count === 0) {
     throw new BusinessError(ErrorCodes.NOT_FOUND);
   }
 };
@@ -30,11 +24,8 @@ export const preventMissingPermission = async (id: number) => {
 export const preventMissingPermissions = async (ids: number[]) => {
   if (ids.length === 0) return;
   const uniqueIds = Array.from(new Set(ids));
-  const rows = await db
-    .select({ id: permissionTable.id })
-    .from(permissionTable)
-    .where(inArray(permissionTable.id, uniqueIds));
-  if (rows.length !== uniqueIds.length) {
+  const count = await permissionUtils.countPermissionsByIds(uniqueIds);
+  if (count !== uniqueIds.length) {
     throw new BusinessError(ErrorCodes.NOT_FOUND);
   }
 };
