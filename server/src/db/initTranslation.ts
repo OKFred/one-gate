@@ -1038,6 +1038,56 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.system.role.superAdminDeleteProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员角色禁止删除",
+      "en-US": "Super admin role cannot be deleted",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.system.role.superAdminUpdateProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员角色核心属性禁止修改",
+      "en-US": "Core attributes of super admin role cannot be modified",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.system.user.superAdminDeleteProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员用户禁止删除",
+      "en-US": "Super admin user cannot be deleted",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.system.user.superAdminDisableProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "超级管理员用户禁止禁用",
+      "en-US": "Super admin user cannot be disabled",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.system.user.assignSuperAdminRoleProhibited",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "禁止分配超级管理员角色",
+      "en-US": "Assigning super admin role is prohibited",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.hasChildren",
     isEnabled: true,
     langCodes: {
@@ -1081,6 +1131,27 @@ export const initialTranslationData = [
   {
     application: "backend",
     business: "business.exception",
+    tKey: "errorHandler.department.selfParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "不能将部门自身设为父部门",
+      "en-US": "A department cannot be its own parent",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.department.descendantParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "不能将子孙部门设为父部门，会导致死循环",
+      "en-US":
+        "A descendant department cannot be set as a parent, it would cause a circular reference",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
     tKey: "errorHandler.notAuthenticated",
     isEnabled: true,
     langCodes: {
@@ -1096,6 +1167,57 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "数据不存在或已被禁用",
       "en-US": "Data does not exist or has been disabled",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.parentNotExist",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "父菜单不存在或已被禁用",
+      "en-US": "Parent menu does not exist or has been disabled",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.selfParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "父菜单不能是自己",
+      "en-US": "Parent menu cannot be itself",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.circularParent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "不能将子孙菜单设为父菜单，会导致环路",
+      "en-US":
+        "Cannot set descendant menu as parent, it causes a circular loop",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.hasChildren",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该菜单下存在子菜单，无法直接删除",
+      "en-US": "Sub-menus exist, cannot delete",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.menu.hasEnabledChildren",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该菜单下存在已启用的子菜单，请先禁用子菜单",
+      "en-US": "Enabled sub-menus exist, please disable them first",
     },
   },
   {
@@ -1126,6 +1248,47 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "登录失败，请检查用户名和密码",
       "en-US": "Login failed, please check username and password",
+    },
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission",
+    tKey: "errorHandler.system.rolePermission.recordNotFound",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "角色权限记录不存在",
+      "en-US": "Role permission record not found",
+    },
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission",
+    tKey: "errorHandler.system.rolePermission.roleNotFound",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关联角色不存在",
+      "en-US": "Associated role not found",
+    },
+  },
+  {
+    application: "frontend",
+    business: "system.rolePermission",
+    tKey: "errorHandler.system.rolePermission.permissionNotFound",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关联权限不存在",
+      "en-US": "Associated permission not found",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.mail.action.sendFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "邮件发送失败，请检查配置或网络连接",
+      "en-US":
+        "Mail sending failed, please check configuration or network connection",
     },
   },
   {
@@ -3819,6 +3982,58 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "考勤详情",
       "en-US": "Attendance Details",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.i18n.language.duplicateLangCode",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该语言代码已存在",
+      "en-US": "Language code already exists",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.i18n.region.duplicateCode",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该国家/地区代码已存在（alpha2、alpha3 或 numeric 重复）",
+      "en-US":
+        "Region code already exists (duplicate alpha2, alpha3, or numeric)",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.i18n.translation.duplicateTKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "该翻译键在同一语言下已存在",
+      "en-US": "Translation key already exists for this language",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.oss.config.duplicateName",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "存储配置名称已存在",
+      "en-US": "OSS configuration name already exists",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.oss.config.initFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "无法初始化存储实例，请检查配置信息或运行环境",
+      "en-US":
+        "Failed to initialize storage instance. Please check configuration or environment.",
     },
   },
 ] as const satisfies BatchTranslationItem[];

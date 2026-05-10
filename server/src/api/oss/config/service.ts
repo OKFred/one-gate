@@ -20,7 +20,7 @@ import {
   type OssConfigDeleteVOLike,
   type OssConfigGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, and, or, like, not } from "drizzle-orm";
+import { asc, count, desc, eq, and, or, like, not, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -37,10 +37,8 @@ import {
   bodyUserContextAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventStorageInitFailure } from "./prevention";
 import { getStorage } from "@/utils/storage";
 
 // 构建查询条件
@@ -119,6 +117,7 @@ const listAllApi = {
   },
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 // 列表 (分页)
@@ -176,6 +175,7 @@ const listApi = {
   pathInfo: { path: "/list", method: "post", summary: "分页获取存储配置" },
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 // 新增
@@ -213,6 +213,7 @@ const addApi = {
   pathInfo: { path: "/add", method: "post", summary: "添加存储配置" },
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 // 更新
@@ -229,6 +230,7 @@ async function onUpdate(
 ): Promise<number | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
+  await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
 
   if (params.isDefault) {
     await db
@@ -247,9 +249,9 @@ async function onUpdate(
     .where(eq(ossConfigTable.id, id))
     .returning({ id: ossConfigTable.id });
 
-  if (!res || res.length === 0)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 const updateApi = {
@@ -258,6 +260,7 @@ const updateApi = {
   pathInfo: { path: "/update", method: "post", summary: "更新存储配置" },
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 // 获取详情
@@ -273,9 +276,9 @@ async function onGet(params: FromSchema<typeof getReq>) {
     .from(ossConfigTable)
     .where(eq(ossConfigTable.id, params.id))
     .limit(1);
-  if (rows.length === 0)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 
 const getApi = {
@@ -288,6 +291,7 @@ const getApi = {
   pathInfo: { path: "/get", method: "post", summary: "获取配置详情" },
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 // 删除
@@ -296,9 +300,9 @@ async function onDelete(obj: FromSchema<typeof getReq>) {
     .delete(ossConfigTable)
     .where(eq(ossConfigTable.id, obj.id))
     .returning({ id: ossConfigTable.id });
-  if (!result || result.length === 0)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  return result[0].id;
+  const row = result[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 const deleteApi = {
@@ -307,6 +311,7 @@ const deleteApi = {
   pathInfo: { path: "/delete", method: "post", summary: "删除配置" },
   adapter: bodyAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 // 验证连通性
@@ -329,12 +334,7 @@ async function onVerify(
     c.env
   );
 
-  if (!storage) {
-    throw new BusinessError(
-      BusinessErrorCode.VALIDATION_FAILED
-      /* "无法初始化存储实例，请检查配置和运行环境" */
-    );
-  }
+  preventStorageInitFailure(storage);
 
   // 通过列出对象来测试连通性
   await storage.list();
@@ -347,6 +347,7 @@ const verifyApi = {
   pathInfo: { path: "/verify", method: "post", summary: "验证存储连通性" },
   adapter: bodyUserContextAdapter,
   service: onVerify,
+  permission: { action: "read" },
 } satisfies API;
 
 // Utils: 获取当前默认配置
@@ -363,6 +364,28 @@ export async function getDefaultConfig() {
     .limit(1);
   return rows[0] || null;
 }
+
+/**
+ * 校验名称是否唯一
+ */
+async function verifyNameUnique(name: string, excludeId?: number) {
+  const records = await db
+    .select({ id: ossConfigTable.id })
+    .from(ossConfigTable)
+    .where(
+      and(
+        eq(ossConfigTable.name, name),
+        excludeId !== undefined ? ne(ossConfigTable.id, excludeId) : undefined
+      )
+    )
+    .limit(1);
+  return records.length === 0;
+}
+
+export const utils = {
+  getDefaultConfig,
+  verifyNameUnique,
+};
 
 export default {
   listAll: listAllApi,

@@ -169,11 +169,7 @@ const TheTable = memo(
         title: t('filter.enabledStatus'),
         render: (row) => (
           <Chip
-            label={
-              row.isEnabled
-                ? t('status.enabled')
-                : t('status.disabled')
-            }
+            label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
             variant="outlined"
@@ -214,11 +210,7 @@ const TheTable = memo(
             <Chip label={row.business} size="small" color="secondary" variant="outlined" />
             <Chip label={row.langCode} size="small" variant="outlined" />
             <Chip
-              label={
-                row.isEnabled
-                  ? t('status.enabled')
-                  : t('status.disabled')
-              }
+              label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
               size="small"
               color={row.isEnabled ? 'success' : 'default'}
               variant="outlined"

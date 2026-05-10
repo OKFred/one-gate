@@ -22,3 +22,11 @@ export const DataScopeValues = Object.values(DataScope) as [
   DataScopeValue,
   ...DataScopeValue[],
 ];
+
+/** DataScope 优先级（值越大越优先） */
+export const SCOPE_PRIORITY: Record<DataScopeValue, number> = {
+  [DataScope.ALL]: 4,
+  [DataScope.DEPT_AND_BELOW]: 3,
+  [DataScope.CUSTOM]: 2,
+  [DataScope.SELF_ONLY]: 1,
+};

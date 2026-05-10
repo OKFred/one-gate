@@ -14,6 +14,7 @@ import {
   StorageListOptions,
   StorageListResult,
 } from "../types";
+import { applyAwsPolyfills } from "../awsPolyfill";
 
 export class S3Provider implements StorageProvider {
   private client: S3Client;
@@ -26,6 +27,7 @@ export class S3Provider implements StorageProvider {
     secretAccessKey: string;
     bucket: string;
   }) {
+    applyAwsPolyfills();
     this.client = new S3Client({
       endpoint: config.endpoint,
       region: config.region,

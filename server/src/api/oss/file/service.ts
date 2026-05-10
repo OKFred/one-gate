@@ -1,9 +1,7 @@
 import { getDefaultConfig } from "../config/service";
 import { getStorage } from "@/utils/storage";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventStorageInitFailure } from "../config/prevention";
 import type { API } from "@/middleware/encapsulation";
 import { bodyUserContextAdapter } from "@/middleware/encapsulation/adapter";
 import type { FromSchema } from "json-schema-to-ts";
@@ -40,10 +38,9 @@ function cleanUndefined(obj: any): any {
 // 获取存储实例辅助函数
 async function getActiveStorage(env: any) {
   const config = await getDefaultConfig();
-  if (!config)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  preventEmpty(config);
 
-  return getStorage(
+  const storage = getStorage(
     {
       provider: config.provider,
       endpoint: config.endpoint || undefined,
@@ -55,6 +52,9 @@ async function getActiveStorage(env: any) {
     },
     env
   );
+
+  preventStorageInitFailure(storage);
+  return storage!;
 }
 
 // 1. 分页列出文件
@@ -86,9 +86,14 @@ async function onList(
 const listApi = {
   req: listReq,
   res: listRes,
-  pathInfo: { path: "/list", method: "post", summary: "列出存储桶中的文件(分页)" },
+  pathInfo: {
+    path: "/list",
+    method: "post",
+    summary: "列出存储桶中的文件(分页)",
+  },
   adapter: bodyUserContextAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 // 2. 获取全部文件
@@ -126,9 +131,14 @@ async function onListAll(
 const listAllApi = {
   req: listAllReq,
   res: listAllRes,
-  pathInfo: { path: "/listAll", method: "post", summary: "获取所有文件（不分页）" },
+  pathInfo: {
+    path: "/listAll",
+    method: "post",
+    summary: "获取所有文件（不分页）",
+  },
   adapter: bodyUserContextAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 // 3. 获取单文件详情 (含下载链接)
@@ -139,9 +149,7 @@ async function onGet(
 ): Promise<FromSchema<typeof getRes>> {
   const storage = await getActiveStorage(c.env);
   const meta = await storage.head(params.key);
-  if (!meta) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  preventEmpty(meta);
 
   const downloadUrl = await storage.getPresignedGetUrl(params.key, {
     expiresIn: 3600,
@@ -162,6 +170,7 @@ const getApi = {
   pathInfo: { path: "/get", method: "post", summary: "获取文件详情及下载链接" },
   adapter: bodyUserContextAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 // 4. 新增文件 (获取上传 URL)
@@ -184,6 +193,7 @@ const addApi = {
   pathInfo: { path: "/add", method: "post", summary: "获取新建文件上传凭证" },
   adapter: bodyUserContextAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 // 5. 更新文件 (覆盖)
@@ -199,9 +209,14 @@ async function onUpdate(
 const updateApi = {
   req: updateReq,
   res: updateRes,
-  pathInfo: { path: "/update", method: "post", summary: "获取覆盖文件上传凭证" },
+  pathInfo: {
+    path: "/update",
+    method: "post",
+    summary: "获取覆盖文件上传凭证",
+  },
   adapter: bodyUserContextAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 // 6. 删除文件
@@ -221,7 +236,12 @@ const deleteApi = {
   pathInfo: { path: "/delete", method: "post", summary: "删除文件" },
   adapter: bodyUserContextAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
+
+export const utils = {
+  getActiveStorage,
+};
 
 export default {
   list: listApi,

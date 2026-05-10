@@ -9,7 +9,7 @@ export async function getTranslation(
   langCode: string,
   key: string
 ): Promise<string> {
-  const cacheKey = `${langCode}:${key}`;
+  const cacheKey = `i18n.translation.${langCode}.${key}`;
 
   try {
     // 1. 尝试从 KV 缓存获取

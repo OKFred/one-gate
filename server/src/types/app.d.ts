@@ -26,26 +26,28 @@ export type AppBindings = {
     bodyObj?: any;
     userObj?: UserObj;
     timing?: TimingVariables;
-    storage: StorageProvider;
+    logger: import("pino").Logger;
+    getOSS: () => Promise<StorageProvider>;
   };
   Bindings: Env;
 };
 
 export type pathObjLike = RouteConfig & {
-  // eslint-disable-next-line no-unused-vars
-  controller: (c: NodeHonoContext) => Promise<Response>;
+  controller: (c: Context) => Promise<Response>;
 };
 
-export type NodeHonoContext = Context<AppBindings> & {
-  // req: { pathArr: string[] };
-  var: {
-    logger: import("pino").Logger;
-    storage: StorageProvider;
-  };
-};
+// 使用纯泛型实例化，取代交叉类型，让 Hono 内部的上下文推导完美运作
+export type Context = import("hono").Context<AppBindings>;
 export type App = OpenAPIHono<AppBindings>;
 
 // 定义类型工具：提取 T 中必填的键（检查可选性）
 export type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
 }[keyof T];
+
+// 统一的接口返回结构类型
+export type ResJson<T = any> = {
+  ok: boolean;
+  data: T;
+  message: string;
+};

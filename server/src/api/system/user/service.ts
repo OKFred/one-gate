@@ -34,7 +34,15 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { hashPassword, verifyPassword } from "@/utils/crypto";
 import type { RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import {
+  preventSuperAdminDelete,
+  preventSuperAdminDisable,
+  preventAssignSuperAdminRole,
+  preventMissingDepartment,
+  preventMissingRoles,
+  preventMissingRegion,
+  preventInvalidLangCode,
+} from "./prevention";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -47,16 +55,15 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { kv } from "@/middleware/cache";
 
 // 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+export const buildWhereCondition = (condition?: {
+  keyword?: string;
+  isEnabled?: boolean;
+}) => {
+  const { keyword, isEnabled } = condition || {};
   const conditions = [];
   if (hasValue(keyword)) {
     conditions.push(or(like(userTable.username, `%${keyword}%`)));
@@ -127,6 +134,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -202,6 +210,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -234,9 +243,13 @@ async function onAdd(
   const regionId = regionObj ? regionObj.value : null;
   const roleIdArr = roleArr.map((o) => o.value);
   const password = await convertPassword(base64Password);
-  if (departmentId) await departmentUtils.verifyDepartment(departmentId);
-  if (regionId) await regionUtils.verifyRegion(regionId);
-  await roleUtils.verifyRoles(roleIdArr);
+
+  // 前置校验
+  preventAssignSuperAdminRole(roleIdArr);
+  await preventMissingDepartment(departmentId);
+  await preventMissingRegion(regionId);
+  await preventMissingRoles(roleIdArr);
+  await preventInvalidLangCode(langCode);
 
   // 插入用户数据
   const res = await db
@@ -253,10 +266,9 @@ async function onAdd(
       creatorId,
     })
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const userRow = res[0];
+  preventEmpty(userRow);
+  return userRow.id;
 }
 const addApi = {
   req: addReq,
@@ -268,6 +280,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -289,67 +302,41 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, departmentObj, regionObj, roleArr, langCode, ...rest } = params;
-  const isEnabled = roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)
-    ? true
-    : params.isEnabled; // 禁止禁用超级管理员
+
+  // 前置校验
+  if (roleArr !== undefined) {
+    const roleIdArr = roleArr.map((o) => o.value);
+    preventAssignSuperAdminRole(roleIdArr);
+    preventSuperAdminDisable(roleIdArr, params.isEnabled);
+    await preventMissingRoles(roleIdArr);
+  }
+  if (langCode !== undefined) await preventInvalidLangCode(langCode);
+  if (departmentObj !== undefined)
+    await preventMissingDepartment(departmentObj?.value ?? null);
+  if (regionObj !== undefined)
+    await preventMissingRegion(regionObj?.value ?? null);
+
   let updateData = {
     ...rest,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
     password: undefined,
-    departmentId: undefined,
-    regionId: undefined,
-    roleIdArr: undefined,
-    isEnabled: undefined,
-    langCode: undefined,
+    departmentId: departmentObj?.value,
+    regionId: regionObj?.value,
+    roleIdArr: roleArr?.map((o) => o.value),
+    isEnabled: params.isEnabled,
+    langCode,
   };
-  if (langCode !== undefined) {
-    await languageUtils.verifyLangCode(langCode);
-    updateData = {
-      ...updateData,
-      langCode,
-    };
-  }
-  if (departmentObj !== undefined) {
-    const departmentId = departmentObj ? departmentObj.value : null;
-    if (departmentId) await departmentUtils.verifyDepartment(departmentId);
-    updateData = {
-      ...updateData,
-      departmentId,
-    };
-  }
-  if (regionObj !== undefined) {
-    const regionId = regionObj ? regionObj.value : null;
-    if (regionId) await regionUtils.verifyRegion(regionId);
-    updateData = {
-      ...updateData,
-      regionId,
-    };
-  }
-  if (roleArr !== undefined) {
-    const roleIdArr = roleArr ? roleArr.map((o) => o.value) : [];
-    await roleUtils.verifyRoles(roleIdArr);
-    updateData = {
-      ...updateData,
-      roleIdArr,
-    };
-  }
-  if (isEnabled !== undefined) {
-    updateData = {
-      ...updateData,
-      isEnabled,
-    };
-  }
 
   const res = await db
     .update(userTable)
     .set(updateData)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  kv.delete(`system.auth.bundle.${id}`).catch(() => {});
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -361,6 +348,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -381,17 +369,17 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
   const thisUser = await onGet({ id });
-  if (thisUser?.roleArr.find((r) => r.value === SUPER_ADMIN_ROLE_ID)) {
-    throw new BusinessError(BusinessErrorCode["PERMISSION_DENIED"]);
-  }
+
+  // 前置校验
+  preventSuperAdminDelete(thisUser?.roleArr.map((r) => r.value) ?? []);
   const res = await db
     .delete(userTable)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const deleteRow = res[0];
+  preventEmpty(deleteRow);
+  kv.delete(`system.auth.bundle.${id}`).catch(() => {});
+  return deleteRow.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -403,17 +391,26 @@ const deleteApi = {
   } as const,
   adapter: bodyAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 export type UserObj = FromSchema<typeof getRes> & {
   token: string;
   userId: number;
   isSuperAdmin: boolean;
+  /** 用户持有的角色 ID 列表 */
+  roleIds: number[];
   permissions: PermissionInfo[];
+  /** 权限码集合，用于高效查找 */
+  permissionCodes: Set<string>;
   /** 有效数据访问范围（由用户所持角色中最高优先级的 dataScope 决定） */
   dataScope: import("@/types/dataScope").DataScopeValue;
   /** 当 dataScope 为 "custom" 时，指定可访问的部门 ID 列表 */
   customDeptIds: number[];
+  /** 内部状态标识：权限和数据范围是否已加载 */
+  _isLoaded?: boolean;
+  /** 确保权限和数据范围已加载的异步方法 */
+  ensureLoaded: () => Promise<void>;
 };
 const getReq = {
   type: "object",
@@ -440,10 +437,9 @@ async function onGet(
     .from(userTable)
     .where(eq(userTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  const { password, departmentId, regionId, roleIdArr, ...rest } = rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  const { password, departmentId, regionId, roleIdArr, ...rest } = row;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
     regionId,
@@ -466,6 +462,7 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 async function convertPassword(base64Password: string): Promise<string> {
@@ -511,10 +508,9 @@ async function updatePassword(
     })
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (res?.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 async function getUserObjByName(username: string): Promise<UserVOLike | null> {
@@ -523,10 +519,8 @@ async function getUserObjByName(username: string): Promise<UserVOLike | null> {
     .from(userTable)
     .where(eq(userTable.username, username))
     .limit(1);
-  if (userArr.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
   const userObj = userArr[0];
+  preventEmpty(userObj);
   const { departmentId, regionId, roleIdArr, ...rest } = userObj;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
     departmentId,
@@ -619,10 +613,9 @@ export async function updateLangCode(
     })
     .where(eq(userTable.id, updateData.id))
     .returning({ id: userTable.id });
-  if (res?.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 /** 更新用户信息 */
@@ -654,10 +647,9 @@ async function updateUserInfo(
     .set(setData)
     .where(eq(userTable.id, id))
     .returning({ id: userTable.id });
-  if (res?.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 export const utils = {

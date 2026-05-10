@@ -40,19 +40,20 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
 
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
   isEnabled,
 }: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [] as any[];
+  const conditions = [] as ReturnType<typeof eq>[];
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(regionTable.alpha2Code, `%${keyword}%`),
         like(regionTable.alpha3Code, `%${keyword}%`)
-      )
+      ) as ReturnType<typeof eq>
     );
   }
   if (hasValue(isEnabled)) {
@@ -126,6 +127,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -196,6 +198,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -216,7 +219,7 @@ async function onAdd(
   userObj: Pick<UserObj, "userId">
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  await uniqueCheck(params);
+
   const addData = {
     ...params,
     labels: params.labels as { [key: string]: string },
@@ -238,6 +241,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -259,11 +263,7 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  await uniqueCheck(params, id);
-  const previousRecord = await onGet({ id });
-  if (!previousRecord) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
   const updateData: any = {
     ...rest,
     updaterId,
@@ -278,10 +278,8 @@ async function onUpdate(
     .set(updateData)
     .where(eq(regionTable.id, id))
     .returning({ id: regionTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  preventEmpty(res[0]);
+  return res[0]!.id;
 }
 const updateApi = {
   req: updateReq,
@@ -293,6 +291,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -316,10 +315,8 @@ async function onDelete(
     .delete(regionTable)
     .where(eq(regionTable.id, id))
     .returning({ id: regionTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return result[0].id;
+  preventEmpty(result[0]);
+  return result[0]!.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -331,6 +328,7 @@ const deleteApi = {
   } as const,
   adapter: bodyAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -355,17 +353,15 @@ const getRes = {
 } as const satisfies JSONSchema;
 async function onGet(
   params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+): Promise<FromSchema<typeof getRes>> {
   const { id } = params;
   const rows = await db
     .select()
     .from(regionTable)
     .where(eq(regionTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  preventEmpty(rows[0]);
+  return rows[0]!;
 }
 const getApi = {
   req: getReq,
@@ -377,52 +373,55 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
-async function uniqueCheck(
-  obj: FromSchema<typeof updateReq | typeof addReq>,
+/** 验证国家地区是否存在且可用 */
+async function verifyRegion(regionId: number): Promise<void> {
+  const regionData = await onGet({ id: regionId });
+  if (!regionData.isEnabled) {
+    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  }
+}
+
+async function verifyRegionCodeUnique(
+  obj: {
+    alpha2Code?: string | null;
+    alpha3Code?: string | null;
+    numeric?: number | null;
+  },
   excludeId?: number
-): Promise<void> {
+) {
   const conditions = [] as any[];
   if (hasValue(obj.alpha2Code)) {
-    conditions.push(eq(regionTable.alpha2Code, obj.alpha2Code));
+    conditions.push(eq(regionTable.alpha2Code, obj.alpha2Code!));
   }
   if (hasValue(obj.alpha3Code)) {
-    conditions.push(eq(regionTable.alpha3Code, obj.alpha3Code));
+    conditions.push(eq(regionTable.alpha3Code, obj.alpha3Code!));
   }
   if (hasValue(obj.numeric)) {
-    conditions.push(eq(regionTable.numeric, obj.numeric));
+    conditions.push(eq(regionTable.numeric, obj.numeric!));
   }
-  if (conditions.length === 0) return;
+  if (conditions.length === 0) return true;
 
-  const whereClause =
+  const matchClause =
     conditions.length === 1 ? conditions[0] : or(...conditions);
   const records = await db
     .select({ id: regionTable.id })
     .from(regionTable)
     .where(
-      and(whereClause, excludeId ? ne(regionTable.id, excludeId) : undefined)
+      and(
+        matchClause,
+        excludeId !== undefined ? ne(regionTable.id, excludeId) : undefined
+      )
     )
     .limit(1);
-  if (records.length > 0) {
-    throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
-  }
-}
-
-/** 验证国家地区是否存在且可用*/
-async function verifyRegion(regionId: number): Promise<void> {
-  try {
-    const regionData = await onGet({ id: regionId });
-    if (!regionData || !regionData.isEnabled) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
-  } catch (error) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  return records.length === 0;
 }
 
 export const utils = {
   verifyRegion,
+  verifyRegionCodeUnique,
 };
 
 export default {

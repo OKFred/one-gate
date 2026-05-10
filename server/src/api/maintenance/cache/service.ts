@@ -8,7 +8,7 @@ import {
   StatsVO,
   RequestParamFields,
   ResponseFields,
-} from "./schema";
+} from "./model";
 
 /**
  * 列出所有 keys
@@ -61,6 +61,7 @@ const listKeys = {
   } as const,
   adapter: bodyAdapter,
   service: onListKeys,
+  permission: { action: "read" },
 } satisfies API;
 
 /**
@@ -106,6 +107,7 @@ const get = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 /**
@@ -150,6 +152,7 @@ const put = {
   } as const,
   adapter: bodyAdapter,
   service: onPut,
+  permission: { action: "edit" },
 } satisfies API;
 
 /**
@@ -191,6 +194,7 @@ const deleteKey = {
   } as const,
   adapter: bodyAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 /**
@@ -227,6 +231,7 @@ const clear = {
   } as const,
   adapter: bodyAdapter,
   service: onClear,
+  permission: { action: "delete" },
 } satisfies API;
 
 export default {

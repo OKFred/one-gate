@@ -1,4 +1,9 @@
-import type { AppBindings, NodeHonoContext, RawRouteConfig } from "@/types/app";
+import type {
+  AppBindings,
+  Context,
+  RawRouteConfig,
+  ResJson,
+} from "@/types/app";
 import { getEnv } from "@/utils/env";
 import { validate } from "@cfworker/json-schema";
 import {
@@ -11,9 +16,8 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
-import { authMiddleware } from "../bearerAuth";
-import { checkPermission } from "../accessControl";
-import { getRuntimeKey } from "hono/adapter";
+import { authMiddleware } from "../auth";
+import { can } from "../auth/permission";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -57,22 +61,14 @@ function routeMaker({
   reqSchema,
   resSchema,
   componentArr,
-  requiredPermissions,
+  permission,
 }: API & {
   nameSpace: string;
   reqSchema: JSONSchema;
   resSchema: JSONSchema;
   componentArr: ReturnType<typeof componentMaker>[];
-  requiredPermissions?: string[];
 }) {
-  // 默认给接口都加上命名空间前缀作为权限标识
-  const permissionCode = nameSpace + ":api" + pathInfo.path;
-  if (!requiredPermissions) {
-    requiredPermissions = [permissionCode];
-  } else {
-    requiredPermissions.push(permissionCode);
-  }
-  const controller = async (c: NodeHonoContext) => {
+  const controller = async (c: Context) => {
     //获取request header content type
     //如果不是 application/json 则报错
     const contentType = c.req.header("content-type");
@@ -86,7 +82,13 @@ function routeMaker({
     );
     try {
       await authMiddleware(c);
-      await checkPermission(requiredPermissions)(c);
+      // 基于 action 的权限检查（RBAC）
+      if (permission) {
+        const userObj = c.get("userObj");
+        if (userObj && !(await can(userObj, permission.action, nameSpace))) {
+          throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+        }
+      }
     } catch (error) {
       if (!ignoreError) {
         throw error;
@@ -113,7 +115,7 @@ function routeMaker({
         );
       }
     }
-    return c.json(
+    return c.json<ResJson>(
       { ok: true, message: "OK", data: result },
       StatusCodes.OK as ContentfulStatusCode
     );
@@ -154,18 +156,12 @@ export interface API {
   res: JSONSchema;
   pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
   adapter: Function;
-  service: (c: NodeHonoContext | any, ...args: any[]) => Promise<any>;
-  requiredPermissions?: string[];
+  service: (c: Context | any, ...args: any[]) => Promise<any>;
+  /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
+  permission?: { action: string };
 }
 
-export default function main(
-  apiObj: Record<string, API>,
-  nameSpace: string,
-  prerequisites?: Function
-) {
-  if (prerequisites && getRuntimeKey() !== "workerd") {
-    prerequisites(); //适配worker时需要调整
-  }
+export default function main(apiObj: Record<string, API>, nameSpace: string) {
   const app = new OpenAPIHono<AppBindings>();
   Array.from(Object.values(apiObj)).forEach((obj) => {
     const { req, res, pathInfo } = obj;

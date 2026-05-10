@@ -1,5 +1,15 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import { IconButton, Box, Tooltip, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import {
+  IconButton,
+  Box,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from '@mui/material';
 import { Download, Delete, ContentCopy } from '@mui/icons-material';
 import { showSnackbar } from '@/components/Notification';
 import ResponsiveList, {
@@ -32,7 +42,12 @@ const TheTable = memo(
     });
 
     const fetchList = useCallback(
-      async (filters: FilterState, page: number = 1, pageSize: number = 10, cursors: (string | undefined)[] = [undefined]) => {
+      async (
+        filters: FilterState,
+        page: number = 1,
+        pageSize: number = 10,
+        cursors: (string | undefined)[] = [undefined],
+      ) => {
         setState((prev) => ({ ...prev, loading: true }));
         try {
           const cursor = cursors[page - 1];
@@ -46,7 +61,7 @@ const TheTable = memo(
           const list = res.data?.data?.list || [];
           const nextCursor = res.data?.data?.cursor;
           const hasMore = !!res.data?.data?.hasMore;
-          
+
           const nextCursors = [...cursors];
           if (hasMore) {
             nextCursors[page] = nextCursor;

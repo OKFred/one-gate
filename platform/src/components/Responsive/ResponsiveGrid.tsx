@@ -54,7 +54,7 @@ export const CardGrid: React.FC<Omit<ResponsiveGridProps, 'columns'>> = (props) 
       sm: 2,
       md: 2,
       lg: 3,
-      xl: 4
+      xl: 4,
     }}
     {...props}
   />
@@ -68,7 +68,7 @@ export const DashboardGrid: React.FC<Omit<ResponsiveGridProps, 'columns'>> = (pr
       sm: 2,
       md: 2,
       lg: 4,
-      xl: 4
+      xl: 4,
     }}
     {...props}
   />

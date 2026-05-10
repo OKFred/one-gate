@@ -1,0 +1,5 @@
+# Ignore build outputs
+dist
+node_modules
+.vite
+openapi.d.ts

@@ -27,10 +27,10 @@ export default function UserManagement() {
   const filterRef = useRef<TheFilterRef>(null);
   const [enabledRegions, setEnabledRegions] = useState<ListAllRegionRes>([]);
   const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
-  
+
   const localObj: LocalObj = useMemo(
     () => ({ tableRef, formRef, filterRef, enabledRegions, enabledLanguages }),
-    [enabledRegions, enabledLanguages]
+    [enabledRegions, enabledLanguages],
   );
 
   // 获取启用的地区列表

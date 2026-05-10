@@ -85,7 +85,11 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         [String(item.id)]: !prev[String(item.id)],
       }));
     } else if (item.path) {
-      navigate(item.path);
+      if (item.path.startsWith('http')) {
+        window.open(item.path, '_blank');
+      } else {
+        navigate(item.path);
+      }
       if (isMobile) {
         onClose?.();
       } // 移动端点击菜单后关闭侧边栏

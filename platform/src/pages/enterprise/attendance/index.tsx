@@ -26,8 +26,8 @@ export default function AttendancePage() {
   const t = useTranslation();
 
   return (
-    <PageLayout 
-      title={t("enterprise.attendance.title")} 
+    <PageLayout
+      title={t('enterprise.attendance.title')}
       actions={<TheActionButtons formRef={formRef} />}
     >
       <TheFilter ref={localObj.filterRef} localObj={localObj} />

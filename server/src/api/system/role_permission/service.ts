@@ -21,6 +21,13 @@ import {
   type RolePermissionGetVOLike,
   RolePermissionBaseVO,
 } from "./model";
+import {
+  ErrorCodes,
+  preventMissingRecord,
+  preventMissingRole,
+  preventMissingPermission,
+  preventMissingPermissions,
+} from "./prevention";
 import { permissionTable } from "../permission/model";
 import roleService, { utils as roleUtils } from "../role/service";
 import permissionService from "../permission/service";
@@ -40,13 +47,11 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
 import { PermissionInfo } from "@/api/system/permission/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import { kv } from "@/middleware/cache";
+import { preventEmpty } from "@/middleware/auth/prevention";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -54,12 +59,13 @@ const buildWhereCondition = ({
   permissionId,
 }: Pick<FromSchema<typeof listReq>, "roleId" | "permissionId">) => {
   const conditions = [];
-  if (roleId !== undefined) {
-    conditions.push(eq(rolePermissionTable.roleId, roleId));
-  }
-  if (permissionId !== undefined) {
-    conditions.push(eq(rolePermissionTable.permissionId, permissionId));
-  }
+  if (hasValue(roleId))
+    conditions.push(eq(rolePermissionTable.roleId, roleId as number));
+  if (hasValue(permissionId))
+    conditions.push(
+      eq(rolePermissionTable.permissionId, permissionId as number)
+    );
+
   return conditions.length > 0
     ? conditions.length === 1
       ? conditions[0]
@@ -73,6 +79,13 @@ async function getCurrentPermissionCount(roleId: number): Promise<number> {
     .from(rolePermissionTable)
     .where(eq(rolePermissionTable.roleId, roleId));
   return countResult[0]?.count || 0;
+}
+
+/** 更新全局权限版本号，强制所有用户缓存失效 */
+async function invalidateAuthCache() {
+  await kv
+    .put("system.auth.global_version", Date.now().toString())
+    .catch(() => {});
 }
 
 const listAllReq = {
@@ -124,6 +137,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -198,6 +212,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -220,18 +235,9 @@ async function onAdd(
   const { userId: creatorId } = userObj;
   const { roleId, permissionId } = obj;
 
-  // 验证角色是否存在
-  await roleService.get.service({ id: roleId });
-
-  // 验证权限是否存在
-  const permissionExists = await db
-    .select({ id: permissionTable.id })
-    .from(permissionTable)
-    .where(eq(permissionTable.id, permissionId))
-    .limit(1);
-  if (permissionExists.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  // 前置校验
+  await preventMissingRole(roleId);
+  await preventMissingPermission(permissionId);
 
   const result = await db
     .insert(rolePermissionTable)
@@ -245,6 +251,9 @@ async function onAdd(
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
+  // 触发全局缓存失效
+  await invalidateAuthCache();
+
   return result[0]?.id;
 }
 const addApi = {
@@ -257,6 +266,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 // 批量添加权限到角色
@@ -285,24 +295,9 @@ async function onBatchAdd(
   const { userId: creatorId } = userObj;
   const { roleId, permissionIds } = obj;
 
-  // 验证角色是否存在
-  await roleService.get.service({ id: roleId });
-
-  // 验证权限是否存在 (分片查询以避免变量限制)
-  const checkChunkSize = 100;
-  let allExistingPermissions: { id: number }[] = [];
-  for (let i = 0; i < permissionIds.length; i += checkChunkSize) {
-    const chunk = permissionIds.slice(i, i + checkChunkSize);
-    const chunkExist = await db
-      .select({ id: permissionTable.id })
-      .from(permissionTable)
-      .where(inArray(permissionTable.id, chunk));
-    allExistingPermissions = allExistingPermissions.concat(chunkExist);
-  }
-  
-  if (allExistingPermissions.length !== permissionIds.length) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  // 前置校验
+  await preventMissingRole(roleId);
+  await preventMissingPermissions(permissionIds);
 
   // 批量插入，分片处理以避免 D1 变量限制 (通常为 100)
   // 每行 3 个变量，取 25 行为一组 (75 变量)
@@ -315,15 +310,26 @@ async function onBatchAdd(
       permissionId,
       creatorId,
     }));
-    batches.push(db.insert(rolePermissionTable).values(values).returning({ id: rolePermissionTable.id }));
+    batches.push(
+      db
+        .insert(rolePermissionTable)
+        .values(values)
+        .returning({ id: rolePermissionTable.id })
+    );
   }
 
   const results = batches.length > 0 ? await db.batch(batches as any) : [];
-  const totalAdded = results.reduce((acc: number, curr: any) => acc + curr.length, 0);
+  const totalAdded = results.reduce(
+    (acc: number, curr: any) => acc + curr.length,
+    0
+  );
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
+
+  // 触发全局缓存失效
+  await invalidateAuthCache();
 
   return totalAdded;
 }
@@ -337,6 +343,7 @@ const batchAddApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onBatchAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -357,10 +364,18 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, ...rest } = params;
+  const { id, roleId, permissionId, ...rest } = params;
+
+  // 前置校验
+  await preventMissingRecord(id);
+  if (hasValue(roleId)) await preventMissingRole(roleId as number);
+  if (hasValue(permissionId))
+    await preventMissingPermission(permissionId as number);
 
   const updateData = {
     ...rest,
+    roleId,
+    permissionId,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
@@ -370,10 +385,11 @@ async function onUpdate(
     .set(updateData)
     .where(eq(rolePermissionTable.id, id))
     .returning({ id: rolePermissionTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  // 触发全局缓存失效
+  await invalidateAuthCache();
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -385,6 +401,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -406,30 +423,31 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
 
-  // 先获取 roleId
+  // 前置校验
   const record = await db
     .select({ roleId: rolePermissionTable.roleId })
     .from(rolePermissionTable)
     .where(eq(rolePermissionTable.id, id))
     .limit(1);
-  if (record.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  const roleId = record[0].roleId;
+  const row = record[0];
+  preventEmpty(row);
+  const roleId = row.roleId;
 
   const result = await db
     .delete(rolePermissionTable)
     .where(eq(rolePermissionTable.id, id))
     .returning({ id: rolePermissionTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  const resRow = result[0];
+  preventEmpty(resRow);
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
-  return result[0].id;
+  // 触发全局缓存失效
+  await invalidateAuthCache();
+
+  return resRow.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -441,6 +459,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 // 批量删除角色的权限
@@ -468,6 +487,9 @@ async function onBatchDelete(
 ): Promise<FromSchema<typeof batchDeleteRes>> {
   const { roleId, permissionIds } = obj;
 
+  // 前置校验
+  await preventMissingRole(roleId);
+
   // 分片删除以避免 D1 变量限制 (通常为 100)
   // inArray 会产生 N 个变量，取 50 为一组
   const chunkSize = 50;
@@ -488,11 +510,17 @@ async function onBatchDelete(
   }
 
   const results = batches.length > 0 ? await db.batch(batches as any) : [];
-  const totalDeleted = results.reduce((acc: number, curr: any) => acc + curr.length, 0);
+  const totalDeleted = results.reduce(
+    (acc: number, curr: any) => acc + curr.length,
+    0
+  );
 
   // 更新角色权限数量
   const currentCount = await getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
+
+  // 触发全局缓存失效
+  await invalidateAuthCache();
 
   return totalDeleted;
 }
@@ -506,6 +534,7 @@ const batchDeleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onBatchDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -537,10 +566,9 @@ async function onGet(
     .from(rolePermissionTable)
     .where(eq(rolePermissionTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 const getApi = {
   req: getReq,
@@ -552,6 +580,7 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 // 获取角色的所有权限
@@ -611,6 +640,7 @@ const getPermissionsByRoleApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGetPermissionsByRole,
+  permission: { action: "read" },
 } satisfies API;
 
 /**
@@ -701,10 +731,36 @@ async function getMenuIdsByRoleIds(roleIds: number[]) {
   return rows.map((row) => parseInt(row.menuId)).filter((id) => !isNaN(id));
 }
 
+async function verifyRecordExists(id: number) {
+  const rows = await db
+    .select({ id: rolePermissionTable.id })
+    .from(rolePermissionTable)
+    .where(eq(rolePermissionTable.id, id))
+    .limit(1);
+  return rows.length > 0;
+}
+
+async function verifyRoleExists(roleId: number) {
+  return await roleUtils.verifyRoleExists(roleId);
+}
+
+async function verifyPermissionExists(permissionId: number) {
+  const count = await permissionUtils.countPermissionsByIds([permissionId]);
+  return count > 0;
+}
+
+async function countPermissionsByIds(ids: number[]) {
+  return await permissionUtils.countPermissionsByIds(ids);
+}
+
 export const utils = {
   addMenuPermissionToRole,
   getMenuIdsByRoleIds,
   getPermissionsByRoleIds,
+  verifyRecordExists,
+  verifyRoleExists,
+  verifyPermissionExists,
+  countPermissionsByIds,
 };
 
 export default {

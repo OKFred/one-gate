@@ -26,7 +26,7 @@ import hasValue from "@/utils/hasValue";
  */
 async function recordLogin(userId: number, ip: string, userAgent: string) {
   const now = Date.now();
-  
+
   // 1. 插入新记录
   await db.insert(loginAuditTable).values({
     userId,
@@ -44,10 +44,12 @@ async function recordLogin(userId: number, ip: string, userAgent: string) {
     .orderBy(desc(loginAuditTable.loginTimeUtc))
     .offset(30)
     .limit(100); // 批量清理，防止积压
-  
+
   if (userRecords.length > 0) {
     const idsToDelete = userRecords.map((r) => r.id);
-    await db.delete(loginAuditTable).where(inArray(loginAuditTable.id, idsToDelete));
+    await db
+      .delete(loginAuditTable)
+      .where(inArray(loginAuditTable.id, idsToDelete));
   }
 }
 
@@ -76,7 +78,13 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10, userId } = params;
+  const {
+    orderBy = "id",
+    descend = true,
+    pageNo = 1,
+    pageSize = 10,
+    userId,
+  } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = loginAuditTable[orderBy] || loginAuditTable.id;
   const finalPageSize = Math.min(pageSize, 1000);
@@ -133,6 +141,7 @@ const listApi = {
   } as const,
   adapter: bodyUserAdapter, // 需要登录才能查看审计记录
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 export const utils = {

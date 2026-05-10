@@ -28,7 +28,11 @@ import { DataScope, DataScopeValues } from "@/types/dataScope";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
+import {
+  preventSuperAdminDelete,
+  preventSuperAdminUpdate,
+  preventMissingRoles,
+} from "./prevention";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -41,16 +45,14 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
 
 // 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
+export const buildWhereCondition = (condition?: {
+  keyword?: string;
+  isEnabled?: boolean;
+}) => {
+  const { keyword, isEnabled } = condition || {};
   const conditions = [];
   if (hasValue(keyword)) {
     conditions.push(or(like(roleTable.name, `%${keyword}%`)));
@@ -119,6 +121,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -196,6 +199,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -246,6 +250,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -277,16 +282,14 @@ async function onUpdate(
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
-  // 禁止禁用超级管理员角色，且锁定其 dataScope 为 "all"
-  const isEnabled = id === SUPER_ADMIN_ROLE_ID ? true : params.isEnabled;
-  const dataScope = id === SUPER_ADMIN_ROLE_ID ? DataScope.ALL : rest.dataScope;
+
+  // 前置校验
+  preventSuperAdminUpdate(id, params);
 
   const updateData = {
     ...rest,
-    dataScope,
     updaterId,
     updateTimeUtc: getCurrentTimestampUtcSql(),
-    isEnabled,
   };
 
   const res = await db
@@ -294,10 +297,9 @@ async function onUpdate(
     .set(updateData)
     .where(eq(roleTable.id, id))
     .returning({ id: roleTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -309,6 +311,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -329,17 +332,16 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  if (id === SUPER_ADMIN_ROLE_ID) {
-    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
-  }
+
+  // 前置校验
+  preventSuperAdminDelete(id);
   const result = await db
     .delete(roleTable)
     .where(eq(roleTable.id, id))
     .returning({ id: roleTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return result[0].id;
+  const row = result[0];
+  preventEmpty(row);
+  return row.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -351,6 +353,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -378,10 +381,8 @@ async function onGet(
     .from(roleTable)
     .where(eq(roleTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
   const row = rows[0];
+  preventEmpty(row);
   return {
     ...row,
     dataScope: (row.dataScope ??
@@ -398,6 +399,7 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 async function getRolesByIds(
@@ -412,17 +414,7 @@ async function getRolesByIds(
 }
 
 async function verifyRoles(roleIdArr: number[]) {
-  const rows = await getRolesByIds(roleIdArr);
-  // 检查返回的角色数量是否与请求的数量一致
-  if (rows.length !== roleIdArr.length) {
-    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
-  }
-  // 检查每个请求的角色ID是否都在返回结果中
-  const returnedRoleIds = rows.map((r) => r.value);
-  const allRolesExist = roleIdArr.every((id) => returnedRoleIds.includes(id));
-  if (!allRolesExist) {
-    throw new BusinessError(BusinessErrorCode["ROLE_NOT_EXIST"]);
-  }
+  await preventMissingRoles(roleIdArr);
 }
 
 /** 更新角色的权限数量 */
@@ -435,10 +427,19 @@ async function updatePermissionCount(
     .set({ permissionCount: newCount })
     .where(eq(roleTable.id, roleId));
 }
+async function verifyRoleExists(roleId: number) {
+  const rows = await db
+    .select({ id: roleTable.id })
+    .from(roleTable)
+    .where(eq(roleTable.id, roleId))
+    .limit(1);
+  return rows.length > 0;
+}
 
 export const utils = {
   getRolesByIds,
   verifyRoles,
+  verifyRoleExists,
   updatePermissionCount,
 };
 

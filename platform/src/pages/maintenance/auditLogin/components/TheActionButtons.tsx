@@ -16,11 +16,7 @@ export const TheActionButtons = ({ tableRef }: ActionButtonsProps) => {
 
   return (
     <Stack direction="row" spacing={1}>
-      <Button
-        variant="contained"
-        startIcon={<RefreshIcon />}
-        onClick={handleRefresh}
-      >
+      <Button variant="contained" startIcon={<RefreshIcon />} onClick={handleRefresh}>
         {t('table.refresh')}
       </Button>
     </Stack>

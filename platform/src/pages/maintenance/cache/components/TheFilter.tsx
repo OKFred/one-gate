@@ -116,7 +116,6 @@ const TheFilter = memo(
 
         <Collapse in={expanded}>
           <Stack spacing={2}>
-
             <TextField
               label={t('cache.filter.keyPrefix')}
               value={keywordInput}

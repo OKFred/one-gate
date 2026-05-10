@@ -26,10 +26,10 @@ export default function ThePage() {
   const formRef = useRef<TheFormRef>(null);
   const filterRef = useRef<TheFilterRef>(null);
   const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
-  
+
   const localObj: LocalObj = useMemo(
     () => ({ tableRef, formRef, filterRef, enabledLanguages }),
-    [enabledLanguages]
+    [enabledLanguages],
   );
 
   // 获取启用的语言列表

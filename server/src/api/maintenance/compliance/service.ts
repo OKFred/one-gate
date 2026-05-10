@@ -149,6 +149,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 /**

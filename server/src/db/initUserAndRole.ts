@@ -18,11 +18,14 @@ export async function prepareSuperAdminRole(options?: { reset?: boolean }) {
   const queries: any[] = [];
 
   if (options?.reset) {
-    queries.push(db.delete(roleTable).where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID)));
+    queries.push(
+      db.delete(roleTable).where(eq(roleTable.id, SUPER_ADMIN_ROLE_ID))
+    );
   }
 
   queries.push(
-    db.insert(roleTable)
+    db
+      .insert(roleTable)
       .values({ ...SUPER_ADMIN_ROLE, id: SUPER_ADMIN_ROLE_ID })
       .onConflictDoUpdate({
         target: roleTable.id,
@@ -50,8 +53,7 @@ export async function prepareSuperAdminUser(
 
   if (options?.reset) {
     queries.push(
-      db.delete(userTable)
-        .where(eq(userTable.username, SUPER_ADMIN.username))
+      db.delete(userTable).where(eq(userTable.username, SUPER_ADMIN.username))
     );
   }
 
@@ -59,7 +61,8 @@ export async function prepareSuperAdminUser(
   const hashedPassword = await hashPassword(SUPER_ADMIN.password);
 
   queries.push(
-    db.insert(userTable)
+    db
+      .insert(userTable)
       .values({
         username: SUPER_ADMIN.username,
         password: hashedPassword,

@@ -1,12 +1,6 @@
 export const BusinessErrorCode = {
-  /** @description 存在子节点，请检查后重试 */
-  HAS_CHILDREN: "HAS_CHILDREN",
   /** @description 无效参数 */
   INVALID_PARAMS: "INVALID_PARAMS",
-  /** @description 登录失败，用户名或密码错误 */
-  LOGIN_FAILED: "LOGIN_FAILED",
-  /** @description 密码错误 */
-  WRONG_PASSWORD: "WRONG_PASSWORD",
   /** @description 未认证或登录态缺失 */
   NOT_AUTHENTICATED: "NOT_AUTHENTICATED",
   /** @description 没有权限操作 */
@@ -19,20 +13,12 @@ export const BusinessErrorCode = {
   VALIDATION_FAILED: "VALIDATION_FAILED",
   /** @description 功能暂未实现 */
   NOT_YET_IMPLEMENTED: "NOT_YET_IMPLEMENTED",
-  /** @description 部门不存在或已被禁用 */
-  DEPARTMENT_NOT_EXIST: "DEPARTMENT_NOT_EXIST",
   /** @description 未知错误 */
   UNKNOWN_ERROR: "UNKNOWN_ERROR",
-  /** @description 角色不存在或已被禁用 */
-  ROLE_NOT_EXIST: "ROLE_NOT_EXIST",
   /** @description 数据库繁忙或锁定 */
   DATABASE_BUSY: "DATABASE_BUSY",
   /** @description 数据库操作错误 */
   DATABASE_ERROR: "DATABASE_ERROR",
-  /** @description 部门下存在在职人员，无法禁用 */
-  DEPARTMENT_HAS_ENABLED_USER: "DEPARTMENT_HAS_ENABLED_USER",
-  /** @description 部门下存在未禁用的子部门 */
-  DEPARTMENT_HAS_ENABLED_CHILDREN: "DEPARTMENT_HAS_ENABLED_CHILDREN",
 } as const;
 
 export type BusinessErrorCode =
@@ -46,21 +32,6 @@ export const ERROR_PRESENTATION_MAP: Record<
     i18nKey: string;
   }
 > = {
-  HAS_CHILDREN: {
-    i18nKey: "errorHandler.hasChildren",
-  },
-  DEPARTMENT_NOT_EXIST: {
-    i18nKey: "errorHandler.departmentNotExist",
-  },
-  ROLE_NOT_EXIST: {
-    i18nKey: "errorHandler.roleNotExist",
-  },
-  LOGIN_FAILED: {
-    i18nKey: "errorHandler.loginFailed",
-  },
-  WRONG_PASSWORD: {
-    i18nKey: "errorHandler.wrongPassword",
-  },
   INVALID_PARAMS: {
     status: 400,
     i18nKey: "errorHandler.invalidParams",
@@ -100,11 +71,5 @@ export const ERROR_PRESENTATION_MAP: Record<
   DATABASE_ERROR: {
     status: 500,
     i18nKey: "errorHandler.databaseError",
-  },
-  DEPARTMENT_HAS_ENABLED_USER: {
-    i18nKey: "errorHandler.departmentHasEnabledUser",
-  },
-  DEPARTMENT_HAS_ENABLED_CHILDREN: {
-    i18nKey: "errorHandler.departmentHasEnabledChildren",
   },
 };

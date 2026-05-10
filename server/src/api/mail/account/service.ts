@@ -39,11 +39,7 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
-import mailActionService from "../action/service";
+import { preventEmpty } from "@/middleware/auth/prevention";
 // 构建查询条件(列表和全部通用)
 const buildWhereCondition = ({
   keyword,
@@ -119,6 +115,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -191,6 +188,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -235,6 +233,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -273,10 +272,9 @@ async function onUpdate(
     .set(updateData)
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 const updateApi = {
   req: updateReq,
@@ -288,6 +286,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -312,10 +311,9 @@ async function onDelete(
     .delete(mailAccountTable)
     .where(eq(mailAccountTable.id, id))
     .returning({ id: mailAccountTable.id });
-  if (!result || result.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return result[0].id;
+  const row = result[0];
+  preventEmpty(row);
+  return row.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -327,6 +325,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -358,10 +357,9 @@ async function onGet(
     .from(mailAccountTable)
     .where(eq(mailAccountTable.id, id))
     .limit(1);
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 const getApi = {
   req: getReq,
@@ -373,6 +371,7 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 async function getMailAccountsByIds(

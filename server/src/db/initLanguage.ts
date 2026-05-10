@@ -44,7 +44,8 @@ export async function prepareLanguage(options?: { reset?: boolean }) {
 
   for (const data of mappedData) {
     queries.push(
-      db.insert(languageTable)
+      db
+        .insert(languageTable)
         .values(data)
         .onConflictDoUpdate({
           target: languageTable.langCode,

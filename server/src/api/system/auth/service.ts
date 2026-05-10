@@ -23,6 +23,7 @@ import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
+import { preventLoginFailure, preventWrongPassword } from "./prevention";
 
 // 普通登录
 const loginReq = {
@@ -73,14 +74,11 @@ async function onLogin(
     username,
     password,
   });
-  if (
-    !verifyResult ||
-    !verifyResult.valid ||
-    !verifyResult.userObj ||
-    !verifyResult.userObj.isEnabled
-  )
-    throw new BusinessError(BusinessErrorCode.LOGIN_FAILED);
-  const userObj = verifyResult.userObj;
+
+  // 前置校验
+  preventLoginFailure(verifyResult);
+
+  const userObj = verifyResult.userObj!;
   const { id, langCode, ...rest } = userObj;
   // 生成token
   const token = tokenUtils.generateToken({
@@ -190,8 +188,7 @@ async function onRefreshToken(
 ): Promise<FromSchema<typeof refreshTokenRes> | null> {
   const { token } = userObj;
   const newToken = tokenUtils.refreshToken(token);
-  if (!newToken) throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
-  return { token: newToken };
+  return { token: newToken! };
 }
 const refreshTokenApi = {
   req: refreshTokenReq,
@@ -375,9 +372,9 @@ async function onUpdatePassword(
     username,
     password: oldPlainPassword,
   });
-  if (!verifyResult.valid) {
-    throw new BusinessError(BusinessErrorCode.WRONG_PASSWORD);
-  }
+
+  // 前置校验
+  preventWrongPassword(verifyResult.valid);
   const newHashedPassword = await userUtils.convertPassword(newBase64Password);
   const res = await userUtils.updatePassword(
     { id, newHashedPassword },
@@ -420,6 +417,9 @@ async function onGetButtonPermission(
   params: FromSchema<typeof getButtonPermissionReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof getButtonPermissionRes> | null> {
+  // 必须手动触发加载，因为该接口本身不走 RBAC 校验
+  await userObj.ensureLoaded();
+
   const buttonPermissions = userObj.permissions.filter(
     (p) => p.category === "button"
   );

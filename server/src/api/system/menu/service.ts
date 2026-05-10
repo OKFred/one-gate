@@ -21,7 +21,7 @@ import {
   type MenuGetVOLike,
   MenuBaseVO,
 } from "./model";
-import { asc, count, desc, eq, or, and } from "drizzle-orm";
+import { asc, count, desc, eq, or, and, like } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
 import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
@@ -37,16 +37,49 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
-import { guardOperation } from "@/middleware/accessControl/onWrite/operationGuard";
-import { buildWhereCondition, presetGuards } from "./permission";
+  preventMissingParent,
+  preventSelfParent,
+  preventCircularParent,
+  preventDeleteWithChildren,
+  preventDisableWithEnabledChildren,
+} from "./prevention";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import hasValue from "@/utils/hasValue";
 import translationService from "@/api/i18n/translation/service";
 import { utils as permissionUtils } from "@/api/system/permission/service";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import { rolePermissionTable } from "@/api/system/role_permission/model";
 import { permissionTable } from "@/api/system/permission/model";
+
+// 构建查询条件(列表和全部通用)
+export const buildWhereCondition = (condition?: {
+  id?: number;
+  keyword?: string;
+  business?: string | null;
+  isEnabled?: boolean;
+}) => {
+  const { id, keyword, business, isEnabled } = condition || {};
+  const conditions = [];
+
+  if (hasValue(id)) {
+    conditions.push(eq(menuTable.id, id!));
+  }
+  if (hasValue(keyword)) {
+    conditions.push(or(like(menuTable.name, `%${keyword}%`)));
+  }
+  if (hasValue(business)) {
+    conditions.push(eq(menuTable.business, business!));
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(menuTable.isEnabled, isEnabled));
+  }
+
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+};
 
 const listAllReq = {
   type: "object",
@@ -78,7 +111,7 @@ async function onListAll(
   const orderField = menuTable[orderBy] || menuTable.id;
   const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
   // 查询所有匹配的数据
-  const whereCondition = await buildWhereCondition(params);
+  const whereCondition = buildWhereCondition(params);
   const rows = await db
     .select({
       id: menuTable.id,
@@ -107,6 +140,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -137,7 +171,7 @@ async function onList(
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const whereCondition = await buildWhereCondition(params);
+  const whereCondition = buildWhereCondition(params);
   // 查询总数
   const countResult = await db
     .select({ total: count(menuTable.id).as("total") })
@@ -180,6 +214,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -200,7 +235,8 @@ async function onAdd(
   const { userId: creatorId } = userObj;
   const { parentId, name } = params;
 
-  await guardOperation([presetGuards.parentExists(parentId)]);
+  // 前置校验
+  await preventMissingParent(parentId);
 
   const updateData = {
     ...params,
@@ -230,6 +266,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -258,17 +295,20 @@ async function onUpdate(
     .from(menuTable)
     .where(eq(menuTable.id, id))
     .limit(1);
-  if (!current[0]) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
   const currentMenu = current[0];
 
-  await guardOperation([
-    presetGuards.notSelfParent(id, rest.parentId),
-    presetGuards.notDescendantParent(id, rest.parentId),
-    presetGuards.parentExistsIfChanged(rest.parentId, currentMenu.parentId),
-    presetGuards.disableCondition(id, currentMenu.isEnabled, rest.isEnabled),
-  ]);
+  // 前置校验
+  preventEmpty(currentMenu);
+  preventSelfParent(id, rest.parentId);
+  await preventMissingParent(rest.parentId);
+  await preventCircularParent(id, rest.parentId);
+  if (currentMenu.isEnabled !== undefined) {
+    await preventDisableWithEnabledChildren(
+      id,
+      currentMenu.isEnabled,
+      rest.isEnabled
+    );
+  }
 
   const updateData = {
     ...rest,
@@ -276,60 +316,66 @@ async function onUpdate(
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  // 使用事务确保菜单表和权限表的更新一致性
-  const result = await db.transaction(async (tx) => {
-    const res = await tx
+  // 提前准备权限更新所需数据
+  const { name } = rest;
+  let permissionId: number | null = null;
+  let permissionName: string | undefined;
+
+  if (name !== undefined) {
+    permissionId = await permissionUtils.getPermissionIdByMenuId(id);
+    const translationList = await translationService.listAll.service({
+      isEnabled: true,
+    });
+    const prefix =
+      translationList.find(
+        (t) =>
+          t.tKey === (rest.business ?? currentMenu.business) &&
+          t.langCode === userObj.langCode
+      )?.tValue || "未知菜单权限";
+    const postfix = translationList.find(
+      (item) =>
+        item.tKey === "permission.category.menu" &&
+        item.langCode === userObj.langCode
+    )?.tValue;
+    permissionName = postfix ? `${prefix}${postfix}` : name + "未知菜单";
+  }
+
+  // 构造 batch 任务
+  const batchQueries: any[] = [
+    db
       .update(menuTable)
       .set(updateData)
       .where(eq(menuTable.id, id))
-      .returning({ id: menuTable.id });
+      .returning({ id: menuTable.id }),
+  ];
 
-    if (!res || res.length === 0) {
-      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-    }
-
-    // 如果更新了菜单名称，需要更新权限记录的名称
-    const { name } = rest;
-    if (name !== undefined) {
-      // 处理权限更新
-      const permissionId = await permissionUtils.getPermissionIdByMenuId(id);
-      const permissionName = await translationService.listAll
-        .service({
-          isEnabled: true,
+  if (permissionId && name !== undefined) {
+    // 删除现有的角色权限关联
+    batchQueries.push(
+      db
+        .delete(rolePermissionTable)
+        .where(eq(rolePermissionTable.permissionId, permissionId))
+    );
+    // 更新权限信息
+    batchQueries.push(
+      db
+        .update(permissionTable)
+        .set({
+          code: `${name}:menu`,
+          name: permissionName,
+          updaterId,
+          updateTimeUtc: getCurrentTimestampUtcSql(),
         })
-        .then((translationList) => {
-          const prefix =
-            translationList.find(
-              (t) => t.tKey === rest.business && t.langCode === userObj.langCode
-            )?.tValue || "未知菜单权限";
-          const postfix = translationList.find(
-            (item) =>
-              item.tKey === "permission.category.menu" &&
-              item.langCode === userObj.langCode
-          )?.tValue;
-          return postfix ? `${prefix}${postfix}` : name + "未知菜单";
-        });
-      if (permissionId) {
-        // 删除现有的角色权限关联
-        await tx
-          .delete(rolePermissionTable)
-          .where(eq(rolePermissionTable.permissionId, permissionId));
-        await tx
-          .update(permissionTable)
-          .set({
-            code: `${name}:menu`,
-            name: permissionName,
-            updaterId,
-            updateTimeUtc: getCurrentTimestampUtcSql(),
-          })
-          .where(eq(permissionTable.id, permissionId));
-      }
-    }
+        .where(eq(permissionTable.id, permissionId))
+    );
+  }
 
-    return res[0].id;
-  });
-
-  return result;
+  // 使用 batch 确保菜单表和权限表的更新一致性（在 D1 中 batch 具有原子性）
+  const batchResults = await db.batch(batchQueries as any);
+  const updateResList = batchResults[0] as { id: number }[];
+  const result = updateResList[0];
+  preventEmpty(result);
+  return result?.id;
 }
 const updateApi = {
   req: updateReq,
@@ -341,6 +387,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -362,16 +409,16 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
-  await guardOperation([presetGuards.noChildren(id)]);
+  // 前置校验
+  await preventDeleteWithChildren(id);
 
   const res = await db
     .delete(menuTable)
     .where(eq(menuTable.id, id))
     .returning({ id: menuTable.id });
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return res[0].id;
+  const result = res[0];
+  preventEmpty(result);
+  return result?.id;
 }
 const deleteApi = {
   req: deleteReq,
@@ -383,6 +430,7 @@ const deleteApi = {
   } as const,
   adapter: bodyAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -411,10 +459,9 @@ async function onGet(
     .where(eq(menuTable.id, id))
     .limit(1);
 
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
-  return rows[0];
+  const result = rows[0];
+  preventEmpty(result);
+  return result;
 }
 const getApi = {
   req: getReq,
@@ -426,6 +473,7 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 const treeReq = {
@@ -540,6 +588,7 @@ const treeApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onTree,
+  permission: { action: "read" },
 } satisfies API;
 
 /** 获取菜单的直接子菜单列表 */

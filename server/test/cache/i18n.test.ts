@@ -25,7 +25,7 @@ const mockTranslations = [
 ];
 
 // 前缀常量，模拟原来的 I18nTranslation 命名空间
-const I18N_PREFIX = "i18n:";
+const I18N_PREFIX = "i18n.translation.";
 
 /**
  * 测试基础功能
@@ -43,7 +43,7 @@ async function testBasicOperations() {
   // 2. 批量写入翻译数据
   console.log("2. 批量写入翻译数据...");
   const writePromises = mockTranslations.map((item) => {
-    const cacheKey = `${I18N_PREFIX}${item.langCode}:${item.tKey}`;
+    const cacheKey = `${I18N_PREFIX}${item.langCode}.${item.tKey}`;
     return kv.put(cacheKey, item.tValue);
   });
   await Promise.all(writePromises);
@@ -51,13 +51,13 @@ async function testBasicOperations() {
 
   // 3. 读取翻译
   console.log("3. 测试读取翻译:");
-  const zhSave = await kv.get(`${I18N_PREFIX}zh-CN:common.save`);
-  const enSave = await kv.get(`${I18N_PREFIX}en-US:common.save`);
-  const jaCancel = await kv.get(`${I18N_PREFIX}ja-JP:common.cancel`);
+  const zhSave = await kv.get(`${I18N_PREFIX}zh-CN.common.save`);
+  const enSave = await kv.get(`${I18N_PREFIX}en-US.common.save`);
+  const jaCancel = await kv.get(`${I18N_PREFIX}ja-JP.common.cancel`);
 
-  console.log(`  zh-CN:common.save => "${zhSave}"`);
-  console.log(`  en-US:common.save => "${enSave}"`);
-  console.log(`  ja-JP:common.cancel => "${jaCancel}"`);
+  console.log(`  zh-CN.common.save => "${zhSave}"`);
+  console.log(`  en-US.common.save => "${enSave}"`);
+  console.log(`  ja-JP.common.cancel => "${jaCancel}"`);
 
   console.assert(zhSave === "保存", "❌ 中文测试失败");
   console.assert(enSave === "Save", "❌ 英文测试失败");
@@ -83,9 +83,9 @@ async function testListOperations() {
   );
 
   // 2. 按前缀过滤（列出所有中文翻译）
-  console.log("2. 列出所有中文翻译 (zh-CN:*):");
+  console.log("2. 列出所有中文翻译 (zh-CN.*):");
   const zhKeys = await kv.list({
-    prefix: `${I18N_PREFIX}zh-CN:`,
+    prefix: `${I18N_PREFIX}zh-CN.`,
     limit: 100,
   });
   console.log(`  找到 ${zhKeys.keys.length} 个中文翻译`);
@@ -99,7 +99,7 @@ async function testListOperations() {
   const languages = ["zh-CN", "en-US", "ja-JP"];
   for (const lang of languages) {
     const result = await kv.list({
-      prefix: `${I18N_PREFIX}${lang}:`,
+      prefix: `${I18N_PREFIX}${lang}.`,
       limit: 100,
     });
     console.log(`  ${lang}: ${result.keys.length} 条`);
@@ -120,8 +120,8 @@ async function testGetSupportedLanguages() {
   const languages = new Set<string>();
 
   for (const item of listResult.keys) {
-    // 移除前缀后提取语言代码: i18n:zh-CN:common.save -> zh-CN
-    const parts = item.name.replace(I18N_PREFIX, "").split(":");
+    // 移除前缀后提取语言代码: i18n.translation.zh-CN.common.save -> zh-CN
+    const parts = item.name.replace(I18N_PREFIX, "").split(".");
     const langCode = parts[0];
     if (langCode) {
       languages.add(langCode);
@@ -151,7 +151,7 @@ async function testFallbackLogic() {
     fallbackLangCode: string = "en-US"
   ): Promise<string> {
     // 先尝试获取指定语言的翻译
-    const cacheKey = `${I18N_PREFIX}${langCode}:${key}`;
+    const cacheKey = `${I18N_PREFIX}${langCode}.${key}`;
     const translation = await kv.get(cacheKey);
     if (translation) {
       return translation;
@@ -159,7 +159,7 @@ async function testFallbackLogic() {
 
     // 如果找不到，尝试使用回退语言
     if (langCode !== fallbackLangCode) {
-      const fallbackKey = `${I18N_PREFIX}${fallbackLangCode}:${key}`;
+      const fallbackKey = `${I18N_PREFIX}${fallbackLangCode}.${key}`;
       const fallbackTranslation = await kv.get(fallbackKey);
       if (fallbackTranslation) {
         return fallbackTranslation;
@@ -172,17 +172,17 @@ async function testFallbackLogic() {
 
   console.log("1. 测试正常翻译:");
   const t1 = await getTranslation("zh-CN", "common.save");
-  console.log(`  zh-CN:common.save => "${t1}"`);
+  console.log(`  zh-CN.common.save => "${t1}"`);
   console.assert(t1 === "保存", "❌ 正常翻译失败");
 
   console.log("\n2. 测试回退到英文:");
   const t2 = await getTranslation("ja-JP", "common.delete"); // 日文没有 delete
-  console.log(`  ja-JP:common.delete (不存在) => "${t2}"`);
+  console.log(`  ja-JP.common.delete (不存在) => "${t2}"`);
   console.assert(t2 === "Delete", "❌ 回退失败");
 
   console.log("\n3. 测试键不存在:");
   const t3 = await getTranslation("zh-CN", "not.exist.key");
-  console.log(`  zh-CN:not.exist.key => "${t3}"`);
+  console.log(`  zh-CN.not.exist.key => "${t3}"`);
   console.assert(t3 === "not.exist.key", "❌ 键不存在处理失败");
 
   console.log("  ✅ 回退逻辑测试通过\n");
@@ -204,7 +204,7 @@ async function testPerformance() {
     const lang = i % 2 === 0 ? "zh-CN" : "en-US";
     const keys = ["common.save", "common.cancel", "common.delete"];
     const key = keys[i % keys.length];
-    promises.push(kv.get(`${I18N_PREFIX}${lang}:${key}`));
+    promises.push(kv.get(`${I18N_PREFIX}${lang}.${key}`));
   }
 
   await Promise.all(promises);

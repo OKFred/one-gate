@@ -27,13 +27,9 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@/api/system/user/service";
-import { validateAttendance } from "./prevention";
-import { AttendanceQualify, validateQualify } from "./qualify";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventTimeTravel } from "./prevention";
 
 // 构建查询条件
 const buildWhereCondition = ({
@@ -96,7 +92,6 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  validateQualify(userObj, AttendanceQualify.LIST);
   const { orderBy = "id", descend = true } = params;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
   const rows = await db
@@ -122,6 +117,7 @@ const listAllApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -150,7 +146,6 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  validateQualify(userObj, AttendanceQualify.LIST);
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = attendanceTable[orderBy] || attendanceTable.id;
@@ -199,7 +194,7 @@ async function onList(
     totalPage: Math.ceil(total / pageSize),
     currentPage: pageNo,
     pageSize,
-    list: list as any,
+    list,
   };
 }
 
@@ -213,6 +208,7 @@ const listApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -236,10 +232,8 @@ async function onAdd(
   const { employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
 
-  validateQualify(userObj, AttendanceQualify.ADD);
-
   // 校验时间冲突
-  validateAttendance({ checkInTime, checkOutTime });
+  preventTimeTravel({ checkInTime, checkOutTime });
 
   const res = await db
     .insert(attendanceTable)
@@ -267,6 +261,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -283,10 +278,8 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   const { id, employeeId, date, checkInTime, checkOutTime, status, remark } =
     params;
 
-  validateQualify(userObj, AttendanceQualify.UPDATE);
-
   // 校验时间冲突
-  validateAttendance({ checkInTime, checkOutTime });
+  preventTimeTravel({ checkInTime, checkOutTime });
 
   const res = await db
     .update(attendanceTable)
@@ -302,11 +295,9 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
     })
     .where(eq(attendanceTable.id, id))
     .returning({ id: attendanceTable.id });
-
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const [row] = res;
+  preventEmpty(row);
+  return row.id;
 }
 
 const updateApi = {
@@ -319,6 +310,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -334,17 +326,15 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>,
   userObj: UserObj
 ): Promise<number | null> {
-  validateQualify(userObj, AttendanceQualify.DELETE);
   const { id } = params;
   const res = await db
     .delete(attendanceTable)
     .where(eq(attendanceTable.id, id))
     .returning({ id: attendanceTable.id });
 
-  if (!res || res.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
-  return res[0].id;
+  const [row] = res;
+  preventEmpty(row);
+  return row.id;
 }
 
 const deleteApi = {
@@ -357,6 +347,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -381,7 +372,6 @@ async function onGet(
   params: FromSchema<typeof getReq>,
   userObj: UserObj
 ): Promise<any> {
-  validateQualify(userObj, AttendanceQualify.GET);
   const { id } = params;
   const rows = await db
     .select({
@@ -393,11 +383,10 @@ async function onGet(
     .where(eq(attendanceTable.id, id))
     .limit(1);
 
-  if (rows.length === 0) {
-    throw new BusinessError(BusinessErrorCode["NOT_EXIST_OR_DISABLED"]);
-  }
+  const [row] = rows;
+  preventEmpty(row);
 
-  const { attendance, employeeName } = rows[0];
+  const { attendance, employeeName } = row;
   const { employeeId, ...rest } = attendance;
 
   return {
@@ -419,6 +408,7 @@ const getApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 export default {

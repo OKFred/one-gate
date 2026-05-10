@@ -8,7 +8,8 @@ import {
   bodyAdapter,
 } from "@/middleware/encapsulation/adapter";
 import { getRuntimeKey } from "hono/adapter";
-import { BusinessError } from "@/middleware/errorHandler/businessError";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventSendFailure } from "./prevention";
 
 const sendReq = {
   type: "object",
@@ -107,9 +108,7 @@ async function onSend(
 
   // 1. 获取邮件账户信息
   const accountObj = await mailAccountService.get.service({ id: accountId });
-  if (!accountObj) {
-    throw new Error("未找到该邮件账户");
-  }
+  preventEmpty(accountObj);
 
   // 2. 如果提供了模板ID，获取模板内容
   let finalSubject = subject || "";
@@ -119,9 +118,7 @@ async function onSend(
 
   if (templateId) {
     const template = await mailTemplateService.get.service({ id: templateId });
-    if (!template) {
-      throw new Error("未找到该邮件模板");
-    }
+    preventEmpty(template);
     finalSubject = template.title;
     finalHtml = template.content;
     finalTemplateId = String(templateId);
@@ -138,14 +135,6 @@ async function onSend(
     }
   }
 
-  // 3. 验证必填字段
-  if (!finalSubject || !finalHtml) {
-    throw new Error(
-      "邮件主题和内容不能为空，请提供 subject 和 html 或 templateId"
-    );
-  }
-
-  // 4. 发送邮件
   let sendStatus = false;
   let exceptionCode: string | undefined = undefined;
   let exceptionDetails: string | undefined = undefined;
@@ -254,9 +243,7 @@ async function onSend(
   );
 
   // 6. 如果发送失败，抛出错误
-  if (!sendStatus) {
-    throw new Error(exceptionDetails || "邮件发送失败");
-  }
+  preventSendFailure(sendStatus, exceptionDetails);
 
   return {
     accepted,
@@ -275,6 +262,7 @@ const sendApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onSend,
+  permission: { action: "add" },
 };
 
 const verifyReq = {
@@ -301,9 +289,7 @@ async function onVerify(
   const { accountId } = bodyObj;
 
   const accountObj = await mailAccountService.get.service({ id: accountId });
-  if (!accountObj) {
-    throw new Error("未找到该邮件账户");
-  }
+  preventEmpty(accountObj);
   const runtime = getRuntimeKey();
   if (runtime === "workerd") {
     // Cloudflare Workers 运行环境
@@ -322,9 +308,9 @@ async function onVerify(
       });
       return true;
     } catch (error: any) {
-      // cannot connect to the specified addres
+      // cannot connect to the specified address
       // 526 Authentication failure
-      throw new BusinessError(error.message);
+      throw error;
     }
   } else {
     // Node.js 运行环境
@@ -354,6 +340,7 @@ const verifyApi = {
   } as const,
   adapter: bodyAdapter,
   service: onVerify,
+  permission: { action: "read" },
 };
 
 export default {

@@ -221,9 +221,7 @@ const TheDetail = memo(
 
                   {log.exceptionDetails && (
                     <Alert severity="error">
-                      <Typography variant="subtitle2">
-                        {t('log.table.errorDetails')}
-                      </Typography>
+                      <Typography variant="subtitle2">{t('log.table.errorDetails')}</Typography>
                       <Typography variant="body2">{log.exceptionDetails}</Typography>
                     </Alert>
                   )}

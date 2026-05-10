@@ -4,13 +4,14 @@
  */
 
 // Initialized with process.env for Node.js compatibility
-let envStore: any = typeof process !== 'undefined' ? process.env : {};
+let envStore: Record<string, any> =
+  typeof process !== "undefined" ? process.env : {};
 
 /**
  * Update the internal environment store.
  * In Cloudflare Workers, this should be called with c.env in a middleware.
  */
-export function setEnv(newEnv: any) {
+export function setEnv(newEnv: Record<string, any>) {
   envStore = { ...envStore, ...newEnv };
 }
 
@@ -24,6 +25,6 @@ export function getEnv(key: string): string | undefined {
 /**
  * Get all environment variables.
  */
-export function getAllEnv(): any {
+export function getAllEnv(): Record<string, any> {
   return envStore;
 }

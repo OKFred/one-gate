@@ -1,0 +1,7 @@
+# Ignore auto-generated files
+worker-configuration.d.ts
+
+# Ignore build outputs
+dist
+node_modules
+.wrangler

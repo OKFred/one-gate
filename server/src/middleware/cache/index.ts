@@ -10,7 +10,7 @@ import type {
   KVPutOptions,
   KVListOptions,
   KVListResult,
-} from "./types";
+} from "./index.d";
 
 // 内部存储，用于缓存 KV 绑定和实例
 const _kvBindings = new Map<string, any>();
@@ -121,7 +121,15 @@ export class KVStorage {
     const { realKV, cache } = this.getExecutor();
 
     if (realKV) {
-      await realKV.put(key, value, options);
+      let finalValue = value;
+      if (
+        typeof value === "object" &&
+        !(value instanceof ArrayBuffer) &&
+        !(value instanceof ReadableStream)
+      ) {
+        finalValue = JSON.stringify(value);
+      }
+      await realKV.put(key, finalValue as any, options);
       return;
     }
 
