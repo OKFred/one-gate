@@ -28,7 +28,7 @@ let _d1Binding: D1Binding | null = null;
 export function setD1Binding(d1Binding: D1Binding) {
   if (!d1Binding) return;
   _d1Binding = d1Binding;
-  _db = drizzleD1(d1Binding);
+  _db = drizzleD1(d1Binding) as any as AppDatabase;
 }
 
 /**
@@ -39,7 +39,7 @@ export function getDb(): AppDatabase {
 
   // Check if we have a stored D1 binding
   if (_d1Binding) {
-    _db = drizzleD1(_d1Binding);
+    _db = drizzleD1(_d1Binding) as any as AppDatabase;
     return _db;
   }
 
@@ -48,7 +48,7 @@ export function getDb(): AppDatabase {
     const fileName = getEnv("DB_FILE_NAME");
     const url = fileName || ":memory:";
     const client = createClient({ url });
-    _db = drizzleLibsql(client);
+    _db = drizzleLibsql(client) as any as AppDatabase;
     return _db;
   } catch (e) {
     // If in Worker, we might expect this to fail if called before middleware
