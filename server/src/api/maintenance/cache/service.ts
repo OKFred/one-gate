@@ -8,7 +8,7 @@ import {
   StatsVO,
   RequestParamFields,
   ResponseFields,
-} from "./schema";
+} from "./model";
 
 /**
  * 列出所有 keys

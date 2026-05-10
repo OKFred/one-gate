@@ -4015,4 +4015,25 @@ export const initialTranslationData = [
       "en-US": "Translation key already exists for this language",
     },
   },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.oss.config.duplicateName",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "存储配置名称已存在",
+      "en-US": "OSS configuration name already exists",
+    },
+  },
+  {
+    application: "backend",
+    business: "business.exception",
+    tKey: "errorHandler.oss.config.initFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "无法初始化存储实例，请检查配置信息或运行环境",
+      "en-US":
+        "Failed to initialize storage instance. Please check configuration or environment.",
+    },
+  },
 ] as const satisfies BatchTranslationItem[];

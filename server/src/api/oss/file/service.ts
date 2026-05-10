@@ -1,9 +1,7 @@
 import { getDefaultConfig } from "../config/service";
 import { getStorage } from "@/utils/storage";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventStorageInitFailure } from "../config/prevention";
 import type { API } from "@/middleware/encapsulation";
 import { bodyUserContextAdapter } from "@/middleware/encapsulation/adapter";
 import type { FromSchema } from "json-schema-to-ts";
@@ -40,9 +38,9 @@ function cleanUndefined(obj: any): any {
 // 获取存储实例辅助函数
 async function getActiveStorage(env: any) {
   const config = await getDefaultConfig();
-  if (!config) throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
+  preventEmpty(config);
 
-  return getStorage(
+  const storage = getStorage(
     {
       provider: config.provider,
       endpoint: config.endpoint || undefined,
@@ -54,6 +52,9 @@ async function getActiveStorage(env: any) {
     },
     env
   );
+
+  preventStorageInitFailure(storage);
+  return storage!;
 }
 
 // 1. 分页列出文件
@@ -146,9 +147,7 @@ async function onGet(
 ): Promise<FromSchema<typeof getRes>> {
   const storage = await getActiveStorage(c.env);
   const meta = await storage.head(params.key);
-  if (!meta) {
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  }
+  preventEmpty(meta);
 
   const downloadUrl = await storage.getPresignedGetUrl(params.key, {
     expiresIn: 3600,

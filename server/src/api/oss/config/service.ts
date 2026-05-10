@@ -37,10 +37,8 @@ import {
   bodyUserContextAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+import { preventEmpty } from "@/middleware/auth/prevention";
+import { preventDuplicateName, preventStorageInitFailure } from "./prevention";
 import { getStorage } from "@/utils/storage";
 
 // 构建查询条件
@@ -193,6 +191,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
+  await preventDuplicateName(obj.name);
 
   // 如果设置为默认建议，则取消其他默认建议
   if (obj.isDefault) {
@@ -228,7 +227,11 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<number | null> {
   const { userId: updaterId } = userObj;
-  const { id, ...rest } = params;
+  const { id, name, ...rest } = params;
+
+  if (name) {
+    await preventDuplicateName(name, id);
+  }
 
   if (params.isDefault) {
     await db
@@ -247,9 +250,9 @@ async function onUpdate(
     .where(eq(ossConfigTable.id, id))
     .returning({ id: ossConfigTable.id });
 
-  if (!res || res.length === 0)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  return res[0].id;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 const updateApi = {
@@ -273,9 +276,9 @@ async function onGet(params: FromSchema<typeof getReq>) {
     .from(ossConfigTable)
     .where(eq(ossConfigTable.id, params.id))
     .limit(1);
-  if (rows.length === 0)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  return rows[0];
+  const row = rows[0];
+  preventEmpty(row);
+  return row;
 }
 
 const getApi = {
@@ -296,9 +299,9 @@ async function onDelete(obj: FromSchema<typeof getReq>) {
     .delete(ossConfigTable)
     .where(eq(ossConfigTable.id, obj.id))
     .returning({ id: ossConfigTable.id });
-  if (!result || result.length === 0)
-    throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
-  return result[0].id;
+  const row = result[0];
+  preventEmpty(row);
+  return row.id;
 }
 
 const deleteApi = {
@@ -329,12 +332,7 @@ async function onVerify(
     c.env
   );
 
-  if (!storage) {
-    throw new BusinessError(
-      BusinessErrorCode.VALIDATION_FAILED
-      /* "无法初始化存储实例，请检查配置和运行环境" */
-    );
-  }
+  preventStorageInitFailure(storage);
 
   // 通过列出对象来测试连通性
   await storage.list();
