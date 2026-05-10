@@ -537,7 +537,7 @@ async function cacheSync(
   operation: "add" | "update" | "delete"
 ) {
   if (record.application !== "backend") return;
-  const cacheKey = `${record.langCode}:${record.tKey}`;
+  const cacheKey = `i18n.translation.${record.langCode}.${record.tKey}`;
   if (operation === "add") {
     await kv.put(cacheKey, record.tValue);
   } else if (operation === "update") {
