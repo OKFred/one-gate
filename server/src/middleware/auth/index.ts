@@ -4,7 +4,11 @@ import userService, { UserObj } from "@/api/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
 import { roleTable } from "@/api/system/role/model";
-import { DataScope, type DataScopeValue } from "@/types/dataScope";
+import {
+  DataScope,
+  SCOPE_PRIORITY,
+  type DataScopeValue,
+} from "@/types/dataScope";
 import db from "@/db/index";
 import { inArray } from "drizzle-orm";
 import {
@@ -12,14 +16,6 @@ import {
   BusinessErrorCode,
 } from "../errorHandler/businessError";
 import { kv } from "../cache";
-
-/** DataScope 优先级（值越大越优先） */
-const SCOPE_PRIORITY: Record<DataScopeValue, number> = {
-  [DataScope.ALL]: 4,
-  [DataScope.DEPT_AND_BELOW]: 3,
-  [DataScope.CUSTOM]: 2,
-  [DataScope.SELF_ONLY]: 1,
-};
 
 export const authMiddleware = async (c: Context) => {
   // 从Authorization header中获取token
