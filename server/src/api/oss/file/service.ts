@@ -239,6 +239,10 @@ const deleteApi = {
   permission: { action: "delete" },
 } satisfies API;
 
+export const utils = {
+  getActiveStorage,
+};
+
 export default {
   list: listApi,
   listAll: listAllApi,

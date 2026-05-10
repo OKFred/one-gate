@@ -14,7 +14,7 @@ function createApp() {
   const app = new OpenAPIHono<AppBindings>();
 
   serveStaticFiles(app);
-  app.use("*", storageMiddleware());
+  storageMiddleware(app);
   errorHandler(app);
   corsHandler(app);
   serverTiming(app);

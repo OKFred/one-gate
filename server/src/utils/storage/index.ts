@@ -1,9 +1,9 @@
 import { StorageProvider } from "./types";
 import { S3Provider } from "./providers/s3";
 import { R2Provider } from "./providers/r2";
-import { Context, MiddlewareHandler } from "hono";
-import { getRuntimeKey } from "hono/adapter";
-
+import { Context } from "hono";
+import { App } from "@/types/app";
+import { utils as ossUtils } from "@/api/oss/file/service";
 /**
  * OSS 配置接口
  */
@@ -48,10 +48,9 @@ export function getStorage(config: OssConfig, env: any = {}): StorageProvider {
 /**
  * Hono 中间件：默认注入 (如果需要默认配置)
  */
-export const storageMiddleware = (): MiddlewareHandler => {
-  return async (c: Context, next) => {
-    const storage = getStorage(undefined, c.env);
-    c.set("storage", storage);
+export const storageMiddleware = (app: App) => {
+  app.use("*", async (c: Context, next) => {
+    c.set("OSS", async () => await ossUtils.getActiveStorage(c.env));
     await next();
-  };
+  });
 };
