@@ -1,4 +1,9 @@
-import type { AppBindings, Context, RawRouteConfig } from "@/types/app";
+import type {
+  AppBindings,
+  Context,
+  RawRouteConfig,
+  ResJson,
+} from "@/types/app";
 import { getEnv } from "@/utils/env";
 import { validate } from "@cfworker/json-schema";
 import {
@@ -110,7 +115,7 @@ function routeMaker({
         );
       }
     }
-    return c.json(
+    return c.json<ResJson>(
       { ok: true, message: "OK", data: result },
       StatusCodes.OK as ContentfulStatusCode
     );

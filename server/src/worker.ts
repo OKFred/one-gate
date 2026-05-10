@@ -1,4 +1,4 @@
-import createApp from "@/server/index";
+import createApp from "@/index";
 import { setD1Binding } from "@/db/index";
 import { setKVBinding } from "@/middleware/cache/index";
 import { setEnv } from "@/utils/env";

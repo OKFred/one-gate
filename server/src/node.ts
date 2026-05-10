@@ -1,4 +1,4 @@
-import createApp from "@/server/index";
+import createApp from "@/index";
 import { getEnv } from "@/utils/env";
 import { serve } from "@hono/node-server";
 

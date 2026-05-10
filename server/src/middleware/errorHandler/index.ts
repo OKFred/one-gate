@@ -1,6 +1,6 @@
 import { getRuntimeKey } from "hono/adapter";
 import { getEnv } from "@/utils/env";
-import type { App, Context } from "@/types/app.ts";
+import type { App, Context, ResJson } from "@/types/app.ts";
 import { getTranslator } from "@/utils/i18n";
 // import { sendFeishuMessage } from "@/rpc/feishu/instance";
 import { HTTPException } from "hono/http-exception";
@@ -18,7 +18,7 @@ type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // æå
 export default function errorHandler(app: App) {
   app.notFound(async (c: Context) => {
     const t = await getTranslator(c);
-    return c.json(
+    return c.json<ResJson<null>>(
       {
         ok: false,
         message: await t("errorHandler.notFound"),
@@ -54,7 +54,7 @@ export default function errorHandler(app: App) {
       throw toHttpException(e);
     }
     if (e instanceof HTTPException) {
-      return c.json(
+      return c.json<ResJson>(
         {
           ok: false,
           message: await t(e.message),
@@ -71,7 +71,7 @@ export default function errorHandler(app: App) {
     } else {
       console.error(msg);
     }
-    return c.json(
+    return c.json<ResJson<string | null>>(
       {
         ok: false,
         message: await t("errorHandler.unknownError"),

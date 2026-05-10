@@ -7,7 +7,7 @@ import routeRegister from "@/api/index";
 import serverTiming from "@/middleware/serverTiming";
 import serveStaticFiles from "@/middleware/serveStatic";
 import { storageMiddleware } from "@/utils/storage";
-import type { AppBindings, Context } from "@/types/app";
+import type { AppBindings, Context, ResJson } from "@/types/app";
 import { getEnv } from "@/utils/env";
 
 function createApp() {
@@ -18,26 +18,21 @@ function createApp() {
   errorHandler(app);
   corsHandler(app);
   serverTiming(app);
-  //   basicAuthHandler(app);
-  //   bearerAuthHandler(app);
-  //   pathHandler(app);
   logHandler(app);
   getEnv("NODE_ENV") !== "production" && docRegister(app);
   const subApp = routeRegister();
   const baseApiPath = getEnv("BASE_API_PATH");
   !baseApiPath && console.error("❌.MISSING ENV: BASE_API_PATH");
   app.route(baseApiPath || "", subApp);
-
-  //   normalRouter(app);
   app.get("/healthCheck", (c: Context) => {
-    return c.json({
+    return c.json<ResJson<string>>({
       ok: true,
       data: new Date().toLocaleString(),
       message: "I am OK!",
     });
   });
   app.get("/version.json", (c: Context) => {
-    return c.json({
+    return c.json<ResJson<string>>({
       ok: true,
       data: getEnv("VERSION") || "unknown",
       message: "Version OK!",

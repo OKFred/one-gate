@@ -44,3 +44,10 @@ export type App = OpenAPIHono<AppBindings>;
 export type RequiredKeys<T> = {
   [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
 }[keyof T];
+
+// 统一的接口返回结构类型
+export type ResJson<T = any> = {
+  ok: boolean;
+  data: T;
+  message: string;
+};

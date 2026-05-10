@@ -1,4 +1,4 @@
-import { Context } from "@/types/app";
+import { Context, type ResJson } from "@/types/app";
 
 const chat = async (c: Context) => {
   const { logger } = c.var;
@@ -25,7 +25,7 @@ const chat = async (c: Context) => {
     return json.choices[0].message.content;
   }
   const data = await ask(q);
-  return c.json({
+  return c.json<ResJson<string>>({
     ok: true,
     data,
     message: "OK",
