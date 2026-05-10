@@ -10,13 +10,14 @@
     "skipLibCheck": true,
     "noUncheckedSideEffectImports": true,
     "resolveJsonModule": true,
-    "lib": ["ESNext", "DOM"],
+    "lib": ["ESNext"],
+    "types": ["node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "worker-configuration.d.ts"],
   "exclude": ["node_modules", "dist", "build", "coverage", "test/**/**"],
   "tsc-alias": {
     "verbose": true,

@@ -11,6 +11,7 @@ import {
   StorageListOptions,
   StorageListResult,
 } from "../types";
+import { applyAwsPolyfills } from "../awsPolyfill";
 
 /**
  * Cloudflare R2 Provider
@@ -28,6 +29,7 @@ export class R2Provider implements StorageProvider {
     accessKeyId: string;
     secretAccessKey: string;
   }) {
+    applyAwsPolyfills();
     this.bucket = config.bucketBinding;
     this.bucketName = config.bucketName;
 
