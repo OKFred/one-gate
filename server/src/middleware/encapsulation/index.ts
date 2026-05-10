@@ -11,7 +11,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "@/api/pathRegister";
-import { authMiddleware } from "../bearerAuth";
+import { authMiddleware } from "../auth";
 import { can } from "../auth/permission";
 
 function componentMaker(

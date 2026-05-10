@@ -10,7 +10,7 @@ import type {
   KVPutOptions,
   KVListOptions,
   KVListResult,
-} from "./types";
+} from "./index.d";
 
 // 内部存储，用于缓存 KV 绑定和实例
 const _kvBindings = new Map<string, any>();
