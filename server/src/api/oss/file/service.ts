@@ -93,6 +93,7 @@ const listApi = {
   },
   adapter: bodyUserContextAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 // 2. 获取全部文件
@@ -137,6 +138,7 @@ const listAllApi = {
   },
   adapter: bodyUserContextAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 // 3. 获取单文件详情 (含下载链接)
@@ -168,6 +170,7 @@ const getApi = {
   pathInfo: { path: "/get", method: "post", summary: "获取文件详情及下载链接" },
   adapter: bodyUserContextAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 // 4. 新增文件 (获取上传 URL)
@@ -190,6 +193,7 @@ const addApi = {
   pathInfo: { path: "/add", method: "post", summary: "获取新建文件上传凭证" },
   adapter: bodyUserContextAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 // 5. 更新文件 (覆盖)
@@ -212,6 +216,7 @@ const updateApi = {
   },
   adapter: bodyUserContextAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 // 6. 删除文件
@@ -231,6 +236,7 @@ const deleteApi = {
   pathInfo: { path: "/delete", method: "post", summary: "删除文件" },
   adapter: bodyUserContextAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 export default {

@@ -149,6 +149,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 /**
@@ -199,5 +200,5 @@ export async function exportDeletionRecord(
 }
 
 export default {
-  // list: listApi,
+  list: listApi,
 };

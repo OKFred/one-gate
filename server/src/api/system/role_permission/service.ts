@@ -135,6 +135,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
@@ -209,6 +210,7 @@ const listApi = {
   } as const,
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 const addReq = {
@@ -262,6 +264,7 @@ const addApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 // 批量添加权限到角色
@@ -338,6 +341,7 @@ const batchAddApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onBatchAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 const updateReq = {
@@ -395,6 +399,7 @@ const updateApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 const deleteReq = {
@@ -452,6 +457,7 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 // 批量删除角色的权限
@@ -526,6 +532,7 @@ const batchDeleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onBatchDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 const getReq = {
@@ -571,6 +578,7 @@ const getApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 // 获取角色的所有权限
@@ -630,6 +638,7 @@ const getPermissionsByRoleApi = {
   } as const,
   adapter: bodyAdapter,
   service: onGetPermissionsByRole,
+  permission: { action: "read" },
 } satisfies API;
 
 /**

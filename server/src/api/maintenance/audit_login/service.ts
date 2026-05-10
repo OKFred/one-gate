@@ -141,6 +141,7 @@ const listApi = {
   } as const,
   adapter: bodyUserAdapter, // 需要登录才能查看审计记录
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 export const utils = {

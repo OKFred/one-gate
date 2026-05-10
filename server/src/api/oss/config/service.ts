@@ -117,6 +117,7 @@ const listAllApi = {
   },
   adapter: bodyAdapter,
   service: onListAll,
+  permission: { action: "read" },
 } satisfies API;
 
 // 列表 (分页)
@@ -174,6 +175,7 @@ const listApi = {
   pathInfo: { path: "/list", method: "post", summary: "分页获取存储配置" },
   adapter: bodyAdapter,
   service: onList,
+  permission: { action: "read" },
 } satisfies API;
 
 // 新增
@@ -211,6 +213,7 @@ const addApi = {
   pathInfo: { path: "/add", method: "post", summary: "添加存储配置" },
   adapter: bodyUserAdapter,
   service: onAdd,
+  permission: { action: "add" },
 } satisfies API;
 
 // 更新
@@ -257,6 +260,7 @@ const updateApi = {
   pathInfo: { path: "/update", method: "post", summary: "更新存储配置" },
   adapter: bodyUserAdapter,
   service: onUpdate,
+  permission: { action: "edit" },
 } satisfies API;
 
 // 获取详情
@@ -287,6 +291,7 @@ const getApi = {
   pathInfo: { path: "/get", method: "post", summary: "获取配置详情" },
   adapter: bodyAdapter,
   service: onGet,
+  permission: { action: "read" },
 } satisfies API;
 
 // 删除
@@ -306,6 +311,7 @@ const deleteApi = {
   pathInfo: { path: "/delete", method: "post", summary: "删除配置" },
   adapter: bodyAdapter,
   service: onDelete,
+  permission: { action: "delete" },
 } satisfies API;
 
 // 验证连通性
@@ -341,6 +347,7 @@ const verifyApi = {
   pathInfo: { path: "/verify", method: "post", summary: "验证存储连通性" },
   adapter: bodyUserContextAdapter,
   service: onVerify,
+  permission: { action: "read" },
 } satisfies API;
 
 // Utils: 获取当前默认配置

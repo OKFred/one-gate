@@ -262,6 +262,7 @@ const sendApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onSend,
+  permission: { action: "add" },
 };
 
 const verifyReq = {
@@ -339,6 +340,7 @@ const verifyApi = {
   } as const,
   adapter: bodyAdapter,
   service: onVerify,
+  permission: { action: "read" },
 };
 
 export default {
