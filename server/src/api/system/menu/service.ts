@@ -499,66 +499,43 @@ async function onTree(
       await rolePermissionUtils.getPermissionsByRoleIds(roleIds);
     const permissionCodes = new Set(userPermissions.map((p) => p.code));
 
-    // 1. 找出所有“直接可见”的菜单节点
-    const visibleMenuIds = new Set<number>();
-    allMenus.forEach((menu) => {
-      const hasChildren = allMenus.some((m) => m.parentId === menu.id);
-      let isVisible = false;
-
+    // 1. 初步过滤：有业务标识的必须有对应 :read 权限。没有业务标识的先保留。
+    filteredMenus = allMenus.filter((menu) => {
       if (menu.business) {
-        // 有业务标识：检查是否有对应 :read 权限
-        isVisible = permissionCodes.has(`${menu.business}:read`);
-      } else {
-        // 无业务标识：
-        // 如果是叶子节点，默认可见（如首页、外部链接等）
-        // 如果是父节点，其可见性由子节点决定，此处先不标记
-        isVisible = !hasChildren;
+        return permissionCodes.has(`${menu.business}:read`);
       }
-
-      if (isVisible) {
-        visibleMenuIds.add(menu.id);
-      }
+      return true;
     });
 
-    // 2. 向上递归：确保所有可见节点的祖先也都被标记为可见
-    const addAncestors = (menuId: number) => {
-      const menu = allMenus.find((m) => m.id === menuId);
-      if (menu?.parentId) {
-        if (!visibleMenuIds.has(menu.parentId)) {
-          visibleMenuIds.add(menu.parentId);
-          addAncestors(menu.parentId);
-        }
-      }
-    };
-
-    // 对当前已确定的可见节点执行祖先搜寻
-    const currentIds = Array.from(visibleMenuIds);
-    currentIds.forEach((id) => addAncestors(id));
-
-    // 3. 最终过滤
-    filteredMenus = allMenus.filter((menu) => visibleMenuIds.has(menu.id));
-
-    // 4. 清理：如果某个父节点（有业务标识）被标记为可见，但它实际上没有任何可见的子节点，且其自身链接为空
-    // 这种情况通常发生在用户有父级权限但没子级权限时，为了避免空的目录，可以根据需求选择是否清理
+    // 2. 递归清理：没有业务标识且没有可见子菜单的“空壳”顶级菜单
     let changed = true;
     while (changed) {
       const beforeCount = filteredMenus.length;
       filteredMenus = filteredMenus.filter((menu) => {
+        // 如果有业务标识，保留（第一步已经过滤过权限了）
+        if (menu.business) return true;
+        // 如果没有业务标识，检查是否有子菜单在当前过滤列表中
         const hasVisibleChildren = filteredMenus.some(
           (m) => m.parentId === menu.id
         );
-        // 如果有子节点，保留
-        if (hasVisibleChildren) return true;
-        // 如果没有子节点且有业务标识，保留（说明它本身就是个功能页）
-        if (menu.business) return true;
-        // 如果既没有子节点也没有业务标识，说明是个空目录，移除
-        return false;
+        return hasVisibleChildren;
+      });
+      changed = filteredMenus.length !== beforeCount;
+    }
+
+    // 3. 级联清理：确保父节点不在列表中的子节点也被移除（严格层级可见性）
+    changed = true;
+    while (changed) {
+      const beforeCount = filteredMenus.length;
+      filteredMenus = filteredMenus.filter((menu) => {
+        if (!menu.parentId) return true;
+        return filteredMenus.some((m) => m.id === menu.parentId);
       });
       changed = filteredMenus.length !== beforeCount;
     }
   }
 
-  // 3. 级联过滤：父菜单若因其他原因（如被禁用）不在列表中，则子菜单也不显示
+  // 4. 再次级联过滤：处理其他通用过滤情况（如被禁用等）
   filteredMenus = filteredMenus.filter((menu) => {
     if (!menu.parentId) return true;
     const parentMenu = filteredMenus.find((m) => m.id === menu.parentId);
