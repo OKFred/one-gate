@@ -1,156 +1,415 @@
-import { useEffect, useState, useMemo, memo, forwardRef, useImperativeHandle, useRef } from 'react';
+import {
+  useEffect,
+  useState,
+  useMemo,
+  memo,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+} from 'react';
 import { useTranslation } from '@/hooks/useTranslation';
-import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { Box, CircularProgress, Typography, Chip, Alert } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Checkbox,
+  Chip,
+  Alert,
+  Collapse,
+  IconButton,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
-import LabelIcon from '@mui/icons-material/Label';
-import KeyIcon from '@mui/icons-material/Key';
 import * as RolePermissionAPI from '@/api/system/role_permission';
-import type { ListAllPermissionRes, ListAllRolePermissionRes } from '@/api/system/type';
-import { RolePermissionActionButtons } from './TheActionButtons';
-import type { TheFormRef } from './TheForm';
-import type { FilterState } from './TheTable';
+import * as PermissionAPI from '@/api/system/permission';
+import type { ListAllPermissionRes, GetPermissionsByRoleRes } from '@/api/system/type';
 
-// 权限分类标签颜色
-const CATEGORY_COLOR: Record<
-  string,
-  'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'default'
-> = {
-  menu: 'primary',
-  button: 'success',
-  api: 'warning',
-};
+type PermissionItem = NonNullable<ListAllPermissionRes>[0];
 
-// 树节点类型
-interface PermissionLeaf {
-  id: number;
-  code: string;
-  name: string;
-  category: string;
-  business: string | null | undefined;
-  resource: string | null | undefined;
-  rolePermissionId: number;
-}
-
-interface BusinessNode {
-  business: string;
-  permissions: PermissionLeaf[];
-}
-
-interface CategoryNode {
-  category: string;
-  businesses: BusinessNode[];
+// 树节点
+interface TreeNode {
+  /** 节点 key，即 business 值 */
+  key: string;
+  /** 该节点直属的权限 */
+  permissions: PermissionItem[];
+  /** 子节点 */
+  children: TreeNode[];
 }
 
 export interface TheTreeRef {
-  refresh: (filters?: FilterState) => void;
+  getChanges: () => { added: number[]; removed: number[] };
+  hasChanges: () => boolean;
+  reload: () => void;
 }
 
 interface Props {
-  initialRoleId?: number | null;
-  allPermissions: ListAllPermissionRes;
-  formRef: React.RefObject<TheFormRef | null>;
+  roleId: number | null;
+  onChange?: (hasChanges: boolean) => void;
+}
+
+/**
+ * 根据 business 字段的 "." 分隔构建层级树
+ * 例如: enterprise → enterprise.attendance 构成父子关系
+ */
+function buildTree(permissions: PermissionItem[]): TreeNode[] {
+  // 1. 按 business 分组
+  const bizMap = new Map<string, PermissionItem[]>();
+  for (const p of permissions) {
+    const biz = p.business || 'other';
+    if (!bizMap.has(biz)) bizMap.set(biz, []);
+    bizMap.get(biz)!.push(p);
+  }
+
+  // 2. 收集所有 business key 并排序
+  const allKeys = Array.from(bizMap.keys()).sort();
+
+  // 3. 构建层级关系
+  const rootNodes: TreeNode[] = [];
+  const nodeMap = new Map<string, TreeNode>();
+
+  for (const key of allKeys) {
+    const node: TreeNode = {
+      key,
+      permissions: bizMap.get(key) || [],
+      children: [],
+    };
+    nodeMap.set(key, node);
+
+    // 查找父节点：逐级向上查找（例如 enterprise.attendance → enterprise）
+    let parentFound = false;
+    const dotIndex = key.lastIndexOf('.');
+    if (dotIndex > 0) {
+      const parentKey = key.substring(0, dotIndex);
+      const parentNode = nodeMap.get(parentKey);
+      if (parentNode) {
+        parentNode.children.push(node);
+        parentFound = true;
+      }
+    }
+
+    if (!parentFound) {
+      rootNodes.push(node);
+    }
+  }
+
+  return rootNodes;
+}
+
+/** 递归获取节点及其所有后代的权限 ID */
+function getAllPermissionIds(node: TreeNode): number[] {
+  const ids = node.permissions.map((p) => p.id);
+  for (const child of node.children) {
+    ids.push(...getAllPermissionIds(child));
+  }
+  return ids;
 }
 
 const TheTree = memo(
-  forwardRef<TheTreeRef, Props>(({ initialRoleId, allPermissions, formRef }, ref) => {
+  forwardRef<TheTreeRef, Props>(({ roleId, onChange }, ref) => {
     const t = useTranslation();
-    const [roleId, setRoleId] = useState<number | null | undefined>(initialRoleId ?? null);
-    const refreshKeyRef = useRef(0);
-    const [refreshKey, setRefreshKey] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [rolePermissions, setRolePermissions] = useState<NonNullable<ListAllRolePermissionRes>>(
-      [],
-    );
+    const [allPermissions, setAllPermissions] = useState<PermissionItem[]>([]);
+    const [initialCheckedIds, setInitialCheckedIds] = useState<Set<number>>(new Set());
+    const [checkedIds, setCheckedIds] = useState<Set<number>>(new Set());
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
 
-    useImperativeHandle(ref, () => ({
-      refresh: (filters?) => {
-        if (filters && 'roleId' in filters) {
-          setRoleId(filters.roleId ?? null);
-        }
-        refreshKeyRef.current += 1;
-        setRefreshKey(refreshKeyRef.current);
-      },
-    }));
-
-    // 当 roleId / refreshKey 变化时拉取数据
-    useEffect(() => {
+    const loadData = useCallback(async () => {
       if (!roleId) {
-        setRolePermissions([]);
+        setAllPermissions([]);
+        setInitialCheckedIds(new Set());
+        setCheckedIds(new Set());
         return;
       }
-      let cancelled = false;
+
       setLoading(true);
       setError(null);
-      RolePermissionAPI.listAllFn({ data: { roleId } })
-        .then((res) => {
-          if (!cancelled) {
-            setRolePermissions(res.data.data || []);
+
+      try {
+        const [permRes, rolePermRes] = await Promise.all([
+          PermissionAPI.listAllFn({ data: {} }),
+          RolePermissionAPI.getPermissionsByRoleFn({ data: { roleId } }),
+        ]);
+
+        const permissions = (permRes.data.data || []) as PermissionItem[];
+        const rolePerms = (rolePermRes.data.data || []) as GetPermissionsByRoleRes;
+        const assignedIds = new Set(rolePerms.map((p) => p.id));
+
+        setAllPermissions(permissions);
+        setInitialCheckedIds(assignedIds);
+        setCheckedIds(new Set(assignedIds));
+
+        // 默认展开有已分配权限的分组
+        const expanded = new Set<string>();
+        permissions.forEach((p) => {
+          if (assignedIds.has(p.id) && p.business) {
+            // 展开自身和所有父级
+            const parts = p.business.split('.');
+            let path = '';
+            for (const part of parts) {
+              path = path ? `${path}.${part}` : part;
+              expanded.add(path);
+            }
           }
-        })
-        .finally(() => {
-          if (!cancelled) setLoading(false);
         });
-      return () => {
-        cancelled = true;
+        setExpandedNodes(expanded);
+      } catch (err) {
+        setError(String(err));
+      } finally {
+        setLoading(false);
+      }
+    }, [roleId]);
+
+    useEffect(() => {
+      loadData();
+    }, [loadData]);
+
+    const hasChanges = useCallback(() => {
+      if (checkedIds.size !== initialCheckedIds.size) return true;
+      for (const id of checkedIds) {
+        if (!initialCheckedIds.has(id)) return true;
+      }
+      return false;
+    }, [checkedIds, initialCheckedIds]);
+
+    // 通知外部变更
+    useEffect(() => {
+      onChange?.(hasChanges());
+    }, [hasChanges, onChange]);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        getChanges: () => {
+          const added = Array.from(checkedIds).filter((id) => !initialCheckedIds.has(id));
+          const removed = Array.from(initialCheckedIds).filter((id) => !checkedIds.has(id));
+          return { added, removed };
+        },
+        hasChanges,
+        reload: loadData,
+      }),
+      [checkedIds, initialCheckedIds, hasChanges, loadData],
+    );
+
+    // 构建树
+    const tree = useMemo(() => buildTree(allPermissions), [allPermissions]);
+
+    // 切换单个权限
+    const togglePermission = useCallback((permId: number) => {
+      setCheckedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(permId)) next.delete(permId);
+        else next.add(permId);
+        return next;
+      });
+    }, []);
+
+    // 切换整个节点（包含子节点）
+    const toggleNode = useCallback(
+      (node: TreeNode) => {
+        const allIds = getAllPermissionIds(node);
+        const allChecked = allIds.every((id) => checkedIds.has(id));
+        setCheckedIds((prev) => {
+          const next = new Set(prev);
+          if (allChecked) {
+            allIds.forEach((id) => next.delete(id));
+          } else {
+            allIds.forEach((id) => next.add(id));
+          }
+          return next;
+        });
+      },
+      [checkedIds],
+    );
+
+    // 切换展开/折叠
+    const toggleExpand = useCallback((key: string) => {
+      setExpandedNodes((prev) => {
+        const next = new Set(prev);
+        if (next.has(key)) next.delete(key);
+        else next.add(key);
+        return next;
+      });
+    }, []);
+
+    const expandAll = useCallback(() => {
+      const all = new Set<string>();
+      const collect = (nodes: TreeNode[]) => {
+        for (const n of nodes) {
+          all.add(n.key);
+          collect(n.children);
+        }
       };
-    }, [roleId, refreshKey]);
+      collect(tree);
+      setExpandedNodes(all);
+    }, [tree]);
 
-    // 构建权限 Map
-    const permissionMap = useMemo(() => {
-      const map = new Map<number, NonNullable<ListAllPermissionRes>[0]>();
-      for (const p of allPermissions ?? []) {
-        if (p?.id != null) map.set(p.id, p);
-      }
-      return map;
-    }, [allPermissions]);
+    const collapseAll = useCallback(() => {
+      setExpandedNodes(new Set());
+    }, []);
 
-    // 构建树形结构：category → business → permission
-    const tree = useMemo<CategoryNode[]>(() => {
-      const categoryMap = new Map<string, Map<string, PermissionLeaf[]>>();
+    // 渲染单个树节点
+    const renderNode = (node: TreeNode, depth: number) => {
+      const isExpanded = expandedNodes.has(node.key);
+      const hasChildren = node.children.length > 0 || node.permissions.length > 0;
+      const allIds = getAllPermissionIds(node);
+      const checkedCount = allIds.filter((id) => checkedIds.has(id)).length;
+      const allChecked = allIds.length > 0 && checkedCount === allIds.length;
+      const someChecked = checkedCount > 0 && !allChecked;
 
-      for (const rp of rolePermissions) {
-        const perm = permissionMap.get(rp.permissionId);
-        if (!perm) continue;
+      return (
+        <Box key={node.key}>
+          {/* 节点行 */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              pl: depth * 3 + 1,
+              pr: 1,
+              py: 0.5,
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'action.hover' },
+              borderBottom: 1,
+              borderColor: 'divider',
+            }}
+            onClick={() => toggleExpand(node.key)}
+          >
+            {hasChildren ? (
+              <IconButton size="small" sx={{ mr: 0.5, p: 0.25 }}>
+                {isExpanded ? (
+                  <ExpandMoreIcon fontSize="small" />
+                ) : (
+                  <ChevronRightIcon fontSize="small" />
+                )}
+              </IconButton>
+            ) : (
+              <Box sx={{ width: 28 }} />
+            )}
+            <Checkbox
+              size="small"
+              checked={allChecked}
+              indeterminate={someChecked}
+              onClick={(e) => e.stopPropagation()}
+              onChange={() => toggleNode(node)}
+              sx={{ p: 0.5 }}
+            />
+            {isExpanded ? (
+              <FolderOpenIcon fontSize="small" color="primary" sx={{ mx: 0.5 }} />
+            ) : (
+              <FolderIcon fontSize="small" color="action" sx={{ mx: 0.5 }} />
+            )}
+            <Typography variant="body2" fontWeight={600} sx={{ mr: 1 }}>
+              {t('businessType.' + node.key)}
+            </Typography>
+            <Chip
+              label={`${checkedCount}/${allIds.length}`}
+              size="small"
+              color={allChecked ? 'success' : someChecked ? 'warning' : 'default'}
+              sx={{ height: 20, fontSize: '0.7rem' }}
+            />
+          </Box>
 
-        const category = perm.category!;
-        const business = perm.business!;
+          {/* 展开内容 */}
+          <Collapse in={isExpanded}>
+            {/* 本级权限 */}
+            {node.permissions.length > 0 && (
+              <Box sx={{ pl: depth * 3 + 5, pr: 2, py: 0.5 }}>
+                {node.permissions.map((perm) => {
+                  const isChecked = checkedIds.has(perm.id);
+                  const isNew = isChecked && !initialCheckedIds.has(perm.id);
+                  const isRemoved = !isChecked && initialCheckedIds.has(perm.id);
 
-        if (!categoryMap.has(category)) {
-          categoryMap.set(category, new Map());
-        }
-        const bizMap = categoryMap.get(category)!;
-        if (!bizMap.has(business)) {
-          bizMap.set(business, []);
-        }
-        bizMap.get(business)!.push({
-          id: perm.id,
-          code: perm.code,
-          name: perm.name!,
-          category,
-          business: perm.business,
-          resource: perm.resource,
-          rolePermissionId: rp.id,
-        });
-      }
+                  return (
+                    <Box
+                      key={perm.id}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        py: 0.25,
+                        px: 1,
+                        borderRadius: 1,
+                        '&:hover': { bgcolor: 'action.hover' },
+                        cursor: 'pointer',
+                        ...(isNew && {
+                          bgcolor: 'success.main',
+                          color: 'success.contrastText',
+                          '&:hover': { bgcolor: 'success.dark' },
+                        }),
+                        ...(isRemoved && {
+                          bgcolor: 'error.main',
+                          color: 'error.contrastText',
+                          '&:hover': { bgcolor: 'error.dark' },
+                        }),
+                      }}
+                      onClick={() => togglePermission(perm.id)}
+                    >
+                      <Checkbox
+                        size="small"
+                        checked={isChecked}
+                        onChange={() => togglePermission(perm.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{
+                          p: 0.5,
+                          ...(isNew && {
+                            color: 'success.contrastText',
+                            '&.Mui-checked': { color: 'success.contrastText' },
+                          }),
+                          ...(isRemoved && { color: 'error.contrastText' }),
+                        }}
+                      />
+                      <Typography variant="body2" sx={{ mr: 1 }}>
+                        {perm.name}
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontFamily: 'monospace', opacity: 0.7 }}>
+                        {perm.code}
+                      </Typography>
+                      {isNew && (
+                        <Chip
+                          label="+"
+                          size="small"
+                          sx={{
+                            ml: 'auto',
+                            height: 18,
+                            fontSize: '0.65rem',
+                            bgcolor: 'transparent',
+                            color: 'inherit',
+                            border: '1px solid currentColor',
+                          }}
+                        />
+                      )}
+                      {isRemoved && (
+                        <Chip
+                          label="-"
+                          size="small"
+                          sx={{
+                            ml: 'auto',
+                            height: 18,
+                            fontSize: '0.65rem',
+                            bgcolor: 'transparent',
+                            color: 'inherit',
+                            border: '1px solid currentColor',
+                          }}
+                        />
+                      )}
+                    </Box>
+                  );
+                })}
+              </Box>
+            )}
 
-      const result: CategoryNode[] = [];
-      for (const [category, bizMap] of categoryMap.entries()) {
-        const businesses: BusinessNode[] = [];
-        for (const [business, perms] of bizMap.entries()) {
-          businesses.push({ business, permissions: perms });
-        }
-        result.push({ category, businesses });
-      }
-      return result;
-    }, [rolePermissions, permissionMap]);
+            {/* 子节点递归 */}
+            {node.children.map((child) => renderNode(child, depth + 1))}
+          </Collapse>
+        </Box>
+      );
+    };
 
     if (!roleId) {
       return (
-        <Box sx={{ p: 2 }}>
-          <Typography variant="body2" color="text.secondary">
+        <Box sx={{ p: 4, textAlign: 'center' }}>
+          <Typography variant="body1" color="text.secondary">
             {t('system.rolePermission.tree.selectRole')}
           </Typography>
         </Box>
@@ -159,8 +418,8 @@ const TheTree = memo(
 
     if (loading) {
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 2 }}>
-          <CircularProgress size={16} />
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4, gap: 1 }}>
+          <CircularProgress size={20} />
           <Typography variant="body2">{t('common.loading')}</Typography>
         </Box>
       );
@@ -168,105 +427,52 @@ const TheTree = memo(
 
     if (error) {
       return (
-        <Alert severity="error" sx={{ m: 1 }}>
+        <Alert severity="error" sx={{ m: 2 }}>
           {error}
         </Alert>
       );
     }
 
-    if (tree.length === 0) {
-      return (
-        <Box sx={{ p: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('rolePermission.noPermissions')}
-          </Typography>
-        </Box>
-      );
-    }
+    const totalChecked = checkedIds.size;
+    const totalPermissions = allPermissions.length;
 
     return (
-      <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
-        <SimpleTreeView
-          defaultExpandedItems={tree.map((c) => `cat-${c.category}`)}
-          sx={{ flexGrow: 1, overflowY: 'auto' }}
+      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
+        {/* 统计栏 */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 2,
+            py: 1,
+            borderBottom: 1,
+            borderColor: 'divider',
+          }}
         >
-          {tree.map((catNode) => (
-            <TreeItem
-              key={catNode.category}
-              itemId={`cat-${catNode.category}`}
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                  <FolderIcon fontSize="small" color="action" />
-                  <Typography variant="body2" fontWeight={600}>
-                    {catNode.category}
-                  </Typography>
-                  <Chip
-                    label={
-                      rolePermissions.filter((rp) => {
-                        const p = permissionMap.get(rp.permissionId);
-                        return p?.category === catNode.category;
-                      }).length
-                    }
-                    size="small"
-                    color={CATEGORY_COLOR[catNode.category] ?? 'default'}
-                    sx={{ height: 18, fontSize: '0.65rem' }}
-                  />
-                </Box>
-              }
-            >
-              {catNode.businesses.map((bizNode) => (
-                <TreeItem
-                  key={`${catNode.category}-${bizNode.business}`}
-                  itemId={`biz-${catNode.category}-${bizNode.business}`}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                      <LabelIcon fontSize="small" color="disabled" />
-                      <Typography variant="body2">{bizNode.business}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        ({bizNode.permissions.length})
-                      </Typography>
-                    </Box>
-                  }
-                >
-                  {bizNode.permissions.map((perm) => (
-                    <TreeItem
-                      key={perm.id}
-                      itemId={`perm-${perm.id}`}
-                      label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.5 }}>
-                          <KeyIcon fontSize="small" sx={{ color: 'text.disabled', fontSize: 14 }} />
-                          <Typography variant="body2">{perm.name}</Typography>
-                          <Typography
-                            variant="caption"
-                            color="text.disabled"
-                            sx={{ fontFamily: 'monospace' }}
-                          >
-                            {perm.code}
-                          </Typography>
-                          <Box sx={{ ml: 'auto' }} onClick={(e) => e.stopPropagation()}>
-                            <RolePermissionActionButtons
-                              row={
-                                {
-                                  id: perm.rolePermissionId,
-                                  roleId: roleId!,
-                                  permissionId: perm.id,
-                                } as never
-                              }
-                              formRef={formRef}
-                              onDeleteSuccess={() =>
-                                ref && 'current' in ref && ref.current?.refresh()
-                              }
-                            />
-                          </Box>
-                        </Box>
-                      }
-                    />
-                  ))}
-                </TreeItem>
-              ))}
-            </TreeItem>
-          ))}
-        </SimpleTreeView>
+          <Typography variant="body2" color="text.secondary">
+            {`${totalChecked} / ${totalPermissions}`}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Chip
+              label={t('common.expandAll')}
+              size="small"
+              variant="outlined"
+              onClick={expandAll}
+              sx={{ cursor: 'pointer' }}
+            />
+            <Chip
+              label={t('common.collapseAll')}
+              size="small"
+              variant="outlined"
+              onClick={collapseAll}
+              sx={{ cursor: 'pointer' }}
+            />
+          </Box>
+        </Box>
+
+        {/* 树 */}
+        {tree.map((node) => renderNode(node, 0))}
       </Box>
     );
   }),

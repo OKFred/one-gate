@@ -358,6 +358,26 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "components",
+    tKey: "dialog.confirmContent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "确定要保存当前权限变更吗？",
+      "en-US": "Are you sure you want to save the current permission changes?",
+    },
+  },
+  {
+    application: "frontend",
+    business: "components",
+    tKey: "dialog.operationSuccess",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "操作成功",
+      "en-US": "Operation successful",
+    },
+  },
+  {
+    application: "frontend",
+    business: "components",
     tKey: "column.yes",
     isEnabled: true,
     langCodes: {
@@ -3382,6 +3402,26 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "确定要删除此缓存项吗？",
       "en-US": "Are you sure you want to delete this cache item?",
+    },
+  },
+  {
+    application: "frontend",
+    business: "components",
+    tKey: "common.collapseAll",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "折叠所有",
+      "en-US": "Collapse All",
+    },
+  },
+  {
+    application: "frontend",
+    business: "components",
+    tKey: "common.expandAll",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "展开所有",
+      "en-US": "Expand All",
     },
   },
   {
