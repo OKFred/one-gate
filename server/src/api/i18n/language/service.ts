@@ -118,7 +118,7 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
-  permission: { action: "read" },
+  permission: false, // 因为切换语言前需要获取语言列表
 } satisfies API;
 
 const listReq = {
