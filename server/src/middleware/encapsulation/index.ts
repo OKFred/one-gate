@@ -162,7 +162,7 @@ export interface API {
   adapter: Function;
   service: (c: Context | any, ...args: any[]) => Promise<any>;
   /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
-  permission?: { action: string };
+  permission?: { action: string } | false;
 }
 
 export default function main(apiObj: Record<string, API>, nameSpace: string) {

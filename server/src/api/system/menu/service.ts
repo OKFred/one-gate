@@ -246,15 +246,9 @@ async function onAdd(
     .insert(menuTable)
     .values(updateData)
     .returning({ id: menuTable.id });
-  const menuId = res[0]?.id;
-  if (menuId) {
-    // 创建菜单权限记录
-    await permissionUtils.createMenuPermission(
-      { menuId, menuName: name, business: params.business },
-      userObj
-    );
-  }
-  return menuId;
+  const row = res[0];
+  preventEmpty(row);
+  return row.id;
 }
 const addApi = {
   req: addReq,
@@ -316,30 +310,6 @@ async function onUpdate(
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  // 提前准备权限更新所需数据
-  const { name } = rest;
-  let permissionId: number | null = null;
-  let permissionName: string | undefined;
-
-  if (name !== undefined) {
-    permissionId = await permissionUtils.getPermissionIdByMenuId(id);
-    const translationList = await translationService.listAll.service({
-      isEnabled: true,
-    });
-    const prefix =
-      translationList.find(
-        (t) =>
-          t.tKey === (rest.business ?? currentMenu.business) &&
-          t.langCode === userObj.langCode
-      )?.tValue || "未知菜单权限";
-    const postfix = translationList.find(
-      (item) =>
-        item.tKey === "permission.category.menu" &&
-        item.langCode === userObj.langCode
-    )?.tValue;
-    permissionName = postfix ? `${prefix}${postfix}` : name + "未知菜单";
-  }
-
   // 构造 batch 任务
   const batchQueries: any[] = [
     db
@@ -348,27 +318,6 @@ async function onUpdate(
       .where(eq(menuTable.id, id))
       .returning({ id: menuTable.id }),
   ];
-
-  if (permissionId && name !== undefined) {
-    // 删除现有的角色权限关联
-    batchQueries.push(
-      db
-        .delete(rolePermissionTable)
-        .where(eq(rolePermissionTable.permissionId, permissionId))
-    );
-    // 更新权限信息
-    batchQueries.push(
-      db
-        .update(permissionTable)
-        .set({
-          code: `menu:${name}`,
-          name: permissionName,
-          updaterId,
-          updateTimeUtc: getCurrentTimestampUtcSql(),
-        })
-        .where(eq(permissionTable.id, permissionId))
-    );
-  }
 
   // 使用 batch 确保菜单表和权限表的更新一致性（在 D1 中 batch 具有原子性）
   const batchResults = await db.batch(batchQueries as any);
@@ -544,21 +493,72 @@ async function onTree(
     .orderBy(asc(menuTable.sort));
 
   let filteredMenus = allMenus;
-  // 如果不是超管角色，则根据用户角色过滤菜单
+  // 如果不是超管角色，则根据用户角色权限过滤菜单
   if (!isSuperAdmin) {
-    // 获取用户角色有权限的菜单ID列表
-    const accessibleMenuIds =
-      await rolePermissionUtils.getMenuIdsByRoleIds(roleIds);
+    const userPermissions =
+      await rolePermissionUtils.getPermissionsByRoleIds(roleIds);
+    const permissionCodes = new Set(userPermissions.map((p) => p.code));
 
-    // 根据用户角色过滤菜单
-    filteredMenus = allMenus.filter((menu) => {
-      // 如果没有配置权限的菜单，默认所有用户可见
-      if (!accessibleMenuIds.includes(menu.id)) return false;
-      return true;
+    // 1. 找出所有“直接可见”的菜单节点
+    const visibleMenuIds = new Set<number>();
+    allMenus.forEach((menu) => {
+      const hasChildren = allMenus.some((m) => m.parentId === menu.id);
+      let isVisible = false;
+
+      if (menu.business) {
+        // 有业务标识：检查是否有对应 :read 权限
+        isVisible = permissionCodes.has(`${menu.business}:read`);
+      } else {
+        // 无业务标识：
+        // 如果是叶子节点，默认可见（如首页、外部链接等）
+        // 如果是父节点，其可见性由子节点决定，此处先不标记
+        isVisible = !hasChildren;
+      }
+
+      if (isVisible) {
+        visibleMenuIds.add(menu.id);
+      }
     });
+
+    // 2. 向上递归：确保所有可见节点的祖先也都被标记为可见
+    const addAncestors = (menuId: number) => {
+      const menu = allMenus.find((m) => m.id === menuId);
+      if (menu?.parentId) {
+        if (!visibleMenuIds.has(menu.parentId)) {
+          visibleMenuIds.add(menu.parentId);
+          addAncestors(menu.parentId);
+        }
+      }
+    };
+
+    // 对当前已确定的可见节点执行祖先搜寻
+    const currentIds = Array.from(visibleMenuIds);
+    currentIds.forEach((id) => addAncestors(id));
+
+    // 3. 最终过滤
+    filteredMenus = allMenus.filter((menu) => visibleMenuIds.has(menu.id));
+
+    // 4. 清理：如果某个父节点（有业务标识）被标记为可见，但它实际上没有任何可见的子节点，且其自身链接为空
+    // 这种情况通常发生在用户有父级权限但没子级权限时，为了避免空的目录，可以根据需求选择是否清理
+    let changed = true;
+    while (changed) {
+      const beforeCount = filteredMenus.length;
+      filteredMenus = filteredMenus.filter((menu) => {
+        const hasVisibleChildren = filteredMenus.some(
+          (m) => m.parentId === menu.id
+        );
+        // 如果有子节点，保留
+        if (hasVisibleChildren) return true;
+        // 如果没有子节点且有业务标识，保留（说明它本身就是个功能页）
+        if (menu.business) return true;
+        // 如果既没有子节点也没有业务标识，说明是个空目录，移除
+        return false;
+      });
+      changed = filteredMenus.length !== beforeCount;
+    }
   }
 
-  // 父菜单没有权限时，所有子菜单也不显示
+  // 3. 级联过滤：父菜单若因其他原因（如被禁用）不在列表中，则子菜单也不显示
   filteredMenus = filteredMenus.filter((menu) => {
     if (!menu.parentId) return true;
     const parentMenu = filteredMenus.find((m) => m.id === menu.parentId);
@@ -588,7 +588,7 @@ const treeApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onTree,
-  permission: { action: "read" },
+  permission: false, // 所有登录用户均可调用，菜单可见性由 onTree 内部根据权限过滤
 } satisfies API;
 
 /** 获取菜单的直接子菜单列表 */

@@ -396,64 +396,6 @@ const getApi = {
   permission: { action: "read" },
 } satisfies API;
 
-// 工具函数：创建菜单权限
-async function createMenuPermission(
-  params: {
-    menuId: number;
-    menuName: string;
-    business: string | null;
-  },
-  userObj: UserObj
-) {
-  const { menuId, menuName, business } = params;
-  const permissionName = await translationService.listAll
-    .service({
-      isEnabled: true,
-    })
-    .then((translationList) => {
-      const tKeySubString = business || "";
-      const prefix =
-        translationList.find(
-          (item) =>
-            item.tKey === "businessType." + tKeySubString &&
-            item.langCode === userObj.langCode
-        )?.tValue || "未知菜单权限";
-      const postfix = translationList.find(
-        (item) =>
-          item.tKey === "permission.category.menu" &&
-          item.langCode === userObj.langCode
-      )?.tValue;
-      return postfix ? `${prefix}${postfix}` : menuName + "未知菜单";
-    });
-  const permissionData = {
-    code: `menu:${menuName}`,
-    name: permissionName,
-    category: "menu" as const,
-    resource: `${menuId}`,
-    business,
-    remark: null,
-    isEnabled: true,
-  };
-  const result = await onAdd(permissionData, userObj);
-  return result;
-}
-
-// 工具函数：根据菜单ID获取权限ID
-async function getPermissionIdByMenuId(menuId: number) {
-  const rows = await db
-    .select({ id: permissionTable.id })
-    .from(permissionTable)
-    .where(
-      and(
-        eq(permissionTable.category, "menu"),
-        eq(permissionTable.resource, `${menuId}`)
-      )
-    )
-    .limit(1);
-
-  return rows.length > 0 ? rows[0].id : null;
-}
-
 /**
  * 过滤生效的权限（处理 allow/deny）
  * @param permissions 权限数组
@@ -481,8 +423,6 @@ function filterEffectivePermissions(
 }
 
 export const utils = {
-  createMenuPermission,
-  getPermissionIdByMenuId,
   filterEffectivePermissions,
 };
 

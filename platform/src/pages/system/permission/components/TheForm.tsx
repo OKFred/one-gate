@@ -64,10 +64,7 @@ const TheForm = memo(
     const [parentAnchorEl, setParentAnchorEl] = useState<HTMLDivElement | null>(null);
     const [loading, setLoading] = useState(false);
     const PERMISSION_TYPES = useMemo(
-      () => [
-        { value: 'menu', label: t('permission.category.menu') },
-        { value: 'action', label: t('permission.category.action') },
-      ],
+      () => [{ value: 'action', label: t('permission.category.action') }],
       [t],
     );
 

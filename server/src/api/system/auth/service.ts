@@ -420,9 +420,7 @@ async function onGetButtonPermission(
   // 必须手动触发加载，因为该接口本身不走 RBAC 校验
   await userObj.ensureLoaded();
 
-  const buttonPermissions = userObj.permissions.filter(
-    (p) => p.category !== "menu"
-  );
+  const buttonPermissions = userObj.permissions;
   return { permissions: buttonPermissions };
 }
 const getButtonPermissionApi = {

@@ -164,6 +164,9 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
   { category: "action", code: "mail.log:read", business: "mail.log" },
   { category: "action", code: "mail.log:view", business: "mail.log" },
 
+  // system.auth (Structural)
+  { category: "action", code: "system.auth:read", business: "system.auth" },
+
   // system.auth
   {
     category: "action",
@@ -175,6 +178,14 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     code: "system.auth:update_password",
     business: "system.auth",
   },
+
+  // structural parents
+  { category: "action", code: "system:read", business: "system" },
+  { category: "action", code: "mail:read", business: "mail" },
+  { category: "action", code: "i18n:read", business: "i18n" },
+  { category: "action", code: "maintenance:read", business: "maintenance" },
+  { category: "action", code: "oss:read", business: "oss" },
+  { category: "action", code: "enterprise:read", business: "enterprise" },
 
   // maintenance.cache
   {

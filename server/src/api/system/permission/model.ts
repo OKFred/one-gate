@@ -34,8 +34,8 @@ const PermissionBasePO = {
   },
   category: {
     type: "string",
-    enum: ["menu", "action"],
-    description: "权限类别：menu-菜单，action-动作",
+    enum: ["action"],
+    description: "权限类别：action-动作",
   },
   resource: {
     type: ["string", "null"],
