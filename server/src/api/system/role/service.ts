@@ -383,11 +383,7 @@ async function onGet(
     .limit(1);
   const row = rows[0];
   preventEmpty(row);
-  return {
-    ...row,
-    dataScope: (row.dataScope ??
-      DataScope.SELF_ONLY) as import("@/types/dataScope").DataScopeValue,
-  };
+  return row;
 }
 const getApi = {
   req: getReq,

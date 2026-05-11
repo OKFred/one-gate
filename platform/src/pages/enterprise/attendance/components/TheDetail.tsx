@@ -114,7 +114,7 @@ const TheDetail = memo(
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('enterprise.attendance.remark')}
+                {t('column.remark')}
               </Typography>
               <Typography variant="body2">{detail.remark || '无'}</Typography>
             </Box>

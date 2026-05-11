@@ -22,7 +22,7 @@ const ExportButton = memo(({ data, fileName }: ExportButtonProps) => {
       t('enterprise.attendance.checkInTime'),
       t('enterprise.attendance.checkOutTime'),
       t('enterprise.attendance.status'),
-      t('enterprise.attendance.remark'),
+      t('column.remark'),
     ];
     const csvContent = [
       headers.join(','),
