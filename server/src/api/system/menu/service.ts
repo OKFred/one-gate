@@ -361,7 +361,7 @@ async function onUpdate(
       db
         .update(permissionTable)
         .set({
-          code: `${name}:menu`,
+          code: `menu:${name}`,
           name: permissionName,
           updaterId,
           updateTimeUtc: getCurrentTimestampUtcSql(),

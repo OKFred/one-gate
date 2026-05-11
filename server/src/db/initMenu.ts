@@ -324,7 +324,7 @@ export async function prepareMenu(options?: { reset?: boolean }) {
     };
 
     return {
-      code: `${item.name}:menu`,
+      code: `menu:${item.name}`,
       name: getPermissionName(),
       category: "menu" as const,
       resource: `${item.id}`,

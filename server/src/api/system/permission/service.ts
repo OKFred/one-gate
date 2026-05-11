@@ -427,7 +427,7 @@ async function createMenuPermission(
       return postfix ? `${prefix}${postfix}` : menuName + "未知菜单";
     });
   const permissionData = {
-    code: `${menuName}:menu`,
+    code: `menu:${menuName}`,
     name: permissionName,
     category: "menu" as const,
     resource: `${menuId}`,
