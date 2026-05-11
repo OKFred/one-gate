@@ -25,8 +25,6 @@ import {
   ErrorCodes,
   preventMissingRecord,
   preventMissingRole,
-  preventMissingPermission,
-  preventMissingPermissions,
 } from "./prevention";
 import { permissionTable } from "../permission/model";
 import roleService, { utils as roleUtils } from "../role/service";
@@ -237,7 +235,6 @@ async function onAdd(
 
   // 前置校验
   await preventMissingRole(roleId);
-  await preventMissingPermission(permissionId);
 
   const result = await db
     .insert(rolePermissionTable)
@@ -297,7 +294,6 @@ async function onBatchAdd(
 
   // 前置校验
   await preventMissingRole(roleId);
-  await preventMissingPermissions(permissionIds);
 
   // 批量插入，分片处理以避免 D1 变量限制 (通常为 100)
   // 每行 3 个变量，取 25 行为一组 (75 变量)
@@ -369,8 +365,6 @@ async function onUpdate(
   // 前置校验
   await preventMissingRecord(id);
   if (hasValue(roleId)) await preventMissingRole(roleId as number);
-  if (hasValue(permissionId))
-    await preventMissingPermission(permissionId as number);
 
   const updateData = {
     ...rest,
@@ -690,7 +684,6 @@ export async function getPermissionsByRoleIds(roleIds: number[]) {
         eq(permissionTable.isEnabled, true)
       )
     )) as PermissionInfo[];
-  // 过滤生效的权限（处理 allow/deny）
   const permissions = permissionUtils.filterEffectivePermissions(rows);
   return permissions;
 }
@@ -744,23 +737,12 @@ async function verifyRoleExists(roleId: number) {
   return await roleUtils.verifyRoleExists(roleId);
 }
 
-async function verifyPermissionExists(permissionId: number) {
-  const count = await permissionUtils.countPermissionsByIds([permissionId]);
-  return count > 0;
-}
-
-async function countPermissionsByIds(ids: number[]) {
-  return await permissionUtils.countPermissionsByIds(ids);
-}
-
 export const utils = {
   addMenuPermissionToRole,
   getMenuIdsByRoleIds,
   getPermissionsByRoleIds,
   verifyRecordExists,
   verifyRoleExists,
-  verifyPermissionExists,
-  countPermissionsByIds,
 };
 
 export default {

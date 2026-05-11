@@ -48,7 +48,6 @@ export const authMiddleware = async (c: Context) => {
     ...rest,
     _isLoaded: false,
     permissions: [],
-    permissionCodes: new Set<string>(),
     dataScope: DataScope.SELF_ONLY,
     customDeptIds: [],
 
@@ -74,7 +73,6 @@ export const authMiddleware = async (c: Context) => {
         // 校验版本号：只有当版本号一致时才使用缓存
         if (cached && cached.version === (globalVersion || "1")) {
           this.permissions = cached.permissions;
-          this.permissionCodes = new Set(cached.permissions.map((p) => p.code));
           this.dataScope = cached.dataScope;
           this.customDeptIds = cached.customDeptIds;
           this._isLoaded = true;
@@ -91,7 +89,6 @@ export const authMiddleware = async (c: Context) => {
       ]);
 
       this.permissions = permissions;
-      this.permissionCodes = new Set(permissions.map((p) => p.code));
 
       let effectiveDataScope: DataScopeValue = DataScope.SELF_ONLY;
       const mergedCustomDeptIds: number[] = [];

@@ -40,7 +40,6 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import { preventMissingPermission } from "./prevention";
 import translationService from "@/api/i18n/translation/service";
 
 // 构建查询条件(列表和全部通用)
@@ -481,21 +480,10 @@ function filterEffectivePermissions(
   return result;
 }
 
-async function countPermissionsByIds(ids: number[]): Promise<number> {
-  if (ids.length === 0) return 0;
-  const uniqueIds = Array.from(new Set(ids));
-  const rows = await db
-    .select({ id: permissionTable.id })
-    .from(permissionTable)
-    .where(inArray(permissionTable.id, uniqueIds));
-  return rows.length;
-}
-
 export const utils = {
   createMenuPermission,
   getPermissionIdByMenuId,
   filterEffectivePermissions,
-  countPermissionsByIds,
 };
 
 export default {

@@ -29,24 +29,3 @@ export const preventMissingRole = async (roleId: number) => {
     throw new BusinessError(ErrorCodes.ROLE_NOT_FOUND);
   }
 };
-
-/**
- * 校验权限是否存在 (单条)
- */
-export const preventMissingPermission = async (permissionId: number) => {
-  const exists = await rolePermissionUtils.verifyPermissionExists(permissionId);
-  if (!exists) {
-    throw new BusinessError(ErrorCodes.PERMISSION_NOT_FOUND);
-  }
-};
-
-/**
- * 校验权限是否存在 (批量)
- */
-export const preventMissingPermissions = async (permissionIds: number[]) => {
-  if (permissionIds.length === 0) return;
-  const count = await rolePermissionUtils.countPermissionsByIds(permissionIds);
-  if (count !== permissionIds.length) {
-    throw new BusinessError(ErrorCodes.PERMISSION_NOT_FOUND);
-  }
-};
