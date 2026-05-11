@@ -8,10 +8,13 @@ import { getEnv } from "../env";
  * @returns 异步翻译函数
  */
 export const getTranslator = async (c: Context) => {
-  const langCode =
+  const rawLangCode =
     c.get("userObj")?.langCode ||
     c.req.header("locale") ||
     c.req.header("Accept-Language");
+
+  // 解析 Accept-Language 格式 (例如 "zh-CN,zh;q=0.9" -> "zh-CN")
+  const langCode = rawLangCode?.split(",")[0]?.trim();
 
   return await createTranslator(langCode);
 };

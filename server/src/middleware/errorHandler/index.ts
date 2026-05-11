@@ -1,10 +1,9 @@
 import { getRuntimeKey } from "hono/adapter";
 import { getEnv } from "@/utils/env";
 import type { App, Context, ResJson } from "@/types/app.ts";
-import { getTranslator } from "@/utils/i18n";
-// import { sendFeishuMessage } from "@/rpc/feishu/instance";
-import { HTTPException } from "hono/http-exception";
 import { type ContentfulStatusCode } from "hono/utils/http-status";
+import { getTranslator } from "@/utils/i18n";
+import { HTTPException } from "hono/http-exception";
 import { StatusCodes } from "http-status-codes";
 import { BusinessError } from "@/middleware/errorHandler/businessError/index";
 import { toHttpException } from "./businessError";
@@ -39,20 +38,24 @@ export default function errorHandler(app: App) {
     additionalProperties: false,
   });
 
-  app.onError(async (e, c: Context) => {
-    const t = await getTranslator(c);
+  app.onError(async (err, c: Context) => {
     if (c.var.logger) {
-      c.var.logger.error(e);
+      c.var.logger.error(err);
     } else {
-      console.error(e);
+      console.error(err);
     }
+    const t = await getTranslator(c);
+
+    let e = err;
+
     const sqlError = convertSqlErrorToBusinessError(e);
     if (sqlError) {
-      throw toHttpException(sqlError);
+      e = toHttpException(sqlError);
     }
     if (e instanceof BusinessError) {
-      throw toHttpException(e);
+      e = toHttpException(e);
     }
+
     if (e instanceof HTTPException) {
       return c.json<ResJson>(
         {
@@ -63,19 +66,11 @@ export default function errorHandler(app: App) {
         { status: e.status as ContentfulStatusCode }
       );
     }
-    const stack = e instanceof Error ? e.stack : String(e);
-    const serverErrorMsg = await t("errorHandler.serverError");
-    const msg = `${serverErrorMsg}: ${stack}`;
-    if (c.var.logger) {
-      c.var.logger.error(msg);
-    } else {
-      console.error(msg);
-    }
-    return c.json<ResJson<string | null>>(
+    return c.json<ResJson<null>>(
       {
         ok: false,
         message: await t("errorHandler.unknownError"),
-        data: getEnv("NODE_ENV") !== "production" ? e.message : null,
+        data: null,
       },
       { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
     );
