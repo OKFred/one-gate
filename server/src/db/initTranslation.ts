@@ -3017,6 +3017,16 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "infra.businessType",
+    tKey: "businessType.oss",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "对象存储",
+      "en-US": "Object Storage",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
     tKey: "businessType.oss.config",
     isEnabled: true,
     langCodes: {

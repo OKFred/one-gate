@@ -221,6 +221,50 @@ const permissionSeeds: Partial<PermissionAddLike>[] = [
     business: "maintenance.audit_login",
   },
 
+  // oss.config
+  {
+    category: "action",
+    code: "oss.config:read",
+    business: "oss.config",
+  },
+  {
+    category: "action",
+    code: "oss.config:add",
+    business: "oss.config",
+  },
+  {
+    category: "action",
+    code: "oss.config:edit",
+    business: "oss.config",
+  },
+  {
+    category: "action",
+    code: "oss.config:delete",
+    business: "oss.config",
+  },
+
+  // oss.file
+  {
+    category: "action",
+    code: "oss.file:read",
+    business: "oss.file",
+  },
+  {
+    category: "action",
+    code: "oss.file:add",
+    business: "oss.file",
+  },
+  {
+    category: "action",
+    code: "oss.file:edit",
+    business: "oss.file",
+  },
+  {
+    category: "action",
+    code: "oss.file:delete",
+    business: "oss.file",
+  },
+
   // enterprise.attendance
   {
     category: "action",
