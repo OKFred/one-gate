@@ -3417,6 +3417,16 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "components",
+    tKey: "common.saving",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "保存中",
+      "en-US": "Saving",
+    },
+  },
+  {
+    application: "frontend",
+    business: "components",
     tKey: "common.collapseAll",
     isEnabled: true,
     langCodes: {
