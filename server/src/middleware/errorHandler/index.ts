@@ -9,11 +9,6 @@ import { BusinessError } from "@/middleware/errorHandler/businessError/index";
 import { toHttpException } from "./businessError";
 import { convertSqlErrorToBusinessError } from "./sqlError";
 
-type HTTPExceptionConstructorParams = Required<
-  ConstructorParameters<typeof HTTPException>
->;
-type HTTPExceptionOptions = Required<HTTPExceptionConstructorParams[1]>; // 提取第二个参数的类型
-
 export default function errorHandler(app: App) {
   app.notFound(async (c: Context) => {
     const t = await getTranslator(c);
@@ -32,7 +27,7 @@ export default function errorHandler(app: App) {
     properties: {
       ok: { type: "boolean" },
       message: { type: "string" },
-      data: { type: "object" },
+      data: { type: "null" },
     },
     required: ["ok", "message", "data"],
     additionalProperties: false,
@@ -45,9 +40,7 @@ export default function errorHandler(app: App) {
       console.error(err);
     }
     const t = await getTranslator(c);
-
     let e = err;
-
     const sqlError = convertSqlErrorToBusinessError(e);
     if (sqlError) {
       e = toHttpException(sqlError);
@@ -55,13 +48,12 @@ export default function errorHandler(app: App) {
     if (e instanceof BusinessError) {
       e = toHttpException(e);
     }
-
     if (e instanceof HTTPException) {
       return c.json<ResJson>(
         {
           ok: false,
           message: await t(e.message),
-          data: e.cause as HTTPExceptionOptions["cause"],
+          data: null,
         },
         { status: e.status as ContentfulStatusCode }
       );
@@ -83,7 +75,6 @@ export default function errorHandler(app: App) {
 getRuntimeKey() !== "workerd" &&
   process.on("uncaughtException", function (err) {
     console.error("uncaughtException:", err);
-    console.log("uncaughtException:" + err);
   });
 
 console.log(`🚀 Server started in ${getEnv("NODE_ENV")} mode`);
