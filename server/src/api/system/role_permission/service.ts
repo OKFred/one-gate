@@ -82,7 +82,7 @@ async function getCurrentPermissionCount(roleId: number): Promise<number> {
 /** 更新全局权限版本号，强制所有用户缓存失效 */
 async function invalidateAuthCache() {
   await kv
-    .put("system.auth.global_version", Date.now().toString())
+    .put("system.auth:global_version", Date.now().toString())
     .catch(() => {});
 }
 

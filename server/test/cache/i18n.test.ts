@@ -25,7 +25,7 @@ const mockTranslations = [
 ];
 
 // 前缀常量，模拟原来的 I18nTranslation 命名空间
-const I18N_PREFIX = "i18n.translation.";
+const I18N_PREFIX = "i18n.translation:";
 
 /**
  * 测试基础功能
@@ -120,7 +120,7 @@ async function testGetSupportedLanguages() {
   const languages = new Set<string>();
 
   for (const item of listResult.keys) {
-    // 移除前缀后提取语言代码: i18n.translation.zh-CN.common.save -> zh-CN
+    // 移除前缀后提取语言代码: i18n.translation:zh-CN.common.save -> zh-CN
     const parts = item.name.replace(I18N_PREFIX, "").split(".");
     const langCode = parts[0];
     if (langCode) {

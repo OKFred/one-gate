@@ -54,8 +54,8 @@ export const authMiddleware = async (c: Context) => {
     async ensureLoaded() {
       if (this._isLoaded) return;
 
-      const cacheKey = `system.auth.bundle.${this.userId}`;
-      const versionKey = "system.auth.global_version";
+      const cacheKey = `system.auth.bundle:${this.userId}`;
+      const versionKey = "system.auth:global_version";
 
       // 1. 尝试从缓存获取权限和数据范围包
       try {
