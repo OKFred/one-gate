@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 import type { SystemMenuTree } from '@/layout/components/type';
 import { treeFn } from '@/api/system/menu';
+import { useTranslation } from '@/hooks/useTranslation';
+import { showSnackbar } from '@/components/Notification';
 interface MenuNode extends Omit<SystemMenuTree, 'children'> {
   children?: MenuNode[];
 }
@@ -19,6 +21,7 @@ const MenuContext = createContext<MenuContextType | undefined>(undefined);
 export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [navItems, setNavItems] = useState<MenuNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslation();
 
   // 规范化后端返回的数据，确保 children 为 MenuNode[]
   const normalizeMenus = useCallback((items: unknown): MenuNode[] => {
@@ -39,6 +42,14 @@ export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const resData = await treeFn({ data: {} });
       const normalizedMenus = normalizeMenus(resData.data.data);
+      if (!normalizedMenus?.length) {
+        // 给到提示：菜单为空，请联系管理员添加菜单
+        showSnackbar({
+          message: t('sidebar.menu.emptyPrompt'),
+          type: 'warning',
+        });
+        return [];
+      }
       setNavItems(normalizedMenus);
       return normalizedMenus;
     } catch (error) {
@@ -47,7 +58,7 @@ export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       setLoading(false);
     }
-  }, [normalizeMenus]);
+  }, [normalizeMenus, t]);
 
   // 初始化时加载菜单
   useEffect(() => {

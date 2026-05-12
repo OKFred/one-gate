@@ -618,6 +618,16 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "business.type",
+    tKey: "sidebar.menu.emptyPrompt",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "菜单为空，请联系管理员添加菜单",
+      "en-US": "The menu is empty. Please contact the administrator to add it.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
     tKey: "sidebar.menu.home",
     isEnabled: true,
     langCodes: {
@@ -733,6 +743,17 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "菜单",
       "en-US": "Menus",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.system.permission.emptyPrompt",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "权限列表为空，请联系管理员分配权限",
+      "en-US":
+        "The permission list is empty. Please contact the administrator to assign it.",
     },
   },
   {

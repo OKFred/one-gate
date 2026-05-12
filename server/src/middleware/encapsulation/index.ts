@@ -88,7 +88,7 @@ function routeMaker({
         if (userObj && !(await can(userObj, permission.action, nameSpace))) {
           throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
         }
-      } else if (!ignoreError) {
+      } else if (!ignoreError && permission === undefined) {
         c.var.logger?.warn(
           `[Security Warning]: Route ${c.req.path} is missing permission declaration!`
         );

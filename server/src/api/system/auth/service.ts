@@ -163,6 +163,7 @@ const wechatLoginApi = {
   } as const,
   adapter: bodyAdapter,
   service: onWechatLogin,
+  permission: false,
 } satisfies API;
 
 // 刷新token
@@ -200,6 +201,7 @@ const refreshTokenApi = {
   } as const,
   adapter: bodyAdapter,
   service: onRefreshToken,
+  permission: false,
 } satisfies API;
 
 // 检查token有效性
@@ -227,6 +229,7 @@ const checkTokenApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onCheckToken,
+  permission: false,
 } satisfies API;
 
 // 获取当前用户信息
@@ -268,6 +271,7 @@ const profileApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onProfile,
+  permission: false,
 } satisfies API;
 
 const updateProfileReq = {
@@ -307,6 +311,7 @@ const updateProfileApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdateProfile,
+  permission: false,
 } satisfies API;
 
 /* 为什么“更新用户信息”和“更新用户语言”不适合强行复用？
@@ -343,6 +348,7 @@ const updateLangCodeApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdateLangCode,
+  permission: false,
 } satisfies API;
 
 // 更新用户密码
@@ -392,6 +398,7 @@ const updatePasswordApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdatePassword,
+  permission: false,
 } satisfies API;
 
 // 获取按钮权限
@@ -431,6 +438,7 @@ const getButtonPermissionApi = {
     method: "post",
     summary: "获取按钮权限",
   } as const,
+  permission: false,
   adapter: bodyUserAdapter,
   service: onGetButtonPermission,
 } satisfies API;

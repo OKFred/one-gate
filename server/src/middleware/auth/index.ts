@@ -135,8 +135,10 @@ export const authMiddleware = async (c: Context) => {
           console.error("Auth Cache Write Error:", err);
         });
 
-      if (c.executionCtx) {
+      try {
         c.executionCtx.waitUntil(putTask);
+      } catch (e) {
+        // 环境不支持 executionCtx (如本地 Node.js 开发环境)
       }
 
       this._isLoaded = true;

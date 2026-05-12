@@ -8,6 +8,8 @@ import React, {
 } from 'react';
 import { getButtonPermissionFn } from '@/api/system/auth';
 import type { GetButtonPermissionsRes } from '@/api/system/type';
+import { useTranslation } from '@/hooks/useTranslation';
+import { showSnackbar } from '@/components/Notification';
 
 type PermissionItem = GetButtonPermissionsRes['permissions'][0];
 interface PermissionContextType {
@@ -30,6 +32,7 @@ const PermissionContext = createContext<PermissionContextType | undefined>(undef
 export const PermissionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [permissions, setPermissions] = useState<PermissionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const t = useTranslation();
 
   // 将权限列表转换为 Set，方便快速查找
   const permissionCodes = useMemo(() => {
@@ -41,14 +44,21 @@ export const PermissionProvider: React.FC<{ children: ReactNode }> = ({ children
     try {
       setLoading(true);
       const resData = await getButtonPermissionFn({ data: {} });
-      setPermissions(resData.data.data.permissions);
+      const items = resData.data.data.permissions || [];
+      if (items.length === 0) {
+        showSnackbar({
+          message: t('sidebar.menu.system.permission.emptyPrompt'),
+          type: 'warning',
+        });
+      }
+      setPermissions(items);
     } catch (error) {
       console.error('Failed to load permissions', error);
       setPermissions([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   // 初始化加载
   useEffect(() => {
