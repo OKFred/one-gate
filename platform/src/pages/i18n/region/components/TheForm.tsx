@@ -22,6 +22,8 @@ import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import hasValue from '@/utils/hasValue';
+import { parseValidationErrors } from '@/utils/error';
+import type { AxiosError, AxiosResponse } from 'axios';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -58,6 +60,7 @@ const TheForm = memo(
       Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> }
     >(DEFAULT_FORM);
     const [loading, setLoading] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -108,6 +111,7 @@ const TheForm = memo(
       setEditId(null);
       setOpen(false);
       setForm(DEFAULT_FORM);
+      setFieldErrors({});
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -123,8 +127,17 @@ const TheForm = memo(
         handleCancel();
         // 刷新表格数据
         tableRef.current?.refresh();
-      } catch (error) {
-        console.warn(error);
+      } catch (error: unknown) {
+        // 解析详细的校验错误
+        const axiosResponse = error as AxiosResponse;
+        const axiosError = error as AxiosError;
+        const errorData =
+          axiosResponse?.data?.data || (axiosError?.response?.data as { data?: unknown })?.data;
+
+        const errors = parseValidationErrors(errorData);
+        if (Object.keys(errors).length > 0) {
+          setFieldErrors(errors);
+        }
       } finally {
         setLoading(false);
       }
@@ -189,7 +202,8 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder={lang.nativeName || langCode}
-                    helperText={`(${langCode})`}
+                    helperText={fieldErrors[langCode] || `(${langCode})`}
+                    error={!!fieldErrors[langCode]}
                   />
                 );
               })}
@@ -204,6 +218,8 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder="CN"
                   inputProps={{ maxLength: 2, pattern: '[A-Z]{2}' }}
+                  error={!!fieldErrors.alpha2Code}
+                  helperText={fieldErrors.alpha2Code}
                 />
 
                 <TextField
@@ -215,6 +231,8 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder="CHN"
                   inputProps={{ maxLength: 3, pattern: '[A-Z]{3}' }}
+                  error={!!fieldErrors.alpha3Code}
+                  helperText={fieldErrors.alpha3Code}
                 />
 
                 <TextField
@@ -227,6 +245,8 @@ const TheForm = memo(
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder="156"
                   inputProps={{ min: 0 }}
+                  error={!!fieldErrors.numeric}
+                  helperText={fieldErrors.numeric}
                 />
               </Stack>
 
@@ -291,7 +311,8 @@ const TheForm = memo(
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder={t('form.pleaseEnter')}
                 inputProps={{ maxLength: 500 }}
-                helperText={`${(form.remark || '').length}/500`}
+                error={!!fieldErrors.remark}
+                helperText={fieldErrors.remark || `${(form.remark || '').length}/500`}
               />
             </Stack>
           </form>

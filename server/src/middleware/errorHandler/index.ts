@@ -27,7 +27,7 @@ export default function errorHandler(app: App) {
     properties: {
       ok: { type: "boolean" },
       message: { type: "string" },
-      data: { type: "null" },
+      data: { type: "object", nullable: true },
     },
     required: ["ok", "message", "data"],
     additionalProperties: false,
@@ -53,7 +53,7 @@ export default function errorHandler(app: App) {
         {
           ok: false,
           message: await t(e.message),
-          data: null,
+          data: (e.cause as any)?.params || null,
         },
         { status: e.status as ContentfulStatusCode }
       );

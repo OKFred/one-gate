@@ -118,8 +118,7 @@ function setupInterceptors(service: AxiosInstance) {
           // 获取用户语言创建翻译函数
           const langCode = authUtils.getUserInfo()?.langCode;
           const t = createTranslator(langCode);
-          const errorMessage = response.data.message || t('error.requestFailed');
-          handleErrorResponse(errorMessage);
+          handleErrorResponse(response.data, t('error.requestFailed'));
           return Promise.reject(response);
         }
       }
@@ -166,19 +165,22 @@ function setupInterceptors(service: AxiosInstance) {
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(
-        error.response?.data?.message || error.message || t('error.networkError'),
-      );
+      handleErrorResponse(error.response?.data, error.message || t('error.networkError'));
       return Promise.reject(error);
     },
   );
   return service;
 }
 
-function handleErrorResponse(errorMessage: string) {
-  showSnackbar({ message: errorMessage, type: 'error' });
-  if (process.env.NODE_ENV !== 'production') {
-    console.error(errorMessage);
+function handleErrorResponse(
+  data: { message?: string; data?: unknown } | null | undefined,
+  fallbackMessage: string,
+) {
+  const message = data?.message || fallbackMessage;
+  showSnackbar({ message, type: 'error' });
+
+  if (import.meta.env.MODE !== 'production' && data?.data) {
+    console.error('[API Error Details]:', data.data);
   }
 }
 

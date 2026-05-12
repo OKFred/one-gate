@@ -6684,7 +6684,7 @@ export interface components {
         ErrorInvalidRequest: {
             ok: boolean;
             message: string;
-            data: null;
+            data: Record<string, never> | null;
         };
         "i18n.languageListAllReq": {
             /** @description 是否降序 */
