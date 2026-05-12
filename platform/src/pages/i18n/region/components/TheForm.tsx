@@ -1,4 +1,11 @@
-import React, { useState, forwardRef, useImperativeHandle, memo } from 'react';
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  memo,
+  useCallback,
+  useMemo,
+} from 'react';
 import {
   Button,
   Dialog,
@@ -22,8 +29,9 @@ import type { TableState } from './TheTable';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import hasValue from '@/utils/hasValue';
-import { parseValidationErrors } from '@/utils/error';
-import type { AxiosError, AxiosResponse } from 'axios';
+import { useFormError } from '@/hooks/useFormError';
+import { FormErrorProvider } from '@/components/Form/FormErrorProvider';
+import { Field } from '@/components/Form/Field';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -60,7 +68,20 @@ const TheForm = memo(
       Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> }
     >(DEFAULT_FORM);
     const [loading, setLoading] = useState(false);
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const { fieldErrors, handleFormError, clearErrors, clearFieldError } = useFormError();
+
+    // 记忆化 Context Value，防止子组件频繁重绘
+    const errorContextValue = useMemo(
+      () => ({ fieldErrors, clearFieldError }),
+      [fieldErrors, clearFieldError],
+    );
+
+    const handleCancel = useCallback(() => {
+      setEditId(null);
+      setOpen(false);
+      setForm(DEFAULT_FORM);
+      clearErrors();
+    }, [clearErrors]);
 
     // 暴露给父组件的方法
     useImperativeHandle(
@@ -104,15 +125,8 @@ const TheForm = memo(
           handleCancel();
         },
       }),
-      [enabledLanguages],
+      [enabledLanguages, handleCancel],
     );
-
-    const handleCancel = () => {
-      setEditId(null);
-      setOpen(false);
-      setForm(DEFAULT_FORM);
-      setFieldErrors({});
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
@@ -128,16 +142,7 @@ const TheForm = memo(
         // 刷新表格数据
         tableRef.current?.refresh();
       } catch (error: unknown) {
-        // 解析详细的校验错误
-        const axiosResponse = error as AxiosResponse;
-        const axiosError = error as AxiosError;
-        const errorData =
-          axiosResponse?.data?.data || (axiosError?.response?.data as { data?: unknown })?.data;
-
-        const errors = parseValidationErrors(errorData);
-        if (Object.keys(errors).length > 0) {
-          setFieldErrors(errors);
-        }
+        handleFormError(error);
       } finally {
         setLoading(false);
       }
@@ -181,141 +186,142 @@ const TheForm = memo(
             px: isMobile ? 2 : 3,
           }}
         >
-          <form onSubmit={handleSubmit}>
-            <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
-              {/* 动态语言字段 */}
-              {enabledLanguages.map((lang) => {
-                if (!lang.langCode) return null;
-                const langCode = lang.langCode;
-                return (
-                  <TextField
-                    key={langCode}
-                    label={lang.nativeName || langCode}
-                    value={form.labels[langCode] || ''}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        labels: { ...form.labels, [langCode]: e.target.value },
-                      })
-                    }
+          <FormErrorProvider value={errorContextValue}>
+            <form onSubmit={handleSubmit}>
+              <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
+                {/* 动态语言字段 */}
+                {enabledLanguages.map((lang) => {
+                  if (!lang.langCode) return null;
+                  const langCode = lang.langCode;
+                  return (
+                    <Field
+                      key={langCode}
+                      name={langCode}
+                      label={lang.nativeName || langCode}
+                      value={form.labels[langCode] || ''}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          labels: { ...form.labels, [langCode]: e.target.value },
+                        })
+                      }
+                      required
+                      fullWidth
+                      size={isMobile ? 'medium' : 'medium'}
+                      placeholder={lang.nativeName || langCode}
+                      helperText={`(${langCode})`}
+                    />
+                  );
+                })}
+
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                  <Field
+                    name="alpha2Code"
+                    label={t('region.table.alpha2Code')}
+                    value={form.alpha2Code}
+                    onChange={(e) => setForm({ ...form, alpha2Code: e.target.value.toUpperCase() })}
                     required
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
-                    placeholder={lang.nativeName || langCode}
-                    helperText={fieldErrors[langCode] || `(${langCode})`}
-                    error={!!fieldErrors[langCode]}
+                    placeholder="CN"
+                    inputProps={{ maxLength: 2, pattern: '[A-Z]{2}' }}
                   />
-                );
-              })}
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
-                  label={t('region.table.alpha2Code')}
-                  value={form.alpha2Code}
-                  onChange={(e) => setForm({ ...form, alpha2Code: e.target.value.toUpperCase() })}
-                  required
-                  fullWidth
-                  size={isMobile ? 'medium' : 'medium'}
-                  placeholder="CN"
-                  inputProps={{ maxLength: 2, pattern: '[A-Z]{2}' }}
-                  error={!!fieldErrors.alpha2Code}
-                  helperText={fieldErrors.alpha2Code}
-                />
-
-                <TextField
-                  label={t('region.table.alpha3Code')}
-                  value={form.alpha3Code}
-                  onChange={(e) => setForm({ ...form, alpha3Code: e.target.value.toUpperCase() })}
-                  required
-                  fullWidth
-                  size={isMobile ? 'medium' : 'medium'}
-                  placeholder="CHN"
-                  inputProps={{ maxLength: 3, pattern: '[A-Z]{3}' }}
-                  error={!!fieldErrors.alpha3Code}
-                  helperText={fieldErrors.alpha3Code}
-                />
-
-                <TextField
-                  label={t('region.table.numeric')}
-                  type="number"
-                  value={form.numeric}
-                  onChange={(e) => setForm({ ...form, numeric: parseInt(e.target.value) || 0 })}
-                  required
-                  fullWidth
-                  size={isMobile ? 'medium' : 'medium'}
-                  placeholder="156"
-                  inputProps={{ min: 0 }}
-                  error={!!fieldErrors.numeric}
-                  helperText={fieldErrors.numeric}
-                />
-              </Stack>
-
-              <Stack direction="row" spacing={2} alignItems="center">
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={form.iso3166Independent}
-                      onChange={(e) => setForm({ ...form, iso3166Independent: e.target.checked })}
-                    />
-                  }
-                  label={t('region.table.iso3166Independent')}
-                />
-
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={form.isEnabled}
-                      onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
-                    />
-                  }
-                  label={t('status.enabled')}
-                />
-              </Stack>
-
-              <Autocomplete
-                multiple
-                options={enabledLanguages.map((lang) => lang.langCode || '')}
-                value={form.businessLanguages || []}
-                onChange={(_, newValue) => {
-                  setForm({
-                    ...form,
-                    businessLanguages: newValue.length > 0 ? newValue : null,
-                  });
-                }}
-                getOptionLabel={(option) => {
-                  const lang = enabledLanguages.find((l) => l.langCode === option);
-                  return lang ? `${lang.nativeName || option} (${option})` : option;
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('region.table.businessLanguages')}
-                    placeholder={t('form.select')}
+                  <Field
+                    name="alpha3Code"
+                    label={t('region.table.alpha3Code')}
+                    value={form.alpha3Code}
+                    onChange={(e) => setForm({ ...form, alpha3Code: e.target.value.toUpperCase() })}
+                    required
+                    fullWidth
                     size={isMobile ? 'medium' : 'medium'}
+                    placeholder="CHN"
+                    inputProps={{ maxLength: 3, pattern: '[A-Z]{3}' }}
                   />
-                )}
-                fullWidth
-              />
-              <TextField
-                label={t('column.remark')}
-                value={form.remark || ''}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    remark: hasValue(e.target.value) ? e.target.value : null,
-                  })
-                }
-                fullWidth
-                multiline
-                rows={2}
-                size={isMobile ? 'medium' : 'medium'}
-                placeholder={t('form.pleaseEnter')}
-                inputProps={{ maxLength: 500 }}
-                error={!!fieldErrors.remark}
-                helperText={fieldErrors.remark || `${(form.remark || '').length}/500`}
-              />
-            </Stack>
-          </form>
+
+                  <Field
+                    name="numeric"
+                    label={t('region.table.numeric')}
+                    type="number"
+                    value={form.numeric}
+                    onChange={(e) => setForm({ ...form, numeric: parseInt(e.target.value) || 0 })}
+                    required
+                    fullWidth
+                    size={isMobile ? 'medium' : 'medium'}
+                    placeholder="156"
+                    inputProps={{ min: 0 }}
+                  />
+                </Stack>
+
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={form.iso3166Independent}
+                        onChange={(e) => setForm({ ...form, iso3166Independent: e.target.checked })}
+                      />
+                    }
+                    label={t('region.table.iso3166Independent')}
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={form.isEnabled}
+                        onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
+                      />
+                    }
+                    label={t('status.enabled')}
+                  />
+                </Stack>
+
+                <Autocomplete
+                  multiple
+                  options={enabledLanguages.map((lang) => lang.langCode || '')}
+                  value={form.businessLanguages || []}
+                  onChange={(_, newValue) => {
+                    setForm({
+                      ...form,
+                      businessLanguages: newValue.length > 0 ? newValue : null,
+                    });
+                  }}
+                  getOptionLabel={(option) => {
+                    const lang = enabledLanguages.find((l) => l.langCode === option);
+                    return lang ? `${lang.nativeName || option} (${option})` : option;
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={t('region.table.businessLanguages')}
+                      placeholder={t('form.select')}
+                      size={isMobile ? 'medium' : 'medium'}
+                      error={!!fieldErrors.businessLanguages}
+                      helperText={fieldErrors.businessLanguages}
+                    />
+                  )}
+                  fullWidth
+                />
+                <Field
+                  name="remark"
+                  label={t('column.remark')}
+                  value={form.remark || ''}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      remark: hasValue(e.target.value) ? e.target.value : null,
+                    })
+                  }
+                  fullWidth
+                  multiline
+                  rows={2}
+                  size={isMobile ? 'medium' : 'medium'}
+                  placeholder={t('form.pleaseEnter')}
+                  inputProps={{ maxLength: 500 }}
+                  helperText={`${(form.remark || '').length}/500`}
+                />
+              </Stack>
+            </form>
+          </FormErrorProvider>
         </DialogContent>
 
         <DialogActions

@@ -53,7 +53,7 @@ export default function errorHandler(app: App) {
         {
           ok: false,
           message: await t(e.message),
-          data: (e.cause as any)?.params || null,
+          data: (e.cause as { params?: unknown })?.params || null,
         },
         { status: e.status as ContentfulStatusCode }
       );
