@@ -12,14 +12,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   Stack,
   Box,
   useTheme,
   IconButton,
   FormControlLabel,
   Checkbox,
-  Autocomplete,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as RegionAPI from '@/api/i18n/region';
@@ -288,31 +286,26 @@ const TheForm = memo(
                   />
                 </Stack>
 
-                <Autocomplete
+                <Field
+                  type="autocomplete"
+                  name="businessLanguages"
+                  label={t('region.table.businessLanguages')}
                   multiple
                   options={enabledLanguages.map((lang) => lang.langCode || '')}
                   value={form.businessLanguages || []}
-                  onChange={(_, newValue) => {
+                  onChange={(newValue: unknown) => {
+                    const val = newValue as string[];
                     setForm({
                       ...form,
-                      businessLanguages: newValue.length > 0 ? newValue : null,
+                      businessLanguages: val.length > 0 ? val : null,
                     });
                   }}
-                  getOptionLabel={(option) => {
-                    const lang = enabledLanguages.find((l) => l.langCode === option);
-                    return lang ? `${lang.nativeName || option} (${option})` : option;
+                  getOptionLabel={(option: unknown) => {
+                    const opt = option as string;
+                    const lang = enabledLanguages.find((l) => l.langCode === opt);
+                    return lang ? `${lang.nativeName || opt} (${opt})` : opt;
                   }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label={t('region.table.businessLanguages')}
-                      placeholder={t('form.select')}
-                      size={isMobile ? 'medium' : 'medium'}
-                      error={!!fieldErrors.businessLanguages}
-                      helperText={fieldErrors.businessLanguages}
-                    />
-                  )}
-                  fullWidth
+                  placeholder={t('form.select')}
                 />
                 <Field
                   name="remark"
