@@ -22,22 +22,27 @@ export interface OssConfig {
  */
 export function getStorage(config: OssConfig, env: any = {}): StorageProvider {
   const provider = config.provider.toUpperCase();
+  const bucketBinding = env[config.bucket] || env.BUCKET;
 
-  if (provider === "R2" && config.accountId) {
-    // 在 R2 模式下，config.bucket 存储的是 Binding 名称 (如 "BUCKET")
-    const bucketBinding = env[config.bucket] || env.BUCKET;
-
+  // 仅在 R2 且存在原生绑定时使用 R2Provider
+  if (provider === "R2" && config.accountId && bucketBinding) {
     return new R2Provider({
       bucketBinding,
-      bucketName: config.bucket, // R2 S3 SDK 仍需要逻辑上的存储桶名 (通常在 CF 后台定义)
+      bucketName: config.bucket,
       accountId: config.accountId,
       accessKeyId: config.accessKeyId,
       secretAccessKey: config.secretAccessKey,
     });
   }
 
+  // 否则一律使用 S3Provider (包含 R2 的 S3 兼容模式)
+  let endpoint = config.endpoint;
+  if (!endpoint && provider === "R2" && config.accountId) {
+    endpoint = `https://${config.accountId}.r2.cloudflarestorage.com`;
+  }
+
   return new S3Provider({
-    endpoint: config.endpoint || "http://localhost:9000",
+    endpoint: endpoint || "http://localhost:9000",
     region: config.region || "auto",
     accessKeyId: config.accessKeyId,
     secretAccessKey: config.secretAccessKey,

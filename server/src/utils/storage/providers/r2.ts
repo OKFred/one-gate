@@ -30,6 +30,9 @@ export class R2Provider implements StorageProvider {
     secretAccessKey: string;
   }) {
     applyAwsPolyfills();
+    if (!config.bucketBinding) {
+      throw new Error("R2 bucket binding is required for R2Provider");
+    }
     this.bucket = config.bucketBinding;
     this.bucketName = config.bucketName;
 
