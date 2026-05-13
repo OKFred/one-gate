@@ -92,8 +92,8 @@ const TheTable = memo(
 
     // 删除成功后的回调
     const handleDeleteSuccess = useCallback(() => {
-      fetchRoles(filters, page);
-    }, [fetchRoles, filters, page]);
+      fetchRoles(filters, 1);
+    }, [fetchRoles, filters]);
 
     // 初始加载
     useEffect(() => {

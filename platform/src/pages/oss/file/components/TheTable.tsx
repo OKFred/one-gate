@@ -108,7 +108,7 @@ const TheTable = memo(
     const renderActions = (row: NonNullable<ListFileRes['list']>[number]) => (
       <FileActionButtons
         row={row}
-        onDeleteSuccess={() => fetchList(state.filters, state.page, state.pageSize, state.cursors)}
+        onDeleteSuccess={() => fetchList(state.filters, 1, state.pageSize, [undefined])}
       />
     );
 

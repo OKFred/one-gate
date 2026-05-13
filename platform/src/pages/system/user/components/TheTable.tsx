@@ -185,8 +185,8 @@ const TheTable = memo(
 
     // 删除成功后的回调
     const handleDeleteSuccess = useCallback(() => {
-      fetchUsers(filters, page);
-    }, [fetchUsers, filters, page]);
+      fetchUsers(filters, 1);
+    }, [fetchUsers, filters]);
 
     // 初始加载
     useEffect(() => {

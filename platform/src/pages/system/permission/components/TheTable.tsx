@@ -101,8 +101,8 @@ const TheTable = memo(
 
     // 删除成功后的回调
     const handleDeleteSuccess = useCallback(() => {
-      fetchPermissions(filters, page);
-    }, [fetchPermissions, filters, page]);
+      fetchPermissions(filters, 1);
+    }, [fetchPermissions, filters]);
 
     // 初始加载
     useEffect(() => {

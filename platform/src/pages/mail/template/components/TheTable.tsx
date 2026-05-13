@@ -174,7 +174,7 @@ const TheTable = memo(
             template={row}
             formRef={formRef}
             previewRef={previewRef}
-            onDeleteSuccess={() => fetchTemplates(filters, page)}
+            onDeleteSuccess={() => fetchTemplates(filters, 1)}
           />
         ),
       },
@@ -231,7 +231,7 @@ const TheTable = memo(
             template={row}
             formRef={formRef}
             previewRef={previewRef}
-            onDeleteSuccess={() => fetchTemplates(filters, page)}
+            onDeleteSuccess={() => fetchTemplates(filters, 1)}
           />
         )}
       />

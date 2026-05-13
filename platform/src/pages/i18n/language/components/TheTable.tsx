@@ -93,8 +93,8 @@ const TheTable = memo(
 
     // 删除成功后的回调
     const handleDeleteSuccess = useCallback(() => {
-      fetchLanguages(filters, page);
-    }, [fetchLanguages, filters, page]);
+      fetchLanguages(filters, 1);
+    }, [fetchLanguages, filters]);
 
     // 初始加载
     useEffect(() => {

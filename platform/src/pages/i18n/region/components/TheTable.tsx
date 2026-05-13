@@ -98,8 +98,8 @@ const TheTable = memo(
 
     // 删除成功后的回调
     const handleDeleteSuccess = useCallback(() => {
-      fetchRegions(filters, page);
-    }, [fetchRegions, filters, page]);
+      fetchRegions(filters, 1);
+    }, [fetchRegions, filters]);
 
     // 初始加载
     useEffect(() => {

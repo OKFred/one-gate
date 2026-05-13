@@ -84,8 +84,8 @@ const TheTable = memo(
     );
 
     const handleDeleteSuccess = useCallback(() => {
-      fetchAttendances(filters, page);
-    }, [fetchAttendances, filters, page]);
+      fetchAttendances(filters, 1);
+    }, [fetchAttendances, filters]);
 
     useEffect(() => {
       fetchAttendances(DEFAULT_FILTERS, 1);

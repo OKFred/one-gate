@@ -88,7 +88,7 @@ const TheTable = memo(
       <ConfigActionButtons
         row={row}
         formRef={formRef}
-        onRefresh={() => fetchList(state.filters, state.page)}
+        onRefresh={() => fetchList(state.filters, 1)}
       />
     );
 
