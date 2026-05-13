@@ -30,8 +30,7 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import hasValue from '@/utils/hasValue';
 import { useFormError } from '@/hooks/useFormError';
-import { FormErrorProvider } from '@/components/Form/FormErrorProvider';
-import { Field } from '@/components/Form/Field';
+import { SchemaForm, Field } from '@/components/Form';
 import { useValidator } from '@/utils/validator';
 import regionSchema from '@/assets/schemas/i18n.regionAddReq.json';
 
@@ -80,7 +79,7 @@ const TheForm = memo(
     } = useFormError(regionSchema);
     const { validate } = useValidator(regionSchema);
 
-    // 记忆化 Context Value，防止子组件频繁重绘
+    // 记忆化 Context Value，确保与 SchemaForm 共享同一引用
     const errorContextValue = useMemo(
       () => ({ fieldErrors, clearFieldError, rootSchema }),
       [fieldErrors, clearFieldError, rootSchema],
@@ -204,9 +203,9 @@ const TheForm = memo(
             px: isMobile ? 2 : 3,
           }}
         >
-          <FormErrorProvider value={errorContextValue}>
-            <form onSubmit={handleSubmit}>
-              <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
+          <SchemaForm schema={regionSchema} contextValue={errorContextValue}>
+            <Box sx={{ pt: 2 }}>
+              <Stack spacing={isMobile ? 2 : 3}>
                 {/* 动态语言字段 */}
                 {enabledLanguages.map((lang) => {
                   if (!lang.langCode) return null;
@@ -280,14 +279,12 @@ const TheForm = memo(
                     label={t('region.table.iso3166Independent')}
                   />
 
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={form.isEnabled}
-                        onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
-                      />
-                    }
+                  <Field
+                    name="isEnabled"
                     label={t('status.enabled')}
+                    type="switch"
+                    value={form.isEnabled}
+                    onChange={(checked: boolean) => setForm({ ...form, isEnabled: checked })}
                   />
                 </Stack>
 
@@ -336,8 +333,8 @@ const TheForm = memo(
                   helperText={`${(form.remark || '').length}/500`}
                 />
               </Stack>
-            </form>
-          </FormErrorProvider>
+            </Box>
+          </SchemaForm>
         </DialogContent>
 
         <DialogActions
