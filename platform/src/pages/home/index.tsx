@@ -54,9 +54,9 @@ export default function HomeRefactored() {
                 <Typography
                   variant="h4"
                   component="div"
-                  fontWeight="bold"
                   color={stat.color}
                   gutterBottom
+                  sx={{ fontWeight: 'bold' }}
                 >
                   {stat.value}
                 </Typography>

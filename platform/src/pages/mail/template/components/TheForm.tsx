@@ -205,10 +205,10 @@ const TheForm = memo(
               </Stack>
 
               <Box>
-                <Typography variant="subtitle1" fontWeight={500} mb={1}>
+                <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
                   {t('template.table.contentLabel')}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" mb={2}>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {t('template.table.contentHelp')}
                 </Typography>
                 <Suspense
@@ -235,7 +235,7 @@ const TheForm = memo(
                 multiline
                 rows={2}
                 size={isMobile ? 'medium' : 'medium'}
-                inputProps={{ maxLength: 500 }}
+                slotProps={{ htmlInput: { maxLength: 500 } }}
                 helperText={`${(form.remark || '').length}/500`}
                 placeholder={t('form.pleaseEnter')}
               />

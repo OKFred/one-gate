@@ -58,7 +58,7 @@ const TheProfile = memo(
             <Typography variant="h5" gutterBottom>
               {user.username}
             </Typography>
-            <Box mt={2}>
+            <Box sx={{ mt: 2 }}>
               <ResponsiveButton
                 variant="outlined"
                 startIcon={<EditIcon />}

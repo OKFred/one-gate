@@ -11,7 +11,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
-import { Edit, Delete, PlayCircleOutline } from '@mui/icons-material';
+import { Edit, Delete, PlayCircleOutlined as PlayIcon } from '@mui/icons-material';
 import { showSnackbar } from '@/components/Notification';
 import ResponsiveList, {
   type TableColumn,
@@ -206,7 +206,7 @@ const ConfigActionButtons = memo(({ row, formRef, onRefresh }: ConfigActionButto
       <Box>
         <Tooltip title={t('oss.config.verify')}>
           <IconButton size="small" color="info" onClick={() => handleVerify(row.id)}>
-            <PlayCircleOutline />
+            <PlayIcon />
           </IconButton>
         </Tooltip>
         <IconButton size="small" color="primary" onClick={() => formRef.current?.open(row.id)}>

@@ -84,7 +84,7 @@ const TheDetail = memo(
             color: theme.palette.primary.contrastText,
           }}
         >
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ViewIcon />
             <Typography variant="h6" component="span">
               {t('page.details')}
@@ -97,7 +97,7 @@ const TheDetail = memo(
 
         <DialogContent dividers>
           {loading ? (
-            <Box py={4} display="flex" justifyContent="center">
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
               <Typography color="text.secondary">{t('common.loading')}...</Typography>
             </Box>
           ) : data ? (

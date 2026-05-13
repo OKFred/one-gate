@@ -82,9 +82,7 @@ export const NotificationDialog = ({
             handleAction('close');
           }
         }}
-        TransitionProps={{
-          onExited: onExited,
-        }}
+        slotProps={{ transition: { onExited: onExited } }}
       >
         <DialogTitle
           sx={{

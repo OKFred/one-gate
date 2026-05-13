@@ -300,7 +300,7 @@ const TheTree = memo(
             ) : (
               <FolderIcon fontSize="small" color="action" sx={{ mx: 0.5 }} />
             )}
-            <Typography variant="body2" fontWeight={600} sx={{ mr: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mr: 1 }}>
               {t('businessType.' + node.key)}
             </Typography>
             <Chip

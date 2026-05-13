@@ -193,9 +193,9 @@ const TheTree = memo(
               key={node.id}
               itemId={node.id.toString()}
               label={
-                <Box display="flex" alignItems="center" py={0.5}>
+                <Box sx={{ display: 'flex', alignItems: 'center', py: 0.5 }}>
                   <ApartmentIcon sx={{ mr: 1, fontSize: 20, color: 'text.secondary' }} />
-                  <Box sx={{ flexGrow: 1 }} alignItems="center" display="flex">
+                  <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
                     {node.name}
                     {node.remark && (
                       <Typography
@@ -232,7 +232,7 @@ const TheTree = memo(
     return (
       <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
         {loading ? (
-          <Box display="flex" justifyContent="center" py={4}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
           </Box>
         ) : departments.length > 0 ? (
@@ -244,7 +244,7 @@ const TheTree = memo(
             {renderTree(departments)}
           </SimpleTreeView>
         ) : (
-          <Typography color="text.secondary" textAlign="center" py={4}>
+          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
             {t('column.noData')}
           </Typography>
         )}

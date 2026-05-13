@@ -108,9 +108,7 @@ const TheSendForm = memo(
 
         {/* 邮件内容编辑器 */}
         <Box>
-          <Typography fontWeight={500} mb={1}>
-            {t('send.dialog.contentLabel')}
-          </Typography>
+          <Typography sx={{ mb: 1, fontWeight: 500 }}>{t('send.dialog.contentLabel')}</Typography>
           <Suspense
             fallback={
               <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>

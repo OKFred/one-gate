@@ -5,7 +5,7 @@ import TheHeader from './components/TheHeader';
 
 export default function Login() {
   return (
-    <Container maxWidth="sm">
+    <Container sx={{ maxWidth: 'sm' }}>
       <Box
         sx={{
           minHeight: '100vh',

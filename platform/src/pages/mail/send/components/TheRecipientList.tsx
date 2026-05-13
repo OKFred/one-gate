@@ -1,7 +1,9 @@
 import { forwardRef, useImperativeHandle, useState, memo } from 'react';
 import { Box, TextField, Typography, IconButton, Stack } from '@mui/material';
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import {
+  RemoveCircleOutlined as RemoveCircleOutlineIcon,
+  AddCircleOutlined as AddCircleOutlineIcon,
+} from '@mui/icons-material';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -47,12 +49,10 @@ const TheRecipientList = memo(
 
     return (
       <Box>
-        <Typography fontWeight={500} mb={1}>
-          {t('send.recipients')}
-        </Typography>
+        <Typography sx={{ mb: 1, fontWeight: 500 }}>{t('send.recipients')}</Typography>
         <Stack spacing={1}>
           {recipients.map((r, i) => (
-            <Stack direction="row" spacing={1} alignItems="center" key={i}>
+            <Stack direction="row" spacing={1} key={i} sx={{ alignItems: 'center' }}>
               <TextField
                 placeholder={t('send.dialog.recipientName')}
                 value={r.name}

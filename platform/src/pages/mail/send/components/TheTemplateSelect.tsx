@@ -77,7 +77,7 @@ const TheTemplateSelect = memo<TheTemplateSelectProps>(({ value, onTemplateChang
           {templates.map((template) => (
             <MenuItem key={template.id} value={template.id?.toString() || ''}>
               <Box>
-                <Typography variant="body2" fontWeight={500}>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   {template.title || template.name}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">

@@ -261,11 +261,11 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder="156"
-                    inputProps={{ min: 0 }}
+                    slotProps={{ htmlInput: { min: 0 } }}
                   />
                 </Stack>
 
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -328,7 +328,7 @@ const TheForm = memo(
                   rows={2}
                   size={isMobile ? 'medium' : 'medium'}
                   placeholder={t('form.pleaseEnter')}
-                  inputProps={{ maxLength: 500 }}
+                  slotProps={{ htmlInput: { maxLength: 500 } }}
                   helperText={`${(form.remark || '').length}/500`}
                 />
               </Stack>

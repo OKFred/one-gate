@@ -121,7 +121,7 @@ const TheTable = memo(
     ];
 
     return (
-      <Box p={1}>
+      <Box sx={{ p: 1 }}>
         <ResponsiveList
           data={keys}
           columns={columns}

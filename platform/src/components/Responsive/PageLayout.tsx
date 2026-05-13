@@ -25,7 +25,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({ title, actions, children
           gap: { xs: 2, sm: 0 },
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
           {title}
         </Typography>
 
@@ -47,7 +47,7 @@ export const SectionLayout: React.FC<SectionLayoutProps> = ({ title, children, s
   return (
     <Box sx={{ mb: { xs: 3, md: 4 }, ...sx }} {...props}>
       {title && (
-        <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ mb: 2 }}>
+        <Typography variant="h4" gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
           {title}
         </Typography>
       )}

@@ -255,7 +255,11 @@ const TheForm = memo(
               />
 
               <Box>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="flex-start">
+                <Stack
+                  direction={{ xs: 'column', sm: 'row' }}
+                  spacing={1}
+                  sx={{ alignItems: 'flex-start' }}
+                >
                   <TextField
                     label={t('translation.table.tValue')}
                     value={form.tValue}
@@ -321,7 +325,7 @@ const TheForm = memo(
                 )}
               </Box>
 
-              <Stack direction="row" spacing={2} alignItems="center">
+              <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                 <Typography variant="body2">{t('status.enabled')}</Typography>
                 <Box
                   component="label"
@@ -357,7 +361,7 @@ const TheForm = memo(
                 rows={2}
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder={t('form.pleaseEnter')}
-                inputProps={{ maxLength: 500 }}
+                slotProps={{ htmlInput: { maxLength: 500 } }}
                 helperText={`${(form.remark || '').length}/500`}
               />
             </Stack>

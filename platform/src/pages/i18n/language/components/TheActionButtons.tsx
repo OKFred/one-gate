@@ -88,7 +88,7 @@ export const LanguageActionButtons = memo(({ row, formRef, onDeleteSuccess }: Ro
 
   return (
     <>
-      <Stack direction="row" spacing={1} justifyContent="center">
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
         <ResponsiveIconButton
           onClick={handleEdit}
           color="primary"

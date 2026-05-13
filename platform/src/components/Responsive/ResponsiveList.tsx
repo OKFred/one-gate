@@ -99,7 +99,7 @@ function ResponsiveListInner<T>({
   // 加载状态
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" py={4}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -222,7 +222,7 @@ function ResponsiveListInner<T>({
                   {/* 标签区域 */}
                   {tagsField && (
                     <Box>
-                      <Stack direction="row" spacing={1} flexWrap="wrap">
+                      <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
                         {tagsField.render(item)}
                       </Stack>
                     </Box>

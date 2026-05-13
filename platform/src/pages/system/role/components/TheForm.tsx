@@ -348,7 +348,7 @@ const TheForm = memo(
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
                 placeholder={t('form.pleaseEnter')}
-                inputProps={{ maxLength: 500 }}
+                slotProps={{ htmlInput: { maxLength: 500 } }}
                 helperText={`${(form.remark || '').length}/500`}
               />
             </Stack>

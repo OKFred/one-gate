@@ -130,8 +130,8 @@ const TheFilter = memo(
 
     return (
       <Paper sx={{ p: 2, mb: 2, position: 'relative' }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={1}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <FilterIcon color="action" />
             <Typography variant="h6">{t('filter.title')}</Typography>
             {!isSearching && filterCount > 0 && (
@@ -143,7 +143,7 @@ const TheFilter = memo(
               />
             )}
           </Box>
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {hasActiveFilters() && (
               <Chip
                 label={t('filter.clear')}
@@ -169,12 +169,14 @@ const TheFilter = memo(
                 onChange={(e) => handleFilterChange('keyword', e.target.value)}
                 size="small"
                 fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon color="action" />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon color="action" />
+                      </InputAdornment>
+                    ),
+                  },
                 }}
               />
 

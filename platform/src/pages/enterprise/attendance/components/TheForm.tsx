@@ -164,7 +164,7 @@ const TheForm = memo(
                 onChange={(e) => setForm({ ...form, date: e.target.value })}
                 required
                 fullWidth
-                InputLabelProps={{ shrink: true }}
+                slotProps={{ inputLabel: { shrink: true } }}
               />
 
               <Stack direction="row" spacing={2}>
@@ -174,8 +174,10 @@ const TheForm = memo(
                   value={form.checkInTime || ''}
                   onChange={(e) => setForm({ ...form, checkInTime: e.target.value })}
                   fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  inputProps={{ step: 1 }}
+                  slotProps={{
+                    inputLabel: { shrink: true },
+                    htmlInput: { step: 1 },
+                  }}
                 />
                 <TextField
                   label={t('enterprise.attendance.checkOutTime')}
@@ -183,8 +185,10 @@ const TheForm = memo(
                   value={form.checkOutTime || ''}
                   onChange={(e) => setForm({ ...form, checkOutTime: e.target.value })}
                   fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  inputProps={{ step: 1 }}
+                  slotProps={{
+                    inputLabel: { shrink: true },
+                    htmlInput: { step: 1 },
+                  }}
                 />
               </Stack>
 
@@ -209,7 +213,7 @@ const TheForm = memo(
                 fullWidth
                 multiline
                 rows={3}
-                inputProps={{ maxLength: 500 }}
+                slotProps={{ htmlInput: { maxLength: 500 } }}
               />
             </Stack>
           </form>

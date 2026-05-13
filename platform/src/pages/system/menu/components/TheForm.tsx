@@ -297,7 +297,7 @@ const TheForm = memo(
               fullWidth
               multiline
               rows={2}
-              inputProps={{ maxLength: 500 }}
+              slotProps={{ htmlInput: { maxLength: 500 } }}
               helperText={`${(formValues.remark || '').length}/500`}
             />
           </Stack>

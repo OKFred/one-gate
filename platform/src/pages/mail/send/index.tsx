@@ -38,7 +38,7 @@ export default function MailSend() {
     <PageLayout title={t('send.title')}>
       <Box sx={{ mx: 'auto', p: 3 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
-          <Typography variant="h5" gutterBottom fontWeight={600}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
             {t('send.title')}
           </Typography>
           <Box component="form" onSubmit={handleSubmit} autoComplete="off">

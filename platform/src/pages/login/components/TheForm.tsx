@@ -102,18 +102,20 @@ export default function TheForm() {
           onChange={handleInputChange('password')}
           onKeyDown={handleKeyPress}
           disabled={loading}
-          InputProps={{
-            endAdornment: (
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={() => setShowPassword(!showPassword)}
-                onMouseDown={(e) => e.preventDefault()}
-                edge="end"
-                disabled={loading}
-              >
-                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-              </IconButton>
-            ),
+          slotProps={{
+            input: {
+              endAdornment: (
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={() => setShowPassword(!showPassword)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  edge="end"
+                  disabled={loading}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              ),
+            },
           }}
         />
 

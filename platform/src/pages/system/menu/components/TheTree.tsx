@@ -178,7 +178,7 @@ const TheTree = memo(
             key={node.id}
             itemId={String(node.id)}
             label={
-              <Box display="flex" alignItems="center" py={0.5}>
+              <Box sx={{ display: 'flex', alignItems: 'center', py: 0.5 }}>
                 {node.icon && (
                   <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
                     <Icon name={node.icon} size={20} />
@@ -219,7 +219,7 @@ const TheTree = memo(
     return (
       <Box sx={{ mt: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
         {loading ? (
-          <Box display="flex" justifyContent="center" py={4}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
           </Box>
         ) : menus.length > 0 ? (
@@ -231,7 +231,7 @@ const TheTree = memo(
             {renderTree(menus)}
           </SimpleTreeView>
         ) : (
-          <Typography color="text.secondary" textAlign="center" py={4}>
+          <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
             {t('column.noData')}
           </Typography>
         )}

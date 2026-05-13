@@ -75,7 +75,7 @@ const TheDetail = memo(
     return (
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth fullScreen={isMobile}>
         <DialogTitle>
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <EmailIcon color="primary" />
             <Typography variant="h6" component="span">
               {t('page.details')}

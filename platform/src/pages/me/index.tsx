@@ -47,7 +47,7 @@ export default function Page() {
 
   return (
     <PageLayout title={t('me.title')}>
-      <Box display="grid" gridTemplateColumns={{ xs: '1fr', md: '1fr 2fr' }} gap={3}>
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', md: '1fr 2fr' } }}>
         {/* 用户资料卡片 */}
         <Box>
           <TheProfile ref={profileRef} localObj={localObj} />

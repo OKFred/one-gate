@@ -36,12 +36,13 @@ export const Field = ({ name, onChange, ...props }: FieldProps) => {
 
   // 自动从 Schema 提取校验属性
   const autoProps = {
-    inputProps: {
-      maxLength: props.schema?.maxLength,
-      pattern: props.schema?.pattern,
-      min: props.schema?.minimum,
-      max: props.schema?.maximum,
-      ...props.inputProps,
+    slotProps: {
+      htmlInput: {
+        maxLength: props.schema?.maxLength,
+        pattern: props.schema?.pattern,
+        min: props.schema?.minimum,
+        max: props.schema?.maximum,
+      },
     },
     required: props.required || (props.schema && !props.schema.nullable),
     type:

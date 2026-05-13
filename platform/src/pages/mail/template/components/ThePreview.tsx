@@ -133,7 +133,7 @@ const ThePreview = memo(
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     {t('template.preview.tags')}
                   </Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap">
+                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap' }}>
                     {template.langCode && (
                       <Chip
                         label={`${t('column.language')}: ${template.langCode}`}

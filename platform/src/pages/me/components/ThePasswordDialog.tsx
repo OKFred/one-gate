@@ -183,14 +183,14 @@ const ThePasswordDialog = memo(
     return (
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth fullScreen={isMobile}>
         <DialogTitle>
-          <Box display="flex" alignItems="center">
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <SettingsIcon sx={{ mr: 1 }} />
             {t('me.changePassword.title')}
           </Box>
         </DialogTitle>
 
         <DialogContent>
-          <Box pt={1}>
+          <Box sx={{ pt: 1 }}>
             <TextField
               fullWidth
               label={t('me.table.currentPassword')}

@@ -72,14 +72,16 @@ const TheDetails = memo(
         <Card>
           <CardContent>
             <Box
-              display="flex"
-              flexDirection={{ xs: 'column', sm: 'row' }}
-              justifyContent="space-between"
-              alignItems={{ xs: 'flex-start', sm: 'center' }}
-              gap={1}
-              mb={2}
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 1,
+                mb: 2,
+              }}
             >
-              <Box display="flex" alignItems="center">
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <AccountBoxIcon sx={{ mr: 1 }} />
                 <Typography variant="h6">{t('me.subtitle')}</Typography>
               </Box>
@@ -94,7 +96,9 @@ const TheDetails = memo(
             </Box>
 
             <Paper variant="outlined" sx={{ p: 2 }}>
-              <Box display="grid" gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }} gap={2}>
+              <Box
+                sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' } }}
+              >
                 <Box>
                   <Typography variant="body2" color="text.secondary">
                     {t('login.username')}

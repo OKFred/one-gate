@@ -100,7 +100,7 @@ const TheAccountList = memo(
             {accounts.map((account) => (
               <MenuItem key={account.id} value={account.id?.toString() || ''}>
                 <Box>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {account.nickname || account.mailAddress}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">

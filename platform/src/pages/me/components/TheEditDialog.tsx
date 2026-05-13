@@ -90,7 +90,7 @@ const TheEditDialog = memo(
     return (
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth fullScreen={isMobile}>
         <DialogTitle>
-          <Box display="flex" alignItems="center">
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <EditIcon sx={{ mr: 1 }} />
             {t('dialog.edit')}
           </Box>
@@ -142,7 +142,7 @@ const TheEditDialog = memo(
               multiline
               rows={3}
               size={isMobile ? 'medium' : 'medium'}
-              inputProps={{ maxLength: 500 }}
+              slotProps={{ htmlInput: { maxLength: 500 } }}
               helperText={`${(remark || '').length}/500`}
             />
           </Stack>

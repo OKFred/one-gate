@@ -99,7 +99,7 @@ export const TemplateActionButtons = memo(
 
     return (
       <>
-        <Stack direction="row" spacing={1} justifyContent="center">
+        <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
           <ResponsiveIconButton
             onClick={handlePreview}
             color="info"

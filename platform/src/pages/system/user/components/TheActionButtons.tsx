@@ -88,7 +88,7 @@ export const UserActionButtons = memo(({ row, formRef, onDeleteSuccess }: RowBut
 
   return (
     <>
-      <Stack direction="row" spacing={1} justifyContent="center">
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
         <ResponsiveIconButton
           onClick={handleEdit}
           color="primary"

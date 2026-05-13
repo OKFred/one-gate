@@ -170,7 +170,7 @@ const TheForm = memo(
                   required
                   fullWidth
                   size={isMobile ? 'medium' : 'medium'}
-                  inputProps={{ min: 1 }}
+                  slotProps={{ htmlInput: { min: 1 } }}
                 />
               </Stack>
               <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
@@ -192,7 +192,7 @@ const TheForm = memo(
                 multiline
                 rows={3}
                 size={isMobile ? 'medium' : 'medium'}
-                inputProps={{ maxLength: 500 }}
+                slotProps={{ htmlInput: { maxLength: 500 } }}
                 helperText={`${(form.remark || '').length}/500`}
               />
             </Stack>

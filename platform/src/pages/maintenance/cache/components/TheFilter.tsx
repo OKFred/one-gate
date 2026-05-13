@@ -90,11 +90,9 @@ const TheFilter = memo(
       <Paper sx={{ p: 2, mb: 2 }}>
         <Stack
           direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={expanded ? 2 : 0}
+          sx={{ alignItems: 'center', justifyContent: 'space-between', mb: expanded ? 2 : 0 }}
         >
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <FilterIcon color="action" />
             <Typography variant="h6">{t('common.filter')}</Typography>
             {filterCount > 0 && (
@@ -123,12 +121,14 @@ const TheFilter = memo(
               fullWidth
               size="small"
               placeholder={t('cache.filter.keyPrefixPlaceholder')}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
           </Stack>

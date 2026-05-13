@@ -110,7 +110,7 @@ export const AccountActionButtons = memo(({ row, formRef, onDeleteSuccess }: Row
 
   return (
     <>
-      <Stack direction="row" spacing={1} justifyContent="center">
+      <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
         <ResponsiveIconButton
           onClick={handleVerify}
           color="success"
