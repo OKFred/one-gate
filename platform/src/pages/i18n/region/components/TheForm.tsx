@@ -32,6 +32,8 @@ import hasValue from '@/utils/hasValue';
 import { useFormError } from '@/hooks/useFormError';
 import { FormErrorProvider } from '@/components/Form/FormErrorProvider';
 import { Field } from '@/components/Form/Field';
+import { useValidator } from '@/utils/validator';
+import regionSchema from '@/assets/schemas/i18n.regionAddReq.json';
 
 // 暴露给父组件的方法
 export interface TheFormRef {
@@ -68,7 +70,9 @@ const TheForm = memo(
       Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> }
     >(DEFAULT_FORM);
     const [loading, setLoading] = useState(false);
-    const { fieldErrors, handleFormError, clearErrors, clearFieldError } = useFormError();
+    const { fieldErrors, handleFormError, clearErrors, clearFieldError, setFieldErrors } =
+      useFormError();
+    const { validate } = useValidator(regionSchema);
 
     // 记忆化 Context Value，防止子组件频繁重绘
     const errorContextValue = useMemo(
@@ -130,6 +134,14 @@ const TheForm = memo(
 
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+
+      // 前端预校验
+      const clientErrors = validate(form);
+      if (Object.keys(clientErrors).length > 0) {
+        setFieldErrors(clientErrors);
+        return;
+      }
+
       setLoading(true);
 
       try {
@@ -224,7 +236,7 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder="CN"
-                    inputProps={{ maxLength: 2, pattern: '[A-Z]{2}' }}
+                    schema={regionSchema.properties.alpha2Code}
                   />
 
                   <Field
@@ -236,7 +248,7 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder="CHN"
-                    inputProps={{ maxLength: 3, pattern: '[A-Z]{3}' }}
+                    schema={regionSchema.properties.alpha3Code}
                   />
 
                   <Field

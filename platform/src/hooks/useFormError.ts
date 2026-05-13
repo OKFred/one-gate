@@ -47,6 +47,7 @@ export function useFormError() {
 
   return {
     fieldErrors,
+    setFieldErrors,
     handleFormError,
     clearErrors,
     clearFieldError,
