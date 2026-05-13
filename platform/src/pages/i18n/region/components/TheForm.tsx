@@ -16,8 +16,6 @@ import {
   Box,
   useTheme,
   IconButton,
-  FormControlLabel,
-  Checkbox,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import * as RegionAPI from '@/api/i18n/region';
@@ -267,14 +265,14 @@ const TheForm = memo(
                 </Stack>
 
                 <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={form.iso3166Independent}
-                        onChange={(e) => setForm({ ...form, iso3166Independent: e.target.checked })}
-                      />
-                    }
+                  <Field
+                    type="checkbox"
+                    name="iso3166Independent"
                     label={t('region.table.iso3166Independent')}
+                    value={form.iso3166Independent}
+                    onChange={(checked: boolean) =>
+                      setForm({ ...form, iso3166Independent: checked })
+                    }
                   />
 
                   <Field
