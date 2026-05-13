@@ -70,14 +70,20 @@ const TheForm = memo(
       Omit<AddRegionReq, 'labels'> & { labels: Record<string, string> }
     >(DEFAULT_FORM);
     const [loading, setLoading] = useState(false);
-    const { fieldErrors, handleFormError, clearErrors, clearFieldError, setFieldErrors } =
-      useFormError();
+    const {
+      fieldErrors,
+      handleFormError,
+      clearErrors,
+      clearFieldError,
+      setFieldErrors,
+      rootSchema,
+    } = useFormError(regionSchema);
     const { validate } = useValidator(regionSchema);
 
     // 记忆化 Context Value，防止子组件频繁重绘
     const errorContextValue = useMemo(
-      () => ({ fieldErrors, clearFieldError }),
-      [fieldErrors, clearFieldError],
+      () => ({ fieldErrors, clearFieldError, rootSchema }),
+      [fieldErrors, clearFieldError, rootSchema],
     );
 
     const handleCancel = useCallback(() => {
@@ -236,7 +242,6 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder="CN"
-                    schema={regionSchema.properties.alpha2Code}
                   />
 
                   <Field
@@ -248,7 +253,6 @@ const TheForm = memo(
                     fullWidth
                     size={isMobile ? 'medium' : 'medium'}
                     placeholder="CHN"
-                    schema={regionSchema.properties.alpha3Code}
                   />
 
                   <Field

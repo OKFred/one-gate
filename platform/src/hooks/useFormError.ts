@@ -4,6 +4,7 @@ import { parseValidationErrors } from '@/utils/error';
 export interface FormErrorContextValue {
   fieldErrors: Record<string, string>;
   clearFieldError: (name: string) => void;
+  rootSchema?: Record<string, unknown>; // 全量 Schema
 }
 
 export const FormErrorContext = createContext<FormErrorContextValue | undefined>(undefined);
@@ -19,11 +20,11 @@ export function useFormErrorContext() {
 /**
  * 表单错误处理 Hook
  */
-export function useFormError() {
+export function useFormError(initialSchema?: Record<string, unknown>) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [rootSchema] = useState<Record<string, unknown> | undefined>(initialSchema);
 
   const handleFormError = useCallback((err: unknown) => {
-    // 兼容拦截器直接 reject 的 response 对象和 axios 原始 error 对象
     const e = err as {
       data?: { data?: unknown };
       response?: { data?: { data?: unknown } };
@@ -51,5 +52,6 @@ export function useFormError() {
     handleFormError,
     clearErrors,
     clearFieldError,
+    rootSchema,
   };
 }
