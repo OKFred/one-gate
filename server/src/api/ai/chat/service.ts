@@ -13,7 +13,7 @@ import {
 async function onAsk(
   params: FromSchema<typeof AskReq>
 ): Promise<FromSchema<typeof AskRes>> {
-  const { q, history = [] } = params;
+  const { q, image, history = [] } = params;
 
   // 预防提示词为空
   preventEmptyPrompt(q);
@@ -24,6 +24,15 @@ async function onAsk(
   preventMissingConfig(config);
 
   const { baseUrl, apiKey, model } = config!;
+
+  // 构造消息内容（支持多模态）
+  const userContent = image
+    ? [
+        { type: "text", text: q },
+        { type: "image_url", image_url: { url: image } },
+      ]
+    : q;
+
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
@@ -32,7 +41,7 @@ async function onAsk(
     },
     body: JSON.stringify({
       model,
-      messages: [...history, { role: "user", content: q }],
+      messages: [...history, { role: "user", content: userContent }],
       temperature: 0.7,
     }),
   });

@@ -16,6 +16,8 @@ import {
   Person as UserIcon,
   AddOutlined as NewChatIcon,
   Refresh as RetryIcon,
+  Image as ImageIcon,
+  Close as CloseIcon,
 } from '@mui/icons-material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -24,14 +26,17 @@ import { askFn } from '@/api/ai/chat';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  image?: string;
 }
 
 export default function HomePage() {
   const t = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -43,16 +48,30 @@ export default function HomePage() {
     const userMsg = (customMsg || input).trim();
     if (!userMsg || loading) return;
 
+    const currentImage = selectedImage;
     if (!customMsg) {
       setInput('');
-      setMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+      setSelectedImage(null);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'user', content: userMsg, image: currentImage || undefined },
+      ]);
     }
     setLoading(true);
 
     try {
-      const history = messages.map((m) => ({ role: m.role, content: m.content }));
+      const history = messages.map((m) => {
+        const content = m.image
+          ? [
+              { type: 'text' as const, text: m.content },
+              { type: 'image_url' as const, image_url: { url: m.image } },
+            ]
+          : m.content;
+        return { role: m.role, content };
+      });
+
       const res = await askFn({
-        data: { q: userMsg, history },
+        data: { q: userMsg, image: currentImage || undefined, history },
       });
 
       if (res.data?.ok) {
@@ -60,9 +79,29 @@ export default function HomePage() {
       } else {
         throw new Error(res.data?.message || 'Failed to get response');
       }
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: `${t('errorHandler.ai.chat.apiError')}`,
+        },
+      ]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setSelectedImage(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleNewChat = () => {
@@ -166,6 +205,15 @@ export default function HomePage() {
                       boxShadow: 1,
                     }}
                   >
+                    {msg.image && (
+                      <Box sx={{ mb: 1 }}>
+                        <img
+                          src={msg.image}
+                          alt="upload"
+                          style={{ maxWidth: '100%', borderRadius: 4, display: 'block' }}
+                        />
+                      </Box>
+                    )}
                     <Typography
                       variant="body1"
                       sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
@@ -194,6 +242,29 @@ export default function HomePage() {
           </Stack>
         </Paper>
 
+        {selectedImage && (
+          <Box sx={{ mb: 1, position: 'relative', display: 'inline-block' }}>
+            <img
+              src={selectedImage}
+              alt="preview"
+              style={{ height: 80, borderRadius: 8, border: '1px solid #ddd' }}
+            />
+            <IconButton
+              size="small"
+              sx={{
+                position: 'absolute',
+                top: -8,
+                right: -8,
+                bgcolor: 'background.paper',
+                boxShadow: 1,
+                '&:hover': { bgcolor: 'error.light', color: 'white' },
+              }}
+              onClick={() => setSelectedImage(null)}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          </Box>
+        )}
         <Paper
           elevation={3}
           sx={{
@@ -205,6 +276,16 @@ export default function HomePage() {
             borderColor: 'primary.light',
           }}
         >
+          <input
+            type="file"
+            hidden
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageUpload}
+          />
+          <IconButton color="primary" onClick={() => fileInputRef.current?.click()}>
+            <ImageIcon />
+          </IconButton>
           <TextField
             fullWidth
             placeholder={t('ai.chat.inputPlaceholder')}
@@ -220,7 +301,7 @@ export default function HomePage() {
           <IconButton
             color="primary"
             onClick={() => handleSend()}
-            disabled={!input.trim() || loading}
+            disabled={(!input.trim() && !selectedImage) || loading}
             sx={{ ml: 1 }}
           >
             <SendIcon />

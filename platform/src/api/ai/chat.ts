@@ -4,7 +4,16 @@ import { axiosPlus } from '@/api/config';
 /** AI 对话接口 */
 export const askFn = (
   axiosConfig: {
-    data: { q: string; history?: { role: string; content: string }[] };
+    data: {
+      q: string;
+      image?: string;
+      history?: {
+        role: string;
+        content:
+          | string
+          | ({ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } })[];
+      }[];
+    };
   } & Omit<AxiosRequestConfig, 'url' | 'method' | 'data'>,
 ) => {
   return axiosPlus({
