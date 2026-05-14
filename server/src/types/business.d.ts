@@ -53,5 +53,11 @@ export type BusinessType = {
   enterprise: "enterprise";
   /** 企业考勤 */
   "enterprise.attendance": "enterprise.attendance";
+  /** AI */
+  ai: "ai";
+  /** AI 配置 */
+  "ai.config": "ai.config";
+  /** AI 对话 */
+  "ai.chat": "ai.chat";
 };
 export type BusinessKey = keyof BusinessType;

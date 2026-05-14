@@ -4,6 +4,7 @@ import maintenance from "./maintenance/index";
 import oss from "./oss/index";
 import enterprise from "./enterprise/index";
 import system from "./system/index";
+import ai from "./ai/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
@@ -15,6 +16,7 @@ function createApp(): App {
   app.route("/oss", oss());
   app.route("/system", system());
   app.route("/enterprise", enterprise());
+  app.route("/ai", ai());
   return app;
 }
 export default createApp;

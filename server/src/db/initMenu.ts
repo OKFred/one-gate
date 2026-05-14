@@ -240,6 +240,22 @@ export const initialMenuData = [
     sort: 1,
     business: "enterprise.attendance",
   },
+  {
+    id: 28,
+    name: "sidebar.menu.ai",
+    icon: "material-symbols:smart-toy",
+    sort: 9,
+    business: "ai",
+  },
+  {
+    id: 29,
+    name: "sidebar.menu.ai.config",
+    icon: "material-symbols:settings-input-component",
+    path: "/ai/config",
+    parentId: 28,
+    sort: 1,
+    business: "ai.config",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

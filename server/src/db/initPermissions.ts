@@ -52,6 +52,10 @@ const permissionSeeds: Record<string, Record<string, string[]>> = {
     "": ["read"],
     attendance: ["read", "add", "edit", "delete"],
   },
+  ai: {
+    "": ["read"],
+    config: ["read", "add", "edit", "delete"],
+  },
 };
 
 /**

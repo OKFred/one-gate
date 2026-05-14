@@ -1,33 +1,65 @@
-import { Context, type ResJson } from "@/types/app";
+import { type FromSchema } from "json-schema-to-ts";
+import { getDefaultConfig } from "../config/service";
+import { AskReq, AskRes } from "./model";
+import { bodyAdapter } from "@/middleware/encapsulation/adapter";
+import type { API } from "@/middleware/encapsulation";
+import { BusinessError } from "@/middleware/errorHandler/businessError";
+import {
+  preventEmptyPrompt,
+  preventMissingConfig,
+  ErrorCodes,
+} from "./prevention";
 
-const chat = async (c: Context) => {
-  const { logger } = c.var;
-  const params = c.req.query();
+async function onAsk(
+  params: FromSchema<typeof AskReq>
+): Promise<FromSchema<typeof AskRes>> {
   const { q } = params;
-  logger.info("gotcha");
-  async function ask(prompt: string) {
-    // TODO: 后续让用户自己配置模型地址
-    const res = await fetch("/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-oss:20b",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        // max_tokens: 256,
-      }),
-    });
-    const json = (await res.json()) as {
-      choices: { message: { content: string } }[];
-    };
-    return json.choices[0].message.content;
-  }
-  const data = await ask(q);
-  return c.json<ResJson<string>>({
-    ok: true,
-    data,
-    message: "OK",
+
+  // 预防提示词为空
+  preventEmptyPrompt(q);
+
+  // 获取默认 AI 配置
+  const config = await getDefaultConfig();
+  // 预防配置缺失
+  preventMissingConfig(config);
+
+  const { baseUrl, apiKey, model } = config!;
+  const res = await fetch(`${baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: "user", content: q }],
+      temperature: 0.7,
+    }),
   });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new BusinessError(ErrorCodes.API_ERROR, {
+      status: res.status,
+      message: errorText,
+    });
+  }
+
+  const json = (await res.json()) as {
+    choices: { message: { content: string } }[];
+  };
+  return json.choices[0].message.content;
+}
+
+const askApi = {
+  req: AskReq,
+  res: AskRes,
+  pathInfo: { path: "/ask", method: "post", summary: "AI 对话接口" },
+  adapter: bodyAdapter,
+  service: onAsk,
+  permission: { action: "read" }, // 假设登录用户即可对话
+} satisfies API;
+
+export default {
+  ask: askApi,
 };

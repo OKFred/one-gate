@@ -1,87 +1,188 @@
-import { Card, CardContent, Stack, Typography } from '@mui/material';
+import { useState, useRef, useEffect } from 'react';
 import {
-  Dashboard as DashboardIcon,
-  Email as EmailIcon,
-  Person as PersonIcon,
-} from '@mui/icons-material';
-import { PageLayout, CardGrid, SectionLayout } from '@/components/Responsive/index';
+  Box,
+  TextField,
+  IconButton,
+  Typography,
+  Paper,
+  Stack,
+  Avatar,
+  CircularProgress,
+  Container,
+} from '@mui/material';
+import { Send as SendIcon, SmartToy as BotIcon, Person as UserIcon } from '@mui/icons-material';
+import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
+import { askFn } from '@/api/ai/chat';
 
-export default function HomeRefactored() {
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export default function HomePage() {
   const t = useTranslation();
-  const stats = [
-    {
-      title: t('quickStart.accounts'),
-      value: '12',
-      icon: <PersonIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
-      color: 'primary.main',
-    },
-    {
-      title: t('quickStart.templates'),
-      value: '24',
-      icon: <EmailIcon sx={{ fontSize: 40, color: 'success.main' }} />,
-      color: 'success.main',
-    },
-    {
-      title: t('quickStart.todaySent'),
-      value: '156',
-      icon: <DashboardIcon sx={{ fontSize: 40, color: 'warning.main' }} />,
-      color: 'warning.main',
-    },
-  ];
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+
+    const userMsg = input.trim();
+    setInput('');
+    setMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+    setLoading(true);
+
+    try {
+      const res = await askFn({
+        data: { q: userMsg },
+      });
+
+      if (res.data?.ok) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: res.data.data }]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: 'Error: ' + (res.data?.message || 'Failed to get response'),
+          },
+        ]);
+      }
+    } catch {
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'Network Error' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <PageLayout title={t('home.title')}>
-      {/* 副标题 */}
-      <Typography sx={{ mb: { xs: 3, md: 4 } }}>{t('home.subtitle')}</Typography>
-
-      {/* 统计卡片网格 */}
-      <SectionLayout>
-        <CardGrid>
-          {stats.map((stat, index) => (
-            <Card
-              key={index}
+    <PageLayout title={t('sidebar.menu.home')}>
+      <Container
+        maxWidth="md"
+        sx={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}
+      >
+        <Paper
+          elevation={0}
+          sx={{
+            flex: 1,
+            mb: 2,
+            p: 2,
+            overflowY: 'auto',
+            borderRadius: 2,
+            border: '1px solid',
+          }}
+          ref={scrollRef}
+        >
+          {messages.length === 0 && (
+            <Box
               sx={{
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: (theme) => theme.shadows[8],
-                },
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                opacity: 0.5,
               }}
             >
-              <CardContent sx={{ textAlign: 'center', py: { xs: 2, md: 3 } }}>
-                <div style={{ marginBottom: 16 }}>{stat.icon}</div>
-                <Typography
-                  variant="h4"
-                  component="div"
-                  color={stat.color}
-                  gutterBottom
-                  sx={{ fontWeight: 'bold' }}
+              <Typography variant="h6">{t('ai.chat.inputPlaceholder')}</Typography>
+            </Box>
+          )}
+          <Stack spacing={2}>
+            {messages.map((msg, idx) => (
+              <Box
+                key={idx}
+                sx={{
+                  display: 'flex',
+                  flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
+                  alignItems: 'flex-start',
+                  gap: 1,
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: msg.role === 'user' ? 'primary.main' : 'secondary.main',
+                    width: 32,
+                    height: 32,
+                  }}
                 >
-                  {stat.value}
-                </Typography>
-                <Typography variant="h6" color="text.secondary">
-                  {stat.title}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))}
-        </CardGrid>
-      </SectionLayout>
+                  {msg.role === 'user' ? (
+                    <UserIcon fontSize="small" />
+                  ) : (
+                    <BotIcon fontSize="small" />
+                  )}
+                </Avatar>
+                <Paper
+                  sx={{
+                    p: 1.5,
+                    maxWidth: '80%',
+                    bgcolor: msg.role === 'user' ? 'primary' : 'secondary',
+                    borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
+                    boxShadow: 1,
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                  >
+                    {msg.content}
+                  </Typography>
+                </Paper>
+              </Box>
+            ))}
+            {loading && (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Avatar sx={{ bgcolor: 'secondary.main', width: 32, height: 32 }}>
+                  <BotIcon fontSize="small" />
+                </Avatar>
+                <Paper sx={{ p: 1.5, borderRadius: '4px 12px 12px 12px', boxShadow: 1 }}>
+                  <CircularProgress size={20} />
+                </Paper>
+              </Box>
+            )}
+          </Stack>
+        </Paper>
 
-      {/* 快速开始 */}
-      <SectionLayout title={t('quickStart.title')}>
-        <Card>
-          <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-            <Stack spacing={2}>
-              <Typography variant="body1">{t('quickStart.configureAccounts')}</Typography>
-              <Typography variant="body1">{t('quickStart.createTemplate')}</Typography>
-              <Typography variant="body1">{t('quickStart.sendMail')}</Typography>
-              <Typography variant="body1">{t('quickStart.viewLogs')}</Typography>
-            </Stack>
-          </CardContent>
-        </Card>
-      </SectionLayout>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 1,
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: 3,
+            border: '1px solid',
+            borderColor: 'primary.light',
+          }}
+        >
+          <TextField
+            fullWidth
+            placeholder={t('ai.chat.inputPlaceholder')}
+            variant="standard"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            sx={{ px: 2 }}
+            slotProps={{
+              input: { disableUnderline: true },
+            }}
+          />
+          <IconButton
+            color="primary"
+            onClick={handleSend}
+            disabled={!input.trim() || loading}
+            sx={{ ml: 1 }}
+          >
+            <SendIcon />
+          </IconButton>
+        </Paper>
+      </Container>
     </PageLayout>
   );
 }

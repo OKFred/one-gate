@@ -23,6 +23,7 @@ const TABLES = [
   "maintenance_audit_login",
   "maintenance_compliance",
   "enterprise_attendance",
+  "ai_llm_config",
 ];
 
 /**

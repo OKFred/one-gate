@@ -61,6 +61,18 @@ export function bodyClientInfoAdapter<TRes>(
   };
 }
 
+/**
+ * 快捷适配器：只需要 query 参数
+ * @param handler 业务逻辑函数，接收 query 参数
+ * @returns service 函数
+ */
+export function queryAdapter<TRes>(handler: (query: any) => Promise<TRes>) {
+  return async (c: Context): Promise<TRes> => {
+    const query = c.req.query();
+    return await handler(query);
+  };
+}
+
 export function rawAdapter<TRes>(handler: (c: Context) => Promise<TRes>) {
   return async (c: Context): Promise<TRes> => {
     return await handler(c);
