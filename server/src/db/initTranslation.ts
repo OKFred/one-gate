@@ -97,6 +97,26 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
+    business: "common",
+    tKey: "common.fullScreen",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "全屏",
+      "en-US": "Full Screen",
+    },
+  },
+  {
+    application: "frontend",
+    business: "common",
+    tKey: "common.exitFullScreen",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "退出全屏",
+      "en-US": "Exit Full Screen",
+    },
+  },
+  {
+    application: "frontend",
     business: "components",
     tKey: "filter.results",
     isEnabled: true,

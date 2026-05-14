@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Container,
 } from '@mui/material';
+import dayjs from 'dayjs';
 import {
   Send as SendIcon,
   SmartToy as BotIcon,
@@ -18,6 +19,8 @@ import {
   Refresh as RetryIcon,
   Image as ImageIcon,
   Close as CloseIcon,
+  Fullscreen as FullscreenIcon,
+  FullscreenExit as FullscreenExitIcon,
 } from '@mui/icons-material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -28,6 +31,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   image?: string;
+  timestamp: string;
 }
 
 export default function HomePage() {
@@ -36,6 +40,7 @@ export default function HomePage() {
   const [input, setInput] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -55,7 +60,12 @@ export default function HomePage() {
       setSelectedImage(null);
       setMessages((prev) => [
         ...prev,
-        { role: 'user', content: userMsg, image: currentImage || undefined },
+        {
+          role: 'user',
+          content: userMsg,
+          image: currentImage || undefined,
+          timestamp: dayjs().format('HH:mm'),
+        },
       ]);
     }
     setLoading(true);
@@ -76,7 +86,10 @@ export default function HomePage() {
       });
 
       if (res.data?.ok) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: res.data.data }]);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: res.data.data, timestamp: dayjs().format('HH:mm') },
+        ]);
       } else {
         throw new Error(res.data?.message || 'Failed to get response');
       }
@@ -86,6 +99,7 @@ export default function HomePage() {
         {
           role: 'assistant',
           content: `${t('errorHandler.ai.chat.apiError')}`,
+          timestamp: dayjs().format('HH:mm'),
         },
       ]);
     } finally {
@@ -121,10 +135,27 @@ export default function HomePage() {
   return (
     <PageLayout title={t('sidebar.menu.home')}>
       <Container
-        maxWidth="md"
-        sx={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}
+        maxWidth={isFullScreen ? false : 'lg'}
+        sx={{
+          height: isFullScreen ? 'calc(100vh - 120px)' : 'calc(100vh - 200px)',
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'all 0.3s ease-in-out',
+        }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1, gap: 1 }}>
+          <IconButton
+            onClick={() => setIsFullScreen(!isFullScreen)}
+            color="primary"
+            size="small"
+            title={isFullScreen ? t('common.exitFullScreen') : t('common.fullScreen')}
+          >
+            {isFullScreen ? (
+              <FullscreenExitIcon fontSize="small" />
+            ) : (
+              <FullscreenIcon fontSize="small" />
+            )}
+          </IconButton>
           <IconButton
             onClick={handleNewChat}
             color="success"
@@ -225,6 +256,18 @@ export default function HomePage() {
                         {msg.content}
                       </Typography>
                     )}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        mt: 0.5,
+                        opacity: 0.6,
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ fontSize: '10px' }}>
+                        {msg.timestamp}
+                      </Typography>
+                    </Box>
                   </Paper>
                   {msg.role === 'user' && idx === messages.length - 2 && (
                     <IconButton size="small" onClick={() => handleRetry(idx)} disabled={loading}>
