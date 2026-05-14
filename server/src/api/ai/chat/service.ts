@@ -25,13 +25,27 @@ async function onAsk(
 
   const { baseUrl, apiKey, model } = config!;
 
-  // 构造消息内容（支持多模态）
+  // 1. 构造系统指令消息
+  const systemMessage = {
+    role: "system",
+    content:
+      "Do not overthink. Keep reasoning short. Answer directly. Use tools quickly.",
+  };
+
+  // 2. 构造用户内容
   const userContent = image
     ? [
         { type: "text", text: q },
         { type: "image_url", image_url: { url: image } },
       ]
     : q;
+
+  // 3. 组装最终消息流
+  const finalMessages = [
+    ...history,
+    systemMessage,
+    { role: "user", content: userContent },
+  ];
 
   const res = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -41,22 +55,24 @@ async function onAsk(
     },
     body: JSON.stringify({
       model,
-      messages: [...history, { role: "user", content: userContent }],
-      temperature: 0.7,
+      messages: finalMessages,
+      max_tokens: 4096,
+      reasoning_effort: "low",
+      temperature: 0.2,
+      tool_ids: ["server:chrome-devtools-mcp", "server:mcp-time"],
     }),
   });
 
   if (!res.ok) {
-    const errorText = await res.text();
-    throw new BusinessError(ErrorCodes.API_ERROR, {
-      status: res.status,
-      message: errorText,
-    });
+    const errorBody = await res.text();
+    console.error(`AI API Error [${res.status}]:`, errorBody);
+    throw new Error(`AI API 响应错误 (${res.status})`);
   }
 
   const json = (await res.json()) as {
     choices: { message: { content: string } }[];
   };
+  console.log(json);
   return json.choices[0].message.content;
 }
 

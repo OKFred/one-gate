@@ -324,7 +324,11 @@ const deleteApi = {
 async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
   const config = await onGet(obj);
   try {
-    const res = await fetch(`${config.baseUrl}/models`);
+    const res = await fetch(`${config.baseUrl}/models`, {
+      headers: {
+        Authorization: config.apiKey ? `Bearer ${config.apiKey}` : undefined,
+      },
+    });
     const result = (await res.json()) as {
       object: string;
       data: {
@@ -334,6 +338,7 @@ async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
         owned_by: string;
       }[];
     };
+    console.log({ result });
     return result.data?.length > 0;
   } catch (e) {
     console.error("验证 AI 配置连通性失败", e);

@@ -91,14 +91,14 @@ export default function HomePage() {
           { role: 'assistant', content: res.data.data, timestamp: dayjs().format('HH:mm') },
         ]);
       } else {
-        throw new Error(res.data?.message || 'Failed to get response');
+        throw new Error(res.data?.message);
       }
     } catch {
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: `${t('errorHandler.ai.chat.apiError')}`,
+          content: `${t('status.failure')}`,
           timestamp: dayjs().format('HH:mm'),
         },
       ]);
