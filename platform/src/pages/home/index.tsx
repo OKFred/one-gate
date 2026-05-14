@@ -22,6 +22,7 @@ import {
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import { askFn } from '@/api/ai/chat';
+import Markdown from '@/components/Markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -214,12 +215,16 @@ export default function HomePage() {
                         />
                       </Box>
                     )}
-                    <Typography
-                      variant="body1"
-                      sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-                    >
-                      {msg.content}
-                    </Typography>
+                    {msg.role === 'assistant' ? (
+                      <Markdown content={msg.content} />
+                    ) : (
+                      <Typography
+                        variant="body1"
+                        sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                      >
+                        {msg.content}
+                      </Typography>
+                    )}
                   </Paper>
                   {msg.role === 'user' && idx === messages.length - 2 && (
                     <IconButton size="small" onClick={() => handleRetry(idx)} disabled={loading}>

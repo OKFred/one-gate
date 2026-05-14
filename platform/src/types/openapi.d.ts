@@ -12790,6 +12790,24 @@ export interface components {
         "ai.chatAskReq": {
             /** @description 用户提问内容 */
             q: string;
+            /** @description 可选的图片 Base64 数据 */
+            image?: string;
+            /** @description 对话上下文历史 */
+            history?: {
+                /** @enum {string} */
+                role: "user" | "assistant" | "system";
+                content: string | ({
+                    /** @constant */
+                    type: "text";
+                    text: string;
+                } | {
+                    /** @constant */
+                    type: "image_url";
+                    image_url: {
+                        url: string;
+                    };
+                })[];
+            }[];
         };
         "ai.chatAskRes": {
             ok: boolean;
