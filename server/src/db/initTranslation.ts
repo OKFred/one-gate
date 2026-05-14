@@ -406,6 +406,16 @@ export const initialTranslationData = [
     },
   },
   {
+    application: "frontend",
+    business: "ai.chat",
+    tKey: "ai.chat.newChat",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "新建对话",
+      "en-US": "New Chat",
+    },
+  },
+  {
     application: "backend",
     business: "ai.chat",
     tKey: "errorHandler.ai.chat.promptRequired",

@@ -13,7 +13,7 @@ import {
 async function onAsk(
   params: FromSchema<typeof AskReq>
 ): Promise<FromSchema<typeof AskRes>> {
-  const { q } = params;
+  const { q, history = [] } = params;
 
   // 预防提示词为空
   preventEmptyPrompt(q);
@@ -32,7 +32,7 @@ async function onAsk(
     },
     body: JSON.stringify({
       model,
-      messages: [{ role: "user", content: q }],
+      messages: [...history, { role: "user", content: q }],
       temperature: 0.7,
     }),
   });

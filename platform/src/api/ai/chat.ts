@@ -3,7 +3,9 @@ import { axiosPlus } from '@/api/config';
 
 /** AI 对话接口 */
 export const askFn = (
-  axiosConfig: { data: { q: string } } & Omit<AxiosRequestConfig, 'url' | 'method' | 'data'>,
+  axiosConfig: {
+    data: { q: string; history?: { role: string; content: string }[] };
+  } & Omit<AxiosRequestConfig, 'url' | 'method' | 'data'>,
 ) => {
   return axiosPlus({
     url: '/api/v1/ai/chat/ask',

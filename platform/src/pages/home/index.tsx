@@ -10,7 +10,13 @@ import {
   CircularProgress,
   Container,
 } from '@mui/material';
-import { Send as SendIcon, SmartToy as BotIcon, Person as UserIcon } from '@mui/icons-material';
+import {
+  Send as SendIcon,
+  SmartToy as BotIcon,
+  Person as UserIcon,
+  AddOutlined as NewChatIcon,
+  Refresh as RetryIcon,
+} from '@mui/icons-material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import { askFn } from '@/api/ai/chat';
@@ -33,35 +39,43 @@ export default function HomePage() {
     }
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
+  const handleSend = async (customMsg?: string) => {
+    const userMsg = (customMsg || input).trim();
+    if (!userMsg || loading) return;
 
-    const userMsg = input.trim();
-    setInput('');
-    setMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+    if (!customMsg) {
+      setInput('');
+      setMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+    }
     setLoading(true);
 
     try {
+      const history = messages.map((m) => ({ role: m.role, content: m.content }));
       const res = await askFn({
-        data: { q: userMsg },
+        data: { q: userMsg, history },
       });
 
       if (res.data?.ok) {
         setMessages((prev) => [...prev, { role: 'assistant', content: res.data.data }]);
       } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: 'Error: ' + (res.data?.message || 'Failed to get response'),
-          },
-        ]);
+        throw new Error(res.data?.message || 'Failed to get response');
       }
-    } catch {
-      setMessages((prev) => [...prev, { role: 'assistant', content: 'Network Error' }]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setInput('');
+  };
+
+  const handleRetry = (idx: number) => {
+    if (loading) return;
+    const userMsg = messages[idx].content;
+    // 移除 idx 之后的所有消息（包括当前的错误响应）
+    setMessages((prev) => prev.slice(0, idx + 1));
+    handleSend(userMsg);
   };
 
   return (
@@ -70,6 +84,19 @@ export default function HomePage() {
         maxWidth="md"
         sx={{ height: 'calc(100vh - 200px)', display: 'flex', flexDirection: 'column' }}
       >
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+          <IconButton
+            onClick={handleNewChat}
+            color="success"
+            size="small"
+            title={t('ai.chat.newChat')}
+          >
+            <NewChatIcon fontSize="small" />
+            <Typography variant="caption" sx={{ ml: 0.5 }}>
+              {t('ai.chat.newChat')}
+            </Typography>
+          </IconButton>
+        </Box>
         <Paper
           elevation={0}
           sx={{
@@ -79,6 +106,7 @@ export default function HomePage() {
             overflowY: 'auto',
             borderRadius: 2,
             border: '1px solid',
+            borderColor: 'divider',
           }}
           ref={scrollRef}
         >
@@ -119,22 +147,38 @@ export default function HomePage() {
                     <BotIcon fontSize="small" />
                   )}
                 </Avatar>
-                <Paper
+                <Stack
+                  direction="row"
+                  spacing={1}
                   sx={{
-                    p: 1.5,
+                    alignItems: 'center',
+                    flexDirection: msg.role === 'user' ? 'row-reverse' : 'row',
                     maxWidth: '80%',
-                    bgcolor: msg.role === 'user' ? 'primary' : 'secondary',
-                    borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
-                    boxShadow: 1,
                   }}
                 >
-                  <Typography
-                    variant="body1"
-                    sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                  <Paper
+                    sx={{
+                      p: 1.5,
+                      bgcolor: msg.role === 'user' ? 'primary.main' : 'background.paper',
+                      color: msg.role === 'user' ? 'primary.contrastText' : 'text.primary',
+                      borderRadius:
+                        msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px',
+                      boxShadow: 1,
+                    }}
                   >
-                    {msg.content}
-                  </Typography>
-                </Paper>
+                    <Typography
+                      variant="body1"
+                      sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+                    >
+                      {msg.content}
+                    </Typography>
+                  </Paper>
+                  {msg.role === 'user' && idx === messages.length - 2 && (
+                    <IconButton size="small" onClick={() => handleRetry(idx)} disabled={loading}>
+                      <RetryIcon fontSize="inherit" />
+                    </IconButton>
+                  )}
+                </Stack>
               </Box>
             ))}
             {loading && (
@@ -175,7 +219,7 @@ export default function HomePage() {
           />
           <IconButton
             color="primary"
-            onClick={handleSend}
+            onClick={() => handleSend()}
             disabled={!input.trim() || loading}
             sx={{ ml: 1 }}
           >

@@ -7,6 +7,18 @@ export const AskReq = {
       type: "string",
       description: "用户提问内容",
     },
+    history: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          role: { type: "string", enum: ["user", "assistant", "system"] },
+          content: { type: "string" },
+        },
+        required: ["role", "content"],
+      },
+      description: "对话上下文历史",
+    },
   },
   required: ["q"],
   additionalProperties: false,
