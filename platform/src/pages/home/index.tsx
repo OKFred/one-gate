@@ -137,7 +137,7 @@ export default function HomePage() {
       <Container
         maxWidth={isFullScreen ? false : 'lg'}
         sx={{
-          height: isFullScreen ? 'calc(100vh - 120px)' : 'calc(100vh - 200px)',
+          height: 'calc(100vh - 200px)',
           display: 'flex',
           flexDirection: 'column',
           transition: 'all 0.3s ease-in-out',
