@@ -1,0 +1,10 @@
+web:
+  url: http://localhost:5173/#/me
+  cdpEndpoint: ws://localhost:9222/devtools/browser
+tasks:
+  - name: 修改个人信息
+    flow:
+      - sleep: 2000
+      - ai: 点击编辑按钮，填写备注，并保存
+      - sleep: 2000
+      - aiAssert: 页面显示更新后的备注信息

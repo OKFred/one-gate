@@ -13,3 +13,4 @@ attached/
 ssl/
 node_modules/
 package-lock.json
+midscene_run/
