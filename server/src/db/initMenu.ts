@@ -259,7 +259,7 @@ export const initialMenuData = [
   {
     id: 30,
     name: "sidebar.menu.system.schemaForm",
-    icon: "material-symbols:form-line",
+    icon: "material-symbols:edit-document",
     path: "/system/schema_form",
     parentId: 8,
     sort: 7,
@@ -268,7 +268,7 @@ export const initialMenuData = [
   {
     id: 31,
     name: "sidebar.menu.system.schemaFormData",
-    icon: "material-symbols:disk",
+    icon: "material-symbols:table-view",
     path: "/system/schema_form_data",
     parentId: 8,
     sort: 8,
