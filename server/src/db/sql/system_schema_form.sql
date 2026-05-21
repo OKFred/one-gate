@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS system_schema_form (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    schema_data TEXT NOT NULL,
+    ui_schema_data TEXT,
+    remark TEXT,
+    is_enabled INTEGER NOT NULL DEFAULT 1,
+    creator_id INTEGER NOT NULL,
+    updater_id INTEGER,
+    create_time_utc INTEGER DEFAULT (
+      CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
+      CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
+    ),
+    update_time_utc INTEGER
+);

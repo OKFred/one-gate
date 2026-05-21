@@ -24,6 +24,8 @@ const TABLES = [
   "maintenance_compliance",
   "enterprise_attendance",
   "ai_llm_config",
+  "system_schema_form",
+  "system_schema_form_data",
 ];
 
 /**

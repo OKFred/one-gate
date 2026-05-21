@@ -82,7 +82,7 @@ const askApi = {
   pathInfo: { path: "/ask", method: "post", summary: "AI 对话接口" },
   adapter: bodyAdapter,
   service: onAsk,
-  permission: { action: "read" }, // 假设登录用户即可对话
+  permission: { action: "read" },
 } satisfies API;
 
 export default {

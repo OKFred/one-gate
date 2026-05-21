@@ -256,6 +256,24 @@ export const initialMenuData = [
     sort: 1,
     business: "ai.config",
   },
+  {
+    id: 30,
+    name: "sidebar.menu.system.schemaForm",
+    icon: "material-symbols:form-line",
+    path: "/system/schema_form",
+    parentId: 8,
+    sort: 7,
+    business: "system.schema_form",
+  },
+  {
+    id: 31,
+    name: "sidebar.menu.system.schemaFormData",
+    icon: "material-symbols:disk",
+    path: "/system/schema_form_data",
+    parentId: 8,
+    sort: 8,
+    business: "system.schema_form_data",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

@@ -41,6 +41,10 @@ export type BusinessType = {
   "system.role_permission": "system.role_permission";
   /** 系统用户 */
   "system.user": "system.user";
+  /** 系统动态表单配置 */
+  "system.schema_form": "system.schema_form";
+  /** 系统动态表单数据 */
+  "system.schema_form_data": "system.schema_form_data";
   /** OSS 配置 */
   "oss.config": "oss.config";
   /** OSS 文件 */

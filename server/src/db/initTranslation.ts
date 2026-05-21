@@ -1010,6 +1010,26 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "business.type",
+    tKey: "sidebar.menu.system.schemaForm",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "动态表单配置",
+      "en-US": "Schema Form Config",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.system.schemaFormData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单提交数据",
+      "en-US": "Schema Form Data",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
     tKey: "sidebar.menu.language",
     isEnabled: true,
     langCodes: {
@@ -4356,6 +4376,512 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "动作",
       "en-US": "Action",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.system.schema_form",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "动态表单配置",
+      "en-US": "Schema Form Config",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.system.schema_form_data",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单提交数据",
+      "en-US": "Schema Form Data",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.ai",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "AI",
+      "en-US": "AI",
+    },
+  },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.ai.config",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "AI配置",
+      "en-US": "AI Config",
+    },
+  },
+  // --- 动态表单配置多语言 (Schema Form Config) ---
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.title",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "动态表单配置",
+      "en-US": "Schema Form Config",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.searchPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "搜索名称或编码...",
+      "en-US": "Search name or code...",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.code",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单编码",
+      "en-US": "Form Code",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单名称",
+      "en-US": "Form Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.actions.add",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "新增配置",
+      "en-US": "Add Configuration",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.actions.preview",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "预览与校验测试",
+      "en-US": "Preview & Test",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.deleteConfirmText",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN":
+        "确定要删除动态表单配置吗？此操作不可撤销，且会影响已提交的关联数据还原。",
+      "en-US":
+        "Are you sure you want to delete this form config? This cannot be undone and affects submitted data.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.errors.invalidObject",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Schema 必须是合法的 JSON 对象",
+      "en-US": "Schema must be a valid JSON object",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.errors.invalidUiObject",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "UI Schema 必须是合法的 JSON 对象",
+      "en-US": "UI Schema must be a valid JSON object",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.errors.invalidJson",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "请输入合法的 JSON 格式字符串",
+      "en-US": "Please enter a valid JSON format string",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.editTitle",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "编辑动态表单配置",
+      "en-US": "Edit Schema Form Configuration",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.addTitle",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "新增动态表单配置",
+      "en-US": "Add Schema Form Configuration",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.quickTemplate",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "快速套用预设模板",
+      "en-US": "Quick Preset Template",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.selectTemplate",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "-- 选择模板 --",
+      "en-US": "-- Select Template --",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.templates.feedback",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "用户意见反馈表",
+      "en-US": "User Feedback Template",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.templates.rsvp",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "活动报名登记表",
+      "en-US": "Activity RSVP Template",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.code",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单唯一编码",
+      "en-US": "Unique Form Code",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.codePlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "例如: customer_survey (仅支持英文字母、数字、下划线和连字符)",
+      "en-US":
+        "e.g. customer_survey (Letters, numbers, underscores, hyphens only)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单名称",
+      "en-US": "Form Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.namePlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "例如: 客户满意度回访表",
+      "en-US": "e.g. Customer Satisfaction Survey",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.schemaData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "JSON Schema 配置数据",
+      "en-US": "JSON Schema Data",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.uiSchemaData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "UI Schema 配置数据 (可选)",
+      "en-US": "UI Schema Data (Optional)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.remarkPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "请输入备注描述",
+      "en-US": "Please enter remark description",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.errors.parseSchemaFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "无法解析该表单的 JSON Schema，请检查配置是否正确。",
+      "en-US": "Unable to parse JSON Schema, please check config.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.errors.submitValidationFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "数据提交校验失败，请检查填写内容。",
+      "en-US": "Validation failed, please check inputs.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.previewTitle",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单预览与提交测试",
+      "en-US": "Form Preview & Submission Test",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.testSubmitSuccess",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "数据提交测试成功！已写入/更新 system_schema_form_data 关联表。",
+      "en-US": "Submission success! Saved to system_schema_form_data.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.testBusinessId",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "测试关联业务 ID (Business ID)",
+      "en-US": "Test Business ID",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.fields.testBusinessIdPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "请输入用于归属的业务主键 ID",
+      "en-US": "Please enter Business ID",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.submitTestData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "提交测试数据",
+      "en-US": "Submit Test Data",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.errors.noValidSchema",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "未配置有效的 JSON Schema",
+      "en-US": "No valid JSON Schema configured",
+    },
+  },
+  // --- 表单提交数据多语言 (Schema Form Data) ---
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.title",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单提交数据",
+      "en-US": "Schema Form Data",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.filter.associatedForm",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关联动态表单",
+      "en-US": "Associated Schema Form",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.filter.allForms",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "-- 全部表单 --",
+      "en-US": "-- All Forms --",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.filter.businessId",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关联业务 ID",
+      "en-US": "Associated Business ID",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.filter.businessIdPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "请输入业务 ID 过滤",
+      "en-US": "Please enter Business ID to filter",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.errors.noSchemaConfig",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "未找到该表单的 Schema 配置数据",
+      "en-US": "Schema config data not found for this form",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.errors.fallbackToRaw",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "无法加载原表单配置，已为您降级为原始提交数据展示。",
+      "en-US": "Cannot load form config. Falling back to raw JSON.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.detailsTitle",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "数据提交详情",
+      "en-US": "Submitted Data Details",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.rawJsonData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "原始提交数据 (JSON)",
+      "en-US": "Raw Submitted Data (JSON)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.actions.view",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "查看详情",
+      "en-US": "View Details",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.actions.delete",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "删除记录",
+      "en-US": "Delete Record",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.deleteConfirmText",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "确定要删除此条提交的动态表单数据记录吗？此操作不可逆。",
+      "en-US":
+        "Are you sure you want to delete this submitted form data? This is irreversible.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.dataSummary",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "提交数据概要",
+      "en-US": "Submitted Data Summary",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.creatorId",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "提交人 ID",
+      "en-US": "Submitter ID",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.submittedData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "提交数据",
+      "en-US": "Submitted Data",
     },
   },
 ] as const satisfies BatchTranslationItem[];

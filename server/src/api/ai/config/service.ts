@@ -338,7 +338,6 @@ async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
         owned_by: string;
       }[];
     };
-    console.log({ result });
     return result.data?.length > 0;
   } catch (e) {
     console.error("验证 AI 配置连通性失败", e);

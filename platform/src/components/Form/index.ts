@@ -7,3 +7,4 @@ export * from './inputs/CheckboxField';
 export * from './SchemaForm';
 export * from './FormErrorProvider';
 export * from './useFieldLogic';
+export * from './DynamicForm';

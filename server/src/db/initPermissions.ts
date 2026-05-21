@@ -25,6 +25,8 @@ const permissionSeeds: Record<string, Record<string, string[]>> = {
     menu: ["read", "add", "edit", "delete"],
     role_permission: ["read", "add", "edit", "delete", "batch-delete"],
     auth: ["read", "update_profile", "update_password"],
+    schema_form: ["read", "add", "edit", "delete"],
+    schema_form_data: ["read", "add", "edit", "delete"],
   },
   mail: {
     "": ["read"],
@@ -55,6 +57,7 @@ const permissionSeeds: Record<string, Record<string, string[]>> = {
   ai: {
     "": ["read"],
     config: ["read", "add", "edit", "delete"],
+    chat: ["read"],
   },
 };
 
