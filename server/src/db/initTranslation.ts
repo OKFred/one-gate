@@ -4418,6 +4418,16 @@ export const initialTranslationData = [
       "en-US": "AI Config",
     },
   },
+  {
+    application: "frontend",
+    business: "infra.businessType",
+    tKey: "businessType.ai.chat",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "AI对话",
+      "en-US": "AI Chat",
+    },
+  },
   // --- 动态表单配置多语言 (Schema Form Config) ---
   {
     application: "frontend",
