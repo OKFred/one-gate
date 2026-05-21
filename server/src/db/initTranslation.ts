@@ -4877,16 +4877,6 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "schemaFormData",
-    tKey: "schemaFormData.creatorId",
-    isEnabled: true,
-    langCodes: {
-      "zh-CN": "提交人 ID",
-      "en-US": "Submitter ID",
-    },
-  },
-  {
-    application: "frontend",
-    business: "schemaFormData",
     tKey: "schemaFormData.submittedData",
     isEnabled: true,
     langCodes: {
@@ -4896,8 +4886,8 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
-    tKey: "schemaForm.creatorName",
+    business: "components",
+    tKey: "column.creatorName",
     isEnabled: true,
     langCodes: {
       "zh-CN": "创建人",
@@ -4906,8 +4896,8 @@ export const initialTranslationData = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
-    tKey: "schemaForm.updaterName",
+    business: "components",
+    tKey: "column.updaterName",
     isEnabled: true,
     langCodes: {
       "zh-CN": "修改人",

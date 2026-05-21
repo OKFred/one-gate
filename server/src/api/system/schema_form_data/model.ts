@@ -36,6 +36,16 @@ const SchemaFormDataPO = {
   ...IndexPO,
   ...SchemaFormDataBasePO,
   ...AuditPO,
+  creatorName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "创建人姓名",
+  },
+  updaterName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "修改人姓名",
+  },
 } as const satisfies Record<keyof SchemaFormDataPOLike, JSONSchema>;
 
 export type SchemaFormDataPOLike = InferSelectModel<typeof schemaFormDataTable>;
@@ -56,6 +66,16 @@ export const SchemaFormDataVO = {
   ...IndexVO,
   ...SchemaFormDataBaseVO,
   ...AuditVO,
+  creatorName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "创建人姓名",
+  },
+  updaterName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "修改人姓名",
+  },
 } as const satisfies Partial<Record<keyof SchemaFormDataVOLike, JSONSchema>>;
 
 export const SchemaFormDataListVO = SchemaFormDataVO;
@@ -91,6 +111,8 @@ const SchemaFormDataBaseKeys = [
   ...IndexKey,
   ...SchemaFormDataAddKeys,
   ...AuditKeys,
+  "creatorName",
+  "updaterName",
 ] as const satisfies RequiredKeys<SchemaFormDataPOLike>[];
 
 export const SchemaFormDataListKeys = SchemaFormDataBaseKeys;
@@ -110,7 +132,9 @@ export const schemaFormDataTable = sqliteTable("system_schema_form_data", {
   businessId: integer("business_id").notNull(),
   dataContent: text("data_content").notNull(),
   creatorId: integer("creator_id").notNull(),
+  creatorName: text("creator_name"),
   updaterId: integer("updater_id"),
+  updaterName: text("updater_name"),
   createTimeUtc: integer("create_time_utc")
     .notNull()
     .default(getCurrentTimestampUtcSql()),

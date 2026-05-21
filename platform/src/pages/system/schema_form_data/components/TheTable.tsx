@@ -223,7 +223,8 @@ const TheTable = memo(
           </span>
         ),
       },
-      { title: t('schemaFormData.creatorId'), render: (row) => row.creatorId || '-' },
+      { title: t('column.creatorName'), render: (row) => row.creatorName || '-' },
+      { title: t('column.updaterName'), render: (row) => row.updaterName || '-' },
       {
         title: t('columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),

@@ -7791,14 +7791,14 @@ export interface components {
                     sortOrder: number;
                     /** @description 备注 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -7948,14 +7948,14 @@ export interface components {
                 sortOrder: number;
                 /** @description 备注 */
                 remark?: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -8090,14 +8090,14 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注 */
                     remark: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -8256,14 +8256,14 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 备注 */
                 remark: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -8460,14 +8460,14 @@ export interface components {
                      * @example false
                      */
                     isEnabled: boolean;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -8674,14 +8674,14 @@ export interface components {
                  * @example false
                  */
                 isEnabled: boolean;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -8886,14 +8886,14 @@ export interface components {
                      * @example 这是一个测试邮箱账号
                      */
                     remark: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -9064,14 +9064,14 @@ export interface components {
                  * @example 这是一个测试邮箱账号
                  */
                 remark: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -9274,14 +9274,14 @@ export interface components {
                     exceptionDetails?: ((string | null) | null) | null;
                     /** @description 备注 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -9437,14 +9437,14 @@ export interface components {
                 exceptionDetails?: ((string | null) | null) | null;
                 /** @description 备注 */
                 remark?: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -9565,14 +9565,14 @@ export interface components {
                      * @example 这是一个测试邮箱模板
                      */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -9719,14 +9719,14 @@ export interface components {
                  * @example 这是一个测试邮箱模板
                  */
                 remark?: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -9801,14 +9801,14 @@ export interface components {
                     userAgent?: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -10088,14 +10088,14 @@ export interface components {
                     isDefault: boolean;
                     /** @description 备注 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -10250,14 +10250,14 @@ export interface components {
                 isDefault: boolean;
                 /** @description 备注 */
                 remark?: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -10586,14 +10586,14 @@ export interface components {
                          */
                         label: string;
                     }[];
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -10707,14 +10707,14 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -10811,14 +10811,14 @@ export interface components {
                     isEnabled: boolean;
                     /** @description 备注说明 */
                     remark: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -10920,14 +10920,14 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -10957,14 +10957,14 @@ export interface components {
                 isEnabled: boolean;
                 /** @description 备注说明 */
                 remark: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -10988,14 +10988,14 @@ export interface components {
                     isEnabled?: boolean;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId?: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc?: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId?: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -11120,14 +11120,14 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -11271,14 +11271,14 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -11325,14 +11325,14 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -11370,14 +11370,14 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -11540,14 +11540,14 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -11703,14 +11703,14 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -11817,14 +11817,14 @@ export interface components {
                     dataScope: "all" | "dept_and_below" | "self_only" | "custom";
                     /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
                     customDeptIds: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -11949,14 +11949,14 @@ export interface components {
                 dataScope: "all" | "dept_and_below" | "self_only" | "custom";
                 /** @description 自定义部门ID列表（JSON序列化，仅 dataScope=custom 时有效） */
                 customDeptIds: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -11988,14 +11988,14 @@ export interface components {
                 roleId: number;
                 /** @description 权限ID */
                 permissionId: number;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -12051,14 +12051,14 @@ export interface components {
                     roleId: number;
                     /** @description 权限ID */
                     permissionId: number;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -12163,14 +12163,14 @@ export interface components {
                 roleId: number;
                 /** @description 权限ID */
                 permissionId: number;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -12221,14 +12221,14 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -12351,14 +12351,14 @@ export interface components {
                     departmentId: ((number | null) | null) | null;
                     /** @description 角色ID数组 */
                     roleIdArr: number[];
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -12594,14 +12594,14 @@ export interface components {
                      */
                     label: string;
                 }[];
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -12669,23 +12669,23 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
                     updateTimeUtc: ((number | null) | null) | null;
-                    /** @description 创建者姓名 */
+                    /** @description 创建人姓名 */
                     creatorName: ((string | null) | null) | null;
-                    /** @description 更新者姓名 */
+                    /** @description 更新人姓名 */
                     updaterName: ((string | null) | null) | null;
                 }[];
             };
@@ -12800,23 +12800,23 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
-                /** @description 创建者姓名 */
+                /** @description 创建人姓名 */
                 creatorName: ((string | null) | null) | null;
-                /** @description 更新者姓名 */
+                /** @description 更新人姓名 */
                 updaterName: ((string | null) | null) | null;
             };
             message: string;
@@ -12869,20 +12869,24 @@ export interface components {
                     businessId: number;
                     /** @description 用户提交的 JSON 数据内容（序列化字符串） */
                     dataContent: string;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
                     updateTimeUtc: ((number | null) | null) | null;
+                    /** @description 创建人姓名 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 修改人姓名 */
+                    updaterName: ((string | null) | null) | null;
                 }[];
             };
             message: string;
@@ -12939,20 +12943,24 @@ export interface components {
                 businessId: number;
                 /** @description 用户提交的 JSON 数据内容（序列化字符串） */
                 dataContent: string;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+                /** @description 创建人姓名 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 修改人姓名 */
+                updaterName: ((string | null) | null) | null;
             };
             message: string;
         };
@@ -13025,14 +13033,14 @@ export interface components {
                      */
                     label: string;
                 } | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId?: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc?: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -13135,14 +13143,14 @@ export interface components {
                          */
                         label: string;
                     } | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -13199,14 +13207,14 @@ export interface components {
                  */
                 label: string;
             } | null) | null) | null;
-            /** @description 创建者ID */
+            /** @description 创建人ID */
             creatorId?: number;
             /**
              * @description 创建时间
              * @example 1672531199000
              */
             createTimeUtc?: number;
-            /** @description 更新者ID */
+            /** @description 更新人ID */
             updaterId?: ((number | null) | null) | null;
             /**
              * @description 更新时间
@@ -13265,14 +13273,14 @@ export interface components {
                  */
                 label: string;
             } | null) | null) | null;
-            /** @description 创建者ID */
+            /** @description 创建人ID */
             creatorId?: number;
             /**
              * @description 创建时间
              * @example 1672531199000
              */
             createTimeUtc?: number;
-            /** @description 更新者ID */
+            /** @description 更新人ID */
             updaterId?: ((number | null) | null) | null;
             /**
              * @description 更新时间
@@ -13352,14 +13360,14 @@ export interface components {
                      */
                     label: string;
                 } | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId?: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc?: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
@@ -13468,14 +13476,14 @@ export interface components {
                     isDefault: boolean;
                     /** @description 备注 */
                     remark?: ((string | null) | null) | null;
-                    /** @description 创建者ID */
+                    /** @description 创建人ID */
                     creatorId: number;
                     /**
                      * @description 创建时间
                      * @example 1672531199000
                      */
                     createTimeUtc: number;
-                    /** @description 更新者ID */
+                    /** @description 更新人ID */
                     updaterId: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
@@ -13609,14 +13617,14 @@ export interface components {
                 isDefault: boolean;
                 /** @description 备注 */
                 remark?: ((string | null) | null) | null;
-                /** @description 创建者ID */
+                /** @description 创建人ID */
                 creatorId: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
                 createTimeUtc: number;
-                /** @description 更新者ID */
+                /** @description 更新人ID */
                 updaterId: ((number | null) | null) | null;
                 /**
                  * @description 更新时间

@@ -1,4 +1,5 @@
 import db from "@/db/index";
+import { utils as userUtils } from "@/api/system/user/service";
 import {
   schemaFormDataTable,
   IndexVO,
@@ -207,6 +208,9 @@ async function onSubmit(
 
   const dataContent = JSON.stringify(data);
 
+  // 获取当前操作人的用户名
+  const username = await userUtils.getUserNameById(creatorId);
+
   // 3. 检查是否已经存在相同 formCode + businessId 的记录，如果存在则更新(upsert)
   const existData = await db
     .select()
@@ -226,6 +230,7 @@ async function onSubmit(
       .set({
         dataContent,
         updaterId: creatorId,
+        updaterName: username,
         updateTimeUtc: getCurrentTimestampUtcSql(),
       })
       .where(eq(schemaFormDataTable.id, record.id))
@@ -240,6 +245,7 @@ async function onSubmit(
         businessId,
         dataContent,
         creatorId,
+        creatorName: username,
       })
       .returning({ id: schemaFormDataTable.id });
     return res[0]?.id || null;
