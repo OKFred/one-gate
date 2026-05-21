@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "sendStatus": {
+      "type": "boolean"
+    },
+    "templateId": {
+      "type": "string"
+    },
+    "startTimeUtc": {
+      "type": "number"
+    },
+    "endTimeUtc": {
+      "type": "number"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "mailTo",
+        "mailFrom",
+        "sendStatus",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

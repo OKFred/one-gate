@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string"
+    },
+    "contentType": {
+      "type": "string"
+    },
+    "expiresIn": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "additionalProperties": false
+}

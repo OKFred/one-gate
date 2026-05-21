@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number",
+      "minimum": 1
+    },
+    "alpha2Code": {
+      "type": "string",
+      "pattern": "^[A-Z]{2}$",
+      "maxLength": 2
+    },
+    "alpha3Code": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "maxLength": 3
+    },
+    "numeric": {
+      "type": "integer",
+      "maximum": 99999
+    },
+    "labels": {
+      "type": "object",
+      "properties": {
+        "zh-CN": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "en-US": {
+          "type": "string",
+          "maxLength": 150
+        }
+      },
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 10,
+        "pattern": "^[a-z]{2}-[A-Z]{2}$"
+      },
+      "additionalProperties": true
+    },
+    "iso3166Independent": {
+      "type": "boolean"
+    },
+    "businessLanguages": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "nullable": true,
+      "items": {
+        "type": "string",
+        "maxLength": 10
+      },
+      "uniqueItems": true
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "remark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false
+}

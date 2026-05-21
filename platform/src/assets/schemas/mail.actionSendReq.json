@@ -1,0 +1,47 @@
+{
+  "type": "object",
+  "properties": {
+    "accountId": {
+      "type": "number"
+    },
+    "templateId": {
+      "type": "number"
+    },
+    "receiverArr": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "subject": {
+      "type": "string"
+    },
+    "html": {
+      "type": "string"
+    },
+    "templateParams": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "accountId",
+    "receiverArr"
+  ],
+  "additionalProperties": false
+}

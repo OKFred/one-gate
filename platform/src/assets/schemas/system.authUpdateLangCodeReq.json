@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "langCode": {
+      "type": "string",
+      "maxLength": 10
+    }
+  },
+  "required": [
+    "langCode"
+  ],
+  "additionalProperties": false
+}

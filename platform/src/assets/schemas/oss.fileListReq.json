@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "keyword": {
+      "type": "string"
+    },
+    "pageSize": {
+      "type": "number"
+    },
+    "cursor": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

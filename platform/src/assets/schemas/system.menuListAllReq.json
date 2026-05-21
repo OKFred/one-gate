@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "business": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "name",
+        "business",
+        "isEnabled",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

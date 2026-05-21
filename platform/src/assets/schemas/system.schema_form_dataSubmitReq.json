@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "formCode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "businessId": {
+      "type": "number"
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "formCode",
+    "businessId",
+    "data"
+  ],
+  "additionalProperties": false
+}

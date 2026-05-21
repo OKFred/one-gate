@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "keyword": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

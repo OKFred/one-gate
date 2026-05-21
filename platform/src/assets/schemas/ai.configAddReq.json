@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "baseUrl": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "apiKey": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "capabilities": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "isDefault": {
+      "type": "boolean"
+    },
+    "remark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    }
+  },
+  "required": [
+    "name",
+    "provider",
+    "apiKey",
+    "model",
+    "isEnabled",
+    "isDefault"
+  ],
+  "additionalProperties": false
+}

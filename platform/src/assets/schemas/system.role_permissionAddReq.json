@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "roleId": {
+      "type": "number",
+      "minimum": 1
+    },
+    "permissionId": {
+      "type": "number",
+      "minimum": 1
+    }
+  },
+  "required": [
+    "roleId",
+    "permissionId"
+  ],
+  "additionalProperties": false
+}

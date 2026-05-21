@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "reset": {
+      "type": "boolean"
+    },
+    "skipSuper": {
+      "type": "boolean"
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

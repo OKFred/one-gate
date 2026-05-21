@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "application": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "business": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "langCode": {
+      "type": "string",
+      "maxLength": 10
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "application",
+        "business",
+        "langCode",
+        "tKey",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

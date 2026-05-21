@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "state": {
+      "type": "string",
+      "maxLength": 100
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "additionalProperties": false
+}

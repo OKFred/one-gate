@@ -1,0 +1,112 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "minimum": 1
+        },
+        "employeeId": {
+          "type": "number",
+          "minimum": 1
+        },
+        "date": {
+          "type": "string",
+          "maxLength": 10
+        },
+        "checkInTime": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "nullable": true
+        },
+        "checkOutTime": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "nullable": true
+        },
+        "status": {
+          "type": "number",
+          "enum": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        "remark": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true,
+          "maxLength": 500
+        },
+        "employeeObj": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "nullable": true,
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "label": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "label"
+          ],
+          "additionalProperties": false
+        },
+        "creatorId": {
+          "type": "number"
+        },
+        "createTimeUtc": {
+          "type": "number"
+        },
+        "updaterId": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "nullable": true
+        },
+        "updateTimeUtc": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "employeeId",
+        "date",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}
