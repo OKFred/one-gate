@@ -4894,4 +4894,24 @@ export const initialTranslationData = [
       "en-US": "Submitted Data",
     },
   },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.creatorName",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "创建人",
+      "en-US": "Creator",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaForm",
+    tKey: "schemaForm.updaterName",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "修改人",
+      "en-US": "Updater",
+    },
+  },
 ] as const satisfies BatchTranslationItem[];

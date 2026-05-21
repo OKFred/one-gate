@@ -1,4 +1,5 @@
 import db from "@/db/index";
+import { utils as userUtils } from "@/api/system/user/service";
 import {
   schemaFormTable,
   IndexVO,
@@ -167,10 +168,12 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
+  const creatorName = await userUtils.getUserNameById(creatorId);
 
   const updateData = {
     ...params,
     creatorId,
+    creatorName,
   };
   const res = await db
     .insert(schemaFormTable)
@@ -224,10 +227,12 @@ async function onUpdate(
     .limit(1);
   const currentForm = current[0];
   preventEmpty(currentForm);
+  const updaterName = await userUtils.getUserNameById(updaterId);
 
   const updateData = {
     ...rest,
     updaterId,
+    updaterName,
     updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 

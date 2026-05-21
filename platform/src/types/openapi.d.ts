@@ -12683,6 +12683,10 @@ export interface components {
                      * @example 1672531199000
                      */
                     updateTimeUtc: ((number | null) | null) | null;
+                    /** @description 创建者姓名 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 更新者姓名 */
+                    updaterName: ((string | null) | null) | null;
                 }[];
             };
             message: string;
@@ -12810,6 +12814,10 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+                /** @description 创建者姓名 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 更新者姓名 */
+                updaterName: ((string | null) | null) | null;
             };
             message: string;
         };

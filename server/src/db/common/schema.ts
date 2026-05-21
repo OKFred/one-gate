@@ -23,7 +23,7 @@ export const IndexPO = {
 export const AddAuditPO = {
   creatorId: {
     type: "number",
-    description: "创建者ID",
+    description: "创建人ID",
   },
   /* createTimeUtc: {
     type: "number",
@@ -36,7 +36,7 @@ export const UpdateAuditPO = {
   updaterId: {
     type: ["number", "null"],
     nullable: true,
-    description: "更新者ID",
+    description: "更新人ID",
   },
   updateTimeUtc: {
     type: ["number", "null"],

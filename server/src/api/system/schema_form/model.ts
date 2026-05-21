@@ -54,16 +54,29 @@ const SchemaFormPO = {
   ...IndexPO,
   ...SchemaFormBasePO,
   ...AuditPO,
+  creatorName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "创建人姓名",
+  },
+  updaterName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "更新人姓名",
+  },
 } as const satisfies Record<keyof SchemaFormPOLike, JSONSchema>;
 
 export type SchemaFormPOLike = InferSelectModel<typeof schemaFormTable>; // 列表
 type SchemaFormSelectPOLike = InferInsertModel<typeof schemaFormTable>;
 type SchemaFormAddPOLike = Omit<
   SchemaFormPOLike,
-  IndexKeyLike | AuditAddOmitKeyLike
+  IndexKeyLike | AuditAddOmitKeyLike | "creatorName" | "updaterName"
 >;
 type SchemaFormUpdatePOLike = Partial<
-  Omit<SchemaFormSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+  Omit<
+    SchemaFormSelectPOLike,
+    IndexKeyLike | AuditUpdateOmitKeyLike | "creatorName" | "updaterName"
+  >
 > &
   Pick<SchemaFormPOLike, IndexKeyLike>;
 
@@ -74,6 +87,16 @@ export const SchemaFormVO = {
   ...IndexVO,
   ...SchemaFormBaseVO,
   ...AuditVO,
+  creatorName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "创建人姓名",
+  },
+  updaterName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "更新人姓名",
+  },
 } as const satisfies Partial<Record<keyof SchemaFormVOLike, JSONSchema>>; // 详情
 
 export const SchemaFormListVO = SchemaFormVO; // 列表
@@ -117,6 +140,8 @@ const SchemaFormBaseKeys = [
   ...IndexKey,
   ...SchemaFormAddKeys,
   ...AuditKeys,
+  "creatorName",
+  "updaterName",
 ] as const satisfies RequiredKeys<SchemaFormPOLike>[];
 
 export const SchemaFormListKeys = SchemaFormBaseKeys;
@@ -140,7 +165,9 @@ export const schemaFormTable = sqliteTable("system_schema_form", {
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
   creatorId: integer("creator_id").notNull(),
+  creatorName: text("creator_name"),
   updaterId: integer("updater_id"),
+  updaterName: text("updater_name"),
   createTimeUtc: integer("create_time_utc")
     .notNull()
     .default(getCurrentTimestampUtcSql()),

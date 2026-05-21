@@ -228,7 +228,8 @@ const TheTable = memo(
           />
         ),
       },
-      { title: t('schemaFormData.creatorId'), render: (row) => row.creatorId || '-' },
+      { title: t('schemaForm.creatorName'), render: (row) => row.creatorName || '-' },
+      { title: t('schemaForm.updaterName'), render: (row) => row.updaterName || '-' },
       {
         title: t('columns.createTime'),
         render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),

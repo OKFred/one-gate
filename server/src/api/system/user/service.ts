@@ -649,6 +649,19 @@ async function updateUserInfo(
   return row.id;
 }
 
+async function getUserNameById(
+  userId: UserVOLike["id"]
+): Promise<UserVOLike["username"]> {
+  const userRows = await db
+    .select({ username: userTable.username })
+    .from(userTable)
+    .where(eq(userTable.id, userId))
+    .limit(1);
+  const userObj = userRows[0];
+  preventEmpty(userObj);
+  return userObj.username;
+}
+
 export const utils = {
   countDepartmentUsers,
   convertPassword,
@@ -656,6 +669,7 @@ export const utils = {
   updatePassword,
   updateLangCode,
   updateUserInfo,
+  getUserNameById,
 };
 
 export default {
