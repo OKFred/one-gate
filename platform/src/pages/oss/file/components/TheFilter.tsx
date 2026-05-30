@@ -44,6 +44,25 @@ const TheFilter = memo(
       prefix: '',
     });
 
+    // 调用表格刷新
+    const refreshTable = useCallback(
+      (newFilters: FilterState) => {
+        if (tableRef.current) {
+          tableRef.current.refresh(newFilters);
+        }
+      },
+      [tableRef],
+    );
+
+    const clearFilters = useCallback(() => {
+      const emptyFilters: FilterState = {
+        prefix: '',
+      };
+      setKeywordInput(''); // 清空输入框
+      setFilters(emptyFilters);
+      refreshTable(emptyFilters);
+    }, [refreshTable]);
+
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
@@ -56,18 +75,7 @@ const TheFilter = memo(
           clearFilters();
         },
       }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [],
-    );
-
-    // 调用表格刷新
-    const refreshTable = useCallback(
-      (newFilters: FilterState) => {
-        if (tableRef.current) {
-          tableRef.current.refresh(newFilters);
-        }
-      },
-      [tableRef],
+      [clearFilters],
     );
 
     // 防抖执行搜索
@@ -91,15 +99,6 @@ const TheFilter = memo(
 
     const handleFilterChange = (value: string) => {
       setKeywordInput(value);
-    };
-
-    const clearFilters = () => {
-      const emptyFilters: FilterState = {
-        prefix: '',
-      };
-      setKeywordInput(''); // 清空输入框
-      setFilters(emptyFilters);
-      refreshTable(emptyFilters);
     };
 
     const hasActiveFilters = () => {

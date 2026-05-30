@@ -1,26 +1,16 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
-import {
-  Chip,
-  Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-} from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, PlayArrow as PlayIcon } from '@mui/icons-material';
+import { Chip } from '@mui/material';
 import ResponsiveList, {
   type TableColumn,
   type CardField,
 } from '@/components/Responsive/ResponsiveList';
-import { ResponsiveIconButton } from '@/components/Responsive/index';
 import * as SchemaFormAPI from '@/api/system/schemaForm';
 import type { Props } from '../index';
 import type { FilterState } from './TheFilter';
 import type { ListSchemaFormReq, ListSchemaFormRes } from '@/api/system/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
+import { RowActionButtons } from './TheActionButtons';
 
 export type SchemaFormItem = NonNullable<ListSchemaFormRes['list']>[0];
 
@@ -142,73 +132,6 @@ const TheTable = memo(
       fetchForms(filters, 1);
     };
 
-    // 行内操作按钮子组件
-    const RowActionButtons = ({ row }: { row: SchemaFormItem }) => {
-      const [deleteDialog, setDeleteDialog] = useState(false);
-
-      const handleEdit = () => {
-        formRef.current?.openEdit(row);
-      };
-
-      const handlePreview = () => {
-        previewRef.current?.open(row.code || '', row.schemaData || '{}');
-      };
-
-      const handleConfirmDelete = async () => {
-        if (row.id) {
-          await SchemaFormAPI.deleteFn({ data: { id: row.id } });
-          handleDeleteSuccess();
-        }
-        setDeleteDialog(false);
-      };
-
-      return (
-        <>
-          <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
-            <ResponsiveIconButton
-              onClick={handlePreview}
-              color="info"
-              size="small"
-              title={t('schemaForm.actions.preview')}
-            >
-              <PlayIcon />
-            </ResponsiveIconButton>
-            <ResponsiveIconButton
-              onClick={handleEdit}
-              color="primary"
-              size="small"
-              title={t('dialog.edit')}
-            >
-              <EditIcon />
-            </ResponsiveIconButton>
-            <ResponsiveIconButton
-              onClick={() => setDeleteDialog(true)}
-              color="error"
-              size="small"
-              title={t('dialog.delete')}
-            >
-              <DeleteIcon />
-            </ResponsiveIconButton>
-          </Stack>
-
-          <Dialog open={deleteDialog} onClose={() => setDeleteDialog(false)}>
-            <DialogTitle>{t('dialog.deleteConfirmTitle')}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>{t('schemaForm.deleteConfirmText')}</DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setDeleteDialog(false)} variant="outlined">
-                {t('dialog.cancel')}
-              </Button>
-              <Button onClick={handleConfirmDelete} color="error" autoFocus>
-                {t('dialog.confirm')}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </>
-      );
-    };
-
     // 表格列配置（PC端）
     const columns: TableColumn<SchemaFormItem>[] = [
       { title: t('columns.id'), render: (row) => row.id },
@@ -237,7 +160,14 @@ const TheTable = memo(
       {
         title: t('table.actions'),
         align: 'center',
-        render: (row) => <RowActionButtons row={row} />,
+        render: (row) => (
+          <RowActionButtons
+            row={row}
+            formRef={formRef}
+            previewRef={previewRef}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        ),
       },
     ];
 
@@ -273,7 +203,14 @@ const TheTable = memo(
         keyExtractor={(row) => row.id!}
         columns={columns}
         cardFields={cardFields}
-        cardActions={(row) => <RowActionButtons row={row} />}
+        cardActions={(row) => (
+          <RowActionButtons
+            row={row}
+            formRef={formRef}
+            previewRef={previewRef}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        )}
       />
     );
   }),

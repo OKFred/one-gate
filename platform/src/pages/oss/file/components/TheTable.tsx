@@ -27,6 +27,10 @@ export interface TheTableRef {
   refresh: (filters?: FilterState) => void;
 }
 
+const DEFAULT_FILTERS: FilterState = {
+  prefix: '',
+};
+
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { filterRef } = localObj;
@@ -34,7 +38,7 @@ const TheTable = memo(
     const [state, setState] = useState({
       list: [] as NonNullable<ListFileRes['list']>,
       loading: false,
-      filters: { prefix: '' } as FilterState,
+      filters: DEFAULT_FILTERS,
       page: 1,
       pageSize: 10,
       hasMore: false,
@@ -87,8 +91,7 @@ const TheTable = memo(
     );
 
     useEffect(() => {
-      fetchList(state.filters);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchList(DEFAULT_FILTERS);
     }, [fetchList]);
 
     useImperativeHandle(ref, () => ({

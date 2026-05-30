@@ -49,6 +49,26 @@ const TheFilter = memo(
       descend: true,
     });
 
+    const refreshTable = useCallback(
+      (newFilters: FilterState) => {
+        if (tableRef.current) {
+          tableRef.current.refresh(newFilters);
+        }
+      },
+      [tableRef],
+    );
+
+    const clearFilters = useCallback(() => {
+      const emptyFilters: FilterState = {
+        keyword: '',
+        orderBy: 'id',
+        descend: true,
+      };
+      setKeywordInput('');
+      setFilters(emptyFilters);
+      refreshTable(emptyFilters);
+    }, [refreshTable]);
+
     useImperativeHandle(
       ref,
       () => ({
@@ -60,17 +80,7 @@ const TheFilter = memo(
           clearFilters();
         },
       }),
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [],
-    );
-
-    const refreshTable = useCallback(
-      (newFilters: FilterState) => {
-        if (tableRef.current) {
-          tableRef.current.refresh(newFilters);
-        }
-      },
-      [tableRef],
+      [clearFilters],
     );
 
     const debouncedSearch = useCallback(() => {
@@ -98,17 +108,6 @@ const TheFilter = memo(
         setFilters(newFilters);
         refreshTable(newFilters);
       }
-    };
-
-    const clearFilters = () => {
-      const emptyFilters: FilterState = {
-        keyword: '',
-        orderBy: 'id',
-        descend: true,
-      };
-      setKeywordInput('');
-      setFilters(emptyFilters);
-      refreshTable(emptyFilters);
     };
 
     const hasActiveFilters = () => {

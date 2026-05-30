@@ -28,6 +28,12 @@ export interface TheTableRef {
   refresh: (filters?: FilterState) => void;
 }
 
+const DEFAULT_FILTERS: FilterState = {
+  keyword: '',
+  orderBy: 'id',
+  descend: true,
+};
+
 const TheTable = memo(
   forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
     const { formRef, filterRef } = localObj;
@@ -38,7 +44,7 @@ const TheTable = memo(
       page: 1,
       pageSize: 10,
       total: 0,
-      filters: { keyword: '', orderBy: 'id', descend: true } as FilterState,
+      filters: DEFAULT_FILTERS,
     });
 
     const fetchList = useCallback(
@@ -74,8 +80,7 @@ const TheTable = memo(
     );
 
     useEffect(() => {
-      fetchList(state.filters, 1);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      fetchList(DEFAULT_FILTERS, 1);
     }, [fetchList]);
 
     useImperativeHandle(ref, () => ({
