@@ -335,7 +335,7 @@ async function onUpdate(
     .returning({ id: userTable.id });
   const row = res[0];
   preventEmpty(row);
-  kv.delete(`system.auth.bundle:${id}`).catch(() => {});
+  kv.del(`system.auth.bundle:${id}`).catch(() => {});
   return row.id;
 }
 const updateApi = {
@@ -378,7 +378,7 @@ async function onDelete(
     .returning({ id: userTable.id });
   const deleteRow = res[0];
   preventEmpty(deleteRow);
-  kv.delete(`system.auth.bundle:${id}`).catch(() => {});
+  kv.del(`system.auth.bundle:${id}`).catch(() => {});
   return deleteRow.id;
 }
 const deleteApi = {

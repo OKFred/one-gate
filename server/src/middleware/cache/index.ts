@@ -159,9 +159,9 @@ export class KVStorage {
   }
 
   /**
-   * 删除缓存值
+   * 删除缓存值 (避免 JavaScript 关键字冲突的非保留字版本)
    */
-  async delete(key: string): Promise<void> {
+  async del(key: string): Promise<void> {
     const { realKV, cache } = this.getExecutor();
 
     if (realKV) {

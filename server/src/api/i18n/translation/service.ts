@@ -543,7 +543,7 @@ async function cacheSync(
   } else if (operation === "update") {
     await kv.put(cacheKey, record.tValue);
   } else if (operation === "delete") {
-    await kv.delete(cacheKey);
+    await kv.del(cacheKey);
   }
 }
 
