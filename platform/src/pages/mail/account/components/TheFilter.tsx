@@ -19,7 +19,7 @@ import {
   ExpandMore,
   Search as SearchIcon,
 } from '@mui/icons-material';
-import { useState, useEffect, useImperativeHandle, useCallback } from 'react';
+import { useState, useEffect, useImperativeHandle } from 'react';
 import type { Props } from '../index';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ListMailAccountReq } from '@/api/mail/type';
@@ -62,34 +62,21 @@ export default function TheFilter({ localObj, ref }: Props & { ref?: React.Ref<T
     [],
   );
 
-  // 调用表格刷新
-  const refreshTable = useCallback(
-    (newFilters: FilterState) => {
-      if (tableRef.current) {
-        tableRef.current.refresh(newFilters);
-      }
-    },
-    [tableRef],
-  );
-
-  // 防抖执行搜索
-  const debouncedSearch = useCallback(() => {
-    const newFilters = { ...filters, keyword: keywordInput };
-    setFilters(newFilters);
-    refreshTable(newFilters);
-  }, [keywordInput, filters, refreshTable]);
-
   // 关键词输入防抖
   useEffect(() => {
     if (keywordInput !== filters.keyword) {
       setIsSearching(true);
       const timer = setTimeout(() => {
-        debouncedSearch();
+        const newFilters = { ...filters, keyword: keywordInput };
+        setFilters(newFilters);
+        if (tableRef.current) {
+          tableRef.current.refresh(newFilters);
+        }
       }, 500); // 500ms 防抖延迟
 
       return () => clearTimeout(timer);
     }
-  }, [keywordInput, filters.keyword, debouncedSearch]);
+  }, [keywordInput, filters, tableRef]);
 
   const handleFilterChange = (key: keyof FilterState, value: string | boolean) => {
     if (key === 'keyword') {
@@ -97,7 +84,9 @@ export default function TheFilter({ localObj, ref }: Props & { ref?: React.Ref<T
     } else {
       const newFilters = { ...filters, [key]: value };
       setFilters(newFilters);
-      refreshTable(newFilters);
+      if (tableRef.current) {
+        tableRef.current.refresh(newFilters);
+      }
     }
   };
 
@@ -109,7 +98,9 @@ export default function TheFilter({ localObj, ref }: Props & { ref?: React.Ref<T
     };
     setKeywordInput(''); // 清空输入框
     setFilters(emptyFilters);
-    refreshTable(emptyFilters);
+    if (tableRef.current) {
+      tableRef.current.refresh(emptyFilters);
+    }
   };
 
   const hasActiveFilters = () => {

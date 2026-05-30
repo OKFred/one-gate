@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef } from 'react';
 import { PageLayout } from '@/components/Responsive/index';
 import TheForm, { type TheFormRef } from './components/TheForm';
 import TheTable, { type TheTableRef } from './components/TheTable';
@@ -19,7 +19,7 @@ export default function MailAccountPage() {
   const tableRef = useRef<TheTableRef>(null);
   const formRef = useRef<TheFormRef>(null);
   const filterRef = useRef<TheFilterRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
+  const localObj: LocalObj = { tableRef, formRef, filterRef };
   const t = useTranslation();
 
   return (
