@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite';
 import { loadEnv } from 'vite';
 import path from 'path';
-import react from '@vitejs/plugin-react-swc';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import babel from '@rolldown/plugin-babel';
 import UnoCSS from 'unocss/vite';
 import childProcess from 'child_process';
 import fs from 'fs/promises';
@@ -74,7 +75,13 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     server: { proxy: {} },
-    plugins: [react(), UnoCSS()],
+    plugins: [
+      react(),
+      babel({
+        presets: [reactCompilerPreset()],
+      }),
+      UnoCSS(),
+    ],
     optimizeDeps: {
       include: [
         'react',
@@ -90,10 +97,23 @@ export default defineConfig(({ command, mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'mui-vendor': ['@mui/material'],
-            'mui-icons': ['@mui/icons-material'],
+          manualChunks(id: string) {
+            if (id.includes('node_modules')) {
+              if (
+                id.includes('react') ||
+                id.includes('react-dom') ||
+                id.includes('react-router-dom') ||
+                id.includes('react-router')
+              ) {
+                return 'react-vendor';
+              }
+              if (id.includes('@mui/material')) {
+                return 'mui-vendor';
+              }
+              if (id.includes('@mui/icons-material')) {
+                return 'mui-icons';
+              }
+            }
           },
         },
       },
