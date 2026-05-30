@@ -180,7 +180,7 @@ async function onDelete(
   params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes>> {
   const { key } = params;
-  await kv.del(key);
+  await kv.delete(key);
   return { success: true };
 }
 

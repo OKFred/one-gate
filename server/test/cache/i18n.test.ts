@@ -36,7 +36,7 @@ async function testBasicOperations() {
   // 1. 清空 i18n 相关缓存
   const keys = await kv.list({ prefix: I18N_PREFIX });
   for (const k of keys.keys) {
-    await kv.del(k.name);
+    await kv.delete(k.name);
   }
   console.log("1. 已清空 i18n 相关的测试缓存\n");
 

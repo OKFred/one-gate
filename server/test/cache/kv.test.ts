@@ -43,7 +43,7 @@ async function testBasicOperations() {
   await kv.put("test:delete", "to be deleted");
   let value = await kv.get("test:delete");
   console.log(`  删除前: "${value}"`);
-  await kv.del("test:delete");
+  await kv.delete("test:delete");
   value = await kv.get("test:delete");
   console.log(`  删除后: ${value}`);
   console.assert(value === null, "❌ 删除测试失败");
