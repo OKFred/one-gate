@@ -1,252 +1,81 @@
-import { forwardRef, useImperativeHandle, useState, useCallback, useEffect, memo } from 'react';
 import { Chip } from '@mui/material';
-import ResponsiveList, {
-  type TableColumn,
-  type CardField,
-} from '@/components/Responsive/ResponsiveList';
-import * as TranslationAPI from '@/api/i18n/translation';
-import { TranslationActionButtons } from './TheActionButtons';
-import type { ListTranslationReq, ListTranslationRes } from '@/api/i18n/type';
-import type { Props } from '../index';
-import type { FilterState } from './TheFilter';
 import dayjs from 'dayjs';
-import { useTranslation } from '@/hooks/useTranslation';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { ListTranslationReq, ListTranslationRes } from '@/api/i18n/type';
 
-// 暴露给父组件的方法
-export interface TheTableRef {
-  /** 刷新表格数据 */
-  refresh: (filters?: FilterState) => void;
-}
+export type TranslationRes = NonNullable<ListTranslationRes['list']>[0];
+import type { FilterState } from './TheFilter';
 
-// 表格内部状态
-export interface TableState {
-  list: NonNullable<ListTranslationRes['list']>;
-  loading: boolean;
-  page: number;
-  pageSize: number;
-  total: number;
-  filters: FilterState;
-}
+export const tableConfig: SchemaCrudConfig<
+  TranslationRes,
+  FilterState,
+  ListTranslationReq
+>['table'] = {
+  columns: (t) => [
+    { title: t('columns.id'), render: (row) => row.id },
+    {
+      title: t('translation.table.application'),
+      render: (row) => (
+        <Chip label={row.application} size="small" color="primary" variant="outlined" />
+      ),
+    },
+    {
+      title: t('translation.table.business'),
+      render: (row) => (
+        <Chip label={row.business} size="small" color="secondary" variant="outlined" />
+      ),
+    },
+    {
+      title: t('translation.table.langCode'),
+      render: (row) => <Chip label={row.langCode} size="small" variant="outlined" />,
+    },
+    { title: t('translation.table.tKey'), render: (row) => row.tKey },
+    { title: t('translation.table.tValue'), render: (row) => row.tValue },
+    {
+      title: t('filter.enabledStatus'),
+      render: (row) => (
+        <Chip
+          label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
+          size="small"
+          color={row.isEnabled ? 'success' : 'default'}
+          variant="outlined"
+        />
+      ),
+    },
+    {
+      title: t('columns.createTime'),
+      render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
+      title: t('column.remark'),
+      render: (row) => row.remark || '-',
+    },
+  ],
 
-const DEFAULT_FILTERS: FilterState = {
-  keyword: '',
-  orderBy: 'id',
-  descend: false,
-  application: undefined,
-  business: undefined,
-  langCode: undefined,
-  isEnabled: undefined,
-};
-
-const TheTable = memo(
-  forwardRef<TheTableRef, Props>(({ localObj }, ref) => {
-    const { formRef, filterRef } = localObj;
-    const t = useTranslation();
-
-    // 整合所有表格相关状态
-    const [state, setState] = useState<TableState>({
-      list: [],
-      loading: false,
-      page: 1,
-      pageSize: 10,
-      total: 0,
-      filters: DEFAULT_FILTERS,
-    });
-
-    const { list, loading, page, pageSize, total, filters } = state;
-
-    // 获取数据的核心函数
-    const fetchTranslations = useCallback(
-      async (searchFilters: FilterState, currentPage: number = 1) => {
-        setState((prev) => ({ ...prev, loading: true }));
-        try {
-          const requestData: ListTranslationReq = {
-            pageNo: currentPage,
-            pageSize: state.pageSize,
-            orderBy: searchFilters.orderBy,
-            isEnabled: searchFilters.isEnabled,
-            descend: searchFilters.descend,
-          };
-
-          if (searchFilters.keyword) {
-            requestData.keyword = searchFilters.keyword;
-          }
-          if (searchFilters.application) {
-            requestData.application = searchFilters.application;
-          }
-          if (searchFilters.business) {
-            requestData.business = searchFilters.business;
-          }
-          if (searchFilters.langCode) {
-            requestData.langCode = searchFilters.langCode;
-          }
-          if (searchFilters.isEnabled !== undefined) {
-            requestData.isEnabled = searchFilters.isEnabled;
-          }
-
-          const res = await TranslationAPI.listFn({ data: requestData });
-          const response = res.data;
-          const translationsList = response?.data?.list || [];
-          const totalCount = response?.data?.total || 0;
-
-          setState((prev) => ({
-            ...prev,
-            list: translationsList,
-            total: totalCount,
-            page: currentPage,
-            filters: searchFilters,
-            loading: false,
-          }));
-
-          // 通知筛选组件更新数量
-          filterRef.current?.updateCount(totalCount);
-        } catch {
-          setState((prev) => ({ ...prev, loading: false }));
-          setState((prev) => ({ ...prev, list: [], total: 0 }));
-          filterRef.current?.updateCount(0);
-        }
-      },
-      [state.pageSize, filterRef],
-    );
-
-    // 删除成功后的回调
-    const handleDeleteSuccess = useCallback(() => {
-      fetchTranslations(filters, 1);
-    }, [fetchTranslations, filters]);
-
-    // 初始加载
-    useEffect(() => {
-      fetchTranslations(DEFAULT_FILTERS, 1);
-    }, [fetchTranslations]);
-
-    // 暴露给父组件的方法
-    useImperativeHandle(
-      ref,
-      () => ({
-        refresh: (newFilters?: FilterState) => {
-          const filtersToUse = newFilters || filters;
-          const pageToUse = newFilters ? 1 : page; // 如果有新筛选条件，重置到第一页
-          fetchTranslations(filtersToUse, pageToUse);
-        },
-      }),
-      [fetchTranslations, filters, page],
-    );
-
-    // 处理分页
-    const handlePageChange = (newPage: number) => {
-      fetchTranslations(filters, newPage);
-    };
-
-    // 处理每页条数变化
-    const handlePageSizeChange = (newPageSize: number) => {
-      setState((prev) => ({ ...prev, pageSize: newPageSize }));
-      // 重置到第一页并刷新数据
-      fetchTranslations(filters, 1);
-    };
-
-    // 表格列配置（PC端）
-    const columns: TableColumn<TableState['list'][0]>[] = [
-      { title: t('columns.id'), render: (row) => row.id },
-      {
-        title: t('translation.table.application'),
-        render: (row) => (
+  cardFields: (t) => [
+    { type: 'title', render: (row) => row.tKey },
+    { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
+    { type: 'content', label: t('translation.table.tValue'), render: (row) => row.tValue },
+    {
+      type: 'tags',
+      render: (row) => (
+        <>
           <Chip label={row.application} size="small" color="primary" variant="outlined" />
-        ),
-      },
-      {
-        title: t('translation.table.business'),
-        render: (row) => (
           <Chip label={row.business} size="small" color="secondary" variant="outlined" />
-        ),
-      },
-      {
-        title: t('translation.table.langCode'),
-        render: (row) => <Chip label={row.langCode} size="small" variant="outlined" />,
-      },
-      { title: t('translation.table.tKey'), render: (row) => row.tKey },
-      { title: t('translation.table.tValue'), render: (row) => row.tValue },
-      {
-        title: t('filter.enabledStatus'),
-        render: (row) => (
+          <Chip label={row.langCode} size="small" variant="outlined" />
           <Chip
             label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
             size="small"
             color={row.isEnabled ? 'success' : 'default'}
             variant="outlined"
           />
-        ),
-      },
-      {
-        title: t('columns.createTime'),
-        render: (row) => dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss'),
-      },
-      {
-        title: t('column.remark'),
-        render: (row) => row.remark || '-',
-      },
-      {
-        title: t('table.actions'),
-        align: 'center',
-        render: (row) => (
-          <TranslationActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        ),
-      },
-    ];
-
-    // 卡片字段配置（移动端）
-    const cardFields: CardField<TableState['list'][0]>[] = [
-      { type: 'title', render: (row) => row.tKey },
-      { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
-      { type: 'content', label: t('translation.table.tValue'), render: (row) => row.tValue },
-      {
-        type: 'tags',
-        render: (row) => (
-          <>
-            <Chip label={row.application} size="small" color="primary" variant="outlined" />
-            <Chip label={row.business} size="small" color="secondary" variant="outlined" />
-            <Chip label={row.langCode} size="small" variant="outlined" />
-            <Chip
-              label={row.isEnabled ? t('status.enabled') : t('status.disabled')}
-              size="small"
-              color={row.isEnabled ? 'success' : 'default'}
-              variant="outlined"
-            />
-          </>
-        ),
-      },
-      {
-        type: 'content',
-        label: t('column.remark'),
-        render: (row) => row.remark || '-',
-      },
-    ];
-
-    return (
-      <ResponsiveList
-        data={list}
-        loading={loading}
-        page={page}
-        total={total}
-        pageSize={pageSize}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        keyExtractor={(row) => row.id!}
-        columns={columns}
-        cardFields={cardFields}
-        cardActions={(row) => (
-          <TranslationActionButtons
-            row={row}
-            formRef={formRef}
-            onDeleteSuccess={handleDeleteSuccess}
-          />
-        )}
-      />
-    );
-  }),
-);
-
-export default TheTable;
+        </>
+      ),
+    },
+    {
+      type: 'content',
+      label: t('column.remark'),
+      render: (row) => row.remark || '-',
+    },
+  ],
+};

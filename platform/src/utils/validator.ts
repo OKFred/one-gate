@@ -37,7 +37,21 @@ export function useValidator(schema: unknown) {
     (data: unknown) => {
       if (!validate) return {};
 
-      const valid = validate(data);
+      // 深度拷贝待校验数据，避免直接污染表单的原有输入状态
+      const dataToValidate = data ? JSON.parse(JSON.stringify(data)) : {};
+
+      // 若字段被声明在 required 中且其值为仅空格的空字符串，从校验数据中删除，以完美触发 AJV required 必填校验
+      const requiredFields = (schema as Record<string, unknown>)?.required || [];
+      if (Array.isArray(requiredFields)) {
+        requiredFields.forEach((field: string) => {
+          const val = dataToValidate[field];
+          if (typeof val === 'string' && val.trim() === '') {
+            delete dataToValidate[field];
+          }
+        });
+      }
+
+      const valid = validate(dataToValidate);
       if (valid) return {};
 
       // 根据当前语言翻译错误信息
@@ -49,16 +63,20 @@ export function useValidator(schema: unknown) {
       // 将 Ajv 错误转换为我们系统通用的 fieldErrors 格式 { fieldName: message }
       const errors: Record<string, string> = {};
       validate.errors?.forEach((err) => {
-        // instancePath 格式通常为 "/fieldName"
+        // instancePath 格式通常为 "/fieldName"，若为 required 错误则缺少的字段名在 params.missingProperty 中
         const fieldName = err.instancePath.replace(/^\//, '') || err.params?.missingProperty;
         if (fieldName) {
-          errors[fieldName] = err.message || 'Validation failed';
+          if (err.keyword === 'required') {
+            errors[fieldName] = lang === 'zh' ? '该字段为必填项' : 'This field is required';
+          } else {
+            errors[fieldName] = err.message || 'Validation failed';
+          }
         }
       });
 
       return errors;
     },
-    [validate, lang],
+    [validate, schema, lang],
   );
 
   return { validate: validateData };

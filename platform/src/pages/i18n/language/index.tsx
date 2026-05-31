@@ -1,32 +1,30 @@
-import { useRef, useMemo } from 'react';
-import { PageLayout } from '@/components/Responsive/index';
-import TheForm, { type TheFormRef } from './components/TheForm';
-import TheTable, { type TheTableRef } from './components/TheTable';
-import TheFilter, { type TheFilterRef } from './components/TheFilter';
-import { TheActionButtons } from './components/TheActionButtons';
-import { useTranslation } from '@/hooks/useTranslation';
-
-export interface Props {
-  localObj: LocalObj;
-}
-export interface LocalObj {
-  tableRef: React.RefObject<TheTableRef | null>;
-  formRef: React.RefObject<TheFormRef | null>;
-  filterRef: React.RefObject<TheFilterRef | null>;
-}
+import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
+import { filterConfig, type FilterState } from './components/TheFilter';
+import { tableConfig, type LanguageRes } from './components/TheTable';
+import { formConfig } from './components/TheForm';
+import * as LanguageAPI from '@/api/i18n/language';
+import type { ListLanguageReq } from '@/api/i18n/type';
+import { I18N } from '@/hooks/usePermission';
 
 export default function LanguagePage() {
-  const tableRef = useRef<TheTableRef>(null);
-  const formRef = useRef<TheFormRef>(null);
-  const filterRef = useRef<TheFilterRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
-  const t = useTranslation();
+  const config: SchemaCrudConfig<LanguageRes, FilterState, ListLanguageReq> = {
+    titleKey: 'language.title',
+    apiKeyName: 'id',
+    permissions: {
+      add: [I18N.LANGUAGE.ADD],
+      edit: [I18N.LANGUAGE.EDIT],
+      delete: [I18N.LANGUAGE.DELETE],
+    },
+    api: {
+      list: LanguageAPI.listFn,
+      add: LanguageAPI.addFn,
+      update: LanguageAPI.updateFn,
+      delete: LanguageAPI.deleteFn,
+    },
+    filter: filterConfig,
+    table: tableConfig,
+    form: formConfig,
+  };
 
-  return (
-    <PageLayout title={t('language.title')} actions={<TheActionButtons formRef={formRef} />}>
-      <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheForm ref={localObj.formRef} localObj={localObj} />
-      <TheTable ref={localObj.tableRef} localObj={localObj} />
-    </PageLayout>
-  );
+  return <SchemaCrudPage config={config} />;
 }

@@ -1,32 +1,54 @@
-import { useRef, useMemo } from 'react';
-import { PageLayout } from '@/components/Responsive/index';
-import { useTranslation } from '@/hooks/useTranslation';
-import TheForm, { type TheFormRef } from './components/TheForm';
-import TheTable, { type TheTableRef } from './components/TheTable';
-import TheFilter, { type TheFilterRef } from './components/TheFilter';
-import { TheActionButtons } from './components/TheActionButtons';
+import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
+import { filterConfig, type FilterState } from './components/TheFilter';
+import { tableConfig, type TranslationRes } from './components/TheTable';
+import { formConfig } from './components/TheForm';
+import * as TranslationAPI from '@/api/i18n/translation';
+import type { ListTranslationReq } from '@/api/i18n/type';
+import { I18N } from '@/hooks/usePermission';
 
-export interface Props {
-  localObj: LocalObj;
-}
-export interface LocalObj {
-  tableRef: React.RefObject<TheTableRef | null>;
-  formRef: React.RefObject<TheFormRef | null>;
-  filterRef: React.RefObject<TheFilterRef | null>;
-}
+const calculateSHA256 = async (text: string): Promise<string> => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+};
 
-export default function ThePage() {
-  const t = useTranslation();
-  const tableRef = useRef<TheTableRef>(null);
-  const formRef = useRef<TheFormRef>(null);
-  const filterRef = useRef<TheFilterRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, formRef, filterRef }), []);
+export default function TranslationPage() {
+  const config: SchemaCrudConfig<TranslationRes, FilterState, ListTranslationReq> = {
+    titleKey: 'translation.title',
+    apiKeyName: 'id',
+    permissions: {
+      add: [I18N.TRANSLATION.ADD],
+      edit: [I18N.TRANSLATION.EDIT],
+      delete: [I18N.TRANSLATION.DELETE],
+    },
+    api: {
+      list: TranslationAPI.listFn,
+      add: async (args) => {
+        const hash = await calculateSHA256(args.data.tValue || '');
+        return TranslationAPI.addFn({
+          data: {
+            ...args.data,
+            valueHash: hash,
+          },
+        });
+      },
+      update: async (args) => {
+        const hash = await calculateSHA256(args.data.tValue || '');
+        return TranslationAPI.updateFn({
+          data: {
+            ...args.data,
+            valueHash: hash,
+          },
+        });
+      },
+      delete: TranslationAPI.deleteFn,
+    },
+    filter: filterConfig,
+    table: tableConfig,
+    form: formConfig,
+  };
 
-  return (
-    <PageLayout title={t('translation.title')} actions={<TheActionButtons formRef={formRef} />}>
-      <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheForm ref={localObj.formRef} localObj={localObj} />
-      <TheTable ref={localObj.tableRef} localObj={localObj} />
-    </PageLayout>
-  );
+  return <SchemaCrudPage config={config} />;
 }
