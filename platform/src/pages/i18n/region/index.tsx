@@ -1,38 +1,16 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
-import { PageLayout } from '@/components/Responsive/index';
-import { useTranslation } from '@/hooks/useTranslation';
-import TheForm, { type TheFormRef } from './components/TheForm';
-import TheTable, { type TheTableRef } from './components/TheTable';
-import TheFilter, { type TheFilterRef } from './components/TheFilter';
-import { TheActionButtons } from './components/TheActionButtons';
+import { useState, useEffect } from 'react';
+import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
+import { filterConfig, type FilterState } from './components/TheFilter';
+import { tableConfig, type RegionRes } from './components/TheTable';
+import { formConfig } from './components/TheForm';
+import * as RegionAPI from '@/api/i18n/region';
 import * as LanguageAPI from '@/api/i18n/language';
-import type { ListAllLanguageRes } from '@/api/i18n/type';
+import type { ListAllLanguageRes, ListRegionReq } from '@/api/i18n/type';
+import { I18N } from '@/hooks/usePermission';
 
-export interface LocalObj {
-  tableRef: React.RefObject<TheTableRef | null>;
-  formRef: React.RefObject<TheFormRef | null>;
-  filterRef: React.RefObject<TheFilterRef | null>;
-  enabledLanguages: ListAllLanguageRes;
-}
-
-export interface Props {
-  localObj: LocalObj;
-  enabledLanguages?: ListAllLanguageRes; // TheFilter 不需要，所以可选
-}
-
-export default function ThePage() {
-  const t = useTranslation();
-  const tableRef = useRef<TheTableRef>(null);
-  const formRef = useRef<TheFormRef>(null);
-  const filterRef = useRef<TheFilterRef>(null);
+export default function RegionPage() {
   const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
 
-  const localObj: LocalObj = useMemo(
-    () => ({ tableRef, formRef, filterRef, enabledLanguages }),
-    [enabledLanguages],
-  );
-
-  // 获取启用的语言列表
   useEffect(() => {
     const fetchLanguages = async () => {
       try {
@@ -45,11 +23,29 @@ export default function ThePage() {
     fetchLanguages();
   }, []);
 
-  return (
-    <PageLayout title={t('region.title')} actions={<TheActionButtons formRef={formRef} />}>
-      <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheForm ref={localObj.formRef} localObj={localObj} />
-      <TheTable ref={localObj.tableRef} localObj={localObj} />
-    </PageLayout>
-  );
+  const config: SchemaCrudConfig<
+    RegionRes,
+    FilterState,
+    ListRegionReq,
+    { enabledLanguages: ListAllLanguageRes }
+  > = {
+    titleKey: 'region.title',
+    apiKeyName: 'id',
+    permissions: {
+      add: [I18N.REGION.ADD],
+      edit: [I18N.REGION.EDIT],
+      delete: [I18N.REGION.DELETE],
+    },
+    api: {
+      list: RegionAPI.listFn,
+      add: RegionAPI.addFn,
+      update: RegionAPI.updateFn,
+      delete: RegionAPI.deleteFn,
+    },
+    filter: filterConfig,
+    table: tableConfig,
+    form: formConfig,
+  };
+
+  return <SchemaCrudPage config={config} extraContext={{ enabledLanguages }} />;
 }
