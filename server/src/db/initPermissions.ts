@@ -59,6 +59,11 @@ const permissionSeeds: Record<string, Record<string, string[]>> = {
     config: ["read", "add", "edit", "delete"],
     chat: ["read"],
   },
+  swarm: {
+    "": ["read"],
+    docker: ["read", "add", "edit", "delete"],
+    nodes: ["read"],
+  },
 };
 
 /**

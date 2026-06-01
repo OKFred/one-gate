@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["manager", "worker"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ready", "down", "disconnected"]
+          },
+          "availability": {
+            "type": "string",
+            "enum": ["active", "drain", "pause"]
+          },
+          "ip": {
+            "type": "string"
+          },
+          "engineVersion": {
+            "type": "string"
+          },
+          "nanoCpus": {
+            "type": "number"
+          },
+          "memoryBytes": {
+            "type": "number"
+          },
+          "runningTaskCount": {
+            "type": "number"
+          },
+          "allocatedCpus": {
+            "type": "number"
+          },
+          "allocatedMemory": {
+            "type": "number"
+          },
+          "rawJson": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "hostname",
+          "role",
+          "status",
+          "availability",
+          "ip",
+          "engineVersion",
+          "nanoCpus",
+          "memoryBytes",
+          "runningTaskCount",
+          "allocatedCpus",
+          "allocatedMemory",
+          "rawJson"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["ok", "data", "message"],
+  "additionalProperties": false
+}

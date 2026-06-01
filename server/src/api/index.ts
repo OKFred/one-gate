@@ -5,6 +5,7 @@ import oss from "./oss/index";
 import enterprise from "./enterprise/index";
 import system from "./system/index";
 import ai from "./ai/index";
+import swarm from "./swarm/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
@@ -17,6 +18,7 @@ function createApp(): App {
   app.route("/system", system());
   app.route("/enterprise", enterprise());
   app.route("/ai", ai());
+  app.route("/swarm", swarm());
   return app;
 }
 export default createApp;

@@ -22,7 +22,6 @@ export function useValidator(schema: unknown) {
     const browserLang = navigator.language.toLowerCase();
     lang = browserLang.includes('zh') ? 'zh' : 'en';
   }
-  console.log({ lang });
   const validate = useMemo(() => {
     if (!schema) return null;
     try {

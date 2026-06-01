@@ -63,5 +63,11 @@ export type BusinessType = {
   "ai.config": "ai.config";
   /** AI 对话 */
   "ai.chat": "ai.chat";
+  /** Swarm */
+  swarm: "swarm";
+  /** Swarm Docker Service */
+  "swarm.docker": "swarm.docker";
+  /** Swarm Nodes */
+  "swarm.nodes": "swarm.nodes";
 };
 export type BusinessKey = keyof BusinessType;

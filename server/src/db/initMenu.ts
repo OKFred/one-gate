@@ -274,6 +274,31 @@ export const initialMenuData = [
     sort: 8,
     business: "system.schema_form_data",
   },
+  {
+    id: 32,
+    name: "sidebar.menu.swarm",
+    icon: "material-symbols:dns",
+    sort: 10,
+    business: "swarm",
+  },
+  {
+    id: 33,
+    name: "sidebar.menu.swarm.docker",
+    icon: "material-symbols:layers",
+    path: "/swarm/docker",
+    parentId: 32,
+    sort: 1,
+    business: "swarm.docker",
+  },
+  {
+    id: 34,
+    name: "sidebar.menu.swarm.nodes",
+    icon: "material-symbols:lan",
+    path: "/swarm/nodes",
+    parentId: 32,
+    sort: 2,
+    business: "swarm.nodes",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

@@ -149,3 +149,17 @@ export const ENTERPRISE = {
     DELETE: 'enterprise.attendance:delete',
   },
 };
+
+export const SWARM = {
+  /** Swarm 集群 Docker 服务管理 */
+  DOCKER: {
+    READ: 'swarm.docker:read',
+    ADD: 'swarm.docker:add',
+    EDIT: 'swarm.docker:edit',
+    DELETE: 'swarm.docker:delete',
+  },
+  /** Swarm 节点管理 */
+  NODES: {
+    READ: 'swarm.nodes:read',
+  },
+};

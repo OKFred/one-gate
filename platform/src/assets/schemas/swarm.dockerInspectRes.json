@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["ok", "data", "message"],
+  "additionalProperties": false
+}

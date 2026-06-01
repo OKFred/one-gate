@@ -7663,6 +7663,470 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/swarm/docker/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出 Docker Swarm 所有服务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/docker/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查看单个 Swarm 服务详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerInspectReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerInspectRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/docker/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 创建新的 Swarm 服务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerCreateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerCreateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/docker/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新现有 Swarm 服务配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/docker/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除 Swarm 服务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerRemoveReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerRemoveRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/docker/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 Swarm 服务日志内容 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerLogsReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerLogsRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/docker/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 Swarm 服务下运行容器的负载实时监控指标 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.dockerStatsReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.dockerStatsRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/swarm/nodes/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出 Docker Swarm 集群节点及其实时分配负载情况 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["swarm.nodesListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["swarm.nodesListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -13688,6 +14152,281 @@ export interface components {
             ok: boolean;
             /** @description AI 返回的内容 */
             data: string;
+            message: string;
+        };
+        "swarm.dockerListReq": {
+            /**
+             * @description 过滤条件，如 { name: ['my-service'] }
+             * @example {
+             *       "name": [
+             *         "my-service"
+             *       ]
+             *     }
+             */
+            filters?: {
+                [key: string]: string[];
+            };
+        };
+        "swarm.dockerListRes": {
+            ok: boolean;
+            /** @description Docker Service 列表 */
+            data: Record<string, never>[];
+            message: string;
+        };
+        "swarm.dockerInspectReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+        };
+        "swarm.dockerInspectRes": {
+            ok: boolean;
+            /** @description Docker Service 详细配置及运行状态 */
+            data: Record<string, never>;
+            message: string;
+        };
+        "swarm.dockerCreateReq": {
+            /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
+            spec: {
+                /**
+                 * @description 服务名称
+                 * @example my-service
+                 */
+                Name: string;
+                /** @description 服务标签对 */
+                Labels?: {
+                    [key: string]: string;
+                };
+                /** @description 任务模板，定义容器的规格和调度属性 */
+                TaskTemplate: {
+                    ContainerSpec: {
+                        /**
+                         * @description 容器镜像
+                         * @example nginx:latest
+                         */
+                        Image: string;
+                        /** @description 环境变量列表 */
+                        Env?: string[];
+                        Command?: string[];
+                        Args?: string[];
+                    };
+                };
+                Mode?: {
+                    Replicated?: {
+                        /**
+                         * @description 服务副本数
+                         * @example 3
+                         */
+                        Replicas?: number;
+                    };
+                    Global?: Record<string, never>;
+                };
+                UpdateConfig?: Record<string, never>;
+                RollbackConfig?: Record<string, never>;
+                EndpointSpec?: {
+                    Ports?: {
+                        /** @enum {string} */
+                        Protocol?: "tcp" | "udp";
+                        PublishMode?: string;
+                        PublishedPort: number;
+                        TargetPort: number;
+                    }[];
+                };
+            };
+        };
+        "swarm.dockerCreateRes": {
+            ok: boolean;
+            data: {
+                /** @description 新建服务的 ID */
+                ID: string;
+            };
+            message: string;
+        };
+        "swarm.dockerUpdateReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+            /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
+            spec: {
+                /**
+                 * @description 服务名称
+                 * @example my-service
+                 */
+                Name: string;
+                /** @description 服务标签对 */
+                Labels?: {
+                    [key: string]: string;
+                };
+                /** @description 任务模板，定义容器的规格和调度属性 */
+                TaskTemplate: {
+                    ContainerSpec: {
+                        /**
+                         * @description 容器镜像
+                         * @example nginx:latest
+                         */
+                        Image: string;
+                        /** @description 环境变量列表 */
+                        Env?: string[];
+                        Command?: string[];
+                        Args?: string[];
+                    };
+                };
+                Mode?: {
+                    Replicated?: {
+                        /**
+                         * @description 服务副本数
+                         * @example 3
+                         */
+                        Replicas?: number;
+                    };
+                    Global?: Record<string, never>;
+                };
+                UpdateConfig?: Record<string, never>;
+                RollbackConfig?: Record<string, never>;
+                EndpointSpec?: {
+                    Ports?: {
+                        /** @enum {string} */
+                        Protocol?: "tcp" | "udp";
+                        PublishMode?: string;
+                        PublishedPort: number;
+                        TargetPort: number;
+                    }[];
+                };
+            };
+            /**
+             * @description 服务的当前配置版本号（即 Spec 的 Version.Index），用于更新校验
+             * @example 12
+             */
+            version: number;
+        };
+        "swarm.dockerUpdateRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "swarm.dockerRemoveReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+        };
+        "swarm.dockerRemoveRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "swarm.dockerLogsReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+            /**
+             * @description 返回的日志行数
+             * @default 100
+             */
+            tail: number;
+        };
+        "swarm.dockerLogsRes": {
+            ok: boolean;
+            data: {
+                /** @description 服务日志文本内容 */
+                logs: string;
+            };
+            message: string;
+        };
+        "swarm.dockerStatsReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+        };
+        "swarm.dockerStatsRes": {
+            ok: boolean;
+            /** @description Swarm 服务各运行中 Task 副本负载指标 */
+            data: {
+                taskId: string;
+                containerId: string;
+                nodeId: string;
+                cpuPercent: number;
+                memoryUsage: number;
+                memoryLimit: number;
+                memoryPercent: number;
+                networkRx: number;
+                networkTx: number;
+                blkRead: number;
+                blkWrite: number;
+            }[];
+            message: string;
+        };
+        "swarm.nodesListReq": {
+            /** @description 过滤条件 */
+            filters?: {
+                [key: string]: string[];
+            };
+        };
+        "swarm.nodesListRes": {
+            ok: boolean;
+            /** @description Swarm Nodes 节点列表及其承载的负载状态 */
+            data: {
+                /** @description 节点 ID */
+                id: string;
+                /** @description 主机名称 */
+                hostname: string;
+                /**
+                 * @description 角色
+                 * @enum {string}
+                 */
+                role: "manager" | "worker";
+                /**
+                 * @description 状态
+                 * @enum {string}
+                 */
+                status: "ready" | "down" | "disconnected";
+                /**
+                 * @description 调度可用性
+                 * @enum {string}
+                 */
+                availability: "active" | "drain" | "pause";
+                /** @description 节点 IP */
+                ip: string;
+                /** @description Docker 引擎版本 */
+                engineVersion: string;
+                /** @description CPU 核心数 */
+                nanoCpus: number;
+                /** @description 总物理内存 */
+                memoryBytes: number;
+                /** @description 在该节点运行中的 Task 数量 */
+                runningTaskCount: number;
+                /** @description 已分配 CPU (核数) */
+                allocatedCpus: number;
+                /** @description 已分配内存 (字节) */
+                allocatedMemory: number;
+                /** @description 原始 JSON 数据 */
+                rawJson: string;
+            }[];
             message: string;
         };
     };
