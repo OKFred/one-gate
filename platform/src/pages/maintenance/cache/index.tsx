@@ -1,33 +1,108 @@
-import { useRef, useMemo } from 'react';
-import { PageLayout } from '@/components/Responsive/index';
-import TheTable, { type CacheTableRef } from './components/TheTable';
-import TheFilter, { type CacheFilterRef } from './components/TheFilter';
-import TheDetail, { type TheDetailRef } from './components/TheDetail';
-import { TheActionButtons } from './components/TheActionButtons';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useState, useMemo } from 'react';
+import { SchemaCrudPage } from '@/components/Crud';
+import { Visibility as ViewIcon } from '@mui/icons-material';
+import * as CacheAPI from '@/api/maintenance/cache';
+import { MAINTENANCE } from '@/hooks/usePermission';
+import type { ListKeysRes } from '@/api/maintenance/type';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import TheDetail from './components/TheDetail';
 
-export interface Props {
-  localObj: LocalObj;
-}
+type CacheRow = NonNullable<ListKeysRes['keys']>[number];
 
-export interface LocalObj {
-  tableRef: React.RefObject<CacheTableRef | null>;
-  detailRef: React.RefObject<TheDetailRef | null>;
-  filterRef: React.RefObject<CacheFilterRef | null>;
+export interface CacheContext {
+  onPreview: (row: CacheRow) => void;
 }
 
 export default function CacheManagementPage() {
-  const t = useTranslation();
-  const tableRef = useRef<CacheTableRef>(null);
-  const detailRef = useRef<TheDetailRef>(null);
-  const filterRef = useRef<CacheFilterRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, detailRef, filterRef }), []);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewRow, setPreviewRow] = useState<CacheRow | null>(null);
+
+  const extraContext = useMemo<CacheContext>(
+    () => ({
+      onPreview: (row) => {
+        setPreviewRow(row);
+        setPreviewOpen(true);
+      },
+    }),
+    [],
+  );
+
+  const config: SchemaCrudConfig<CacheRow, { prefix: string }, { prefix?: string }, CacheContext> =
+    {
+      titleKey: 'cache.title',
+      apiKeyName: 'name',
+      permissions: {},
+      api: {
+        list: async (args) => {
+          const prefix = args.data?.prefix || undefined;
+          const res = await CacheAPI.listKeysFn({ data: { prefix, limit: 1000 } });
+          const keysList = res.data?.data?.keys || [];
+          return {
+            data: {
+              data: {
+                list: keysList,
+                total: keysList.length,
+              },
+            },
+          } as unknown as ReturnType<
+            NonNullable<
+              SchemaCrudConfig<CacheRow, { prefix: string }, { prefix?: string }>['api']['list']
+            >
+          >;
+        },
+        delete: (args) => {
+          const row = args as unknown as { data: CacheRow };
+          return CacheAPI.deleteFn({ data: { key: row.data.name } });
+        },
+      },
+      filter: {
+        defaultFilters: { prefix: '' },
+        fields: (t) => [
+          {
+            name: 'prefix',
+            label: t('cache.filter.keyPrefix'),
+            type: 'text',
+            placeholder: t('cache.filter.keyPrefixPlaceholder'),
+            sx: { width: '100%' },
+          },
+        ],
+        transformRequest: (filters) => ({
+          prefix: filters.prefix || undefined,
+        }),
+      },
+      table: {
+        columns: (t) => [{ title: t('cache.columns.key'), render: (row) => row.name }],
+        cardFields: (t) => [{ label: t('cache.columns.key'), render: (row) => row.name }],
+        actions: (_, context) => [
+          {
+            key: 'view',
+            color: 'info',
+            icon: <ViewIcon />,
+            permissionCodes: [MAINTENANCE.CACHE.VIEW],
+            onClick: (row) => {
+              context?.onPreview(row);
+            },
+          },
+        ],
+      },
+      form: {
+        schema: { type: 'object' },
+        defaultForm: {},
+      },
+    };
 
   return (
-    <PageLayout title={t('cache.title')} actions={<TheActionButtons tableRef={tableRef} />}>
-      <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheTable ref={localObj.tableRef} localObj={localObj} />
-      <TheDetail ref={localObj.detailRef} localObj={localObj} />
-    </PageLayout>
+    <>
+      <SchemaCrudPage config={config} extraContext={extraContext} />
+
+      <TheDetail
+        open={previewOpen}
+        onClose={() => {
+          setPreviewOpen(false);
+          setPreviewRow(null);
+        }}
+        cacheKey={previewRow?.name || ''}
+      />
+    </>
   );
 }
