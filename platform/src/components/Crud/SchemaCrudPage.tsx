@@ -70,11 +70,13 @@ async function executeFetchList<TRecord, TFilters, TApiData, TExtra>(
 interface SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra = unknown> {
   config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra>;
   extraContext?: TExtra;
+  customActions?: React.ReactNode;
 }
 
 export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
   config,
   extraContext,
+  customActions,
 }: SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra>) {
   const t = useTranslation();
   const { isMobile } = useResponsive();
@@ -422,16 +424,19 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     <PageLayout
       title={t(config.titleKey)}
       actions={
-        config.api.add && (
-          <ResponsiveButton
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpenAdd}
-            permissionCodes={config.permissions?.add || []}
-          >
-            {t('dialog.add')}
-          </ResponsiveButton>
-        )
+        <Stack direction="row" spacing={1}>
+          {customActions}
+          {config.api.add && (
+            <ResponsiveButton
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleOpenAdd}
+              permissionCodes={config.permissions?.add || []}
+            >
+              {t('dialog.add')}
+            </ResponsiveButton>
+          )}
+        </Stack>
       }
     >
       {/* 1. 筛选组件 (Filter) */}

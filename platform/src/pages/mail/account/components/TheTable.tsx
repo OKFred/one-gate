@@ -55,7 +55,7 @@ export const tableConfig: SchemaCrudConfig<
     },
   ],
 
-  actions: (t, extraContext) => [
+  actions: (_t, extraContext) => [
     {
       key: 'verify',
       color: 'success',

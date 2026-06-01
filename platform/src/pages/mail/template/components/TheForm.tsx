@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import { TextField, Stack, Box, Typography, CircularProgress } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import type { AddMailTemplateReq } from '@/api/mail/type';

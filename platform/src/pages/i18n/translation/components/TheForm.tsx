@@ -9,16 +9,11 @@ import {
   ListItemText,
   Chip,
   CircularProgress,
-  Typography,
 } from '@mui/material';
 import { WarningAmber as WarningIcon, CheckCircle as CheckCircleIcon } from '@mui/icons-material';
 import { Field } from '@/components/Form';
-import type { SchemaCrudConfig } from '@/components/Crud';
-import type { TranslationRes } from './TheTable';
-import type { FilterState } from './TheFilter';
-import type { ListTranslationReq, CheckDuplicateTranslationRes } from '@/api/i18n/type';
+import type { CheckDuplicateTranslationRes } from '@/api/i18n/type';
 import * as TranslationAPI from '@/api/i18n/translation';
-import translationSchema from '@/assets/schemas/i18n.translationAddReq.json';
 import hasValue from '@/utils/hasValue';
 
 interface FormState {
@@ -33,7 +28,7 @@ interface FormState {
   remark: string | null;
 }
 
-export function TranslationFormFields({
+export default function TranslationFormFields({
   form,
   setForm,
   t,
@@ -220,55 +215,3 @@ export function TranslationFormFields({
     </Box>
   );
 }
-
-export const formConfig: SchemaCrudConfig<TranslationRes, FilterState, ListTranslationReq>['form'] =
-  {
-    schema: translationSchema,
-    defaultForm: {
-      application: '',
-      business: '',
-      langCode: '',
-      tKey: '',
-      tValue: '',
-      valueHash: '',
-      isEnabled: true,
-      remark: null,
-    },
-    afterOpen: (form, isEdit, row) => {
-      if (isEdit && row) {
-        return {
-          ...form,
-          id: row.id,
-          application: row.application || '',
-          business: row.business || '',
-          langCode: row.langCode || '',
-          tKey: row.tKey || '',
-          tValue: row.tValue || '',
-          valueHash: row.valueHash || '',
-          isEnabled: row.isEnabled ?? true,
-          remark: row.remark || null,
-        };
-      }
-      return {
-        ...form,
-        id: undefined,
-        application: '',
-        business: '',
-        langCode: '',
-        tKey: '',
-        tValue: '',
-        valueHash: '',
-        isEnabled: true,
-        remark: null,
-      };
-    },
-    renderForm: (form, setForm, _errorContextValue, t) => {
-      return (
-        <TranslationFormFields
-          form={form as Partial<FormState>}
-          setForm={setForm as (form: Partial<FormState>) => void}
-          t={t}
-        />
-      );
-    },
-  };

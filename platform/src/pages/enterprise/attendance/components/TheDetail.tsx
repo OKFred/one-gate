@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle, memo } from 'react';
+import { memo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -12,122 +12,101 @@ import {
   Chip,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
-import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import dayjs from 'dayjs';
 import type { AttendanceObj } from '@/api/enterprise/type';
 
-export interface TheDetailRef {
-  onOpen: (row: AttendanceObj) => void;
+export interface TheDetailProps {
+  open: boolean;
+  onClose: () => void;
+  detail: AttendanceObj | null;
 }
 
-const TheDetail = memo(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  forwardRef<TheDetailRef, Props>(({ localObj: _ }, ref) => {
-    const t = useTranslation();
-    const { isMobile } = useResponsive();
-    const [open, setOpen] = useState(false);
-    const [detail, setDetail] = useState<AttendanceObj | null>(null);
+const TheDetail = memo(({ open, onClose, detail }: TheDetailProps) => {
+  const t = useTranslation();
+  const { isMobile } = useResponsive();
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        onOpen: (row: AttendanceObj) => {
-          setDetail(row);
-          setOpen(true);
-        },
-      }),
-      [],
-    );
+  if (!detail) return null;
 
-    const handleClose = () => {
-      setOpen(false);
-    };
-
-    if (!detail) return null;
-
-    const getStatusChip = (status: number) => {
-      const statusMap: Record<
-        number,
-        { label: string; color: Parameters<typeof Chip>[0]['color'] }
-      > = {
+  const getStatusChip = (status: number) => {
+    const statusMap: Record<number, { label: string; color: Parameters<typeof Chip>[0]['color'] }> =
+      {
         0: { label: t('enterprise.attendance.status.normal'), color: 'success' },
         1: { label: t('enterprise.attendance.status.late'), color: 'warning' },
         2: { label: t('enterprise.attendance.status.earlyLeave'), color: 'info' },
         3: { label: t('enterprise.attendance.status.absent'), color: 'error' },
       };
-      const { label, color } = statusMap[status] || { label: t('column.noData'), color: 'default' };
-      return <Chip label={label} color={color} size="small" />;
-    };
+    const { label, color } = statusMap[status] || { label: t('column.noData'), color: 'default' };
+    return <Chip label={label} color={color} size="small" />;
+  };
 
-    return (
-      <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth fullScreen={isMobile}>
-        <DialogTitle
-          sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-        >
-          {t('enterprise.attendance.detailTitle')}
-          {isMobile && (
-            <Button onClick={handleClose}>
-              <CloseIcon />
-            </Button>
-          )}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth fullScreen={isMobile}>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {t('enterprise.attendance.detailTitle')}
+        {isMobile && (
+          <Button onClick={onClose}>
+            <CloseIcon />
+          </Button>
+        )}
+      </DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('enterprise.attendance.employee')}
+            </Typography>
+            <Typography variant="body1">{detail.employeeObj?.label || '-'}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('enterprise.attendance.date')}
+            </Typography>
+            <Typography variant="body1">{detail.date}</Typography>
+          </Box>
+          <Divider />
+          <Stack direction="row" spacing={4}>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('enterprise.attendance.employee')}
+                {t('enterprise.attendance.checkInTime')}
               </Typography>
-              <Typography variant="body1">{detail.employeeObj?.label || '-'}</Typography>
+              <Typography variant="body1">
+                {detail.checkInTime ? dayjs(detail.checkInTime).format('HH:mm:ss') : '-'}
+              </Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('enterprise.attendance.date')}
+                {t('enterprise.attendance.checkOutTime')}
               </Typography>
-              <Typography variant="body1">{detail.date}</Typography>
-            </Box>
-            <Divider />
-            <Stack direction="row" spacing={4}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('enterprise.attendance.checkInTime')}
-                </Typography>
-                <Typography variant="body1">
-                  {detail.checkInTime ? dayjs(detail.checkInTime).format('HH:mm:ss') : '-'}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('enterprise.attendance.checkOutTime')}
-                </Typography>
-                <Typography variant="body1">
-                  {detail.checkOutTime ? dayjs(detail.checkOutTime).format('HH:mm:ss') : '-'}
-                </Typography>
-              </Box>
-            </Stack>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('enterprise.attendance.status')}
+              <Typography variant="body1">
+                {detail.checkOutTime ? dayjs(detail.checkOutTime).format('HH:mm:ss') : '-'}
               </Typography>
-              <Box sx={{ mt: 0.5 }}>{getStatusChip(detail.status)}</Box>
-            </Box>
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                {t('column.remark')}
-              </Typography>
-              <Typography variant="body2">{detail.remark || '无'}</Typography>
             </Box>
           </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} variant="contained">
-            {t('dialog.close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }),
-);
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('enterprise.attendance.status')}
+            </Typography>
+            <Box sx={{ mt: 0.5 }}>{getStatusChip(detail.status)}</Box>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              {t('column.remark')}
+            </Typography>
+            <Typography variant="body2">{detail.remark || '无'}</Typography>
+          </Box>
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} variant="contained">
+          {t('dialog.close')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+});
+
+TheDetail.displayName = 'TheDetail';
 
 export default TheDetail;

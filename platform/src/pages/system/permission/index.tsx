@@ -1,53 +1,68 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
-import { PageLayout } from '@/components/Responsive/index';
-import { useTranslation } from '@/hooks/useTranslation';
-import TheForm, { type TheFormRef } from './components/TheForm';
-import TheTable, { type TheTableRef } from './components/TheTable';
-import TheFilter, { type TheFilterRef } from './components/TheFilter';
-import { TheActionButtons } from './components/TheActionButtons';
+import { useState, useEffect } from 'react';
+import { SchemaCrudPage } from '@/components/Crud';
+import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
+import { tableConfig, type PermissionRes } from './components/TheTable';
+import PermissionFormFields from './components/TheForm';
+import schema from '@/assets/schemas/system.permissionAddReq.json';
 import * as PermissionAPI from '@/api/system/permission';
-import type { ListAllPermissionRes } from '@/api/system/type';
+import { SYSTEM } from '@/hooks/usePermission';
+import type { ListPermissionReq, ListAllPermissionRes } from '@/api/system/type';
+import type { SchemaCrudConfig } from '@/components/Crud';
 
-export interface Props {
-  localObj: LocalObj;
-}
-export interface LocalObj {
-  tableRef: React.RefObject<TheTableRef | null>;
-  formRef: React.RefObject<TheFormRef | null>;
-  filterRef: React.RefObject<TheFilterRef | null>;
-  allPermissions: ListAllPermissionRes;
-}
+const DEFAULT_FORM: Partial<PermissionRes> = {
+  code: '',
+  name: '',
+  category: 'action',
+  resource: '',
+  business: null,
+  remark: null,
+  isEnabled: true,
+};
 
 export default function PermissionManagement() {
-  const t = useTranslation();
-  const tableRef = useRef<TheTableRef>(null);
-  const formRef = useRef<TheFormRef>(null);
-  const filterRef = useRef<TheFilterRef>(null);
   const [allPermissions, setAllPermissions] = useState<ListAllPermissionRes>([]);
 
-  const localObj: LocalObj = useMemo(
-    () => ({ tableRef, formRef, filterRef, allPermissions }),
-    [allPermissions],
-  );
-
-  // 获取所有权限列表
   useEffect(() => {
-    const fetchPermissions = async () => {
-      try {
-        const res = await PermissionAPI.listAllFn({ data: {} });
-        setAllPermissions(res.data.data || []);
-      } catch (error) {
-        console.error('Failed to fetch permissions:', error);
-      }
-    };
-    fetchPermissions();
+    // 异步拉取全部权限，供新增/编辑表单树级归属选择
+    PermissionAPI.listAllFn({ data: {} })
+      .then((res) => setAllPermissions(res.data.data || []))
+      .catch(console.error);
   }, []);
 
-  return (
-    <PageLayout title={t('permission.title')} actions={<TheActionButtons formRef={formRef} />}>
-      <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheForm ref={localObj.formRef} localObj={localObj} />
-      <TheTable ref={localObj.tableRef} localObj={localObj} />
-    </PageLayout>
-  );
+  const config: SchemaCrudConfig<PermissionRes, FilterState, ListPermissionReq> = {
+    titleKey: 'permission.title',
+    apiKeyName: 'id',
+    permissions: {
+      add: [SYSTEM.PERMISSION.ADD],
+      edit: [SYSTEM.PERMISSION.EDIT],
+      delete: [SYSTEM.PERMISSION.DELETE],
+    },
+    api: {
+      list: PermissionAPI.listFn,
+      add: PermissionAPI.addFn,
+      update: PermissionAPI.updateFn,
+      delete: PermissionAPI.deleteFn,
+    },
+    filter: {
+      defaultFilters,
+      fields: filterConfig.fields,
+      transformRequest: (filters) =>
+        ({
+          keyword: filters.keyword || undefined,
+        }) as ListPermissionReq,
+    },
+    table: {
+      columns: tableConfig.columns,
+      cardFields: tableConfig.cardFields,
+    },
+    form: {
+      schema,
+      defaultForm: DEFAULT_FORM,
+      renderForm: (form, setForm, _isMobile, t) => (
+        <PermissionFormFields form={form} setForm={setForm} allPermissions={allPermissions} t={t} />
+      ),
+    },
+  };
+
+  return <SchemaCrudPage config={config} />;
 }

@@ -113,7 +113,7 @@ export const tableConfig: SchemaCrudConfig<
     },
   ],
 
-  actions: (t, extraContext) => [
+  actions: (_t, extraContext) => [
     {
       key: 'view',
       color: 'primary',

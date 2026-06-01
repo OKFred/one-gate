@@ -30,7 +30,7 @@
     "NODE_ENV": "production",
     "BASE_API_PATH": "/api/v1",
     "LOCALE": "zh-CN",
-    "VERSION": "20260531222836-2da63bf",
+    "VERSION": "20260601215422-549febf",
   },
 
   /**
