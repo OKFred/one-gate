@@ -1,267 +1,114 @@
-import React, { useState, useImperativeHandle } from 'react';
+import { useState } from 'react';
+import { TextField, Stack, IconButton } from '@mui/material';
 import {
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Stack,
-  Box,
-  useTheme,
-  IconButton,
-} from '@mui/material';
-import {
-  Close as CloseIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import * as AccountAPI from '@/api/mail/account';
+import type { Dispatch, SetStateAction } from 'react';
 import type { AddMailAccountReq } from '@/api/mail/type';
-import type { Props } from '../index';
-import type { TableState } from './TheTable';
-import { useResponsive } from '@/hooks/useResponsive';
-import { useTranslation } from '@/hooks/useTranslation';
 
-// 暴露给父组件的方法
-export interface TheFormRef {
-  /** 打开编辑表单 */
-  onOpen: (row?: TableState['list'][0]) => void;
+export interface AccountFormFieldsProps {
+  form: Partial<AddMailAccountReq>;
+  setForm: Dispatch<SetStateAction<Partial<AddMailAccountReq>>>;
+  isMobile: boolean;
+  t: (key: string) => string;
 }
 
-const DEFAULT_FORM: AddMailAccountReq = {
-  nickname: '',
-  mailAddress: '',
-  host: '',
-  port: 465,
-  password: '',
-  isEnabled: true,
-  remark: null,
-};
-
-export default function TheForm({ localObj, ref }: Props & { ref?: React.Ref<TheFormRef> }) {
-  const { tableRef } = localObj;
-  const theme = useTheme();
-  const { isMobile } = useResponsive();
-  const t = useTranslation();
-
-  // 内部状态管理
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<AddMailAccountReq>(DEFAULT_FORM);
+/**
+ * 邮箱账户高内聚表单字段组件（集成密码可见性状态与受控输入）
+ */
+export default function AccountFormFields({ form, setForm, isMobile, t }: AccountFormFieldsProps) {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  // 暴露给父组件的方法
-  useImperativeHandle(
-    ref,
-    () => ({
-      onOpen: (row?: TableState['list'][0]) => {
-        if (row) {
-          setEditId(row.id!);
-          setForm({
-            nickname: row.nickname ?? '',
-            mailAddress: row.mailAddress ?? '',
-            host: row.host ?? '',
-            port: row.port,
-            password: row.password ?? '',
-            isEnabled: row.isEnabled,
-            remark: row.remark ?? null,
-          });
-        } else {
-          setEditId(null);
-          setForm(DEFAULT_FORM);
-        }
-        setShowPassword(false);
-        setOpen(true);
-      },
-    }),
-    [],
-  );
-
-  const handleCancel = () => {
-    setEditId(null);
-    setOpen(false);
-    setForm(DEFAULT_FORM);
-    setShowPassword(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const base64Password = globalThis.btoa(form.password); // 防小白
-      const formData = {
-        ...form,
-        password: base64Password,
-        port: form.port,
-      };
-
-      if (editId) {
-        await AccountAPI.updateFn({ data: { id: editId, ...formData } });
-      } else {
-        await AccountAPI.addFn({ data: formData });
-      }
-      handleCancel();
-      // 刷新表格数据
-      tableRef.current?.refresh();
-    } catch (error) {
-      console.warn(error);
-    } finally {
-      setLoading(false);
-    }
+  const handleFieldChange = (key: keyof AddMailAccountReq, value: unknown) => {
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleCancel}
-      maxWidth="md"
-      fullWidth
-      fullScreen={isMobile}
-      sx={{
-        '& .MuiDialog-paper': {
-          margin: isMobile ? 0 : theme.spacing(4),
-          maxHeight: isMobile ? '100vh' : 'calc(100vh - 64px)',
-        },
-      }}
-    >
-      <DialogTitle
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          pb: isMobile ? 1 : 2,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {editId ? t('dialog.edit') : t('dialog.add')}
-        </Box>
-        {isMobile && (
-          <IconButton edge="end" color="inherit" onClick={handleCancel} aria-label="close">
-            <CloseIcon />
-          </IconButton>
-        )}
-      </DialogTitle>
+    <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <TextField
+          label={t('account.table.nickname')}
+          value={form.nickname || ''}
+          onChange={(e) => handleFieldChange('nickname', e.target.value)}
+          required
+          fullWidth
+          size="medium"
+        />
+        <TextField
+          label={t('account.table.email')}
+          type="email"
+          value={form.mailAddress || ''}
+          onChange={(e) => handleFieldChange('mailAddress', e.target.value)}
+          required
+          fullWidth
+          size="medium"
+        />
+      </Stack>
 
-      <DialogContent
-        sx={{
-          pb: isMobile ? 1 : 2,
-          px: isMobile ? 2 : 3,
-        }}
-      >
-        <form onSubmit={handleSubmit}>
-          <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label={t('account.table.nickname')}
-                value={form.nickname}
-                onChange={(e) => setForm({ ...form, nickname: e.target.value })}
-                required
-                fullWidth
-                size="medium"
-              />
-              <TextField
-                label={t('account.table.email')}
-                type="email"
-                value={form.mailAddress}
-                onChange={(e) => setForm({ ...form, mailAddress: e.target.value })}
-                required
-                fullWidth
-                size="medium"
-              />
-            </Stack>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <TextField
+          label={t('account.table.host')}
+          value={form.host || ''}
+          onChange={(e) => handleFieldChange('host', e.target.value)}
+          required
+          fullWidth
+          size="medium"
+        />
+        <TextField
+          label={t('account.table.port')}
+          type="number"
+          value={form.port ?? ''}
+          onChange={(e) => {
+            const val = e.target.value;
+            handleFieldChange('port', val === '' ? undefined : Number(val));
+          }}
+          required
+          fullWidth
+          size="medium"
+        />
+      </Stack>
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label={t('account.table.host')}
-                value={form.host}
-                onChange={(e) => setForm({ ...form, host: e.target.value })}
-                required
-                fullWidth
-                size="medium"
-              />
-              <TextField
-                label={t('account.table.port')}
-                type="number"
-                value={form.port}
-                onChange={(e) => setForm({ ...form, port: Number(e.target.value) })}
-                required
-                fullWidth
-                size="medium"
-              />
-            </Stack>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <TextField
+          label={t('account.table.password')}
+          type={showPassword ? 'text' : 'password'}
+          value={form.password || ''}
+          onChange={(e) => handleFieldChange('password', e.target.value)}
+          required
+          fullWidth
+          size="medium"
+          slotProps={{
+            input: {
+              endAdornment: (
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={() => setShowPassword(!showPassword)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              ),
+            },
+          }}
+        />
+      </Stack>
 
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                label={t('account.table.password')}
-                type={showPassword ? 'text' : 'password'}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required
-                fullWidth
-                size="medium"
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={() => setShowPassword(!showPassword)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                      </IconButton>
-                    ),
-                  },
-                }}
-              />
-            </Stack>
-
-            <TextField
-              label={t('column.remark')}
-              value={form.remark || ''}
-              onChange={(e) => setForm({ ...form, remark: e.target.value || null })}
-              fullWidth
-              multiline
-              rows={3}
-              size="medium"
-              slotProps={{ htmlInput: { maxLength: 500 } }}
-              helperText={`${(form.remark || '').length}/500`}
-            />
-          </Stack>
-        </form>
-      </DialogContent>
-
-      <DialogActions
-        sx={{
-          px: isMobile ? 2 : 3,
-          py: isMobile ? 2 : 2,
-          flexDirection: isMobile ? 'column-reverse' : 'row',
-          gap: isMobile ? 1 : 0,
-        }}
-      >
-        <Button
-          onClick={handleCancel}
-          variant="outlined"
-          fullWidth={isMobile}
-          size={isMobile ? 'large' : 'medium'}
-          disabled={loading}
-        >
-          {t('dialog.cancel')}
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          color="primary"
-          fullWidth={isMobile}
-          size={isMobile ? 'large' : 'medium'}
-          disabled={loading}
-        >
-          {t('dialog.save')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      <TextField
+        label={t('column.remark')}
+        value={form.remark || ''}
+        onChange={(e) => handleFieldChange('remark', e.target.value || null)}
+        fullWidth
+        multiline
+        rows={3}
+        size="medium"
+        slotProps={{ htmlInput: { maxLength: 500 } }}
+        helperText={`${(form.remark || '').length}/500`}
+      />
+    </Stack>
   );
 }

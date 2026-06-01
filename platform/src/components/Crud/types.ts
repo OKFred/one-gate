@@ -22,11 +22,12 @@ export interface CrudHelpers<TRecord> {
 export interface RowAction<TRecord> {
   key: string;
   label?: string;
-  icon: ReactNode;
+  icon: ReactNode | ((row: TRecord) => ReactNode);
   color?: 'primary' | 'secondary' | 'error' | 'success' | 'warning' | 'info' | 'inherit';
   permissionCodes?: string[];
   onClick: (row: TRecord, helpers: CrudHelpers<TRecord>) => void | Promise<void>;
   visible?: (row: TRecord) => boolean;
+  disabled?: boolean | ((row: TRecord) => boolean);
 }
 
 /**

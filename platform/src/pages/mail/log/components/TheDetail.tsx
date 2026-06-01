@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, memo } from 'react';
+import { memo } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -20,226 +20,204 @@ import {
   Description as TemplateIcon,
 } from '@mui/icons-material';
 import type { ListMailLogRes } from '@/api/mail/type';
-import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import dayjs from 'dayjs';
 
-// 暴露给父组件的方法
-export interface TheDetailRef {
-  /** 打开详情对话框 */
-  open: (log: NonNullable<ListMailLogRes['list']>[0]) => void;
+export interface TheDetailProps {
+  open: boolean;
+  onClose: () => void;
+  log: NonNullable<ListMailLogRes['list']>[0] | null;
 }
 
-const TheDetail = memo(
-  forwardRef<TheDetailRef, Props>((_, ref) => {
-    const { isMobile } = useResponsive();
-    const t = useTranslation();
-    const [open, setOpen] = useState(false);
-    const [log, setLog] = useState<NonNullable<ListMailLogRes['list']>[0] | null>(null);
+const TheDetail = memo(({ open, onClose, log }: TheDetailProps) => {
+  const { isMobile } = useResponsive();
+  const t = useTranslation();
 
-    // 暴露给父组件的方法
-    useImperativeHandle(
-      ref,
-      () => ({
-        open: (selectedLog: NonNullable<ListMailLogRes['list']>[0]) => {
-          setLog(selectedLog);
-          setOpen(true);
-        },
-      }),
-      [],
-    );
+  const formatDate = (timestamp?: number) => {
+    if (!timestamp) return '-';
+    return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
+  };
 
-    const handleClose = () => {
-      setOpen(false);
-      setLog(null);
-    };
+  const formatTemplateParams = (params?: string) => {
+    if (!params) return null;
+    try {
+      const parsed = JSON.parse(params);
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+      return params;
+    }
+  };
 
-    const formatDate = (timestamp?: number) => {
-      if (!timestamp) return '-';
-      return dayjs(timestamp).format('YYYY-MM-DD HH:mm:ss');
-    };
+  if (!log) return null;
 
-    const formatTemplateParams = (params?: string) => {
-      if (!params) return null;
-      try {
-        const parsed = JSON.parse(params);
-        return JSON.stringify(parsed, null, 2);
-      } catch {
-        return params;
-      }
-    };
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth fullScreen={isMobile}>
+      <DialogTitle>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <EmailIcon color="primary" />
+          <Typography variant="h6" component="span">
+            {t('page.details')}
+          </Typography>
+        </Box>
+      </DialogTitle>
 
-    if (!log) return null;
-
-    return (
-      <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth fullScreen={isMobile}>
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <EmailIcon color="primary" />
-            <Typography variant="h6" component="span">
-              {t('page.details')}
+      <DialogContent>
+        <Stack spacing={3}>
+          {/* 发送状态 */}
+          <Box>
+            <Typography variant="subtitle2" gutterBottom color="text.secondary">
+              {t('columns.status')}
             </Typography>
+            {log.sendStatus ? (
+              <Chip
+                icon={<SuccessIcon />}
+                label={t('status.success')}
+                color="success"
+                variant="outlined"
+              />
+            ) : (
+              <Chip
+                icon={<ErrorIcon />}
+                label={t('status.failure')}
+                color="error"
+                variant="outlined"
+              />
+            )}
           </Box>
-        </DialogTitle>
 
-        <DialogContent>
-          <Stack spacing={3}>
-            {/* 发送状态 */}
-            <Box>
-              <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                {t('columns.status')}
-              </Typography>
-              {log.sendStatus ? (
-                <Chip
-                  icon={<SuccessIcon />}
-                  label={t('status.success')}
-                  color="success"
-                  variant="outlined"
-                />
-              ) : (
-                <Chip
-                  icon={<ErrorIcon />}
-                  label={t('status.failure')}
-                  color="error"
-                  variant="outlined"
-                />
+          <Divider />
+
+          {/* 基本信息 */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {t('log.table.basicInfo')}
+            </Typography>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('log.table.subject')}
+                </Typography>
+                <Typography variant="body1">{log.title || '-'}</Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('log.table.recipient')}
+                </Typography>
+                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
+                  {log.mailTo || '-'}
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('log.table.sender')}
+                </Typography>
+                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
+                  {log.mailFrom || '-'}
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
+
+          <Divider />
+
+          {/* 时间信息 */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              <TimeIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              {t('log.table.timeInfo')}
+            </Typography>
+            <Stack spacing={2}>
+              <Box>
+                <Typography variant="subtitle2" color="text.secondary">
+                  {t('columns.createTime')}
+                </Typography>
+                <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
+              </Box>
+
+              {log.updateTimeUtc && (
+                <Box>
+                  <Typography variant="subtitle2" color="text.secondary">
+                    {t('columns.updateTime')}
+                  </Typography>
+                  <Typography variant="body1">{formatDate(log.updateTimeUtc)}</Typography>
+                </Box>
               )}
-            </Box>
+            </Stack>
+          </Box>
 
-            <Divider />
-
-            {/* 基本信息 */}
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                {t('log.table.basicInfo')}
-              </Typography>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('log.table.subject')}
-                  </Typography>
-                  <Typography variant="body1">{log.title || '-'}</Typography>
-                </Box>
-
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('log.table.recipient')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                    {log.mailTo || '-'}
-                  </Typography>
-                </Box>
-
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('log.table.sender')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                    {log.mailFrom || '-'}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Box>
-
-            <Divider />
-
-            {/* 时间信息 */}
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                <TimeIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                {t('log.table.timeInfo')}
-              </Typography>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('columns.createTime')}
-                  </Typography>
-                  <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
-                </Box>
-
-                {log.updateTimeUtc && (
-                  <Box>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {t('columns.updateTime')}
-                    </Typography>
-                    <Typography variant="body1">{formatDate(log.updateTimeUtc)}</Typography>
-                  </Box>
-                )}
-              </Stack>
-            </Box>
-
-            {/* 模板信息 */}
-            {(log.templateId || log.templateParams) && (
-              <>
-                <Divider />
-                <Box>
-                  <Typography variant="h6" gutterBottom>
-                    <TemplateIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                    {t('log.table.templateInfo')}
-                  </Typography>
-                  <Stack spacing={2}>
-                    {log.templateParams && (
-                      <Box>
-                        <Typography variant="subtitle2" color="text.secondary">
-                          {t('log.table.templateParams')}
-                        </Typography>
-                        <Box
-                          component="pre"
-                          sx={{
-                            backgroundColor: 'grey.100',
-                            p: 2,
-                            borderRadius: 1,
-                            fontSize: '0.875rem',
-                            overflow: 'auto',
-                            maxHeight: '200px',
-                          }}
-                        >
-                          {formatTemplateParams(log.templateParams)}
-                        </Box>
+          {/* 模板信息 */}
+          {(log.templateId || log.templateParams) && (
+            <>
+              <Divider />
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  <TemplateIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  {t('log.table.templateInfo')}
+                </Typography>
+                <Stack spacing={2}>
+                  {log.templateParams && (
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {t('log.table.templateParams')}
+                      </Typography>
+                      <Box
+                        component="pre"
+                        sx={{
+                          backgroundColor: 'grey.100',
+                          p: 2,
+                          borderRadius: 1,
+                          fontSize: '0.875rem',
+                          overflow: 'auto',
+                          maxHeight: '200px',
+                        }}
+                      >
+                        {formatTemplateParams(log.templateParams)}
                       </Box>
-                    )}
-                  </Stack>
-                </Box>
-              </>
-            )}
-
-            {/* 错误信息 */}
-            {!log.sendStatus && (log.exceptionCode || log.exceptionDetails) && (
-              <>
-                <Divider />
-                <Box>
-                  <Typography variant="h6" gutterBottom color="error">
-                    {t('log.table.errorInfo')}
-                  </Typography>
-                  {log.exceptionCode && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2">{t('log.table.errorCode')}</Typography>
-                      <Typography variant="body2">{log.exceptionCode}</Typography>
-                    </Alert>
+                    </Box>
                   )}
+                </Stack>
+              </Box>
+            </>
+          )}
 
-                  {log.exceptionDetails && (
-                    <Alert severity="error">
-                      <Typography variant="subtitle2">{t('log.table.errorDetails')}</Typography>
-                      <Typography variant="body2">{log.exceptionDetails}</Typography>
-                    </Alert>
-                  )}
-                </Box>
-              </>
-            )}
-          </Stack>
-        </DialogContent>
+          {/* 错误信息 */}
+          {!log.sendStatus && (log.exceptionCode || log.exceptionDetails) && (
+            <>
+              <Divider />
+              <Box>
+                <Typography variant="h6" gutterBottom color="error">
+                  {t('log.table.errorInfo')}
+                </Typography>
+                {log.exceptionCode && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2">{t('log.table.errorCode')}</Typography>
+                    <Typography variant="body2">{log.exceptionCode}</Typography>
+                  </Alert>
+                )}
 
-        <DialogActions>
-          <Button onClick={handleClose} color="primary" variant="contained">
-            {t('dialog.close')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }),
-);
+                {log.exceptionDetails && (
+                  <Alert severity="error">
+                    <Typography variant="subtitle2">{t('log.table.errorDetails')}</Typography>
+                    <Typography variant="body2">{log.exceptionDetails}</Typography>
+                  </Alert>
+                )}
+              </Box>
+            </>
+          )}
+        </Stack>
+      </DialogContent>
+
+      <DialogActions>
+        <Button onClick={onClose} color="primary" variant="contained">
+          {t('dialog.close')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+});
 
 TheDetail.displayName = 'TheDetail';
 

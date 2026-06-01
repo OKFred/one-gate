@@ -382,8 +382,9 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
           color={act.color || 'primary'}
           size="small"
           permissionCodes={act.permissionCodes}
+          disabled={typeof act.disabled === 'function' ? act.disabled(row) : act.disabled}
         >
-          {act.icon}
+          {typeof act.icon === 'function' ? act.icon(row) : act.icon}
         </ResponsiveIconButton>
       ));
 

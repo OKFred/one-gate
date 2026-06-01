@@ -1,32 +1,59 @@
-import { useRef, useMemo } from 'react';
-import { PageLayout } from '@/components/Responsive/index';
-import TheTable, { type TheTableRef } from './components/TheTable';
-import TheFilter, { type TheFilterRef } from './components/TheFilter';
-import TheDetail, { type TheDetailRef } from './components/TheDetail';
-import { TheActionButtons } from './components/TheActionButtons';
-import { useTranslation } from '@/hooks/useTranslation';
+import { useState } from 'react';
+import { SchemaCrudPage } from '@/components/Crud';
+import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
+import { tableConfig, type LogRes, type TableExtraContext } from './components/TheTable';
+import TheDetail from './components/TheDetail';
+import * as mailLogAPI from '@/api/mail/log';
+import type { ListMailLogReq } from '@/api/mail/type';
+import type { SchemaCrudConfig } from '@/components/Crud';
 
-export interface Props {
-  localObj: LocalObj;
-}
-export interface LocalObj {
-  tableRef: React.RefObject<TheTableRef | null>;
-  filterRef: React.RefObject<TheFilterRef | null>;
-  detailRef: React.RefObject<TheDetailRef | null>;
-}
+// 纯只读列表无需配置表单和 Schema 校验
+const emptySchema = { type: 'object', properties: {} };
 
 export default function MailLogPage() {
-  const tableRef = useRef<TheTableRef>(null);
-  const filterRef = useRef<TheFilterRef>(null);
-  const detailRef = useRef<TheDetailRef>(null);
-  const localObj: LocalObj = useMemo(() => ({ tableRef, filterRef, detailRef }), []);
-  const t = useTranslation();
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailData, setDetailData] = useState<LogRes | null>(null);
+
+  const openDetail = (row: LogRes) => {
+    setDetailData(row);
+    setDetailOpen(true);
+  };
+
+  const extraContext: TableExtraContext = {
+    openDetail,
+  };
+
+  const config: SchemaCrudConfig<LogRes, FilterState, ListMailLogReq, TableExtraContext> = {
+    titleKey: 'log.title',
+    apiKeyName: 'id',
+    api: {
+      list: mailLogAPI.listFn,
+    },
+    filter: {
+      defaultFilters,
+      fields: filterConfig.fields,
+      transformRequest: (filters) =>
+        ({
+          keyword: filters.keyword || undefined,
+          orderBy: filters.orderBy,
+          descend: filters.descend,
+        }) as ListMailLogReq,
+    },
+    table: {
+      columns: tableConfig.columns,
+      cardFields: tableConfig.cardFields,
+      actions: tableConfig.actions,
+    },
+    form: {
+      schema: emptySchema,
+      defaultForm: {},
+    },
+  };
 
   return (
-    <PageLayout title={t('log.title')} actions={<TheActionButtons tableRef={tableRef} />}>
-      <TheFilter ref={localObj.filterRef} localObj={localObj} />
-      <TheTable ref={localObj.tableRef} localObj={localObj} />
-      <TheDetail ref={localObj.detailRef} localObj={localObj} />
-    </PageLayout>
+    <>
+      <SchemaCrudPage config={config} extraContext={extraContext} />
+      <TheDetail open={detailOpen} onClose={() => setDetailOpen(false)} log={detailData} />
+    </>
   );
 }
