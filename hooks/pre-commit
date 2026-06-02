@@ -53,7 +53,15 @@ if [ -f "$DEV_VARS_FILE" ]; then
   echo "  ✅ .dev.vars updated"
 fi
 
-# --- 4. Format changed files ---
+# --- 4. Update platform/public/version.json (committed, used by Frontend) ---
+VERSION_JSON_FILE="platform/public/version.json"
+if [ -d "platform/public" ]; then
+  echo "{\"version\": \"$VERSION\"}" > "$VERSION_JSON_FILE"
+  git add "$VERSION_JSON_FILE"
+  echo "  ✅ platform/public/version.json updated"
+fi
+
+# --- 5. Format changed files ---
 echo "🧹 Formatting changed files..."
 echo "  🔹 server..."
 cd server && npx lint-staged
