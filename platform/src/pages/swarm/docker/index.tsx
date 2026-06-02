@@ -1,6 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
-import { Visibility as ViewIcon, Article as LogIcon } from '@mui/icons-material';
+import {
+  Visibility as ViewIcon,
+  Article as LogIcon,
+  PlayArrow as PlayIcon,
+  Pause as PauseIcon,
+} from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 import * as DockerAPI from '@/api/swarm/docker';
 import { SWARM } from '@/hooks/usePermission';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -185,7 +191,7 @@ export default function DockerSwarmManagement() {
           render: (row) => row.Spec?.Mode?.Replicated?.Replicas ?? t('swarm.docker.globalMode'),
         },
       ],
-      actions: (_, context) => [
+      actions: (t, context) => [
         {
           key: 'inspect',
           color: 'info',
@@ -202,6 +208,78 @@ export default function DockerSwarmManagement() {
           permissionCodes: [SWARM.DOCKER.READ],
           onClick: (row) => {
             context?.onLogs(row);
+          },
+        },
+        {
+          key: 'pause',
+          color: 'warning',
+          icon: (
+            <Tooltip title={t('swarm.docker.pause')}>
+              <PauseIcon />
+            </Tooltip>
+          ),
+          permissionCodes: [SWARM.DOCKER.EDIT],
+          visible: (row) =>
+            !!row.Spec?.Mode?.Replicated && (row.Spec?.Mode?.Replicated?.Replicas ?? 0) > 0,
+          onClick: async (row, helpers) => {
+            try {
+              const inspectRes = await DockerAPI.inspectServiceFn({ data: { id: row.ID } });
+              const currentService = inspectRes.data?.data as unknown as DockerServiceObj;
+              if (!currentService || !currentService.Spec) {
+                throw new Error('Failed to inspect service');
+              }
+              const version = currentService.Version?.Index || 0;
+              const spec = currentService.Spec;
+              if (spec.Mode?.Replicated) {
+                spec.Mode.Replicated.Replicas = 0;
+              }
+              await DockerAPI.updateServiceFn({
+                data: {
+                  id: row.ID,
+                  spec: spec as any,
+                  version,
+                },
+              });
+              helpers.refreshTable();
+            } catch (err) {
+              console.error('Failed to pause service:', err);
+            }
+          },
+        },
+        {
+          key: 'play',
+          color: 'success',
+          icon: (
+            <Tooltip title={t('swarm.docker.play')}>
+              <PlayIcon />
+            </Tooltip>
+          ),
+          permissionCodes: [SWARM.DOCKER.EDIT],
+          visible: (row) =>
+            !!row.Spec?.Mode?.Replicated && (row.Spec?.Mode?.Replicated?.Replicas ?? 0) === 0,
+          onClick: async (row, helpers) => {
+            try {
+              const inspectRes = await DockerAPI.inspectServiceFn({ data: { id: row.ID } });
+              const currentService = inspectRes.data?.data as unknown as DockerServiceObj;
+              if (!currentService || !currentService.Spec) {
+                throw new Error('Failed to inspect service');
+              }
+              const version = currentService.Version?.Index || 0;
+              const spec = currentService.Spec;
+              if (spec.Mode?.Replicated) {
+                spec.Mode.Replicated.Replicas = 1;
+              }
+              await DockerAPI.updateServiceFn({
+                data: {
+                  id: row.ID,
+                  spec: spec as any,
+                  version,
+                },
+              });
+              helpers.refreshTable();
+            } catch (err) {
+              console.error('Failed to play service:', err);
+            }
           },
         },
       ],

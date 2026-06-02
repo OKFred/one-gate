@@ -4950,7 +4950,7 @@ export const initialTranslationData = [
     tKey: "sidebar.menu.swarm",
     isEnabled: true,
     langCodes: {
-      "zh-CN": "Swarm 集群管理",
+      "zh-CN": "集群管理",
       "en-US": "Swarm Cluster",
     },
   },
@@ -4972,6 +4972,26 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "Docker Swarm 服务",
       "en-US": "Docker Swarm Services",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm",
+    tKey: "swarm.docker.pause",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "暂停服务",
+      "en-US": "Pause Service",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm",
+    tKey: "swarm.docker.play",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "恢复服务",
+      "en-US": "Resume Service",
     },
   },
   {
