@@ -46,10 +46,14 @@
                   }
                 }
               },
-              "required": ["Image"]
+              "required": [
+                "Image"
+              ]
             }
           },
-          "required": ["ContainerSpec"]
+          "required": [
+            "ContainerSpec"
+          ]
         },
         "Mode": {
           "type": "object",
@@ -83,7 +87,10 @@
                 "properties": {
                   "Protocol": {
                     "type": "string",
-                    "enum": ["tcp", "udp"]
+                    "enum": [
+                      "tcp",
+                      "udp"
+                    ]
                   },
                   "PublishMode": {
                     "type": "string"
@@ -95,18 +102,28 @@
                     "type": "number"
                   }
                 },
-                "required": ["PublishedPort", "TargetPort"]
+                "required": [
+                  "PublishedPort",
+                  "TargetPort"
+                ]
               }
             }
           }
         }
       },
-      "required": ["Name", "TaskTemplate"]
+      "required": [
+        "Name",
+        "TaskTemplate"
+      ]
     },
     "version": {
       "type": "number"
     }
   },
-  "required": ["id", "spec", "version"],
+  "required": [
+    "id",
+    "spec",
+    "version"
+  ],
   "additionalProperties": false
 }

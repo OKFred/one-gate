@@ -11,13 +11,19 @@
           "type": "string"
         }
       },
-      "required": ["ID"],
+      "required": [
+        "ID"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

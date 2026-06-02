@@ -17,15 +17,26 @@
           },
           "role": {
             "type": "string",
-            "enum": ["manager", "worker"]
+            "enum": [
+              "manager",
+              "worker"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["ready", "down", "disconnected"]
+            "enum": [
+              "ready",
+              "down",
+              "disconnected"
+            ]
           },
           "availability": {
             "type": "string",
-            "enum": ["active", "drain", "pause"]
+            "enum": [
+              "active",
+              "drain",
+              "pause"
+            ]
           },
           "ip": {
             "type": "string"
@@ -74,6 +85,10 @@
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }
