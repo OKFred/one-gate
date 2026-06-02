@@ -4,7 +4,7 @@ import type { RouteObject } from 'react-router-dom';
 import { CircularProgress } from '@mui/material';
 import RootRedirect from './components/RootRedirect';
 
-const modules = import.meta.glob('./pages/!(error|login)/**/index.tsx');
+const modules = import.meta.glob('./pages/**/index.tsx');
 export const loginPath = '/login';
 export const homePath = '/home';
 
@@ -43,7 +43,9 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
 }
 
 const childrenRoutes = buildRouteTree(
-  Object.entries(modules) as [string, () => Promise<unknown>][],
+  (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
+    ([filePath]) => !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/')
+  ),
 );
 
 const Layout = lazy(() => import('./layout'));
