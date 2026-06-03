@@ -12,7 +12,7 @@ COPY package.json pnpm-lock.yaml ./
 
 # 设置国内源并安装依赖
 RUN pnpm config set registry https://registry.npmmirror.com
-RUN pnpm install
+RUN pnpm install --dangerously-allow-all-builds
 
 # 复制源代码
 COPY . .
