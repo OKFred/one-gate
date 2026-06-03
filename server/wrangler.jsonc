@@ -20,6 +20,9 @@
   },
   "upload_source_maps": true,
   "compatibility_flags": ["nodejs_compat"],
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
 
   /**
    * Environment Variables
@@ -30,7 +33,7 @@
     "NODE_ENV": "production",
     "BASE_API_PATH": "/api/v1",
     "LOCALE": "zh-CN",
-    "VERSION": "20260603005406-ab8d48ec",
+    "VERSION": "20260603011133-559c84cc",
   },
 
   /**

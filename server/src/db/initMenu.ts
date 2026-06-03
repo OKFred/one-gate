@@ -200,6 +200,15 @@ export const initialMenuData = [
     business: "maintenance.audit_login",
   },
   {
+    id: 35,
+    name: "sidebar.menu.maintenance.cron",
+    icon: "material-symbols:alarm",
+    path: "/maintenance/cron",
+    parentId: 19,
+    sort: 4,
+    business: "maintenance.cron",
+  },
+  {
     id: 23,
     name: "sidebar.menu.oss",
     icon: "material-symbols:cloud",

@@ -26,6 +26,8 @@ const TABLES = [
   "ai_llm_config",
   "system_schema_form",
   "system_schema_form_data",
+  "system_cron_job",
+  "system_cron_job_log",
 ];
 
 /**

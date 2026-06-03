@@ -86,6 +86,426 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
 export const initialTranslationData = [
   {
     application: "frontend",
+    business: "cron",
+    tKey: "cron.log.title",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "任务执行历史",
+      "en-US": "Task Execution History",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.empty",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "暂无任务执行日志",
+      "en-US": "No execution log available",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.id",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "ID",
+      "en-US": "ID",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.status",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "执行状态",
+      "en-US": "Status",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.startTime",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "开始时间",
+      "en-US": "Start Time",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.duration",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "耗时 (毫秒)",
+      "en-US": "Duration (ms)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.detail",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "执行日志 / 异常堆栈",
+      "en-US": "Log / Stack Trace",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.success",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "执行成功",
+      "en-US": "Executed Successfully",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.log.unknownError",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "未知异常",
+      "en-US": "Unknown Exception",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.button.close",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关闭",
+      "en-US": "Close",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.filter.keywordPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "搜索名称/任务Key",
+      "en-US": "Search Name / Job Key",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "任务名称",
+      "en-US": "Task Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.jobKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "任务唯一 Key",
+      "en-US": "Job Unique Key",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.cronExpression",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Cron 表达式",
+      "en-US": "Cron Expression",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.runCount",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "运行次数",
+      "en-US": "Run Count",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.lastRunTime",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "上次运行时间",
+      "en-US": "Last Run Time",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.nextRunTime",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "下次预定时间",
+      "en-US": "Next Scheduled Time",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.jobKey.testLog",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "控制台测试日志任务 (test_log)",
+      "en-US": "Console Test Log Task (test_log)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.jobKey.syncExternalData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "外部数据同步任务 (sync_external_data)",
+      "en-US": "External Data Sync Task (sync_external_data)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.cronExpressionPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "例如: */5 * * * * (每 5 分钟执行一次)",
+      "en-US": "e.g. */5 * * * * (every 5 minutes)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.statusLabel",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "是否开启任务",
+      "en-US": "Enable Task",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.field.parameters",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "任务自定义参数 (JSON 字符串)",
+      "en-US": "Custom Parameters (JSON string)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.status.success",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "成功",
+      "en-US": "Success",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.status.fail",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "失败",
+      "en-US": "Fail",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.parsing",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "正在解析 Cron 表达式...",
+      "en-US": "Parsing Cron expression...",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.frequency",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "执行频率：",
+      "en-US": "Execution Frequency:",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.nextTimes",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "预定下次执行时间 (未来 5 次)：",
+      "en-US": "Scheduled Next Run Times (Next 5 runs):",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.invalid",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Cron 表达式无效",
+      "en-US": "Invalid Cron Expression",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.reason",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "原因: {error}",
+      "en-US": "Reason: {error}",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.parseFailed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "解析失败",
+      "en-US": "Parse Failed",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.noData",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "接口未返回数据",
+      "en-US": "No data returned from API",
+    },
+  },
+  {
+    application: "frontend",
+    business: "cron",
+    tKey: "cron.helper.networkError",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "网络错误",
+      "en-US": "Network Error",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.custom",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "自定义周期",
+      "en-US": "Custom cycle",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.minutely",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每分钟执行一次",
+      "en-US": "Execute every minute",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.minutes",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每 {minutes} 分钟执行一次",
+      "en-US": "Execute every {minutes} minutes",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.hourly",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每小时执行一次",
+      "en-US": "Execute every hour",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.hours",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每 {hours} 小时执行一次",
+      "en-US": "Execute every {hours} hours",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.daily",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每天执行一次",
+      "en-US": "Execute every day",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.days",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每 {days} 天执行一次",
+      "en-US": "Execute every {days} days",
+    },
+  },
+  {
+    application: "backend",
+    business: "cron",
+    tKey: "cron.frequency.seconds",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "每 {seconds} 秒执行一次",
+      "en-US": "Execute every {seconds} seconds",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.maintenance.cron",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "定时任务",
+      "en-US": "Scheduled Tasks",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "businessType.maintenance.cron",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "系统运维-定时任务",
+      "en-US": "Maintenance-Cron Job",
+    },
+  },
+  {
+    application: "frontend",
     business: "components",
     tKey: "table.deleteConfirm",
     isEnabled: true,

@@ -121,6 +121,13 @@ export const MAINTENANCE = {
     DELETE: 'maintenance.cache:delete',
     VIEW: 'maintenance.cache:view',
   },
+  /** 定时任务管理 */
+  CRON: {
+    READ: 'maintenance.cron:read',
+    ADD: 'maintenance.cron:add',
+    EDIT: 'maintenance.cron:edit',
+    DELETE: 'maintenance.cron:delete',
+  },
 };
 
 export const OSS = {

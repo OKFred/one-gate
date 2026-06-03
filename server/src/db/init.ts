@@ -9,6 +9,7 @@ import {
   prepareSuperAdminRole,
   prepareSuperAdminUser,
 } from "./initUserAndRole";
+import { kv } from "@/middleware/cache";
 
 export const SUPER_ADMIN_ID = 1;
 export const SUPER_ADMIN_ROLE_ID = 1;
@@ -79,6 +80,11 @@ export async function initDatabase(options?: {
     }
 
     console.log("✅ 全局原子初始化完成");
+
+    // 触发全局缓存失效，强制刷新所有用户权限
+    await kv
+      .put("system.auth:global_version", Date.now().toString())
+      .catch(() => {});
 
     // 返回统计汇总
     return {
