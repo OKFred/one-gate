@@ -52,6 +52,19 @@ async function runCommand(command, args, cwd = ".") {
  * 入口函数
  */
 async function main() {
+  // 确保 server/.env 存在，以防 docker compose 因为缺少该文件而报错
+  const serverEnvPath = path.resolve(__dirname, "server", ".env");
+  const serverEnvExample = path.resolve(__dirname, "server", ".env.example");
+  if (!fs.existsSync(serverEnvPath)) {
+    if (fs.existsSync(serverEnvExample)) {
+      console.log("📝 检测到 server/.env 不存在，正在根据 .env.example 复制创建...");
+      fs.copyFileSync(serverEnvExample, serverEnvPath);
+      console.log("✅ server/.env 创建成功");
+    } else {
+      console.warn("⚠️ 警告: 未找到 server/.env.example 模板文件，无法自动创建 server/.env！");
+    }
+  }
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
