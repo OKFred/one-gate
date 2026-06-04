@@ -65,6 +65,14 @@ async function main() {
     }
   }
 
+  // 确保 data.db 存在，以防 docker compose 挂载时将其创建为文件夹
+  const dbPath = path.resolve(__dirname, "data.db");
+  if (!fs.existsSync(dbPath)) {
+    console.log("📝 检测到 data.db 不存在，正在创建空数据库文件...");
+    fs.writeFileSync(dbPath, "");
+    console.log("✅ data.db 创建成功");
+  }
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -87,7 +95,22 @@ async function main() {
 
   // 保存最新的 URL
   saveEnvRegistryUrl(registryUrl);
-  rl.close();
+
+  // 解析命令行参数
+  const args = process.argv.slice(2);
+  const hasPushArg = args.includes("--push");
+
+  let shouldPush = false;
+  if (hasPushArg) {
+    shouldPush = true;
+    rl.close();
+  } else {
+    const inputPush = await rl.question(
+      `是否推送镜像到远程 Registry？(y/N) [默认: N]: `,
+    );
+    shouldPush = inputPush.trim().toLowerCase() === "y";
+    rl.close();
+  }
 
   console.log(`\n📦 即将构建并推送至: ${registryUrl}\n`);
 
@@ -133,10 +156,14 @@ async function main() {
     }
 
     // Push
-    const pushCode = await runCommand("docker", ["push", imageName]);
-    if (pushCode !== 0) {
-      console.error(`❌ ${app.name} 推送失败 (代码: ${pushCode})`);
-      process.exit(1);
+    if (shouldPush) {
+      const pushCode = await runCommand("docker", ["push", imageName]);
+      if (pushCode !== 0) {
+        console.error(`❌ ${app.name} 推送失败 (代码: ${pushCode})`);
+        process.exit(1);
+      }
+    } else {
+      console.log(`⏭️  跳过推送 ${app.name} 镜像到 Registry`);
     }
 
     console.log(`✅ ${app.name} 处理完毕`);
