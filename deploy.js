@@ -57,16 +57,25 @@ async function main() {
   const serverEnvExample = path.resolve(__dirname, "server", ".env.example");
   if (!fs.existsSync(serverEnvPath)) {
     if (fs.existsSync(serverEnvExample)) {
-      console.log("📝 检测到 server/.env 不存在，正在根据 .env.example 复制创建...");
+      console.log(
+        "📝 检测到 server/.env 不存在，正在根据 .env.example 复制创建...",
+      );
       fs.copyFileSync(serverEnvExample, serverEnvPath);
       console.log("✅ server/.env 创建成功");
     } else {
-      console.warn("⚠️ 警告: 未找到 server/.env.example 模板文件，无法自动创建 server/.env！");
+      console.warn(
+        "⚠️ 警告: 未找到 server/.env.example 模板文件，无法自动创建 server/.env！",
+      );
     }
   }
 
   // 确保 data.db 存在，以防 docker compose 挂载时将其创建为文件夹
   const dbPath = path.resolve(__dirname, "data.db");
+  if (fs.existsSync(dbPath) && fs.lstatSync(dbPath).isFile() === false) {
+    // 删除文件夹
+    fs.rmSync(dbPath, { recursive: true, force: true });
+    console.log("✅ data.db 文件夹删除成功");
+  }
   if (!fs.existsSync(dbPath)) {
     console.log("📝 检测到 data.db 不存在，正在创建空数据库文件...");
     fs.writeFileSync(dbPath, "");
@@ -117,13 +126,19 @@ async function main() {
   // 自动生成 VERSION 并注入 server/.env
   try {
     const { execSync } = await import("node:child_process");
-    const version = execSync('git log -1 --format="%cd-%h" --date=format:"%Y%m%d%H%M%S"', { encoding: "utf-8" }).trim();
+    const version = execSync(
+      'git log -1 --format="%cd-%h" --date=format:"%Y%m%d%H%M%S"',
+      { encoding: "utf-8" },
+    ).trim();
     if (version) {
       const envFilePath = path.resolve(__dirname, "server/.env");
       if (fs.existsSync(envFilePath)) {
         let envContent = fs.readFileSync(envFilePath, "utf-8");
         if (envContent.match(/^VERSION=/m)) {
-          envContent = envContent.replace(/^VERSION=.*$/m, `VERSION=${version}`);
+          envContent = envContent.replace(
+            /^VERSION=.*$/m,
+            `VERSION=${version}`,
+          );
         } else {
           envContent = envContent.trimEnd() + `\nVERSION=${version}\n`;
         }
