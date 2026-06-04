@@ -189,7 +189,25 @@ async function main() {
   const composeCode = await runCommand("docker", ["compose", "up", "-d"]);
 
   if (composeCode === 0) {
-    console.log("\n✨ 部署成功！\n");
+    console.log("\n🗄️ 正在容器内初始化数据库表结构...");
+    const dbInitCode = await runCommand("docker", [
+      "compose",
+      "exec",
+      "-T",
+      "backend",
+      "pnpm",
+      "run",
+      "db:init",
+      "node",
+    ]);
+
+    if (dbInitCode === 0) {
+      console.log("\n✨ 部署并初始化成功！\n");
+    } else {
+      console.error(
+        `\n⚠️  部署已完成，但数据库初始化失败 (代码: ${dbInitCode})`,
+      );
+    }
   } else {
     console.error(
       `\n⚠️  Compose 启动过程中可能存在问题 (代码: ${composeCode})`,

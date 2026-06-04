@@ -22,4 +22,4 @@ RUN pnpm run build
 EXPOSE 8787
 
 # 执行启动命令
-CMD ["sh", "-c", "pnpm run db:init node && pnpm run start"]
+CMD ["pnpm", "run" ,"start"]
