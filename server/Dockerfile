@@ -6,13 +6,14 @@ WORKDIR /app
 
 # 复制 package 文件并安装依赖
 COPY package*.json ./
-COPY pnpm-lock.yaml ./
+COPY pnpm-*.yaml ./
+
 # 设置国内源
 RUN npm config set registry https://registry.npmmirror.com
 RUN npm install -g pnpm
 # 设置国内源
 RUN pnpm config set registry https://registry.npmmirror.com
-RUN pnpm install --dangerously-allow-all-builds
+RUN pnpm install
 
 # 复制所有源代码
 COPY . .
