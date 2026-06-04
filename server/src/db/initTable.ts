@@ -1,4 +1,5 @@
 import { baseTableInit } from "@/db/utils/schema";
+import { initDatabase } from "@/db/init";
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
@@ -162,6 +163,16 @@ async function main() {
 
   if (flags.isNode) {
     await runDrizzleInit();
+    console.log(
+      "\n📦 正在同步数据库基础数据 (User, Role, Menu, Translation)..."
+    );
+    try {
+      await initDatabase();
+      console.log("✅ 数据库基础数据同步成功");
+    } catch (error) {
+      console.error("❌ 数据库基础数据同步失败:", error);
+      process.exit(1);
+    }
   }
 
   if (flags.isWorker) {
