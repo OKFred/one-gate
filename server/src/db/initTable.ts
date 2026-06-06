@@ -1,32 +1,25 @@
 import { baseTableInit } from "@/db/utils/schema";
+import { initDatabase } from "@/db/init";
 import fs from "node:fs";
 import path from "node:path";
 import { execSync } from "node:child_process";
 
+const sqlDir = path.resolve(process.cwd(), "src/db/sql");
+
 /**
- * 所有需要初始化的数据库表名 (用于 Drizzle 引擎)
+ * 动态获取所有需要初始化的数据库表名 (通过读取 src/db/sql 目录下的文件名)
  */
-const TABLES = [
-  "system_user",
-  "system_role",
-  "system_permission",
-  "system_role_permission",
-  "system_menu",
-  "system_department",
-  "i18n_language",
-  "i18n_region",
-  "i18n_translation",
-  "mail_account",
-  "mail_template",
-  "mail_log",
-  "oss_config",
-  "maintenance_audit_login",
-  "maintenance_compliance",
-  "enterprise_attendance",
-  "ai_llm_config",
-  "system_schema_form",
-  "system_schema_form_data",
-];
+function getTables(): string[] {
+  if (!fs.existsSync(sqlDir)) {
+    console.warn("⚠️  未找到 SQL 脚本目录:", sqlDir);
+    return [];
+  }
+  return fs
+    .readdirSync(sqlDir)
+    .filter((f) => f.endsWith(".sql"))
+    .map((f) => f.replace(/\.sql$/, ""))
+    .sort();
+}
 
 /**
  * [Node 模式] 使用 Drizzle 引擎初始化表结构
@@ -35,7 +28,8 @@ const TABLES = [
 export async function runDrizzleInit() {
   console.log("\n🏗️  正在通过 Drizzle 引擎同步本地 SQLite 表结构...");
   console.log("-------------------------------------------");
-  for (const tableName of TABLES) {
+  const tables = getTables();
+  for (const tableName of tables) {
     try {
       await baseTableInit(tableName);
       console.log(`✅ [Drizzle] ${tableName} 同步成功`);
@@ -50,7 +44,6 @@ export async function runDrizzleInit() {
  * 遍历 src/db/sql 目录下的所有脚本并推送到 D1
  */
 async function runWranglerInit(target: "local" | "remote") {
-  const sqlDir = path.resolve(process.cwd(), "src/db/sql");
   if (!fs.existsSync(sqlDir)) {
     console.warn("⚠️  未找到 SQL 脚本目录:", sqlDir);
     return;
@@ -170,6 +163,16 @@ async function main() {
 
   if (flags.isNode) {
     await runDrizzleInit();
+    console.log(
+      "\n📦 正在同步数据库基础数据 (User, Role, Menu, Translation)..."
+    );
+    try {
+      await initDatabase();
+      console.log("✅ 数据库基础数据同步成功");
+    } catch (error) {
+      console.error("❌ 数据库基础数据同步失败:", error);
+      process.exit(1);
+    }
   }
 
   if (flags.isWorker) {
