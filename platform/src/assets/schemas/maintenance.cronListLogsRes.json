@@ -1,0 +1,64 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number"
+        },
+        "totalPage": {
+          "type": "number"
+        },
+        "currentPage": {
+          "type": "number"
+        },
+        "pageSize": {
+          "type": "number"
+        },
+        "list": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "jobId": {
+                "type": "number"
+              },
+              "status": {
+                "type": "number"
+              },
+              "errorMessage": {
+                "type": ["string", "null"],
+                "nullable": true
+              },
+              "startTimeUtc": {
+                "type": "number"
+              },
+              "endTimeUtc": {
+                "type": "number"
+              },
+              "durationMs": {
+                "type": "number"
+              }
+            },
+            "required": ["id", "jobId", "status", "startTimeUtc", "endTimeUtc", "durationMs"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["total", "totalPage", "currentPage", "pageSize", "list"],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["ok", "data", "message"],
+  "additionalProperties": false
+}

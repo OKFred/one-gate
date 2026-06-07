@@ -121,6 +121,13 @@ export const MAINTENANCE = {
     DELETE: 'maintenance.cache:delete',
     VIEW: 'maintenance.cache:view',
   },
+  /** 定时任务管理 */
+  CRON: {
+    READ: 'maintenance.cron:read',
+    ADD: 'maintenance.cron:add',
+    EDIT: 'maintenance.cron:edit',
+    DELETE: 'maintenance.cron:delete',
+  },
 };
 
 export const OSS = {
@@ -161,5 +168,12 @@ export const SWARM = {
   /** Swarm 节点管理 */
   NODES: {
     READ: 'swarm.nodes:read',
+  },
+  /** Swarm Docker配置管理 */
+  DOCKER_CONFIG: {
+    READ: 'swarm.docker_config:read',
+    ADD: 'swarm.docker_config:add',
+    EDIT: 'swarm.docker_config:edit',
+    DELETE: 'swarm.docker_config:delete',
   },
 };

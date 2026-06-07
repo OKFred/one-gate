@@ -200,6 +200,15 @@ export const initialMenuData = [
     business: "maintenance.audit_login",
   },
   {
+    id: 35,
+    name: "sidebar.menu.maintenance.cron",
+    icon: "material-symbols:alarm",
+    path: "/maintenance/cron",
+    parentId: 19,
+    sort: 4,
+    business: "maintenance.cron",
+  },
+  {
     id: 23,
     name: "sidebar.menu.oss",
     icon: "material-symbols:cloud",
@@ -298,6 +307,15 @@ export const initialMenuData = [
     parentId: 32,
     sort: 2,
     business: "swarm.nodes",
+  },
+  {
+    id: 36,
+    name: "sidebar.menu.swarm.dockerConfig",
+    icon: "material-symbols:settings-ethernet",
+    path: "/swarm/docker_config",
+    parentId: 32,
+    sort: 3,
+    business: "swarm.docker_config",
   },
 ] satisfies menuLike[];
 

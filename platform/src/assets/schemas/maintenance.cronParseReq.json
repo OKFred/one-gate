@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "cronExpression": {
+      "type": "string"
+    }
+  },
+  "required": ["cronExpression"],
+  "additionalProperties": false
+}

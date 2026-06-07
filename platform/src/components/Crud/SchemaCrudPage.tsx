@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Stack } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
@@ -81,6 +81,10 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
   const t = useTranslation();
   const { isMobile } = useResponsive();
 
+  // 使用 ref 持有 config，避免 config 对象引用变化触发 useEffect 重复执行
+  const configRef = useRef(config);
+  configRef.current = config;
+
   // 1. 列表核心状态与查询参数大对象管理
   const [list, setList] = useState<TRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -109,14 +113,15 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
   // 5. AJV 表单验证与校验错误处理 Hook
   const { fieldErrors, handleFormError, clearErrors, setFieldErrors, clearFieldError, rootSchema } =
     useFormError(config.form.schema);
-  const { validate } = useValidator(config.form.schema);
+  const { validate: validateAdd } = useValidator(config.form.schema);
+  const { validate: validateUpdate } = useValidator(config.form.updateSchema || config.form.schema);
 
   const errorContextValue = { fieldErrors, clearFieldError, rootSchema };
 
   // 获取/刷新表格数据
   const fetchList = (currentQuery: QueryState<TFilters>) => {
     executeFetchList(currentQuery, {
-      config,
+      config: configRef.current,
       setList,
       setTotal,
       setFilterCount,
@@ -128,14 +133,15 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
 
   // 初始加载及分页大小变化监听
   useEffect(() => {
+    const cfg = configRef.current;
     const newQuery = {
       page: 1,
       pageSize: query.pageSize,
-      filters: config.filter.defaultFilters,
+      filters: cfg.filter.defaultFilters,
     };
     setQuery(newQuery);
     executeFetchList(newQuery, {
-      config,
+      config: cfg,
       setList,
       setTotal,
       setFilterCount,
@@ -144,12 +150,10 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       setIsSearching,
     });
     // 检查关键字字段，如果有则初始化 keywordInput
-    if ('keyword' in (config.filter.defaultFilters as Record<string, unknown>)) {
-      setKeywordInput(
-        (config.filter.defaultFilters as unknown as { keyword: string }).keyword || '',
-      );
+    if ('keyword' in (cfg.filter.defaultFilters as Record<string, unknown>)) {
+      setKeywordInput((cfg.filter.defaultFilters as unknown as { keyword: string }).keyword || '');
     }
-  }, [query.pageSize, config.filter.defaultFilters, config]);
+  }, [query.pageSize]);
 
   // 关键字搜索防抖
   useEffect(() => {
@@ -166,7 +170,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
           };
           setQuery(newQuery);
           executeFetchList(newQuery, {
-            config,
+            config: configRef.current,
             setList,
             setTotal,
             setFilterCount,
@@ -179,7 +183,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         return () => clearTimeout(timer);
       }
     }
-  }, [keywordInput, query, config]);
+  }, [keywordInput, query]);
 
   // 筛选事件处理
   const handleFilterChange = (
@@ -257,6 +261,13 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const isEdit = !!editId;
+    // 根据操作类型选择对应的 schema 和验证器
+    const activeSchema = isEdit
+      ? config.form.updateSchema || config.form.schema
+      : config.form.schema;
+    const validate = isEdit ? validateUpdate : validateAdd;
+
     // 前端预验证
     const clientErrors = validate(form);
     if (Object.keys(clientErrors).length > 0) {
@@ -268,7 +279,23 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     try {
       let submitForm = { ...form };
       if (config.form.beforeSubmit) {
-        submitForm = config.form.beforeSubmit(submitForm, !!editId);
+        submitForm = config.form.beforeSubmit(submitForm, isEdit);
+      }
+
+      // 根据 schema 的 properties 过滤掉多余字段（如审计字段）
+      const allowedKeys = Object.keys(
+        (activeSchema as { properties?: Record<string, unknown> }).properties || {},
+      );
+      if (allowedKeys.length > 0) {
+        const filtered = {} as Partial<TRecord>;
+        for (const key of allowedKeys) {
+          if (key in (submitForm as Record<string, unknown>)) {
+            (filtered as Record<string, unknown>)[key] = (submitForm as Record<string, unknown>)[
+              key
+            ];
+          }
+        }
+        submitForm = filtered;
       }
 
       if (editId) {

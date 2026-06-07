@@ -45,7 +45,7 @@ export function Filter<TFilters>({
   hasActiveFilters,
   t,
 }: FilterProps<TFilters>) {
-  const [filterExpanded, setFilterExpanded] = useState(true);
+  const [filterExpanded, setFilterExpanded] = useState(false);
 
   if (filterFields.length === 0) return null;
 
