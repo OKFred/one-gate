@@ -308,6 +308,15 @@ export const initialMenuData = [
     sort: 2,
     business: "swarm.nodes",
   },
+  {
+    id: 36,
+    name: "sidebar.menu.swarm.dockerConfig",
+    icon: "material-symbols:settings-ethernet",
+    path: "/swarm/docker_config",
+    parentId: 32,
+    sort: 3,
+    business: "swarm.docker_config",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

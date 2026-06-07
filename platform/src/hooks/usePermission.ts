@@ -169,4 +169,11 @@ export const SWARM = {
   NODES: {
     READ: 'swarm.nodes:read',
   },
+  /** Swarm Docker配置管理 */
+  DOCKER_CONFIG: {
+    READ: 'swarm.docker_config:read',
+    ADD: 'swarm.docker_config:add',
+    EDIT: 'swarm.docker_config:edit',
+    DELETE: 'swarm.docker_config:delete',
+  },
 };

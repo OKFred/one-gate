@@ -86,6 +86,166 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
 export const initialTranslationData = [
   {
     application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "配置名称",
+      "en-US": "Config Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.host",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Docker Host 地址",
+      "en-US": "Docker Host",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.hostPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "tcp://127.0.0.1:2376 或 https://192.168.1.100:2376",
+      "en-US": "tcp://127.0.0.1:2376 or https://192.168.1.100:2376",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.tlsVerify",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "启用 TLS 验证",
+      "en-US": "Enable TLS",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.isDefault",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "默认配置",
+      "en-US": "Default",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.isDefaultForm",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "设为默认配置",
+      "en-US": "Set as Default",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.defaultLabel",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "默认",
+      "en-US": "Default",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.apiVersion",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "API 版本 (例如: v1.45)",
+      "en-US": "API Version (e.g. v1.45)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.cfMtlsBinding",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Cloudflare mTLS 证书绑定名称 (仅在 CF Worker 下生效)",
+      "en-US": "Cloudflare mTLS Binding Name (CF Worker only)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.cfMtlsBindingPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "mtls-docker",
+      "en-US": "mtls-docker",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.caCert",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "CA 证书 (ca.pem)",
+      "en-US": "CA Cert (ca.pem)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.clientCert",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "客户端证书 (cert.pem)",
+      "en-US": "Client Cert (cert.pem)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.clientKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "客户端私钥 (key.pem)",
+      "en-US": "Client Key (key.pem)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.verifySuccess",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "连接验证成功",
+      "en-US": "Connection verified successfully",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.verifyError",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "连接验证异常",
+      "en-US": "Connection verification error",
+    },
+  },
+  {
+    application: "frontend",
+    business: "swarm.docker_config",
+    tKey: "swarm.docker_config.actions.verify",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "测试连通性",
+      "en-US": "Test Connection",
+    },
+  },
+  {
+    application: "frontend",
     business: "cron",
     tKey: "cron.log.title",
     isEnabled: true,
@@ -723,6 +883,26 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "Docker服务",
       "en-US": "Docker Service",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.swarm.dockerConfig",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Docker配置",
+      "en-US": "Docker Config",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "businessType.swarm.docker_config",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Swarm集群-Docker配置",
+      "en-US": "Swarm-Docker Config",
     },
   },
   {

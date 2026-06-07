@@ -1,16 +1,191 @@
-import { getEnv } from "@/utils/env";
+import { getEnv, getAllEnv } from "@/utils/env";
+import db from "@/db/index";
+import { eq, and } from "drizzle-orm";
 
 export class DockerClient {
   private baseUrl: string;
   private apiVersion: string;
+  private isInitialized = false;
+  private dispatcher?: any;
+  private cfMtlsBinding?: string;
 
   constructor() {
-    let host = getEnv("DOCKER_HOST") || "http://localhost:2375";
+    // 构造函数不进行数据库查询，由 ensureInitialized 延迟执行以支持异步
+  }
+
+  /**
+   * 重置初始化状态 (在配置发生改变时调用，清除 TLS dispatcher 缓存)
+   */
+  public reset() {
+    this.isInitialized = false;
+    this.dispatcher = undefined;
+    this.cfMtlsBinding = undefined;
+  }
+
+  /**
+   * 延迟异步载入默认配置，并依运行时环境（Node.js / Worker）自适应创建 mTLS 凭证
+   */
+  private async ensureInitialized() {
+    if (this.isInitialized) return;
+
+    try {
+      // 动态导入以解决可能在 `client -> model -> service -> client` 产生的循环依赖
+      const { swarmDockerConfigTable } =
+        await import("@/api/swarm/docker_config/model");
+
+      const rows = await db
+        .select()
+        .from(swarmDockerConfigTable)
+        .where(
+          and(
+            eq(swarmDockerConfigTable.isEnabled, true),
+            eq(swarmDockerConfigTable.isDefault, true)
+          )
+        )
+        .limit(1);
+
+      const config = rows[0];
+      if (config) {
+        let { host } = config;
+        if (host.startsWith("tcp://")) {
+          host = host.replace(
+            "tcp://",
+            config.tlsVerify ? "https://" : "http://"
+          );
+        }
+        if (host.endsWith("/")) {
+          host = host.slice(0, -1);
+        }
+        this.baseUrl = host;
+        this.apiVersion = config.apiVersion;
+        this.cfMtlsBinding = config.cfMtlsBinding || undefined;
+
+        if (config.tlsVerify) {
+          const isNode =
+            typeof process !== "undefined" && process.versions?.node != null;
+          if (isNode) {
+            // Node.js 运行时：通过 undici.Agent 挂载数据库读取的证书文本
+            // @ts-ignore
+            const { Agent } = await import("undici");
+            const { caCert, clientCert, clientKey } = config;
+
+            if (caCert && clientCert && clientKey) {
+              this.dispatcher = new Agent({
+                connect: {
+                  rejectUnauthorized: true,
+                  ca: caCert,
+                  cert: clientCert,
+                  key: clientKey,
+                },
+              });
+            }
+          }
+        } else {
+          this.dispatcher = undefined;
+          this.cfMtlsBinding = undefined;
+        }
+      } else {
+        throw new Error("❌ DockerClient 异步初始化配置失败，没有找到默认配置");
+      }
+    } catch (e) {
+      console.error("❌ DockerClient 异步初始化配置失败:", e);
+    }
+
+    this.isInitialized = true;
+  }
+
+  /**
+   * 跨平台统一 fetch 执行层
+   */
+  private async performFetch(
+    url: string,
+    init: RequestInit
+  ): Promise<Response> {
+    await this.ensureInitialized();
+
+    const cfMtls = this.cfMtlsBinding
+      ? getAllEnv()[this.cfMtlsBinding]
+      : undefined;
+    if (cfMtls && typeof cfMtls.fetch === "function") {
+      // Cloudflare Worker：直接通过 mTLS 绑定连接
+      return await cfMtls.fetch(url, init);
+    }
+
+    // Node.js：注入 TLS dispatcher (如果存在)
+    if (this.dispatcher) {
+      (init as any).dispatcher = this.dispatcher;
+    }
+    return await fetch(url, init);
+  }
+
+  /**
+   * 测试给定 Docker 配置参数的连通性
+   */
+  async testRawConnection(options: {
+    host: string;
+    apiVersion: string;
+    tlsVerify: boolean;
+    caCert?: string;
+    clientCert?: string;
+    clientKey?: string;
+    cfMtlsBinding?: string;
+  }): Promise<boolean> {
+    let host = options.host;
+    if (host.startsWith("tcp://")) {
+      host = host.replace("tcp://", options.tlsVerify ? "https://" : "http://");
+    }
     if (host.endsWith("/")) {
       host = host.slice(0, -1);
     }
-    this.baseUrl = host;
-    this.apiVersion = getEnv("DOCKER_API_VERSION") || "v1.47";
+    const url = `${host}/${options.apiVersion}/_ping`;
+
+    const fetchOptions: any = {
+      method: "GET",
+      signal: AbortSignal.timeout(5000), // 设置 5 秒超时
+    };
+
+    let dispatcher: any = undefined;
+    const isNode =
+      typeof process !== "undefined" && process.versions?.node != null;
+
+    if (options.tlsVerify && isNode) {
+      try {
+        // @ts-ignore
+        const { Agent } = await import("undici");
+        if (options.caCert && options.clientCert && options.clientKey) {
+          dispatcher = new Agent({
+            connect: {
+              rejectUnauthorized: true,
+              ca: options.caCert,
+              cert: options.clientCert,
+              key: options.clientKey,
+            },
+          });
+        }
+      } catch (e) {
+        console.error("testRawConnection load TLS Agent error:", e);
+      }
+    }
+
+    const cfMtls = options.cfMtlsBinding
+      ? getAllEnv()[options.cfMtlsBinding]
+      : undefined;
+
+    try {
+      let response: Response;
+      if (cfMtls && typeof cfMtls.fetch === "function") {
+        response = await cfMtls.fetch(url, fetchOptions);
+      } else {
+        if (dispatcher) {
+          fetchOptions.dispatcher = dispatcher;
+        }
+        response = await fetch(url, fetchOptions);
+      }
+      return response.ok && (await response.text()).trim() === "OK";
+    } catch (err) {
+      console.error("testRawConnection connection failed:", err);
+      return false;
+    }
   }
 
   private getUrl(path: string, queryParams?: Record<string, string>): string {
@@ -30,6 +205,7 @@ export class DockerClient {
       queryParams?: Record<string, string>;
     }
   ): Promise<T> {
+    await this.ensureInitialized();
     const url = this.getUrl(path, options?.queryParams);
     const headers: Record<string, string> = {};
     let requestBody: any = undefined;
@@ -39,7 +215,7 @@ export class DockerClient {
       requestBody = JSON.stringify(options.body);
     }
 
-    const response = await fetch(url, {
+    const response = await this.performFetch(url, {
       method,
       headers,
       body: requestBody,
@@ -137,7 +313,7 @@ export class DockerClient {
       `/services/${encodeURIComponent(idOrName)}/logs`,
       queryParams
     );
-    const response = await fetch(url, { method: "GET" });
+    const response = await this.performFetch(url, { method: "GET" });
 
     if (!response.ok) {
       const text = await response.text();
@@ -195,7 +371,7 @@ export class DockerClient {
             `/containers/${encodeURIComponent(containerId)}/stats`,
             { stream: "false" }
           );
-          const response = await fetch(url, { method: "GET" });
+          const response = await this.performFetch(url, { method: "GET" });
           if (!response.ok) return;
 
           const stats = (await response.json()) as any;
@@ -273,7 +449,7 @@ export class DockerClient {
             blkWrite,
           });
         } catch (e) {
-          // 容器 stats 报错（可能因不在本节点而 404 等），静默处理
+          // 容器 stats 报错静默处理
         }
       })
     );

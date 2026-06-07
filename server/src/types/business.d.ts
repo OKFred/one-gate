@@ -71,5 +71,7 @@ export type BusinessType = {
   "swarm.docker": "swarm.docker";
   /** Swarm Nodes */
   "swarm.nodes": "swarm.nodes";
+  /** Swarm Docker 配置 */
+  "swarm.docker_config": "swarm.docker_config";
 };
 export type BusinessKey = keyof BusinessType;

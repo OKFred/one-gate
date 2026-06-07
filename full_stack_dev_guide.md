@@ -44,11 +44,10 @@
 
 每增加一个新模块，必须更新以下文件以支持自动化初始化：
 
-1. **`server/src/db/initTable.ts`**: 在 `TABLES` 数组中添加新表名。
-2. **`server/src/db/initMenu.ts`**: 添加侧边栏菜单配置（注意分配唯一的 ID）。
-3. **`server/src/db/initPermissions.ts`**: 添加 `api` 和 `button` 类型的权限码。
-4. **`server/src/db/initTranslation.ts`**: 添加菜单、业务类型及页面组件的多语言翻译。
-5. **`server/src/types/business.d.ts`**: 扩展 `BusinessKey` 类型。
+1. **`server/src/db/initMenu.ts`**: 添加侧边栏菜单配置（注意分配唯一的 ID）。
+2. **`server/src/db/initPermissions.ts`**: 添加 `api` 和 `button` 类型的权限码。
+3. **`server/src/db/initTranslation.ts`**: 添加菜单、业务类型及页面组件的多语言翻译。
+4. **`server/src/types/business.d.ts`**: 扩展 `BusinessKey` 类型。
 
 运行初始化命令：
 
@@ -92,6 +91,7 @@ export type [Module]Obj = ListRes['list'][number];
 对于增删改查页面，根据复杂度的不同，分为**声明式低代码极速构建（推荐）**与**传统多组件独立构建**两种方式。
 
 #### 模式 A：声明式低代码极速构建 (基于 SchemaCrudPage 底座)
+
 当页面为典型的列表查询、表单增改、详情及删除时，**必须优先选用声明式底座进行快速构建**。这能让你的页面代码从 5 个组件文件减少到仅 1 至 2 个，并且原生享有完善的响应式和 loading 交互。
 
 1. **一阶：纯声明式极速构建 (0 冗余组件)**
@@ -104,7 +104,9 @@ export type [Module]Obj = ListRes['list'][number];
    - 利用 `form.afterOpen` 与 `form.beforeSubmit` 等生命周期钩子，以及 `form.renderForm` 传入自定义表单渲染逻辑。
 
 #### 模式 B：传统多组件独立构建 (高定制树形/复杂图表等)
+
 仅当页面的交互逻辑与 CRUD 存在底层冲突（如需要支持折叠树拖拽菜单、复杂的拓扑交互图表）时，才使用传统的多组件构建：
+
 - **`index.tsx`**: 页面入口，使用 `PageLayout`。
 - **`components/TheTable.tsx`**: 响应式列表展示。
 - **`components/TheForm.tsx`**: 表单编辑/新增 Dialog。
@@ -139,10 +141,12 @@ export type [Module]Obj = ListRes['list'][number];
 为了确保系统的稳定性和可维护性，必须遵循以下类型规范：
 
 ### 7.1 严禁使用 `any`
+
 - 在组件、State、Props 和 API 调用中禁止出现 `any`。
 - 如果类型复杂或来自第三方库，使用 `unknown` 或具体的工具类型（如 `Parameters` / `ReturnType`）进行推导。
 
 ### 7.2 显式类型转换 (Explicit Casting)
+
 - 在提交表单 Payload 时，应显式转换为 API 定义的请求类型：
   ```typescript
   const payload = { ...form } as AddReq;
@@ -150,12 +154,14 @@ export type [Module]Obj = ListRes['list'][number];
   ```
 
 ### 7.3 MUI 组件样式属性类型
+
 - 当需要定义 MUI 组件属性（如 `color`, `variant`）的变量时，应使用其定义的字面量类型，而非 `string`：
   ```typescript
-  const color: Parameters<typeof Chip>[0]['color'] = 'success';
+  const color: Parameters<typeof Chip>[0]["color"] = "success";
   ```
 
 ### 7.4 命名约定
+
 - **接口请求**: `[Action][Module]Req` (例如 `ListAttendanceReq`).
 - **接口响应**: `[Action][Module]Res` (例如 `ListAttendanceRes`).
 - **实体对象**: `[Module]Obj` (代表列表中的单行数据，例如 `AttendanceObj`).
@@ -167,27 +173,31 @@ export type [Module]Obj = ListRes['list'][number];
 为了保证系统鉴权的严密性，前后端的权限控制码（Permission Code）必须遵循**绝对的统一性与对齐原则**：
 
 ### 8.1 权限码命名规则
+
 权限码统一采用点和冒号分隔的层级命名法：`[module].[sub_module]:[action]`。
 例如：
+
 - `system.user:add` (系统管理-用户管理-新增)
 - `enterprise.attendance:export` (企业管理-考勤管理-导出)
 - `maintenance.cache:delete` (系统维护-缓存管理-删除)
 
 ### 8.2 后端权限码与鉴权
+
 1. **数据源初始化**：
    在后端初始化文件 `server/src/db/initPermissions.ts` 中，必须声明所有有效的 `api` 和 `button` 类型的权限码，确保在数据库中被自动初始化和入库。
 2. **中间件拦截强校验**：
    在服务的路由层或控制器层，对写操作（POST、PUT、DELETE）和敏感的读操作进行统一的鉴权中间件过滤（如引用对应的权限码常量进行匹配校验），防止越权行为。
 
 ### 8.3 前端权限控制与对齐
+
 1. **常量定义同步**：
    在前端 `platform/src/hooks/usePermission.ts` 的 `permissions` 对象或对应的业务常量大对象中，必须声明与后端 `initPermissions.ts` **完全一致、字母完全对齐**的权限码常量：
    ```typescript
    export const MAINTENANCE = {
      CACHE: {
-       VIEW: 'maintenance.cache:view',
-       DELETE: 'maintenance.cache:delete',
-     }
+       VIEW: "maintenance.cache:view",
+       DELETE: "maintenance.cache:delete",
+     },
    };
    ```
 2. **交互按钮绑定**：

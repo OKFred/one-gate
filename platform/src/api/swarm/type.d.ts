@@ -1,4 +1,5 @@
 import * as DockerAPI from './docker';
+import * as DockerConfigAPI from './docker_config';
 
 export type ListReq = NonNullable<Parameters<typeof DockerAPI.listServicesFn>[0]>['data'];
 export type ListRes = Awaited<ReturnType<typeof DockerAPI.listServicesFn>>['data']['data'];
@@ -8,6 +9,15 @@ export type CreateReq = NonNullable<Parameters<typeof DockerAPI.createServiceFn>
 export type CreateRes = Awaited<ReturnType<typeof DockerAPI.createServiceFn>>['data']['data'];
 export type UpdateReq = NonNullable<Parameters<typeof DockerAPI.updateServiceFn>[0]>['data'];
 export type RemoveReq = NonNullable<Parameters<typeof DockerAPI.removeServiceFn>[0]>['data'];
+
+export type ListDockerConfigReq = NonNullable<Parameters<typeof DockerConfigAPI.listFn>[0]>['data'];
+export type ListDockerConfigRes = Awaited<
+  ReturnType<typeof DockerConfigAPI.listFn>
+>['data']['data'];
+export type AddDockerConfigReq = NonNullable<Parameters<typeof DockerConfigAPI.addFn>[0]>['data'];
+export type UpdateDockerConfigReq = NonNullable<
+  Parameters<typeof DockerConfigAPI.updateFn>[0]
+>['data'];
 
 /** 业务对象类型 */
 export interface DockerServiceObj {
