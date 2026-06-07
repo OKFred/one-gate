@@ -45,10 +45,15 @@ export interface FilterFieldConfig<TFilters> {
  * 全局低代码 CRUD 页面核心配置接口
  */
 export interface SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra = unknown> {
+  /** 启用游标分页模式：total 与翻页解耦，由 hasMore/cursor 驱动翻页 */
+  cursorPagination?: boolean;
+
   // API 异步网络请求接口定义
   api: {
     list: (args: { data: TApiData }) => Promise<{
-      data: { data?: { list?: TRecord[]; total?: number } };
+      data: {
+        data?: { list?: TRecord[]; total?: number; hasMore?: boolean; cursor?: string };
+      };
     }>;
     add?: (args: { data: Omit<TRecord, 'id'> }) => Promise<unknown>;
     update?: (args: { data: TRecord }) => Promise<unknown>;

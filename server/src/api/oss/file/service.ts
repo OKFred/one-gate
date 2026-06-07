@@ -70,13 +70,16 @@ async function onList(
     cursor: params.cursor,
   });
 
+  const list = result.objects.map((item) => ({
+    key: item.key,
+    size: item.size,
+    lastModified: item.lastModified?.toISOString(),
+    contentType: item.contentType,
+  }));
+
   return cleanUndefined({
-    list: result.objects.map((item) => ({
-      key: item.key,
-      size: item.size,
-      lastModified: item.lastModified?.toISOString(),
-      contentType: item.contentType,
-    })),
+    list,
+    total: list.length,
     pageSize: params.pageSize || 10,
     cursor: result.cursor,
     hasMore: result.isTruncated,

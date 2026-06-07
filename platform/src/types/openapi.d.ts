@@ -11830,6 +11830,8 @@ export interface components {
         "oss.fileListReq": {
             /** @description 前缀/路径搜索 (对应 prefix) */
             keyword?: string;
+            /** @description 页码 (游标分页下仅作兼容，不影响实际查询) */
+            pageNo?: number;
             /**
              * @description 每页数量 (对应 limit)
              * @default 10
@@ -11851,6 +11853,8 @@ export interface components {
                     /** @description MIME类型 */
                     contentType?: string;
                 }[];
+                /** @description 当前页实际条数 */
+                total: number;
                 pageSize: number;
                 /** @description 下一页游标 */
                 cursor?: string;

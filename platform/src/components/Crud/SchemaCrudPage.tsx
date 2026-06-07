@@ -24,14 +24,28 @@ interface FetchListOptions<TRecord, TFilters, TApiData, TExtra> {
   setQuery: React.Dispatch<React.SetStateAction<QueryState<TFilters>>>;
   setLoading: (loading: boolean) => void;
   setIsSearching: (isSearching: boolean) => void;
+  // 游标分页支持
+  cursorMapRef?: React.MutableRefObject<Record<number, string | undefined>>;
+  setCursorMap?: React.Dispatch<React.SetStateAction<Record<number, string | undefined>>>;
+  setHasMore?: (hasMore: boolean) => void;
 }
 
 async function executeFetchList<TRecord, TFilters, TApiData, TExtra>(
   query: QueryState<TFilters>,
   options: FetchListOptions<TRecord, TFilters, TApiData, TExtra>,
 ) {
-  const { config, setList, setTotal, setFilterCount, setQuery, setLoading, setIsSearching } =
-    options;
+  const {
+    config,
+    setList,
+    setTotal,
+    setFilterCount,
+    setQuery,
+    setLoading,
+    setIsSearching,
+    cursorMapRef,
+    setCursorMap,
+    setHasMore,
+  } = options;
 
   setLoading(true);
   try {
@@ -48,15 +62,34 @@ async function executeFetchList<TRecord, TFilters, TApiData, TExtra>(
       (dataPayload as unknown as { pageSize: number }).pageSize = query.pageSize;
     }
 
+    // 游标分页：注入 cursor
+    if (config.cursorPagination && cursorMapRef) {
+      (dataPayload as unknown as { cursor?: string }).cursor = cursorMapRef.current[query.page];
+    }
+
     const res = await config.api.list({ data: dataPayload });
     const responseData = res.data?.data;
     const dataList = responseData?.list || [];
-    const totalCount = responseData?.total || 0;
 
     setList(dataList);
-    setTotal(totalCount);
-    setFilterCount(totalCount);
     setQuery((prev) => ({ ...prev, page: query.page }));
+
+    if (config.cursorPagination) {
+      // 游标分页：用 hasMore 计算虚拟 total
+      const hasMoreFlag = responseData?.hasMore ?? false;
+      const nextCursor = responseData?.cursor;
+      setHasMore?.(hasMoreFlag);
+      setCursorMap?.((prev) => ({ ...prev, [query.page + 1]: nextCursor }));
+      const virtualTotal = hasMoreFlag
+        ? query.page * query.pageSize + 1
+        : (query.page - 1) * query.pageSize + dataList.length;
+      setTotal(virtualTotal);
+      setFilterCount(dataList.length);
+    } else {
+      const totalCount = responseData?.total || 0;
+      setTotal(totalCount);
+      setFilterCount(totalCount);
+    }
   } catch {
     setList([]);
     setTotal(0);
@@ -95,6 +128,12 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     filters: config.filter.defaultFilters,
   });
 
+  // 1.5 游标分页状态
+  const [cursorMap, setCursorMap] = useState<Record<number, string | undefined>>({});
+  const cursorMapRef = useRef(cursorMap);
+  cursorMapRef.current = cursorMap;
+  const [, setHasMore] = useState(false);
+
   // 2. 辅助筛选器状态管理
   const [keywordInput, setKeywordInput] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -128,6 +167,9 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       setQuery,
       setLoading,
       setIsSearching,
+      cursorMapRef,
+      setCursorMap,
+      setHasMore,
     });
   };
 
@@ -140,6 +182,8 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       filters: cfg.filter.defaultFilters,
     };
     setQuery(newQuery);
+    // 重置游标
+    setCursorMap({});
     executeFetchList(newQuery, {
       config: cfg,
       setList,
@@ -148,6 +192,9 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       setQuery,
       setLoading,
       setIsSearching,
+      cursorMapRef,
+      setCursorMap,
+      setHasMore,
     });
     // 检查关键字字段，如果有则初始化 keywordInput
     if ('keyword' in (cfg.filter.defaultFilters as Record<string, unknown>)) {
@@ -169,6 +216,8 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
             filters: { ...query.filters, keyword: keywordInput },
           };
           setQuery(newQuery);
+          // 搜索变化时重置游标
+          setCursorMap({});
           executeFetchList(newQuery, {
             config: configRef.current,
             setList,
@@ -177,6 +226,9 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
             setQuery,
             setLoading,
             setIsSearching,
+            cursorMapRef,
+            setCursorMap,
+            setHasMore,
           });
         }, 500);
 
@@ -202,12 +254,14 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         },
       };
       setQuery(newQuery);
+      setCursorMap({});
       fetchList(newQuery);
     }
   };
 
   const handleClearFilters = () => {
     setKeywordInput('');
+    setCursorMap({});
     const newQuery = {
       page: 1,
       pageSize: query.pageSize,

@@ -25,10 +25,11 @@
                 "type": "string"
               }
             },
-            "required": [
-              "key"
-            ]
+            "required": ["key"]
           }
+        },
+        "total": {
+          "type": "number"
         },
         "pageSize": {
           "type": "number"
@@ -40,21 +41,13 @@
           "type": "boolean"
         }
       },
-      "required": [
-        "list",
-        "pageSize",
-        "hasMore"
-      ],
+      "required": ["list", "total", "pageSize", "hasMore"],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": [
-    "ok",
-    "data",
-    "message"
-  ],
+  "required": ["ok", "data", "message"],
   "additionalProperties": false
 }

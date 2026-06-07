@@ -4,6 +4,9 @@
     "keyword": {
       "type": "string"
     },
+    "pageNo": {
+      "type": "number"
+    },
     "pageSize": {
       "type": "number"
     },

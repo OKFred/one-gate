@@ -27,21 +27,9 @@ export default function OSSConfigPage() {
     apiKeyName: 'id',
     permissions: {},
     api: {
-      list: OSSConfigAPI.listFn as unknown as SchemaCrudConfig<
-        ConfigRes,
-        FilterState,
-        ListConfigReq
-      >['api']['list'],
-      add: OSSConfigAPI.addFn as unknown as SchemaCrudConfig<
-        ConfigRes,
-        FilterState,
-        AddConfigReq
-      >['api']['add'],
-      update: OSSConfigAPI.updateFn as unknown as SchemaCrudConfig<
-        ConfigRes,
-        FilterState,
-        AddConfigReq
-      >['api']['update'],
+      list: OSSConfigAPI.listFn,
+      add: OSSConfigAPI.addFn,
+      update: OSSConfigAPI.updateFn,
       delete: OSSConfigAPI.deleteFn,
     },
     filter: {

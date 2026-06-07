@@ -12,6 +12,10 @@ export const listReq = {
   type: "object",
   properties: {
     keyword: { type: "string", description: "前缀/路径搜索 (对应 prefix)" },
+    pageNo: {
+      type: "number",
+      description: "页码 (游标分页下仅作兼容，不影响实际查询)",
+    },
     pageSize: {
       type: "number",
       description: "每页数量 (对应 limit)",
@@ -33,11 +37,12 @@ export const listRes = {
         required: ["key"],
       },
     },
+    total: { type: "number", description: "当前页实际条数" },
     pageSize: { type: "number" },
     cursor: { type: "string", description: "下一页游标" },
     hasMore: { type: "boolean", description: "是否还有更多数据" },
   },
-  required: ["list", "pageSize", "hasMore"],
+  required: ["list", "total", "pageSize", "hasMore"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 

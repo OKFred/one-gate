@@ -34,13 +34,10 @@ export default function OSSFilePage() {
   const config: SchemaCrudConfig<FileRes, FilterState, ListFileReq> = {
     titleKey: 'oss.file.title',
     apiKeyName: 'key',
+    cursorPagination: true,
     permissions: {},
     api: {
-      list: OSSFileAPI.listFn as unknown as SchemaCrudConfig<
-        FileRes,
-        FilterState,
-        ListFileReq
-      >['api']['list'],
+      list: OSSFileAPI.listFn,
       delete: (
         args: Parameters<
           NonNullable<SchemaCrudConfig<FileRes, FilterState, ListFileReq>['api']['delete']>
