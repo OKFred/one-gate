@@ -1,23 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type PermissionRes } from './components/TheTable';
-import PermissionFormFields from './components/TheForm';
-import schema from '@/assets/schemas/system.permissionAddReq.json';
+import { formConfig } from './components/TheForm';
 import * as PermissionAPI from '@/api/system/permission';
 import { SYSTEM } from '@/hooks/usePermission';
 import type { ListPermissionReq, ListAllPermissionRes } from '@/api/system/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
-const DEFAULT_FORM: Partial<PermissionRes> = {
-  code: '',
-  name: '',
-  category: 'action',
-  resource: '',
-  business: null,
-  remark: null,
-  isEnabled: true,
-};
+export interface PermissionExtraContext {
+  allPermissions: ListAllPermissionRes;
+}
 
 export default function PermissionManagement() {
   const [allPermissions, setAllPermissions] = useState<ListAllPermissionRes>([]);
@@ -29,7 +22,19 @@ export default function PermissionManagement() {
       .catch(console.error);
   }, []);
 
-  const config: SchemaCrudConfig<PermissionRes, FilterState, ListPermissionReq> = {
+  const extraContext = useMemo<PermissionExtraContext>(
+    () => ({
+      allPermissions,
+    }),
+    [allPermissions],
+  );
+
+  const config: SchemaCrudConfig<
+    PermissionRes,
+    FilterState,
+    ListPermissionReq,
+    PermissionExtraContext
+  > = {
     titleKey: 'permission.title',
     apiKeyName: 'id',
     permissions: {
@@ -55,14 +60,8 @@ export default function PermissionManagement() {
       columns: tableConfig.columns,
       cardFields: tableConfig.cardFields,
     },
-    form: {
-      schema,
-      defaultForm: DEFAULT_FORM,
-      renderForm: (form, setForm, _isMobile, t) => (
-        <PermissionFormFields form={form} setForm={setForm} allPermissions={allPermissions} t={t} />
-      ),
-    },
+    form: formConfig,
   };
 
-  return <SchemaCrudPage config={config} />;
+  return <SchemaCrudPage config={config} extraContext={extraContext} />;
 }

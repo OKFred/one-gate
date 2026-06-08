@@ -1,25 +1,10 @@
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type ConfigRes } from './components/TheTable';
-import ConfigFormFields from './components/TheForm';
-import schema from '@/assets/schemas/oss.configAddReq.json';
+import { formConfig } from './components/TheForm';
 import * as OSSConfigAPI from '@/api/oss/config';
-import type { AddConfigReq, ListConfigReq } from '@/api/oss/type';
+import type { ListConfigReq } from '@/api/oss/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
-
-const DEFAULT_FORM: Partial<ConfigRes> = {
-  name: '',
-  provider: 'S3',
-  endpoint: '',
-  region: 'auto',
-  accessKey: '',
-  secretKey: '',
-  bucket: '',
-  accountId: '',
-  isDefault: false,
-  isEnabled: true,
-  remark: '',
-};
 
 export default function OSSConfigPage() {
   const config: SchemaCrudConfig<ConfigRes, FilterState, ListConfigReq> = {
@@ -44,18 +29,7 @@ export default function OSSConfigPage() {
       columns: tableConfig.columns,
       cardFields: tableConfig.cardFields,
     },
-    form: {
-      schema,
-      defaultForm: DEFAULT_FORM,
-      renderForm: (form, setForm, isMobile, t) => (
-        <ConfigFormFields
-          form={form as Partial<AddConfigReq>}
-          setForm={setForm as React.Dispatch<React.SetStateAction<Partial<AddConfigReq>>>}
-          isMobile={isMobile}
-          t={t}
-        />
-      ),
-    },
+    form: formConfig,
   };
 
   return <SchemaCrudPage config={config} />;

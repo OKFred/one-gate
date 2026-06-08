@@ -1,6 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useMemo } from 'react';
 import {
-  TextField,
   Stack,
   FormControlLabel,
   Switch,
@@ -13,12 +13,17 @@ import {
   Typography,
   Popover,
 } from '@mui/material';
+import { TextField } from '@/components/Form';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ArrowDropDown as ArrowDropDownIcon } from '@mui/icons-material';
-import type { ListAllPermissionRes } from '@/api/system/type';
-
+import type { ListAllPermissionRes, ListPermissionReq } from '@/api/system/type';
 import type { PermissionRes } from './TheTable';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { FilterState } from './TheFilter';
+import type { PermissionExtraContext } from '../index';
+import schema from '@/assets/schemas/system.permissionAddReq.json';
+import updateSchema from '@/assets/schemas/system.permissionUpdateReq.json';
 
 export interface PermissionFormFieldsProps {
   form: Partial<PermissionRes>;
@@ -27,14 +32,36 @@ export interface PermissionFormFieldsProps {
   t: (key: string) => string;
 }
 
+export const formConfig: SchemaCrudConfig<
+  PermissionRes,
+  FilterState,
+  ListPermissionReq,
+  PermissionExtraContext
+>['form'] = {
+  schema,
+  updateSchema,
+  defaultForm: {
+    code: '',
+    name: '',
+    category: 'action',
+    resource: '',
+    business: null,
+    remark: null,
+    isEnabled: true,
+  },
+  renderForm: (form, setForm, _isMobile, t, extraContext) => (
+    <PermissionFormFields
+      form={form}
+      setForm={setForm}
+      allPermissions={extraContext?.allPermissions || []}
+      t={t}
+    />
+  ),
+};
+
 type PermissionNode = ListAllPermissionRes[number] & { children: PermissionNode[] };
 
-export default function PermissionFormFields({
-  form,
-  setForm,
-  allPermissions,
-  t,
-}: PermissionFormFieldsProps) {
+function PermissionFormFields({ form, setForm, allPermissions, t }: PermissionFormFieldsProps) {
   const [parentAnchorEl, setParentAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const PERMISSION_TYPES = useMemo(
@@ -123,6 +150,7 @@ export default function PermissionFormFields({
   return (
     <Stack spacing={3} sx={{ mt: 1 }}>
       <TextField
+        name="code"
         label={t('permission.code')}
         value={form.code ?? ''}
         onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
@@ -131,6 +159,7 @@ export default function PermissionFormFields({
       />
 
       <TextField
+        name="name"
         label={t('permission.name')}
         value={form.name ?? ''}
         onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -154,6 +183,7 @@ export default function PermissionFormFields({
       </FormControl>
 
       <TextField
+        name="resource"
         label={t('permission.resource')}
         value={form.resource ?? ''}
         onChange={(e) => setForm((prev) => ({ ...prev, resource: e.target.value }))}
@@ -248,6 +278,7 @@ export default function PermissionFormFields({
       />
 
       <TextField
+        name="remark"
         label={t('column.remark')}
         value={form.remark ?? ''}
         onChange={(e) =>

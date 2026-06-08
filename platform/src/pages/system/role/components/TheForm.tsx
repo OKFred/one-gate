@@ -1,6 +1,6 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  TextField,
   Stack,
   FormControlLabel,
   Switch,
@@ -14,10 +14,14 @@ import {
   Checkbox,
   ListItemText,
 } from '@mui/material';
+import { TextField } from '@/components/Form';
 import * as DepartmentAPI from '@/api/system/department';
-import type { ListAllDepartmentRes } from '@/api/system/type';
-
+import type { ListAllDepartmentRes, ListRoleReq } from '@/api/system/type';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { FilterState } from './TheFilter';
 import type { RoleRecord } from '../index';
+import schema from '@/assets/schemas/system.roleAddReq.json';
+import updateSchema from '@/assets/schemas/system.roleUpdateReq.json';
 
 export interface RoleFormFieldsProps {
   form: Partial<RoleRecord>;
@@ -35,7 +39,55 @@ type FlatDepartment = {
   level: number;
 };
 
-export default function RoleFormFields({ form, setForm, t }: RoleFormFieldsProps) {
+export const formConfig: SchemaCrudConfig<RoleRecord, FilterState, ListRoleReq>['form'] = {
+  schema,
+  updateSchema,
+  defaultForm: {
+    name: '',
+    remark: null,
+    isEnabled: true,
+    dataScope: 'self_only',
+    customDeptIds: null,
+    selectedDeptIds: [],
+  },
+  afterOpen: (form, isEdit, row) => {
+    if (isEdit && row) {
+      let selectedDeptIds: number[] = [];
+      if (row.customDeptIds) {
+        try {
+          selectedDeptIds = JSON.parse(row.customDeptIds);
+        } catch {
+          selectedDeptIds = [];
+        }
+      }
+      return {
+        ...form,
+        ...row,
+        selectedDeptIds,
+      };
+    }
+    return {
+      ...form,
+      selectedDeptIds: [],
+    };
+  },
+  beforeSubmit: (form) => ({
+    ...form,
+    customDeptIds:
+      form.dataScope === 'custom' && form.selectedDeptIds
+        ? JSON.stringify(form.selectedDeptIds)
+        : null,
+  }),
+  renderForm: (form, setForm, _isMobile, t) => (
+    <RoleFormFields
+      form={form}
+      setForm={setForm as unknown as React.Dispatch<React.SetStateAction<Partial<RoleRecord>>>}
+      t={t}
+    />
+  ),
+};
+
+function RoleFormFields({ form, setForm, t }: RoleFormFieldsProps) {
   const [allDepartments, setAllDepartments] = useState<DepartmentData[]>([]);
 
   useEffect(() => {
@@ -99,6 +151,7 @@ export default function RoleFormFields({ form, setForm, t }: RoleFormFieldsProps
   return (
     <Stack spacing={3} sx={{ mt: 1 }}>
       <TextField
+        name="name"
         label={t('role.table.roleName')}
         value={form.name ?? ''}
         onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
@@ -169,6 +222,7 @@ export default function RoleFormFields({ form, setForm, t }: RoleFormFieldsProps
       )}
 
       <TextField
+        name="remark"
         label={t('column.remark')}
         value={form.remark ?? ''}
         onChange={(e) => setForm((prev) => ({ ...prev, remark: e.target.value || null }))}

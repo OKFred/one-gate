@@ -1,18 +1,42 @@
-import { TextField, MenuItem, FormControlLabel, Switch, Grid } from '@mui/material';
-import type { Dispatch, SetStateAction } from 'react';
-import type { AddConfigReq } from '@/api/oss/type';
+import React from 'react';
+import { MenuItem, FormControlLabel, Switch, Grid } from '@mui/material';
+import { TextField } from '@/components/Form';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { FilterState } from './TheFilter';
+import type { ConfigRes } from './TheTable';
+import type { AddConfigReq, ListConfigReq } from '@/api/oss/type';
+import schema from '@/assets/schemas/oss.configAddReq.json';
+import updateSchema from '@/assets/schemas/oss.configUpdateReq.json';
 
-export interface ConfigFormFieldsProps {
-  form: Partial<AddConfigReq>;
-  setForm: Dispatch<SetStateAction<Partial<AddConfigReq>>>;
-  isMobile: boolean;
-  t: (key: string) => string;
-}
+export const formConfig: SchemaCrudConfig<ConfigRes, FilterState, ListConfigReq>['form'] = {
+  schema,
+  updateSchema,
+  defaultForm: {
+    name: '',
+    provider: 'S3',
+    endpoint: '',
+    region: 'auto',
+    accessKey: '',
+    secretKey: '',
+    bucket: '',
+    accountId: '',
+    isDefault: false,
+    isEnabled: true,
+    remark: '',
+  },
+  renderForm: (form, setForm, _isMobile, t) =>
+    renderConfigForm(
+      form as Partial<AddConfigReq>,
+      setForm as React.Dispatch<React.SetStateAction<Partial<AddConfigReq>>>,
+      t,
+    ),
+};
 
-/**
- * OSS 存储配置受控表单字段组件
- */
-export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsProps) {
+function renderConfigForm(
+  form: Partial<AddConfigReq>,
+  setForm: React.Dispatch<React.SetStateAction<Partial<AddConfigReq>>>,
+  t: (key: string) => string,
+) {
   const handleFieldChange = (key: keyof AddConfigReq, value: unknown) => {
     setForm((prev) => ({
       ...prev,
@@ -24,6 +48,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
     <Grid container spacing={2} sx={{ pt: 1 }}>
       <Grid size={12}>
         <TextField
+          name="name"
           fullWidth
           label={t('oss.config.name')}
           value={form.name || ''}
@@ -33,6 +58,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       </Grid>
       <Grid size={6}>
         <TextField
+          name="provider"
           select
           fullWidth
           label={t('oss.config.provider')}
@@ -45,6 +71,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       </Grid>
       <Grid size={6}>
         <TextField
+          name="bucket"
           fullWidth
           label={t('oss.config.bucket')}
           value={form.bucket || ''}
@@ -54,6 +81,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       </Grid>
       <Grid size={12}>
         <TextField
+          name="endpoint"
           fullWidth
           label={t('oss.config.endpoint')}
           value={form.endpoint || ''}
@@ -64,6 +92,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       {form.provider === 'R2' && (
         <Grid size={12}>
           <TextField
+            name="accountId"
             fullWidth
             label={t('oss.config.accountId')}
             value={form.accountId || ''}
@@ -73,6 +102,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       )}
       <Grid size={6}>
         <TextField
+          name="region"
           fullWidth
           label={t('oss.config.region')}
           value={form.region || ''}
@@ -81,6 +111,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       </Grid>
       <Grid size={12}>
         <TextField
+          name="accessKey"
           fullWidth
           label={t('oss.config.accessKey')}
           value={form.accessKey || ''}
@@ -90,6 +121,7 @@ export default function ConfigFormFields({ form, setForm, t }: ConfigFormFieldsP
       </Grid>
       <Grid size={12}>
         <TextField
+          name="secretKey"
           fullWidth
           type="password"
           label={t('oss.config.secretKey')}

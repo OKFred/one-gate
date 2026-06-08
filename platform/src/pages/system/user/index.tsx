@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type UserRes } from './components/TheTable';
-import UserFormFields from './components/TheForm';
-import schema from '@/assets/schemas/system.userAddReq.json';
+import { formConfig } from './components/TheForm';
 import * as UserAPI from '@/api/system/user';
 import * as RoleAPI from '@/api/system/role';
 import * as DepartmentAPI from '@/api/system/department';
@@ -22,6 +21,8 @@ export interface UserTableContext {
     langCode: string | null | undefined,
   ) => string;
   getLanguageName: (langCode: string | null | undefined) => string;
+  enabledRegions?: ListAllRegionRes;
+  enabledLanguages?: ListAllLanguageRes;
 }
 
 export type UserRecord = UserRes & {
@@ -29,14 +30,6 @@ export type UserRecord = UserRes & {
   roleArr?: { value: number; label: string }[];
   departmentObj?: { value: number; label: string } | null;
   regionObj?: { value: number; label: string } | null;
-};
-
-const DEFAULT_FORM: Partial<UserRecord> = {
-  username: '',
-  password: '',
-  langCode: '',
-  isEnabled: true,
-  remark: null,
 };
 
 export default function UserManagement() {
@@ -122,8 +115,17 @@ export default function UserManagement() {
       getRoleNames,
       getRegionName,
       getLanguageName,
+      enabledRegions,
+      enabledLanguages,
     }),
-    [getDepartmentName, getRoleNames, getRegionName, getLanguageName],
+    [
+      getDepartmentName,
+      getRoleNames,
+      getRegionName,
+      getLanguageName,
+      enabledRegions,
+      enabledLanguages,
+    ],
   );
 
   const config: SchemaCrudConfig<UserRecord, FilterState, ListUserReq, UserTableContext> = {
@@ -172,24 +174,7 @@ export default function UserManagement() {
         ListUserReq
       >['table']['cardFields'],
     },
-    form: {
-      schema,
-      defaultForm: DEFAULT_FORM,
-      beforeSubmit: (form) => ({
-        ...form,
-        password: form.password ? globalThis.btoa(form.password) : undefined,
-      }),
-      renderForm: (form, setForm, _isMobile, t) => (
-        <UserFormFields
-          form={form}
-          setForm={setForm}
-          enabledRegions={enabledRegions}
-          enabledLanguages={enabledLanguages}
-          t={t}
-          isEdit={!!form.id}
-        />
-      ),
-    },
+    form: formConfig,
   };
 
   return <SchemaCrudPage config={config} extraContext={extraContext} />;

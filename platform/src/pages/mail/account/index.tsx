@@ -2,24 +2,13 @@ import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type AccountRes, type TableExtraContext } from './components/TheTable';
-import AccountFormFields from './components/TheForm';
-import schema from '@/assets/schemas/mail.accountAddReq.json';
+import { formConfig } from './components/TheForm';
 import * as AccountAPI from '@/api/mail/account';
 import * as ActionAPI from '@/api/mail/action';
 import { MAIL } from '@/hooks/usePermission';
 import { showSnackbar } from '@/components/Notification';
-import type { AddMailAccountReq, ListMailAccountReq } from '@/api/mail/type';
+import type { ListMailAccountReq } from '@/api/mail/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
-
-const DEFAULT_FORM: Partial<AccountRes> = {
-  nickname: '',
-  mailAddress: '',
-  host: '',
-  port: 465,
-  password: '',
-  isEnabled: true,
-  remark: null,
-};
 
 export default function MailAccountPage() {
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
@@ -71,26 +60,7 @@ export default function MailAccountPage() {
       cardFields: tableConfig.cardFields,
       actions: tableConfig.actions,
     },
-    form: {
-      schema,
-      defaultForm: DEFAULT_FORM,
-      beforeSubmit: (form) => {
-        // 对输入密码进行 Base64 编码以整合原有安全业务规则
-        const base64Password = form.password ? globalThis.btoa(form.password) : '';
-        return {
-          ...form,
-          password: base64Password,
-        };
-      },
-      renderForm: (form, setForm, isMobile, t) => (
-        <AccountFormFields
-          form={form as Partial<AddMailAccountReq>}
-          setForm={setForm as React.Dispatch<React.SetStateAction<Partial<AddMailAccountReq>>>}
-          isMobile={isMobile}
-          t={t}
-        />
-      ),
-    },
+    form: formConfig,
   };
 
   return <SchemaCrudPage config={config} extraContext={extraContext} />;

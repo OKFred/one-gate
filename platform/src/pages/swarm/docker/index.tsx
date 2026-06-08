@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import {
   Visibility as ViewIcon,
@@ -11,7 +11,12 @@ import * as DockerAPI from '@/api/swarm/docker';
 import { SWARM } from '@/hooks/usePermission';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { DockerServiceObj } from '@/api/swarm/type';
-import TheForm, { type SwarmFormState, type EnvPair, type PortMapping } from './components/TheForm';
+import {
+  formConfig,
+  type SwarmFormState,
+  type EnvPair,
+  type PortMapping,
+} from './components/TheForm';
 import TheDetail from './components/TheDetail';
 import TheLogs from './components/TheLogs';
 
@@ -236,7 +241,9 @@ export default function DockerSwarmManagement() {
               await DockerAPI.updateServiceFn({
                 data: {
                   id: row.ID,
-                  spec: spec as any,
+                  spec: spec as unknown as NonNullable<
+                    NonNullable<Parameters<typeof DockerAPI.updateServiceFn>[0]>['data']
+                  >['spec'],
                   version,
                 },
               });
@@ -272,7 +279,9 @@ export default function DockerSwarmManagement() {
               await DockerAPI.updateServiceFn({
                 data: {
                   id: row.ID,
-                  spec: spec as any,
+                  spec: spec as unknown as NonNullable<
+                    NonNullable<Parameters<typeof DockerAPI.updateServiceFn>[0]>['data']
+                  >['spec'],
                   version,
                 },
               });
@@ -284,56 +293,7 @@ export default function DockerSwarmManagement() {
         },
       ],
     },
-    form: {
-      schema: { type: 'object' },
-      defaultForm: {
-        Name: '',
-        Image: '',
-        Replicas: 1,
-        EnvPairs: [],
-        PortMappings: [],
-      } as unknown as Partial<DockerServiceObj>,
-      afterOpen: (form, isEdit) => {
-        if (isEdit && form) {
-          const serviceRow = form as unknown as DockerServiceObj;
-          const containerSpec = serviceRow.Spec?.TaskTemplate?.ContainerSpec || {};
-          const rawEnv: string[] = containerSpec.Env || [];
-          const EnvPairs: EnvPair[] = rawEnv.map((item) => {
-            const index = item.indexOf('=');
-            if (index !== -1) {
-              return { key: item.substring(0, index), value: item.substring(index + 1) };
-            }
-            return { key: item, value: '' };
-          });
-
-          const rawPorts = serviceRow.Spec?.EndpointSpec?.Ports || [];
-          const PortMappings: PortMapping[] = rawPorts.map((p) => ({
-            Protocol: p.Protocol || 'tcp',
-            PublishedPort: p.PublishedPort || 0,
-            TargetPort: p.TargetPort || 0,
-          }));
-
-          return {
-            id: serviceRow.ID,
-            Name: serviceRow.Spec?.Name || '',
-            Image: containerSpec.Image || '',
-            Replicas: serviceRow.Spec?.Mode?.Replicated?.Replicas || 1,
-            EnvPairs,
-            PortMappings,
-          } as unknown as Partial<DockerServiceObj>;
-        }
-        return form;
-      },
-      renderForm: (form, setForm, _isMobile, t) => (
-        <TheForm
-          form={form as unknown as Partial<SwarmFormState>}
-          setForm={
-            setForm as unknown as React.Dispatch<React.SetStateAction<Partial<SwarmFormState>>>
-          }
-          t={t}
-        />
-      ),
-    },
+    form: formConfig,
   };
 
   return (

@@ -1,16 +1,62 @@
+/* eslint-disable react-refresh/only-export-components */
 import { useState, useEffect } from 'react';
-import { TextField, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField } from '@/components/Form';
 import * as UserAPI from '@/api/system/user';
 import type { ListAllUserRes } from '@/api/system/type';
 import type { AttendanceRecord } from '../index';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { FilterState } from './TheFilter';
+import type { ListAttendanceReq } from '@/api/enterprise/type';
+import dayjs from 'dayjs';
 
 interface AttendanceFormFieldsProps {
   form: Partial<AttendanceRecord>;
-  setForm: (updater: (prev: Partial<AttendanceRecord>) => Partial<AttendanceRecord>) => void;
+  setForm: React.Dispatch<React.SetStateAction<Partial<AttendanceRecord>>>;
   t: (key: string) => string;
 }
 
-export default function AttendanceFormFields({ form, setForm, t }: AttendanceFormFieldsProps) {
+export const formConfig: SchemaCrudConfig<
+  AttendanceRecord,
+  FilterState,
+  ListAttendanceReq
+>['form'] = {
+  schema: { type: 'object' },
+  defaultForm: {
+    employeeId: undefined,
+    date: dayjs().format('YYYY-MM-DD'),
+    _checkInStr: '',
+    _checkOutStr: '',
+    status: 0,
+    remark: '',
+  },
+  afterOpen: (form, isEdit, row) => {
+    if (!isEdit || !row) return form;
+    return {
+      ...form,
+      employeeId: row.employeeObj?.value ?? row.employeeId,
+      date: row.date,
+      _checkInStr: row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '',
+      _checkOutStr: row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '',
+      status: row.status,
+      remark: row.remark || '',
+    };
+  },
+  beforeSubmit: (form) => {
+    const { _checkInStr, _checkOutStr, ...rest } = form;
+    return {
+      ...rest,
+      employeeId: Number(form.employeeId),
+      checkInTime: _checkInStr ? dayjs(`${form.date} ${_checkInStr}`).valueOf() : null,
+      checkOutTime: _checkOutStr ? dayjs(`${form.date} ${_checkOutStr}`).valueOf() : null,
+    };
+  },
+  renderForm: (form, setForm, _isMobile, t) => (
+    <AttendanceFormFields form={form} setForm={setForm} t={t} />
+  ),
+};
+
+function AttendanceFormFields({ form, setForm, t }: AttendanceFormFieldsProps) {
   const [users, setUsers] = useState<ListAllUserRes>([]);
 
   useEffect(() => {
@@ -41,6 +87,7 @@ export default function AttendanceFormFields({ form, setForm, t }: AttendanceFor
 
       {/* 日期 */}
       <TextField
+        name="date"
         label={t('enterprise.attendance.date')}
         type="date"
         value={form.date ?? ''}
@@ -53,6 +100,7 @@ export default function AttendanceFormFields({ form, setForm, t }: AttendanceFor
       {/* 打卡时间 / 下班时间 */}
       <Stack direction="row" spacing={2}>
         <TextField
+          name="_checkInStr"
           label={t('enterprise.attendance.checkInTime')}
           type="time"
           value={form._checkInStr ?? ''}
@@ -64,6 +112,7 @@ export default function AttendanceFormFields({ form, setForm, t }: AttendanceFor
           }}
         />
         <TextField
+          name="_checkOutStr"
           label={t('enterprise.attendance.checkOutTime')}
           type="time"
           value={form._checkOutStr ?? ''}
@@ -93,6 +142,7 @@ export default function AttendanceFormFields({ form, setForm, t }: AttendanceFor
 
       {/* 备注 */}
       <TextField
+        name="remark"
         label={t('column.remark')}
         value={form.remark ?? ''}
         onChange={(e) => update({ remark: e.target.value })}

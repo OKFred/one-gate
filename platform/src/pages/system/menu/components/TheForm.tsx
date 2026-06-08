@@ -25,11 +25,10 @@ import hasValue from '@/utils/hasValue';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { TreeMenuRes } from '@/api/system/type';
 // 菜单数据接口
-export interface MenuFormData
-  extends Pick<
-    TreeMenuRes[0],
-    'name' | 'icon' | 'business' | 'path' | 'remark' | 'parentId' | 'sort' | 'isEnabled'
-  > {
+export interface MenuFormData extends Pick<
+  TreeMenuRes[0],
+  'name' | 'icon' | 'business' | 'path' | 'remark' | 'parentId' | 'sort' | 'isEnabled'
+> {
   id?: number;
 }
 // 菜单菜单类型（简化版）
@@ -179,6 +178,10 @@ const TheForm = memo(
         setEditingMenu(null);
       } catch (err) {
         console.error(err);
+        const errLike = err as { response?: { data?: { message?: string } } };
+        const errMsg =
+          errLike.response?.data?.message || (err as Error).message || t('error.requestFailed');
+        setError(errMsg);
       } finally {
         setLoading(false);
       }

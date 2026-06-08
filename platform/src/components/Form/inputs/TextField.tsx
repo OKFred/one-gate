@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextField as MuiTextField, FormControl } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
 import { useFieldLogic } from '../useFieldLogic';
 
 export interface TextFieldProps {
@@ -19,6 +20,9 @@ export interface TextFieldProps {
   multiline?: boolean;
   rows?: number;
   slotProps?: Record<string, unknown>;
+  sx?: SxProps<Theme>;
+  select?: boolean;
+  children?: React.ReactNode;
 }
 
 export const TextField = ({

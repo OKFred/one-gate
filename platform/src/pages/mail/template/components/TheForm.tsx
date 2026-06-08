@@ -1,27 +1,55 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Suspense, lazy } from 'react';
-import { TextField, Stack, Box, Typography, CircularProgress } from '@mui/material';
-import type { Dispatch, SetStateAction } from 'react';
-import type { AddMailTemplateReq } from '@/api/mail/type';
+import { Stack, Box, Typography, CircularProgress } from '@mui/material';
+import { TextField } from '@/components/Form';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { TemplateRes } from './TheTable';
+import type { FilterState } from './TheFilter';
+import type { AddMailTemplateReq, ListMailTemplateReq } from '@/api/mail/type';
+import schema from '@/assets/schemas/mail.templateAddReq.json';
+import updateSchema from '@/assets/schemas/mail.templateUpdateReq.json';
 
 // 动态导入 JoditEditor 实现代码分割
 const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
 
 export interface TemplateFormFieldsProps {
   form: Partial<AddMailTemplateReq>;
-  setForm: Dispatch<SetStateAction<Partial<AddMailTemplateReq>>>;
+  setForm: React.Dispatch<React.SetStateAction<Partial<AddMailTemplateReq>>>;
   isMobile: boolean;
   t: (key: string) => string;
 }
 
-/**
- * 邮件模板高内聚表单字段组件（包含异步 Jodit 富文本编辑器）
- */
-export default function TemplateFormFields({
-  form,
-  setForm,
-  isMobile,
-  t,
-}: TemplateFormFieldsProps) {
+export const formConfig: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemplateReq>['form'] = {
+  schema,
+  updateSchema,
+  defaultForm: {
+    name: '',
+    title: '',
+    langCode: '',
+    content: '',
+    category: '',
+    isEnabled: true,
+    remark: null,
+  },
+  beforeSubmit: (form, isEdit) => {
+    return {
+      ...form,
+      langCode: form.langCode || (isEdit ? undefined : ''),
+      category: form.category || '',
+      remark: form.remark ?? null,
+    };
+  },
+  renderForm: (form, setForm, isMobile, t) => (
+    <TemplateFormFields
+      form={form as Partial<AddMailTemplateReq>}
+      setForm={setForm as React.Dispatch<React.SetStateAction<Partial<AddMailTemplateReq>>>}
+      isMobile={isMobile}
+      t={t}
+    />
+  ),
+};
+
+function TemplateFormFields({ form, setForm, isMobile, t }: TemplateFormFieldsProps) {
   const handleFieldChange = (key: keyof AddMailTemplateReq, value: unknown) => {
     setForm((prev) => ({
       ...prev,
@@ -33,6 +61,7 @@ export default function TemplateFormFields({
     <Stack spacing={isMobile ? 2 : 3} sx={{ mt: 1 }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <TextField
+          name="name"
           label={t('template.table.name')}
           value={form.name || ''}
           onChange={(e) => handleFieldChange('name', e.target.value)}
@@ -42,6 +71,7 @@ export default function TemplateFormFields({
           helperText={t('template.table.nameHelp')}
         />
         <TextField
+          name="title"
           label={t('template.table.subject')}
           value={form.title || ''}
           onChange={(e) => handleFieldChange('title', e.target.value)}
@@ -54,6 +84,7 @@ export default function TemplateFormFields({
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
         <TextField
+          name="langCode"
           label={t('translation.table.langCode')}
           value={form.langCode || ''}
           onChange={(e) => handleFieldChange('langCode', e.target.value)}
@@ -63,6 +94,7 @@ export default function TemplateFormFields({
           helperText={t('template.table.langCodeHelp')}
         />
         <TextField
+          name="category"
           label={t('template.table.category')}
           value={form.category || ''}
           onChange={(e) => handleFieldChange('category', e.target.value)}
@@ -97,6 +129,7 @@ export default function TemplateFormFields({
       </Box>
 
       <TextField
+        name="remark"
         label={t('column.remark')}
         value={form.remark || ''}
         onChange={(e) => handleFieldChange('remark', e.target.value || null)}

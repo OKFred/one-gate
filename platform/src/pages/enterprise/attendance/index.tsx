@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type AttendanceContext } from './components/TheTable';
 import TheDetail from './components/TheDetail';
-import AttendanceFormFields from './components/TheForm';
+import { formConfig } from './components/TheForm';
 import * as AttendanceAPI from '@/api/enterprise/attendance';
 import type { ListAttendanceReq, AttendanceObj } from '@/api/enterprise/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -19,55 +19,6 @@ export type AttendanceRecord = AttendanceObj & {
   /** UI 专用：下班时间的 HH:mm:ss 字符串 */
   _checkOutStr?: string;
 };
-
-// ─── form 辅助函数（内联定义，避免混合导出破坏 Fast Refresh）────────
-
-const formDefaultForm: Partial<AttendanceRecord> = {
-  employeeId: undefined,
-  date: dayjs().format('YYYY-MM-DD'),
-  _checkInStr: '',
-  _checkOutStr: '',
-  status: 0,
-  remark: '',
-};
-
-function formAfterOpen(
-  form: Partial<AttendanceRecord>,
-  isEdit: boolean,
-  row?: AttendanceRecord,
-): Partial<AttendanceRecord> {
-  if (!isEdit || !row) return form;
-  return {
-    ...form,
-    employeeId: row.employeeObj?.value ?? row.employeeId,
-    date: row.date,
-    _checkInStr: row.checkInTime ? dayjs(row.checkInTime).format('HH:mm:ss') : '',
-    _checkOutStr: row.checkOutTime ? dayjs(row.checkOutTime).format('HH:mm:ss') : '',
-    status: row.status,
-    remark: row.remark || '',
-  };
-}
-
-function formBeforeSubmit(form: Partial<AttendanceRecord>): Partial<AttendanceRecord> {
-  const { _checkInStr, _checkOutStr, ...rest } = form;
-  return {
-    ...rest,
-    employeeId: Number(form.employeeId),
-    checkInTime: _checkInStr ? dayjs(`${form.date} ${_checkInStr}`).valueOf() : null,
-    checkOutTime: _checkOutStr ? dayjs(`${form.date} ${_checkOutStr}`).valueOf() : null,
-  };
-}
-
-function renderAttendanceForm(
-  form: Partial<AttendanceRecord>,
-  setForm: React.Dispatch<React.SetStateAction<Partial<AttendanceRecord>>>,
-  _isMobile: boolean,
-  t: (key: string) => string,
-) {
-  const updater = (patch: (prev: Partial<AttendanceRecord>) => Partial<AttendanceRecord>) =>
-    setForm(patch);
-  return <AttendanceFormFields form={form} setForm={updater} t={t} />;
-}
 
 // ─── 页面组件 ──────────────────────────────────────────────────────
 
@@ -191,13 +142,7 @@ export default function AttendanceManagement() {
       cardFields: tableConfig.cardFields,
       actions: tableConfig.actions,
     },
-    form: {
-      schema: { type: 'object' },
-      defaultForm: formDefaultForm,
-      afterOpen: formAfterOpen,
-      beforeSubmit: formBeforeSubmit,
-      renderForm: renderAttendanceForm,
-    },
+    form: formConfig,
   };
 
   const customActions = (

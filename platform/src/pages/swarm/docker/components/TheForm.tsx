@@ -1,15 +1,10 @@
 import React from 'react';
-import {
-  TextField,
-  Grid,
-  Button,
-  IconButton,
-  Typography,
-  Box,
-  Divider,
-  MenuItem,
-} from '@mui/material';
+import { Grid, Button, IconButton, Typography, Box, Divider, MenuItem } from '@mui/material';
+import { TextField } from '@/components/Form';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+
+import type { SchemaCrudConfig } from '@/components/Crud';
+import type { DockerServiceObj } from '@/api/swarm/type';
 
 export interface EnvPair {
   key: string;
@@ -36,7 +31,63 @@ export interface TheFormProps {
   t: (key: string) => string;
 }
 
-export default function TheForm({ form, setForm, t }: TheFormProps) {
+export const formConfig: SchemaCrudConfig<
+  DockerServiceObj,
+  { keyword: string },
+  { keyword?: string }
+>['form'] = {
+  schema: { type: 'object' },
+  defaultForm: {
+    Name: '',
+    Image: '',
+    Replicas: 1,
+    EnvPairs: [],
+    PortMappings: [],
+  } as unknown as Partial<DockerServiceObj>,
+  afterOpen: (form, isEdit) => {
+    if (isEdit && form) {
+      const serviceRow = form as unknown as DockerServiceObj;
+      const containerSpec = serviceRow.Spec?.TaskTemplate?.ContainerSpec || {};
+      const rawEnv: string[] = containerSpec.Env || [];
+      const EnvPairs: EnvPair[] = rawEnv.map((item) => {
+        const index = item.indexOf('=');
+        if (index !== -1) {
+          return { key: item.substring(0, index), value: item.substring(index + 1) };
+        }
+        return { key: item, value: '' };
+      });
+
+      const rawPorts = serviceRow.Spec?.EndpointSpec?.Ports || [];
+      const PortMappings: PortMapping[] = rawPorts.map((p) => ({
+        Protocol: p.Protocol || 'tcp',
+        PublishedPort: p.PublishedPort || 0,
+        TargetPort: p.TargetPort || 0,
+      }));
+
+      return {
+        id: serviceRow.ID,
+        Name: serviceRow.Spec?.Name || '',
+        Image: containerSpec.Image || '',
+        Replicas: serviceRow.Spec?.Mode?.Replicated?.Replicas || 1,
+        EnvPairs,
+        PortMappings,
+      } as unknown as Partial<DockerServiceObj>;
+    }
+    return form;
+  },
+  renderForm: (form, setForm, _isMobile, t) =>
+    renderDockerForm(
+      form as unknown as Partial<SwarmFormState>,
+      setForm as unknown as React.Dispatch<React.SetStateAction<Partial<SwarmFormState>>>,
+      t,
+    ),
+};
+
+function renderDockerForm(
+  form: Partial<SwarmFormState>,
+  setForm: React.Dispatch<React.SetStateAction<Partial<SwarmFormState>>>,
+  t: (key: string) => string,
+) {
   const envPairs = form.EnvPairs || [];
   const portMappings = form.PortMappings || [];
 
@@ -95,6 +146,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
     <Grid container spacing={2} sx={{ pt: 1 }}>
       <Grid size={12}>
         <TextField
+          name="Name"
           fullWidth
           label={t('swarm.docker.name')}
           placeholder={t('swarm.docker.namePlaceholder')}
@@ -105,6 +157,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
       </Grid>
       <Grid size={8}>
         <TextField
+          name="Image"
           fullWidth
           label={t('swarm.docker.image')}
           placeholder={t('swarm.docker.imagePlaceholder')}
@@ -115,6 +168,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
       </Grid>
       <Grid size={4}>
         <TextField
+          name="Replicas"
           fullWidth
           type="number"
           label={t('swarm.docker.replicas')}
@@ -150,6 +204,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
             envPairs.map((pair, index) => (
               <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
                 <TextField
+                  name={`EnvPairs.${index}.key`}
                   size="small"
                   label={t('swarm.docker.key')}
                   placeholder={t('swarm.docker.keyPlaceholder')}
@@ -158,6 +213,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
                   sx={{ flex: 1 }}
                 />
                 <TextField
+                  name={`EnvPairs.${index}.value`}
                   size="small"
                   label={t('swarm.docker.value')}
                   placeholder={t('swarm.docker.valuePlaceholder')}
@@ -197,6 +253,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
             portMappings.map((mapping, index) => (
               <Box key={index} sx={{ display: 'flex', gap: 1, mb: 1, alignItems: 'center' }}>
                 <TextField
+                  name={`PortMappings.${index}.Protocol`}
                   select
                   size="small"
                   label={t('swarm.docker.protocol')}
@@ -208,6 +265,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
                   <MenuItem value="udp">UDP</MenuItem>
                 </TextField>
                 <TextField
+                  name={`PortMappings.${index}.PublishedPort`}
                   size="small"
                   type="number"
                   label={t('swarm.docker.pubPort')}
@@ -217,6 +275,7 @@ export default function TheForm({ form, setForm, t }: TheFormProps) {
                   sx={{ flex: 1 }}
                 />
                 <TextField
+                  name={`PortMappings.${index}.TargetPort`}
                   size="small"
                   type="number"
                   label={t('swarm.docker.targetPort')}

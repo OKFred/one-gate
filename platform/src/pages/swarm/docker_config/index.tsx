@@ -6,9 +6,7 @@ import {
   type SwarmDockerConfigRes,
   type TableExtraContext,
 } from './components/TheTable';
-import DockerConfigFormFields from './components/TheForm';
-import schema from '@/assets/schemas/swarm.docker_configAddReq.json';
-import updateSchema from '@/assets/schemas/swarm.docker_configUpdateReq.json';
+import { formConfig } from './components/TheForm';
 import * as DockerConfigAPI from '@/api/swarm/docker_config';
 import type {
   ListDockerConfigReq,
@@ -19,20 +17,6 @@ import { SWARM } from '@/hooks/usePermission';
 import { showSnackbar } from '@/components/Notification';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { useTranslation } from '@/hooks/useTranslation';
-
-const DEFAULT_FORM: Partial<SwarmDockerConfigRes> = {
-  name: '',
-  host: '',
-  apiVersion: '',
-  tlsVerify: false,
-  caCert: '',
-  clientCert: '',
-  clientKey: '',
-  cfMtlsBinding: '',
-  isDefault: false,
-  isEnabled: true,
-  remark: '',
-};
 
 export default function SwarmDockerConfigPage() {
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
@@ -102,14 +86,7 @@ export default function SwarmDockerConfigPage() {
       cardFields: tableConfig.cardFields,
       actions: tableConfig.actions,
     },
-    form: {
-      schema,
-      updateSchema,
-      defaultForm: DEFAULT_FORM,
-      renderForm: (form, setForm, _isMobile, t) => (
-        <DockerConfigFormFields form={form} setForm={setForm} t={t} />
-      ),
-    },
+    form: formConfig,
   };
 
   return <SchemaCrudPage config={config} extraContext={extraContext} />;

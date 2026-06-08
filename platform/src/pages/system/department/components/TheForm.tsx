@@ -250,6 +250,10 @@ const TheForm = memo(
         setError('');
       } catch (err) {
         console.error(err);
+        const errLike = err as { response?: { data?: { message?: string } } };
+        const errMsg =
+          errLike.response?.data?.message || (err as Error).message || t('error.requestFailed');
+        setError(errMsg);
       } finally {
         setLoading(false);
       }

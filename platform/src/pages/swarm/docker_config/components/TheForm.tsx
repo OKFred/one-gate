@@ -1,19 +1,46 @@
 import React from 'react';
-import { TextField, FormControlLabel, Switch, Grid } from '@mui/material';
-
+import { FormControlLabel, Switch, Grid } from '@mui/material';
+import { TextField } from '@/components/Form';
+import type { SchemaCrudConfig } from '@/components/Crud';
+import schema from '@/assets/schemas/swarm.docker_configAddReq.json';
+import updateSchema from '@/assets/schemas/swarm.docker_configUpdateReq.json';
+import type { FilterState } from './TheFilter';
+import type { ListDockerConfigReq } from '@/api/swarm/type';
 import type { SwarmDockerConfigRes } from './TheTable';
 
-export interface DockerConfigFormFieldsProps {
-  form: Partial<SwarmDockerConfigRes>;
-  setForm: React.Dispatch<React.SetStateAction<Partial<SwarmDockerConfigRes>>>;
-  t: (key: string) => string;
-}
+export const formConfig: SchemaCrudConfig<
+  SwarmDockerConfigRes,
+  FilterState,
+  ListDockerConfigReq
+>['form'] = {
+  schema,
+  updateSchema,
+  defaultForm: {
+    name: '',
+    host: '',
+    apiVersion: '',
+    tlsVerify: false,
+    caCert: '',
+    clientCert: '',
+    clientKey: '',
+    cfMtlsBinding: '',
+    isDefault: false,
+    isEnabled: true,
+    remark: '',
+  },
+  renderForm: (form, setForm, _isMobile, t) => renderDockerConfigForm(form, setForm, t),
+};
 
-export default function DockerConfigFormFields({ form, setForm, t }: DockerConfigFormFieldsProps) {
+function renderDockerConfigForm(
+  form: Partial<SwarmDockerConfigRes>,
+  setForm: React.Dispatch<React.SetStateAction<Partial<SwarmDockerConfigRes>>>,
+  t: (key: string) => string,
+) {
   return (
     <Grid container spacing={2} sx={{ pt: 1 }}>
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField
+          name="name"
           fullWidth
           label={t('swarm.docker_config.name')}
           value={form.name ?? ''}
@@ -23,6 +50,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
       </Grid>
       <Grid size={{ xs: 12, sm: 6 }}>
         <TextField
+          name="apiVersion"
           fullWidth
           label={t('swarm.docker_config.apiVersion')}
           value={form.apiVersion ?? ''}
@@ -32,6 +60,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
       </Grid>
       <Grid size={12}>
         <TextField
+          name="host"
           fullWidth
           label={t('swarm.docker_config.host')}
           value={form.host ?? ''}
@@ -57,6 +86,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
         <>
           <Grid size={12}>
             <TextField
+              name="cfMtlsBinding"
               fullWidth
               label={t('swarm.docker_config.cfMtlsBinding')}
               value={form.cfMtlsBinding ?? ''}
@@ -66,6 +96,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
           </Grid>
           <Grid size={12}>
             <TextField
+              name="caCert"
               fullWidth
               multiline
               rows={4}
@@ -77,6 +108,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
           </Grid>
           <Grid size={12}>
             <TextField
+              name="clientCert"
               fullWidth
               multiline
               rows={4}
@@ -88,6 +120,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
           </Grid>
           <Grid size={12}>
             <TextField
+              name="clientKey"
               fullWidth
               multiline
               rows={4}
@@ -103,6 +136,7 @@ export default function DockerConfigFormFields({ form, setForm, t }: DockerConfi
 
       <Grid size={12}>
         <TextField
+          name="remark"
           fullWidth
           multiline
           rows={2}
