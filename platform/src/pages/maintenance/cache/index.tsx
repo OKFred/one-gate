@@ -51,8 +51,7 @@ export default function CacheManagementPage() {
           >;
         },
         delete: (args) => {
-          const row = args as unknown as { data: CacheRow };
-          return CacheAPI.deleteFn({ data: { key: row.data.name } });
+          return CacheAPI.deleteFn({ data: { key: String(args.data.id) } });
         },
       },
       filter: {
