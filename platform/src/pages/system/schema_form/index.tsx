@@ -13,8 +13,8 @@ const DEFAULT_FORM: Partial<SchemaFormItem> = {
   code: '',
   name: '',
   schemaData: '',
-  uiSchemaData: '',
-  remark: '',
+  uiSchemaData: null,
+  remark: null,
   isEnabled: true,
 };
 

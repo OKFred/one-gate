@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Stack } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
@@ -16,88 +16,22 @@ import { Filter } from './components/Filter';
 import { FormDialog } from './components/FormDialog';
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 
-interface FetchListOptions<TRecord, TFilters, TApiData, TExtra> {
-  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra>;
-  setList: (list: TRecord[]) => void;
-  setTotal: (total: number) => void;
-  setFilterCount: (count: number) => void;
-  setQuery: React.Dispatch<React.SetStateAction<QueryState<TFilters>>>;
-  setLoading: (loading: boolean) => void;
-  setIsSearching: (isSearching: boolean) => void;
-  // 游标分页支持
-  cursorMapRef?: React.MutableRefObject<Record<number, string | undefined>>;
-  setCursorMap?: React.Dispatch<React.SetStateAction<Record<number, string | undefined>>>;
-  setHasMore?: (hasMore: boolean) => void;
-}
-
-async function executeFetchList<TRecord, TFilters, TApiData, TExtra>(
-  query: QueryState<TFilters>,
-  options: FetchListOptions<TRecord, TFilters, TApiData, TExtra>,
-) {
-  const {
-    config,
-    setList,
-    setTotal,
-    setFilterCount,
-    setQuery,
-    setLoading,
-    setIsSearching,
-    cursorMapRef,
-    setCursorMap,
-    setHasMore,
-  } = options;
-
-  setLoading(true);
-  try {
-    let dataPayload = {
-      pageNo: query.page,
-      pageSize: query.pageSize,
-      ...query.filters,
-    } as unknown as TApiData;
-
-    if (config.filter.transformRequest) {
-      dataPayload = config.filter.transformRequest(query.filters);
-      // 确保包含分页字段
-      (dataPayload as unknown as { pageNo: number }).pageNo = query.page;
-      (dataPayload as unknown as { pageSize: number }).pageSize = query.pageSize;
-    }
-
-    // 游标分页：注入 cursor
-    if (config.cursorPagination && cursorMapRef) {
-      (dataPayload as unknown as { cursor?: string }).cursor = cursorMapRef.current[query.page];
-    }
-
-    const res = await config.api.list({ data: dataPayload });
-    const responseData = res.data?.data;
-    const dataList = responseData?.list || [];
-
-    setList(dataList);
-    setQuery((prev) => ({ ...prev, page: query.page }));
-
-    if (config.cursorPagination) {
-      // 游标分页：用 hasMore 计算虚拟 total
-      const hasMoreFlag = responseData?.hasMore ?? false;
-      const nextCursor = responseData?.cursor;
-      setHasMore?.(hasMoreFlag);
-      setCursorMap?.((prev) => ({ ...prev, [query.page + 1]: nextCursor }));
-      const virtualTotal = hasMoreFlag
-        ? query.page * query.pageSize + 1
-        : (query.page - 1) * query.pageSize + dataList.length;
-      setTotal(virtualTotal);
-      setFilterCount(dataList.length);
-    } else {
-      const totalCount = responseData?.total || 0;
-      setTotal(totalCount);
-      setFilterCount(totalCount);
-    }
-  } catch {
-    setList([]);
-    setTotal(0);
-    setFilterCount(0);
-  } finally {
-    setLoading(false);
-    setIsSearching(false);
-  }
+export interface CrudState<TRecord, TFilters> {
+  list: TRecord[];
+  loading: boolean;
+  total: number;
+  query: QueryState<TFilters>;
+  cursorMap: Record<number, string | undefined>;
+  hasMore: boolean;
+  keywordInput: string;
+  isSearching: boolean;
+  filterCount: number;
+  formOpen: boolean;
+  editId: number | null;
+  form: Partial<TRecord>;
+  formLoading: boolean;
+  deleteConfirmOpen: boolean;
+  rowToDelete: TRecord | null;
 }
 
 interface SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra = unknown> {
@@ -118,36 +52,62 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
   const configRef = useRef(config);
   configRef.current = config;
 
-  // 1. 列表核心状态与查询参数大对象管理
-  const [list, setList] = useState<TRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState(0);
-  const [query, setQuery] = useState<QueryState<TFilters>>({
-    page: 1,
-    pageSize: 10,
-    filters: config.filter.defaultFilters,
+  // 1. 使用 useState 管理组件所有状态
+  const [state, setState] = useState<CrudState<TRecord, TFilters>>({
+    list: [],
+    loading: false,
+    total: 0,
+    query: {
+      page: 1,
+      pageSize: 10,
+      filters: config.filter.defaultFilters,
+    },
+    cursorMap: {},
+    hasMore: false,
+    keywordInput: '',
+    isSearching: false,
+    filterCount: 0,
+    formOpen: false,
+    editId: null,
+    form: config.form.defaultForm,
+    formLoading: false,
+    deleteConfirmOpen: false,
+    rowToDelete: null,
   });
 
-  // 1.5 游标分页状态
-  const [cursorMap, setCursorMap] = useState<Record<number, string | undefined>>({});
-  const cursorMapRef = useRef(cursorMap);
-  cursorMapRef.current = cursorMap;
-  const [, setHasMore] = useState(false);
+  const {
+    list,
+    loading,
+    total,
+    query,
+    keywordInput,
+    isSearching,
+    filterCount,
+    formOpen,
+    editId,
+    form,
+    formLoading,
+    deleteConfirmOpen,
+    rowToDelete,
+  } = state;
 
-  // 2. 辅助筛选器状态管理
-  const [keywordInput, setKeywordInput] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [filterCount, setFilterCount] = useState(0);
+  // 保持一个最新的 stateRef 供异步 API 请求时读取最新状态（如最新的 cursorMap）
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
-  // 3. 表单/对话框状态管理
-  const [formOpen, setFormOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<Partial<TRecord>>(config.form.defaultForm);
-  const [formLoading, setFormLoading] = useState(false);
-
-  // 4. 删除确认框状态
-  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [rowToDelete, setRowToDelete] = useState<TRecord | null>(null);
+  const updateState = useCallback(
+    (
+      updates:
+        | Partial<CrudState<TRecord, TFilters>>
+        | ((prev: CrudState<TRecord, TFilters>) => Partial<CrudState<TRecord, TFilters>>),
+    ) => {
+      setState((prev) => {
+        const next = typeof updates === 'function' ? updates(prev) : updates;
+        return { ...prev, ...next };
+      });
+    },
+    [],
+  );
 
   // 5. AJV 表单验证与校验错误处理 Hook
   const { fieldErrors, handleFormError, clearErrors, setFieldErrors, clearFieldError, rootSchema } =
@@ -158,20 +118,73 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
   const errorContextValue = { fieldErrors, clearFieldError, rootSchema };
 
   // 获取/刷新表格数据
-  const fetchList = (currentQuery: QueryState<TFilters>) => {
-    executeFetchList(currentQuery, {
-      config: configRef.current,
-      setList,
-      setTotal,
-      setFilterCount,
-      setQuery,
-      setLoading,
-      setIsSearching,
-      cursorMapRef,
-      setCursorMap,
-      setHasMore,
-    });
-  };
+  const fetchList = useCallback(
+    async (currentQuery: QueryState<TFilters>) => {
+      updateState({ loading: true });
+      try {
+        let dataPayload = {
+          pageNo: currentQuery.page,
+          pageSize: currentQuery.pageSize,
+          ...currentQuery.filters,
+        } as unknown as TApiData;
+
+        if (configRef.current.filter.transformRequest) {
+          dataPayload = configRef.current.filter.transformRequest(currentQuery.filters);
+          // 确保包含分页字段
+          (dataPayload as unknown as { pageNo: number }).pageNo = currentQuery.page;
+          (dataPayload as unknown as { pageSize: number }).pageSize = currentQuery.pageSize;
+        }
+
+        // 游标分页：注入 cursor
+        if (configRef.current.cursorPagination) {
+          (dataPayload as unknown as { cursor?: string }).cursor =
+            stateRef.current.cursorMap[currentQuery.page];
+        }
+
+        const res = await configRef.current.api.list({ data: dataPayload });
+        const responseData = res.data?.data;
+        const dataList = responseData?.list || [];
+
+        if (configRef.current.cursorPagination) {
+          const hasMore = responseData?.hasMore ?? false;
+          updateState((prev) => {
+            const virtualTotal = hasMore
+              ? currentQuery.page * currentQuery.pageSize + 1
+              : (currentQuery.page - 1) * currentQuery.pageSize + dataList.length;
+            return {
+              list: dataList,
+              total: virtualTotal,
+              filterCount: dataList.length,
+              query: { ...prev.query, page: currentQuery.page },
+              hasMore,
+              cursorMap: { ...prev.cursorMap, [currentQuery.page + 1]: responseData?.cursor },
+              loading: false,
+              isSearching: false,
+            };
+          });
+        } else {
+          const totalCount = responseData?.total || 0;
+          updateState((prev) => ({
+            list: dataList,
+            total: totalCount,
+            filterCount: totalCount,
+            query: { ...prev.query, page: currentQuery.page },
+            loading: false,
+            isSearching: false,
+          }));
+        }
+      } catch {
+        updateState({
+          list: [],
+          total: 0,
+          filterCount: 0,
+          loading: false,
+          isSearching: false,
+        });
+      }
+    },
+    [updateState],
+  );
 
   // 初始加载及分页大小变化监听
   useEffect(() => {
@@ -181,26 +194,21 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       pageSize: query.pageSize,
       filters: cfg.filter.defaultFilters,
     };
-    setQuery(newQuery);
-    // 重置游标
-    setCursorMap({});
-    executeFetchList(newQuery, {
-      config: cfg,
-      setList,
-      setTotal,
-      setFilterCount,
-      setQuery,
-      setLoading,
-      setIsSearching,
-      cursorMapRef,
-      setCursorMap,
-      setHasMore,
-    });
+
     // 检查关键字字段，如果有则初始化 keywordInput
+    let initialKeyword = '';
     if ('keyword' in (cfg.filter.defaultFilters as Record<string, unknown>)) {
-      setKeywordInput((cfg.filter.defaultFilters as unknown as { keyword: string }).keyword || '');
+      initialKeyword = (cfg.filter.defaultFilters as unknown as { keyword: string }).keyword || '';
     }
-  }, [query.pageSize]);
+
+    updateState({
+      query: newQuery,
+      cursorMap: {},
+      keywordInput: initialKeyword,
+    });
+
+    fetchList(newQuery);
+  }, [query.pageSize, fetchList, updateState]);
 
   // 关键字搜索防抖
   useEffect(() => {
@@ -208,34 +216,21 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     if ('keyword' in filtersRecord) {
       const currentKeyword = filtersRecord.keyword as string;
       if (keywordInput !== currentKeyword) {
-        setIsSearching(true);
+        updateState({ isSearching: true });
         const timer = setTimeout(() => {
           const newQuery = {
             ...query,
             page: 1,
             filters: { ...query.filters, keyword: keywordInput },
           };
-          setQuery(newQuery);
-          // 搜索变化时重置游标
-          setCursorMap({});
-          executeFetchList(newQuery, {
-            config: configRef.current,
-            setList,
-            setTotal,
-            setFilterCount,
-            setQuery,
-            setLoading,
-            setIsSearching,
-            cursorMapRef,
-            setCursorMap,
-            setHasMore,
-          });
+          updateState({ query: newQuery, cursorMap: {} });
+          fetchList(newQuery);
         }, 500);
 
         return () => clearTimeout(timer);
       }
     }
-  }, [keywordInput, query]);
+  }, [keywordInput, query, fetchList, updateState]);
 
   // 筛选事件处理
   const handleFilterChange = (
@@ -243,7 +238,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     value: boolean | string | number | undefined,
   ) => {
     if (key === 'keyword') {
-      setKeywordInput(value as string);
+      updateState({ keywordInput: value as string });
     } else {
       const newQuery = {
         ...query,
@@ -253,26 +248,23 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
           [key]: value,
         },
       };
-      setQuery(newQuery);
-      setCursorMap({});
+      updateState({ query: newQuery, cursorMap: {} });
       fetchList(newQuery);
     }
   };
 
   const handleClearFilters = () => {
-    setKeywordInput('');
-    setCursorMap({});
     const newQuery = {
       page: 1,
       pageSize: query.pageSize,
-      filters: config.filter.defaultFilters,
+      filters: configRef.current.filter.defaultFilters,
     };
-    setQuery(newQuery);
+    updateState({ query: newQuery, cursorMap: {}, keywordInput: '' });
     fetchList(newQuery);
   };
 
   const hasActiveFilters = () => {
-    const defaultRecord = config.filter.defaultFilters as Record<string, unknown>;
+    const defaultRecord = configRef.current.filter.defaultFilters as Record<string, unknown>;
     const currentRecord = query.filters as Record<string, unknown>;
     return Object.keys(currentRecord).some((key) => {
       if (key === 'keyword') return !!keywordInput;
@@ -282,34 +274,35 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
 
   // 表单操作处理
   const handleOpenAdd = () => {
-    setEditId(null);
-    let initialForm = { ...config.form.defaultForm };
-    if (config.form.afterOpen) {
-      initialForm = config.form.afterOpen(initialForm, false);
+    let initialForm = { ...configRef.current.form.defaultForm };
+    if (configRef.current.form.afterOpen) {
+      initialForm = configRef.current.form.afterOpen(initialForm, false);
     }
-    setForm(initialForm);
     clearErrors();
-    setFormOpen(true);
+    updateState({ editId: null, form: initialForm, formOpen: true });
   };
 
   const handleOpenEdit = (row: TRecord) => {
-    const idKey = (config.apiKeyName || 'id') as keyof TRecord;
+    const idKey = (configRef.current.apiKeyName || 'id') as keyof TRecord;
     const recordId = row[idKey] as unknown as number;
-    setEditId(recordId);
     let initialForm = { ...row } as Partial<TRecord>;
-    if (config.form.afterOpen) {
-      initialForm = config.form.afterOpen(initialForm, true, row);
+    if (configRef.current.form.afterOpen) {
+      initialForm = configRef.current.form.afterOpen(initialForm, true, row);
     }
-    setForm(initialForm);
     clearErrors();
-    setFormOpen(true);
+    updateState({ editId: recordId, form: initialForm, formOpen: true });
   };
 
   const handleCloseForm = () => {
-    setEditId(null);
-    setForm(config.form.defaultForm);
     clearErrors();
-    setFormOpen(false);
+    updateState({ editId: null, form: configRef.current.form.defaultForm, formOpen: false });
+  };
+
+  const setForm = (newForm: React.SetStateAction<Partial<TRecord>>) => {
+    updateState((prev) => {
+      const nextForm = typeof newForm === 'function' ? newForm(prev.form) : newForm;
+      return { form: nextForm };
+    });
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -318,8 +311,8 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     const isEdit = !!editId;
     // 根据操作类型选择对应的 schema 和验证器
     const activeSchema = isEdit
-      ? config.form.updateSchema || config.form.schema
-      : config.form.schema;
+      ? configRef.current.form.updateSchema || configRef.current.form.schema
+      : configRef.current.form.schema;
     const validate = isEdit ? validateUpdate : validateAdd;
 
     // 前端预验证
@@ -329,11 +322,11 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       return;
     }
 
-    setFormLoading(true);
+    updateState({ formLoading: true });
     try {
       let submitForm = { ...form };
-      if (config.form.beforeSubmit) {
-        submitForm = config.form.beforeSubmit(submitForm, isEdit);
+      if (configRef.current.form.beforeSubmit) {
+        submitForm = configRef.current.form.beforeSubmit(submitForm, isEdit);
       }
 
       // 根据 schema 的 properties 过滤掉多余字段（如审计字段）
@@ -353,15 +346,15 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       }
 
       if (editId) {
-        const idKey = (config.apiKeyName || 'id') as keyof TRecord;
-        if (config.api.update) {
-          await config.api.update({
+        const idKey = (configRef.current.apiKeyName || 'id') as keyof TRecord;
+        if (configRef.current.api.update) {
+          await configRef.current.api.update({
             data: { ...submitForm, [idKey]: editId } as unknown as TRecord,
           });
         }
       } else {
-        if (config.api.add) {
-          await config.api.add({
+        if (configRef.current.api.add) {
+          await configRef.current.api.add({
             data: submitForm as unknown as Omit<TRecord, 'id'>,
           });
         }
@@ -372,35 +365,33 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         fetchList(query);
       } else {
         const newQuery = { ...query, page: 1 };
-        setQuery(newQuery);
+        updateState({ query: newQuery });
         fetchList(newQuery);
       }
     } catch (err: unknown) {
       handleFormError(err);
     } finally {
-      setFormLoading(false);
+      updateState({ formLoading: false });
     }
   };
 
   // 删除操作处理
   const handleOpenDeleteConfirm = (row: TRecord) => {
-    setRowToDelete(row);
-    setDeleteConfirmOpen(true);
+    updateState({ rowToDelete: row, deleteConfirmOpen: true });
   };
 
   const handleCloseDeleteConfirm = () => {
-    setRowToDelete(null);
-    setDeleteConfirmOpen(false);
+    updateState({ rowToDelete: null, deleteConfirmOpen: false });
   };
 
   const handleConfirmDelete = async () => {
-    if (rowToDelete && config.api.delete) {
-      const idKey = (config.apiKeyName || 'id') as keyof TRecord;
+    if (rowToDelete && configRef.current.api.delete) {
+      const idKey = (configRef.current.apiKeyName || 'id') as keyof TRecord;
       const recordId = rowToDelete[idKey] as unknown as number;
       try {
-        await config.api.delete({ data: { id: recordId } });
+        await configRef.current.api.delete({ data: { id: recordId } });
         const newQuery = { ...query, page: 1 };
-        setQuery(newQuery);
+        updateState({ query: newQuery });
         fetchList(newQuery);
       } catch (err: unknown) {
         console.error('Delete failed:', err);
@@ -542,12 +533,12 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         pageSize={query.pageSize}
         onPageChange={(newPage) => {
           const newQuery = { ...query, page: newPage };
-          setQuery(newQuery);
+          updateState({ query: newQuery });
           fetchList(newQuery);
         }}
         onPageSizeChange={(newPageSize) => {
           const newQuery = { ...query, page: 1, pageSize: newPageSize };
-          setQuery(newQuery);
+          updateState({ query: newQuery });
           fetchList(newQuery);
         }}
         keyExtractor={(row) => {

@@ -5416,6 +5416,26 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "schemaFormData",
+    tKey: "schemaFormData.filter.formCode",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "表单编码",
+      "en-US": "Form Code",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.filter.formCodePlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "请输入表单编码过滤",
+      "en-US": "Please enter Form Code to filter",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
     tKey: "schemaFormData.filter.businessId",
     isEnabled: true,
     langCodes: {
@@ -5522,6 +5542,16 @@ export const initialTranslationData = [
     langCodes: {
       "zh-CN": "提交数据",
       "en-US": "Submitted Data",
+    },
+  },
+  {
+    application: "frontend",
+    business: "schemaFormData",
+    tKey: "schemaFormData.dataContent",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "数据内容",
+      "en-US": "Data Content",
     },
   },
   {

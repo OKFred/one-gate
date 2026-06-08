@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Stack,
-  Box,
-  Typography,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Switch,
-} from '@mui/material';
+import { Stack, Box, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Field } from '@/components/Form';
+import hasValue from '@/utils/hasValue';
 
 import type { SchemaFormItem } from './TheTable';
 
@@ -136,7 +127,7 @@ export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsP
       )}
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-        <TextField
+        <Field
           name="code"
           label={t('schemaForm.fields.code')}
           placeholder={t('schemaForm.fields.codePlaceholder')}
@@ -146,7 +137,7 @@ export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsP
           required
           fullWidth
         />
-        <TextField
+        <Field
           name="name"
           label={t('schemaForm.fields.name')}
           placeholder={t('schemaForm.fields.namePlaceholder')}
@@ -161,7 +152,7 @@ export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsP
         <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1 }}>
           {t('schemaForm.fields.schemaData')}
         </Typography>
-        <TextField
+        <Field
           name="schemaData"
           label=""
           placeholder='{"type": "object", "properties": { ... }}'
@@ -183,12 +174,17 @@ export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsP
         <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1 }}>
           {t('schemaForm.fields.uiSchemaData')}
         </Typography>
-        <TextField
+        <Field
           name="uiSchemaData"
           label=""
           placeholder='{"ui:order": ["field1", "field2"]}'
           value={form.uiSchemaData ?? ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, uiSchemaData: e.target.value }))}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              uiSchemaData: hasValue(e.target.value) ? e.target.value : null,
+            }))
+          }
           fullWidth
           multiline
           rows={4}
@@ -200,25 +196,28 @@ export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsP
         />
       </Box>
 
-      <TextField
+      <Field
         name="remark"
         label={t('column.remark')}
         placeholder={t('schemaForm.fields.remarkPlaceholder')}
         value={form.remark ?? ''}
-        onChange={(e) => setForm((prev) => ({ ...prev, remark: e.target.value }))}
+        onChange={(e) =>
+          setForm((prev) => ({
+            ...prev,
+            remark: hasValue(e.target.value) ? e.target.value : null,
+          }))
+        }
         fullWidth
         multiline
         rows={2}
       />
 
-      <FormControlLabel
-        control={
-          <Switch
-            checked={!!form.isEnabled}
-            onChange={(e) => setForm((prev) => ({ ...prev, isEnabled: e.target.checked }))}
-          />
-        }
+      <Field
+        name="isEnabled"
         label={t('status.enabled')}
+        type="switch"
+        value={!!form.isEnabled}
+        onChange={(checked: boolean) => setForm((prev) => ({ ...prev, isEnabled: checked }))}
       />
     </Stack>
   );
