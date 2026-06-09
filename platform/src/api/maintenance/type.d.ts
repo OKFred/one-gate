@@ -1,6 +1,7 @@
 import * as CacheAPI from '@/api/maintenance/cache';
 import * as AuditLoginAPI from '@/api/maintenance/auditLogin';
 import * as CronAPI from '@/api/maintenance/cron';
+import * as ScriptAPI from '@/api/maintenance/script';
 
 // ==================== Cache ====================
 
@@ -50,3 +51,24 @@ export type ListCronLogsRes = Awaited<ReturnType<typeof CronAPI.listLogsFn>>['da
 
 export type CronObj = ListCronRes['list'][number];
 export type CronLogObj = ListCronLogsRes['list'][number];
+
+// ==================== Script ====================
+export type ListScriptReq = NonNullable<Parameters<typeof ScriptAPI.listFn>[0]['data']>;
+export type ListScriptRes = Awaited<ReturnType<typeof ScriptAPI.listFn>>['data']['data'];
+
+export type GetScriptReq = NonNullable<Parameters<typeof ScriptAPI.getFn>[0]['data']>;
+export type GetScriptRes = Awaited<ReturnType<typeof ScriptAPI.getFn>>['data']['data'];
+
+export type AddScriptReq = NonNullable<Parameters<typeof ScriptAPI.addFn>[0]['data']>;
+export type AddScriptRes = Awaited<ReturnType<typeof ScriptAPI.addFn>>['data']['data'];
+
+export type UpdateScriptReq = NonNullable<Parameters<typeof ScriptAPI.updateFn>[0]['data']>;
+export type UpdateScriptRes = Awaited<ReturnType<typeof ScriptAPI.updateFn>>['data']['data'];
+
+export type DeleteScriptReq = NonNullable<Parameters<typeof ScriptAPI.deleteFn>[0]['data']>;
+export type DeleteScriptRes = Awaited<ReturnType<typeof ScriptAPI.deleteFn>>['data']['data'];
+
+export type RunTestScriptReq = NonNullable<Parameters<typeof ScriptAPI.runTestFn>[0]['data']>;
+export type RunTestScriptRes = Awaited<ReturnType<typeof ScriptAPI.runTestFn>>['data']['data'];
+
+export type ScriptObj = ListScriptRes['list'][number];

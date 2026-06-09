@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Stack } from '@mui/material';
 import { Field } from '@/components/Form';
 import CronHelper from './CronHelper';
 import hasValue from '@/utils/hasValue';
-import type { CronObj } from '@/api/maintenance/type';
+import type { CronObj, ScriptObj } from '@/api/maintenance/type';
+import * as ScriptAPI from '@/api/maintenance/script';
 
 export interface CronFormFieldsProps {
   form: Partial<CronObj>;
@@ -12,6 +13,28 @@ export interface CronFormFieldsProps {
 }
 
 export default function CronFormFields({ form, setForm, t }: CronFormFieldsProps) {
+  const [dynamicOptions, setDynamicOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    ScriptAPI.listFn({
+      data: {
+        pageNo: 1,
+        pageSize: 1000,
+      },
+    })
+      .then((res) => {
+        const list = res?.data?.data?.list || [];
+        const opts = list.map((item: ScriptObj) => ({
+          label: `${item.name} (${item.scriptKey})${!item.isEnabled ? ` - [${t('status.disabled') || '已禁用'}]` : ''}`,
+          value: item.scriptKey,
+        }));
+        setDynamicOptions(opts);
+      })
+      .catch((err) => {
+        console.error('Failed to load scripts for cron job form:', err);
+      });
+  }, [t]);
+
   return (
     <Box sx={{ pt: 2 }}>
       <Stack spacing={3}>
@@ -30,12 +53,9 @@ export default function CronFormFields({ form, setForm, t }: CronFormFieldsProps
           name="jobKey"
           label={t('cron.field.jobKey')}
           type="select"
-          value={form.jobKey || 'test_log'}
+          value={form.jobKey || ''}
           onChange={(val: unknown) => setForm((prev) => ({ ...prev, jobKey: val as string }))}
-          options={[
-            { label: t('cron.jobKey.testLog'), value: 'test_log' },
-            { label: t('cron.jobKey.syncExternalData'), value: 'sync_external_data' },
-          ]}
+          options={dynamicOptions}
           required
           fullWidth
         />

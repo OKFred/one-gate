@@ -45,6 +45,7 @@ const permissionSeeds: Record<string, Record<string, string[]>> = {
     cache: ["read", "add", "edit", "delete", "view"],
     audit_login: ["read"],
     cron: ["read", "add", "edit", "delete"],
+    script: ["read", "add", "edit", "delete"],
   },
   oss: {
     "": ["read"],

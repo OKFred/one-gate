@@ -6345,4 +6345,114 @@ export const initialTranslationData = [
       "en-US": "Node JSON Details",
     },
   },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "sidebar.menu.maintenance.script",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "JS 脚本管理",
+      "en-US": "JS Scripts",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "businessType.maintenance.script",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "系统运维-JS脚本",
+      "en-US": "Maintenance-JS Script",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.field.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "脚本名称",
+      "en-US": "Script Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.field.scriptKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "脚本唯一 Key",
+      "en-US": "Script Key",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.field.code",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "脚本代码",
+      "en-US": "Script Code",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.field.description",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "脚本描述",
+      "en-US": "Description",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.field.status",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "状态",
+      "en-US": "Status",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.filter.keywordPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "搜索名称/脚本Key",
+      "en-US": "Search Name / Script Key",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.button.run",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "立即执行",
+      "en-US": "Run Now",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.run.success",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "脚本运行成功",
+      "en-US": "Script executed successfully",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.script",
+    tKey: "script.run.failed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "脚本运行失败",
+      "en-US": "Script execution failed",
+    },
+  },
 ] as const satisfies BatchTranslationItem[];

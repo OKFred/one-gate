@@ -209,6 +209,15 @@ export const initialMenuData = [
     business: "maintenance.cron",
   },
   {
+    id: 37,
+    name: "sidebar.menu.maintenance.script",
+    icon: "material-symbols:code",
+    path: "/maintenance/script",
+    parentId: 19,
+    sort: 5,
+    business: "maintenance.script",
+  },
+  {
     id: 23,
     name: "sidebar.menu.oss",
     icon: "material-symbols:cloud",

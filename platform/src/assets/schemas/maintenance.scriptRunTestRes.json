@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "durationMs": {
+          "type": "number"
+        },
+        "errorMessage": {
+          "type": ["string", "null"],
+          "nullable": true
+        },
+        "result": {}
+      },
+      "required": ["success", "durationMs"],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["ok", "data", "message"],
+  "additionalProperties": false
+}

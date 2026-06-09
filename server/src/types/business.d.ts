@@ -27,6 +27,8 @@ export type BusinessType = {
   "maintenance.compliance": "maintenance.compliance";
   /** 运维定时任务 */
   "maintenance.cron": "maintenance.cron";
+  /** 运维JS脚本 */
+  "maintenance.script": "maintenance.script";
   /** 系统 */
   system: "system";
   /** 系统鉴权 */

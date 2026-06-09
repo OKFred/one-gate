@@ -61,14 +61,38 @@ export async function runPendingJobs() {
       }
 
       console.log(`[Scheduler] 开始执行任务 [${job.name} (${job.jobKey})]...`);
-      const handler = jobsRegistry[job.jobKey];
+      let handler = jobsRegistry[job.jobKey];
       const startTime = Date.now();
       let status = 1; // 1: 成功, 0: 失败
       let errorMessage: string | null = null;
 
       if (!handler) {
+        // 从数据库查询动态脚本
+        const { jsScriptTable } =
+          await import("@/api/maintenance/script/model");
+        const scripts = await db
+          .select()
+          .from(jsScriptTable)
+          .where(
+            and(
+              eq(jsScriptTable.scriptKey, job.jobKey),
+              eq(jsScriptTable.isEnabled, true)
+            )
+          )
+          .limit(1);
+
+        const script = scripts[0];
+        if (script) {
+          handler = async ({ params, db }) => {
+            const { executeJsScript } = await import("./executor");
+            await executeJsScript(script.code, { params, db });
+          };
+        }
+      }
+
+      if (!handler) {
         status = 0;
-        errorMessage = `Job key "${job.jobKey}" is not registered in jobsRegistry.`;
+        errorMessage = `Job key "${job.jobKey}" is not registered in jobsRegistry and no matching JS script was found.`;
         console.error(
           `[Scheduler] 任务 [${job.name}] 执行失败: ${errorMessage}`
         );

@@ -1,0 +1,63 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number",
+          "minimum": 1
+        },
+        "scriptKey": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "code": {
+          "type": "string"
+        },
+        "isEnabled": {
+          "type": "boolean"
+        },
+        "creatorId": {
+          "type": "number"
+        },
+        "createTimeUtc": {
+          "type": "number"
+        },
+        "updaterId": {
+          "type": ["number", "null"],
+          "nullable": true
+        },
+        "updateTimeUtc": {
+          "type": ["number", "null"],
+          "nullable": true
+        }
+      },
+      "required": [
+        "id",
+        "scriptKey",
+        "name",
+        "description",
+        "code",
+        "isEnabled",
+        "creatorId",
+        "createTimeUtc",
+        "updaterId",
+        "updateTimeUtc"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": ["ok", "data", "message"],
+  "additionalProperties": false
+}

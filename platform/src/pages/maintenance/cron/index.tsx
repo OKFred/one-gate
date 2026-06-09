@@ -26,7 +26,7 @@ const cronFormSchema = {
 // 2. 默认表单初始状态
 const DEFAULT_FORM: Partial<CronObj> = {
   name: '',
-  jobKey: 'test_log',
+  jobKey: '',
   cronExpression: '*/5 * * * *',
   status: 1,
   parameters: null,
@@ -83,7 +83,7 @@ export default function CronManagement() {
           return {
             ...form,
             name: row.name || '',
-            jobKey: row.jobKey || 'test_log',
+            jobKey: row.jobKey || '',
             cronExpression: row.cronExpression || '*/5 * * * *',
             status: row.status ?? 1,
             parameters: row.parameters || null,
@@ -92,7 +92,7 @@ export default function CronManagement() {
         return {
           ...form,
           name: '',
-          jobKey: 'test_log',
+          jobKey: '',
           cronExpression: '*/5 * * * *',
           status: 1,
           parameters: null,

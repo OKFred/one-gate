@@ -128,6 +128,13 @@ export const MAINTENANCE = {
     EDIT: 'maintenance.cron:edit',
     DELETE: 'maintenance.cron:delete',
   },
+  /** JS脚本管理 */
+  SCRIPT: {
+    READ: 'maintenance.script:read',
+    ADD: 'maintenance.script:add',
+    EDIT: 'maintenance.script:edit',
+    DELETE: 'maintenance.script:delete',
+  },
 };
 
 export const OSS = {

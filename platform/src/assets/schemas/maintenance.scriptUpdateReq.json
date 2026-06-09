@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number",
+      "minimum": 1
+    },
+    "scriptKey": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "code": {
+      "type": "string"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    }
+  },
+  "required": ["id"],
+  "additionalProperties": false
+}
