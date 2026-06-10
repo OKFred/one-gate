@@ -6970,6 +6970,16 @@ export const initialTranslationData = [
   {
     application: "frontend",
     business: "maintenance.api_task",
+    tKey: "apiTask.import.start",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "开始导入",
+      "en-US": "Start Import",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
     tKey: "apiTask.test.schemaValid",
     isEnabled: true,
     langCodes: {
