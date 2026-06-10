@@ -66,3 +66,14 @@ export const runTestFn = (
     ...axiosConfig,
   });
 };
+
+/** 批量添加 API Task */
+export const bulkAddFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/maintenance/api-task/bulkAdd', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/maintenance/api-task/bulkAdd',
+    method: 'post',
+    ...axiosConfig,
+  });
+};

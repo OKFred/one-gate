@@ -30,16 +30,18 @@ async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }
       const outputDir = path.resolve(__dirname, 'src/assets/schemas');
       await fs.mkdir(outputDir, { recursive: true });
 
-      // 递归删除无用字段的函数
-      const cleanSchema = (obj: Record<string, unknown>) => {
+      // 递归删除无用字段的函数，但不要删掉 properties 里的 description 字段
+      const cleanSchema = (obj: Record<string, unknown>, isProperties = false) => {
         if (typeof obj !== 'object' || obj === null) return;
-        const keysToRemove = ['description', 'examples', 'default', 'x-displayName', 'x-id'];
-        keysToRemove.forEach((key) => delete obj[key]);
-        Object.values(obj).forEach((value) => {
+        if (!isProperties) {
+          const keysToRemove = ['description', 'examples', 'default', 'x-displayName', 'x-id'];
+          keysToRemove.forEach((key) => delete obj[key]);
+        }
+        for (const [key, value] of Object.entries(obj)) {
           if (typeof value === 'object' && value !== null) {
-            cleanSchema(value as Record<string, unknown>);
+            cleanSchema(value as Record<string, unknown>, key === 'properties');
           }
-        });
+        }
       };
 
       for (const [name, schema] of Object.entries(schemas)) {

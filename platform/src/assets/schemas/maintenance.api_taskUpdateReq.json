@@ -13,6 +13,11 @@
       "type": "string",
       "maxLength": 100
     },
+    "description": {
+      "type": ["string", "null"],
+      "nullable": true,
+      "maxLength": 500
+    },
     "baseUrl": {
       "type": "string",
       "maxLength": 500

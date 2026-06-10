@@ -135,6 +135,13 @@ export const MAINTENANCE = {
     EDIT: 'maintenance.api_task:edit',
     DELETE: 'maintenance.api_task:delete',
   },
+  /** API 文档管理 */
+  API_DOCS: {
+    READ: 'maintenance.api_docs:read',
+    ADD: 'maintenance.api_docs:add',
+    EDIT: 'maintenance.api_docs:edit',
+    DELETE: 'maintenance.api_docs:delete',
+  },
 };
 
 export const OSS = {

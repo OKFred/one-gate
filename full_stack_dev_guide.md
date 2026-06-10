@@ -202,3 +202,23 @@ export type [Module]Obj = ListRes['list'][number];
    ```
 2. **交互按钮绑定**：
    在渲染表格操作列按钮（如 `table.actions` 中的 `permissionCodes`）、页面通用按钮、或定制组件时，必须绑定该权限码常量。底座和鉴权 Hook 将根据当前用户的实际拥有的权限列表自动对按钮进行隐藏或禁用，从而做到全链路的安全协同。
+
+---
+
+## 9. 后端 API 接口更新与前端 Schema 同步规范
+
+每当后端 API 接口更新（修改了字段、路由或类型）时，前端需要重新同步接口元数据和 JSON Schemas，步骤如下：
+
+### 9.1 类型与 Schema 自动同步触发条件
+- 前端 `platform` 的开发模式（`pnpm run dev`）在配置了本地后端地址（通过 `VITE_SERVER_URL`）时，会自动在启动或热重载时拉取后端的 `/doc.json`，并执行以下两项任务：
+  1. 生成最新的前端 TypeScript 类型文件 `platform/src/types/openapi.d.ts`。
+  2. 解析 `/doc.json` 内的 components 结构，提取拆分后写入到 `platform/src/assets/schemas/*.json` 中，供低代码表单底座使用。
+
+### 9.2 手动或重新编译同步方法
+- 如果开发服务器已经在运行但后端接口发生了更新，可以通过以下方式强制重新同步：
+  - **方法 A**：在 `platform` 目录下重新运行 `pnpm run dev`（热启动会触发配置加载，从而调用 API 获取和拆分生成）。
+  - **方法 B**：或者如果开发服务器被配置了热更新，只需保存一下 `platform/vite.config.ts` 即可触发配置文件重新载入，进而重新请求并写入 Schema。
+
+### 9.3 编译过滤规范 (Vite cleanSchema 防御)
+- 在对 API 的 JSON Schemas 进行元数据清洗时（删除 `examples`、`default` 以及文档描述），**严禁**误删 `properties` 映射内部的数据表字段本身（例如 `"description"`、`"default"` 属性字段）。
+- 在修改 `vite.config.ts` 的清洗过滤函数时，必须使用上下文状态位（如 `isProperties`）进行防御，以防数据表字段被误过滤导致低代码表单底座（`SchemaCrudPage`）因匹配不到 properties 而过滤掉该字段的提交。

@@ -46,6 +46,7 @@ const permissionSeeds: Record<string, Record<string, string[]>> = {
     audit_login: ["read"],
     cron: ["read", "add", "edit", "delete"],
     api_task: ["read", "add", "edit", "delete"],
+    api_docs: ["read", "add", "edit", "delete"],
   },
   oss: {
     "": ["read"],

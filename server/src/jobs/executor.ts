@@ -15,6 +15,10 @@ export interface ApiTaskResult {
   statusCode: number;
   responseBody: string;
   success: boolean;
+  headers?: Record<string, string>;
+  statusText?: string;
+  url?: string;
+  redirected?: boolean;
 }
 
 /**
@@ -26,7 +30,16 @@ export async function executeApiTask(
   task: ApiTaskDef,
   params: Record<string, unknown>
 ): Promise<ApiTaskResult> {
-  const url = new URL(task.path, task.baseUrl);
+  // 拼接 baseUrl 和 path，保留 baseUrl 中的路径后缀（例如 /v2）
+  let fullUrlStr = task.baseUrl;
+  if (fullUrlStr.endsWith("/") && task.path.startsWith("/")) {
+    fullUrlStr += task.path.slice(1);
+  } else if (!fullUrlStr.endsWith("/") && !task.path.startsWith("/")) {
+    fullUrlStr += "/" + task.path;
+  } else {
+    fullUrlStr += task.path;
+  }
+  const url = new URL(fullUrlStr);
   const method = task.method.toUpperCase();
 
   // 合并默认请求头
@@ -67,10 +80,19 @@ export async function executeApiTask(
     });
 
     const responseBody = await res.text();
+    const resHeaders: Record<string, string> = {};
+    res.headers.forEach((value, key) => {
+      resHeaders[key] = value;
+    });
+
     return {
       statusCode: res.status,
       responseBody,
       success: res.ok,
+      headers: resHeaders,
+      statusText: res.statusText,
+      url: res.url,
+      redirected: res.redirected,
     };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
@@ -79,6 +101,10 @@ export async function executeApiTask(
       statusCode: isTimeout ? 408 : 0,
       responseBody: message,
       success: false,
+      headers: {},
+      statusText: isTimeout ? "Request Timeout" : "Network Error",
+      url: url.toString(),
+      redirected: false,
     };
   } finally {
     clearTimeout(timer);

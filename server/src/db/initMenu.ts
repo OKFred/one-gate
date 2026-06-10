@@ -218,6 +218,15 @@ export const initialMenuData = [
     business: "maintenance.api_task",
   },
   {
+    id: 38,
+    name: "sidebar.menu.maintenance.apiDocs",
+    icon: "material-symbols:api",
+    path: "/maintenance/api-docs",
+    parentId: 19,
+    sort: 6,
+    business: "maintenance.api_docs",
+  },
+  {
     id: 23,
     name: "sidebar.menu.oss",
     icon: "material-symbols:cloud",

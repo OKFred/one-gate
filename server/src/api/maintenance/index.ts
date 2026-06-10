@@ -4,6 +4,7 @@ import compliance from "./compliance/index";
 import init from "./init/index";
 import cron from "./cron/index";
 import apiTask from "./api-task/index";
+import apiDocs from "./api-docs/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
@@ -15,6 +16,7 @@ function createApp(): App {
   app.route("/init", init());
   app.route("/cron", cron());
   app.route("/api-task", apiTask());
+  app.route("/api-docs", apiDocs());
   return app;
 }
 export default createApp;

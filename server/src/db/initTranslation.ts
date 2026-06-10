@@ -6515,4 +6515,486 @@ export const initialTranslationData = [
       "en-US": "Request execution failed",
     },
   },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "sidebar.menu.maintenance.apiDocs",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "API 文档",
+      "en-US": "API Docs",
+    },
+  },
+  {
+    application: "frontend",
+    business: "business.type",
+    tKey: "businessType.maintenance.api_docs",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "系统运维-API文档管理",
+      "en-US": "Maintenance-API Docs",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.field.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "文档名称",
+      "en-US": "Doc Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.field.docType",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "文档类型",
+      "en-US": "Doc Type",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.field.version",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "版本",
+      "en-US": "Version",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.field.description",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "描述",
+      "en-US": "Description",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.field.content",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "文档内容",
+      "en-US": "Content",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.button.upload",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "上传文档",
+      "en-US": "Upload Doc",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.upload.success",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "上传成功",
+      "en-US": "Uploaded successfully",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.upload.failed",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "上传失败",
+      "en-US": "Upload failed",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.filter.keywordPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "搜索名称/描述",
+      "en-US": "Search Name / Description",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.button.importFromDocs",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "从文档导入",
+      "en-US": "Import from Docs",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.title",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "立即执行测试",
+      "en-US": "Run Test",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.result",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "执行结果",
+      "en-US": "Execution Result",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.response",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "响应内容 (Response)",
+      "en-US": "Response Content",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.headers",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "响应头 (Headers)",
+      "en-US": "Response Headers",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.noResponse",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "无响应内容",
+      "en-US": "No Response Content",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.noHeaders",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "无响应头",
+      "en-US": "No Response Headers",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.errorDetails",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "错误详情",
+      "en-US": "Error Details",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.status",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "状态",
+      "en-US": "Status",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.duration",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "耗时",
+      "en-US": "Duration",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.run",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "立即执行",
+      "en-US": "Run Test Now",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.running",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "执行中...",
+      "en-US": "Running...",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.close",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "关闭",
+      "en-US": "Close",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.paramsInput",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "JSON 入参（请求 Body / Query 参数）",
+      "en-US": "JSON Parameters (Request Body / Query)",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.paramsSchema",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "入参 Schema（OAS3 参考）：",
+      "en-US": "Parameters Schema (OAS3 Reference):",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.form.uploadTip",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "支持 .json / .yaml / .yml 格式，上传后将自动解析文档基本信息。",
+      "en-US":
+        "Supports .json, .yaml, or .yml formats. Document info will be parsed automatically after uploading.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_docs",
+    tKey: "apiDocs.form.contentPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "可以直接粘贴 Swagger / OpenAPI JSON 或 YAML 内容...",
+      "en-US":
+        "You can paste Swagger / OpenAPI JSON or YAML content directly here...",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.title",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "从 Swagger/OpenAPI 文档批量导入 API 任务",
+      "en-US": "Batch Import API Tasks from Swagger/OpenAPI Document",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.successPrefix",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "导入完成：成功 ",
+      "en-US": "Import completed: ",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.successMiddle",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": " 个，失败 ",
+      "en-US": " succeeded, ",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.successSuffix",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": " 个。",
+      "en-US": " failed.",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.failedDetails",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "失败详情：",
+      "en-US": "Failure Details:",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.taskKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "任务 Key",
+      "en-US": "Task Key",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.errorReason",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "错误原因",
+      "en-US": "Error Reason",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.selectDoc",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "选择已上传文档",
+      "en-US": "Select Uploaded Document",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.baseUrl",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "基准 URL (Base URL)",
+      "en-US": "Base URL",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.keyPrefix",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "Key 前缀 (Prefix)",
+      "en-US": "Key Prefix",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.selectedEndpoints",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "已选中的接口 ({{selected}} / {{total}})",
+      "en-US": "Selected Endpoints ({{selected}} / {{total}})",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.searchPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "搜索 Path / 名称...",
+      "en-US": "Search Path / Name...",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.endpointName",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "接口名称 / 描述",
+      "en-US": "Endpoint Name / Description",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.generatedKey",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "生成后任务 Key",
+      "en-US": "Generated Task Key",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.done",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "完成",
+      "en-US": "Done",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.cancel",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "取消",
+      "en-US": "Cancel",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.import.importing",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "导入中...",
+      "en-US": "Importing...",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.schemaValid",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "响应符合 Schema 规范",
+      "en-US": "Response matches schema specification",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.schemaInvalid",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "响应不符合 Schema 规范，错误如下：",
+      "en-US": "Response does not match schema specification. Errors:",
+    },
+  },
+  {
+    application: "frontend",
+    business: "maintenance.api_task",
+    tKey: "apiTask.test.noSchema",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "未配置响应 Schema，已跳过校验",
+      "en-US": "No response schema configured, validation skipped",
+    },
+  },
 ] as const satisfies BatchTranslationItem[];

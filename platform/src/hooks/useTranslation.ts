@@ -55,9 +55,15 @@ export const getTranslations = (langCode?: LangCode): Translations => {
 export const createTranslator = (langCode?: LangCode) => {
   const language = langCode || fallbackLangCode;
 
-  return (key: string): string => {
+  return (key: string, params?: Record<string, string | number>): string => {
     const translations = translationCache[language] || {};
-    return translations[key] || key;
+    let text = translations[key] || key;
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        text = text.replace(new RegExp(`\\{\\{\\s*${k}\\s*\\}\\}`, 'g'), String(v));
+      });
+    }
+    return text;
   };
 };
 

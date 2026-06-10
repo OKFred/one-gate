@@ -32,6 +32,7 @@ import {
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import hasValue from "@/utils/hasValue";
+import { validate } from "@cfworker/json-schema";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -434,6 +435,26 @@ const runTestRes = {
     durationMs: { type: "number" },
     responseBody: { type: ["string", "null"], nullable: true },
     errorMessage: { type: ["string", "null"], nullable: true },
+    responseHeaders: {
+      type: "object",
+      additionalProperties: true,
+    },
+    statusText: { type: ["string", "null"], nullable: true },
+    url: { type: ["string", "null"], nullable: true },
+    redirected: { type: "boolean" },
+    schemaValidation: {
+      type: "object",
+      properties: {
+        hasSchema: { type: "boolean" },
+        valid: { type: "boolean" },
+        errors: {
+          type: "array",
+          items: { type: "string" },
+        },
+      },
+      required: ["hasSchema", "valid"],
+      additionalProperties: false,
+    },
   },
   required: ["success", "statusCode", "durationMs"],
   additionalProperties: false,
@@ -469,12 +490,63 @@ async function onRunTest(
   const result = await executeApiTask(task, parsedParams);
   const durationMs = Date.now() - startTime;
 
+  let schemaValidation = {
+    hasSchema: false,
+    valid: true,
+    errors: [] as string[],
+  };
+
+  if (task.responseSchema) {
+    try {
+      const schemaObj = JSON.parse(task.responseSchema);
+      let dataObj: unknown = null;
+      let isJson = false;
+      if (result.responseBody) {
+        try {
+          dataObj = JSON.parse(result.responseBody);
+          isJson = true;
+        } catch (e) {
+          // not valid JSON
+        }
+      }
+      if (isJson) {
+        const { valid, errors } = validate(dataObj, schemaObj, "2020-12");
+        schemaValidation = {
+          hasSchema: true,
+          valid,
+          errors: errors.map((err) => `${err.instanceLocation}: ${err.error}`),
+        };
+      } else {
+        schemaValidation = {
+          hasSchema: true,
+          valid: false,
+          errors: [
+            "Response body is not valid JSON, cannot validate against Schema.",
+          ],
+        };
+      }
+    } catch (e) {
+      schemaValidation = {
+        hasSchema: true,
+        valid: false,
+        errors: [
+          `Invalid response schema definition: ${e instanceof Error ? e.message : String(e)}`,
+        ],
+      };
+    }
+  }
+
   return {
     success: result.success,
     statusCode: result.statusCode,
     durationMs,
     responseBody: result.responseBody,
     errorMessage: result.success ? null : `HTTP ${result.statusCode}`,
+    responseHeaders: result.headers || {},
+    statusText: result.statusText || null,
+    url: result.url || null,
+    redirected: result.redirected ?? false,
+    schemaValidation,
   };
 }
 
@@ -491,6 +563,134 @@ const runTestApi = {
   permission: { action: "edit" },
 } satisfies API;
 
+//----------------- 7. 批量添加任务 ----------------//
+const bulkAddReq = {
+  type: "object",
+  properties: {
+    tasks: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          taskKey: { type: "string" },
+          name: { type: "string" },
+          description: { type: ["string", "null"], nullable: true },
+          baseUrl: { type: "string" },
+          path: { type: "string" },
+          method: {
+            type: "string",
+            enum: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+          },
+          headers: { type: ["string", "null"], nullable: true },
+          requestSchema: { type: ["string", "null"], nullable: true },
+          responseSchema: { type: ["string", "null"], nullable: true },
+          timeoutMs: { type: "number" },
+          isEnabled: { type: "boolean" },
+        },
+        required: ["taskKey", "name", "baseUrl", "path", "method"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["tasks"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const bulkAddRes = {
+  type: "object",
+  properties: {
+    successCount: { type: "number" },
+    failedCount: { type: "number" },
+    errors: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          taskKey: { type: "string" },
+          message: { type: "string" },
+        },
+        required: ["taskKey", "message"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["successCount", "failedCount", "errors"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onBulkAdd(
+  params: FromSchema<typeof bulkAddReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof bulkAddRes>> {
+  const { userId: creatorId } = userObj;
+  const { tasks } = params;
+
+  let successCount = 0;
+  let failedCount = 0;
+  const errors: { taskKey: string; message: string }[] = [];
+
+  for (const task of tasks) {
+    try {
+      const existRows = await db
+        .select()
+        .from(apiTaskTable)
+        .where(eq(apiTaskTable.taskKey, task.taskKey))
+        .limit(1);
+
+      if (existRows.length > 0) {
+        errors.push({
+          taskKey: task.taskKey,
+          message: `任务 Key "${task.taskKey}" 已存在`,
+        });
+        failedCount++;
+        continue;
+      }
+
+      await db.insert(apiTaskTable).values({
+        taskKey: task.taskKey,
+        name: task.name,
+        description: task.description || null,
+        baseUrl: task.baseUrl,
+        path: task.path,
+        method: task.method as any,
+        headers: task.headers || null,
+        requestSchema: task.requestSchema || null,
+        responseSchema: task.responseSchema || null,
+        timeoutMs: task.timeoutMs ?? 30000,
+        isEnabled: task.isEnabled ?? true,
+        creatorId,
+      });
+
+      successCount++;
+    } catch (err: any) {
+      errors.push({
+        taskKey: task.taskKey,
+        message: err.message || String(err),
+      });
+      failedCount++;
+    }
+  }
+
+  return {
+    successCount,
+    failedCount,
+    errors,
+  };
+}
+
+const bulkAddApi = {
+  req: bulkAddReq,
+  res: bulkAddRes,
+  pathInfo: {
+    path: "/bulkAdd",
+    method: "post",
+    summary: "批量添加 API Task",
+  } as const,
+  adapter: bodyUserAdapter,
+  service: onBulkAdd,
+  permission: { action: "add" },
+} satisfies API;
+
 //----------------- 统一导出 ----------------//
 export default {
   list: listApi,
@@ -499,4 +699,5 @@ export default {
   delete: deleteApi,
   get: getApi,
   runTest: runTestApi,
+  bulkAdd: bulkAddApi,
 };

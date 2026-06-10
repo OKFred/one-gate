@@ -3429,6 +3429,412 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/maintenance/api-task/bulkAdd": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 批量添加 API Task */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_taskBulkAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_taskBulkAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/api-docs/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 API 文档列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_docsListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_docsListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/api-docs/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 上传/添加 API 文档 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_docsAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_docsAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/api-docs/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新 API 文档 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_docsUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_docsUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/api-docs/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除 API 文档 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_docsDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_docsDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/api-docs/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 API 文档详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_docsGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_docsGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/maintenance/api-docs/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 解析 API 文档并获取接口列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["maintenance.api_docsParseReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["maintenance.api_docsParseRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/oss/config/listAll": {
         parameters: {
             query?: never;
@@ -12109,6 +12515,253 @@ export interface components {
                 durationMs: number;
                 responseBody?: ((string | null) | null) | null;
                 errorMessage?: ((string | null) | null) | null;
+                responseHeaders?: {
+                    [key: string]: unknown;
+                };
+                statusText?: ((string | null) | null) | null;
+                url?: ((string | null) | null) | null;
+                redirected?: boolean;
+                schemaValidation?: {
+                    hasSchema: boolean;
+                    valid: boolean;
+                    errors?: string[];
+                };
+            };
+            message: string;
+        };
+        "maintenance.api_taskBulkAddReq": {
+            tasks: {
+                taskKey: string;
+                name: string;
+                description?: ((string | null) | null) | null;
+                baseUrl: string;
+                path: string;
+                /** @enum {string} */
+                method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+                headers?: ((string | null) | null) | null;
+                requestSchema?: ((string | null) | null) | null;
+                responseSchema?: ((string | null) | null) | null;
+                timeoutMs?: number;
+                isEnabled?: boolean;
+            }[];
+        };
+        "maintenance.api_taskBulkAddRes": {
+            ok: boolean;
+            data: {
+                successCount: number;
+                failedCount: number;
+                errors: {
+                    taskKey: string;
+                    message: string;
+                }[];
+            };
+            message: string;
+        };
+        "maintenance.api_docsListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "createTimeUtc";
+        };
+        "maintenance.api_docsListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 文档名称 */
+                    name: string;
+                    /** @description 文档版本 */
+                    version: ((string | null) | null) | null;
+                    /** @description 文档描述 */
+                    description: ((string | null) | null) | null;
+                    /**
+                     * @description 文档类型
+                     * @enum {string}
+                     */
+                    docType: "swagger2.0" | "openapi3.0" | "openapi3.1";
+                    /** @description 文档内容 (JSON 字符串) */
+                    content: string;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "maintenance.api_docsAddReq": {
+            /** @description 文档名称 */
+            name: string;
+            /** @description 文档版本 */
+            version?: ((string | null) | null) | null;
+            /** @description 文档描述 */
+            description?: ((string | null) | null) | null;
+            /**
+             * @description 文档类型
+             * @enum {string}
+             */
+            docType: "swagger2.0" | "openapi3.0" | "openapi3.1";
+            /** @description 文档内容 (JSON 字符串) */
+            content: string;
+        };
+        "maintenance.api_docsAddRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "maintenance.api_docsUpdateReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 文档名称 */
+            name?: string;
+            /** @description 文档版本 */
+            version?: ((string | null) | null) | null;
+            /** @description 文档描述 */
+            description?: ((string | null) | null) | null;
+            /**
+             * @description 文档类型
+             * @enum {string}
+             */
+            docType?: "swagger2.0" | "openapi3.0" | "openapi3.1";
+            /** @description 文档内容 (JSON 字符串) */
+            content?: string;
+        };
+        "maintenance.api_docsUpdateRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "maintenance.api_docsDeleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "maintenance.api_docsDeleteRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "maintenance.api_docsGetReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "maintenance.api_docsGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 文档名称 */
+                name: string;
+                /** @description 文档版本 */
+                version: ((string | null) | null) | null;
+                /** @description 文档描述 */
+                description: ((string | null) | null) | null;
+                /**
+                 * @description 文档类型
+                 * @enum {string}
+                 */
+                docType: "swagger2.0" | "openapi3.0" | "openapi3.1";
+                /** @description 文档内容 (JSON 字符串) */
+                content: string;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "maintenance.api_docsParseReq": {
+            /** @description 文档ID */
+            id: number;
+        };
+        "maintenance.api_docsParseRes": {
+            ok: boolean;
+            data: {
+                info: {
+                    title: string;
+                    version: string;
+                    description: string;
+                };
+                /** @enum {string} */
+                docType: "swagger2.0" | "openapi3.0" | "openapi3.1";
+                apis: {
+                    path: string;
+                    method: string;
+                    summary: string;
+                    description: string;
+                    requestSchema: string;
+                    responseSchema: string;
+                }[];
             };
             message: string;
         };

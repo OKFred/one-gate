@@ -2,9 +2,10 @@ import * as CacheAPI from '@/api/maintenance/cache';
 import * as AuditLoginAPI from '@/api/maintenance/auditLogin';
 import * as CronAPI from '@/api/maintenance/cron';
 import * as ApiTaskAPI from '@/api/maintenance/api-task';
+import * as ApiDocsAPI from '@/api/maintenance/api-docs';
 
 // ==================== Cache ====================
-
+// ... (lines 6-69 stay identical, let's keep them)
 export type ListKeysReq = NonNullable<Parameters<typeof CacheAPI.listKeysFn>[0]['data']>;
 export type ListKeysRes = Awaited<ReturnType<typeof CacheAPI.listKeysFn>>['data']['data'];
 
@@ -38,6 +39,7 @@ export type AddCronRes = Awaited<ReturnType<typeof CronAPI.addFn>>['data']['data
 export type UpdateCronReq = NonNullable<Parameters<typeof CronAPI.updateFn>[0]['data']>;
 export type UpdateCronRes = Awaited<ReturnType<typeof CronAPI.updateFn>>['data']['data'];
 
+// ... Rest of file up to line 70
 export type DeleteCronReq = NonNullable<Parameters<typeof CronAPI.deleteFn>[0]['data']>;
 export type DeleteCronRes = Awaited<ReturnType<typeof CronAPI.deleteFn>>['data']['data'];
 
@@ -67,3 +69,28 @@ export type RunTestApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.runTest
 export type RunTestApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.runTestFn>>['data']['data'];
 
 export type ApiTaskObj = ListApiTaskRes['list'][number];
+
+// ==================== API Docs ====================
+export type ListApiDocsReq = NonNullable<Parameters<typeof ApiDocsAPI.listFn>[0]['data']>;
+export type ListApiDocsRes = Awaited<ReturnType<typeof ApiDocsAPI.listFn>>['data']['data'];
+
+export type GetApiDocsReq = NonNullable<Parameters<typeof ApiDocsAPI.getFn>[0]['data']>;
+export type GetApiDocsRes = Awaited<ReturnType<typeof ApiDocsAPI.getFn>>['data']['data'];
+
+export type AddApiDocsReq = NonNullable<Parameters<typeof ApiDocsAPI.addFn>[0]['data']>;
+export type AddApiDocsRes = Awaited<ReturnType<typeof ApiDocsAPI.addFn>>['data']['data'];
+
+export type UpdateApiDocsReq = NonNullable<Parameters<typeof ApiDocsAPI.updateFn>[0]['data']>;
+export type UpdateApiDocsRes = Awaited<ReturnType<typeof ApiDocsAPI.updateFn>>['data']['data'];
+
+export type DeleteApiDocsReq = NonNullable<Parameters<typeof ApiDocsAPI.deleteFn>[0]['data']>;
+export type DeleteApiDocsRes = Awaited<ReturnType<typeof ApiDocsAPI.deleteFn>>['data']['data'];
+
+export type ParseApiDocsReq = NonNullable<Parameters<typeof ApiDocsAPI.parseFn>[0]['data']>;
+export type ParseApiDocsRes = Awaited<ReturnType<typeof ApiDocsAPI.parseFn>>['data']['data'];
+
+export type ApiDocsObj = ListApiDocsRes['list'][number];
+
+// ==================== API Task Add Bulk ====================
+export type BulkAddApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.bulkAddFn>[0]['data']>;
+export type BulkAddApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.bulkAddFn>>['data']['data'];
