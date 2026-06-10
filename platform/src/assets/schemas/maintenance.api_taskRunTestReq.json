@@ -1,0 +1,14 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "parameters": {
+      "type": ["string", "null"],
+      "nullable": true
+    }
+  },
+  "required": ["id"],
+  "additionalProperties": false
+}

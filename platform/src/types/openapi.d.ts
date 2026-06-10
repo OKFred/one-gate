@@ -3081,7 +3081,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/script/list": {
+    "/api/v1/maintenance/api-task/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3090,7 +3090,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取JS脚本列表 */
+        /** 获取 API Task 列表 */
         post: {
             parameters: {
                 query?: never;
@@ -3100,7 +3100,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["maintenance.scriptListReq"];
+                    "application/json": components["schemas"]["maintenance.api_taskListReq"];
                 };
             };
             responses: {
@@ -3110,7 +3110,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["maintenance.scriptListRes"];
+                        "application/json": components["schemas"]["maintenance.api_taskListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3139,7 +3139,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/script/add": {
+    "/api/v1/maintenance/api-task/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -3148,7 +3148,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加JS脚本 */
+        /** 添加 API Task */
         post: {
             parameters: {
                 query?: never;
@@ -3158,7 +3158,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["maintenance.scriptAddReq"];
+                    "application/json": components["schemas"]["maintenance.api_taskAddReq"];
                 };
             };
             responses: {
@@ -3168,7 +3168,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["maintenance.scriptAddRes"];
+                        "application/json": components["schemas"]["maintenance.api_taskAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3197,7 +3197,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/script/update": {
+    "/api/v1/maintenance/api-task/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -3206,7 +3206,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 更新JS脚本 */
+        /** 更新 API Task */
         post: {
             parameters: {
                 query?: never;
@@ -3216,7 +3216,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["maintenance.scriptUpdateReq"];
+                    "application/json": components["schemas"]["maintenance.api_taskUpdateReq"];
                 };
             };
             responses: {
@@ -3226,7 +3226,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["maintenance.scriptUpdateRes"];
+                        "application/json": components["schemas"]["maintenance.api_taskUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3255,7 +3255,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/script/delete": {
+    "/api/v1/maintenance/api-task/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -3264,7 +3264,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除JS脚本 */
+        /** 删除 API Task */
         post: {
             parameters: {
                 query?: never;
@@ -3274,7 +3274,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["maintenance.scriptDeleteReq"];
+                    "application/json": components["schemas"]["maintenance.api_taskDeleteReq"];
                 };
             };
             responses: {
@@ -3284,7 +3284,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["maintenance.scriptDeleteRes"];
+                        "application/json": components["schemas"]["maintenance.api_taskDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3313,7 +3313,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/script/get": {
+    "/api/v1/maintenance/api-task/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -3322,7 +3322,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取JS脚本详情 */
+        /** 获取 API Task 详情 */
         post: {
             parameters: {
                 query?: never;
@@ -3332,7 +3332,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["maintenance.scriptGetReq"];
+                    "application/json": components["schemas"]["maintenance.api_taskGetReq"];
                 };
             };
             responses: {
@@ -3342,7 +3342,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["maintenance.scriptGetRes"];
+                        "application/json": components["schemas"]["maintenance.api_taskGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3371,7 +3371,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/script/runTest": {
+    "/api/v1/maintenance/api-task/runTest": {
         parameters: {
             query?: never;
             header?: never;
@@ -3380,7 +3380,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 立即执行JS脚本测试 */
+        /** 立即测试执行 API Task */
         post: {
             parameters: {
                 query?: never;
@@ -3390,7 +3390,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["maintenance.scriptRunTestReq"];
+                    "application/json": components["schemas"]["maintenance.api_taskRunTestReq"];
                 };
             };
             responses: {
@@ -3400,7 +3400,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["maintenance.scriptRunTestRes"];
+                        "application/json": components["schemas"]["maintenance.api_taskRunTestRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -11838,6 +11838,7 @@ export interface components {
                     jobId: number;
                     status: number;
                     errorMessage?: ((string | null) | null) | null;
+                    responseBody?: ((string | null) | null) | null;
                     startTimeUtc: number;
                     endTimeUtc: number;
                     durationMs: number;
@@ -11861,7 +11862,7 @@ export interface components {
             };
             message: string;
         };
-        "maintenance.scriptListReq": {
+        "maintenance.api_taskListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -11882,9 +11883,9 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "name" | "scriptKey" | "createTimeUtc";
+            orderBy?: "id" | "name" | "taskKey" | "createTimeUtc";
         };
-        "maintenance.scriptListRes": {
+        "maintenance.api_taskListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -11901,14 +11902,29 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /** @description 脚本唯一标识键 */
-                    scriptKey: string;
-                    /** @description 脚本名称 */
+                    /** @description 任务唯一标识键 */
+                    taskKey: string;
+                    /** @description 任务名称 */
                     name: string;
-                    /** @description 脚本描述 */
+                    /** @description 任务描述 */
                     description: ((string | null) | null) | null;
-                    /** @description ES Module 脚本代码 */
-                    code: string;
+                    /** @description 请求基础 URL，例如 https://api.example.com */
+                    baseUrl: string;
+                    /** @description API 路径，例如 /v1/data */
+                    path: string;
+                    /**
+                     * @description HTTP 方法
+                     * @enum {string}
+                     */
+                    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+                    /** @description JSON 字符串，默认请求头（如 Authorization） */
+                    headers: ((string | null) | null) | null;
+                    /** @description OAS3 Schema JSON 字符串，描述请求入参结构 */
+                    requestSchema: ((string | null) | null) | null;
+                    /** @description OAS3 Schema JSON 字符串，描述响应结构（可选，仅供文档参考） */
+                    responseSchema: ((string | null) | null) | null;
+                    /** @description 请求超时时间（毫秒），默认 30000 */
+                    timeoutMs: number;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 创建人ID */
@@ -11929,19 +11945,34 @@ export interface components {
             };
             message: string;
         };
-        "maintenance.scriptAddReq": {
-            /** @description 脚本唯一标识键 */
-            scriptKey: string;
-            /** @description 脚本名称 */
+        "maintenance.api_taskAddReq": {
+            /** @description 任务唯一标识键 */
+            taskKey: string;
+            /** @description 任务名称 */
             name: string;
-            /** @description 脚本描述 */
+            /** @description 任务描述 */
             description?: ((string | null) | null) | null;
-            /** @description ES Module 脚本代码 */
-            code: string;
+            /** @description 请求基础 URL，例如 https://api.example.com */
+            baseUrl: string;
+            /** @description API 路径，例如 /v1/data */
+            path: string;
+            /**
+             * @description HTTP 方法
+             * @enum {string}
+             */
+            method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+            /** @description JSON 字符串，默认请求头（如 Authorization） */
+            headers?: ((string | null) | null) | null;
+            /** @description OAS3 Schema JSON 字符串，描述请求入参结构 */
+            requestSchema?: ((string | null) | null) | null;
+            /** @description OAS3 Schema JSON 字符串，描述响应结构（可选，仅供文档参考） */
+            responseSchema?: ((string | null) | null) | null;
+            /** @description 请求超时时间（毫秒），默认 30000 */
+            timeoutMs: number;
             /** @description 是否启用 */
             isEnabled: boolean;
         };
-        "maintenance.scriptAddRes": {
+        "maintenance.api_taskAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -11950,24 +11981,39 @@ export interface components {
             data: number;
             message: string;
         };
-        "maintenance.scriptUpdateReq": {
+        "maintenance.api_taskUpdateReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
-            /** @description 脚本唯一标识键 */
-            scriptKey?: string;
-            /** @description 脚本名称 */
+            /** @description 任务唯一标识键 */
+            taskKey?: string;
+            /** @description 任务名称 */
             name?: string;
-            /** @description 脚本描述 */
+            /** @description 任务描述 */
             description?: ((string | null) | null) | null;
-            /** @description ES Module 脚本代码 */
-            code?: string;
+            /** @description 请求基础 URL，例如 https://api.example.com */
+            baseUrl?: string;
+            /** @description API 路径，例如 /v1/data */
+            path?: string;
+            /**
+             * @description HTTP 方法
+             * @enum {string}
+             */
+            method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+            /** @description JSON 字符串，默认请求头（如 Authorization） */
+            headers?: ((string | null) | null) | null;
+            /** @description OAS3 Schema JSON 字符串，描述请求入参结构 */
+            requestSchema?: ((string | null) | null) | null;
+            /** @description OAS3 Schema JSON 字符串，描述响应结构（可选，仅供文档参考） */
+            responseSchema?: ((string | null) | null) | null;
+            /** @description 请求超时时间（毫秒），默认 30000 */
+            timeoutMs?: number;
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
-        "maintenance.scriptUpdateRes": {
+        "maintenance.api_taskUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -11976,14 +12022,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "maintenance.scriptDeleteReq": {
+        "maintenance.api_taskDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "maintenance.scriptDeleteRes": {
+        "maintenance.api_taskDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -11992,14 +12038,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "maintenance.scriptGetReq": {
+        "maintenance.api_taskGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "maintenance.scriptGetRes": {
+        "maintenance.api_taskGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -12007,14 +12053,29 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /** @description 脚本唯一标识键 */
-                scriptKey: string;
-                /** @description 脚本名称 */
+                /** @description 任务唯一标识键 */
+                taskKey: string;
+                /** @description 任务名称 */
                 name: string;
-                /** @description 脚本描述 */
+                /** @description 任务描述 */
                 description: ((string | null) | null) | null;
-                /** @description ES Module 脚本代码 */
-                code: string;
+                /** @description 请求基础 URL，例如 https://api.example.com */
+                baseUrl: string;
+                /** @description API 路径，例如 /v1/data */
+                path: string;
+                /**
+                 * @description HTTP 方法
+                 * @enum {string}
+                 */
+                method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+                /** @description JSON 字符串，默认请求头（如 Authorization） */
+                headers: ((string | null) | null) | null;
+                /** @description OAS3 Schema JSON 字符串，描述请求入参结构 */
+                requestSchema: ((string | null) | null) | null;
+                /** @description OAS3 Schema JSON 字符串，描述响应结构（可选，仅供文档参考） */
+                responseSchema: ((string | null) | null) | null;
+                /** @description 请求超时时间（毫秒），默认 30000 */
+                timeoutMs: number;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 创建人ID */
@@ -12034,20 +12095,20 @@ export interface components {
             };
             message: string;
         };
-        "maintenance.scriptRunTestReq": {
-            /** @description 脚本ID */
+        "maintenance.api_taskRunTestReq": {
+            /** @description 任务ID */
             id: number;
-            /** @description 手动指定的 JSON 参数 */
+            /** @description JSON 入参（覆盖默认参数） */
             parameters?: ((string | null) | null) | null;
         };
-        "maintenance.scriptRunTestRes": {
+        "maintenance.api_taskRunTestRes": {
             ok: boolean;
             data: {
                 success: boolean;
+                statusCode: number;
                 durationMs: number;
+                responseBody?: ((string | null) | null) | null;
                 errorMessage?: ((string | null) | null) | null;
-                /** @description 执行结果 */
-                result?: unknown;
             };
             message: string;
         };

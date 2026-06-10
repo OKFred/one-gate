@@ -176,6 +176,7 @@ export const cronLogTable = sqliteTable("system_cron_job_log", {
   jobId: integer("job_id").notNull(),
   status: integer("status").notNull(), // 0: 失败, 1: 成功
   errorMessage: text("error_message"),
+  responseBody: text("response_body"),
   startTimeUtc: integer("start_time_utc").notNull(),
   endTimeUtc: integer("end_time_utc").notNull(),
   durationMs: integer("duration_ms").notNull(),

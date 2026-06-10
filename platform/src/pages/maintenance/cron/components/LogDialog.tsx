@@ -121,9 +121,34 @@ export default function LogDialog({ open, onClose, job }: LogDialogProps) {
                       <TableCell>{log.durationMs}ms</TableCell>
                       <TableCell sx={{ maxWidth: 300, wordBreak: 'break-all' }}>
                         {log.status === 1 ? (
-                          <Typography variant="caption" color="text.secondary">
-                            {t('cron.log.success')}
-                          </Typography>
+                          <Stack spacing={0.5}>
+                            <Typography variant="caption" color="text.secondary">
+                              {t('cron.log.success')}
+                            </Typography>
+                            {log.responseBody && (
+                              <Box
+                                sx={{
+                                  fontFamily: 'monospace',
+                                  fontSize: '11px',
+                                  bgcolor: 'action.hover',
+                                  p: 0.5,
+                                  borderRadius: 0.5,
+                                  maxHeight: 80,
+                                  overflowY: 'auto',
+                                  whiteSpace: 'pre-wrap',
+                                  color: 'text.secondary',
+                                }}
+                              >
+                                {(() => {
+                                  try {
+                                    return JSON.stringify(JSON.parse(log.responseBody), null, 2);
+                                  } catch {
+                                    return log.responseBody;
+                                  }
+                                })()}
+                              </Box>
+                            )}
+                          </Stack>
                         ) : (
                           <Typography variant="caption" color="error">
                             {log.errorMessage || t('cron.log.unknownError')}

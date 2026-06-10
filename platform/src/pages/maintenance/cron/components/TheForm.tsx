@@ -3,8 +3,8 @@ import { Box, Stack } from '@mui/material';
 import { Field } from '@/components/Form';
 import CronHelper from './CronHelper';
 import hasValue from '@/utils/hasValue';
-import type { CronObj, ScriptObj } from '@/api/maintenance/type';
-import * as ScriptAPI from '@/api/maintenance/script';
+import type { CronObj, ApiTaskObj } from '@/api/maintenance/type';
+import * as ApiTaskAPI from '@/api/maintenance/api-task';
 
 export interface CronFormFieldsProps {
   form: Partial<CronObj>;
@@ -16,7 +16,7 @@ export default function CronFormFields({ form, setForm, t }: CronFormFieldsProps
   const [dynamicOptions, setDynamicOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
-    ScriptAPI.listFn({
+    ApiTaskAPI.listFn({
       data: {
         pageNo: 1,
         pageSize: 1000,
@@ -24,14 +24,14 @@ export default function CronFormFields({ form, setForm, t }: CronFormFieldsProps
     })
       .then((res) => {
         const list = res?.data?.data?.list || [];
-        const opts = list.map((item: ScriptObj) => ({
-          label: `${item.name} (${item.scriptKey})${!item.isEnabled ? ` - [${t('status.disabled') || '已禁用'}]` : ''}`,
-          value: item.scriptKey,
+        const opts = list.map((item: ApiTaskObj) => ({
+          label: `${item.name} (${item.taskKey})${!item.isEnabled ? ` - [${t('status.disabled') || '已禁用'}]` : ''}`,
+          value: item.taskKey,
         }));
         setDynamicOptions(opts);
       })
       .catch((err) => {
-        console.error('Failed to load scripts for cron job form:', err);
+        console.error('Failed to load API tasks for cron job form:', err);
       });
   }, [t]);
 

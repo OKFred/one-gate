@@ -1,27 +1,22 @@
 import * as CacheAPI from '@/api/maintenance/cache';
 import * as AuditLoginAPI from '@/api/maintenance/auditLogin';
 import * as CronAPI from '@/api/maintenance/cron';
-import * as ScriptAPI from '@/api/maintenance/script';
+import * as ApiTaskAPI from '@/api/maintenance/api-task';
 
 // ==================== Cache ====================
 
-// 列出所有 keys
 export type ListKeysReq = NonNullable<Parameters<typeof CacheAPI.listKeysFn>[0]['data']>;
 export type ListKeysRes = Awaited<ReturnType<typeof CacheAPI.listKeysFn>>['data']['data'];
 
-// 获取缓存值
 export type GetCacheReq = NonNullable<Parameters<typeof CacheAPI.getFn>[0]['data']>;
 export type GetCacheRes = Awaited<ReturnType<typeof CacheAPI.getFn>>['data']['data'];
 
-// 设置缓存值
 export type PutCacheReq = NonNullable<Parameters<typeof CacheAPI.putFn>[0]['data']>;
 export type PutCacheRes = Awaited<ReturnType<typeof CacheAPI.putFn>>['data']['data'];
 
-// 删除缓存值
 export type DeleteCacheReq = NonNullable<Parameters<typeof CacheAPI.deleteFn>[0]['data']>;
 export type DeleteCacheRes = Awaited<ReturnType<typeof CacheAPI.deleteFn>>['data']['data'];
 
-// 清空所有缓存
 export type ClearCacheReq = NonNullable<Parameters<typeof CacheAPI.clearFn>[0]['data']>;
 export type ClearCacheRes = Awaited<ReturnType<typeof CacheAPI.clearFn>>['data']['data'];
 
@@ -52,23 +47,23 @@ export type ListCronLogsRes = Awaited<ReturnType<typeof CronAPI.listLogsFn>>['da
 export type CronObj = ListCronRes['list'][number];
 export type CronLogObj = ListCronLogsRes['list'][number];
 
-// ==================== Script ====================
-export type ListScriptReq = NonNullable<Parameters<typeof ScriptAPI.listFn>[0]['data']>;
-export type ListScriptRes = Awaited<ReturnType<typeof ScriptAPI.listFn>>['data']['data'];
+// ==================== API Task ====================
+export type ListApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.listFn>[0]['data']>;
+export type ListApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.listFn>>['data']['data'];
 
-export type GetScriptReq = NonNullable<Parameters<typeof ScriptAPI.getFn>[0]['data']>;
-export type GetScriptRes = Awaited<ReturnType<typeof ScriptAPI.getFn>>['data']['data'];
+export type GetApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.getFn>[0]['data']>;
+export type GetApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.getFn>>['data']['data'];
 
-export type AddScriptReq = NonNullable<Parameters<typeof ScriptAPI.addFn>[0]['data']>;
-export type AddScriptRes = Awaited<ReturnType<typeof ScriptAPI.addFn>>['data']['data'];
+export type AddApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.addFn>[0]['data']>;
+export type AddApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.addFn>>['data']['data'];
 
-export type UpdateScriptReq = NonNullable<Parameters<typeof ScriptAPI.updateFn>[0]['data']>;
-export type UpdateScriptRes = Awaited<ReturnType<typeof ScriptAPI.updateFn>>['data']['data'];
+export type UpdateApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.updateFn>[0]['data']>;
+export type UpdateApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.updateFn>>['data']['data'];
 
-export type DeleteScriptReq = NonNullable<Parameters<typeof ScriptAPI.deleteFn>[0]['data']>;
-export type DeleteScriptRes = Awaited<ReturnType<typeof ScriptAPI.deleteFn>>['data']['data'];
+export type DeleteApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.deleteFn>[0]['data']>;
+export type DeleteApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.deleteFn>>['data']['data'];
 
-export type RunTestScriptReq = NonNullable<Parameters<typeof ScriptAPI.runTestFn>[0]['data']>;
-export type RunTestScriptRes = Awaited<ReturnType<typeof ScriptAPI.runTestFn>>['data']['data'];
+export type RunTestApiTaskReq = NonNullable<Parameters<typeof ApiTaskAPI.runTestFn>[0]['data']>;
+export type RunTestApiTaskRes = Awaited<ReturnType<typeof ApiTaskAPI.runTestFn>>['data']['data'];
 
-export type ScriptObj = ListScriptRes['list'][number];
+export type ApiTaskObj = ListApiTaskRes['list'][number];

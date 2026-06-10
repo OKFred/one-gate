@@ -1,24 +1,24 @@
 import db from "@/db/index";
 import {
-  jsScriptTable,
+  apiTaskTable,
   IndexVO,
-  JsScriptVO,
-  JsScriptListVO,
-  JsScriptAddVO,
-  JsScriptUpdateVO,
-  JsScriptListKeys,
-  JsScriptDetailKeys,
-  JsScriptGetKeys,
-  JsScriptDeleteKeys,
-  JsScriptAddKeys,
-  JsScriptUpdateKeys,
-  JsScriptSortableKeys,
-  type JsScriptPOLike,
-  type JsScriptVOLike,
-  type JsScriptAddVOLike,
-  type JsScriptUpdateVOLike,
-  type JsScriptDeleteVOLike,
-  type JsScriptGetVOLike,
+  ApiTaskVO,
+  ApiTaskListVO,
+  ApiTaskAddVO,
+  ApiTaskUpdateVO,
+  ApiTaskListKeys,
+  ApiTaskDetailKeys,
+  ApiTaskGetKeys,
+  ApiTaskDeleteKeys,
+  ApiTaskAddKeys,
+  ApiTaskUpdateKeys,
+  ApiTaskSortableKeys,
+  type ApiTaskPOLike,
+  type ApiTaskVOLike,
+  type ApiTaskAddVOLike,
+  type ApiTaskUpdateVOLike,
+  type ApiTaskDeleteVOLike,
+  type ApiTaskGetVOLike,
 } from "./model";
 import { asc, count, desc, eq, and, like, or } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -37,7 +37,7 @@ import {
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import { executeJsScript } from "@/jobs/executor";
+import { executeApiTask } from "@/jobs/executor";
 
 // 辅助函数：根据条件构建查询 filter
 const buildWhereCondition = (condition?: {
@@ -50,13 +50,13 @@ const buildWhereCondition = (condition?: {
   if (hasValue(keyword)) {
     conditions.push(
       or(
-        like(jsScriptTable.name, `%${keyword}%`),
-        like(jsScriptTable.scriptKey, `%${keyword}%`)
+        like(apiTaskTable.name, `%${keyword}%`),
+        like(apiTaskTable.taskKey, `%${keyword}%`)
       )
     );
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(jsScriptTable.isEnabled, isEnabled));
+    conditions.push(eq(apiTaskTable.isEnabled, isEnabled));
   }
 
   return conditions.length > 0
@@ -66,25 +66,22 @@ const buildWhereCondition = (condition?: {
     : undefined;
 };
 
-//----------------- 1. 获取脚本列表 ----------------//
+//----------------- 1. 获取任务列表 ----------------//
 const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
     isEnabled: { type: "boolean", description: "是否启用" },
-    orderBy: orderByWrapper<(keyof JsScriptPOLike)[]>(JsScriptSortableKeys),
+    orderBy: orderByWrapper<(keyof ApiTaskPOLike)[]>(ApiTaskSortableKeys),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<JsScriptPOLike>[]>(
-    {
-      ...JsScriptListVO,
-    },
-    [...JsScriptListKeys]
-  ),
+  ...listResponseWrapper<RequiredKeys<ApiTaskPOLike>[]>({ ...ApiTaskListVO }, [
+    ...ApiTaskListKeys,
+  ]),
 } as const satisfies JSONSchema;
 
 async function onList(
@@ -93,16 +90,15 @@ async function onList(
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
-  const orderField = jsScriptTable[orderBy] || jsScriptTable.id;
+  const orderField = apiTaskTable[orderBy] || apiTaskTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   const whereCondition = buildWhereCondition(params);
 
-  // 查询总数
   const countResult = await db
-    .select({ total: count(jsScriptTable.id) })
-    .from(jsScriptTable)
+    .select({ total: count(apiTaskTable.id) })
+    .from(apiTaskTable)
     .where(whereCondition);
   const total = countResult[0]?.total || 0;
 
@@ -116,10 +112,9 @@ async function onList(
     };
   }
 
-  // 查询数据
   const rows = await db
     .select()
-    .from(jsScriptTable)
+    .from(apiTaskTable)
     .where(whereCondition)
     .orderBy(descend ? desc(orderField) : asc(orderField))
     .limit(finalPageSize)
@@ -141,22 +136,22 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: "获取JS脚本列表",
+    summary: "获取 API Task 列表",
   } as const,
   adapter: bodyUserAdapter,
   service: onList,
   permission: { action: "read" },
 } satisfies API;
 
-//----------------- 2. 新增脚本 ----------------//
+//----------------- 2. 新增任务 ----------------//
 const addReq = {
   type: "object",
   properties: {
-    ...JsScriptAddVO,
-  } satisfies Partial<Record<keyof JsScriptAddVOLike, JSONSchema>>,
+    ...ApiTaskAddVO,
+  } satisfies Partial<Record<keyof ApiTaskAddVOLike, JSONSchema>>,
   required: [
-    ...JsScriptAddKeys,
-  ] as const satisfies RequiredKeys<JsScriptAddVOLike>[],
+    ...ApiTaskAddKeys,
+  ] as const satisfies RequiredKeys<ApiTaskAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -169,31 +164,48 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { scriptKey, name, description, code, isEnabled } = params;
+  const {
+    taskKey,
+    name,
+    description,
+    baseUrl,
+    path,
+    method,
+    headers,
+    requestSchema,
+    responseSchema,
+    timeoutMs,
+    isEnabled,
+  } = params;
 
-  // 校验 scriptKey 唯一性
   const existRows = await db
     .select()
-    .from(jsScriptTable)
-    .where(eq(jsScriptTable.scriptKey, scriptKey))
+    .from(apiTaskTable)
+    .where(eq(apiTaskTable.taskKey, taskKey))
     .limit(1);
   if (existRows.length > 0) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-      message: `脚本 Key "${scriptKey}" 已存在，请换用其他唯一 Key`,
+      message: `任务 Key "${taskKey}" 已存在，请换用其他唯一 Key`,
     });
   }
 
   const res = await db
-    .insert(jsScriptTable)
+    .insert(apiTaskTable)
     .values({
-      scriptKey,
+      taskKey,
       name,
       description,
-      code,
+      baseUrl,
+      path,
+      method,
+      headers,
+      requestSchema,
+      responseSchema,
+      timeoutMs,
       isEnabled,
       creatorId,
     })
-    .returning({ id: jsScriptTable.id });
+    .returning({ id: apiTaskTable.id });
 
   return res[0]?.id;
 }
@@ -204,22 +216,20 @@ const addApi = {
   pathInfo: {
     path: "/add",
     method: "post",
-    summary: "添加JS脚本",
+    summary: "添加 API Task",
   } as const,
   adapter: bodyUserAdapter,
   service: onAdd,
   permission: { action: "add" },
 } satisfies API;
 
-//----------------- 3. 更新脚本 ----------------//
+//----------------- 3. 更新任务 ----------------//
 const updateReq = {
   type: "object",
-  properties: {
-    ...JsScriptUpdateVO,
-  },
+  properties: { ...ApiTaskUpdateVO },
   required: [
-    ...JsScriptUpdateKeys,
-  ] as const satisfies RequiredKeys<JsScriptUpdateVOLike>[],
+    ...ApiTaskUpdateKeys,
+  ] as const satisfies RequiredKeys<ApiTaskUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -232,46 +242,61 @@ async function onUpdate(
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
   const { userId: updaterId } = userObj;
-  const { id, scriptKey, name, description, code, isEnabled } = params;
+  const {
+    id,
+    taskKey,
+    name,
+    description,
+    baseUrl,
+    path,
+    method,
+    headers,
+    requestSchema,
+    responseSchema,
+    timeoutMs,
+    isEnabled,
+  } = params;
 
-  // 前置校验脚本是否存在
   const existRows = await db
     .select()
-    .from(jsScriptTable)
-    .where(eq(jsScriptTable.id, id))
+    .from(apiTaskTable)
+    .where(eq(apiTaskTable.id, id))
     .limit(1);
   const row = existRows[0];
   preventEmpty(row);
 
-  // 如果修改了 scriptKey，校验唯一性
-  if (scriptKey !== undefined && scriptKey !== row.scriptKey) {
-    const duplicateKeyRows = await db
+  if (taskKey !== undefined && taskKey !== row.taskKey) {
+    const duplicateRows = await db
       .select()
-      .from(jsScriptTable)
-      .where(eq(jsScriptTable.scriptKey, scriptKey))
+      .from(apiTaskTable)
+      .where(eq(apiTaskTable.taskKey, taskKey))
       .limit(1);
-    if (duplicateKeyRows.length > 0) {
+    if (duplicateRows.length > 0) {
       throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-        message: `脚本 Key "${scriptKey}" 已存在，请换用其他唯一 Key`,
+        message: `任务 Key "${taskKey}" 已存在，请换用其他唯一 Key`,
       });
     }
   }
 
-  const updateData = {
-    scriptKey,
-    name,
-    description,
-    code,
-    isEnabled,
-    updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
-  };
-
   const res = await db
-    .update(jsScriptTable)
-    .set(updateData)
-    .where(eq(jsScriptTable.id, id))
-    .returning({ id: jsScriptTable.id });
+    .update(apiTaskTable)
+    .set({
+      taskKey,
+      name,
+      description,
+      baseUrl,
+      path,
+      method,
+      headers,
+      requestSchema,
+      responseSchema,
+      timeoutMs,
+      isEnabled,
+      updaterId,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
+    })
+    .where(eq(apiTaskTable.id, id))
+    .returning({ id: apiTaskTable.id });
 
   const updateRow = res[0];
   preventEmpty(updateRow);
@@ -284,22 +309,20 @@ const updateApi = {
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: "更新JS脚本",
+    summary: "更新 API Task",
   } as const,
   adapter: bodyUserAdapter,
   service: onUpdate,
   permission: { action: "edit" },
 } satisfies API;
 
-//----------------- 4. 删除脚本 ----------------//
+//----------------- 4. 删除任务 ----------------//
 const deleteReq = {
   type: "object",
-  properties: {
-    ...IndexVO,
-  },
+  properties: { ...IndexVO },
   required: [
-    ...JsScriptDeleteKeys,
-  ] as const satisfies RequiredKeys<JsScriptDeleteVOLike>[],
+    ...ApiTaskDeleteKeys,
+  ] as const satisfies RequiredKeys<ApiTaskDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -312,23 +335,19 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-
   const existRows = await db
     .select()
-    .from(jsScriptTable)
-    .where(eq(jsScriptTable.id, id))
+    .from(apiTaskTable)
+    .where(eq(apiTaskTable.id, id))
     .limit(1);
-  const row = existRows[0];
-  preventEmpty(row);
+  preventEmpty(existRows[0]);
 
   const result = await db
-    .delete(jsScriptTable)
-    .where(eq(jsScriptTable.id, id))
-    .returning({ id: jsScriptTable.id });
-
+    .delete(apiTaskTable)
+    .where(eq(apiTaskTable.id, id))
+    .returning({ id: apiTaskTable.id });
   const deleteRow = result[0];
   preventEmpty(deleteRow);
-
   return deleteRow.id;
 }
 
@@ -338,33 +357,29 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: "删除JS脚本",
+    summary: "删除 API Task",
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
   permission: { action: "delete" },
 } satisfies API;
 
-//----------------- 5. 获取脚本详情 ----------------//
+//----------------- 5. 获取任务详情 ----------------//
 const getReq = {
   type: "object",
-  properties: {
-    ...IndexVO,
-  },
+  properties: { ...IndexVO },
   required: [
-    ...JsScriptGetKeys,
-  ] as const satisfies RequiredKeys<JsScriptGetVOLike>[],
+    ...ApiTaskGetKeys,
+  ] as const satisfies RequiredKeys<ApiTaskGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const getRes = {
   type: "object",
-  properties: {
-    ...JsScriptVO,
-  },
+  properties: { ...ApiTaskVO },
   required: [
-    ...JsScriptDetailKeys,
-  ] as const satisfies RequiredKeys<JsScriptVOLike>[],
+    ...ApiTaskDetailKeys,
+  ] as const satisfies RequiredKeys<ApiTaskVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -375,8 +390,8 @@ async function onGet(
   const { id } = params;
   const rows = await db
     .select()
-    .from(jsScriptTable)
-    .where(eq(jsScriptTable.id, id))
+    .from(apiTaskTable)
+    .where(eq(apiTaskTable.id, id))
     .limit(1);
   const row = rows[0];
   preventEmpty(row);
@@ -389,22 +404,22 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: "获取JS脚本详情",
+    summary: "获取 API Task 详情",
   } as const,
   adapter: bodyUserAdapter,
   service: onGet,
   permission: { action: "read" },
 } satisfies API;
 
-//----------------- 6. 手动测试运行脚本 ----------------//
+//----------------- 6. 立即测试执行 ----------------//
 const runTestReq = {
   type: "object",
   properties: {
-    id: { type: "number", description: "脚本ID" },
+    id: { type: "number", description: "任务ID" },
     parameters: {
       type: ["string", "null"],
       nullable: true,
-      description: "手动指定的 JSON 参数",
+      description: "JSON 入参（覆盖默认参数）",
     },
   },
   required: ["id"],
@@ -415,11 +430,12 @@ const runTestRes = {
   type: "object",
   properties: {
     success: { type: "boolean" },
+    statusCode: { type: "number" },
     durationMs: { type: "number" },
+    responseBody: { type: ["string", "null"], nullable: true },
     errorMessage: { type: ["string", "null"], nullable: true },
-    result: { description: "执行结果" },
   },
-  required: ["success", "durationMs"],
+  required: ["success", "statusCode", "durationMs"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -429,46 +445,36 @@ async function onRunTest(
 ): Promise<FromSchema<typeof runTestRes>> {
   const { id, parameters } = params;
 
-  // 获取脚本内容
   const rows = await db
     .select()
-    .from(jsScriptTable)
-    .where(eq(jsScriptTable.id, id))
+    .from(apiTaskTable)
+    .where(eq(apiTaskTable.id, id))
     .limit(1);
-  const script = rows[0];
-  preventEmpty(script);
+  const task = rows[0];
+  preventEmpty(task);
 
-  let parsedParams = {};
+  let parsedParams: Record<string, unknown> = {};
   if (parameters) {
     try {
-      parsedParams = JSON.parse(parameters);
-    } catch (err: any) {
+      parsedParams = JSON.parse(parameters) as Record<string, unknown>;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-        message: `无效的 JSON 参数: ${err.message}`,
+        message: `无效的 JSON 参数: ${msg}`,
       });
     }
   }
 
   const startTime = Date.now();
-  let success = true;
-  let errorMessage: string | null = null;
-  let result: any = undefined;
-
-  try {
-    result = await executeJsScript(script.code, { params: parsedParams, db });
-  } catch (err: any) {
-    success = false;
-    errorMessage = err.message || String(err);
-  }
-
-  const endTime = Date.now();
-  const durationMs = endTime - startTime;
+  const result = await executeApiTask(task, parsedParams);
+  const durationMs = Date.now() - startTime;
 
   return {
-    success,
+    success: result.success,
+    statusCode: result.statusCode,
     durationMs,
-    errorMessage,
-    result,
+    responseBody: result.responseBody,
+    errorMessage: result.success ? null : `HTTP ${result.statusCode}`,
   };
 }
 
@@ -478,11 +484,11 @@ const runTestApi = {
   pathInfo: {
     path: "/runTest",
     method: "post",
-    summary: "立即执行JS脚本测试",
+    summary: "立即测试执行 API Task",
   } as const,
   adapter: bodyUserAdapter,
   service: onRunTest,
-  permission: { action: "edit" }, // 运行测试需要编辑权限
+  permission: { action: "edit" },
 } satisfies API;
 
 //----------------- 统一导出 ----------------//

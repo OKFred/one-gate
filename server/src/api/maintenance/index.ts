@@ -3,7 +3,7 @@ import cache from "./cache/index";
 import compliance from "./compliance/index";
 import init from "./init/index";
 import cron from "./cron/index";
-import script from "./script/index";
+import apiTask from "./api-task/index";
 import type { App, AppBindings } from "@/types/app.d";
 import { OpenAPIHono } from "@hono/zod-openapi";
 
@@ -14,7 +14,7 @@ function createApp(): App {
   app.route("/compliance", compliance());
   app.route("/init", init());
   app.route("/cron", cron());
-  app.route("/script", script());
+  app.route("/api-task", apiTask());
   return app;
 }
 export default createApp;

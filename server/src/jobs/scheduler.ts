@@ -61,61 +61,86 @@ export async function runPendingJobs() {
       }
 
       console.log(`[Scheduler] 开始执行任务 [${job.name} (${job.jobKey})]...`);
-      let handler = jobsRegistry[job.jobKey];
+
       const startTime = Date.now();
       let status = 1; // 1: 成功, 0: 失败
       let errorMessage: string | null = null;
+      let responseBody: string | null = null;
 
-      if (!handler) {
-        // 从数据库查询动态脚本
-        const { jsScriptTable } =
-          await import("@/api/maintenance/script/model");
-        const scripts = await db
+      // 4. 优先从静态注册表获取 handler
+      const staticHandler = jobsRegistry[job.jobKey];
+
+      if (staticHandler) {
+        // 4a. 静态注册的内置任务
+        try {
+          const params = job.parameters ? JSON.parse(job.parameters) : {};
+          await staticHandler({ params, db });
+          console.log(`[Scheduler] 任务 [${job.name}] 执行完毕。`);
+        } catch (err: unknown) {
+          status = 0;
+          errorMessage = err instanceof Error ? err.message : String(err);
+          console.error(`[Scheduler] 任务 [${job.name}] 执行出错:`, err);
+        }
+      } else {
+        // 4b. 从数据库查询 API Task 定义
+        const { apiTaskTable } =
+          await import("@/api/maintenance/api-task/model");
+        const { executeApiTask } = await import("./executor");
+
+        const apiTasks = await db
           .select()
-          .from(jsScriptTable)
+          .from(apiTaskTable)
           .where(
             and(
-              eq(jsScriptTable.scriptKey, job.jobKey),
-              eq(jsScriptTable.isEnabled, true)
+              eq(apiTaskTable.taskKey, job.jobKey),
+              eq(apiTaskTable.isEnabled, true)
             )
           )
           .limit(1);
 
-        const script = scripts[0];
-        if (script) {
-          handler = async ({ params, db }) => {
-            const { executeJsScript } = await import("./executor");
-            await executeJsScript(script.code, { params, db });
-          };
-        }
-      }
+        const apiTask = apiTasks[0];
 
-      if (!handler) {
-        status = 0;
-        errorMessage = `Job key "${job.jobKey}" is not registered in jobsRegistry and no matching JS script was found.`;
-        console.error(
-          `[Scheduler] 任务 [${job.name}] 执行失败: ${errorMessage}`
-        );
-      } else {
-        try {
-          const params = job.parameters ? JSON.parse(job.parameters) : {};
-          await handler({ params, db });
-          console.log(`[Scheduler] 任务 [${job.name}] 执行完毕。`);
-        } catch (err: any) {
+        if (!apiTask) {
           status = 0;
-          errorMessage = err.message || String(err);
-          console.error(`[Scheduler] 任务 [${job.name}] 执行出错:`, err);
+          errorMessage = `Job key "${job.jobKey}" 未在静态注册表中找到，也未找到匹配的 API Task 定义。`;
+          console.error(
+            `[Scheduler] 任务 [${job.name}] 执行失败: ${errorMessage}`
+          );
+        } else {
+          try {
+            const params: Record<string, unknown> = job.parameters
+              ? JSON.parse(job.parameters)
+              : {};
+            const result = await executeApiTask(apiTask, params);
+            responseBody = result.responseBody;
+            if (result.success) {
+              console.log(
+                `[Scheduler] 任务 [${job.name}] 执行完毕，HTTP ${result.statusCode}。`
+              );
+            } else {
+              status = 0;
+              errorMessage = `HTTP ${result.statusCode}: ${result.responseBody.slice(0, 500)}`;
+              console.error(
+                `[Scheduler] 任务 [${job.name}] 请求失败: ${errorMessage}`
+              );
+            }
+          } catch (err: unknown) {
+            status = 0;
+            errorMessage = err instanceof Error ? err.message : String(err);
+            console.error(`[Scheduler] 任务 [${job.name}] 执行出错:`, err);
+          }
         }
       }
 
       const endTime = Date.now();
       const durationMs = endTime - startTime;
 
-      // 4. 记录日志到数据库
+      // 5. 记录日志到数据库
       await db.insert(cronLogTable).values({
         jobId: job.id,
         status,
         errorMessage,
+        responseBody,
         startTimeUtc: startTime,
         endTimeUtc: endTime,
         durationMs,

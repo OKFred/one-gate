@@ -1,9 +1,15 @@
-CREATE TABLE IF NOT EXISTS maintenance_js_script (
+CREATE TABLE IF NOT EXISTS maintenance_api_task (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    script_key TEXT NOT NULL UNIQUE,
+    task_key TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     description TEXT,
-    code TEXT NOT NULL,
+    base_url TEXT NOT NULL,
+    path TEXT NOT NULL,
+    method TEXT NOT NULL DEFAULT 'GET',
+    headers TEXT,
+    request_schema TEXT,
+    response_schema TEXT,
+    timeout_ms INTEGER NOT NULL DEFAULT 30000,
     is_enabled INTEGER NOT NULL,
     creator_id INTEGER NOT NULL,
     updater_id INTEGER,

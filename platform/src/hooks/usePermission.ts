@@ -128,12 +128,12 @@ export const MAINTENANCE = {
     EDIT: 'maintenance.cron:edit',
     DELETE: 'maintenance.cron:delete',
   },
-  /** JS脚本管理 */
-  SCRIPT: {
-    READ: 'maintenance.script:read',
-    ADD: 'maintenance.script:add',
-    EDIT: 'maintenance.script:edit',
-    DELETE: 'maintenance.script:delete',
+  /** API 采集任务管理 */
+  API_TASK: {
+    READ: 'maintenance.api_task:read',
+    ADD: 'maintenance.api_task:add',
+    EDIT: 'maintenance.api_task:edit',
+    DELETE: 'maintenance.api_task:delete',
   },
 };
 

@@ -432,6 +432,7 @@ const listLogsRes = {
           jobId: { type: "number" },
           status: { type: "number" },
           errorMessage: { type: ["string", "null"], nullable: true },
+          responseBody: { type: ["string", "null"], nullable: true },
           startTimeUtc: { type: "number" },
           endTimeUtc: { type: "number" },
           durationMs: { type: "number" },

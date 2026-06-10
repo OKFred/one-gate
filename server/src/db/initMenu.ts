@@ -210,12 +210,12 @@ export const initialMenuData = [
   },
   {
     id: 37,
-    name: "sidebar.menu.maintenance.script",
-    icon: "material-symbols:code",
-    path: "/maintenance/script",
+    name: "sidebar.menu.maintenance.apiTask",
+    icon: "material-symbols:http",
+    path: "/maintenance/api-task",
     parentId: 19,
     sort: 5,
-    business: "maintenance.script",
+    business: "maintenance.api_task",
   },
   {
     id: 23,
