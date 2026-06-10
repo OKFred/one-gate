@@ -64,6 +64,7 @@ export async function prepareSuperAdminUser(
     db
       .insert(userTable)
       .values({
+        id: SUPER_ADMIN_ID,
         username: SUPER_ADMIN.username,
         password: hashedPassword,
         langCode: SUPER_ADMIN.langCode,
@@ -75,7 +76,6 @@ export async function prepareSuperAdminUser(
       .onConflictDoUpdate({
         target: userTable.username,
         set: {
-          password: hashedPassword,
           langCode: SUPER_ADMIN.langCode,
           roleIdArr: sql`excluded.role_id_arr`,
           isEnabled: true,
