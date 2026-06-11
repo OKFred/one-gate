@@ -191,3 +191,13 @@ export const SWARM = {
     DELETE: 'swarm.docker_config:delete',
   },
 };
+
+export const AI = {
+  /** AI 配置 */
+  CONFIG: {
+    READ: 'ai.config:read',
+    ADD: 'ai.config:add',
+    EDIT: 'ai.config:edit',
+    DELETE: 'ai.config:delete',
+  },
+};

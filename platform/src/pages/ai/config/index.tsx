@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
-import { tableConfig, type AiConfigRes } from './components/TheTable';
+import { tableConfig, type AiConfigRes, type TableExtraContext } from './components/TheTable';
 import AiConfigFormFields from './components/TheForm';
 import schema from '@/assets/schemas/ai.configAddReq.json';
 import * as AiConfigAPI from '@/api/ai/config';
 import type { ListAiConfigReq } from '@/api/ai/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
+import { showSnackbar } from '@/components/Notification';
+import { useTranslation } from '@/hooks/useTranslation';
+import { AI } from '@/hooks/usePermission';
 
 const DEFAULT_FORM: Partial<AiConfigRes> = {
   name: '',
@@ -20,10 +24,37 @@ const DEFAULT_FORM: Partial<AiConfigRes> = {
 };
 
 export default function AiConfigManagement() {
-  const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq> = {
+  const [verifyingId, setVerifyingId] = useState<number | null>(null);
+  const t = useTranslation();
+
+  // 处理 AI 配置连通性测试
+  const handleVerify = async (id: number) => {
+    try {
+      setVerifyingId(id);
+      const res = await AiConfigAPI.verifyFn({ data: { id } });
+      if (res.data.data) {
+        showSnackbar({ message: t('ai.config.verifySuccess'), type: 'success' });
+      } else {
+        showSnackbar({ message: t('ai.config.verifyFailed'), type: 'error' });
+      }
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
+  const extraContext: TableExtraContext = {
+    verifyingId,
+    handleVerify,
+  };
+
+  const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq, TableExtraContext> = {
     titleKey: 'ai.config.title',
     apiKeyName: 'id',
-    permissions: {},
+    permissions: {
+      add: [AI.CONFIG.ADD],
+      edit: [AI.CONFIG.EDIT],
+      delete: [AI.CONFIG.DELETE],
+    },
     api: {
       list: AiConfigAPI.listFn,
       add: AiConfigAPI.addFn,
@@ -41,6 +72,7 @@ export default function AiConfigManagement() {
     table: {
       columns: tableConfig.columns,
       cardFields: tableConfig.cardFields,
+      actions: tableConfig.actions,
     },
     form: {
       schema,
@@ -78,5 +110,5 @@ export default function AiConfigManagement() {
     },
   };
 
-  return <SchemaCrudPage config={config} />;
+  return <SchemaCrudPage config={config} extraContext={extraContext} />;
 }
