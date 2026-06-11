@@ -3,7 +3,7 @@ import type { BatchTranslationItem } from "@/db/initTranslation";
 export const maintenanceTranslations: BatchTranslationItem[] = [
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.title",
     isEnabled: true,
     langCodes: {
@@ -13,7 +13,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.empty",
     isEnabled: true,
     langCodes: {
@@ -23,7 +23,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.id",
     isEnabled: true,
     langCodes: {
@@ -33,7 +33,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.status",
     isEnabled: true,
     langCodes: {
@@ -43,7 +43,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.startTime",
     isEnabled: true,
     langCodes: {
@@ -53,7 +53,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.duration",
     isEnabled: true,
     langCodes: {
@@ -63,7 +63,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.detail",
     isEnabled: true,
     langCodes: {
@@ -73,7 +73,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.success",
     isEnabled: true,
     langCodes: {
@@ -83,7 +83,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.log.unknownError",
     isEnabled: true,
     langCodes: {
@@ -93,7 +93,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.button.close",
     isEnabled: true,
     langCodes: {
@@ -103,7 +103,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.filter.keywordPlaceholder",
     isEnabled: true,
     langCodes: {
@@ -113,7 +113,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.name",
     isEnabled: true,
     langCodes: {
@@ -123,7 +123,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.jobKey",
     isEnabled: true,
     langCodes: {
@@ -133,7 +133,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.cronExpression",
     isEnabled: true,
     langCodes: {
@@ -143,7 +143,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.runCount",
     isEnabled: true,
     langCodes: {
@@ -153,7 +153,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.lastRunTime",
     isEnabled: true,
     langCodes: {
@@ -163,7 +163,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.nextRunTime",
     isEnabled: true,
     langCodes: {
@@ -173,7 +173,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.jobKey.testLog",
     isEnabled: true,
     langCodes: {
@@ -183,7 +183,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.jobKey.syncExternalData",
     isEnabled: true,
     langCodes: {
@@ -193,7 +193,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.cronExpressionPlaceholder",
     isEnabled: true,
     langCodes: {
@@ -203,7 +203,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.statusLabel",
     isEnabled: true,
     langCodes: {
@@ -213,7 +213,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.field.parameters",
     isEnabled: true,
     langCodes: {
@@ -223,7 +223,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.status.success",
     isEnabled: true,
     langCodes: {
@@ -233,7 +233,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.status.fail",
     isEnabled: true,
     langCodes: {
@@ -243,7 +243,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.parsing",
     isEnabled: true,
     langCodes: {
@@ -253,7 +253,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.frequency",
     isEnabled: true,
     langCodes: {
@@ -263,7 +263,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.nextTimes",
     isEnabled: true,
     langCodes: {
@@ -273,7 +273,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.invalid",
     isEnabled: true,
     langCodes: {
@@ -283,7 +283,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.reason",
     isEnabled: true,
     langCodes: {
@@ -293,7 +293,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.parseFailed",
     isEnabled: true,
     langCodes: {
@@ -303,7 +303,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.noData",
     isEnabled: true,
     langCodes: {
@@ -313,7 +313,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.helper.networkError",
     isEnabled: true,
     langCodes: {
@@ -323,7 +323,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.custom",
     isEnabled: true,
     langCodes: {
@@ -333,7 +333,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.minutely",
     isEnabled: true,
     langCodes: {
@@ -343,7 +343,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.minutes",
     isEnabled: true,
     langCodes: {
@@ -353,7 +353,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.hourly",
     isEnabled: true,
     langCodes: {
@@ -363,7 +363,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.hours",
     isEnabled: true,
     langCodes: {
@@ -373,7 +373,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.daily",
     isEnabled: true,
     langCodes: {
@@ -383,7 +383,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.days",
     isEnabled: true,
     langCodes: {
@@ -393,7 +393,7 @@ export const maintenanceTranslations: BatchTranslationItem[] = [
   },
   {
     application: "backend",
-    business: "cron",
+    business: "maintenance.cron",
     tKey: "cron.frequency.seconds",
     isEnabled: true,
     langCodes: {

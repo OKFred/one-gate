@@ -191,4 +191,44 @@ export const ossTranslations: BatchTranslationItem[] = [
       "en-US": "Account ID",
     },
   },
+  {
+    application: "frontend",
+    business: "oss.file",
+    tKey: "oss.file.name",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "文件名",
+      "en-US": "File Name",
+    },
+  },
+  {
+    application: "frontend",
+    business: "oss.file",
+    tKey: "oss.file.contentType",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "内容类型",
+      "en-US": "Content Type",
+    },
+  },
+  {
+    application: "frontend",
+    business: "oss.file",
+    tKey: "oss.file.path",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "上传路径",
+      "en-US": "Upload Path",
+    },
+  },
+  {
+    application: "frontend",
+    business: "oss.file",
+    tKey: "oss.file.pathPlaceholder",
+    isEnabled: true,
+    langCodes: {
+      "zh-CN": "请输入存储路径，为空默认根目录",
+      "en-US": "Enter storage path, leave empty for root",
+    },
+  },
 ];

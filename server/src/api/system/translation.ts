@@ -1095,7 +1095,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.title",
     isEnabled: true,
     langCodes: {
@@ -1105,7 +1105,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.searchPlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1115,7 +1115,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.code",
     isEnabled: true,
     langCodes: {
@@ -1125,7 +1125,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.name",
     isEnabled: true,
     langCodes: {
@@ -1135,7 +1135,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.actions.add",
     isEnabled: true,
     langCodes: {
@@ -1145,7 +1145,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.actions.preview",
     isEnabled: true,
     langCodes: {
@@ -1155,7 +1155,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.deleteConfirmText",
     isEnabled: true,
     langCodes: {
@@ -1167,7 +1167,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.errors.invalidObject",
     isEnabled: true,
     langCodes: {
@@ -1177,7 +1177,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.errors.invalidUiObject",
     isEnabled: true,
     langCodes: {
@@ -1187,7 +1187,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.errors.invalidJson",
     isEnabled: true,
     langCodes: {
@@ -1197,7 +1197,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.editTitle",
     isEnabled: true,
     langCodes: {
@@ -1207,7 +1207,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.addTitle",
     isEnabled: true,
     langCodes: {
@@ -1217,7 +1217,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.quickTemplate",
     isEnabled: true,
     langCodes: {
@@ -1227,7 +1227,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.selectTemplate",
     isEnabled: true,
     langCodes: {
@@ -1237,7 +1237,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.templates.feedback",
     isEnabled: true,
     langCodes: {
@@ -1247,7 +1247,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.templates.rsvp",
     isEnabled: true,
     langCodes: {
@@ -1257,7 +1257,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.code",
     isEnabled: true,
     langCodes: {
@@ -1267,7 +1267,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.codePlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1278,7 +1278,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.name",
     isEnabled: true,
     langCodes: {
@@ -1288,7 +1288,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.namePlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1298,7 +1298,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.schemaData",
     isEnabled: true,
     langCodes: {
@@ -1308,7 +1308,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.uiSchemaData",
     isEnabled: true,
     langCodes: {
@@ -1318,7 +1318,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.remarkPlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1328,7 +1328,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.errors.parseSchemaFailed",
     isEnabled: true,
     langCodes: {
@@ -1338,7 +1338,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.errors.submitValidationFailed",
     isEnabled: true,
     langCodes: {
@@ -1348,7 +1348,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.previewTitle",
     isEnabled: true,
     langCodes: {
@@ -1358,7 +1358,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.testSubmitSuccess",
     isEnabled: true,
     langCodes: {
@@ -1368,7 +1368,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.testBusinessId",
     isEnabled: true,
     langCodes: {
@@ -1378,7 +1378,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.fields.testBusinessIdPlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1388,7 +1388,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.submitTestData",
     isEnabled: true,
     langCodes: {
@@ -1398,7 +1398,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaForm",
+    business: "system.schema_form",
     tKey: "schemaForm.errors.noValidSchema",
     isEnabled: true,
     langCodes: {
@@ -1408,7 +1408,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.title",
     isEnabled: true,
     langCodes: {
@@ -1418,7 +1418,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.filter.associatedForm",
     isEnabled: true,
     langCodes: {
@@ -1428,7 +1428,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.filter.allForms",
     isEnabled: true,
     langCodes: {
@@ -1438,7 +1438,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.filter.formCode",
     isEnabled: true,
     langCodes: {
@@ -1448,7 +1448,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.filter.formCodePlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1458,7 +1458,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.filter.businessId",
     isEnabled: true,
     langCodes: {
@@ -1468,7 +1468,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.filter.businessIdPlaceholder",
     isEnabled: true,
     langCodes: {
@@ -1478,7 +1478,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.errors.noSchemaConfig",
     isEnabled: true,
     langCodes: {
@@ -1488,7 +1488,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.errors.fallbackToRaw",
     isEnabled: true,
     langCodes: {
@@ -1498,7 +1498,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.detailsTitle",
     isEnabled: true,
     langCodes: {
@@ -1508,7 +1508,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.rawJsonData",
     isEnabled: true,
     langCodes: {
@@ -1518,7 +1518,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.actions.view",
     isEnabled: true,
     langCodes: {
@@ -1528,7 +1528,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.actions.delete",
     isEnabled: true,
     langCodes: {
@@ -1538,7 +1538,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.deleteConfirmText",
     isEnabled: true,
     langCodes: {
@@ -1549,7 +1549,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.dataSummary",
     isEnabled: true,
     langCodes: {
@@ -1559,7 +1559,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.submittedData",
     isEnabled: true,
     langCodes: {
@@ -1569,7 +1569,7 @@ export const systemTranslations: BatchTranslationItem[] = [
   },
   {
     application: "frontend",
-    business: "schemaFormData",
+    business: "system.schema_form_data",
     tKey: "schemaFormData.dataContent",
     isEnabled: true,
     langCodes: {
