@@ -61,7 +61,15 @@ if [ -d "platform/public" ]; then
   echo "  ✅ platform/public/version.json updated"
 fi
 
-# --- 5. Format changed files ---
+# --- 5. Run I18n validation check ---
+echo "🌐 Running I18n compliance check..."
+if ! node platform/scripts/scan-i18n-enhanced.js --fail-on-missing; then
+  echo "❌ Git Commit Aborted: I18n validation failed! Please fix the missing keys listed above."
+  exit 1
+fi
+echo "  ✅ I18n compliance check passed"
+
+# --- 6. Format changed files ---
 echo "🧹 Formatting changed files..."
 echo "  🔹 server..."
 cd server && npx lint-staged

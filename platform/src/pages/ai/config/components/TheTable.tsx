@@ -45,7 +45,7 @@ export const tableConfig: SchemaCrudConfig<
       title: t('ai.config.isDefault'),
       render: (row) => (
         <Chip
-          label={row.isDefault ? t('dialog.yes') : t('dialog.no')}
+          label={row.isDefault ? t('column.yes') : t('column.no')}
           color={row.isDefault ? 'success' : 'default'}
           size="small"
         />

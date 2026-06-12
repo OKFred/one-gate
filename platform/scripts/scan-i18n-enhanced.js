@@ -99,18 +99,54 @@ function extractTranslationKeys(filePath) {
 }
 
 /**
- * 从 initTranslation.ts 文件中提取所有多语言键
+ * 从 initTranslation.ts 文件中提取所有多语言键，支持解析并加载其 import 导入的所有子翻译文件
  */
 function extractInitI18nKeys(filePath) {
+  const keys = new Set();
   try {
     const content = readFileSync(filePath, 'utf-8');
-    const keys = new Set();
-    const keyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
-
+    const importRegex = /import\s+{[^}]+}\s+from\s+['"`]([^'"`]+)['"`]/g;
     let match;
-    while ((match = keyRegex.exec(content)) !== null) {
-      const key = match[1].trim();
-      keys.add(key);
+    const serverSrcDir = path.dirname(path.dirname(filePath)); // server/src
+    const dbDir = path.dirname(filePath); // server/src/db
+
+    // 1. 提取 initTranslation.ts 中直接定义的所有 tKey
+    const directKeyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
+    let directMatch;
+    while ((directMatch = directKeyRegex.exec(content)) !== null) {
+      keys.add(directMatch[1].trim());
+    }
+
+    // 2. 解析所有 import 的多语言配置文件并提取 tKey
+    while ((match = importRegex.exec(content)) !== null) {
+      const importPath = match[1];
+      let resolvedPath;
+      if (importPath.startsWith('@/')) {
+        resolvedPath = join(serverSrcDir, importPath.slice(2));
+      } else if (importPath.startsWith('./')) {
+        resolvedPath = join(dbDir, importPath);
+      } else {
+        continue;
+      }
+
+      // 自动拼接扩展名
+      if (!resolvedPath.endsWith('.ts')) {
+        resolvedPath += '.ts';
+      }
+
+      try {
+        const fileContent = readFileSync(resolvedPath, 'utf-8');
+        const keyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
+        let keyMatch;
+        while ((keyMatch = keyRegex.exec(fileContent)) !== null) {
+          keys.add(keyMatch[1].trim());
+        }
+      } catch (err) {
+        console.error(
+          `Warning: Failed to read imported translation file ${resolvedPath}:`,
+          err.message,
+        );
+      }
     }
 
     return keys;
@@ -127,23 +163,12 @@ function generateMarkdownReport(missingKeys, unusedKeys, keyLocations, title) {
   let report = `# ${title}\n\n`;
   report += `生成时间：${new Date().toLocaleString('zh-CN')}\n\n`;
 
+  const usedKeysCount = Object.keys(keyLocations).length;
+  const definedKeysCount = usedKeysCount - missingKeys.length + unusedKeys.length;
+
   report += `## 统计摘要\n\n`;
-  report += `- 前端代码中使用的多语言键数：${
-    new Set([
-      ...Object.values(keyLocations)
-        .flat()
-        .map((item) => item.key),
-    ]).size
-  }\n`;
-  report += `- initTranslation.ts 中定义的多语言键数：${
-    [
-      ...new Set(
-        Object.values(keyLocations)
-          .flat()
-          .map((item) => item.key),
-      ),
-    ].length + unusedKeys.length
-  }\n`;
+  report += `- 前端代码中使用的多语言键数：${usedKeysCount}\n`;
+  report += `- 数据库中定义的多语言键数：${definedKeysCount}\n`;
   report += `- **缺失的多语言键数：${missingKeys.length}**\n`;
   report += `- **未使用的多语言键数：${unusedKeys.length}**\n\n`;
 
@@ -291,6 +316,22 @@ async function main() {
   writeFileSync(finalOutputPath, report, 'utf-8');
   console.log(`💾 报告已保存到: ${finalOutputPath}`);
   console.log('\n' + '='.repeat(50) + '\n');
+
+  // 如果指定了阻断标志且存在缺失的多语言键，则抛错并退出进程
+  const failOnMissing = args.includes('--fail-on-missing') || args.includes('--ci');
+  if (failOnMissing && missingKeys.length > 0) {
+    console.error(
+      `❌ 错误: 发现 ${missingKeys.length} 个缺失的多语言翻译键，请在后端相应的 translation.ts 中补充定义：`,
+    );
+    missingKeys.forEach((key) => {
+      const locations = keyLocations[key] || [];
+      console.error(`  - 键名: \x1b[31m${key}\x1b[0m`);
+      locations.forEach((loc) => {
+        console.error(`    位置: ${loc.file}:${loc.line} - \`${loc.context}\``);
+      });
+    });
+    process.exit(1);
+  }
 }
 
 main().catch((error) => {

@@ -42,7 +42,7 @@ export const tableConfig: SchemaCrudConfig<
       title: t('swarm.docker_config.tlsVerify'),
       render: (row) => (
         <Chip
-          label={row.tlsVerify ? t('status.yes') : t('status.no')}
+          label={row.tlsVerify ? t('column.yes') : t('column.no')}
           color={row.tlsVerify ? 'primary' : 'default'}
           size="small"
           variant="outlined"
