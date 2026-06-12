@@ -15,7 +15,9 @@ export const initialLanguageData = [
     isEnabled: true,
     sortOrder: 2,
   },
-];
+] as const;
+
+export type LanguageCode = (typeof initialLanguageData)[number]["langCode"];
 
 /**
  * 准备语言数据同步语句

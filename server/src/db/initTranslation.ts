@@ -13,14 +13,42 @@ import { ossTranslations } from "@/api/oss/translation";
 import { enterpriseTranslations } from "@/api/enterprise/translation";
 import { systemTranslations } from "@/api/system/translation";
 import { sharedTranslations } from "./translation/shared";
+import type { BusinessKey } from "@/types/business";
+import type { LanguageCode } from "@/db/initLanguage";
 
 export type BatchTranslationItem = {
   application: "frontend" | "backend";
-  business: string;
+  business: BusinessKey;
   tKey: string;
-  langCodes: Record<string, string>;
+  langCodes: Record<LanguageCode, string>;
   isEnabled: boolean;
 };
+
+export type TranslationInputItem = {
+  application?: string;
+  tKey: string;
+  langCodes: Record<LanguageCode, string>;
+  isEnabled?: boolean;
+};
+
+export function mapTranslations(
+  map: Partial<Record<BusinessKey, TranslationInputItem[]>>
+): BatchTranslationItem[] {
+  const list: BatchTranslationItem[] = [];
+  for (const [business, items] of Object.entries(map)) {
+    if (!items) continue;
+    for (const item of items) {
+      list.push({
+        application: item.application === "backend" ? "backend" : "frontend",
+        business: business as BusinessKey,
+        tKey: item.tKey,
+        isEnabled: item.isEnabled ?? true,
+        langCodes: item.langCodes,
+      });
+    }
+  }
+  return list;
+}
 
 /**
  * 准备多语言数据同步语句
@@ -93,13 +121,13 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
 }
 
 export const initialTranslationData = [
-  ...sharedTranslations,
-  ...aiTranslations,
-  ...swarmTranslations,
-  ...i18nTranslations,
-  ...mailTranslations,
-  ...maintenanceTranslations,
-  ...ossTranslations,
-  ...enterpriseTranslations,
-  ...systemTranslations,
-] as const satisfies BatchTranslationItem[];
+  ...mapTranslations(sharedTranslations),
+  ...mapTranslations(aiTranslations),
+  ...mapTranslations(swarmTranslations),
+  ...mapTranslations(i18nTranslations),
+  ...mapTranslations(mailTranslations),
+  ...mapTranslations(maintenanceTranslations),
+  ...mapTranslations(ossTranslations),
+  ...mapTranslations(enterpriseTranslations),
+  ...mapTranslations(systemTranslations),
+] satisfies BatchTranslationItem[];
