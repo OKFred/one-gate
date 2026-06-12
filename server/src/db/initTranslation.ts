@@ -120,14 +120,14 @@ export async function prepareTranslation(options?: { reset?: boolean }) {
   return { queries, stats };
 }
 
-export const initialTranslationData = [
-  ...mapTranslations(sharedTranslations),
-  ...mapTranslations(aiTranslations),
-  ...mapTranslations(swarmTranslations),
-  ...mapTranslations(i18nTranslations),
-  ...mapTranslations(mailTranslations),
-  ...mapTranslations(maintenanceTranslations),
-  ...mapTranslations(ossTranslations),
-  ...mapTranslations(enterpriseTranslations),
-  ...mapTranslations(systemTranslations),
-] satisfies BatchTranslationItem[];
+export const initialTranslationData = mapTranslations({
+  ...sharedTranslations,
+  ...aiTranslations,
+  ...swarmTranslations,
+  ...i18nTranslations,
+  ...mailTranslations,
+  ...maintenanceTranslations,
+  ...ossTranslations,
+  ...enterpriseTranslations,
+  ...systemTranslations,
+}) satisfies BatchTranslationItem[];
