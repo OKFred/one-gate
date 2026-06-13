@@ -3,7 +3,8 @@ import { db } from "@/db/index";
 import { cronTable, cronLogTable } from "@/api/maintenance/cron/model";
 import { jobsRegistry } from "./registry";
 import { CronExpressionParser } from "cron-parser";
-
+import { apiTaskTable } from "@/api/maintenance/api-task/model";
+import { executeApiTask } from "./executor";
 /**
  * 扫描并运行所有待执行的定时任务 (两端通用核心调度方法)
  */
@@ -83,10 +84,6 @@ export async function runPendingJobs() {
         }
       } else {
         // 4b. 从数据库查询 API Task 定义
-        const { apiTaskTable } =
-          await import("@/api/maintenance/api-task/model");
-        const { executeApiTask } = await import("./executor");
-
         const apiTasks = await db
           .select()
           .from(apiTaskTable)
