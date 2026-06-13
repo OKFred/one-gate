@@ -148,7 +148,7 @@ export const MailTemplateSortableKeys = [
 export const mailTemplateTable = sqliteTable(
   "mail_template",
   {
-    id: integer("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
     name: text("name").notNull().unique(),
     title: text("title").notNull(),
     langCode: text("lang_code").notNull(),

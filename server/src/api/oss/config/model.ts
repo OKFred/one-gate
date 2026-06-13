@@ -152,7 +152,7 @@ export const OssConfigSortableKeys = [
 
 //----------------- Table ----------------//
 export const ossConfigTable = sqliteTable("oss_config", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   provider: text("provider", { enum: ["S3", "R2"] }).notNull(),
   endpoint: text("endpoint"),

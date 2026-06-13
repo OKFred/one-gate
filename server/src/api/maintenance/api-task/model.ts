@@ -175,7 +175,7 @@ export const ApiTaskSortableKeys = [
 //----------------- Drizzle Tables ----------------//
 
 export const apiTaskTable = sqliteTable("maintenance_api_task", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   taskKey: text("task_key").notNull(),
   name: text("name").notNull(),
   description: text("description"),

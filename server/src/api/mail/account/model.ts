@@ -153,7 +153,7 @@ export const MailAccountSortableKeys = [
 export const mailAccountTable = sqliteTable(
   "mail_account",
   {
-    id: integer("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
     mailAddress: text("mail_address").notNull().unique(),
     password: text("password").notNull(),
     nickname: text("nickname").notNull(),

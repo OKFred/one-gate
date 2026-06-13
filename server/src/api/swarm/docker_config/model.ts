@@ -166,7 +166,7 @@ export const SwarmDockerConfigSortableKeys = [
 
 //----------------- Table ----------------//
 export const swarmDockerConfigTable = sqliteTable("swarm_docker_config", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   host: text("host").notNull(),
   apiVersion: text("api_version"),

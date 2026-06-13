@@ -153,7 +153,7 @@ export const CronSortableKeys = [
 //----------------- Drizzle Tables ----------------//
 
 export const cronTable = sqliteTable("system_cron_job", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   jobKey: text("job_key").notNull(),
   name: text("name").notNull(),
   cronExpression: text("cron_expression").notNull(),

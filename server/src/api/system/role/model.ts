@@ -128,7 +128,7 @@ export const RoleSortableKeys = [
 ] as const satisfies RequiredKeys<RolePOLike>[];
 
 export const roleTable = sqliteTable("system_role", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),

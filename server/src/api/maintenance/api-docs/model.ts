@@ -129,7 +129,7 @@ export const ApiDocsSortableKeys = [
 
 //----------------- Drizzle Tables ----------------//
 export const apiDocsTable = sqliteTable("maintenance_api_docs", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   version: text("version"),
   description: text("description"),

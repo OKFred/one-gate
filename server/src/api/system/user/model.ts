@@ -280,7 +280,7 @@ export const UserSortableKeys = [
 
 //----------------- Table ----------------//
 export const userTable = sqliteTable("system_user", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
   langCode: text("lang_code").notNull(),

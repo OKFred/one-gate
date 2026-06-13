@@ -147,7 +147,7 @@ export const AttendanceSortableKeys = [
 
 //----------------- Table ----------------//
 export const attendanceTable = sqliteTable("enterprise_attendance", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   employeeId: integer("employee_id").notNull(),
   date: text("date").notNull(),
   checkInTime: integer("check_in_time"),

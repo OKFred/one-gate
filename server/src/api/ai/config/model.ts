@@ -142,7 +142,7 @@ export const AiLlmConfigSortableKeys = [
 
 //----------------- Table ----------------//
 export const aiLlmConfigTable = sqliteTable("ai_llm_config", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   provider: text("provider").notNull(),
   baseUrl: text("base_url"),

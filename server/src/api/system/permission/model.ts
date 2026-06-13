@@ -145,7 +145,7 @@ export const PermissionSortableKeys = [
 ] as const satisfies RequiredKeys<PermissionPOLike>[];
 
 export const permissionTable = sqliteTable("system_permission", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
   category: text("category").notNull(), // menu, action

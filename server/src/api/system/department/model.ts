@@ -110,7 +110,7 @@ export const DepartmentSortableKeys = [
 ] as const satisfies RequiredKeys<DepartmentPOLike>[];
 
 export const departmentTable = sqliteTable("system_department", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull().unique(),
   parentId: integer("parent_id"),
   remark: text("remark"),

@@ -106,7 +106,7 @@ export const RolePermissionSortableKeys = [
 ] as const satisfies RequiredKeys<RolePermissionPOLike>[];
 
 export const rolePermissionTable = sqliteTable("system_role_permission", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   roleId: integer("role_id").notNull(),
   permissionId: integer("permission_id").notNull(),
   creatorId: integer("creator_id").notNull(),

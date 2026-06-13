@@ -154,7 +154,7 @@ export const MailLogSortableKeys = [
 export const mailLogTable = sqliteTable(
   "mail_log",
   {
-    id: integer("id").primaryKey().notNull(),
+    id: integer("id").primaryKey({ autoIncrement: true }),
     mailTo: text("mail_to").notNull(),
     mailFrom: text("mail_from").notNull(),
     title: text("title").notNull(),

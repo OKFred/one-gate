@@ -157,7 +157,7 @@ export const SchemaFormSortableKeys = [
 ] as const satisfies RequiredKeys<SchemaFormPOLike>[];
 
 export const schemaFormTable = sqliteTable("system_schema_form", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   code: text("code").notNull().unique(),
   name: text("name").notNull(),
   schemaData: text("schema_data").notNull(),

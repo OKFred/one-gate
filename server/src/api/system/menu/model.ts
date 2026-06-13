@@ -137,7 +137,7 @@ export const MenuSortableKeys = [
 ] as const satisfies RequiredKeys<MenuPOLike>[];
 
 export const menuTable = sqliteTable("system_menu", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   icon: text("icon").notNull(),
   path: text("path"),
