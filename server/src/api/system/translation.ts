@@ -81,6 +81,20 @@ export const systemTranslations = {
       },
     },
     {
+      tKey: "login.title",
+      langCodes: {
+        "zh-CN": "Open The Gate",
+        "en-US": "Open The Gate",
+      },
+    },
+    {
+      tKey: "login.subtitle",
+      langCodes: {
+        "zh-CN": "通用企业级权限管理后台",
+        "en-US": "General Enterprise Permission Management Platform",
+      },
+    },
+    {
       tKey: "dialog.message",
       langCodes: {
         "zh-CN": "页面未找到",
