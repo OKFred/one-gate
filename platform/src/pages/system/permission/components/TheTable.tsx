@@ -14,7 +14,15 @@ export const tableConfig: SchemaCrudConfig<PermissionRes, FilterState, ListPermi
       { title: t('permission.name'), render: (row) => row.name },
       {
         title: t('permission.category'),
-        render: (row) => t(`permission.category.${row.category}`),
+        render: (row) => {
+          const map: Record<string, string> = {
+            menu: t('permission.category.menu'),
+            button: t('permission.category.button'),
+            api: t('permission.category.api'),
+            action: t('permission.category.action'),
+          };
+          return map[row.category] || row.category;
+        },
       },
       { title: t('permission.resource'), render: (row) => row.resource || '--' },
       { title: t('permission.business'), render: (row) => row.business || '--' },
@@ -42,7 +50,15 @@ export const tableConfig: SchemaCrudConfig<PermissionRes, FilterState, ListPermi
       {
         type: 'content',
         label: t('permission.category'),
-        render: (row) => t(`permission.category.${row.category}`),
+        render: (row) => {
+          const map: Record<string, string> = {
+            menu: t('permission.category.menu'),
+            button: t('permission.category.button'),
+            api: t('permission.category.api'),
+            action: t('permission.category.action'),
+          };
+          return map[row.category] || row.category;
+        },
       },
       { type: 'content', label: t('permission.resource'), render: (row) => row.resource || '--' },
       { type: 'content', label: t('permission.business'), render: (row) => row.business || '--' },

@@ -1,15 +1,15 @@
 # 多语言扫描报告
 
-生成时间：2026/6/12 21:22:09
+生成时间：2026/6/12 21:28:45
 
 ## 统计摘要
 
-- 前端代码中使用的多语言键数：419
+- 前端代码中使用的多语言键数：507
 - 数据库中定义的多语言键数：689
 - **缺失的多语言键数：0**
-- **未使用的多语言键数：270**
+- **未使用的多语言键数：182**
 
-## 已定义但未使用的多语言键（270个）
+## 已定义但未使用的多语言键（182个）
 
 以下是在 initTranslation.ts 中定义但前端代码中未使用的多语言键：
 
@@ -99,19 +99,19 @@
 - `common.submit`
 - `common.submitting`
 - `common.view`
-- `cron.frequency.custom`
-- `cron.frequency.daily`
-- `cron.frequency.days`
-- `cron.frequency.hourly`
-- `cron.frequency.hours`
-- `cron.frequency.minutely`
-- `cron.frequency.minutes`
-- `cron.frequency.seconds`
 - `cron.jobKey.syncExternalData`
 - `cron.jobKey.testLog`
 - `department.table.managers`
 - `enterprise.attendance.title`
-- `errorHandler.ai.chat.apiError`
-- `errorHandler.ai.chat.configNotFound`
+- `errorHandler.departmentHasEnabledChildren`
+- `errorHandler.departmentNotExist`
+- `errorHandler.forbidden`
+- `errorHandler.i18n.language.duplicateLangCode`
+- `errorHandler.i18n.region.duplicateCode`
+- `errorHandler.i18n.translation.duplicateTKey`
+- `errorHandler.oss.config.duplicateName`
+- `errorHandler.serverError`
+- `errorHandler.targetNotExist`
+- `errorHandler.undefinedError`
 
-... 以及其他 170 个
+... 以及其他 82 个

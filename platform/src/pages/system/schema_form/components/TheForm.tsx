@@ -14,7 +14,6 @@ export interface SchemaFormFieldsProps {
 const SCHEMAS_TEMPLATES = [
   {
     name: '用户意见反馈表',
-    tKey: 'schemaForm.templates.feedback',
     code: 'user_feedback',
     schema: {
       type: 'object',
@@ -55,7 +54,6 @@ const SCHEMAS_TEMPLATES = [
   },
   {
     name: '活动报名登记表',
-    tKey: 'schemaForm.templates.rsvp',
     code: 'activity_rsvp',
     schema: {
       type: 'object',
@@ -88,10 +86,21 @@ const SCHEMAS_TEMPLATES = [
 export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsProps) {
   const [selectedTemplate, setSelectedTemplate] = useState('');
 
+  const templates = [
+    {
+      ...SCHEMAS_TEMPLATES[0],
+      tLabel: t('schemaForm.templates.feedback'),
+    },
+    {
+      ...SCHEMAS_TEMPLATES[1],
+      tLabel: t('schemaForm.templates.rsvp'),
+    },
+  ];
+
   const handleApplyTemplate = (templateIndex: string) => {
     if (templateIndex === '') return;
     const idx = Number(templateIndex);
-    const tpl = SCHEMAS_TEMPLATES[idx];
+    const tpl = templates[idx];
     if (tpl) {
       setForm((prev) => ({
         ...prev,
@@ -117,9 +126,9 @@ export default function SchemaFormFields({ form, setForm, t }: SchemaFormFieldsP
             onChange={(e) => handleApplyTemplate(e.target.value)}
           >
             <MenuItem value="">{t('schemaForm.selectTemplate')}</MenuItem>
-            {SCHEMAS_TEMPLATES.map((tpl, i) => (
+            {templates.map((tpl, i) => (
               <MenuItem key={i} value={String(i)}>
-                {t(tpl.tKey)}
+                {tpl.tLabel}
               </MenuItem>
             ))}
           </Select>

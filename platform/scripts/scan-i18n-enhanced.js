@@ -69,7 +69,7 @@ function getAllFiles(dir, fileList = []) {
 }
 
 /**
- * 从文件中提取所有多语言键
+ * 从前端文件中提取所有多语言键
  */
 function extractTranslationKeys(filePath) {
   try {
@@ -94,6 +94,90 @@ function extractTranslationKeys(filePath) {
     return keys;
   } catch (error) {
     console.error(`Error reading file ${filePath}:`, error.message);
+    return [];
+  }
+}
+
+const IGNORED_BUSINESS_KEYS = new Set([
+  'i18n',
+  'i18n.language',
+  'i18n.region',
+  'i18n.translation',
+  'mail',
+  'mail.account',
+  'mail.template',
+  'mail.action',
+  'mail.log',
+  'maintenance',
+  'maintenance.cache',
+  'maintenance.api_docs',
+  'maintenance.compliance',
+  'maintenance.cron',
+  'maintenance.api_task',
+  'maintenance.audit_login',
+  'maintenance.init',
+  'system',
+  'system.auth',
+  'system.department',
+  'system.menu',
+  'system.permission',
+  'system.role',
+  'system.role_permission',
+  'system.user',
+  'system.schema_form',
+  'system.schema_form_data',
+  'oss.config',
+  'oss.file',
+  'enterprise',
+  'enterprise.attendance',
+  'ai',
+  'ai.config',
+  'ai.chat',
+  'swarm',
+  'swarm.docker',
+  'swarm.nodes',
+  'swarm.docker_config',
+]);
+
+/**
+ * 从后端文件中提取所有多语言键（包括 t() 调用、i18nKey: "..." 和特定前缀 of 错误码字面量）
+ */
+function extractBackendTranslationKeys(filePath) {
+  try {
+    const content = readFileSync(filePath, 'utf-8');
+    const keys = [];
+
+    const addKey = (key, index) => {
+      if (isValidTranslationKey(key) && !IGNORED_BUSINESS_KEYS.has(key)) {
+        const line = content.substring(0, index).split('\n').length;
+        const lineContent = content.split('\n')[line - 1];
+        keys.push({ key, line, context: lineContent.trim() });
+      }
+    };
+
+    // 1. 正常 t('xxx') 或 t("xxx")
+    const tRegex = /\bt\(\s*['"`]([^'"`\s]+)['"`]/g;
+    let match;
+    while ((match = tRegex.exec(content)) !== null) {
+      addKey(match[1].trim(), match.index);
+    }
+
+    // 2. ERROR_PRESENTATION_MAP 中的 i18nKey: "xxx"
+    const i18nKeyRegex = /\bi18nKey:\s*['"`]([^'"`\s]+)['"`]/g;
+    while ((match = i18nKeyRegex.exec(content)) !== null) {
+      addKey(match[1].trim(), match.index);
+    }
+
+    // 3. 各模块中的多语言键名（匹配特定模块前缀，如 errorHandler. 或 businessType. 等）
+    const prefixRegex =
+      /['"`]((?:errorHandler|businessType|cron|mail|oss|cache|enterprise|sidebar\.menu)\.[a-zA-Z0-9_\-\.]+)['"`]/g;
+    while ((match = prefixRegex.exec(content)) !== null) {
+      addKey(match[1].trim(), match.index);
+    }
+
+    return keys;
+  } catch (error) {
+    console.error(`Error reading backend file ${filePath}:`, error.message);
     return [];
   }
 }
@@ -255,7 +339,7 @@ async function main() {
   console.log('多语言扫描工具（增强版）');
   console.log('='.repeat(50) + '\n');
 
-  // 扫描前端代码
+  // 1. 扫描前端代码
   console.log(`📁 扫描前端代码: ${platformSrcDir}`);
   const files = getAllFiles(platformSrcDir);
   console.log(`✓ 找到 ${files.length} 个 TS/TSX 文件\n`);
@@ -280,7 +364,37 @@ async function main() {
     });
   });
 
-  console.log(`✓ 扫描完成，找到 ${usedKeys.size} 个独立的多语言键\n`);
+  // 2. 扫描后端代码
+  const serverSrcDir = join(baseDir, '../server/src');
+  console.log(`📁 扫描后端代码: ${serverSrcDir}`);
+  const serverFiles = getAllFiles(serverSrcDir).filter(
+    (file) =>
+      !file.includes('db/migrations') &&
+      !file.includes('db/init') && // 排除 initTranslation.ts etc 自身以避免循环自检测
+      !file.includes('translation') && // 排除 translation 定义文件
+      file.endsWith('.ts'),
+  );
+  console.log(`✓ 找到 ${serverFiles.length} 个后端 TS 文件\n`);
+
+  const serverBaseDir = join(baseDir, '..');
+  serverFiles.forEach((filePath) => {
+    const keyData = extractBackendTranslationKeys(filePath);
+    const relativePath = relative(serverBaseDir, filePath);
+
+    keyData.forEach((item) => {
+      usedKeys.add(item.key);
+      if (!keyLocations[item.key]) {
+        keyLocations[item.key] = [];
+      }
+      keyLocations[item.key].push({
+        file: relativePath,
+        line: item.line,
+        context: item.context,
+      });
+    });
+  });
+
+  console.log(`✓ 扫描完成，累计找到 ${usedKeys.size} 个独立的多语言键\n`);
 
   // 扫描 initTranslation.ts
   console.log(`📋 扫描多语言定义: ${initI18nPath}`);
@@ -303,7 +417,7 @@ async function main() {
   if (outputFormat === 'json') {
     report = JSON.stringify(
       generateJsonReport(missingKeys, unusedKeys, keyLocations, {
-        total: files.length,
+        total: files.length + serverFiles.length,
       }),
       null,
       2,

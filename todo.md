@@ -28,10 +28,8 @@
   * 引入仓储层（Repository Pattern）或专用查询对象（Query Object），将所有的 ORM 查询逻辑封装至 `repository.ts` 中。
   * 使得 `service.ts` 保持纯粹的业务工作流与领域逻辑，不再含有 ORM 特有的 API，也有利于通过 Mock Repository 编写轻量级的服务单元测试。
 
-### 4. 多语言检测与自动化合规拦截机制的 SOC 闭环 ── 🟡 进行中 (高优先级)
-* **现状**：
-  * `platform/scripts/scan-i18n-enhanced.js` 能有效找出前端未在后端同步的多语言键，但仅生成了离线的 Markdown 报告，无法在开发/构建阶段拦截错误。由于最近的多语言架构重构（将翻译条目拆分到各子包的 `translation.ts` 中），原本扫描 `initTranslation.ts` 的正则已失效，需更新扫描器。
-* **改进方案**：
-  * **修复扫描器**：使 `scan-i18n-enhanced.js` 支持解析 `initTranslation.ts` 中所有的 `import` 引用，动态、深度遍历所有子包的 `translation.ts` 文件以收集完整的多语言键。
-  * **支持拦截拦截**：为扫描脚本添加 `--fail-on-missing` (或 `--ci`) 命令行参数。当检测到前端使用了未定义的 Key 时，控制台打印详细的位置信息并以非零状态码退出 (`process.exit(1)`)。
-  * **构建与构建链集成**：将扫描校验集成到前端 `package.json` 的 `build` 脚本以及 Git `pre-commit` 钩子中，构建/提交前自动运行，防止将缺失多语言文案的代码推入仓库。
+### 4. 多语言检测与自动化合规拦截机制的 SOC 闭环 ── 🟢 已完成 (高优先级)
+* **现状与改造**：
+  * **增强扫描器**：已重构 `scan-i18n-enhanced.js`。现在它支持递归解析 `initTranslation.ts` 中的 `import` 并深度遍历所有子包的 `translation.ts` / `shared.ts` 文件。并且增加了对**后端项目目录 (`server/src`)** 的扫描，全面支持对前后端所有真实使用的多语言键（包括后端错误码、定时任务与日志模块的 Key）的联合排查，过滤了非翻译用途的业务模块标识（BusinessKey）。
+  * **移除拼接，显式枚举**：对前端代码进行了完全清零的改造，将动态拼接 `t(\`permission.category.\${row.category}\`)` 及 Schema Form 模板翻译等全部改为**显式 Map 映射**，消除了扫描器的盲区。
+  * **安全校验与 Git 钩子拦截**：集成了 `--fail-on-missing` 参数并集成进 Git `pre-commit` 钩子。现在本地 commit 时若有任何一处遗漏的多语言键，会自动打印具体的代码文件与行号并以状态码 `1` 强行阻断。目前前后端使用的多语言缺失数量为 **0**。
