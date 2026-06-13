@@ -1,8 +1,5 @@
-// @ts-ignore
 import process from "process";
-// @ts-ignore
 import fs from "fs";
-// @ts-ignore
 import path from "path";
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
@@ -90,6 +87,21 @@ function analyzeImports(code: string, filePath: string) {
   return result;
 }
 
+function shouldAnalyzeFile(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/");
+  if (normalized.startsWith("src/api/")) {
+    if (normalized.startsWith("src/api/system/auth/")) {
+      return true;
+    }
+    const parts = normalized.split("/");
+    const dirParts = parts.slice(0, -1);
+    if (dirParts.length > 3) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function resolveImportPath(
   importPath: string,
   currentFilePath: string,
@@ -149,6 +161,14 @@ function analyzeDependencies(
     }
 
     visited.add(filePath);
+
+    if (!shouldAnalyzeFile(filePath)) {
+      if (!graph[filePath]) {
+        graph[filePath] = { static: [], dynamic: [], computed: [] };
+      }
+      return;
+    }
+
     const code = fs.readFileSync(absolutePath, "utf-8");
     const imports = analyzeImports(code, filePath);
 
@@ -217,6 +237,10 @@ function findPossibleImports(dir: string, projectRoot: string): string[] {
   return files;
 }
 
+function sanitizeId(str: string): string {
+  return str.replace(/[\/\\\.@\-:]/g, "_");
+}
+
 export default function main() {
   const projectRoot = process.cwd();
   // 支持多个入口点
@@ -230,20 +254,70 @@ export default function main() {
   console.log("=== Analysis Summary ===");
   console.log(`Total files analyzed: ${Object.keys(graph).length}`);
 
-  // 生成 Mermaid 可视化
-  function sanitizeId(str: string): string {
-    return str.replace(/[\/\\\.@\-:]/g, "_");
+  function getCollapsedNode(filePath: string): string {
+    const normalized = filePath.replace(/\\/g, "/");
+    if (normalized.startsWith("src/api/")) {
+      const parts = normalized.split("/");
+      if (parts.length > 3) {
+        if (parts[2] === "system" && parts[3] === "auth") {
+          return `src/api/system/auth`;
+        }
+        return `src/api/${parts[2]}`;
+      }
+    }
+    const dir = path.dirname(filePath).replace(/\\/g, "/");
+    if (dir === "." || dir === "src" || dir === "") {
+      return filePath;
+    }
+    return dir;
   }
 
-  // 按目录分组
-  const groups: { [dir: string]: string[] } = {};
-  for (const file of Object.keys(graph)) {
-    const dir = path.dirname(file);
-    if (!groups[dir]) groups[dir] = [];
-    groups[dir].push(file);
+  class DAGBuilder {
+    private adjacencyList: Map<string, Set<string>> = new Map();
+
+    public tryAddEdge(from: string, to: string): boolean {
+      if (from === to) return false;
+      if (this.hasPath(to, from)) {
+        return false; // Adding this edge would form a cycle
+      }
+      if (!this.adjacencyList.has(from)) {
+        this.adjacencyList.set(from, new Set());
+      }
+      this.adjacencyList.get(from)!.add(to);
+      return true;
+    }
+
+    private hasPath(
+      start: string,
+      target: string,
+      visited: Set<string> = new Set()
+    ): boolean {
+      if (start === target) return true;
+      visited.add(start);
+      const neighbors = this.adjacencyList.get(start);
+      if (neighbors) {
+        for (const neighbor of neighbors) {
+          if (!visited.has(neighbor)) {
+            if (this.hasPath(neighbor, target, visited)) return true;
+          }
+        }
+      }
+      return false;
+    }
   }
 
-  let mermaidContent = `---
+  function generateMermaid(isDetailed: boolean): string {
+    const dag = new DAGBuilder();
+
+    if (isDetailed) {
+      const groups: { [dir: string]: string[] } = {};
+      for (const file of Object.keys(graph)) {
+        const dir = path.dirname(file).replace(/\\/g, "/");
+        if (!groups[dir]) groups[dir] = [];
+        groups[dir].push(file);
+      }
+
+      let mermaidContent = `---
 config:
   theme: neo-dark
   layout: elk
@@ -251,60 +325,199 @@ config:
 graph LR
 `;
 
-  // 生成子图
-  for (const [dir, files] of Object.entries(groups)) {
-    if (dir === ".") {
-      for (const file of files) {
+      for (const [dir, files] of Object.entries(groups)) {
+        if (dir === "." || dir === "") {
+          for (const file of files) {
+            const fileId = sanitizeId(file);
+            mermaidContent += `  ${fileId}["${file}"]\n`;
+          }
+          continue;
+        }
+
+        const dirId = sanitizeId(dir);
+        mermaidContent += `  subgraph ${dirId} ["${dir}/"]\n`;
+        for (const file of files) {
+          const fileId = sanitizeId(file);
+          mermaidContent += `    ${fileId}["${path.basename(file)}"]\n`;
+        }
+        mermaidContent += `  end\n`;
+      }
+
+      for (const [file, deps] of Object.entries(graph)) {
         const fileId = sanitizeId(file);
-        mermaidContent += `  ${fileId}["${file}"]\n`;
-      }
-      continue;
-    }
 
-    const dirId = sanitizeId(dir);
-    mermaidContent += `  subgraph ${dirId} ["${dir}/"]\n`;
-    for (const file of files) {
-      const fileId = sanitizeId(file);
-      mermaidContent += `    ${fileId}["${path.basename(file)}"]\n`;
+        for (const dep of deps.static) {
+          const depId = sanitizeId(dep);
+          if (dag.tryAddEdge(file, dep)) {
+            mermaidContent += `  ${fileId} --> ${depId}\n`;
+          }
+        }
+
+        for (const dep of deps.dynamic) {
+          const depId = sanitizeId(dep);
+          if (dag.tryAddEdge(file, dep)) {
+            mermaidContent += `  ${fileId} -.->|dynamic| ${depId}\n`;
+          }
+        }
+
+        if (deps.computed.length > 0) {
+          for (const computed of deps.computed) {
+            const label = computed.replace(/:/g, " ");
+            mermaidContent += `  ${fileId} -.->|"${label}"| COMPUTED[Runtime Computed]\n`;
+          }
+        }
+      }
+
+      mermaidContent +=
+        "\n  classDef entry fill:#2d5,stroke:#333,stroke-width:4px\n";
+      mermaidContent +=
+        "  classDef computed fill:#f96,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5\n";
+
+      entryFiles.forEach((f) => {
+        mermaidContent += `  class ${sanitizeId(f)} entry\n`;
+      });
+      mermaidContent += "  class COMPUTED computed\n";
+
+      return mermaidContent;
+    } else {
+      const collapsedNodes: {
+        [node: string]: {
+          label: string;
+          isFolder: boolean;
+          static: Set<string>;
+          dynamic: Set<string>;
+          computed: Set<string>;
+        };
+      } = {};
+
+      for (const file of Object.keys(graph)) {
+        const node = getCollapsedNode(file);
+        if (!collapsedNodes[node]) {
+          const isFolder = node !== file;
+          collapsedNodes[node] = {
+            label: isFolder ? `${path.basename(node)}/` : path.basename(node),
+            isFolder,
+            static: new Set(),
+            dynamic: new Set(),
+            computed: new Set(),
+          };
+        }
+
+        const deps = graph[file];
+        for (const dep of deps.static) {
+          const depNode = getCollapsedNode(dep);
+          if (depNode !== node) {
+            collapsedNodes[node].static.add(depNode);
+          }
+        }
+        for (const dep of deps.dynamic) {
+          const depNode = getCollapsedNode(dep);
+          if (depNode !== node) {
+            collapsedNodes[node].dynamic.add(depNode);
+          }
+        }
+        for (const comp of deps.computed) {
+          collapsedNodes[node].computed.add(comp);
+        }
+      }
+
+      const groups: { [parentDir: string]: string[] } = {};
+      for (const node of Object.keys(collapsedNodes)) {
+        const parentDir = path.dirname(node).replace(/\\/g, "/");
+        if (!groups[parentDir]) groups[parentDir] = [];
+        groups[parentDir].push(node);
+      }
+
+      let mermaidContent = `---
+config:
+  theme: neo-dark
+  layout: elk
+---
+graph LR
+`;
+
+      for (const [parentDir, nodes] of Object.entries(groups)) {
+        if (parentDir === "." || parentDir === "") {
+          for (const node of nodes) {
+            const nodeId = sanitizeId(node);
+            const info = collapsedNodes[node];
+            mermaidContent += `  ${nodeId}["${info.label}"]\n`;
+          }
+          continue;
+        }
+
+        const dirId = sanitizeId(parentDir);
+        mermaidContent += `  subgraph ${dirId} ["${parentDir}/"]\n`;
+        for (const node of nodes) {
+          const nodeId = sanitizeId(node);
+          const info = collapsedNodes[node];
+          mermaidContent += `    ${nodeId}["${info.label}"]\n`;
+        }
+        mermaidContent += `  end\n`;
+      }
+
+      for (const [node, info] of Object.entries(collapsedNodes)) {
+        const nodeId = sanitizeId(node);
+
+        for (const dep of info.static) {
+          const depId = sanitizeId(dep);
+          if (dag.tryAddEdge(node, dep)) {
+            mermaidContent += `  ${nodeId} --> ${depId}\n`;
+          }
+        }
+
+        for (const dep of info.dynamic) {
+          const depId = sanitizeId(dep);
+          if (dag.tryAddEdge(node, dep)) {
+            mermaidContent += `  ${nodeId} -.->|dynamic| ${depId}\n`;
+          }
+        }
+
+        if (info.computed.size > 0) {
+          for (const computed of info.computed) {
+            const label = computed.replace(/:/g, " ");
+            mermaidContent += `  ${nodeId} -.->|"${label}"| COMPUTED[Runtime Computed]\n`;
+          }
+        }
+      }
+
+      mermaidContent +=
+        "\n  classDef entry fill:#2d5,stroke:#333,stroke-width:4px\n";
+      mermaidContent +=
+        "  classDef computed fill:#f96,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5\n";
+
+      entryFiles.forEach((f) => {
+        const collapsedEntry = getCollapsedNode(f);
+        mermaidContent += `  class ${sanitizeId(collapsedEntry)} entry\n`;
+      });
+      mermaidContent += "  class COMPUTED computed\n";
+
+      return mermaidContent;
     }
-    mermaidContent += `  end\n`;
   }
 
-  // 生成连线
-  for (const [file, deps] of Object.entries(graph)) {
-    const fileId = sanitizeId(file);
+  function updateReadme(readmePath: string, mermaidCode: string) {
+    if (!fs.existsSync(readmePath)) return;
+    let content = fs.readFileSync(readmePath, "utf-8");
+    const startMarker = "<!-- DEPENDENCY_GRAPH_START -->";
+    const endMarker = "<!-- DEPENDENCY_GRAPH_END -->";
+    const startIndex = content.indexOf(startMarker);
+    const endIndex = content.indexOf(endMarker);
 
-    for (const dep of deps.static) {
-      const depId = sanitizeId(dep);
-      mermaidContent += `  ${fileId} --> ${depId}\n`;
-    }
-
-    for (const dep of deps.dynamic) {
-      const depId = sanitizeId(dep);
-      mermaidContent += `  ${fileId} -.->|dynamic| ${depId}\n`;
-    }
-
-    if (deps.computed.length > 0) {
-      for (const computed of deps.computed) {
-        const label = computed.replace(/:/g, " ");
-        mermaidContent += `  ${fileId} -.->|"${label}"| COMPUTED[Runtime Computed]\n`;
-      }
+    if (startIndex !== -1 && endIndex !== -1) {
+      const before = content.substring(0, startIndex + startMarker.length);
+      const after = content.substring(endIndex);
+      const newGraph = `\n\`\`\`mermaid\n${mermaidCode}\`\`\`\n`;
+      content = before + newGraph + after;
+      fs.writeFileSync(readmePath, content, "utf-8");
+      console.log(`✅ Embedded dependency graph into: ${readmePath}`);
     }
   }
 
-  // 样式定义
-  mermaidContent +=
-    "\n  classDef entry fill:#2d5,stroke:#333,stroke-width:4px\n";
-  mermaidContent +=
-    "  classDef computed fill:#f96,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5\n";
+  const compactContent = generateMermaid(false);
 
-  entryFiles.forEach((f) => {
-    mermaidContent += `  class ${sanitizeId(f)} entry\n`;
-  });
-  mermaidContent += "  class COMPUTED computed\n";
-
-  fs.writeFileSync("./dist/dependency-graph.mmd", mermaidContent);
-  console.log("\n✅ Mermaid diagram written to: ./dist/dependency-graph.mmd");
+  updateReadme("./README.md", compactContent);
+  updateReadme("./README_zh_CN.md", compactContent);
 }
 
 main();
