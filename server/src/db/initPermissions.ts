@@ -5,12 +5,12 @@
 
 import db from "@/db/index";
 import { permissionTable } from "@/api/system/permission/model";
-import { PermissionAddLike } from "@/api/system/permission/service";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "@/utils/env";
 import { sql } from "drizzle-orm";
 import { permissionSeeds } from "@/constants/permissions";
+import { actionTranslations } from "@/db/translation/shared";
 
 const LOCALE = getEnv("LOCALE") || "zh-CN";
 
@@ -51,20 +51,14 @@ export async function preparePermissions(options?: { reset?: boolean }) {
           );
           const prefix = trans?.langCodes?.[LOCALE];
 
-          // 动作名称映射
-          const actionNameMap: Record<string, string> = {
-            read: "查看",
-            list: "列表",
-            add: "新增",
-            edit: "编辑",
-            delete: "删除",
-            export: "导出",
-            view: "浏览",
-            "batch-delete": "批量删除",
-          };
-
-          const actionName = actionNameMap[action] || action;
-          return prefix ? `${prefix}-${actionName}` : code + "未知动作";
+          const actionTrans =
+            actionTranslations[action as keyof typeof actionTranslations];
+          const actionName = actionTrans?.[LOCALE] || action;
+          const unknownName =
+            actionTranslations.unknown[
+              LOCALE as keyof typeof actionTranslations.unknown
+            ];
+          return prefix ? `${prefix}-${actionName}` : code + unknownName;
         };
 
         mappedData.push({

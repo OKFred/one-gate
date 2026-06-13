@@ -1371,3 +1371,42 @@ export const sharedTranslations = {
   >,
   TranslationInputItem[]
 >;
+
+export const actionTranslations = {
+  read: {
+    "zh-CN": "查看",
+    "en-US": "View",
+  },
+  list: {
+    "zh-CN": "列表",
+    "en-US": "List",
+  },
+  add: {
+    "zh-CN": "新增",
+    "en-US": "Add",
+  },
+  edit: {
+    "zh-CN": "编辑",
+    "en-US": "Edit",
+  },
+  delete: {
+    "zh-CN": "删除",
+    "en-US": "Delete",
+  },
+  export: {
+    "zh-CN": "导出",
+    "en-US": "Export",
+  },
+  view: {
+    "zh-CN": "浏览",
+    "en-US": "View",
+  },
+  "batch-delete": {
+    "zh-CN": "批量删除",
+    "en-US": "Batch Delete",
+  },
+  unknown: {
+    "zh-CN": "未知动作",
+    "en-US": "Unknown Action",
+  },
+} as const;
