@@ -7,9 +7,7 @@ export type PermissionAction =
   | "delete"
   | "export"
   | "view"
-  | "batch-delete"
-  | "update_profile"
-  | "update_password";
+  | "batch-delete";
 
 export type CheckPermissionSeeds<T> = {
   [P in keyof T & string]: {
@@ -38,7 +36,7 @@ export const permissionSeeds = {
     /** 角色权限管理 */
     role_permission: ["read", "add", "edit", "delete", "batch-delete"],
     /** 个人信息 */
-    auth: ["read", "update_profile", "update_password"],
+    auth: ["read", "edit"],
     /** 动态表单配置 */
     schema_form: ["read", "add", "edit", "delete"],
     /** 动态表单数据 */

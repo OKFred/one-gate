@@ -61,8 +61,6 @@ export async function preparePermissions(options?: { reset?: boolean }) {
             export: "导出",
             view: "浏览",
             "batch-delete": "批量删除",
-            update_profile: "更新资料",
-            update_password: "更新密码",
           };
 
           const actionName = actionNameMap[action] || action;

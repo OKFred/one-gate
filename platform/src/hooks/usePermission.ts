@@ -65,8 +65,7 @@ export const SYSTEM = {
   /** 个人信息 */
   AUTH: {
     READ: 'system.auth:read',
-    UPDATE_PROFILE: 'system.auth:update_profile',
-    UPDATE_PASSWORD: 'system.auth:update_password',
+    EDIT: 'system.auth:edit',
   },
   /** 动态表单配置 */
   SCHEMA_FORM: {
