@@ -77,8 +77,8 @@ export default function CronFormFields({ form, setForm, t }: CronFormFieldsProps
           name="status"
           label={t('cron.field.statusLabel')}
           type="switch"
-          value={form.status === 1}
-          onChange={(checked: boolean) => setForm((prev) => ({ ...prev, status: checked ? 1 : 0 }))}
+          value={!!form.status}
+          onChange={(checked: boolean) => setForm((prev) => ({ ...prev, status: checked }))}
         />
 
         <Field

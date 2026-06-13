@@ -109,10 +109,8 @@ export default function LogDialog({ open, onClose, job }: LogDialogProps) {
                       <TableCell>{log.id}</TableCell>
                       <TableCell>
                         <Chip
-                          label={
-                            log.status === 1 ? t('cron.status.success') : t('cron.status.fail')
-                          }
-                          color={log.status === 1 ? 'success' : 'error'}
+                          label={log.status ? t('cron.status.success') : t('cron.status.fail')}
+                          color={log.status ? 'success' : 'error'}
                           size="small"
                           variant="outlined"
                         />
@@ -120,7 +118,7 @@ export default function LogDialog({ open, onClose, job }: LogDialogProps) {
                       <TableCell>{dayjs(log.startTimeUtc).format('YYYY-MM-DD HH:mm:ss')}</TableCell>
                       <TableCell>{log.durationMs}ms</TableCell>
                       <TableCell sx={{ maxWidth: 300, wordBreak: 'break-all' }}>
-                        {log.status === 1 ? (
+                        {log.status ? (
                           <Stack spacing={0.5}>
                             <Typography variant="caption" color="text.secondary">
                               {t('cron.log.success')}

@@ -17,8 +17,7 @@
       "maximum": 1000
     },
     "status": {
-      "type": "number",
-      "enum": [0, 1]
+      "type": "boolean"
     },
     "orderBy": {
       "type": "string",

@@ -12029,11 +12029,8 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 状态
-             * @enum {number}
-             */
-            status?: 0 | 1;
+            /** @description 状态 */
+            status?: boolean;
             /** @enum {string} */
             orderBy?: "id" | "name" | "lastRunTimeUtc" | "runCount" | "createTimeUtc";
         };
@@ -12060,11 +12057,8 @@ export interface components {
                     name: string;
                     /** @description Cron 表达式 */
                     cronExpression: string;
-                    /**
-                     * @description 状态 (0: 禁用, 1: 启用)
-                     * @enum {number}
-                     */
-                    status: 0 | 1;
+                    /** @description 状态 (false: 禁用, true: 启用) */
+                    status: boolean;
                     /** @description JSON 格式参数 */
                     parameters?: ((string | null) | null) | null;
                     /** @description 上次运行的毫秒时间戳 */
@@ -12098,11 +12092,8 @@ export interface components {
             name: string;
             /** @description Cron 表达式 */
             cronExpression: string;
-            /**
-             * @description 状态 (0: 禁用, 1: 启用)
-             * @enum {number}
-             */
-            status: 0 | 1;
+            /** @description 状态 (false: 禁用, true: 启用) */
+            status: boolean;
             /** @description JSON 格式参数 */
             parameters?: ((string | null) | null) | null;
         };
@@ -12127,11 +12118,8 @@ export interface components {
             name?: string;
             /** @description Cron 表达式 */
             cronExpression?: string;
-            /**
-             * @description 状态 (0: 禁用, 1: 启用)
-             * @enum {number}
-             */
-            status?: 0 | 1;
+            /** @description 状态 (false: 禁用, true: 启用) */
+            status?: boolean;
             /** @description JSON 格式参数 */
             parameters?: ((string | null) | null) | null;
         };
@@ -12181,11 +12169,8 @@ export interface components {
                 name: string;
                 /** @description Cron 表达式 */
                 cronExpression: string;
-                /**
-                 * @description 状态 (0: 禁用, 1: 启用)
-                 * @enum {number}
-                 */
-                status: 0 | 1;
+                /** @description 状态 (false: 禁用, true: 启用) */
+                status: boolean;
                 /** @description JSON 格式参数 */
                 parameters?: ((string | null) | null) | null;
                 /** @description 上次运行的毫秒时间戳 */
@@ -12242,7 +12227,7 @@ export interface components {
                 list: {
                     id: number;
                     jobId: number;
-                    status: number;
+                    status: boolean;
                     errorMessage?: ((string | null) | null) | null;
                     responseBody?: ((string | null) | null) | null;
                     startTimeUtc: number;

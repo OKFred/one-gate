@@ -14,8 +14,8 @@ export const tableConfig: SchemaCrudConfig<CronObj, FilterState, ListCronReq>['t
       title: t('filter.enabledStatus'),
       render: (row) => (
         <Chip
-          label={row.status === 1 ? t('status.enabled') : t('status.disabled')}
-          color={row.status === 1 ? 'success' : 'default'}
+          label={row.status ? t('status.enabled') : t('status.disabled')}
+          color={row.status ? 'success' : 'default'}
           size="small"
           variant="outlined"
         />
@@ -30,7 +30,7 @@ export const tableConfig: SchemaCrudConfig<CronObj, FilterState, ListCronReq>['t
     {
       title: t('cron.field.nextRunTime'),
       render: (row) =>
-        row.nextRunTimeUtc && row.status === 1
+        row.nextRunTimeUtc && row.status
           ? dayjs(row.nextRunTimeUtc).format('YYYY-MM-DD HH:mm:ss')
           : '-',
     },
@@ -44,8 +44,8 @@ export const tableConfig: SchemaCrudConfig<CronObj, FilterState, ListCronReq>['t
       type: 'tags',
       render: (row) => (
         <Chip
-          label={row.status === 1 ? t('status.enabled') : t('status.disabled')}
-          color={row.status === 1 ? 'success' : 'default'}
+          label={row.status ? t('status.enabled') : t('status.disabled')}
+          color={row.status ? 'success' : 'default'}
           size="small"
           variant="outlined"
         />

@@ -18,8 +18,7 @@
       "maxLength": 100
     },
     "status": {
-      "type": "number",
-      "enum": [0, 1]
+      "type": "boolean"
     },
     "parameters": {
       "type": ["string", "null"],

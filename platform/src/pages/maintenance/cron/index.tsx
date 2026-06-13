@@ -17,7 +17,7 @@ const cronFormSchema = {
     name: { type: 'string', minLength: 1 },
     jobKey: { type: 'string', minLength: 1 },
     cronExpression: { type: 'string', minLength: 1 },
-    status: { type: 'number', enum: [0, 1] },
+    status: { type: 'boolean' },
     parameters: { type: ['string', 'null'] },
   },
   required: ['name', 'jobKey', 'cronExpression', 'status'],
@@ -28,7 +28,7 @@ const DEFAULT_FORM: Partial<CronObj> = {
   name: '',
   jobKey: '',
   cronExpression: '*/5 * * * *',
-  status: 1,
+  status: true,
   parameters: null,
 };
 
@@ -85,7 +85,7 @@ export default function CronManagement() {
             name: row.name || '',
             jobKey: row.jobKey || '',
             cronExpression: row.cronExpression || '*/5 * * * *',
-            status: row.status ?? 1,
+            status: row.status ?? true,
             parameters: row.parameters || null,
           };
         }
@@ -94,7 +94,7 @@ export default function CronManagement() {
           name: '',
           jobKey: '',
           cronExpression: '*/5 * * * *',
-          status: 1,
+          status: true,
           parameters: null,
         };
       },

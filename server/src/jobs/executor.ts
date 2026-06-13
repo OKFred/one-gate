@@ -1,7 +1,12 @@
 /**
- * API Task HTTP 执行器
+ * API Task HTTP 执行器与定时任务解耦执行器
  * 基于 fetch() 标准 API，兼容 Node.js 18+ 和 Cloudflare Workers
  */
+
+import { AppDatabase } from "@/db/index";
+import { jobsRegistry } from "./registry";
+import { apiTaskTable } from "@/api/maintenance/api-task/model";
+import { eq, and } from "drizzle-orm";
 
 export interface ApiTaskDef {
   baseUrl: string;
@@ -55,7 +60,7 @@ export async function executeApiTask(
     }
   }
 
-  // GET / DELETE → 参数追加到 query string，其他 → JSON body
+  // GET / DELETE → 参数追加 to query string，其他 → JSON body
   let body: string | undefined;
   if (method === "GET" || method === "DELETE") {
     for (const [k, v] of Object.entries(params)) {
@@ -110,3 +115,119 @@ export async function executeApiTask(
     clearTimeout(timer);
   }
 }
+
+export interface JobExecutorResult {
+  status: boolean; // true: 成功, false: 失败
+  errorMessage?: string | null;
+  responseBody?: string | null;
+}
+
+export interface JobExecutor {
+  /**
+   * 判断当前执行器是否支持处理该任务
+   */
+  supports(jobKey: string): Promise<boolean> | boolean;
+
+  /**
+   * 执行具体的任务逻辑
+   */
+  execute(
+    job: { jobKey: string; parameters?: string | null; name: string },
+    db: AppDatabase
+  ): Promise<JobExecutorResult>;
+}
+
+/**
+ * 内置静态任务执行器
+ */
+export class StaticJobExecutor implements JobExecutor {
+  supports(jobKey: string): boolean {
+    return !!jobsRegistry[jobKey];
+  }
+
+  async execute(
+    job: { jobKey: string; parameters?: string | null; name: string },
+    db: AppDatabase
+  ): Promise<JobExecutorResult> {
+    const handler = jobsRegistry[job.jobKey];
+    if (!handler) {
+      return {
+        status: false,
+        errorMessage: `Static handler not found for key: ${job.jobKey}`,
+      };
+    }
+    try {
+      const params = job.parameters ? JSON.parse(job.parameters) : {};
+      await handler({ params, db });
+      return { status: true };
+    } catch (err: unknown) {
+      return {
+        status: false,
+        errorMessage: err instanceof Error ? err.message : String(err),
+      };
+    }
+  }
+}
+
+/**
+ * HTTP 动态 API 任务执行器
+ */
+export class HttpJobExecutor implements JobExecutor {
+  supports(jobKey: string): boolean {
+    // 作为兜底执行器
+    return true;
+  }
+
+  async execute(
+    job: { jobKey: string; parameters?: string | null; name: string },
+    db: AppDatabase
+  ): Promise<JobExecutorResult> {
+    const apiTasks = await db
+      .select()
+      .from(apiTaskTable)
+      .where(
+        and(
+          eq(apiTaskTable.taskKey, job.jobKey),
+          eq(apiTaskTable.isEnabled, true)
+        )
+      )
+      .limit(1);
+
+    const apiTask = apiTasks[0];
+    if (!apiTask) {
+      return {
+        status: false,
+        errorMessage: `Job key "${job.jobKey}" 未在静态注册表中找到，也未找到匹配的 API Task 定义。`,
+      };
+    }
+
+    try {
+      const params: Record<string, unknown> = job.parameters
+        ? JSON.parse(job.parameters)
+        : {};
+      const result = await executeApiTask(apiTask, params);
+      if (result.success) {
+        return {
+          status: true,
+          responseBody: result.responseBody,
+        };
+      } else {
+        return {
+          status: false,
+          errorMessage: `HTTP ${result.statusCode}: ${result.responseBody.slice(0, 500)}`,
+          responseBody: result.responseBody,
+        };
+      }
+    } catch (err: unknown) {
+      return {
+        status: false,
+        errorMessage: err instanceof Error ? err.message : String(err),
+      };
+    }
+  }
+}
+
+export const jobExecutors: JobExecutor[] = [
+  new StaticJobExecutor(),
+  new HttpJobExecutor(),
+];

@@ -31,7 +31,7 @@
                 "type": "number"
               },
               "status": {
-                "type": "number"
+                "type": "boolean"
               },
               "errorMessage": {
                 "type": ["string", "null"],

@@ -33,9 +33,8 @@ const CronBasePO = {
     maxLength: 100,
   },
   status: {
-    type: "number",
-    description: "状态 (0: 禁用, 1: 启用)",
-    enum: [0, 1],
+    type: "boolean",
+    description: "状态 (false: 禁用, true: 启用)",
   },
   parameters: {
     type: ["string", "null"],
@@ -158,7 +157,7 @@ export const cronTable = sqliteTable("system_cron_job", {
   jobKey: text("job_key").notNull(),
   name: text("name").notNull(),
   cronExpression: text("cron_expression").notNull(),
-  status: integer("status").$type<0 | 1>().notNull().default(1),
+  status: integer("status", { mode: "boolean" }).notNull().default(true),
   parameters: text("parameters"),
   lastRunTimeUtc: integer("last_run_time_utc"),
   nextRunTimeUtc: integer("next_run_time_utc"),
@@ -172,9 +171,9 @@ export const cronTable = sqliteTable("system_cron_job", {
 });
 
 export const cronLogTable = sqliteTable("system_cron_job_log", {
-  id: integer("id").primaryKey().notNull(),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   jobId: integer("job_id").notNull(),
-  status: integer("status").notNull(), // 0: 失败, 1: 成功
+  status: integer("status", { mode: "boolean" }).notNull(), // false: 失败, true: 成功
   errorMessage: text("error_message"),
   responseBody: text("response_body"),
   startTimeUtc: integer("start_time_utc").notNull(),

@@ -3,7 +3,7 @@ import type { ListCronReq } from '@/api/maintenance/type';
 
 export interface FilterState {
   keyword: string;
-  status: 0 | 1 | undefined;
+  status: boolean | undefined;
 }
 
 export const defaultFilters: FilterState = {
@@ -26,8 +26,8 @@ export const filterConfig: SchemaCrudConfig<unknown, FilterState, ListCronReq>['
       label: t('filter.enabledStatus'),
       options: [
         { label: t('filter.all'), value: undefined },
-        { label: t('status.enabled'), value: 1 },
-        { label: t('status.disabled'), value: 0 },
+        { label: t('status.enabled'), value: true },
+        { label: t('status.disabled'), value: false },
       ],
     },
   ],

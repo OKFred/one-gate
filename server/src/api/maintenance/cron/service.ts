@@ -45,7 +45,7 @@ import { CronExpressionParser } from "cron-parser";
 // 辅助函数：根据条件构建查询 filter
 const buildWhereCondition = (condition?: {
   keyword?: string;
-  status?: 0 | 1;
+  status?: boolean;
 }) => {
   const { keyword, status } = condition || {};
   const conditions = [];
@@ -74,7 +74,7 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    status: { type: "number", enum: [0, 1], description: "状态" },
+    status: { type: "boolean", description: "状态" },
     orderBy: orderByWrapper<(keyof CronPOLike)[]>(CronSortableKeys),
   },
   required: [],
@@ -174,7 +174,7 @@ async function onAdd(
 
   // 验证 Cron 表达式是否合法，并计算初始下次运行时间
   let nextRunTimeUtc: number | null = null;
-  if (status === 1) {
+  if (status === true) {
     try {
       const interval = CronExpressionParser.parse(cronExpression);
       nextRunTimeUtc = interval.next().toDate().getTime();
@@ -252,7 +252,7 @@ async function onUpdate(
     cronExpression !== undefined ? cronExpression : row.cronExpression;
   const targetStatus = status !== undefined ? status : row.status;
 
-  if (targetStatus === 1) {
+  if (targetStatus === true) {
     try {
       const interval = CronExpressionParser.parse(targetCron);
       nextRunTimeUtc = interval.next().toDate().getTime();
@@ -430,7 +430,7 @@ const listLogsRes = {
         properties: {
           id: { type: "number" },
           jobId: { type: "number" },
-          status: { type: "number" },
+          status: { type: "boolean" },
           errorMessage: { type: ["string", "null"], nullable: true },
           responseBody: { type: ["string", "null"], nullable: true },
           startTimeUtc: { type: "number" },
