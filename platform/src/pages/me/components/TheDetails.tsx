@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useState, memo, useRef, useEffect } fr
 import { Card, CardContent, Typography, Box, Chip, Paper, Tooltip } from '@mui/material';
 import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
-import { AUTH } from '@/hooks/usePermission';
+import { SYSTEM } from '@/hooks/usePermission';
 import type { GetUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
@@ -89,7 +89,7 @@ const TheDetails = memo(
                 variant="contained"
                 startIcon={<EditIcon />}
                 onClick={handleEdit}
-                permissionCodes={[AUTH.PROFILE.UPDATE_PROFILE]}
+                permissionCodes={[SYSTEM.AUTH.UPDATE_PROFILE]}
               >
                 {t('dialog.edit')}
               </ResponsiveButton>

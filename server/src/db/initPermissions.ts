@@ -10,65 +10,9 @@ import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "@/utils/env";
 import { sql } from "drizzle-orm";
-const LOCALE = getEnv("LOCALE") || "zh-CN";
+import { permissionSeeds } from "@/constants/permissions";
 
-/**
- * 基础权限种子数据 (结构化)
- */
-const permissionSeeds: Record<string, Record<string, string[]>> = {
-  system: {
-    "": ["read"],
-    user: ["read", "add", "edit", "delete", "export"],
-    role: ["read", "add", "edit", "delete"],
-    permission: ["read", "add", "edit", "delete"],
-    department: ["read", "add", "edit", "delete"],
-    menu: ["read", "add", "edit", "delete"],
-    role_permission: ["read", "add", "edit", "delete", "batch-delete"],
-    auth: ["read", "update_profile", "update_password"],
-    schema_form: ["read", "add", "edit", "delete"],
-    schema_form_data: ["read", "add", "edit", "delete"],
-  },
-  mail: {
-    "": ["read"],
-    account: ["read", "add", "edit", "delete"],
-    template: ["read", "add", "edit", "delete"],
-    log: ["read", "view"],
-  },
-  i18n: {
-    "": ["read"],
-    language: ["read", "add", "edit", "delete"],
-    region: ["read", "add", "edit", "delete"],
-    translation: ["read", "add", "edit", "delete"],
-  },
-  maintenance: {
-    "": ["read"],
-    cache: ["read", "add", "edit", "delete", "view"],
-    audit_login: ["read"],
-    cron: ["read", "add", "edit", "delete"],
-    api_task: ["read", "add", "edit", "delete"],
-    api_docs: ["read", "add", "edit", "delete"],
-  },
-  oss: {
-    "": ["read"],
-    config: ["read", "add", "edit", "delete"],
-    file: ["read", "add", "edit", "delete"],
-  },
-  enterprise: {
-    "": ["read"],
-    attendance: ["read", "add", "edit", "delete"],
-  },
-  ai: {
-    "": ["read"],
-    config: ["read", "add", "edit", "delete"],
-    chat: ["read"],
-  },
-  swarm: {
-    "": ["read"],
-    docker: ["read", "add", "edit", "delete"],
-    docker_config: ["read", "add", "edit", "delete"],
-    nodes: ["read"],
-  },
-};
+const LOCALE = getEnv("LOCALE") || "zh-CN";
 
 /**
  * 准备系统权限数据同步语句

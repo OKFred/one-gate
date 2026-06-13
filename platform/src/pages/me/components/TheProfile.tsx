@@ -3,7 +3,7 @@ import { Card, CardContent, Avatar, Typography, Box } from '@mui/material';
 import { Person as PersonIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import { AUTH } from '@/hooks/usePermission';
+import { SYSTEM } from '@/hooks/usePermission';
 import type { GetUserRes } from '@/api/system/type';
 import type { Props } from '../index';
 import ThePasswordDialog, { type ThePasswordDialogRef } from './ThePasswordDialog';
@@ -64,7 +64,7 @@ const TheProfile = memo(
                 startIcon={<EditIcon />}
                 onClick={handleEdit}
                 fullWidth
-                permissionCodes={[AUTH.PROFILE.UPDATE_PASSWORD]}
+                permissionCodes={[SYSTEM.AUTH.UPDATE_PASSWORD]}
               >
                 {t('me.changePassword.title')}
               </ResponsiveButton>

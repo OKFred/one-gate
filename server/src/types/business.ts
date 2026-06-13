@@ -53,6 +53,8 @@ export const BUSINESS = {
   "system.schema_form": "system.schema_form",
   /** 系统动态表单数据 */
   "system.schema_form_data": "system.schema_form_data",
+  /** OSS */
+  oss: "oss",
   /** OSS 配置 */
   "oss.config": "oss.config",
   /** OSS 文件 */
