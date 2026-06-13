@@ -13,6 +13,7 @@
     "worker:dev": "npx wrangler dev",
     "worker:types": "npx wrangler types",
     "db:init": "npx tsx -r dotenv/config ./src/db/initTable.ts",
+    "sync:permissions": "npx tsx scripts/sync-permissions.ts",
     "format": "prettier --write .",
     "lint": "eslint . --fix"
   },
