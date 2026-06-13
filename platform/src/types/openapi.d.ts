@@ -12739,6 +12739,7 @@ export interface components {
                 };
                 /** @enum {string} */
                 docType: "swagger2.0" | "openapi3.0" | "openapi3.1";
+                baseUrl: string;
                 apis: {
                     path: string;
                     method: string;

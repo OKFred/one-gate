@@ -35,14 +35,48 @@ export async function executeApiTask(
   task: ApiTaskDef,
   params: Record<string, unknown>
 ): Promise<ApiTaskResult> {
+  // 支持 path 参数替换，兼容根层级属性和独立的 "path" 对象参数结构 (例如 {"path": {"petId": 123}})
+  let tempPath = task.path;
+  const paramsCopy = { ...params };
+
+  const hasDedicatedPathParams =
+    paramsCopy.path &&
+    typeof paramsCopy.path === "object" &&
+    !Array.isArray(paramsCopy.path);
+
+  const pathParams = hasDedicatedPathParams
+    ? { ...(paramsCopy.path as Record<string, unknown>) }
+    : {};
+
+  const pathParamRegex = /{([^}]+)}/g;
+  let match;
+  while ((match = pathParamRegex.exec(task.path)) !== null) {
+    const key = match[1];
+    if (hasDedicatedPathParams && key in pathParams) {
+      tempPath = tempPath.replace(`{${key}}`, String(pathParams[key]));
+      delete pathParams[key];
+    } else if (key in paramsCopy) {
+      tempPath = tempPath.replace(`{${key}}`, String(paramsCopy[key]));
+      delete paramsCopy[key];
+    }
+  }
+
+  if (hasDedicatedPathParams) {
+    if (Object.keys(pathParams).length === 0) {
+      delete paramsCopy.path;
+    } else {
+      paramsCopy.path = pathParams;
+    }
+  }
+
   // 拼接 baseUrl 和 path，保留 baseUrl 中的路径后缀（例如 /v2）
   let fullUrlStr = task.baseUrl;
-  if (fullUrlStr.endsWith("/") && task.path.startsWith("/")) {
-    fullUrlStr += task.path.slice(1);
-  } else if (!fullUrlStr.endsWith("/") && !task.path.startsWith("/")) {
-    fullUrlStr += "/" + task.path;
+  if (fullUrlStr.endsWith("/") && tempPath.startsWith("/")) {
+    fullUrlStr += tempPath.slice(1);
+  } else if (!fullUrlStr.endsWith("/") && !tempPath.startsWith("/")) {
+    fullUrlStr += "/" + tempPath;
   } else {
-    fullUrlStr += task.path;
+    fullUrlStr += tempPath;
   }
   const url = new URL(fullUrlStr);
   const method = task.method.toUpperCase();
@@ -60,16 +94,53 @@ export async function executeApiTask(
     }
   }
 
-  // GET / DELETE → 参数追加 to query string，其他 → JSON body
+  // 检查是否存在独立的 "query" 对象参数结构 (例如 {"query": {"foo": "bar"}})
+  const hasDedicatedQueryParams =
+    paramsCopy.query &&
+    typeof paramsCopy.query === "object" &&
+    !Array.isArray(paramsCopy.query);
+
+  if (hasDedicatedQueryParams) {
+    const queryParams = paramsCopy.query as Record<string, unknown>;
+    for (const [k, v] of Object.entries(queryParams)) {
+      if (v !== undefined && v !== null) {
+        url.searchParams.set(k, String(v));
+      }
+    }
+    delete paramsCopy.query;
+  }
+
+  // 检查是否存在独立的 "body" 对象参数结构 (例如 {"body": {"age": 10}})
+  const hasDedicatedBodyParams =
+    paramsCopy.body &&
+    typeof paramsCopy.body === "object" &&
+    !Array.isArray(paramsCopy.body);
+
+  let finalBodyObj: Record<string, unknown> | undefined;
+  if (hasDedicatedBodyParams) {
+    finalBodyObj = { ...(paramsCopy.body as Record<string, unknown>) };
+    delete paramsCopy.body;
+  }
+
+  // 处理未被消费的普通/平铺参数 (向后兼容)
   let body: string | undefined;
   if (method === "GET" || method === "DELETE") {
-    for (const [k, v] of Object.entries(params)) {
+    // 根级平铺的普通参数追加到 query string
+    for (const [k, v] of Object.entries(paramsCopy)) {
       if (v !== undefined && v !== null) {
         url.searchParams.set(k, String(v));
       }
     }
   } else {
-    body = JSON.stringify(params);
+    // 非 GET/DELETE：合并 body 参数与剩余平铺参数作为请求体
+    if (finalBodyObj !== undefined) {
+      Object.assign(finalBodyObj, paramsCopy);
+    } else if (Object.keys(paramsCopy).length > 0) {
+      finalBodyObj = paramsCopy;
+    }
+    if (finalBodyObj !== undefined) {
+      body = JSON.stringify(finalBodyObj);
+    }
   }
 
   const controller = new AbortController();

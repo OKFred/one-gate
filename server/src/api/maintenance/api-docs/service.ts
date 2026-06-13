@@ -34,9 +34,11 @@ import type { API } from "@/middleware/encapsulation";
 import hasValue from "@/utils/hasValue";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@/middleware/errorHandler/businessError/index";
+  preventInvalidFormat,
+  preventUnsupportedFormat,
+  preventParseFailed,
+  preventParseFailedGeneral,
+} from "./prevention";
 import YAML from "yaml";
 
 // 辅助函数：解析 Swagger 2.0 / OpenAPI 3.0 并扁平化所有 $ref 局部引用
@@ -92,28 +94,28 @@ export function parseApiDoc(contentStr: string): {
   info: { title: string; version: string; description: string };
   docType: "swagger2.0" | "openapi3.0" | "openapi3.1";
   apis: ExtractedApi[];
+  baseUrl: string;
 } {
   let doc: any;
+  let parsedSuccess = false;
   try {
     doc = JSON.parse(contentStr);
+    parsedSuccess = true;
   } catch (e) {
     try {
       doc = YAML.parse(contentStr);
+      parsedSuccess = true;
     } catch (ye) {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-        message: "文档格式错误，无法解析为 JSON 或 YAML",
-      });
+      // 忽略，由下方校验处理
     }
   }
 
-  const isOAS3 = !!(doc.openapi && doc.openapi.startsWith("3."));
-  const isSwagger2 = doc.swagger === "2.0";
+  preventInvalidFormat(parsedSuccess);
 
-  if (!isOAS3 && !isSwagger2) {
-    throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-      message: "不支持的文档格式，仅支持 Swagger 2.0 或 OpenAPI 3.x",
-    });
-  }
+  const isOAS3 = !!(doc && doc.openapi && doc.openapi.startsWith("3."));
+  const isSwagger2 = doc && doc.swagger === "2.0";
+
+  preventUnsupportedFormat(isOAS3, isSwagger2);
 
   const isOAS3_1 = !!(doc.openapi && doc.openapi.startsWith("3.1"));
   const docType = isOAS3_1
@@ -121,6 +123,22 @@ export function parseApiDoc(contentStr: string): {
     : isOAS3
       ? "openapi3.0"
       : "swagger2.0";
+
+  let baseUrl = "";
+  if (isOAS3) {
+    const servers = doc.servers || [];
+    baseUrl = servers[0]?.url || "";
+  } else if (isSwagger2) {
+    const host = doc.host || "";
+    const basePath = doc.basePath || "";
+    const scheme = doc.schemes?.[0] || "http";
+    if (host) {
+      baseUrl = `${scheme}://${host}${basePath}`;
+    } else if (basePath) {
+      baseUrl = basePath;
+    }
+  }
+
   const info = {
     title: doc.info?.title || "未命名文档",
     version: doc.info?.version || "1.0.0",
@@ -139,13 +157,13 @@ export function parseApiDoc(contentStr: string): {
         continue;
       if (typeof operation !== "object" || operation === null) continue;
 
-      const summary = (operation as any).summary || "";
-      const description = (operation as any).description || "";
+      const summary = operation.summary || "";
+      const description = operation.description || "";
 
       // 提取 Request Schema
       let reqProperties: Record<string, any> = {};
       let reqRequired: string[] = [];
-      const parameters = (operation as any).parameters || [];
+      const parameters = operation.parameters || [];
 
       for (const p of parameters) {
         if (p.in === "body" && isSwagger2) {
@@ -174,8 +192,8 @@ export function parseApiDoc(contentStr: string): {
         }
       }
 
-      if (isOAS3 && (operation as any).requestBody) {
-        const bodyContent = (operation as any).requestBody.content || {};
+      if (isOAS3 && operation.requestBody) {
+        const bodyContent = operation.requestBody.content || {};
         const jsonBody = bodyContent["application/json"];
         if (jsonBody && jsonBody.schema) {
           const bodySchema = dereference(jsonBody.schema, doc);
@@ -199,7 +217,7 @@ export function parseApiDoc(contentStr: string): {
 
       // 提取 Response Schema
       let resSchema: any = null;
-      const responses = (operation as any).responses || {};
+      const responses = operation.responses || {};
       const successResponse =
         responses["200"] || responses["201"] || responses["default"];
       if (successResponse) {
@@ -227,7 +245,7 @@ export function parseApiDoc(contentStr: string): {
     }
   }
 
-  return { info, docType, apis };
+  return { info, docType, apis, baseUrl };
 }
 
 // 辅助函数：根据条件构建查询 filter
@@ -360,9 +378,7 @@ async function onAdd(
     if (!description) description = parsed.info.description || null;
     docType = parsed.docType;
   } catch (err: any) {
-    throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-      message: err.message || "文档解析失败，请检查 Swagger 2.0 / OAS 3.0 格式",
-    });
+    preventParseFailed(err.message);
   }
 
   const res = await db
@@ -371,7 +387,7 @@ async function onAdd(
       name,
       version,
       description,
-      docType: docType as any,
+      docType: docType,
       content,
       creatorId,
     })
@@ -431,9 +447,7 @@ async function onUpdate(
       if (!description) description = parsed.info.description || null;
       docType = parsed.docType;
     } catch (err: any) {
-      throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-        message: err.message || "文档解析失败，请检查格式",
-      });
+      preventParseFailedGeneral(err.message);
     }
   }
 
@@ -443,7 +457,7 @@ async function onUpdate(
       name,
       version,
       description,
-      docType: docType as any,
+      docType: docType,
       content,
       updaterId,
       updateTimeUtc: getCurrentTimestampUtcSql(),
@@ -591,6 +605,7 @@ const parseRes = {
       type: "string",
       enum: ["swagger2.0", "openapi3.0", "openapi3.1"],
     },
+    baseUrl: { type: "string" },
     apis: {
       type: "array",
       items: {
@@ -615,7 +630,7 @@ const parseRes = {
       },
     },
   },
-  required: ["info", "docType", "apis"],
+  required: ["info", "docType", "apis", "baseUrl"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 

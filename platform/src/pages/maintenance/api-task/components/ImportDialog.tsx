@@ -122,6 +122,9 @@ export const ImportDialog: React.FC<ImportDialogProps> = ({ open, onClose, onSuc
         });
         setSelectedEndpoints(initialSelected);
       }
+      if (res.data?.data?.baseUrl) {
+        setBaseUrl(res.data.data.baseUrl);
+      }
     } catch (err) {
       console.error('Failed to parse doc', err);
     }

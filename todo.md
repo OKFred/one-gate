@@ -6,7 +6,7 @@
 
 ## 📋 待办事项列表
 
-### 1. 前后端权限定义的中心化与类型安全 ── 🔴 待开始 (高优先级)
+### 1. 前后端权限定义的中心化与类型安全 ── 🟢 已完成 (高优先级)
 * **现状**：
   * 后端权限同步在 `server/src/db/initPermissions.ts` 中通过 `permissionSeeds` 定义（松散的 `Record<string, Record<string, string[]>>`）。
   * 前端权限在 `platform/src/hooks/usePermission.ts` 中硬编码了整个权限对象。两端完全脱节，易导致权限码拼写错误或遗漏（如前端缺失 `ai.chat` 和动态表单等权限）。
@@ -14,7 +14,7 @@
   * **后端侧**：在 `initPermissions.ts` 中，对 `permissionSeeds` 采用强类型约束（通过 `satisfies` 匹配 `BusinessKey`），在编译期拦截非法的权限子键组合。
   * **自动同步**：编写脚本或在编译流程中，根据后端的权限树定义自动生成前端的 `usePermission.ts` 权限对象，保持“单源真理”。
 
-### 2. 定时任务调度器与具体任务执行器的解耦 ── 🔴 待开始 (中优先级)
+### 2. 定时任务调度器与具体任务执行器的解耦 ── 🟢 已完成 (中优先级)
 * **现状**：
   * `server/src/jobs/scheduler.ts` 中耦合了调度器逻辑（时间解析、乐观锁抢占、运行计数、任务日志）与具体的任务执行技术（通过 `if-else` 分发到内置静态任务或通过 `apiTaskTable` 动态调用的 HTTP 网络请求）。
 * **改进方案**：
