@@ -32,8 +32,8 @@
   "vars": {
     "NODE_ENV": "production",
     "BASE_API_PATH": "/api/v1",
-    "LOCALE": "zh-CN",
-    "VERSION": "20260613205751-f73a223d",
+    "LOCALE": "en-US",
+    "VERSION": "20260613210117-97543218",
   },
 
   /**
