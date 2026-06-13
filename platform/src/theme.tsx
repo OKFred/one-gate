@@ -14,6 +14,10 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   });
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', mode);
+  }, [mode]);
+
+  useEffect(() => {
     // 监听主题变化
     const observer = new MutationObserver(() => {
       const theme = document.documentElement.getAttribute('data-theme');
