@@ -173,11 +173,9 @@ describe("Mail Action Workers 全链路集成测试", () => {
         const realPort = Number((env as any).TEST_MAIL_PORT || 465);
         const receiver = (env as any).TEST_MAIL_RECEIVER as string;
 
-        // 1. 录入真实发信账户（保存为 base64 加密密码）
-        const base64Password = Buffer.from(realPassword).toString("base64");
         const accountId = await mailAccountRepository.onInsert({
           mailAddress: realAddress,
-          password: base64Password,
+          password: realPassword,
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
@@ -212,10 +210,9 @@ describe("Mail Action Workers 全链路集成测试", () => {
         const realHost = (env as any).TEST_MAIL_HOST as string;
         const realPort = Number((env as any).TEST_MAIL_PORT || 465);
 
-        const base64Password = Buffer.from(realPassword).toString("base64");
         const accountId = await mailAccountRepository.onInsert({
           mailAddress: realAddress,
-          password: base64Password,
+          password: realPassword,
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
@@ -236,10 +233,9 @@ describe("Mail Action Workers 全链路集成测试", () => {
         const realHost = (env as any).TEST_MAIL_HOST as string;
         const realPort = Number((env as any).TEST_MAIL_PORT || 465);
 
-        const base64Password = Buffer.from(wrongPassword).toString("base64");
         const accountId = await mailAccountRepository.onInsert({
           mailAddress: realAddress,
-          password: base64Password,
+          password: wrongPassword,
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
