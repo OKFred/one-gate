@@ -16,7 +16,8 @@ export default defineConfig({
     },
     include: [
       "src/**/*.spec.ts",
-      "src/**/*.workers.spec.ts"
+      "src/**/*.workers.spec.ts",
+      "test/index.spec.ts"
     ],
     exclude: ["**/*.node.spec.ts"],
   },
