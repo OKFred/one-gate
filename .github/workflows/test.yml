@@ -1,0 +1,42 @@
+name: Run Server Tests
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+          cache-dependency-path: 'server/pnpm-lock.yaml'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./server
+
+      - name: Run All Tests
+        run: npx vitest run
+        working-directory: ./server
+        # ─── 核心步骤：将 GitHub 存储的 Secrets 注入到测试的运行环境变量中 ───
+        env:
+          TEST_MAIL_ADDRESS: ${{ secrets.TEST_MAIL_ADDRESS }}
+          TEST_MAIL_PASS: ${{ secrets.TEST_MAIL_PASSWORD }}
+          TEST_MAIL_HOST: ${{ secrets.TEST_MAIL_HOST }}
+          TEST_MAIL_PORT: ${{ secrets.TEST_MAIL_PORT }}
+          TEST_MAIL_RECEIVER: ${{ secrets.TEST_MAIL_RECEIVER }}

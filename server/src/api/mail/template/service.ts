@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  mailTemplateTable,
   IndexVO,
   MailTemplateVO,
   MailTemplateListVO,
@@ -23,11 +21,8 @@ import {
   MailTemplateUniqueKeys,
   MailTemplateUniqueVO,
 } from "./model";
-import { asc, count, desc, eq, or, like, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -40,31 +35,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(mailTemplateTable.name, `%${keyword}%`),
-        like(mailTemplateTable.title, `%${keyword}%`),
-        like(mailTemplateTable.category, `%${keyword}%`)
-      )
-    );
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(mailTemplateTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as mailTemplateRepository from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -94,24 +65,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = mailTemplateTable[orderBy] || mailTemplateTable.id;
-  const maxLimit = 10000;
-  const rows = await db
-    .select({
-      id: mailTemplateTable.id,
-      name: mailTemplateTable.name,
-      title: mailTemplateTable.title,
-      langCode: mailTemplateTable.langCode,
-      content: mailTemplateTable.content,
-      category: mailTemplateTable.category,
-      isEnabled: mailTemplateTable.isEnabled,
-    })
-    .from(mailTemplateTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await mailTemplateRepository.findPageAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -150,40 +104,23 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = mailTemplateTable[orderBy] || mailTemplateTable.id;
+  const { pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(mailTemplateTable.id).as("total") })
-    .from(mailTemplateTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  const rows = await db
-    .select()
-    .from(mailTemplateTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await mailTemplateRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
+  });
+
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -221,12 +158,8 @@ async function onAdd(
     ...obj,
     creatorId,
   };
-  const result = await db
-    .insert(mailTemplateTable)
-    .values(addData)
-    .returning({ id: mailTemplateTable.id });
-
-  return result[0]?.id;
+  const insertedId = await mailTemplateRepository.onInsert(addData);
+  return insertedId || null;
 }
 const addApi = {
   req: addReq,
@@ -264,15 +197,10 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
+    updateTimeUtc: Date.now(),
   };
 
-  const res = await db
-    .update(mailTemplateTable)
-    .set(updateData)
-    .where(eq(mailTemplateTable.id, id))
-    .returning({ id: mailTemplateTable.id });
-  const row = res[0];
+  const row = await mailTemplateRepository.onUpdate(id, updateData);
   preventEmpty(row);
   return row.id;
 }
@@ -307,11 +235,7 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  const result = await db
-    .delete(mailTemplateTable)
-    .where(eq(mailTemplateTable.id, id))
-    .returning({ id: mailTemplateTable.id });
-  const row = result[0];
+  const row = await mailTemplateRepository.onDelete(id);
   preventEmpty(row);
   return row.id;
 }
@@ -352,12 +276,7 @@ async function onGet(
   obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(mailTemplateTable)
-    .where(eq(mailTemplateTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await mailTemplateRepository.findById(id);
   preventEmpty(row);
   return row;
 }

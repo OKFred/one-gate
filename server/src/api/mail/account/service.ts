@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  mailAccountTable,
   IndexVO,
   MailAccountVO,
   MailAccountListVO,
@@ -23,11 +21,8 @@ import {
   MailAccountUniqueKeys,
   MailAccountUniqueVO,
 } from "./model";
-import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -40,24 +35,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(mailAccountTable.mailAddress, `%${keyword}%`)));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(mailAccountTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as mailAccountRepository from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -87,23 +65,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = mailAccountTable[orderBy] || mailAccountTable.id;
-  const maxLimit = 10000;
-  const rows = await db
-    .select({
-      id: mailAccountTable.id,
-      mailAddress: mailAccountTable.mailAddress,
-      nickname: mailAccountTable.nickname,
-      host: mailAccountTable.host,
-      port: mailAccountTable.port,
-      isEnabled: mailAccountTable.isEnabled,
-    })
-    .from(mailAccountTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await mailAccountRepository.findPageAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -142,40 +104,23 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = mailAccountTable[orderBy] || mailAccountTable.id;
+  const { pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(mailAccountTable.id).as("total") })
-    .from(mailAccountTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  const rows = await db
-    .select()
-    .from(mailAccountTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await mailAccountRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
+  });
+
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -216,12 +161,8 @@ async function onAdd(
     password: plainPassword,
     creatorId,
   };
-  const result = await db
-    .insert(mailAccountTable)
-    .values(addData)
-    .returning({ id: mailAccountTable.id });
-
-  return result[0]?.id;
+  const insertedId = await mailAccountRepository.onInsert(addData);
+  return insertedId || null;
 }
 const addApi = {
   req: addReq,
@@ -263,16 +204,11 @@ async function onUpdate(
     ...rest,
     password: plainPassword,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
+    updateTimeUtc: Date.now(),
     isEnabled: isEnabled !== undefined ? isEnabled : undefined,
   };
 
-  const res = await db
-    .update(mailAccountTable)
-    .set(updateData)
-    .where(eq(mailAccountTable.id, id))
-    .returning({ id: mailAccountTable.id });
-  const row = res[0];
+  const row = await mailAccountRepository.onUpdate(id, updateData);
   preventEmpty(row);
   return row.id;
 }
@@ -307,11 +243,7 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  const result = await db
-    .delete(mailAccountTable)
-    .where(eq(mailAccountTable.id, id))
-    .returning({ id: mailAccountTable.id });
-  const row = result[0];
+  const row = await mailAccountRepository.onDelete(id);
   preventEmpty(row);
   return row.id;
 }
@@ -352,12 +284,7 @@ async function onGet(
   obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(mailAccountTable)
-    .where(eq(mailAccountTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await mailAccountRepository.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -377,12 +304,7 @@ const getApi = {
 async function getMailAccountsByIds(
   ids: number[]
 ): Promise<{ value: number; label: string }[]> {
-  if (ids.length === 0) return [];
-  const rows = await db
-    .select({ value: mailAccountTable.id, label: mailAccountTable.mailAddress })
-    .from(mailAccountTable)
-    .where(inArray(mailAccountTable.id, ids));
-  return rows;
+  return await mailAccountRepository.getMailAccountsByIds(ids);
 }
 
 export const utils = {

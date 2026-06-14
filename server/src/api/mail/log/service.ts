@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  mailLogTable,
   IndexVO,
   MailLogVO,
   MailLogListVO,
@@ -23,11 +21,8 @@ import {
   MailLogUniqueKeys,
   MailLogUniqueVO,
 } from "./model";
-import { asc, count, desc, eq, or, like, and, gte, lte } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -40,45 +35,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  sendStatus,
-  templateId,
-  startTimeUtc,
-  endTimeUtc,
-}: Pick<
-  FromSchema<typeof listReq>,
-  "keyword" | "sendStatus" | "templateId" | "startTimeUtc" | "endTimeUtc"
->) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(mailLogTable.mailTo, `%${keyword}%`),
-        like(mailLogTable.mailFrom, `%${keyword}%`)
-      )
-    );
-  }
-  if (sendStatus !== undefined) {
-    conditions.push(eq(mailLogTable.sendStatus, sendStatus));
-  }
-  if (hasValue(templateId)) {
-    conditions.push(eq(mailLogTable.templateId, templateId));
-  }
-  if (startTimeUtc !== undefined) {
-    conditions.push(gte(mailLogTable.createTimeUtc, startTimeUtc));
-  }
-  if (endTimeUtc !== undefined) {
-    conditions.push(lte(mailLogTable.createTimeUtc, endTimeUtc));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as mailLogRepository from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -109,22 +66,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = mailLogTable[orderBy] || mailLogTable.id;
-  const maxLimit = 10000;
-  const rows = await db
-    .select({
-      id: mailLogTable.id,
-      mailTo: mailLogTable.mailTo,
-      mailFrom: mailLogTable.mailFrom,
-      title: mailLogTable.title,
-      sendStatus: mailLogTable.sendStatus,
-    })
-    .from(mailLogTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await mailLogRepository.findPageAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -164,40 +106,23 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = mailLogTable[orderBy] || mailLogTable.id;
+  const { pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(mailLogTable.id).as("total") })
-    .from(mailLogTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  const rows = await db
-    .select()
-    .from(mailLogTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await mailLogRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
+  });
+
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -235,12 +160,8 @@ async function onAdd(
     ...obj,
     creatorId,
   };
-  const result = await db
-    .insert(mailLogTable)
-    .values(addData)
-    .returning({ id: mailLogTable.id });
-
-  return result[0]?.id;
+  const insertedId = await mailLogRepository.onInsert(addData);
+  return insertedId || null;
 }
 const addApi = {
   req: addReq,
@@ -278,15 +199,10 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
+    updateTimeUtc: Date.now(),
   };
 
-  const res = await db
-    .update(mailLogTable)
-    .set(updateData)
-    .where(eq(mailLogTable.id, id))
-    .returning({ id: mailLogTable.id });
-  const row = res[0];
+  const row = await mailLogRepository.onUpdate(id, updateData);
   preventEmpty(row);
   return row.id;
 }
@@ -321,11 +237,7 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  const result = await db
-    .delete(mailLogTable)
-    .where(eq(mailLogTable.id, id))
-    .returning({ id: mailLogTable.id });
-  const row = result[0];
+  const row = await mailLogRepository.onDelete(id);
   preventEmpty(row);
   return row.id;
 }
@@ -366,12 +278,7 @@ async function onGet(
   obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(mailLogTable)
-    .where(eq(mailLogTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await mailLogRepository.findById(id);
   preventEmpty(row);
   return row;
 }
