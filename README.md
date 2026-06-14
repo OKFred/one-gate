@@ -69,6 +69,22 @@ This script will:
 
 ## ☁️ Cloudflare Deployment & CI/CD (Automation)
 
+### ⚡ Quick Deployment (Backend Only)
+
+You can quickly deploy the backend Workers and provision the associated Cloudflare resources (D1 Database, KV Namespace, R2 Bucket) to your own Cloudflare account by clicking the button below:
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/okfred/node_server/tree/dev/server)
+
+> [!IMPORTANT]
+> **Post-deployment Steps Required:**
+> 1. **Initialize Database Tables:** The button provisions the D1 database but does not initialize the schema. You **must** run the following command locally to sync DDL and base data to your remote D1:
+>    ```bash
+>    cd server && pnpm run db:init worker remote
+>    ```
+> 2. **Deploy Frontend Pages:** The deploy button only supports Workers and does *not* deploy the React frontend (`/platform`). You need to manually deploy the `/platform` folder to Cloudflare Pages, and configure the frontend to point to your backend Worker's URL.
+
+### 🛠️ Automated Deployment via GitHub Actions (Recommended)
+
 This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/test.yml`) for automated testing and deployments. If you fork or clone this project and want to deploy it to your own Cloudflare account, follow these steps:
 
 ### 1. Rename Project Identifiers

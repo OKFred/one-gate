@@ -76,5 +76,18 @@
     "typescript": "^5.8.2",
     "vitest": "~4.1.8",
     "wrangler": "^4.100.0"
+  },
+  "cloudflare": {
+    "bindings": {
+      "DB": {
+        "description": "D1 database instance for RBAC core data storage."
+      },
+      "KV": {
+        "description": "KV namespace used for user sessions, caching, and rate limiting."
+      },
+      "BUCKET": {
+        "description": "R2 bucket for static file and media uploads."
+      }
+    }
   }
 }

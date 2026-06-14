@@ -69,7 +69,23 @@ npx tsx deploy.js
 
 ## ☁️ Cloudflare 部署与 CI/CD (自动化集成)
 
-本项目已集成极简、安全的 GitHub Actions 持续集成与部署工作流（通过 `.github/workflows/test.yml` 驱动）。对于 fork 或 clone 本项目的用户，如果想要一键部署到自己的 Cloudflare 上，请参照以下指引：
+### ⚡ 极速部署 (仅限后端)
+
+你可以通过点击下方的按钮，将后端 Workers 及其关联的 Cloudflare 资源（D1 数据库、KV 命名空间、R2 存储桶）一键部署到你自己的 Cloudflare 账号中：
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/okfred/node_server/tree/dev/server)
+
+> [!IMPORTANT]
+> **部署完成后的后续步骤：**
+> 1. **初始化数据库表结构：** 部署按钮仅会在你的账户中自动创建 D1 数据库，但不会初始化表结构。你**必须**在本地运行以下命令，将 DDL 和基础权限数据同步到你的远程 D1 数据库中：
+>    ```bash
+>    cd server && pnpm run db:init worker remote
+>    ```
+> 2. **部署前端 Pages：** 该部署按钮仅支持 Workers 部署，**不会**部署 React 前端项目 (`/platform`)。你需要手动将 `/platform` 文件夹发布到 Cloudflare Pages，并配置前端使其指向你的后端 Worker 的 URL。
+
+### 🛠️ 通过 GitHub Actions 自动部署 (推荐)
+
+本项目已集成极简、安全的 GitHub Actions 持续集成与部署工作流（通过 `.github/workflows/test.yml` 驱动）。对于 fork 或 clone 本项目的用户，如果想要自动构建并部署全栈系统，请参照以下指引：
 
 ### 1. 修改项目标识名称
 
