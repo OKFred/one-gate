@@ -13,7 +13,6 @@ export default defineConfig({
     },
     include: [
       "src/**/*.node.spec.ts",
-      "test/**/*.{test,spec}.ts"
     ],
   },
 });
