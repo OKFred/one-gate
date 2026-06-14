@@ -1,5 +1,7 @@
 # RBAC Fullstack
 
+[中文说明 (README_zh_CN.md)](README_zh_CN.md)
+
 A modern, high-performance Role-Based Access Control (RBAC) system built with Hono (Backend) and React (Frontend). Highlighting seamless deployment on Cloudflare Workers and Node.js.
 
 ## 🏗️ Project Architecture
@@ -53,6 +55,7 @@ npx tsx deploy.js
 ```
 
 This script will:
+
 1. Prompt for your **Docker Registry URL**.
 2. Automatically build and push `:server` and `:platform` images.
 3. Save the URL to your local `.env` for future use.
@@ -64,6 +67,24 @@ This script will:
 - `server/`: Hono backend source code.
 - `scripts/`: Shared maintenance and scanning scripts.
 
----
+## ☁️ Cloudflare Deployment & CI/CD (Automation)
 
-[中文说明 (README_zh_CN.md)](README_zh_CN.md)
+This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/test.yml`) for automated testing and deployments. If you fork or clone this project and want to deploy it to your own Cloudflare account, follow these steps:
+
+### 1. Rename Project Identifiers
+
+- **Backend Worker**: Open `server/wrangler.jsonc` (or `wrangler.toml`) and change the `"name": "your-worker-name"` to match your desired backend service name on Cloudflare.
+- **Frontend Pages**: Open `.github/workflows/test.yml`, go to the very last step, and update `--project-name=your-pages-name` with your Cloudflare Pages project name.
+
+### 2. Configure GitHub Repository Secrets
+
+Navigate to your GitHub repository -> **Settings** -> **Secrets and variables** -> **Actions** -> **Repository secrets**:
+
+- **Cloudflare Credentials**: Add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
+- **Other Configuration / Test Environment Variables**: Refer to [**`server/.env.example`**](./server/.env.example) to configure any additional secrets needed for testing or development (e.g. `TEST_MAIL_*` variables for email integration testing, which will be safely skipped on CI if not provided).
+
+### 3. Disconnect Automated Builds on Cloudflare
+
+- To avoid double deployments, go to your Cloudflare dashboard settings for the imported Worker and Pages, and **Disconnect** the Git repository under **Build**.
+- This delegates the full deployment control to your GitHub Actions runner, establishing a secure delivery pipeline where **"deployments only execute after all tests pass with green lights"**.
+
