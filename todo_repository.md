@@ -36,8 +36,8 @@
 
 ---
 
-### 3. Enterprise (企业管理模块) ── 🔴 未完成
-* [ ] **attendance (考勤管理)** `src/api/enterprise/attendance/` ── 🔴 待改造
+### 3. Enterprise (企业管理模块) ── 🟢 已完成
+* [x] **attendance (考勤管理)** `src/api/enterprise/attendance/` ── 🟢 已完成
   * 抽离打卡记录插入、考勤状态更新、关联统计等 ORM 操作至 `repository.ts`。
 
 ---
