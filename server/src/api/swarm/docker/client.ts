@@ -1,6 +1,4 @@
 import { getEnv, getAllEnv } from "@/utils/env";
-import db from "@/db/index";
-import { eq, and } from "drizzle-orm";
 
 export class DockerClient {
   private baseUrl: string;
@@ -29,22 +27,12 @@ export class DockerClient {
     if (this.isInitialized) return;
 
     try {
-      // 动态导入以解决可能在 `client -> model -> service -> client` 产生的循环依赖
-      const { swarmDockerConfigTable } =
-        await import("@/api/swarm/docker_config/model");
+      // 动态导入以解决可能在 `client -> repository -> client` 产生的循环依赖
+      const swarmDockerConfigRepository =
+        await import("@/api/swarm/docker_config/repository");
 
-      const rows = await db
-        .select()
-        .from(swarmDockerConfigTable)
-        .where(
-          and(
-            eq(swarmDockerConfigTable.isEnabled, true),
-            eq(swarmDockerConfigTable.isDefault, true)
-          )
-        )
-        .limit(1);
-
-      const config = rows[0];
+      const config =
+        await swarmDockerConfigRepository.findDefaultActiveConfig();
       if (config) {
         let { host } = config;
         if (host.startsWith("tcp://")) {
@@ -57,7 +45,7 @@ export class DockerClient {
           host = host.slice(0, -1);
         }
         this.baseUrl = host;
-        this.apiVersion = config.apiVersion;
+        this.apiVersion = config.apiVersion || "";
         this.cfMtlsBinding = config.cfMtlsBinding || undefined;
 
         if (config.tlsVerify) {

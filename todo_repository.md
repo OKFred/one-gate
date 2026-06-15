@@ -49,15 +49,15 @@
   * 抽离登录日志插入与多维过滤 SQL。
 * [x] **compliance (合规审计)** `src/api/maintenance/compliance/` ── 🟢 已完成
 * [x] **cron (计划任务)** `src/api/maintenance/cron/` ── 🟢 已完成
+  * 抽离定时任务及运行日志的 CRUD，对接仓储层，并添加全流程集成测试。
 * [x] **cache (缓存管理)** `src/api/maintenance/cache/` ── 🟢 已完成（无需改造，无直接 ORM 读写）
 * [x] **init (系统初始化)** `src/api/maintenance/init/` ── 🟢 已完成（无需改造，无直接 ORM 读写）
 
 ---
 
-### 5. OSS (对象存储模块) ── 🔴 未完成
-* [ ] **config (存储桶配置)** `src/api/oss/config/` ── 🔴 待改造
-* [ ] **file (文件元数据)** `src/api/oss/file/` ── 🔴 待改造
-  * 抽离文件上传记录持久化、状态同步及元数据查询至 `repository.ts`。
+### 5. OSS (对象存储模块) ── 🟢 已完成
+* [x] **config (存储桶配置)** `src/api/oss/config/` ── 🟢 已完成
+* [x] **file (文件元数据)** `src/api/oss/file/` ── 🟢 已完成（无需改造，无直接 ORM 读写）
 
 ---
 
