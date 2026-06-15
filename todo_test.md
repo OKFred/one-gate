@@ -28,10 +28,10 @@
 ### 2. 待建设测试用例的模块清单 (🔴 待启动)
 
 #### AI 模块 (`src/api/ai/`)
-* [ ] **ai.integration.spec.ts**：建立同构全链路测试，覆盖：
+* [x] **ai.integration.spec.ts**：建立同构全链路测试，覆盖：
   * AI 配置项的增删改查。
   * 智能助手聊天记录的持久化和会话拉取逻辑。
-* [ ] 对第三方大模型（LLM）的流式返回或请求客户端建立合理的 mock 机制，确保测试不依赖外部 API Key 且能稳定运行。
+* [x] 对第三方大模型（LLM）的流式返回或请求客户端建立合理的 mock 机制，确保测试不依赖外部 API Key 且能稳定运行。
 
 #### Enterprise 模块 (`src/api/enterprise/`)
 * [ ] **attendance.integration.spec.ts**：建立考勤考表、上下班打卡记录和迟到缺勤规则校验的集成测试。
