@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import aiLlmConfigService from "./service";
 import * as aiLlmConfigRepository from "./repository";
+import type { AiLlmConfigPOLike, AiLlmConfigAddVOLike } from "./model";
+import type { UserObj } from "@/types/app";
 
 vi.mock("./repository", () => {
   return {
@@ -16,7 +18,7 @@ vi.mock("./repository", () => {
 });
 
 describe("AI Config Service 单元测试", () => {
-  const userObj = { userId: 1 } as any;
+  const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -35,7 +37,7 @@ describe("AI Config Service 单元测试", () => {
         },
       ];
       vi.mocked(aiLlmConfigRepository.findPageAll).mockResolvedValue(
-        mockList as any
+        mockList as unknown as AiLlmConfigPOLike[]
       );
 
       const params = { isEnabled: true };
@@ -51,7 +53,7 @@ describe("AI Config Service 单元测试", () => {
       const mockList = [{ id: 1, name: "Config 1", provider: "OpenAI" }];
       vi.mocked(aiLlmConfigRepository.findPage).mockResolvedValue({
         total: 15,
-        list: mockList as any,
+        list: mockList as unknown as AiLlmConfigPOLike[],
       });
 
       const params = { pageNo: 2, pageSize: 10 };
@@ -85,7 +87,10 @@ describe("AI Config Service 单元测试", () => {
         isDefault: true,
       };
 
-      const res = await aiLlmConfigService.add.service(addData, userObj);
+      const res = await aiLlmConfigService.add.service(
+        addData as unknown as AiLlmConfigAddVOLike,
+        userObj
+      );
 
       expect(aiLlmConfigRepository.disableOtherDefaults).toHaveBeenCalledTimes(
         1
@@ -109,7 +114,10 @@ describe("AI Config Service 单元测试", () => {
         isDefault: false,
       };
 
-      const res = await aiLlmConfigService.add.service(addData, userObj);
+      const res = await aiLlmConfigService.add.service(
+        addData as unknown as AiLlmConfigAddVOLike,
+        userObj
+      );
 
       expect(aiLlmConfigRepository.disableOtherDefaults).not.toHaveBeenCalled();
       expect(aiLlmConfigRepository.onInsert).toHaveBeenCalledWith({
@@ -124,11 +132,11 @@ describe("AI Config Service 单元测试", () => {
     it("如果设为默认，应该更新时取消其他默认配置，并返回 ID", async () => {
       const mockRecord = { id: 5, name: "Old Name", isDefault: false };
       vi.mocked(aiLlmConfigRepository.findById).mockResolvedValue(
-        mockRecord as any
+        mockRecord as unknown as AiLlmConfigPOLike
       );
       vi.mocked(aiLlmConfigRepository.onUpdate).mockResolvedValue({
         id: 5,
-      } as any);
+      } as unknown as AiLlmConfigPOLike);
 
       const updateData = {
         id: 5,
@@ -136,7 +144,10 @@ describe("AI Config Service 单元测试", () => {
         isDefault: true,
       };
 
-      const res = await aiLlmConfigService.update.service(updateData, userObj);
+      const res = await aiLlmConfigService.update.service(
+        updateData as any,
+        userObj
+      );
 
       expect(aiLlmConfigRepository.findById).toHaveBeenCalledWith(5);
       expect(aiLlmConfigRepository.disableOtherDefaults).toHaveBeenCalledWith(
@@ -159,7 +170,7 @@ describe("AI Config Service 单元测试", () => {
     it("获取成功应该返回详情记录", async () => {
       const mockRecord = { id: 5, name: "Name" };
       vi.mocked(aiLlmConfigRepository.findById).mockResolvedValue(
-        mockRecord as any
+        mockRecord as unknown as AiLlmConfigPOLike
       );
 
       const res = await aiLlmConfigService.get.service({ id: 5 });
@@ -181,7 +192,7 @@ describe("AI Config Service 单元测试", () => {
     it("应该删除并返回被删除记录 ID", async () => {
       vi.mocked(aiLlmConfigRepository.onDelete).mockResolvedValue({
         id: 6,
-      } as any);
+      } as unknown as AiLlmConfigPOLike);
 
       const res = await aiLlmConfigService.delete.service({ id: 6 });
 
@@ -198,7 +209,7 @@ describe("AI Config Service 单元测试", () => {
         apiKey: "secret",
       };
       vi.mocked(aiLlmConfigRepository.findById).mockResolvedValue(
-        mockRecord as any
+        mockRecord as unknown as AiLlmConfigPOLike
       );
 
       const mockFetch = vi.fn().mockResolvedValue({
@@ -229,7 +240,7 @@ describe("AI Config Service 单元测试", () => {
         apiKey: "secret",
       };
       vi.mocked(aiLlmConfigRepository.findById).mockResolvedValue(
-        mockRecord as any
+        mockRecord as unknown as AiLlmConfigPOLike
       );
 
       const mockFetch = vi.fn().mockRejectedValue(new Error("Network Error"));

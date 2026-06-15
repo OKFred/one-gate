@@ -3,6 +3,7 @@ import aiChatService from "./service";
 import { getDefaultConfig } from "../config/service";
 import { BusinessError } from "@/middleware/errorHandler/businessError";
 import { ErrorCodes } from "./prevention";
+import type { AiLlmConfigPOLike } from "../config/model";
 
 vi.mock("../config/service", () => {
   return {
@@ -29,7 +30,7 @@ describe("AI Chat Service 单元测试", () => {
         isDefault: true,
         creatorId: 1,
         createTimeUtc: 1234567,
-      } as any);
+      } as unknown as AiLlmConfigPOLike);
 
       const mockFetch = vi.fn().mockResolvedValue({
         ok: true,
@@ -87,7 +88,7 @@ describe("AI Chat Service 单元测试", () => {
         isDefault: true,
         creatorId: 1,
         createTimeUtc: 1234567,
-      } as any);
+      } as unknown as AiLlmConfigPOLike);
 
       const mockFetch = vi.fn().mockResolvedValue({
         ok: false,

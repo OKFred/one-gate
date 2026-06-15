@@ -6,10 +6,11 @@ import aiChatService from "../chat/service";
 import aiConfigSql from "@/db/sql/ai_llm_config.sql?raw";
 import { BusinessError } from "@/middleware/errorHandler/businessError";
 import { ErrorCodes as ChatErrorCodes } from "../chat/prevention";
+import type { UserObj } from "@/types/app";
 
 describe("AI 模块全链路集成测试", () => {
   const testTables = ["ai_llm_config"];
-  const userObj = { userId: 1 } as any;
+  const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
     await setupTestDb(db, [aiConfigSql]);
