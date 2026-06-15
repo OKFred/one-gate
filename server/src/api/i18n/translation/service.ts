@@ -443,11 +443,12 @@ async function cacheSync(
   record: FromSchema<typeof addReq>,
   operation: "add" | "update" | "delete"
 ) {
-  if (record.application !== "backend") return;
   const cacheKey = `i18n.translation:${record.langCode}.${record.tKey}`;
   if (operation === "add") {
+    if (record.application !== "backend") return;
     await kv.put(cacheKey, record.tValue);
   } else if (operation === "update") {
+    if (record.application !== "backend") return;
     await kv.put(cacheKey, record.tValue);
   } else if (operation === "delete") {
     await kv.delete(cacheKey);

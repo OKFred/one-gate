@@ -20,7 +20,7 @@
 ## 📋 测试用例建设与重构清单
 
 ### 1. 已建立测试模块的优化与维护
-* [x] **i18n 模块** ── 🟢 已合并为同构单文件 `__test/i18n.integration.spec.ts`，测试覆盖 100% 绿灯。
+* [x] **i18n 模块** ── 🟢 已合并为同构单文件 `__test/i18n.integration.spec.ts`，并补全了 `language`、`region`、`translation` 子目录的 Service 单元测试，测试覆盖 100% 绿灯。
 * [x] **mail 模块** ── 🟢 已重构为异构测试模式（`action.integration.workers.spec.ts`、`action.integration.node.spec.ts` 与 `shared` 结合），并补充了 `account`、`log`、`template` 的单体服务测试。
 
 ---

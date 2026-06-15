@@ -7,6 +7,7 @@ import translationService, {
   utils as translationUtils,
 } from "../translation/service";
 import { kv } from "@/middleware/cache";
+import type { UserObj } from "@/types/app";
 
 // 静态导入 SQL 文件
 import languageSql from "@/db/sql/i18n_language.sql?raw";
@@ -15,6 +16,7 @@ import translationSql from "@/db/sql/i18n_translation.sql?raw";
 
 describe("i18n 全链路集成测试", () => {
   const testTables = ["i18n_language", "i18n_region", "i18n_translation"];
+  const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
     await setupTestDb(db, [languageSql, regionSql, translationSql]);
@@ -37,7 +39,7 @@ describe("i18n 全链路集成测试", () => {
           sortOrder: 1,
           remark: "Chinese",
         },
-        { userId: 1 }
+        userObj
       );
       expect(langId).toBeGreaterThan(0);
 
@@ -55,7 +57,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: false,
           sortOrder: 2,
         },
-        { userId: 2 } as any
+        userObj
       );
       expect(updatedId).toBe(langId);
 
@@ -83,7 +85,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: true,
           sortOrder: 1,
         },
-        { userId: 1 }
+        userObj
       );
       await languageService.add.service(
         {
@@ -92,7 +94,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: false,
           sortOrder: 2,
         },
-        { userId: 1 }
+        userObj
       );
 
       // listAll (不分页)
@@ -119,7 +121,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: true,
           sortOrder: 1,
         },
-        { userId: 1 }
+        userObj
       );
 
       // verifyLangCode
@@ -151,7 +153,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: true,
           remark: "Mainland",
         },
-        { userId: 1 }
+        userObj
       );
       expect(regionId).toBeGreaterThan(0);
 
@@ -168,7 +170,7 @@ describe("i18n 全链路集成测试", () => {
           labels: { "zh-CN": "中国大陆", "en-US": "Mainland China" },
           isEnabled: false,
         },
-        { userId: 2 } as any
+        userObj
       );
       expect(updatedId).toBe(regionId);
 
@@ -202,7 +204,7 @@ describe("i18n 全链路集成测试", () => {
           remark: "",
           businessLanguages: [],
         },
-        { userId: 1 }
+        userObj
       );
 
       const allList = await regionService.listAll.service({ isEnabled: true });
@@ -228,7 +230,7 @@ describe("i18n 全链路集成测试", () => {
           remark: "",
           businessLanguages: [],
         },
-        { userId: 1 }
+        userObj
       );
 
       // verifyRegion
@@ -265,7 +267,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: true,
           remark: "Save button",
         },
-        { userId: 1 }
+        userObj
       );
       expect(transId).toBeGreaterThan(0);
 
@@ -292,7 +294,7 @@ describe("i18n 全链路集成测试", () => {
           valueHash: newValueHash,
           isEnabled: true,
         },
-        { userId: 2 } as any
+        userObj
       );
 
       // 验证 KV 更新
@@ -322,7 +324,7 @@ describe("i18n 全链路集成测试", () => {
           isEnabled: true,
           remark: "",
         },
-        { userId: 1 }
+        userObj
       );
 
       // checkDuplicate
