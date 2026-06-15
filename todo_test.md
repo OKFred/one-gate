@@ -34,7 +34,8 @@
 * [x] 对第三方大模型（LLM）的流式返回或请求客户端建立合理的 mock 机制，确保测试不依赖外部 API Key 且能稳定运行。
 
 #### Enterprise 模块 (`src/api/enterprise/`)
-* [ ] **attendance.integration.spec.ts**：建立考勤考表、上下班打卡记录和迟到缺勤规则校验的集成测试。
+* [x] **attendance.integration.spec.ts** ── 🟢 已完成
+  * 建立考勤考表、上下班打卡记录和迟到缺勤规则校验的集成测试。
 
 #### Maintenance 模块 (`src/api/maintenance/`)
 * [ ] **api-task.integration.spec.ts**（需异构拆分或条件判断）：
