@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  swarmDockerConfigTable,
   IndexVO,
   SwarmDockerConfigVO,
   SwarmDockerConfigListVO,
@@ -15,12 +13,10 @@ import {
   SwarmDockerConfigSortableKeys,
   type SwarmDockerConfigPOLike,
 } from "./model";
-import { asc, count, desc, eq, and, or, like, not } from "drizzle-orm";
+import * as swarmDockerConfigRepository from "./repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import { dockerClient } from "../docker/client";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -33,25 +29,6 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(swarmDockerConfigTable.name, `%${keyword}%`)));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(swarmDockerConfigTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
 
 // 列表 (全部)
 const listAllReq = {
@@ -86,21 +63,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField =
-    swarmDockerConfigTable[orderBy] || swarmDockerConfigTable.id;
-  return await db
-    .select({
-      id: swarmDockerConfigTable.id,
-      name: swarmDockerConfigTable.name,
-      host: swarmDockerConfigTable.host,
-      isEnabled: swarmDockerConfigTable.isEnabled,
-      isDefault: swarmDockerConfigTable.isDefault,
-    })
-    .from(swarmDockerConfigTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(1000);
+  return await swarmDockerConfigRepository.findAll(params);
 }
 
 const listAllApi = {
@@ -141,30 +104,22 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField =
-    swarmDockerConfigTable[orderBy] || swarmDockerConfigTable.id;
 
-  const countResult = await db
-    .select({ total: count(swarmDockerConfigTable.id).as("total") })
-    .from(swarmDockerConfigTable)
-    .where(buildWhereCondition(params));
-
-  const total = countResult[0]?.total || 0;
-  const rows = await db
-    .select()
-    .from(swarmDockerConfigTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(pageSize)
-    .offset(offset);
+  const { list, total } = await swarmDockerConfigRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    pageNo,
+    pageSize,
+    orderBy: orderBy as keyof SwarmDockerConfigPOLike,
+    descend,
+  });
 
   return {
     total,
     totalPage: Math.ceil(total / pageSize),
     currentPage: pageNo,
     pageSize,
-    list: rows,
+    list,
   };
 }
 
@@ -195,21 +150,18 @@ async function onAdd(
 
   // 如果设置为默认配置，则取消其他默认配置
   if (obj.isDefault) {
-    await db
-      .update(swarmDockerConfigTable)
-      .set({ isDefault: false })
-      .where(eq(swarmDockerConfigTable.isDefault, true));
+    await swarmDockerConfigRepository.clearAllDefaults();
   }
 
-  const result = await db
-    .insert(swarmDockerConfigTable)
-    .values({ ...obj, creatorId })
-    .returning({ id: swarmDockerConfigTable.id });
+  const result = await swarmDockerConfigRepository.onInsert({
+    ...obj,
+    creatorId,
+  });
 
   // 配置变更，重置客户端的初始化状态
   dockerClient.reset();
 
-  return result[0]?.id;
+  return result?.id ?? null;
 }
 
 const addApi = {
@@ -238,34 +190,21 @@ async function onUpdate(
   await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
 
   if (params.isDefault) {
-    await db
-      .update(swarmDockerConfigTable)
-      .set({ isDefault: false })
-      .where(
-        and(
-          eq(swarmDockerConfigTable.isDefault, true),
-          not(eq(swarmDockerConfigTable.id, id))
-        )
-      );
+    await swarmDockerConfigRepository.clearAllDefaults(id);
   }
 
-  const res = await db
-    .update(swarmDockerConfigTable)
-    .set({
-      ...rest,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(swarmDockerConfigTable.id, id))
-    .returning({ id: swarmDockerConfigTable.id });
+  const res = await swarmDockerConfigRepository.onUpdate(id, {
+    ...rest,
+    updaterId,
+    updateTimeUtc: Date.now(),
+  });
 
-  const row = res[0];
-  preventEmpty(row);
+  preventEmpty(res);
 
   // 配置变更，重置客户端的初始化状态
   dockerClient.reset();
 
-  return row.id;
+  return res.id;
 }
 
 const updateApi = {
@@ -285,12 +224,7 @@ const getReq = {
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const rows = await db
-    .select()
-    .from(swarmDockerConfigTable)
-    .where(eq(swarmDockerConfigTable.id, params.id))
-    .limit(1);
-  const row = rows[0];
+  const row = await swarmDockerConfigRepository.findById(params.id);
   preventEmpty(row);
   return row;
 }
@@ -310,11 +244,7 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const result = await db
-    .delete(swarmDockerConfigTable)
-    .where(eq(swarmDockerConfigTable.id, obj.id))
-    .returning({ id: swarmDockerConfigTable.id });
-  const row = result[0];
+  const row = await swarmDockerConfigRepository.onDelete(obj.id);
   preventEmpty(row);
 
   // 配置变更，重置客户端的初始化状态
@@ -339,7 +269,7 @@ async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
     // 调用 dockerClient 的测试连接静态方法
     return await dockerClient.testRawConnection({
       host: config.host,
-      apiVersion: config.apiVersion,
+      apiVersion: config.apiVersion || "",
       tlsVerify: config.tlsVerify,
       caCert: config.caCert ?? undefined,
       clientCert: config.clientCert ?? undefined,
