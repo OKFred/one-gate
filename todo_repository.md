@@ -19,19 +19,19 @@
 
 ## 📋 模块重构待办清单
 
-### 1. Mail (邮件模块) ── 🟡 部分未完成
+### 1. Mail (邮件模块) ── 🟢 已完成
 * [x] **template (邮件模板)** ── 🟢 已完成
-* [ ] **account (发信账户)** `src/api/mail/account/` ── 🔴 待改造
+* [x] **account (发信账户)** `src/api/mail/account/` ── 🟢 已完成
   * 改造 `service.ts`，抽离 Drizzle 数据库调用至新文件 `repository.ts`。
-* [ ] **log (发信日志)** `src/api/mail/log/` ── 🔴 待改造
+* [x] **log (发信日志)** `src/api/mail/log/` ── 🟢 已完成
   * 改造 `service.ts`，抽离 Drizzle 数据库调用至新文件 `repository.ts`。
 
 ---
 
-### 2. AI (智能助手模块) ── 🔴 未完成
-* [ ] **chat (会话记录)** `src/api/ai/chat/` ── 🔴 待改造
+### 2. AI (智能助手模块) ── 🟢 已完成
+* [x] **chat (会话记录)** `src/api/ai/chat/` ── 🟢 已完成
   * 抽离 SQL 查询至 `repository.ts`（包含会话列表分页、历史消息记录查询、消息持久化插入等）。
-* [ ] **config (AI配置)** `src/api/ai/config/` ── 🔴 待改造
+* [x] **config (AI配置)** `src/api/ai/config/` ── 🟢 已完成
   * 抽离 SQL 读写至 `repository.ts`。
 
 ---
