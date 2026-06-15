@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  apiTaskTable,
   IndexVO,
   ApiTaskVO,
   ApiTaskListVO,
@@ -20,10 +18,8 @@ import {
   type ApiTaskDeleteVOLike,
   type ApiTaskGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, and, like, or } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   listReqBase,
   listResponseWrapper,
@@ -31,7 +27,6 @@ import {
 } from "@/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import hasValue from "@/utils/hasValue";
 import { validate } from "@cfworker/json-schema";
 import {
   BusinessError,
@@ -39,33 +34,7 @@ import {
 } from "@/middleware/errorHandler/businessError/index";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import { executeApiTask } from "@/jobs/executor";
-
-// 辅助函数：根据条件构建查询 filter
-const buildWhereCondition = (condition?: {
-  keyword?: string;
-  isEnabled?: boolean;
-}) => {
-  const { keyword, isEnabled } = condition || {};
-  const conditions = [];
-
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(apiTaskTable.name, `%${keyword}%`),
-        like(apiTaskTable.taskKey, `%${keyword}%`)
-      )
-    );
-  }
-  if (hasValue(isEnabled)) {
-    conditions.push(eq(apiTaskTable.isEnabled, isEnabled));
-  }
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as apiTaskRepository from "./repository";
 
 //----------------- 1. 获取任务列表 ----------------//
 const listReq = {
@@ -89,45 +58,22 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj?: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = apiTaskTable[orderBy] || apiTaskTable.id;
+  const { pageNo = 1, pageSize = 10 } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const whereCondition = buildWhereCondition(params);
+  const { total, list } = await apiTaskRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
-  const countResult = await db
-    .select({ total: count(apiTaskTable.id) })
-    .from(apiTaskTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  const rows = await db
-    .select()
-    .from(apiTaskTable)
-    .where(whereCondition)
-    .orderBy(descend ? desc(orderField) : asc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
-
-  const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
-    totalPage,
+    totalPage: Math.ceil(total / finalPageSize),
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list: list as any,
   };
 }
 
@@ -179,36 +125,29 @@ async function onAdd(
     isEnabled,
   } = params;
 
-  const existRows = await db
-    .select()
-    .from(apiTaskTable)
-    .where(eq(apiTaskTable.taskKey, taskKey))
-    .limit(1);
-  if (existRows.length > 0) {
+  const existRow = await apiTaskRepository.findByKey(taskKey);
+  if (existRow) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
       message: `任务 Key "${taskKey}" 已存在，请换用其他唯一 Key`,
     });
   }
 
-  const res = await db
-    .insert(apiTaskTable)
-    .values({
-      taskKey,
-      name,
-      description,
-      baseUrl,
-      path,
-      method,
-      headers,
-      requestSchema,
-      responseSchema,
-      timeoutMs,
-      isEnabled,
-      creatorId,
-    })
-    .returning({ id: apiTaskTable.id });
+  const insertedId = await apiTaskRepository.onInsert({
+    taskKey,
+    name,
+    description,
+    baseUrl,
+    path,
+    method,
+    headers,
+    requestSchema,
+    responseSchema,
+    timeoutMs,
+    isEnabled,
+    creatorId,
+  });
 
-  return res[0]?.id;
+  return insertedId || null;
 }
 
 const addApi = {
@@ -258,48 +197,34 @@ async function onUpdate(
     isEnabled,
   } = params;
 
-  const existRows = await db
-    .select()
-    .from(apiTaskTable)
-    .where(eq(apiTaskTable.id, id))
-    .limit(1);
-  const row = existRows[0];
+  const row = await apiTaskRepository.findById(id);
   preventEmpty(row);
 
   if (taskKey !== undefined && taskKey !== row.taskKey) {
-    const duplicateRows = await db
-      .select()
-      .from(apiTaskTable)
-      .where(eq(apiTaskTable.taskKey, taskKey))
-      .limit(1);
-    if (duplicateRows.length > 0) {
+    const duplicateRow = await apiTaskRepository.findByKey(taskKey);
+    if (duplicateRow) {
       throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
         message: `任务 Key "${taskKey}" 已存在，请换用其他唯一 Key`,
       });
     }
   }
 
-  const res = await db
-    .update(apiTaskTable)
-    .set({
-      taskKey,
-      name,
-      description,
-      baseUrl,
-      path,
-      method,
-      headers,
-      requestSchema,
-      responseSchema,
-      timeoutMs,
-      isEnabled,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(apiTaskTable.id, id))
-    .returning({ id: apiTaskTable.id });
+  const updateRow = await apiTaskRepository.onUpdate(id, {
+    taskKey,
+    name,
+    description,
+    baseUrl,
+    path,
+    method,
+    headers,
+    requestSchema,
+    responseSchema,
+    timeoutMs,
+    isEnabled,
+    updaterId,
+    updateTimeUtc: Date.now(),
+  });
 
-  const updateRow = res[0];
   preventEmpty(updateRow);
   return updateRow.id;
 }
@@ -336,18 +261,10 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-  const existRows = await db
-    .select()
-    .from(apiTaskTable)
-    .where(eq(apiTaskTable.id, id))
-    .limit(1);
-  preventEmpty(existRows[0]);
+  const existRow = await apiTaskRepository.findById(id);
+  preventEmpty(existRow);
 
-  const result = await db
-    .delete(apiTaskTable)
-    .where(eq(apiTaskTable.id, id))
-    .returning({ id: apiTaskTable.id });
-  const deleteRow = result[0];
+  const deleteRow = await apiTaskRepository.onDelete(id);
   preventEmpty(deleteRow);
   return deleteRow.id;
 }
@@ -389,12 +306,7 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(apiTaskTable)
-    .where(eq(apiTaskTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await apiTaskRepository.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -466,12 +378,7 @@ async function onRunTest(
 ): Promise<FromSchema<typeof runTestRes>> {
   const { id, parameters } = params;
 
-  const rows = await db
-    .select()
-    .from(apiTaskTable)
-    .where(eq(apiTaskTable.id, id))
-    .limit(1);
-  const task = rows[0];
+  const task = await apiTaskRepository.findById(id);
   preventEmpty(task);
 
   let parsedParams: Record<string, unknown> = {};
@@ -631,13 +538,8 @@ async function onBulkAdd(
 
   for (const task of tasks) {
     try {
-      const existRows = await db
-        .select()
-        .from(apiTaskTable)
-        .where(eq(apiTaskTable.taskKey, task.taskKey))
-        .limit(1);
-
-      if (existRows.length > 0) {
+      const existRow = await apiTaskRepository.findByKey(task.taskKey);
+      if (existRow) {
         errors.push({
           taskKey: task.taskKey,
           message: `任务 Key "${task.taskKey}" 已存在`,
@@ -646,7 +548,7 @@ async function onBulkAdd(
         continue;
       }
 
-      await db.insert(apiTaskTable).values({
+      await apiTaskRepository.onInsert({
         taskKey: task.taskKey,
         name: task.name,
         description: task.description || null,

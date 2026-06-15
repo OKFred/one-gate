@@ -42,8 +42,8 @@
 
 ---
 
-### 4. Maintenance (系统维护与任务模块) ── 🔴 未完成
-* [ ] **api-task (API定时任务)** `src/api/maintenance/api-task/` ── 🔴 待改造
+### 4. Maintenance (系统维护与任务模块) ── 🟡 部分未完成
+* [x] **api-task (API定时任务)** `src/api/maintenance/api-task/` ── 🟢 已完成
   * 抽离任务表 `apiTaskTable` 的查询、锁抢占及状态更新 SQL 至 `repository.ts`。
 * [ ] **audit_login (登录审计)** `src/api/maintenance/audit_login/` ── 🔴 待改造
   * 抽离登录日志插入与多维过滤 SQL。
