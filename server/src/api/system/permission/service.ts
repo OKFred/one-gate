@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  permissionTable,
   IndexVO,
   PermissionVO,
   PermissionListVO,
@@ -23,11 +21,8 @@ import {
   PermissionUniqueKeys,
   PermissionUniqueVO,
 } from "./model";
-import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -40,46 +35,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import translationService from "@/api/i18n/translation/service";
-
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-  code,
-  name,
-  category,
-}: Pick<
-  FromSchema<typeof listReq>,
-  "keyword" | "isEnabled" | "code" | "name" | "category"
->) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(permissionTable.code, `%${keyword}%`),
-        like(permissionTable.name, `%${keyword}%`)
-      )
-    );
-  }
-  if (hasValue(code)) {
-    conditions.push(eq(permissionTable.code, code));
-  }
-  if (hasValue(name)) {
-    conditions.push(eq(permissionTable.name, name));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(permissionTable.isEnabled, isEnabled));
-  }
-  if (category !== undefined) {
-    conditions.push(eq(permissionTable.category, category));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { permissionRepository } from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -110,26 +66,11 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = permissionTable[orderBy] || permissionTable.id;
-  const maxLimit = 10000;
-
-  const rows = await db
-    .select({
-      id: permissionTable.id,
-      code: permissionTable.code,
-      name: permissionTable.name,
-      category: permissionTable.category,
-      resource: permissionTable.resource,
-      business: permissionTable.business,
-      remark: permissionTable.remark,
-      isEnabled: permissionTable.isEnabled,
-    })
-    .from(permissionTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows as FromSchema<typeof listAllRes>;
+  const rows = await permissionRepository.findAll(params);
+  return rows.map((row) => ({
+    ...row,
+    category: row.category as "action",
+  }));
 }
 const listAllApi = {
   req: listAllReq,
@@ -170,40 +111,30 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = permissionTable[orderBy] || permissionTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  const countResult = await db
-    .select({ total: count(permissionTable.id).as("total") })
-    .from(permissionTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
+  const { total, list } = await permissionRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    code: params.code,
+    name: params.name,
+    category: params.category,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
-  const rows = await db
-    .select()
-    .from(permissionTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list: list.map((row) => ({
+      ...row,
+      category: row.category as "action",
+    })),
   };
 }
 const listApi = {
@@ -239,15 +170,12 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
 
-  const result = await db
-    .insert(permissionTable)
-    .values({
-      ...obj,
-      creatorId,
-    })
-    .returning({ id: permissionTable.id });
+  const insertedId = await permissionRepository.onInsert({
+    ...obj,
+    creatorId,
+  });
 
-  return result[0]?.id;
+  return insertedId;
 }
 const addApi = {
   req: addReq,
@@ -285,17 +213,10 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  const res = await db
-    .update(permissionTable)
-    .set(updateData)
-    .where(eq(permissionTable.id, id))
-    .returning({ id: permissionTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const updatedId = await permissionRepository.onUpdate(id, updateData);
+  return updatedId;
 }
 const updateApi = {
   req: updateReq,
@@ -328,13 +249,8 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = obj;
-  const result = await db
-    .delete(permissionTable)
-    .where(eq(permissionTable.id, id))
-    .returning({ id: permissionTable.id });
-  const row = result[0];
-  preventEmpty(row);
-  return row.id;
+  const deletedId = await permissionRepository.onDelete(id);
+  return deletedId;
 }
 const deleteApi = {
   req: deleteReq,
@@ -374,12 +290,7 @@ async function onGet(
   obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(permissionTable)
-    .where(eq(permissionTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await permissionRepository.findById(id);
   preventEmpty(row);
   return row as FromSchema<typeof getRes>;
 }

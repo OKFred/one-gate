@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  rolePermissionTable,
   IndexVO,
   RolePermissionVO,
   RolePermissionListVO,
@@ -21,18 +19,12 @@ import {
   type RolePermissionGetVOLike,
   RolePermissionBaseVO,
 } from "./model";
-import {
-  ErrorCodes,
-  preventMissingRecord,
-  preventMissingRole,
-} from "./prevention";
-import { permissionTable } from "../permission/model";
+import { preventMissingRecord, preventMissingRole } from "./prevention";
 import roleService, { utils as roleUtils } from "../role/service";
 import permissionService from "../permission/service";
-import { asc, count, desc, eq, and, inArray, is } from "drizzle-orm";
+import { permissionRepository } from "../permission/repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
@@ -50,34 +42,7 @@ import { utils as permissionUtils } from "@/api/system/permission/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
 import { kv } from "@/middleware/cache";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件
-const buildWhereCondition = ({
-  roleId,
-  permissionId,
-}: Pick<FromSchema<typeof listReq>, "roleId" | "permissionId">) => {
-  const conditions = [];
-  if (hasValue(roleId))
-    conditions.push(eq(rolePermissionTable.roleId, roleId as number));
-  if (hasValue(permissionId))
-    conditions.push(
-      eq(rolePermissionTable.permissionId, permissionId as number)
-    );
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
-
-async function getCurrentPermissionCount(roleId: number): Promise<number> {
-  const countResult = await db
-    .select({ count: count(rolePermissionTable.id).as("count") })
-    .from(rolePermissionTable)
-    .where(eq(rolePermissionTable.roleId, roleId));
-  return countResult[0]?.count || 0;
-}
+import { rolePermissionRepository } from "./repository";
 
 /** 更新全局权限版本号，强制所有用户缓存失效 */
 async function invalidateAuthCache() {
@@ -113,17 +78,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = rolePermissionTable[orderBy] || rolePermissionTable.id;
-  const maxLimit = 10000;
-
-  const rows = await db
-    .select()
-    .from(rolePermissionTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await rolePermissionRepository.findAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -164,40 +119,24 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = rolePermissionTable[orderBy] || rolePermissionTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  const countResult = await db
-    .select({ total: count(rolePermissionTable.id).as("total") })
-    .from(rolePermissionTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
+  const { total, list } = await rolePermissionRepository.findPage({
+    roleId: params.roleId,
+    permissionId: params.permissionId,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
-  const rows = await db
-    .select()
-    .from(rolePermissionTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -231,27 +170,25 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { roleId, permissionId } = obj;
+  const { roleId } = obj;
 
   // 前置校验
   await preventMissingRole(roleId);
 
-  const result = await db
-    .insert(rolePermissionTable)
-    .values({
-      ...obj,
-      creatorId,
-    })
-    .returning({ id: rolePermissionTable.id });
+  const insertedId = await rolePermissionRepository.onInsert({
+    ...obj,
+    creatorId,
+  });
 
   // 更新角色权限数量
-  const currentCount = await getCurrentPermissionCount(roleId);
+  const currentCount =
+    await rolePermissionRepository.getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
   await invalidateAuthCache();
 
-  return result[0]?.id;
+  return insertedId;
 }
 const addApi = {
   req: addReq,
@@ -295,33 +232,17 @@ async function onBatchAdd(
   // 前置校验
   await preventMissingRole(roleId);
 
-  // 批量插入，分片处理以避免 D1 变量限制 (通常为 100)
-  // 每行 3 个变量，取 25 行为一组 (75 变量)
-  const chunkSize = 25;
-  const batches = [];
-  for (let i = 0; i < permissionIds.length; i += chunkSize) {
-    const chunk = permissionIds.slice(i, i + chunkSize);
-    const values = chunk.map((permissionId) => ({
-      roleId,
-      permissionId,
-      creatorId,
-    }));
-    batches.push(
-      db
-        .insert(rolePermissionTable)
-        .values(values)
-        .returning({ id: rolePermissionTable.id })
-    );
-  }
+  const values = permissionIds.map((permissionId) => ({
+    roleId,
+    permissionId,
+    creatorId,
+  }));
 
-  const results = batches.length > 0 ? await db.batch(batches as any) : [];
-  const totalAdded = results.reduce(
-    (acc: number, curr: any) => acc + curr.length,
-    0
-  );
+  const totalAdded = await rolePermissionRepository.onBatchInsert(values);
 
   // 更新角色权限数量
-  const currentCount = await getCurrentPermissionCount(roleId);
+  const currentCount =
+    await rolePermissionRepository.getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
@@ -371,19 +292,12 @@ async function onUpdate(
     roleId,
     permissionId,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  const res = await db
-    .update(rolePermissionTable)
-    .set(updateData)
-    .where(eq(rolePermissionTable.id, id))
-    .returning({ id: rolePermissionTable.id });
-  const row = res[0];
-  preventEmpty(row);
+  const updatedId = await rolePermissionRepository.onUpdate(id, updateData);
   // 触发全局缓存失效
   await invalidateAuthCache();
-  return row.id;
+  return updatedId;
 }
 const updateApi = {
   req: updateReq,
@@ -418,30 +332,21 @@ async function onDelete(
   const { id } = obj;
 
   // 前置校验
-  const record = await db
-    .select({ roleId: rolePermissionTable.roleId })
-    .from(rolePermissionTable)
-    .where(eq(rolePermissionTable.id, id))
-    .limit(1);
-  const row = record[0];
-  preventEmpty(row);
-  const roleId = row.roleId;
+  const record = await rolePermissionRepository.findById(id);
+  preventEmpty(record);
+  const roleId = record.roleId;
 
-  const result = await db
-    .delete(rolePermissionTable)
-    .where(eq(rolePermissionTable.id, id))
-    .returning({ id: rolePermissionTable.id });
-  const resRow = result[0];
-  preventEmpty(resRow);
+  const deletedId = await rolePermissionRepository.onDelete(id);
 
   // 更新角色权限数量
-  const currentCount = await getCurrentPermissionCount(roleId);
+  const currentCount =
+    await rolePermissionRepository.getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
   await invalidateAuthCache();
 
-  return resRow.id;
+  return deletedId;
 }
 const deleteApi = {
   req: deleteReq,
@@ -484,33 +389,14 @@ async function onBatchDelete(
   // 前置校验
   await preventMissingRole(roleId);
 
-  // 分片删除以避免 D1 变量限制 (通常为 100)
-  // inArray 会产生 N 个变量，取 50 为一组
-  const chunkSize = 50;
-  const batches = [];
-  for (let i = 0; i < permissionIds.length; i += chunkSize) {
-    const chunk = permissionIds.slice(i, i + chunkSize);
-    batches.push(
-      db
-        .delete(rolePermissionTable)
-        .where(
-          and(
-            eq(rolePermissionTable.roleId, roleId),
-            inArray(rolePermissionTable.permissionId, chunk)
-          )
-        )
-        .returning({ id: rolePermissionTable.id })
-    );
-  }
-
-  const results = batches.length > 0 ? await db.batch(batches as any) : [];
-  const totalDeleted = results.reduce(
-    (acc: number, curr: any) => acc + curr.length,
-    0
+  const totalDeleted = await rolePermissionRepository.onBatchDelete(
+    roleId,
+    permissionIds
   );
 
   // 更新角色权限数量
-  const currentCount = await getCurrentPermissionCount(roleId);
+  const currentCount =
+    await rolePermissionRepository.getCurrentPermissionCount(roleId);
   await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
@@ -555,12 +441,7 @@ async function onGet(
   obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(rolePermissionTable)
-    .where(eq(rolePermissionTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await rolePermissionRepository.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -596,33 +477,11 @@ async function onGetPermissionsByRole(
   obj: FromSchema<typeof getPermissionsByRoleReq>
 ): Promise<FromSchema<typeof getPermissionsByRoleRes>> {
   const { roleId } = obj;
-  const rows = await db
-    .select({
-      id: permissionTable.id,
-      code: permissionTable.code,
-      name: permissionTable.name,
-      category: permissionTable.category,
-      resource: permissionTable.resource,
-      business: permissionTable.business,
-      remark: permissionTable.remark,
-      isEnabled: permissionTable.isEnabled,
-      creatorId: permissionTable.creatorId,
-      updaterId: permissionTable.updaterId,
-      createTimeUtc: permissionTable.createTimeUtc,
-      updateTimeUtc: permissionTable.updateTimeUtc,
-    })
-    .from(rolePermissionTable)
-    .innerJoin(
-      permissionTable,
-      eq(rolePermissionTable.permissionId, permissionTable.id)
-    )
-    .where(
-      and(
-        eq(rolePermissionTable.roleId, roleId),
-        eq(permissionTable.isEnabled, true)
-      )
-    );
-  return rows as PermissionInfo[];
+  const rows = await rolePermissionRepository.getPermissionsByRole(roleId);
+  return rows.map((row) => ({
+    ...row,
+    category: row.category as "action",
+  }));
 }
 const getPermissionsByRoleApi = {
   req: getPermissionsByRoleReq,
@@ -648,8 +507,8 @@ export async function getPermissionsByRoleIds(roleIds: number[]) {
   }
   // 如果是超管，给到所有权限（无视启用状态）
   if (roleIds.includes(SUPER_ADMIN_ROLE_ID)) {
-    const rows = (await db.select().from(permissionTable)) as PermissionInfo[];
-    return permissionUtils.filterEffectivePermissions(rows);
+    const rows = await permissionRepository.getAllPermissions();
+    return permissionUtils.filterEffectivePermissions(rows as PermissionInfo[]);
   }
   // 仅允许已启用的角色
   const enabledRoles = await roleService.listAll.service({ isEnabled: true });
@@ -658,33 +517,11 @@ export async function getPermissionsByRoleIds(roleIds: number[]) {
   if (filteredRoleIds.length === 0) {
     return [];
   }
-  const rows = (await db
-    .select({
-      id: permissionTable.id,
-      code: permissionTable.code,
-      name: permissionTable.name,
-      category: permissionTable.category,
-      resource: permissionTable.resource,
-      business: permissionTable.business,
-      remark: permissionTable.remark,
-      isEnabled: permissionTable.isEnabled,
-      creatorId: permissionTable.creatorId,
-      updaterId: permissionTable.updaterId,
-      createTimeUtc: permissionTable.createTimeUtc,
-      updateTimeUtc: permissionTable.updateTimeUtc,
-    })
-    .from(rolePermissionTable)
-    .innerJoin(
-      permissionTable,
-      eq(rolePermissionTable.permissionId, permissionTable.id)
-    )
-    .where(
-      and(
-        inArray(rolePermissionTable.roleId, filteredRoleIds),
-        eq(permissionTable.isEnabled, true)
-      )
-    )) as PermissionInfo[];
-  const permissions = permissionUtils.filterEffectivePermissions(rows);
+  const rows =
+    await rolePermissionRepository.getPermissionsByRoleIds(filteredRoleIds);
+  const permissions = permissionUtils.filterEffectivePermissions(
+    rows as PermissionInfo[]
+  );
   return permissions;
 }
 
@@ -694,21 +531,15 @@ async function addMenuPermissionToRole(
   permissionId: number,
   creatorId: number
 ) {
-  const rolePermissionData = {
+  await rolePermissionRepository.onInsert({
     roleId,
     permissionId,
     creatorId,
-  };
-  await db.insert(rolePermissionTable).values(rolePermissionData);
+  });
 }
 
 async function verifyRecordExists(id: number) {
-  const rows = await db
-    .select({ id: rolePermissionTable.id })
-    .from(rolePermissionTable)
-    .where(eq(rolePermissionTable.id, id))
-    .limit(1);
-  return rows.length > 0;
+  return await rolePermissionRepository.verifyRecordExists(id);
 }
 
 async function verifyRoleExists(roleId: number) {

@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  departmentTable,
   IndexVO,
   DepartmentVO,
   DepartmentListVO,
@@ -21,10 +19,8 @@ import {
   type DepartmentGetVOLike,
   DepartmentBaseVO,
 } from "./model";
-import { asc, count, desc, eq, and, like } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   listAllReqBase,
   listReqBase,
@@ -34,7 +30,6 @@ import {
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { exportDeletionRecord } from "@/api/maintenance/compliance";
-import hasValue from "@/utils/hasValue";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -48,28 +43,7 @@ import {
   preventHasChildren,
 } from "./prevention";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件（列表和全部通用）
-export const buildWhereCondition = (condition?: {
-  id?: number;
-  keyword?: string;
-  parentId?: number;
-}) => {
-  const { id, keyword, parentId } = condition || {};
-  const conditions = [];
-
-  if (hasValue(id)) conditions.push(eq(departmentTable.id, id));
-  if (hasValue(keyword))
-    conditions.push(like(departmentTable.name, `%${keyword}%`));
-  if (parentId !== undefined)
-    conditions.push(eq(departmentTable.parentId, parentId));
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { departmentRepository } from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -97,27 +71,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj?: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = departmentTable[orderBy] || departmentTable.id;
-  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
-
-  // 构建查询条件
-  const whereCondition = buildWhereCondition({});
-
-  // 查询所有匹配的数据
-  const rows = await db
-    .select({
-      id: departmentTable.id,
-      name: departmentTable.name,
-      remark: departmentTable.remark,
-      parentId: departmentTable.parentId,
-      isEnabled: departmentTable.isEnabled,
-    })
-    .from(departmentTable)
-    .where(whereCondition)
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await departmentRepository.findAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -156,44 +110,24 @@ async function onList(
   userObj?: UserObj
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = departmentTable[orderBy] || departmentTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  // 构建查询条件
-  const whereCondition = buildWhereCondition(params);
+  const { total, list } = await departmentRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(departmentTable.id) })
-    .from(departmentTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(departmentTable)
-    .where(whereCondition)
-    .orderBy(descend ? desc(orderField) : asc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -232,18 +166,15 @@ async function onAdd(
   // 前置校验
   await preventMissingParent(parentId);
 
-  const res = await db
-    .insert(departmentTable)
-    .values({
-      name,
-      remark,
-      parentId,
-      isEnabled,
-      creatorId,
-    })
-    .returning({ id: departmentTable.id });
+  const insertedId = await departmentRepository.onInsert({
+    name,
+    remark,
+    parentId,
+    isEnabled,
+    creatorId,
+  });
 
-  return res[0]?.id;
+  return insertedId;
 }
 const addApi = {
   req: addReq,
@@ -292,18 +223,10 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  const res = await db
-    .update(departmentTable)
-    .set(updateData)
-    .where(eq(departmentTable.id, id))
-    .returning({ id: departmentTable.id });
-
-  const updateRow = res[0];
-  preventEmpty(updateRow);
-  return updateRow.id;
+  const updatedId = await departmentRepository.onUpdate(id, updateData);
+  return updatedId;
 }
 const updateApi = {
   req: updateReq,
@@ -349,13 +272,7 @@ async function onDelete(
   await preventHasChildren(id);
 
   // 执行删除操作
-  const result = await db
-    .delete(departmentTable)
-    .where(eq(departmentTable.id, id))
-    .returning({ id: departmentTable.id });
-
-  const deleteRow = result[0];
-  preventEmpty(deleteRow);
+  const deletedId = await departmentRepository.onDelete(id);
 
   // 归档删除记录
   try {
@@ -380,7 +297,7 @@ async function onDelete(
     // 归档失败不影响删除操作
   }
 
-  return result[0].id;
+  return deletedId;
 }
 const deleteApi = {
   req: deleteReq,
@@ -420,12 +337,7 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(departmentTable)
-    .where(eq(departmentTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await departmentRepository.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -477,13 +389,8 @@ async function onTree(
   params: FromSchema<typeof treeReq>,
   userObj: UserObj
 ): Promise<DepartmentTreeItem[]> {
-  const whereCondition = await buildWhereCondition({});
   // 获取所有部门
-  const allDepartments = await db
-    .select()
-    .from(departmentTable)
-    .where(whereCondition)
-    .orderBy(asc(departmentTable.id));
+  const allDepartments = await departmentRepository.getTreeData();
 
   // 递归构建树形结构
   function buildDepartmentTree(
@@ -519,31 +426,14 @@ const treeApi = {
 export async function getDepartmentNameById(
   id: number
 ): Promise<string | null> {
-  const rows = await db
-    .select({ name: departmentTable.name })
-    .from(departmentTable)
-    .where(eq(departmentTable.id, id))
-    .limit(1);
-  return rows.length > 0 ? rows[0].name : null;
+  return await departmentRepository.getDepartmentNameById(id);
 }
 
 /** @description 获取所有部门列表 */
 async function getAllDepartments(
   isEnabled?: boolean
 ): Promise<{ name: string; id: number; parentId: number }[]> {
-  const allDepartments = await db
-    .select({
-      name: departmentTable.name,
-      id: departmentTable.id,
-      parentId: departmentTable.parentId,
-    })
-    .from(departmentTable)
-    .where(
-      isEnabled !== undefined
-        ? eq(departmentTable.isEnabled, isEnabled)
-        : undefined
-    );
-  return allDepartments;
+  return await departmentRepository.getAllDepartments(isEnabled);
 }
 
 /** @description 获取子孙部门的列表 */
@@ -655,13 +545,10 @@ export async function getSiblingDepartments(
 
 /** @description 验证部门是否存在 */
 export async function verifyDepartment(departmentId: number) {
-  const rows = await db
-    .select({ name: departmentTable.name })
-    .from(departmentTable)
-    .where(eq(departmentTable.id, departmentId))
-    .limit(1);
-  preventEmpty(rows[0]);
+  const row = await departmentRepository.findById(departmentId);
+  preventEmpty(row);
 }
+
 export const utils = {
   verifyDepartment,
   getDepartmentNameById,

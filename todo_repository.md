@@ -61,20 +61,21 @@
 
 ---
 
-### 6. Swarm (Docker 节点管理模块) ── 🔴 未完成
-* [ ] **docker (服务容器)** `src/api/swarm/docker/` ── 🔴 待改造
-* [ ] **docker_config (Docker配置)** `src/api/swarm/docker_config/` ── 🔴 待改造
-* [ ] **nodes (节点管理)** `src/api/swarm/nodes/` ── 🔴 待改造
+### 6. Swarm (Docker 节点管理模块) ── 🟢 已完成
+* [x] **docker (服务容器)** `src/api/swarm/docker/` ── 🟢 已完成（无需改造，无直接 ORM 读写）
+* [x] **docker_config (Docker配置)** `src/api/swarm/docker_config/` ── 🟢 已完成
+* [x] **nodes (节点管理)** `src/api/swarm/nodes/` ── 🟢 已完成（无需改造，无直接 ORM 读写）
 
 ---
 
-### 7. System (系统权限与架构模块) ── 🔴 未完成
-* [ ] **user (用户账户)** `src/api/system/user/` ── 🔴 待改造
+### 7. System (系统权限与架构模块) ── 🟢 已完成
+* [x] **user (用户账户)** `src/api/system/user/` ── 🟢 已完成
   * 抽离用户基础信息、密码验证关联、部门及状态更新的 SQL。
-* [ ] **role (系统角色)** `src/api/system/role/` ── 🔴 待改造
-* [ ] **permission (细粒度权限码)** `src/api/system/permission/` ── 🔴 待改造
-* [ ] **role_permission (角色权限关系联表)** `src/api/system/role_permission/` ── 🔴 待改造
-* [ ] **department (组织部门结构)** `src/api/system/department/` ── 🔴 待改造
-* [ ] **menu (菜单定义)** `src/api/system/menu/` ── 🔴 待改造
-* [ ] **schema_form (动态表单定义)** `src/api/system/schema_form/` ── 🔴 待改造
-* [ ] **schema_form_data (表单实例数据)** `src/api/system/schema_form_data/` ── 🔴 待改造
+* [x] **role (系统角色)** `src/api/system/role/` ── 🟢 已完成
+* [x] **permission (细粒度权限码)** `src/api/system/permission/` ── 🟢 已完成
+* [x] **role_permission (角色权限关系联表)** `src/api/system/role_permission/` ── 🟢 已完成
+* [x] **department (组织部门结构)** `src/api/system/department/` ── 🟢 已完成
+* [x] **menu (菜单定义)** `src/api/system/menu/` ── 🟢 已完成
+* [x] **schema_form (动态表单定义)** `src/api/system/schema_form/` ── 🟢 已完成
+* [x] **schema_form_data (表单实例数据)** `src/api/system/schema_form_data/` ── 🟢 已完成
+
