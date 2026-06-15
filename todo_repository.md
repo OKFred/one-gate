@@ -47,7 +47,7 @@
   * 抽离任务表 `apiTaskTable` 的查询、锁抢占及状态更新 SQL 至 `repository.ts`。
 * [x] **audit_login (登录审计)** `src/api/maintenance/audit_login/` ── 🟢 已完成
   * 抽离登录日志插入与多维过滤 SQL。
-* [ ] **compliance (合规审计)** `src/api/maintenance/compliance/` ── 🔴 待改造
+* [x] **compliance (合规审计)** `src/api/maintenance/compliance/` ── 🟢 已完成
 * [ ] **cron (计划任务)** `src/api/maintenance/cron/` ── 🔴 待改造
 * [ ] **cache (缓存管理)** `src/api/maintenance/cache/` ── 🔴 待改造
 * [ ] **init (系统初始化)** `src/api/maintenance/init/` ── 🔴 待改造
