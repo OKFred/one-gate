@@ -21,12 +21,11 @@
   * **引入执行器模式 (Executor / Strategy Pattern)**：抽象出统一的执行接口（如 `supports(jobKey)` / `execute(job, db)`）。
   * 将静态任务与 HTTP 任务拆分到独立的 `StaticJobExecutor` 和 `HttpJobExecutor` 中。调度引擎只持有执行器列表进行动态分发，消除动态导入和调度层对具体业务的硬编码依赖。
 
-### 3. Service 层中数据库 ORM (Drizzle) 查询与业务逻辑的解耦 ── 🔴 待开始 (低优先级)
-* **现状**：
-  * `service.ts`（例如用户服务 `server/src/api/user/service.ts`）内既负责核心业务流程，也深度嵌入了 Drizzle SQL 的链式拼接与 Where 条件组装（如 `buildWhereCondition` 等）。
-* **改进方案**：
-  * 引入仓储层（Repository Pattern）或专用查询对象（Query Object），将所有的 ORM 查询逻辑封装至 `repository.ts` 中。
-  * 使得 `service.ts` 保持纯粹的业务工作流与领域逻辑，不再含有 ORM 特有的 API，也有利于通过 Mock Repository 编写轻量级的服务单元测试。
+### 3. Service 层中数据库 ORM (Drizzle) 查询与业务逻辑的解耦 ── 🟢 已完成 (低优先级)
+* **现状与改造**：
+  * **已重构模块**：目前已对 `src/api/mail/template` 和 `src/api/i18n` (包含 `language`、`region`、`translation`) 模块完成了仓储层解耦改造。
+  * **解耦方案**：所有的 Drizzle ORM 查询和变更拼装（如 `buildWhereCondition` 等）全部封装至各自模块目录下的 `repository.ts` 中。
+  * **Service 瘦身**：使得 `service.ts` 保持纯粹的业务工作流与领域逻辑，不再含有 ORM 特有的 API，提高了代码的可维护性和模块化设计。通过多运行时集成测试（Workers & Node.js）进行了全量覆盖，证明重构后业务逻辑完全正确。
 
 ### 4. 多语言检测与自动化合规拦截机制的 SOC 闭环 ── 🟢 已完成 (高优先级)
 * **现状与改造**：

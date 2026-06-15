@@ -51,6 +51,9 @@ jobs:
           TEST_MAIL_HOST: ${{ secrets.TEST_MAIL_HOST }}
           TEST_MAIL_PORT: ${{ secrets.TEST_MAIL_PORT }}
           TEST_MAIL_RECEIVER: ${{ secrets.TEST_MAIL_RECEIVER }}
+          JWT_SECRET: "test-secret-key-for-ci-runs"
+          BASE_API_PATH: "/api/v1"
+          LOCALE: "zh-CN"
 
   # Job 2：部署（仅在测试成功，且为 main/master/dev 分支时运行）
   deploy:
@@ -94,6 +97,8 @@ jobs:
       - name: Build Frontend
         run: pnpm run build
         working-directory: ./platform
+        env:
+          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
 
       - name: Deploy Pages Frontend
         uses: cloudflare/wrangler-action@v3

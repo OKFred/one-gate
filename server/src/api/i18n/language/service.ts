@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  languageTable,
   IndexVO,
   LanguageVO,
   LanguageListVO,
@@ -20,11 +18,10 @@ import {
   type LanguageDeleteVOLike,
   type LanguageGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, or, like, and, SQL, ne } from "drizzle-orm";
+import * as languageRepository from "./repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
+
 import {
   listAllReqBase,
   listReqBase,
@@ -38,31 +35,6 @@ import {
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
 
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [] as SQL<unknown>[];
-
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(languageTable.langCode, `%${keyword}%`),
-        like(languageTable.nativeName, `%${keyword}%`)
-      )
-    );
-  }
-  if (hasValue(isEnabled)) {
-    conditions.push(eq(languageTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
-
 const listAllReq = {
   type: "object",
   properties: {
@@ -73,6 +45,7 @@ const listAllReq = {
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const listAllRes = {
   type: "array",
   items: {
@@ -88,26 +61,13 @@ const listAllRes = {
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
+
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "sortOrder", descend = false } = params;
-  const orderField = languageTable[orderBy] || languageTable.sortOrder;
-  const maxLimit = 100_000;
-  const rows = await db
-    .select({
-      id: languageTable.id,
-      langCode: languageTable.langCode,
-      nativeName: languageTable.nativeName,
-      isEnabled: languageTable.isEnabled,
-      sortOrder: languageTable.sortOrder,
-    })
-    .from(languageTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await languageRepository.findPageAll(params);
 }
+
 const listAllApi = {
   req: listAllReq,
   res: listAllRes,
@@ -131,6 +91,7 @@ const listReq = {
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const listRes = {
   ...listResponseWrapper<RequiredKeys<LanguagePOLike>[]>(
     {
@@ -139,6 +100,7 @@ const listRes = {
     [...LanguageListKeys]
   ),
 } as const satisfies JSONSchema;
+
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
@@ -148,42 +110,28 @@ async function onList(
     pageNo = 1,
     pageSize = 10,
   } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = languageTable[orderBy] || languageTable.sortOrder;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(languageTable.id).as("total") })
-    .from(languageTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
+  const { total, list } = await languageRepository.findPage({
+    pageNo,
+    pageSize: finalPageSize,
+    orderBy,
+    descend,
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+  });
 
-  const rows = await db
-    .select()
-    .from(languageTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
-  const totalPage = Math.ceil(total / finalPageSize);
+  const totalPage = finalPageSize === 0 ? 0 : Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
+
 const listApi = {
   req: listReq,
   res: listRes,
@@ -207,9 +155,11 @@ const addReq = {
   ] as const satisfies RequiredKeys<LanguageAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
+
 async function onAdd(
   params: FromSchema<typeof addReq>,
   userObj: Pick<UserObj, "userId">
@@ -220,12 +170,9 @@ async function onAdd(
     ...params,
     creatorId,
   };
-  const result = await db
-    .insert(languageTable)
-    .values(addData)
-    .returning({ id: languageTable.id });
-  return result[0]?.id ?? null;
+  return await languageRepository.onInsert(addData);
 }
+
 const addApi = {
   req: addReq,
   res: addRes,
@@ -249,9 +196,11 @@ const updateReq = {
   ] as const satisfies RequiredKeys<LanguageUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
+
 async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
@@ -263,18 +212,14 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
+    updateTimeUtc: Date.now(),
   };
 
-  const res = await db
-    .update(languageTable)
-    .set(updateData)
-    .where(eq(languageTable.id, id))
-    .returning({ id: languageTable.id });
-  const row = res[0];
+  const row = await languageRepository.onUpdate(id, updateData);
   preventEmpty(row);
   return row.id;
 }
+
 const updateApi = {
   req: updateReq,
   res: updateRes,
@@ -298,21 +243,20 @@ const deleteReq = {
   ] as const satisfies RequiredKeys<LanguageDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
+
 async function onDelete(
   params: FromSchema<typeof deleteReq>
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-  const result = await db
-    .delete(languageTable)
-    .where(eq(languageTable.id, id))
-    .returning({ id: languageTable.id });
-  const row = result[0];
+  const row = await languageRepository.onDelete(id);
   preventEmpty(row);
   return row.id;
 }
+
 const deleteApi = {
   req: deleteReq,
   res: deleteRes,
@@ -336,6 +280,7 @@ const getReq = {
   ] as const satisfies RequiredKeys<LanguageGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const getRes = {
   type: "object",
   properties: {
@@ -346,19 +291,16 @@ const getRes = {
   ] as const satisfies RequiredKeys<LanguageVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes>> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(languageTable)
-    .where(eq(languageTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await languageRepository.findById(id);
   preventEmpty(row);
   return row;
 }
+
 const getApi = {
   req: getReq,
   res: getRes,
@@ -373,32 +315,19 @@ const getApi = {
 } satisfies API;
 
 async function verifyLangCode(langCode: string): Promise<void> {
-  const record = await db
-    .select({ id: languageTable.id })
-    .from(languageTable)
-    .where(
-      and(
-        eq(languageTable.langCode, langCode),
-        eq(languageTable.isEnabled, true)
-      )
-    )
-    .limit(1);
-  const row = record[0];
+  const row = await languageRepository.findByLangCode({
+    langCode,
+    isEnabled: true,
+  });
   preventEmpty(row);
 }
 
 async function verifyLangCodeUnique(langCode: string, excludeId?: number) {
-  const record = await db
-    .select({ id: languageTable.id })
-    .from(languageTable)
-    .where(
-      and(
-        eq(languageTable.langCode, langCode),
-        excludeId !== undefined ? ne(languageTable.id, excludeId) : undefined
-      )
-    )
-    .limit(1);
-  return record.length === 0;
+  const row = await languageRepository.findByLangCode({
+    langCode,
+    excludeId,
+  });
+  return row === null;
 }
 
 export const utils = {

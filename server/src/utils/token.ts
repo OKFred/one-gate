@@ -1,9 +1,15 @@
 import crypto from "crypto";
 import { getEnv } from "@/utils/env";
 
-// 临时使用简单的token生成，生产环境建议使用JWT
-const JWT_SECRET = getEnv("JWT_SECRET");
-!JWT_SECRET && console.error("❌.MISSING ENV: JWT_SECRET");
+// 动态获取 JWT_SECRET，避免在 Cloudflare Workers 启动加载时 env 还未注入的问题
+function getJwtSecret(): string {
+  const secret = getEnv("JWT_SECRET");
+  if (!secret) {
+    console.error("❌.MISSING ENV: JWT_SECRET");
+    return "";
+  }
+  return secret;
+}
 
 export interface TokenPayload {
   userId: number;
@@ -23,7 +29,7 @@ export const tokenUtils = {
     // 简单的token实现，生产环境建议使用JWT
     const tokenData = JSON.stringify(tokenPayload);
     const signature = crypto
-      .createHmac("sha256", JWT_SECRET)
+      .createHmac("sha256", getJwtSecret())
       .update(tokenData)
       .digest("hex");
 
@@ -39,7 +45,7 @@ export const tokenUtils = {
 
       const tokenData = Buffer.from(encodedData, "base64").toString();
       const expectedSignature = crypto
-        .createHmac("sha256", JWT_SECRET)
+        .createHmac("sha256", getJwtSecret())
         .update(tokenData)
         .digest("hex");
 

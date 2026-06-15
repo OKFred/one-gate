@@ -19,6 +19,7 @@ export default defineConfig({
       "src/**/*.workers.spec.ts",
       "test/index.spec.ts"
     ],
+    setupFiles: ["./test/setup.workers.ts"],
     exclude: ["**/*.node.spec.ts"],
   },
   ssr: {

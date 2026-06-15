@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  translationTable,
   IndexVO,
   TranslationVO,
   TranslationListVO,
@@ -20,11 +18,10 @@ import {
   type TranslationDeleteVOLike,
   type TranslationGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, or, like, inArray, and, ne } from "drizzle-orm";
+import * as translationRepository from "./repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
+
 import {
   listAllReqBase,
   listReqBase,
@@ -39,45 +36,6 @@ import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
 
 import { kv } from "@/middleware/cache";
-
-// 构建查询条件(列表和全部通用)
-const buildWhereCondition = ({
-  keyword,
-  application,
-  business,
-  langCode,
-  isEnabled,
-}: Pick<
-  FromSchema<typeof listReq>,
-  "keyword" | "application" | "business" | "langCode" | "isEnabled"
->) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(translationTable.tKey, `%${keyword}%`),
-        like(translationTable.tValue, `%${keyword}%`)
-      )
-    );
-  }
-  if (hasValue(application)) {
-    conditions.push(eq(translationTable.application, application));
-  }
-  if (hasValue(business)) {
-    conditions.push(eq(translationTable.business, business));
-  }
-  if (hasValue(langCode)) {
-    conditions.push(eq(translationTable.langCode, langCode));
-  }
-  if (hasValue(isEnabled)) {
-    conditions.push(eq(translationTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
 
 const listAllReq = {
   type: "object",
@@ -94,6 +52,7 @@ const listAllReq = {
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const listAllRes = {
   type: "array",
   items: {
@@ -111,29 +70,13 @@ const listAllRes = {
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
+
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = translationTable[orderBy] || translationTable.id;
-  const maxLimit = 100_000; // 设置最大返回数量限制，防止数据过大
-  // 查询所有匹配的数据
-  const rows = await db
-    .select({
-      id: translationTable.id,
-      application: translationTable.application,
-      business: translationTable.business,
-      langCode: translationTable.langCode,
-      tKey: translationTable.tKey,
-      tValue: translationTable.tValue,
-      isEnabled: translationTable.isEnabled,
-    })
-    .from(translationTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await translationRepository.findPageAll(params);
 }
+
 const listAllApi = {
   req: listAllReq,
   res: listAllRes,
@@ -162,6 +105,7 @@ const listReq = {
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const listRes = {
   ...listResponseWrapper<RequiredKeys<TranslationPOLike>[]>(
     {
@@ -170,47 +114,36 @@ const listRes = {
     [...TranslationListKeys]
   ),
 } as const satisfies JSONSchema;
+
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = translationTable[orderBy] || translationTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(translationTable.id).as("total") })
-    .from(translationTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(translationTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
-  const totalPage = Math.ceil(total / finalPageSize);
+  const { total, list } = await translationRepository.findPage({
+    pageNo,
+    pageSize: finalPageSize,
+    orderBy,
+    descend,
+    keyword: params.keyword,
+    application: params.application,
+    business: params.business,
+    langCode: params.langCode,
+    isEnabled: params.isEnabled,
+  });
+
+  const totalPage = finalPageSize === 0 ? 0 : Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
+
 const listApi = {
   req: listReq,
   res: listRes,
@@ -234,9 +167,11 @@ const addReq = {
   ] as const satisfies RequiredKeys<TranslationAddVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const addRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
+
 async function onAdd(
   params: FromSchema<typeof addReq>,
   userObj: Pick<UserObj, "userId">
@@ -247,18 +182,16 @@ async function onAdd(
     ...params,
     creatorId,
   };
-  const result = await db
-    .insert(translationTable)
-    .values(addData)
-    .returning({ id: translationTable.id });
+  const transId = await translationRepository.onInsert(addData);
 
   // 如果是后端应用，同步更新 KV 缓存
   if (params.application === "backend") {
     await cacheSync(params, "add");
   }
 
-  return result[0]?.id;
+  return transId;
 }
+
 const addApi = {
   req: addReq,
   res: addRes,
@@ -282,9 +215,11 @@ const updateReq = {
   ] as const satisfies RequiredKeys<TranslationUpdateVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const updateRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
+
 async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
@@ -296,15 +231,11 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
+    updateTimeUtc: Date.now(),
   };
 
-  const res = await db
-    .update(translationTable)
-    .set(updateData)
-    .where(eq(translationTable.id, id))
-    .returning({ id: translationTable.id });
-  preventEmpty(res[0]);
+  const row = await translationRepository.onUpdate(id, updateData);
+  preventEmpty(row);
 
   // 如果涉及后端文案，同步更新 KV 缓存
   if (
@@ -318,10 +249,11 @@ async function onUpdate(
       await cacheSync(current, "delete");
     }
   }
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const updateRow = row;
+  preventEmpty(updateRow);
+  return updateRow.id;
 }
+
 const updateApi = {
   req: updateReq,
   res: updateRes,
@@ -345,6 +277,7 @@ const deleteReq = {
   ] as const satisfies RequiredKeys<TranslationDeleteVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const deleteRes = {
   ...IndexVO["id"],
 } as const satisfies JSONSchema;
@@ -355,11 +288,7 @@ async function onDelete(
   const { id } = params;
   // 先取出记录（若不存在则 preventEmpty 抛出），用于删除后的缓存同步
   const record = await onGet({ id });
-  const result = await db
-    .delete(translationTable)
-    .where(eq(translationTable.id, id))
-    .returning({ id: translationTable.id });
-  const row = result[0];
+  const row = await translationRepository.onDelete(id);
   preventEmpty(row);
   // 获取删除前的信息以更新 KV
   if (record.application === "backend") {
@@ -368,6 +297,7 @@ async function onDelete(
 
   return row.id;
 }
+
 const deleteApi = {
   req: deleteReq,
   res: deleteRes,
@@ -391,6 +321,7 @@ const getReq = {
   ] as const satisfies RequiredKeys<TranslationGetVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 const getRes = {
   type: "object",
   properties: {
@@ -401,19 +332,16 @@ const getRes = {
   ] as const satisfies RequiredKeys<TranslationVOLike>[],
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes>> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(translationTable)
-    .where(eq(translationTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await translationRepository.findById(id);
   preventEmpty(row);
   return row;
 }
+
 const getApi = {
   req: getReq,
   res: getRes,
@@ -430,12 +358,7 @@ const getApi = {
 async function getTranslationsByIds(
   ids: number[]
 ): Promise<{ value: number; label: string }[]> {
-  if (ids.length === 0) return [];
-  const rows = await db
-    .select({ value: translationTable.id, label: translationTable.tKey })
-    .from(translationTable)
-    .where(inArray(translationTable.id, ids));
-  return rows;
+  return await translationRepository.findTranslationsByIds(ids);
 }
 
 // 检查重复文案
@@ -483,26 +406,10 @@ async function onCheckDuplicate(
   params: FromSchema<typeof checkDuplicateReq>
 ): Promise<FromSchema<typeof checkDuplicateRes>> {
   const { tValue, valueHash, excludeId } = params;
-
-  const whereCondition = excludeId
-    ? and(
-        eq(translationTable.valueHash, valueHash),
-        ne(translationTable.id, excludeId)
-      )
-    : eq(translationTable.valueHash, valueHash);
-
-  const rows = await db
-    .select({
-      id: translationTable.id,
-      business: translationTable.business,
-      application: translationTable.application,
-      langCode: translationTable.langCode,
-      tKey: translationTable.tKey,
-      tValue: translationTable.tValue,
-      isEnabled: translationTable.isEnabled,
-    })
-    .from(translationTable)
-    .where(whereCondition);
+  const rows = await translationRepository.findDuplicates({
+    valueHash,
+    excludeId: excludeId || undefined,
+  });
   const filteredRows = rows.filter((row) => row.tValue === tValue);
   return {
     hasDuplicate: filteredRows.length > 0,
@@ -551,18 +458,12 @@ async function verifyTKeyUnique(
   obj: { tKey?: string; langCode?: string },
   excludeId?: number
 ) {
-  const existing = await db
-    .select({ id: translationTable.id })
-    .from(translationTable)
-    .where(
-      and(
-        eq(translationTable.tKey, obj.tKey!),
-        eq(translationTable.langCode, obj.langCode!),
-        excludeId !== undefined ? ne(translationTable.id, excludeId) : undefined
-      )
-    )
-    .limit(1);
-  return existing.length === 0;
+  const row = await translationRepository.findByKeyAndLang({
+    tKey: obj.tKey!,
+    langCode: obj.langCode!,
+    excludeId,
+  });
+  return row === null;
 }
 
 export const utils = {
