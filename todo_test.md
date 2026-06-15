@@ -25,7 +25,7 @@
 
 ---
 
-### 2. 待建设测试用例的模块清单 (🔴 待启动)
+### 2. 待建设测试用例的模块清单
 
 #### AI 模块 (`src/api/ai/`)
 * [x] **ai.integration.spec.ts**：建立同构全链路测试，覆盖：
@@ -38,11 +38,13 @@
   * 建立考勤考表、上下班打卡记录和迟到缺勤规则校验的集成测试。
 
 #### Maintenance 模块 (`src/api/maintenance/`)
-* [ ] **api-task.integration.spec.ts**（需异构拆分或条件判断）：
+* [x] **api-task.integration.spec.ts** ── 🟢 已完成
   * 模拟并发抢占定时任务锁的悲观/乐观并发竞争测试。
   * 定时任务自动调度与状态转换测试。
-* [ ] **audit_login.integration.spec.ts**：测试登录事件审计日志的安全拦截和保存。
-* [ ] **cache.integration.spec.ts**：测试 KV 缓存以及内存缓存的清除与同步。
+* [x] **audit_login.integration.spec.ts** ── 🟢 已完成
+  * 测试登录事件审计日志的安全拦截和保存（含 Log Rotation 限额测试）。
+* [x] **cache.integration.spec.ts** ── 🟢 已完成
+  * 测试 KV 缓存的 Put / Get / Delete / Clear / ListKeys 操作。
 
 #### OSS 模块 (`src/api/oss/`)
 * [ ] **file.integration.workers.spec.ts** / **file.integration.node.spec.ts**：
@@ -54,11 +56,13 @@
   * 因为控制 Docker Swarm 节点的 Docker 套接字 API（通常使用 Unix Socket / `got` / `dockerode`）主要在 Node.js 环境工作，需在此编写 Docker 守护进程 API 的 Mock 拦截，测试服务容器与节点的发现和启停状态更新。
 
 #### System 模块 (`src/api/system/`)
-* [ ] **auth.integration.spec.ts**：
+* [x] **auth.integration.spec.ts** ── 🟢 已完成
   * 用户登录凭证生成、JWT 签名校验、权限白名单及 RBAC 访问权限拦截的全链路测试。
-* [ ] **user & role & permission.integration.spec.ts**：
+* [x] **user_role_permission.integration.spec.ts** ── 🟢 已完成
   * 用户、角色、系统细粒度权限的多对多关联关系测试。
-  * 系统初始化时预设种子数据（Seeds）校验。
-* [ ] **schema_form & schema_form_data.integration.spec.ts**：
-  * 动态表单的 JSON Schema 校验。
-  * 实例表单提交与动态字段检索集成测试。
+  * 禁用角色后权限自动过滤的验证。
+  * Department 增删改查。
+* [x] **schema_form.integration.spec.ts** ── 🟢 已完成
+  * 动态表单的 JSON Schema 校验（含非法字段、类型错误、缺失必填字段）。
+  * 实例表单提交 Upsert 逻辑与动态字段检索集成测试。
+  * 禁用或不存在的表单提交被正确拒绝。
