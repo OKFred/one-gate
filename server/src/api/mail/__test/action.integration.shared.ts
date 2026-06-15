@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll, afterEach } from "vitest";
 import db from "@/db/index";
 import { setupTestDb, clearTestData } from "@/db/testHelper";
-import mailActionService from "./action/service";
-import * as mailAccountRepository from "./account/repository";
-import * as mailTemplateRepository from "./template/repository";
-import * as mailLogRepository from "./log/repository";
+import mailActionService from "../action/service";
+import * as mailAccountRepository from "../account/repository";
+import * as mailTemplateRepository from "../template/repository";
+import * as mailLogRepository from "../log/repository";
 
 // 静态导入 SQL 文件文本（Vite 支持 ?raw 后缀直接读取文本）
 import accountSql from "@/db/sql/mail_account.sql?raw";

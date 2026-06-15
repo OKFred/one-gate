@@ -1,27 +1,7 @@
 /// <reference types="@cloudflare/vitest-pool-workers/types" />
 import { describe, vi } from "vitest";
 import { env } from "cloudflare:workers";
-import { setD1Binding } from "@/db/index";
 import { runMailActionIntegrationTests } from "./action.integration.shared";
-
-vi.mock("pino", () => {
-  const noop = () => {};
-  const logger = {
-    info: noop,
-    error: noop,
-    warn: noop,
-    debug: noop,
-    child: () => logger,
-  };
-  const mockPino = () => logger;
-  (mockPino as any).stdTimeFunctions = {
-    epochTime: () => 0,
-  };
-  return {
-    default: mockPino,
-    pino: mockPino,
-  };
-});
 
 vi.mock("nodemailer", () => {
   return {
@@ -67,9 +47,5 @@ describe("Mail Action Workers 全链路集成测试", () => {
   runMailActionIntegrationTests({
     runtime: "Workers",
     getEnv: () => env,
-    beforeAllHook: () => {
-      // 绑定 D1 数据库
-      setD1Binding(env.DB);
-    },
   });
 });
