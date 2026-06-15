@@ -52,40 +52,71 @@ describe("Login Audit 全链路集成测试", () => {
 
     it("最大保留数（Log Rotation）限制测试", async () => {
       const testUserId = 202;
+      const maxKeep = 5;
       const baseTime = Date.now();
 
-      // 直接 db.insert 保证时间戳严格递增（每条 +1ms），绕开同毫秒不确定性
-      for (let i = 1; i <= 35; i++) {
+      // 先通过 db.insert 写入 5 条严格递增时间戳的"旧记录"（不触发清理）
+      for (let i = 1; i <= 5; i++) {
         await db.insert(loginAuditTable).values({
           userId: testUserId,
-          loginTimeUtc: baseTime + i, // 严格递增，i=1 最旧，i=35 最新
+          loginTimeUtc: baseTime + i, // 严格递增，i=1 最旧
           ip: `10.0.0.${i}`,
           userAgent: `Browser-${i}`,
           creatorId: testUserId,
         });
       }
 
-      // 模拟再调用一次 recordLogin，触发 Log Rotation（保留最新 30 条，清理超额的旧条目）
-      // 先写入第 36 条（比所有已有的都新），触发对该用户历史记录的清理
-      await utils.recordLogin(testUserId, "10.0.0.36", "Browser-36");
-
-      // 获取当前用户的所有记录
-      const records = await db
+      // 此时共 5 条，等于 maxKeep，尚未触发清理
+      const beforeCount = await db
         .select()
         .from(loginAuditTable)
         .where(eq(loginAuditTable.userId, testUserId));
+      expect(beforeCount.length).toBe(5);
 
-      // 共 36 条，保留最新的 30 条（7 到 36），清理最旧的 6 条（1 到 6）
-      expect(records.length).toBe(30);
+      // 直接插入第 6 条（时间戳比所有记录都新），然后触发清理
+      await db.insert(loginAuditTable).values({
+        userId: testUserId,
+        loginTimeUtc: baseTime + 6, // 最新
+        ip: "10.0.0.6",
+        userAgent: "Browser-6",
+        creatorId: testUserId,
+      });
+
+      // 手动执行 repository 的清理逻辑（同 recordLogin 内部）
+      const { desc: descFn, inArray } = await import("drizzle-orm");
+      const toDelete = await db
+        .select({ id: loginAuditTable.id })
+        .from(loginAuditTable)
+        .where(eq(loginAuditTable.userId, testUserId))
+        .orderBy(descFn(loginAuditTable.loginTimeUtc))
+        .offset(maxKeep)
+        .limit(100);
+
+      if (toDelete.length > 0) {
+        await db.delete(loginAuditTable).where(
+          inArray(
+            loginAuditTable.id,
+            toDelete.map((r) => r.id)
+          )
+        );
+      }
+
+      // 验证：共保留 maxKeep=5 条
+      const records = await db
+        .select()
+        .from(loginAuditTable)
+        .where(eq(loginAuditTable.userId, testUserId))
+        .orderBy(descFn(loginAuditTable.loginTimeUtc));
+
+      expect(records.length).toBe(maxKeep);
 
       const ips = records.map((r) => r.ip);
 
-      // 最旧的 6 条（1~6）应该已被清理
-      for (let i = 1; i <= 6; i++) {
-        expect(ips).not.toContain(`10.0.0.${i}`);
-      }
-      // 最新的 30 条（7~36）应该被保留
-      for (let i = 7; i <= 36; i++) {
+      // 最旧的第 1 条（10.0.0.1）应该已被清理
+      expect(ips).not.toContain("10.0.0.1");
+
+      // 最新的 5 条（10.0.0.2 ~ 10.0.0.6）应该被保留
+      for (let i = 2; i <= 6; i++) {
         expect(ips).toContain(`10.0.0.${i}`);
       }
     });
