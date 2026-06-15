@@ -52,12 +52,22 @@ describe("Login Audit 全链路集成测试", () => {
 
     it("最大保留数（Log Rotation）限制测试", async () => {
       const testUserId = 202;
+      const baseTime = Date.now();
 
-      // 循环写入 35 条记录，验证只保留了最近的 30 条记录 (默认 maxKeep = 30)
+      // 直接 db.insert 保证时间戳严格递增（每条 +1ms），绕开同毫秒不确定性
       for (let i = 1; i <= 35; i++) {
-        // 加上极微的时间间隔或不同 IP 区分
-        await utils.recordLogin(testUserId, `10.0.0.${i}`, `Browser-${i}`);
+        await db.insert(loginAuditTable).values({
+          userId: testUserId,
+          loginTimeUtc: baseTime + i, // 严格递增，i=1 最旧，i=35 最新
+          ip: `10.0.0.${i}`,
+          userAgent: `Browser-${i}`,
+          creatorId: testUserId,
+        });
       }
+
+      // 模拟再调用一次 recordLogin，触发 Log Rotation（保留最新 30 条，清理超额的旧条目）
+      // 先写入第 36 条（比所有已有的都新），触发对该用户历史记录的清理
+      await utils.recordLogin(testUserId, "10.0.0.36", "Browser-36");
 
       // 获取当前用户的所有记录
       const records = await db
@@ -65,14 +75,17 @@ describe("Login Audit 全链路集成测试", () => {
         .from(loginAuditTable)
         .where(eq(loginAuditTable.userId, testUserId));
 
+      // 共 36 条，保留最新的 30 条（7 到 36），清理最旧的 6 条（1 到 6）
       expect(records.length).toBe(30);
 
-      // 验证最旧的 5 条记录 (1 到 5) 已被清理，保留了最新的 6 到 35
       const ips = records.map((r) => r.ip);
-      for (let i = 1; i <= 5; i++) {
+
+      // 最旧的 6 条（1~6）应该已被清理
+      for (let i = 1; i <= 6; i++) {
         expect(ips).not.toContain(`10.0.0.${i}`);
       }
-      for (let i = 6; i <= 35; i++) {
+      // 最新的 30 条（7~36）应该被保留
+      for (let i = 7; i <= 36; i++) {
         expect(ips).toContain(`10.0.0.${i}`);
       }
     });
