@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  attendanceTable,
   AttendanceVO,
   AttendanceListKeys,
   AttendanceGetKeys,
@@ -10,12 +8,8 @@ import {
   type AttendancePOLike,
   type AttendanceVOLike,
 } from "./model";
-import { userTable } from "@/api/system/user/model";
-import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -30,38 +24,7 @@ import type { API } from "@/middleware/encapsulation";
 import type { UserObj } from "@/api/system/user/service";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import { preventTimeTravel } from "./prevention";
-
-// 构建查询条件
-const buildWhereCondition = ({
-  keyword,
-  status,
-  employeeId,
-  date,
-}: {
-  keyword?: string;
-  status?: number;
-  employeeId?: number;
-  date?: string;
-}) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(attendanceTable.remark, `%${keyword}%`)));
-  }
-  if (status !== undefined) {
-    conditions.push(eq(attendanceTable.status, status));
-  }
-  if (employeeId !== undefined) {
-    conditions.push(eq(attendanceTable.employeeId, employeeId));
-  }
-  if (hasValue(date)) {
-    conditions.push(eq(attendanceTable.date, date));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as attendanceRepository from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -92,14 +55,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = attendanceTable[orderBy] || attendanceTable.id;
-  const rows = await db
-    .select()
-    .from(attendanceTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(10000);
+  const rows = await attendanceRepository.findPageAll(params);
 
   return rows.map((row) => ({
     ...row,
@@ -146,55 +102,22 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = attendanceTable[orderBy] || attendanceTable.id;
+  const { pageNo = 1, pageSize = 10 } = params;
+  const maxPageSize = 1000;
+  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(attendanceTable.id).as("total") })
-    .from(attendanceTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-
-  if (total === 0) {
-    return {
-      total: 0,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize,
-      list: [],
-    };
-  }
-
-  const rows = await db
-    .select({
-      attendance: attendanceTable,
-      employeeName: userTable.username,
-    })
-    .from(attendanceTable)
-    .leftJoin(userTable, eq(attendanceTable.employeeId, userTable.id))
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(pageSize)
-    .offset(offset);
-
-  const list = rows.map(({ attendance, employeeName }) => {
-    const { employeeId, ...rest } = attendance;
-    return {
-      ...rest,
-      employeeObj: {
-        value: employeeId,
-        label: employeeName || `Unknown(${employeeId})`,
-      },
-    };
+  const { total, list } = await attendanceRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
   });
 
   return {
     total,
-    totalPage: Math.ceil(total / pageSize),
+    totalPage: Math.ceil(total / finalPageSize),
     currentPage: pageNo,
-    pageSize,
-    list,
+    pageSize: finalPageSize,
+    list: list as any,
   };
 }
 
@@ -235,20 +158,17 @@ async function onAdd(
   // 校验时间冲突
   preventTimeTravel({ checkInTime, checkOutTime });
 
-  const res = await db
-    .insert(attendanceTable)
-    .values({
-      employeeId,
-      date,
-      checkInTime,
-      checkOutTime,
-      status,
-      remark,
-      creatorId,
-    })
-    .returning({ id: attendanceTable.id });
+  const insertedId = await attendanceRepository.onInsert({
+    employeeId,
+    date,
+    checkInTime,
+    checkOutTime,
+    status,
+    remark,
+    creatorId,
+  });
 
-  return res[0]?.id || null;
+  return insertedId || null;
 }
 
 const addApi = {
@@ -281,21 +201,16 @@ async function onUpdate(params: any, userObj: UserObj): Promise<number | null> {
   // 校验时间冲突
   preventTimeTravel({ checkInTime, checkOutTime });
 
-  const res = await db
-    .update(attendanceTable)
-    .set({
-      employeeId,
-      date,
-      checkInTime,
-      checkOutTime,
-      status,
-      remark,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(attendanceTable.id, id))
-    .returning({ id: attendanceTable.id });
-  const [row] = res;
+  const row = await attendanceRepository.onUpdate(id, {
+    employeeId,
+    date,
+    checkInTime,
+    checkOutTime,
+    status,
+    remark,
+    updaterId,
+    updateTimeUtc: Date.now(),
+  });
   preventEmpty(row);
   return row.id;
 }
@@ -327,12 +242,7 @@ async function onDelete(
   userObj: UserObj
 ): Promise<number | null> {
   const { id } = params;
-  const res = await db
-    .delete(attendanceTable)
-    .where(eq(attendanceTable.id, id))
-    .returning({ id: attendanceTable.id });
-
-  const [row] = res;
+  const row = await attendanceRepository.onDelete(id);
   preventEmpty(row);
   return row.id;
 }
@@ -373,29 +283,9 @@ async function onGet(
   userObj: UserObj
 ): Promise<any> {
   const { id } = params;
-  const rows = await db
-    .select({
-      attendance: attendanceTable,
-      employeeName: userTable.username,
-    })
-    .from(attendanceTable)
-    .leftJoin(userTable, eq(attendanceTable.employeeId, userTable.id))
-    .where(eq(attendanceTable.id, id))
-    .limit(1);
-
-  const [row] = rows;
+  const row = await attendanceRepository.findById(id);
   preventEmpty(row);
-
-  const { attendance, employeeName } = row;
-  const { employeeId, ...rest } = attendance;
-
-  return {
-    ...rest,
-    employeeObj: {
-      value: employeeId,
-      label: employeeName || `Unknown(${employeeId})`,
-    },
-  };
+  return row;
 }
 
 const getApi = {

@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  userTable,
   IndexVO,
   UserUniqueVO,
   UserBaseVO,
@@ -27,13 +25,10 @@ import {
 import { utils as departmentUtils } from "@/api/system/department/service";
 import { utils as roleUtils } from "@/api/system/role/service";
 import regionService, { utils as regionUtils } from "@/api/i18n/region/service";
-import { utils as languageUtils } from "@/api/i18n/language/service";
 import type { PermissionInfo } from "@/api/system/permission/service";
-import { asc, count, desc, eq, or, like, and, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { hashPassword, verifyPassword } from "@/utils/crypto";
 import type { RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   preventSuperAdminDelete,
   preventSuperAdminDisable,
@@ -43,7 +38,6 @@ import {
   preventMissingRegion,
   preventInvalidLangCode,
 } from "./prevention";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -57,26 +51,7 @@ import {
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import { kv } from "@/middleware/cache";
-
-// 构建查询条件(列表和全部通用)
-export const buildWhereCondition = (condition?: {
-  keyword?: string;
-  isEnabled?: boolean;
-}) => {
-  const { keyword, isEnabled } = condition || {};
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(userTable.username, `%${keyword}%`)));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(userTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { userRepository } from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -104,25 +79,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = userTable[orderBy] || userTable.id;
-  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
-  // 查询所有匹配的数据
-  const rows = await db
-    .select({
-      id: userTable.id,
-      username: userTable.username,
-      langCode: userTable.langCode,
-      remark: userTable.remark,
-      departmentId: userTable.departmentId,
-      roleIdArr: userTable.roleIdArr,
-      isEnabled: userTable.isEnabled,
-    })
-    .from(userTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await userRepository.findAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -159,35 +116,18 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = userTable[orderBy] || userTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(userTable.id).as("total") })
-    .from(userTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(userTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
-  const rowsFiltered = rows.map((row) => {
+  const { total, list } = await userRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
+
+  const rowsFiltered = list.map((row) => {
     const { password, ...rest } = row; // 注意：不返回密码字段
     return rest;
   });
@@ -252,23 +192,18 @@ async function onAdd(
   await preventInvalidLangCode(langCode);
 
   // 插入用户数据
-  const res = await db
-    .insert(userTable)
-    .values({
-      username,
-      password,
-      langCode,
-      remark,
-      departmentId,
-      regionId,
-      roleIdArr,
-      isEnabled,
-      creatorId,
-    })
-    .returning({ id: userTable.id });
-  const userRow = res[0];
-  preventEmpty(userRow);
-  return userRow.id;
+  const insertedId = await userRepository.onInsert({
+    username,
+    password,
+    langCode,
+    remark,
+    departmentId,
+    regionId,
+    roleIdArr,
+    isEnabled,
+    creatorId,
+  });
+  return insertedId;
 }
 const addApi = {
   req: addReq,
@@ -316,11 +251,9 @@ async function onUpdate(
   if (regionObj !== undefined)
     await preventMissingRegion(regionObj?.value ?? null);
 
-  let updateData = {
+  const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
-    password: undefined,
     departmentId: departmentObj?.value,
     regionId: regionObj?.value,
     roleIdArr: roleArr?.map((o) => o.value),
@@ -328,15 +261,9 @@ async function onUpdate(
     langCode,
   };
 
-  const res = await db
-    .update(userTable)
-    .set(updateData)
-    .where(eq(userTable.id, id))
-    .returning({ id: userTable.id });
-  const row = res[0];
-  preventEmpty(row);
+  const updatedId = await userRepository.onUpdate(id, updateData);
   kv.delete(`system.auth.bundle:${id}`).catch(() => {});
-  return row.id;
+  return updatedId;
 }
 const updateApi = {
   req: updateReq,
@@ -372,14 +299,9 @@ async function onDelete(
 
   // 前置校验
   preventSuperAdminDelete(thisUser?.roleArr.map((r) => r.value) ?? []);
-  const res = await db
-    .delete(userTable)
-    .where(eq(userTable.id, id))
-    .returning({ id: userTable.id });
-  const deleteRow = res[0];
-  preventEmpty(deleteRow);
+  const deletedId = await userRepository.onDelete(id);
   kv.delete(`system.auth.bundle:${id}`).catch(() => {});
-  return deleteRow.id;
+  return deletedId;
 }
 const deleteApi = {
   req: deleteReq,
@@ -406,7 +328,7 @@ export type UserObj = FromSchema<typeof getRes> & {
   customDeptIds: number[];
   /** 内部状态标识：权限和数据范围是否已加载 */
   _isLoaded?: boolean;
-  /** 确保权限和数据范围已加载的异步方法 */
+  /** 确保权限和数据范围已加载 of 异步方法 */
   ensureLoaded: () => Promise<void>;
 };
 const getReq = {
@@ -429,12 +351,7 @@ async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await userRepository.findById(id);
   preventEmpty(row);
   const { password, departmentId, regionId, roleIdArr, ...rest } = row;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
@@ -496,27 +413,15 @@ async function updatePassword(
   userObj: UserObj
 ): Promise<number> {
   const { userId: updaterId } = userObj;
-  const res = await db
-    .update(userTable)
-    .set({
-      password: newHashedPassword,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(userTable.id, id))
-    .returning({ id: userTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const updatedId = await userRepository.onUpdate(id, {
+    password: newHashedPassword,
+    updaterId,
+  });
+  return updatedId;
 }
 
 async function getUserObjByName(username: string): Promise<UserVOLike | null> {
-  const userArr = await db
-    .select()
-    .from(userTable)
-    .where(eq(userTable.username, username))
-    .limit(1);
-  const userObj = userArr[0];
+  const userObj = await userRepository.findByUsername(username);
   preventEmpty(userObj);
   const { departmentId, regionId, roleIdArr, ...rest } = userObj;
   const { departmentObj, regionObj, roleArr } = await getDTOs({
@@ -580,17 +485,7 @@ async function countDepartmentUsers(
   departmentIds: number[],
   isEnabled: boolean
 ): Promise<number> {
-  if (!departmentIds || departmentIds.length === 0) return 0;
-  const result = await db
-    .select({ count: count(userTable.id) })
-    .from(userTable)
-    .where(
-      and(
-        inArray(userTable.departmentId, departmentIds),
-        eq(userTable.isEnabled, isEnabled)
-      )
-    );
-  return result[0]?.count || 0;
+  return await userRepository.countDepartmentUsers(departmentIds, isEnabled);
 }
 
 /** 更新用户语言 */
@@ -601,18 +496,11 @@ export async function updateLangCode(
   },
   userObj: UserObj
 ): Promise<number> {
-  const res = await db
-    .update(userTable)
-    .set({
-      langCode: updateData.langCode,
-      updaterId: userObj.userId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(userTable.id, updateData.id))
-    .returning({ id: userTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const updatedId = await userRepository.onUpdate(updateData.id, {
+    langCode: updateData.langCode,
+    updaterId: userObj.userId,
+  });
+  return updatedId;
 }
 
 /** 更新用户信息 */
@@ -625,11 +513,8 @@ async function updateUserInfo(
   userObj: UserObj
 ): Promise<number> {
   const { id, regionObj, remark } = updateData;
-  const setData = {
+  const setData: Partial<UserPOLike> = {
     updaterId: userObj.userId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
-    regionId: undefined,
-    remark: undefined,
   };
   if (regionObj !== undefined) {
     const regionId = regionObj ? regionObj.value : null;
@@ -639,27 +524,16 @@ async function updateUserInfo(
   if (remark !== undefined) {
     setData.remark = remark;
   }
-  const res = await db
-    .update(userTable)
-    .set(setData)
-    .where(eq(userTable.id, id))
-    .returning({ id: userTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const updatedId = await userRepository.onUpdate(id, setData);
+  return updatedId;
 }
 
 async function getUserNameById(
   userId: UserVOLike["id"]
 ): Promise<UserVOLike["username"]> {
-  const userRows = await db
-    .select({ username: userTable.username })
-    .from(userTable)
-    .where(eq(userTable.id, userId))
-    .limit(1);
-  const userObj = userRows[0];
-  preventEmpty(userObj);
-  return userObj.username;
+  const username = await userRepository.getUserNameById(userId);
+  preventEmpty(username);
+  return username;
 }
 
 export const utils = {

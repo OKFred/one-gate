@@ -1,7 +1,5 @@
-import db from "@/db/index";
 import { utils as userUtils } from "@/api/system/user/service";
 import {
-  schemaFormTable,
   IndexVO,
   SchemaFormVO,
   SchemaFormListVO,
@@ -20,12 +18,9 @@ import {
   type SchemaFormUpdateVOLike,
   type SchemaFormDeleteVOLike,
   type SchemaFormGetVOLike,
-  SchemaFormBaseVO,
 } from "./model";
-import { asc, count, desc, eq, or, and, like, inArray } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   listReqBase,
   listResponseWrapper,
@@ -37,38 +32,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import hasValue from "@/utils/hasValue";
-
-// 构建查询条件
-export const buildWhereCondition = (condition?: {
-  id?: number;
-  keyword?: string;
-  isEnabled?: boolean;
-}) => {
-  const { id, keyword, isEnabled } = condition || {};
-  const conditions = [];
-
-  if (hasValue(id)) {
-    conditions.push(eq(schemaFormTable.id, id!));
-  }
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(schemaFormTable.name, `%${keyword}%`),
-        like(schemaFormTable.code, `%${keyword}%`)
-      )
-    );
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(schemaFormTable.isEnabled, isEnabled));
-  }
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { schemaFormRepository } from "./repository";
 
 const listReq = {
   type: "object",
@@ -94,44 +58,24 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = schemaFormTable[orderBy] || schemaFormTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  const whereCondition = buildWhereCondition(params);
+  const { total, list } = await schemaFormRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(schemaFormTable.id).as("total") })
-    .from(schemaFormTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(schemaFormTable)
-    .where(whereCondition)
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 
@@ -175,13 +119,8 @@ async function onAdd(
     creatorId,
     creatorName,
   };
-  const res = await db
-    .insert(schemaFormTable)
-    .values(updateData)
-    .returning({ id: schemaFormTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const insertedId = await schemaFormRepository.onInsert(updateData);
+  return insertedId;
 }
 
 const addApi = {
@@ -220,12 +159,7 @@ async function onUpdate(
   const { id, ...rest } = params;
 
   // 获取当前记录
-  const current = await db
-    .select()
-    .from(schemaFormTable)
-    .where(eq(schemaFormTable.id, id))
-    .limit(1);
-  const currentForm = current[0];
+  const currentForm = await schemaFormRepository.findById(id);
   preventEmpty(currentForm);
   const updaterName = await userUtils.getUserNameById(updaterId);
 
@@ -233,18 +167,10 @@ async function onUpdate(
     ...rest,
     updaterId,
     updaterName,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  const res = await db
-    .update(schemaFormTable)
-    .set(updateData)
-    .where(eq(schemaFormTable.id, id))
-    .returning({ id: schemaFormTable.id });
-
-  const result = res[0];
-  preventEmpty(result);
-  return result?.id;
+  const updatedId = await schemaFormRepository.onUpdate(id, updateData);
+  return updatedId;
 }
 
 const updateApi = {
@@ -281,13 +207,8 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
-  const res = await db
-    .delete(schemaFormTable)
-    .where(eq(schemaFormTable.id, id))
-    .returning({ id: schemaFormTable.id });
-  const result = res[0];
-  preventEmpty(result);
-  return result?.id;
+  const deletedId = await schemaFormRepository.onDelete(id);
+  return deletedId;
 }
 
 const deleteApi = {
@@ -328,20 +249,14 @@ async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id, code } = params;
-
-  const conditions = [];
-  if (id) conditions.push(eq(schemaFormTable.id, id));
-  if (code) conditions.push(eq(schemaFormTable.code, code));
-
-  const rows = await db
-    .select()
-    .from(schemaFormTable)
-    .where(or(...conditions))
-    .limit(1);
-
-  const result = rows[0];
-  preventEmpty(result);
-  return result;
+  let row = null;
+  if (id) {
+    row = await schemaFormRepository.findById(id);
+  } else if (code) {
+    row = await schemaFormRepository.findByCode(code);
+  }
+  preventEmpty(row);
+  return row;
 }
 
 const getApi = {

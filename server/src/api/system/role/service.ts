@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  roleTable,
   IndexVO,
   RoleVO,
   RoleListVO,
@@ -23,17 +21,14 @@ import {
   RoleUniqueKeys,
   RoleUniqueVO,
 } from "./model";
-import { asc, count, desc, eq, or, like, inArray, and } from "drizzle-orm";
 import { DataScope, DataScopeValues } from "@/types/dataScope";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   preventSuperAdminDelete,
   preventSuperAdminUpdate,
   preventMissingRoles,
 } from "./prevention";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -46,26 +41,7 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件(列表和全部通用)
-export const buildWhereCondition = (condition?: {
-  keyword?: string;
-  isEnabled?: boolean;
-}) => {
-  const { keyword, isEnabled } = condition || {};
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(roleTable.name, `%${keyword}%`)));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(roleTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { roleRepository } from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -93,23 +69,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = roleTable[orderBy] || roleTable.id;
-  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
-  // 查询所有匹配的数据
-  const rows = await db
-    .select({
-      id: roleTable.id,
-      name: roleTable.name,
-      remark: roleTable.remark,
-      isEnabled: roleTable.isEnabled,
-      dataScope: roleTable.dataScope,
-    })
-    .from(roleTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await roleRepository.findAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -143,50 +103,28 @@ const listRes = {
   ),
 } as const satisfies JSONSchema;
 
-/**
- * 查询角色列表（纯业务逻辑）
- * @param params 查询参数
- * @returns 角色列表
- */
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = roleTable[orderBy] || roleTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(roleTable.id).as("total") })
-    .from(roleTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(roleTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await roleRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
+
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -230,15 +168,12 @@ async function onAdd(
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
 
-  const result = await db
-    .insert(roleTable)
-    .values({
-      ...obj,
-      creatorId,
-    })
-    .returning({ id: roleTable.id });
+  const insertedId = await roleRepository.onInsert({
+    ...obj,
+    creatorId,
+  });
 
-  return result[0]?.id;
+  return insertedId;
 }
 const addApi = {
   req: addReq,
@@ -289,17 +224,10 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  const res = await db
-    .update(roleTable)
-    .set(updateData)
-    .where(eq(roleTable.id, id))
-    .returning({ id: roleTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  const updatedId = await roleRepository.onUpdate(id, updateData);
+  return updatedId;
 }
 const updateApi = {
   req: updateReq,
@@ -335,13 +263,8 @@ async function onDelete(
 
   // 前置校验
   preventSuperAdminDelete(id);
-  const result = await db
-    .delete(roleTable)
-    .where(eq(roleTable.id, id))
-    .returning({ id: roleTable.id });
-  const row = result[0];
-  preventEmpty(row);
-  return row.id;
+  const deletedId = await roleRepository.onDelete(id);
+  return deletedId;
 }
 const deleteApi = {
   req: deleteReq,
@@ -376,12 +299,7 @@ async function onGet(
   obj: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = obj;
-  const rows = await db
-    .select()
-    .from(roleTable)
-    .where(eq(roleTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await roleRepository.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -401,12 +319,7 @@ const getApi = {
 async function getRolesByIds(
   ids: number[]
 ): Promise<{ value: number; label: string }[]> {
-  if (ids.length === 0) return [];
-  const rows = await db
-    .select({ value: roleTable.id, label: roleTable.name })
-    .from(roleTable)
-    .where(inArray(roleTable.id, ids));
-  return rows;
+  return await roleRepository.getRolesByIds(ids);
 }
 
 async function verifyRoles(roleIdArr: number[]) {
@@ -418,18 +331,11 @@ async function updatePermissionCount(
   roleId: number,
   newCount: number
 ): Promise<void> {
-  await db
-    .update(roleTable)
-    .set({ permissionCount: newCount })
-    .where(eq(roleTable.id, roleId));
+  await roleRepository.updatePermissionCount(roleId, newCount);
 }
+
 async function verifyRoleExists(roleId: number) {
-  const rows = await db
-    .select({ id: roleTable.id })
-    .from(roleTable)
-    .where(eq(roleTable.id, roleId))
-    .limit(1);
-  return rows.length > 0;
+  return await roleRepository.verifyRoleExists(roleId);
 }
 
 export const utils = {

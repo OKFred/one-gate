@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  menuTable,
   IndexVO,
   MenuVO,
   MenuListVO,
@@ -21,10 +19,8 @@ import {
   type MenuGetVOLike,
   MenuBaseVO,
 } from "./model";
-import { asc, count, desc, eq, or, and, like } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   listAllReqBase,
   listReqBase,
@@ -44,42 +40,8 @@ import {
   preventDisableWithEnabledChildren,
 } from "./prevention";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import hasValue from "@/utils/hasValue";
-import translationService from "@/api/i18n/translation/service";
-import { utils as permissionUtils } from "@/api/system/permission/service";
 import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
-import { rolePermissionTable } from "@/api/system/role_permission/model";
-import { permissionTable } from "@/api/system/permission/model";
-
-// 构建查询条件(列表和全部通用)
-export const buildWhereCondition = (condition?: {
-  id?: number;
-  keyword?: string;
-  business?: string | null;
-  isEnabled?: boolean;
-}) => {
-  const { id, keyword, business, isEnabled } = condition || {};
-  const conditions = [];
-
-  if (hasValue(id)) {
-    conditions.push(eq(menuTable.id, id!));
-  }
-  if (hasValue(keyword)) {
-    conditions.push(or(like(menuTable.name, `%${keyword}%`)));
-  }
-  if (hasValue(business)) {
-    conditions.push(eq(menuTable.business, business!));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(menuTable.isEnabled, isEnabled));
-  }
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { menuRepository } from "./repository";
 
 const listAllReq = {
   type: "object",
@@ -107,28 +69,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = menuTable[orderBy] || menuTable.id;
-  const maxLimit = 10000; // 设置最大返回数量限制，防止数据过大
-  // 查询所有匹配的数据
-  const whereCondition = buildWhereCondition(params);
-  const rows = await db
-    .select({
-      id: menuTable.id,
-      name: menuTable.name,
-      icon: menuTable.icon,
-      path: menuTable.path,
-      parentId: menuTable.parentId,
-      sort: menuTable.sort,
-      business: menuTable.business,
-      remark: menuTable.remark,
-      isEnabled: menuTable.isEnabled,
-    })
-    .from(menuTable)
-    .where(whereCondition)
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(maxLimit);
-  return rows;
+  return await menuRepository.findAll(params);
 }
 const listAllApi = {
   req: listAllReq,
@@ -162,46 +103,30 @@ const listRes = {
     [...MenuListKeys]
   ),
 } as const satisfies JSONSchema;
+
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = menuTable[orderBy] || menuTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  const whereCondition = buildWhereCondition(params);
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(menuTable.id).as("total") })
-    .from(menuTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(menuTable)
-    .where(whereCondition)
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await menuRepository.findPage({
+    keyword: params.keyword,
+    isEnabled: params.isEnabled,
+    business: params.business,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
+
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 const listApi = {
@@ -233,22 +158,17 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { parentId, name } = params;
+  const { parentId } = params;
 
   // 前置校验
   await preventMissingParent(parentId);
 
-  const updateData = {
+  const insertedId = await menuRepository.onInsert({
     ...params,
     creatorId,
-  };
-  const res = await db
-    .insert(menuTable)
-    .values(updateData)
-    .returning({ id: menuTable.id });
-  const row = res[0];
-  preventEmpty(row);
-  return row.id;
+  });
+
+  return insertedId;
 }
 const addApi = {
   req: addReq,
@@ -284,15 +204,10 @@ async function onUpdate(
   const { id, ...rest } = params;
 
   // 获取当前菜单记录，用于前置校验
-  const current = await db
-    .select()
-    .from(menuTable)
-    .where(eq(menuTable.id, id))
-    .limit(1);
-  const currentMenu = current[0];
+  const currentMenu = await menuRepository.findById(id);
+  preventEmpty(currentMenu);
 
   // 前置校验
-  preventEmpty(currentMenu);
   preventSelfParent(id, rest.parentId);
   await preventMissingParent(rest.parentId);
   await preventCircularParent(id, rest.parentId);
@@ -307,24 +222,10 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
   };
 
-  // 构造 batch 任务
-  const batchQueries: any[] = [
-    db
-      .update(menuTable)
-      .set(updateData)
-      .where(eq(menuTable.id, id))
-      .returning({ id: menuTable.id }),
-  ];
-
-  // 使用 batch 确保菜单表和权限表的更新一致性（在 D1 中 batch 具有原子性）
-  const batchResults = await db.batch(batchQueries as any);
-  const updateResList = batchResults[0] as { id: number }[];
-  const result = updateResList[0];
-  preventEmpty(result);
-  return result?.id;
+  const updatedId = await menuRepository.onUpdate(id, updateData);
+  return updatedId;
 }
 const updateApi = {
   req: updateReq,
@@ -361,13 +262,8 @@ async function onDelete(
   // 前置校验
   await preventDeleteWithChildren(id);
 
-  const res = await db
-    .delete(menuTable)
-    .where(eq(menuTable.id, id))
-    .returning({ id: menuTable.id });
-  const result = res[0];
-  preventEmpty(result);
-  return result?.id;
+  const deletedId = await menuRepository.onDelete(id);
+  return deletedId;
 }
 const deleteApi = {
   req: deleteReq,
@@ -402,15 +298,9 @@ async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(menuTable)
-    .where(eq(menuTable.id, id))
-    .limit(1);
-
-  const result = rows[0];
-  preventEmpty(result);
-  return result;
+  const row = await menuRepository.findById(id);
+  preventEmpty(row);
+  return row;
 }
 const getApi = {
   req: getReq,
@@ -474,23 +364,7 @@ async function onTree(
   const roleIds = roleArr.map((r) => r.value);
   // 获取所有菜单
   const { showAll } = params;
-  // 构建查询条件
-  const buildWhereCondition = () => {
-    const conditions = [];
-    if (showAll !== true) {
-      conditions.push(eq(menuTable.isEnabled, true)); // 默认只查询启用的菜单
-    }
-    return conditions.length > 0
-      ? conditions.length === 1
-        ? conditions[0]
-        : or(...conditions)
-      : undefined;
-  };
-  const allMenus = await db
-    .select()
-    .from(menuTable)
-    .where(buildWhereCondition())
-    .orderBy(asc(menuTable.sort));
+  const allMenus = await menuRepository.getTreeMenus(showAll);
 
   let filteredMenus = allMenus;
   // 如果不是超管角色，则根据用户角色权限过滤菜单
@@ -542,7 +416,7 @@ async function onTree(
     return !!parentMenu;
   });
   function buildMenuTree(
-    data,
+    data: MenuPOLike[],
     parentId: number | null = null
   ): FromSchema<typeof treeRes> {
     return data
@@ -570,27 +444,14 @@ const treeApi = {
 
 /** 获取菜单的直接子菜单列表 */
 async function getChildMenus(menuId: number) {
-  return await db
-    .select({ id: menuTable.id })
-    .from(menuTable)
-    .where(eq(menuTable.parentId, menuId));
+  return await menuRepository.getChildMenus(menuId);
 }
 
 /** @description 获取所有菜单列表 */
 async function getAllMenus(
   isEnabled?: boolean
 ): Promise<{ name: string; id: number; parentId: number | null }[]> {
-  const allMenus = await db
-    .select({
-      name: menuTable.name,
-      id: menuTable.id,
-      parentId: menuTable.parentId,
-    })
-    .from(menuTable)
-    .where(
-      isEnabled !== undefined ? eq(menuTable.isEnabled, isEnabled) : undefined
-    );
-  return allMenus;
+  return await menuRepository.getAllMenus(isEnabled);
 }
 
 /** @description 获取子孙菜单的列表 */
@@ -617,11 +478,7 @@ async function getDescendantMenus(
 
 /** 获取菜单的直接启用子菜单数量 */
 async function countEnabledChildMenus(menuId: number): Promise<number> {
-  const result = await db
-    .select({ total: count(menuTable.id).as("total") })
-    .from(menuTable)
-    .where(and(eq(menuTable.parentId, menuId), eq(menuTable.isEnabled, true)));
-  return result[0]?.total ?? 0;
+  return await menuRepository.countEnabledChildMenus(menuId);
 }
 
 export const utils = {

@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  complianceArchiveTable,
   IndexVO,
   ComplianceArchiveVO,
   ComplianceArchiveListVO,
@@ -12,11 +10,8 @@ import {
   type ComplianceArchiveVOLike,
   type ComplianceArchiveGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, and, like } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listReqBase,
   listResponseWrapper,
@@ -27,42 +22,7 @@ import {
   bodyUserAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-
-// 构建查询条件
-const buildWhereCondition = ({
-  keyword,
-  sourceTable,
-  deleteReason,
-  deleteType,
-  restorable,
-}: Pick<
-  FromSchema<typeof listReq>,
-  "keyword" | "sourceTable" | "deleteReason" | "deleteType" | "restorable"
->) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(
-      like(complianceArchiveTable.sourcePrimaryKey, `%${keyword}%`)
-    );
-  }
-  if (hasValue(sourceTable)) {
-    conditions.push(eq(complianceArchiveTable.sourceTable, sourceTable));
-  }
-  if (hasValue(deleteReason)) {
-    conditions.push(eq(complianceArchiveTable.deleteReason, deleteReason));
-  }
-  if (hasValue(deleteType)) {
-    conditions.push(eq(complianceArchiveTable.deleteType, deleteType));
-  }
-  if (hasValue(restorable)) {
-    conditions.push(eq(complianceArchiveTable.restorable, restorable));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as complianceRepository from "./repository";
 
 const listReq = {
   type: "object",
@@ -98,36 +58,14 @@ async function onList(
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
   const offset = (pageNo - 1) * pageSize;
-  const orderField =
-    complianceArchiveTable[orderBy] || complianceArchiveTable.id;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(complianceArchiveTable.id).as("total") })
-    .from(complianceArchiveTable)
-    .where(buildWhereCondition(params));
-  const total = countResult[0]?.total || 0;
-
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(complianceArchiveTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await complianceRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
   const totalPage = Math.ceil(total / finalPageSize);
   return {
@@ -135,7 +73,7 @@ async function onList(
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list: list as any,
   };
 }
 
@@ -191,12 +129,7 @@ export async function exportDeletionRecord(
     creatorId,
   };
 
-  const result = await db
-    .insert(complianceArchiveTable)
-    .values(insertData)
-    .returning({ id: complianceArchiveTable.id });
-
-  return result[0]?.id || null;
+  return await complianceRepository.onInsert(insertData);
 }
 
 export default {

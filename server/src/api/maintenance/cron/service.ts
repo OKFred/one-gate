@@ -1,8 +1,5 @@
-import db from "@/db/index";
 import { getTranslation } from "@/utils/i18n/shared";
 import {
-  cronTable,
-  cronLogTable,
   IndexVO,
   CronVO,
   CronListVO,
@@ -21,12 +18,9 @@ import {
   type CronUpdateVOLike,
   type CronDeleteVOLike,
   type CronGetVOLike,
-  CronBaseVO,
 } from "./model";
-import { asc, count, desc, eq, and, like, or, isNull } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import {
   listReqBase,
   listResponseWrapper,
@@ -34,40 +28,13 @@ import {
 } from "@/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
-import hasValue from "@/utils/hasValue";
 import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError/index";
 import { preventEmpty } from "@/middleware/auth/prevention";
 import { CronExpressionParser } from "cron-parser";
-
-// 辅助函数：根据条件构建查询 filter
-const buildWhereCondition = (condition?: {
-  keyword?: string;
-  status?: boolean;
-}) => {
-  const { keyword, status } = condition || {};
-  const conditions = [];
-
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(cronTable.name, `%${keyword}%`),
-        like(cronTable.jobKey, `%${keyword}%`)
-      )
-    );
-  }
-  if (hasValue(status)) {
-    conditions.push(eq(cronTable.status, status));
-  }
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as cronRepository from "./repository";
 
 //----------------- 1. 获取任务列表 ----------------//
 const listReq = {
@@ -94,39 +61,25 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj?: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = cronTable[orderBy] || cronTable.id;
+  const {
+    orderBy = "id",
+    descend = true,
+    pageNo = 1,
+    pageSize = 10,
+    keyword,
+    status,
+  } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const whereCondition = buildWhereCondition(params);
-
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(cronTable.id) })
-    .from(cronTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  // 查询数据
-  const rows = await db
-    .select()
-    .from(cronTable)
-    .where(whereCondition)
-    .orderBy(descend ? desc(orderField) : asc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await cronRepository.findPage({
+    pageNo,
+    pageSize: finalPageSize,
+    orderBy: orderBy as keyof CronPOLike,
+    descend,
+    keyword,
+    status,
+  });
 
   const totalPage = Math.ceil(total / finalPageSize);
   return {
@@ -134,7 +87,7 @@ async function onList(
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 
@@ -185,20 +138,15 @@ async function onAdd(
     }
   }
 
-  const res = await db
-    .insert(cronTable)
-    .values({
-      jobKey,
-      name,
-      cronExpression,
-      status,
-      parameters,
-      nextRunTimeUtc,
-      creatorId,
-    })
-    .returning({ id: cronTable.id });
-
-  return res[0]?.id;
+  return await cronRepository.onInsert({
+    jobKey,
+    name,
+    cronExpression,
+    status,
+    parameters,
+    nextRunTimeUtc,
+    creatorId,
+  });
 }
 
 const addApi = {
@@ -238,12 +186,7 @@ async function onUpdate(
   const { id, jobKey, name, cronExpression, status, parameters } = params;
 
   // 前置校验任务是否存在
-  const existRows = await db
-    .select()
-    .from(cronTable)
-    .where(eq(cronTable.id, id))
-    .limit(1);
-  const row = existRows[0];
+  const row = await cronRepository.findById(id);
   preventEmpty(row);
 
   // 如果更新了 cron 表达式或者状态，需要重新计算下次运行时间
@@ -273,16 +216,10 @@ async function onUpdate(
     parameters,
     nextRunTimeUtc,
     updaterId,
-    updateTimeUtc: getCurrentTimestampUtcSql(),
+    updateTimeUtc: Date.now(),
   };
 
-  const res = await db
-    .update(cronTable)
-    .set(updateData)
-    .where(eq(cronTable.id, id))
-    .returning({ id: cronTable.id });
-
-  const updateRow = res[0];
+  const updateRow = await cronRepository.onUpdate(id, updateData);
   preventEmpty(updateRow);
   return updateRow.id;
 }
@@ -322,25 +259,12 @@ async function onDelete(
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
 
-  const existRows = await db
-    .select()
-    .from(cronTable)
-    .where(eq(cronTable.id, id))
-    .limit(1);
-  const row = existRows[0];
+  const row = await cronRepository.findById(id);
   preventEmpty(row);
 
-  // 执行删除配置表
-  const result = await db
-    .delete(cronTable)
-    .where(eq(cronTable.id, id))
-    .returning({ id: cronTable.id });
-
-  const deleteRow = result[0];
+  // 执行级联删除
+  const deleteRow = await cronRepository.onDelete(id);
   preventEmpty(deleteRow);
-
-  // 同时清理该定时任务下的所有日志数据
-  await db.delete(cronLogTable).where(eq(cronLogTable.jobId, id));
 
   return deleteRow.id;
 }
@@ -382,12 +306,7 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(cronTable)
-    .where(eq(cronTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await cronRepository.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -458,33 +377,14 @@ async function onListLogs(
   userObj?: UserObj
 ): Promise<FromSchema<typeof listLogsRes>> {
   const { jobId, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(cronLogTable.id) })
-    .from(cronLogTable)
-    .where(eq(cronLogTable.jobId, jobId));
-  const total = countResult[0]?.total || 0;
-
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  const rows = await db
-    .select()
-    .from(cronLogTable)
-    .where(eq(cronLogTable.jobId, jobId))
-    .orderBy(desc(cronLogTable.id)) // 最新日志排在前面
-    .limit(finalPageSize)
-    .offset(offset);
+  const { total, list } = await cronRepository.findLogsPage({
+    jobId,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
   const totalPage = Math.ceil(total / finalPageSize);
   return {
@@ -492,7 +392,7 @@ async function onListLogs(
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 

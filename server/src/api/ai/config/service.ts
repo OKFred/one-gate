@@ -1,6 +1,4 @@
-import db from "@/db/index";
 import {
-  aiLlmConfigTable,
   IndexVO,
   AiLlmConfigVO,
   AiLlmConfigListVO,
@@ -15,11 +13,8 @@ import {
   AiLlmConfigSortableKeys,
   type AiLlmConfigPOLike,
 } from "./model";
-import { asc, count, desc, eq, and, or, like, not, ne } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
-import hasValue from "@/utils/hasValue";
 import {
   listAllReqBase,
   listReqBase,
@@ -29,29 +24,10 @@ import {
 import {
   bodyAdapter,
   bodyUserAdapter,
-  bodyUserContextAdapter,
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-
-// 构建查询条件
-const buildWhereCondition = ({
-  keyword,
-  isEnabled,
-}: Pick<FromSchema<typeof listReq>, "keyword" | "isEnabled">) => {
-  const conditions = [];
-  if (hasValue(keyword)) {
-    conditions.push(or(like(aiLlmConfigTable.name, `%${keyword}%`)));
-  }
-  if (isEnabled !== undefined) {
-    conditions.push(eq(aiLlmConfigTable.isEnabled, isEnabled));
-  }
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import * as aiLlmConfigRepository from "./repository";
 
 // 列表 (全部)
 const listAllReq = {
@@ -87,21 +63,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const { orderBy = "id", descend = true } = params;
-  const orderField = aiLlmConfigTable[orderBy] || aiLlmConfigTable.id;
-  return await db
-    .select({
-      id: aiLlmConfigTable.id,
-      name: aiLlmConfigTable.name,
-      provider: aiLlmConfigTable.provider,
-      isEnabled: aiLlmConfigTable.isEnabled,
-      isDefault: aiLlmConfigTable.isDefault,
-      capabilities: aiLlmConfigTable.capabilities,
-    })
-    .from(aiLlmConfigTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(1000);
+  return await aiLlmConfigRepository.findPageAll(params);
 }
 
 const listAllApi = {
@@ -141,30 +103,22 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = aiLlmConfigTable[orderBy] || aiLlmConfigTable.id;
+  const { pageNo = 1, pageSize = 10 } = params;
+  const maxPageSize = 1000;
+  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const countResult = await db
-    .select({ total: count(aiLlmConfigTable.id).as("total") })
-    .from(aiLlmConfigTable)
-    .where(buildWhereCondition(params));
-
-  const total = countResult[0]?.total || 0;
-  const rows = await db
-    .select()
-    .from(aiLlmConfigTable)
-    .where(buildWhereCondition(params))
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(pageSize)
-    .offset(offset);
+  const { total, list } = await aiLlmConfigRepository.findPage({
+    ...params,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
   return {
     total,
-    totalPage: Math.ceil(total / pageSize),
+    totalPage: Math.ceil(total / finalPageSize),
     currentPage: pageNo,
-    pageSize,
-    list: rows,
+    pageSize: finalPageSize,
+    list,
   };
 }
 
@@ -195,17 +149,15 @@ async function onAdd(
 
   // 如果设置为默认建议，则取消其他默认建议
   if (obj.isDefault) {
-    await db
-      .update(aiLlmConfigTable)
-      .set({ isDefault: false })
-      .where(eq(aiLlmConfigTable.isDefault, true));
+    await aiLlmConfigRepository.disableOtherDefaults();
   }
 
-  const result = await db
-    .insert(aiLlmConfigTable)
-    .values({ ...obj, creatorId })
-    .returning({ id: aiLlmConfigTable.id });
-  return result[0]?.id;
+  const addData = {
+    ...obj,
+    creatorId,
+  };
+  const insertedId = await aiLlmConfigRepository.onInsert(addData);
+  return insertedId || null;
 }
 
 const addApi = {
@@ -234,28 +186,16 @@ async function onUpdate(
   await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
 
   if (params.isDefault) {
-    await db
-      .update(aiLlmConfigTable)
-      .set({ isDefault: false })
-      .where(
-        and(
-          eq(aiLlmConfigTable.isDefault, true),
-          not(eq(aiLlmConfigTable.id, id))
-        )
-      );
+    await aiLlmConfigRepository.disableOtherDefaults(id);
   }
 
-  const res = await db
-    .update(aiLlmConfigTable)
-    .set({
-      ...rest,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(aiLlmConfigTable.id, id))
-    .returning({ id: aiLlmConfigTable.id });
+  const updateData = {
+    ...rest,
+    updaterId,
+    updateTimeUtc: Date.now(),
+  };
 
-  const row = res[0];
+  const row = await aiLlmConfigRepository.onUpdate(id, updateData);
   preventEmpty(row);
   return row.id;
 }
@@ -277,12 +217,7 @@ const getReq = {
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const rows = await db
-    .select()
-    .from(aiLlmConfigTable)
-    .where(eq(aiLlmConfigTable.id, params.id))
-    .limit(1);
-  const row = rows[0];
+  const row = await aiLlmConfigRepository.findById(params.id);
   preventEmpty(row);
   return row;
 }
@@ -302,11 +237,7 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const result = await db
-    .delete(aiLlmConfigTable)
-    .where(eq(aiLlmConfigTable.id, obj.id))
-    .returning({ id: aiLlmConfigTable.id });
-  const row = result[0];
+  const row = await aiLlmConfigRepository.onDelete(obj.id);
   preventEmpty(row);
   return row.id;
 }
@@ -356,17 +287,7 @@ const verifyApi = {
 
 // Utils: 获取当前默认配置
 export async function getDefaultConfig() {
-  const rows = await db
-    .select()
-    .from(aiLlmConfigTable)
-    .where(
-      and(
-        eq(aiLlmConfigTable.isEnabled, true),
-        eq(aiLlmConfigTable.isDefault, true)
-      )
-    )
-    .limit(1);
-  return rows[0] || null;
+  return await aiLlmConfigRepository.getDefaultConfig();
 }
 
 export const utils = {

@@ -1,7 +1,5 @@
-import db from "@/db/index";
 import { utils as userUtils } from "@/api/system/user/service";
 import {
-  schemaFormDataTable,
   IndexVO,
   SchemaFormDataVO,
   SchemaFormDataListVO,
@@ -14,11 +12,8 @@ import {
   type SchemaFormDataPOLike,
   type SchemaFormDataDeleteVOLike,
 } from "./model";
-import { schemaFormTable } from "../schema_form/model";
-import { asc, count, desc, eq, and, or } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@/types/app";
-import { getCurrentTimestampUtcSql } from "@/utils/timestamp";
 import { validate } from "@cfworker/json-schema";
 import {
   listReqBase,
@@ -31,37 +26,11 @@ import {
 } from "@/middleware/encapsulation/adapter";
 import type { API } from "@/middleware/encapsulation";
 import { preventEmpty } from "@/middleware/auth/prevention";
-import hasValue from "@/utils/hasValue";
 import {
   BusinessError,
   BusinessErrorCode,
 } from "@/middleware/errorHandler/businessError";
-
-// 构建查询条件
-export const buildWhereCondition = (condition?: {
-  id?: number;
-  formCode?: string;
-  businessId?: number;
-}) => {
-  const { id, formCode, businessId } = condition || {};
-  const conditions = [];
-
-  if (hasValue(id)) {
-    conditions.push(eq(schemaFormDataTable.id, id!));
-  }
-  if (hasValue(formCode)) {
-    conditions.push(eq(schemaFormDataTable.formCode, formCode!));
-  }
-  if (hasValue(businessId)) {
-    conditions.push(eq(schemaFormDataTable.businessId, businessId!));
-  }
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
+import { schemaFormDataRepository } from "./repository";
 
 const listReq = {
   type: "object",
@@ -90,44 +59,24 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const offset = (pageNo - 1) * pageSize;
-  const orderField = schemaFormDataTable[orderBy] || schemaFormDataTable.id;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
+  const finalPageSize = pageSize > 1000 ? 1000 : pageSize;
 
-  const whereCondition = buildWhereCondition(params);
+  const { total, list } = await schemaFormDataRepository.findPage({
+    formCode: params.formCode,
+    businessId: params.businessId,
+    orderBy,
+    descend,
+    pageNo,
+    pageSize: finalPageSize,
+  });
 
-  // 查询总数
-  const countResult = await db
-    .select({ total: count(schemaFormDataTable.id).as("total") })
-    .from(schemaFormDataTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  // 查询列表数据
-  const rows = await db
-    .select()
-    .from(schemaFormDataTable)
-    .where(whereCondition)
-    .orderBy(!descend ? asc(orderField) : desc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
   const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list,
   };
 }
 
@@ -171,18 +120,7 @@ async function onSubmit(
   const { formCode, businessId, data } = params;
 
   // 1. 根据 formCode 获取对应的 Schema 配置
-  const formConfigs = await db
-    .select()
-    .from(schemaFormTable)
-    .where(
-      and(
-        eq(schemaFormTable.code, formCode),
-        eq(schemaFormTable.isEnabled, true)
-      )
-    )
-    .limit(1);
-
-  const formConfig = formConfigs[0];
+  const formConfig = await schemaFormDataRepository.findFormConfig(formCode);
   if (!formConfig) {
     throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
       cause: [`Schema Form Config not found or disabled for code: ${formCode}`],
@@ -212,43 +150,28 @@ async function onSubmit(
   const username = await userUtils.getUserNameById(creatorId);
 
   // 3. 检查是否已经存在相同 formCode + businessId 的记录，如果存在则更新(upsert)
-  const existData = await db
-    .select()
-    .from(schemaFormDataTable)
-    .where(
-      and(
-        eq(schemaFormDataTable.formCode, formCode),
-        eq(schemaFormDataTable.businessId, businessId)
-      )
-    )
-    .limit(1);
+  const record = await schemaFormDataRepository.findByFormCodeAndBusinessId(
+    formCode,
+    businessId
+  );
 
-  if (existData.length > 0) {
-    const record = existData[0];
-    const res = await db
-      .update(schemaFormDataTable)
-      .set({
-        dataContent,
-        updaterId: creatorId,
-        updaterName: username,
-        updateTimeUtc: getCurrentTimestampUtcSql(),
-      })
-      .where(eq(schemaFormDataTable.id, record.id))
-      .returning({ id: schemaFormDataTable.id });
-    return res[0]?.id || null;
+  if (record) {
+    const updatedId = await schemaFormDataRepository.onUpdate(record.id, {
+      dataContent,
+      updaterId: creatorId,
+      updaterName: username,
+    });
+    return updatedId;
   } else {
     // 插入新数据
-    const res = await db
-      .insert(schemaFormDataTable)
-      .values({
-        formCode,
-        businessId,
-        dataContent,
-        creatorId,
-        creatorName: username,
-      })
-      .returning({ id: schemaFormDataTable.id });
-    return res[0]?.id || null;
+    const insertedId = await schemaFormDataRepository.onInsert({
+      formCode,
+      businessId,
+      dataContent,
+      creatorId,
+      creatorName: username,
+    });
+    return insertedId;
   }
 }
 
@@ -286,13 +209,8 @@ async function onDelete(
   const { id } = params;
   if (id === undefined) return null;
 
-  const res = await db
-    .delete(schemaFormDataTable)
-    .where(eq(schemaFormDataTable.id, id))
-    .returning({ id: schemaFormDataTable.id });
-  const result = res[0];
-  preventEmpty(result);
-  return result?.id;
+  const deletedId = await schemaFormDataRepository.onDelete(id);
+  return deletedId;
 }
 
 const deleteApi = {
@@ -334,27 +252,17 @@ async function onGet(
   params: FromSchema<typeof getReq>
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id, formCode, businessId } = params;
-
-  const conditions = [];
-  if (id) conditions.push(eq(schemaFormDataTable.id, id));
-  if (formCode && businessId) {
-    conditions.push(
-      and(
-        eq(schemaFormDataTable.formCode, formCode),
-        eq(schemaFormDataTable.businessId, businessId)
-      )
+  let row = null;
+  if (id) {
+    row = await schemaFormDataRepository.findById(id);
+  } else if (formCode && businessId) {
+    row = await schemaFormDataRepository.findByFormCodeAndBusinessId(
+      formCode,
+      businessId
     );
   }
-
-  const rows = await db
-    .select()
-    .from(schemaFormDataTable)
-    .where(or(...conditions))
-    .limit(1);
-
-  const result = rows[0];
-  preventEmpty(result);
-  return result;
+  preventEmpty(row);
+  return row;
 }
 
 const getApi = {
