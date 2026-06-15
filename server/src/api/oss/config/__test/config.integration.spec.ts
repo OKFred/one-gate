@@ -11,13 +11,11 @@ import ossConfigSql from "@/db/sql/oss_config.sql?raw";
 vi.mock("@/utils/storage", () => {
   return {
     getStorage: vi.fn().mockReturnValue({
-      list: vi
-        .fn()
-        .mockResolvedValue({
-          objects: [],
-          isTruncated: false,
-          cursor: undefined,
-        }),
+      list: vi.fn().mockResolvedValue({
+        objects: [],
+        isTruncated: false,
+        cursor: undefined,
+      }),
     }),
   };
 });
@@ -93,6 +91,7 @@ describe("OSS Config 模块集成测试", () => {
           id: config1Id!,
           name: "S3 Storage 1 Updated",
           isDefault: true,
+          region: "auto",
         },
         userObj
       );
