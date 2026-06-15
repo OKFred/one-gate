@@ -61,23 +61,33 @@ async function onList(
   params: FromSchema<typeof listReq>,
   userObj?: UserObj
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
+  const {
+    orderBy = "id",
+    descend = true,
+    pageNo = 1,
+    pageSize = 10,
+    keyword,
+    status,
+  } = params;
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
   const { total, list } = await cronRepository.findPage({
-    ...params,
     pageNo,
     pageSize: finalPageSize,
+    orderBy: orderBy as keyof CronPOLike,
+    descend,
+    keyword,
+    status,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
+  const totalPage = finalPageSize > 0 ? Math.ceil(total / finalPageSize) : 0;
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: list as any,
+    list,
   };
 }
 
@@ -128,7 +138,7 @@ async function onAdd(
     }
   }
 
-  const insertedId = await cronRepository.onInsert({
+  const id = await cronRepository.onInsert({
     jobKey,
     name,
     cronExpression,
@@ -138,7 +148,7 @@ async function onAdd(
     creatorId,
   });
 
-  return insertedId;
+  return id;
 }
 
 const addApi = {
@@ -254,6 +264,7 @@ async function onDelete(
   const row = await cronRepository.findById(id);
   preventEmpty(row);
 
+  // 执行删除配置表，并自动清理定时任务下的所有日志数据（在 repository 事务中实现）
   const deleteRow = await cronRepository.onDelete(id);
   preventEmpty(deleteRow);
 
@@ -377,13 +388,13 @@ async function onListLogs(
     pageSize: finalPageSize,
   });
 
-  const totalPage = Math.ceil(total / finalPageSize);
+  const totalPage = finalPageSize > 0 ? Math.ceil(total / finalPageSize) : 0;
   return {
     total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: list as any,
+    list,
   };
 }
 

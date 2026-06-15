@@ -94,17 +94,15 @@ export async function onUpdate(
 }
 
 export async function onDelete(id: number) {
-  return await db.transaction(async (tx) => {
-    const deletedCron = await tx
-      .delete(cronTable)
-      .where(eq(cronTable.id, id))
-      .returning({ id: cronTable.id });
+  const deletedCron = await db
+    .delete(cronTable)
+    .where(eq(cronTable.id, id))
+    .returning({ id: cronTable.id });
 
-    if (deletedCron[0]) {
-      await tx.delete(cronLogTable).where(eq(cronLogTable.jobId, id));
-    }
-    return deletedCron[0] || null;
-  });
+  if (deletedCron[0]) {
+    await db.delete(cronLogTable).where(eq(cronLogTable.jobId, id));
+  }
+  return deletedCron[0] || null;
 }
 
 export async function findLogsPage(params: {
