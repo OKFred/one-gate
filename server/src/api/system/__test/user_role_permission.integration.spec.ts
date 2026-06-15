@@ -23,6 +23,7 @@ import departmentSql from "@/db/sql/system_department.sql?raw";
 import menuSql from "@/db/sql/system_menu.sql?raw";
 import languageSql from "@/db/sql/i18n_language.sql?raw";
 import regionSql from "@/db/sql/i18n_region.sql?raw";
+import complianceSql from "@/db/sql/maintenance_compliance.sql?raw";
 
 describe("System User / Role / Permission RBAC 全链路集成测试", () => {
   const testTables = [
@@ -34,6 +35,7 @@ describe("System User / Role / Permission RBAC 全链路集成测试", () => {
     "system_menu",
     "i18n_language",
     "i18n_region",
+    "compliance_archives",
   ];
 
   const adminUserObj = { userId: 1, langCode: "zh-CN" } as unknown as UserObj;
@@ -48,6 +50,7 @@ describe("System User / Role / Permission RBAC 全链路集成测试", () => {
       menuSql,
       languageSql,
       regionSql,
+      complianceSql,
     ]);
   });
 
