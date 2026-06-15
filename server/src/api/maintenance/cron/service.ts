@@ -81,7 +81,7 @@ async function onList(
     status,
   });
 
-  const totalPage = finalPageSize > 0 ? Math.ceil(total / finalPageSize) : 0;
+  const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,
@@ -138,7 +138,7 @@ async function onAdd(
     }
   }
 
-  const id = await cronRepository.onInsert({
+  return await cronRepository.onInsert({
     jobKey,
     name,
     cronExpression,
@@ -147,8 +147,6 @@ async function onAdd(
     nextRunTimeUtc,
     creatorId,
   });
-
-  return id;
 }
 
 const addApi = {
@@ -264,7 +262,7 @@ async function onDelete(
   const row = await cronRepository.findById(id);
   preventEmpty(row);
 
-  // 执行删除配置表，并自动清理定时任务下的所有日志数据（在 repository 事务中实现）
+  // 执行级联删除
   const deleteRow = await cronRepository.onDelete(id);
   preventEmpty(deleteRow);
 
@@ -388,7 +386,7 @@ async function onListLogs(
     pageSize: finalPageSize,
   });
 
-  const totalPage = finalPageSize > 0 ? Math.ceil(total / finalPageSize) : 0;
+  const totalPage = Math.ceil(total / finalPageSize);
   return {
     total,
     totalPage,

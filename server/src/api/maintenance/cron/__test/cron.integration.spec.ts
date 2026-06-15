@@ -1,17 +1,5 @@
-process.env.DB_FILE_NAME = "file:cron-test.db";
-
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterEach,
-  afterAll,
-  vi,
-} from "vitest";
-import { sql } from "drizzle-orm";
-import fs from "fs";
-import db, { closeDb } from "@/db/index";
+import { describe, it, expect, beforeAll, afterEach, vi } from "vitest";
+import db from "@/db/index";
 import { setupTestDb, clearTestData } from "@/db/testHelper";
 import cronService from "../service";
 import { cronLogTable } from "../model";
@@ -21,126 +9,96 @@ import type { UserObj } from "@/types/app";
 import cronSql from "@/db/sql/system_cron_job.sql?raw";
 import cronLogSql from "@/db/sql/system_cron_job_log.sql?raw";
 
+// Mock 翻译辅助函数，避免因为缺少 i18n 表或缓存未命中报错
 vi.mock("@/utils/i18n/shared", () => {
   return {
-    getTranslation: async (lang: string, key: string) => {
-      if (key === "cron.frequency.minutely") return "每分钟";
-      if (key === "cron.frequency.minutes") return "每{minutes}分钟";
-      if (key === "cron.frequency.hourly") return "每小时";
-      if (key === "cron.frequency.hours") return "每{hours}小时";
-      if (key === "cron.frequency.daily") return "每天";
-      if (key === "cron.frequency.days") return "每{days}天";
-      if (key === "cron.frequency.seconds") return "每{seconds}秒";
-      return key;
+    getTranslation: async (langCode: string, key: string) => {
+      const mockDict: Record<string, string> = {
+        "cron.frequency.minutes": "每 {minutes} 分钟",
+        "cron.frequency.minutely": "每分钟",
+        "cron.frequency.hours": "每 {hours} 小时",
+        "cron.frequency.hourly": "每小时",
+        "cron.frequency.days": "每 {days} 天",
+        "cron.frequency.daily": "每天",
+        "cron.frequency.seconds": "每 {seconds} 秒",
+        "cron.frequency.custom": "自定义频率",
+      };
+      return mockDict[key] || key;
     },
   };
 });
 
-describe("Cron 模块全链路集成测试", () => {
+describe("Cron 计划任务全链路集成测试", () => {
   const testTables = ["system_cron_job", "system_cron_job_log"];
-  const userObj = { userId: 1 } as unknown as UserObj;
+  const userObj = { userId: 1, langCode: "zh-CN" } as unknown as UserObj;
 
   beforeAll(async () => {
-    try {
-      console.log("Running custom db setup");
-      const statements = [
-        ...cronSql
-          .split(";")
-          .map((s) => s.trim())
-          .filter(Boolean),
-        ...cronLogSql
-          .split(";")
-          .map((s) => s.trim())
-          .filter(Boolean),
-      ];
-      for (const stmt of statements) {
-        console.log("Executing SQL statement:", stmt);
-        await db.run(sql.raw(stmt));
-      }
-
-      const tables = await db.run(
-        sql`SELECT name FROM sqlite_master WHERE type='table'`
-      );
-      console.log("Final tables list in DB:", tables);
-
-      await db.run(sql`DELETE FROM system_cron_job`);
-      await db.run(sql`DELETE FROM system_cron_job_log`);
-      console.log("Cleared test data successfully");
-    } catch (err) {
-      console.error("Setup DB failed with error:", err);
-      throw err;
-    }
+    await setupTestDb(db, [cronSql, cronLogSql]);
+    await clearTestData(db, testTables);
   });
 
   afterEach(async () => {
-    try {
-      await db.run(sql`DELETE FROM system_cron_job`);
-      await db.run(sql`DELETE FROM system_cron_job_log`);
-    } catch (err) {
-      console.error("afterEach clear failed:", err);
-    }
+    await clearTestData(db, testTables);
   });
 
-  describe("计划任务配置 (CRUD)", () => {
-    it("全流程增删改查测试", async () => {
-      const tables = await db.run(
-        sql`SELECT name FROM sqlite_master WHERE type='table'`
-      );
-      console.log("Tables before insert in test:", tables);
-
-      // 1. Add
-      const jobId = await cronService.add.service(
+  describe("Cron 任务管理 (CRUD)", () => {
+    it("全流程增删改查及 Cron 校验测试", async () => {
+      // 1. Add (启用状态下，会自动计算下次运行时间)
+      const cronId = await cronService.add.service(
         {
-          jobKey: "test_job_key",
-          name: "Test Job",
-          cronExpression: "*/5 * * * *",
+          jobKey: "test_job",
+          name: "测试任务",
+          cronExpression: "0 0 * * *", // 每天零点
           status: true,
-          parameters: "{}",
+          parameters: "test_param",
         },
         userObj
       );
-      expect(jobId).toBeGreaterThan(0);
+      expect(cronId).toBeGreaterThan(0);
 
       // 2. Get
-      const job = await cronService.get.service({ id: jobId! });
-      expect(job?.jobKey).toBe("test_job_key");
-      expect(job?.name).toBe("Test Job");
-      expect(job?.cronExpression).toBe("*/5 * * * *");
-      expect(job?.status).toBe(true);
+      const cron = await cronService.get.service({ id: cronId! });
+      expect(cron.jobKey).toBe("test_job");
+      expect(cron.name).toBe("测试任务");
+      expect(cron.cronExpression).toBe("0 0 * * *");
+      expect(cron.status).toBe(true);
+      expect(cron.parameters).toBe("test_param");
+      expect(cron.nextRunTimeUtc).toBeGreaterThan(0);
 
-      // 3. Update
+      // 3. Update (修改为禁用状态，下次运行时间应设为 null)
       const updatedId = await cronService.update.service(
         {
-          id: jobId!,
-          name: "Updated Test Job",
-          cronExpression: "0 0 * * *",
+          id: cronId!,
+          jobKey: "test_job_updated",
+          name: "测试任务更新",
           status: false,
         },
         userObj
       );
-      expect(updatedId).toBe(jobId);
+      expect(updatedId).toBe(cronId);
 
-      const jobAfterUpdate = await cronService.get.service({ id: jobId! });
-      expect(jobAfterUpdate?.name).toBe("Updated Test Job");
-      expect(jobAfterUpdate?.cronExpression).toBe("0 0 * * *");
-      expect(jobAfterUpdate?.status).toBe(false);
+      const cronAfterUpdate = await cronService.get.service({ id: cronId! });
+      expect(cronAfterUpdate.name).toBe("测试任务更新");
+      expect(cronAfterUpdate.jobKey).toBe("test_job_updated");
+      expect(cronAfterUpdate.status).toBe(false);
+      expect(cronAfterUpdate.nextRunTimeUtc).toBeNull();
 
       // 4. Delete
       const deletedId = await cronService.delete.service(
-        { id: jobId! },
+        { id: cronId! },
         userObj
       );
-      expect(deletedId).toBe(jobId);
+      expect(deletedId).toBe(cronId);
 
-      await expect(cronService.get.service({ id: jobId! })).rejects.toThrow();
+      await expect(cronService.get.service({ id: cronId! })).rejects.toThrow();
     });
 
-    it("列表查询分页过滤测试", async () => {
+    it("列表查询测试 (list)", async () => {
       await cronService.add.service(
         {
           jobKey: "job_1",
-          name: "Daily Job",
-          cronExpression: "0 0 * * *",
+          name: "任务1",
+          cronExpression: "*/5 * * * *",
           status: true,
         },
         userObj
@@ -148,121 +106,133 @@ describe("Cron 模块全链路集成测试", () => {
       await cronService.add.service(
         {
           jobKey: "job_2",
-          name: "Weekly Job",
-          cronExpression: "0 0 * * 0",
+          name: "任务2",
+          cronExpression: "0 0 1 * *",
           status: false,
         },
         userObj
       );
 
-      // 1. 查询全部启用状态
-      const result1 = await cronService.list.service({
-        status: true,
+      // 1. 无过滤条件列表查询
+      const pageResult1 = await cronService.list.service({
         pageNo: 1,
         pageSize: 10,
       });
-      expect(result1.total).toBe(1);
-      expect(result1.list[0].jobKey).toBe("job_1");
+      expect(pageResult1.total).toBe(2);
+      expect(pageResult1.list.length).toBe(2);
 
-      // 2. 关键词模糊查询
-      const result2 = await cronService.list.service({
-        keyword: "weekly",
+      // 2. 状态过滤查询
+      const pageResult2 = await cronService.list.service({
         pageNo: 1,
         pageSize: 10,
+        status: true,
       });
-      expect(result2.total).toBe(1);
-      expect(result2.list[0].jobKey).toBe("job_2");
+      expect(pageResult2.total).toBe(1);
+      expect(pageResult2.list[0].jobKey).toBe("job_1");
+
+      // 3. 关键词模糊匹配
+      const pageResult3 = await cronService.list.service({
+        pageNo: 1,
+        pageSize: 10,
+        keyword: "2",
+      });
+      expect(pageResult3.total).toBe(1);
+      expect(pageResult3.list[0].jobKey).toBe("job_2");
+    });
+
+    it("新增非法 Cron 表达式应该抛出错误", async () => {
+      await expect(
+        cronService.add.service(
+          {
+            jobKey: "invalid_job",
+            name: "非法任务",
+            cronExpression: "invalid-cron-expr",
+            status: true,
+          },
+          userObj
+        )
+      ).rejects.toThrow();
     });
   });
 
-  describe("任务运行日志测试", () => {
-    it("日志分页查询与级联删除测试", async () => {
-      // 1. 创建任务
-      const jobId = await cronService.add.service(
+  describe("Cron 运行日志与级联删除测试", () => {
+    it("运行日志的写入、查询和级联删除", async () => {
+      // 1. 新建一个任务
+      const cronId = await cronService.add.service(
         {
-          jobKey: "log_test_job",
-          name: "Log Test Job",
+          jobKey: "log_job",
+          name: "日志测试任务",
           cronExpression: "0 0 * * *",
           status: true,
         },
         userObj
       );
 
-      // 2. 直接向数据库插入该任务的运行日志记录
+      // 2. 直接在数据库中模拟插入 2 条日志记录
       await db.insert(cronLogTable).values([
         {
-          jobId: jobId!,
+          jobId: cronId!,
           status: true,
-          startTimeUtc: Date.now() - 5000,
-          endTimeUtc: Date.now() - 4000,
-          durationMs: 1000,
-          responseBody: "success",
+          startTimeUtc: Date.now() - 10000,
+          endTimeUtc: Date.now() - 9900,
+          durationMs: 100,
         },
         {
-          jobId: jobId!,
+          jobId: cronId!,
           status: false,
-          errorMessage: "some error occurred",
-          startTimeUtc: Date.now() - 2000,
-          endTimeUtc: Date.now() - 1000,
-          durationMs: 1000,
+          errorMessage: "Timeout",
+          startTimeUtc: Date.now() - 5000,
+          endTimeUtc: Date.now() - 4800,
+          durationMs: 200,
         },
       ]);
 
-      // 3. 调用 listLogs 接口
-      const logResult = await cronService.listLogs.service({
-        jobId: jobId!,
+      // 3. 查询日志列表
+      const logsResult = await cronService.listLogs.service({
+        jobId: cronId!,
         pageNo: 1,
         pageSize: 10,
       });
-      expect(logResult.total).toBe(2);
-      expect(logResult.list[0].status).toBe(false);
-      expect(logResult.list[0].errorMessage).toBe("some error occurred");
-      expect(logResult.list[1].status).toBe(true);
+      expect(logsResult.total).toBe(2);
+      expect(logsResult.list.length).toBe(2);
+      expect(logsResult.list[0].status).toBe(false); // 按 id 倒序，最新的一条在最前面
+      expect(logsResult.list[0].errorMessage).toBe("Timeout");
 
-      // 4. 删除任务，并检查级联日志删除是否生效
-      await cronService.delete.service({ id: jobId! }, userObj);
+      // 4. 删除任务，应该级联删除所有日志
+      await cronService.delete.service({ id: cronId! }, userObj);
 
-      const logResultAfterDelete = await cronService.listLogs.service({
-        jobId: jobId!,
+      // 验证日志被清理
+      const logsAfterDelete = await cronService.listLogs.service({
+        jobId: cronId!,
         pageNo: 1,
         pageSize: 10,
       });
-      expect(logResultAfterDelete.total).toBe(0);
-      expect(logResultAfterDelete.list.length).toBe(0);
+      expect(logsAfterDelete.total).toBe(0);
+      expect(logsAfterDelete.list.length).toBe(0);
     });
   });
 
-  describe("Cron 表达式解析与频率提示测试", () => {
-    it("合法表达式解析", async () => {
-      const parseResult = await cronService.parse.service(
+  describe("Cron 表达式解析功能测试 (Parse)", () => {
+    it("合法的 Cron 表达式解析", async () => {
+      const res = await cronService.parse.service(
         { cronExpression: "*/5 * * * *" },
         userObj
       );
-      expect(parseResult.valid).toBe(true);
-      expect(parseResult.error).toBeNull();
-      expect(parseResult.frequency).toBe("每5分钟");
-      expect(parseResult.nextTimes.length).toBe(5);
+      expect(res.valid).toBe(true);
+      expect(res.error).toBeNull();
+      expect(res.frequency).toContain("每 5 分钟");
+      expect(res.nextTimes.length).toBe(5);
     });
 
-    it("非法表达式解析", async () => {
-      const parseResult = await cronService.parse.service(
-        { cronExpression: "invalid-cron-exp" },
+    it("非法的 Cron 表达式解析", async () => {
+      const res = await cronService.parse.service(
+        { cronExpression: "invalid-cron" },
         userObj
       );
-      expect(parseResult.valid).toBe(false);
-      expect(parseResult.error).not.toBeNull();
-      expect(parseResult.nextTimes.length).toBe(0);
+      expect(res.valid).toBe(false);
+      expect(res.error).not.toBeNull();
+      expect(res.frequency).toBe("无法解析频率");
+      expect(res.nextTimes.length).toBe(0);
     });
-  });
-
-  afterAll(async () => {
-    try {
-      await closeDb();
-      if (fs.existsSync("cron-test.db")) fs.unlinkSync("cron-test.db");
-      if (fs.existsSync("cron-test.db-shm")) fs.unlinkSync("cron-test.db-shm");
-      if (fs.existsSync("cron-test.db-wal")) fs.unlinkSync("cron-test.db-wal");
-    } catch (err) {
-      console.error("Failed to clean up test db files:", err);
-    }
   });
 });
