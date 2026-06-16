@@ -15,6 +15,7 @@ import Logout from '@mui/icons-material/Logout';
 import LanguageIcon from '@mui/icons-material/Language';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { getThemeMode } from '@/hooks/useThemeMode';
 import { authUtils } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 import * as LanguageAPI from '@/api/i18n/language';
@@ -33,13 +34,7 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
   const [languages, setLanguages] = useState<ListAllLanguageRes>([]);
   const [languagesLoaded, setLanguagesLoaded] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
-    // 从 localStorage 读取主题设置
-    const saved = localStorage.getItem('theme');
-    if (saved) return saved === 'dark';
-    // 如果没有保存，则跟随系统设置
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+  const [darkMode, setDarkMode] = useState<boolean>(() => getThemeMode() === 'dark');
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
   const t = useTranslation();

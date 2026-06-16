@@ -1,17 +1,13 @@
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material';
 import { useMemo, useState, useEffect, type ReactNode } from 'react';
+import { getThemeMode } from '@/hooks/useThemeMode';
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const [mode, setMode] = useState<'light' | 'dark'>(() => {
-    const saved = localStorage.getItem('theme');
-    if (saved === 'dark') return 'dark';
-    if (saved === 'light') return 'light';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+  const [mode, setMode] = useState<'light' | 'dark'>(getThemeMode);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', mode);
