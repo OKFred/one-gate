@@ -4,7 +4,7 @@ import cacheService from "../service";
 describe("Cache 全链路集成测试", () => {
   afterEach(async () => {
     // 每次测试后清空缓存
-    await cacheService.clear.service({});
+    await cacheService.clear.service();
   });
 
   it("能进行基本的 Put、Get、Delete、Clear 操作", async () => {
