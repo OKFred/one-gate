@@ -110,6 +110,7 @@ export class R2Provider implements StorageProvider {
       prefix: options?.prefix,
       limit: options?.limit,
       cursor: options?.cursor,
+      delimiter: options?.delimiter,
     });
     const objects = response.objects.map((obj: any) => ({
       key: obj.key,
@@ -118,6 +119,9 @@ export class R2Provider implements StorageProvider {
     }));
     return {
       objects,
+      prefixes: Array.isArray(response.delimitedPrefixes)
+        ? response.delimitedPrefixes
+        : [],
       cursor: response.cursor,
       isTruncated: response.truncated,
     };

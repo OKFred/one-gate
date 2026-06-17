@@ -7,18 +7,23 @@ const OSSFileBaseVO = {
   contentType: { type: "string", description: "MIME类型" },
 } as const;
 
-// 1. list (分页列表)
+const OSSDirectoryVO = {
+  key: { type: "string", description: "目录路径" },
+  name: { type: "string", description: "目录名称" },
+  prefix: { type: "string", description: "进入该目录所需的路径前缀" },
+} as const;
+
 export const listReq = {
   type: "object",
   properties: {
-    keyword: { type: "string", description: "前缀/路径搜索 (对应 prefix)" },
+    keyword: { type: "string", description: "前缀/路径搜索" },
     pageNo: {
       type: "number",
-      description: "页码 (游标分页下仅作兼容，不影响实际查询)",
+      description: "页码,兼容游标分页",
     },
     pageSize: {
       type: "number",
-      description: "每页数量 (对应 limit)",
+      description: "每页数量",
       default: 10,
     },
     cursor: { type: "string", description: "下一页游标" },
@@ -35,22 +40,66 @@ export const listRes = {
         type: "object",
         properties: { ...OSSFileBaseVO },
         required: ["key"],
+        additionalProperties: false,
       },
     },
-    total: { type: "number", description: "当前页实际条数" },
+    total: { type: "number", description: "当前页数量" },
     pageSize: { type: "number" },
     cursor: { type: "string", description: "下一页游标" },
-    hasMore: { type: "boolean", description: "是否还有更多数据" },
+    hasMore: { type: "boolean", description: "是否有更多数据" },
   },
   required: ["list", "total", "pageSize", "hasMore"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-// 2. listAll (获取全部文件)
+export const listDirectoryReq = {
+  type: "object",
+  properties: {
+    prefix: { type: "string", description: "当前目录前缀" },
+    pageSize: {
+      type: "number",
+      description: "每页数量",
+      default: 100,
+    },
+    cursor: { type: "string", description: "下一页游标" },
+  },
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+export const listDirectoryRes = {
+  type: "object",
+  properties: {
+    prefix: { type: "string", description: "当前目录前缀" },
+    directories: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { ...OSSDirectoryVO },
+        required: ["key", "name", "prefix"],
+        additionalProperties: false,
+      },
+    },
+    files: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { ...OSSFileBaseVO },
+        required: ["key"],
+        additionalProperties: false,
+      },
+    },
+    pageSize: { type: "number" },
+    cursor: { type: "string", description: "下一页游标" },
+    hasMore: { type: "boolean", description: "是否有更多数据" },
+  },
+  required: ["prefix", "directories", "files", "pageSize", "hasMore"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
 export const listAllReq = {
   type: "object",
   properties: {
-    keyword: { type: "string", description: "前缀/路径搜索 (对应 prefix)" },
+    keyword: { type: "string", description: "前缀/路径搜索" },
   },
   additionalProperties: false,
 } as const satisfies JSONSchema;
@@ -61,10 +110,10 @@ export const listAllRes = {
     type: "object",
     properties: { ...OSSFileBaseVO },
     required: ["key"],
+    additionalProperties: false,
   },
 } as const satisfies JSONSchema;
 
-// 3. get (获取文件详情和下载链接)
 export const getReq = {
   type: "object",
   properties: {
@@ -84,7 +133,6 @@ export const getRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-// 4. add (获取上传凭证，即新建文件)
 export const addReq = {
   type: "object",
   properties: {
@@ -96,7 +144,7 @@ export const addReq = {
     },
     expiresIn: {
       type: "number",
-      description: "凭证过期时间(秒)",
+      description: "预签名URL过期时间(秒)",
       default: 3600,
     },
   },
@@ -114,11 +162,9 @@ export const addRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-// 5. update (覆盖文件，等同于 add，为了接口统一而设立)
 export const updateReq = addReq;
 export const updateRes = addRes;
 
-// 6. delete
 export const deleteReq = {
   type: "object",
   properties: {

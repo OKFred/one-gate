@@ -4,10 +4,21 @@ import { preventEmpty } from "@/middleware/auth/prevention";
 import { preventStorageInitFailure } from "../config/prevention";
 import type { API } from "@/middleware/encapsulation";
 import { bodyUserContextAdapter } from "@/middleware/encapsulation/adapter";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError";
+import type { Context } from "@/types/app";
+import type {
+  StorageObjectMetadata,
+  StorageProvider,
+} from "@/utils/storage/types";
 import type { FromSchema } from "json-schema-to-ts";
 import {
   listReq,
   listRes,
+  listDirectoryReq,
+  listDirectoryRes,
   listAllReq,
   listAllRes,
   getReq,
@@ -20,23 +31,72 @@ import {
   deleteRes,
 } from "./model";
 
-// 辅助函数：移除对象中值为 undefined 的属性，避免 JSON Schema 校验失败
-function cleanUndefined(obj: any): any {
+type CleanValue =
+  | string
+  | number
+  | boolean
+  | null
+  | CleanValue[]
+  | { [key: string]: CleanValue };
+
+function cleanUndefined<T>(obj: T): CleanValue {
   if (Array.isArray(obj)) {
     return obj.map(cleanUndefined);
   }
   if (obj !== null && typeof obj === "object") {
     return Object.fromEntries(
-      Object.entries(obj)
-        .filter(([_, v]) => v !== undefined)
-        .map(([k, v]) => [k, cleanUndefined(v)])
-    );
+      Object.entries(obj as Record<string, unknown>)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => [key, cleanUndefined(value)])
+    ) as { [key: string]: CleanValue };
   }
-  return obj;
+  return obj as CleanValue;
 }
 
-// 获取存储实例辅助函数
-async function getActiveStorage(env: any) {
+function validateSegments(path: string) {
+  if (path.split("/").some((segment) => segment === "..")) {
+    throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
+      cause: ["Object key cannot contain '..' path segments"],
+    });
+  }
+}
+
+function normalizeObjectKey(key: string) {
+  const normalized = key.replace(/^\/+/, "").replace(/\/+/g, "/").trim();
+  validateSegments(normalized);
+  if (!normalized || normalized.endsWith("/")) {
+    throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
+      cause: ["Object key is required and cannot be a directory prefix"],
+    });
+  }
+  return normalized;
+}
+
+function normalizePrefix(prefix?: string) {
+  const normalized = (prefix || "")
+    .replace(/^\/+/, "")
+    .replace(/\/+/g, "/")
+    .trim();
+  validateSegments(normalized);
+  if (!normalized) return "";
+  return normalized.endsWith("/") ? normalized : `${normalized}/`;
+}
+
+function getNameFromPrefix(prefix: string) {
+  const trimmed = prefix.replace(/\/+$/, "");
+  return trimmed.split("/").pop() || trimmed;
+}
+
+function toFileVO(item: StorageObjectMetadata) {
+  return {
+    key: item.key,
+    size: item.size,
+    lastModified: item.lastModified?.toISOString(),
+    contentType: item.contentType,
+  };
+}
+
+async function getActiveStorage(env: unknown): Promise<StorageProvider> {
   const config = await getDefaultConfig();
   preventEmpty(config);
 
@@ -54,28 +114,22 @@ async function getActiveStorage(env: any) {
   );
 
   preventStorageInitFailure(storage);
-  return storage!;
+  return storage;
 }
 
-// 1. 分页列出文件
 async function onList(
   params: FromSchema<typeof listReq>,
-  userObj: any,
-  c: any
+  _userObj: unknown,
+  c: Context
 ): Promise<FromSchema<typeof listRes>> {
   const storage = await getActiveStorage(c.env);
   const result = await storage.list({
-    prefix: params.keyword,
+    prefix: params.keyword ? normalizePrefix(params.keyword) : undefined,
     limit: params.pageSize,
     cursor: params.cursor,
   });
 
-  const list = result.objects.map((item) => ({
-    key: item.key,
-    size: item.size,
-    lastModified: item.lastModified?.toISOString(),
-    contentType: item.contentType,
-  }));
+  const list = result.objects.map(toFileVO);
 
   return cleanUndefined({
     list,
@@ -83,7 +137,7 @@ async function onList(
     pageSize: params.pageSize || 10,
     cursor: result.cursor,
     hasMore: result.isTruncated,
-  });
+  }) as FromSchema<typeof listRes>;
 }
 
 const listApi = {
@@ -92,27 +146,76 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: "列出存储桶中的文件(分页)",
+    summary: "List files in storage bucket",
   },
   adapter: bodyUserContextAdapter,
   service: onList,
   permission: { action: "read" },
 } satisfies API;
 
-// 2. 获取全部文件
+async function onListDirectory(
+  params: FromSchema<typeof listDirectoryReq>,
+  _userObj: unknown,
+  c: Context
+): Promise<FromSchema<typeof listDirectoryRes>> {
+  const storage = await getActiveStorage(c.env);
+  const prefix = normalizePrefix(params.prefix);
+  const result = await storage.list({
+    prefix,
+    delimiter: "/",
+    limit: params.pageSize || 100,
+    cursor: params.cursor,
+  });
+
+  const directories = (result.prefixes || []).map((itemPrefix) => {
+    const normalized = normalizePrefix(itemPrefix);
+    return {
+      key: normalized,
+      name: getNameFromPrefix(normalized),
+      prefix: normalized,
+    };
+  });
+
+  const files = result.objects
+    .filter((item) => item.key !== prefix && !item.key.endsWith("/"))
+    .map(toFileVO);
+
+  return cleanUndefined({
+    prefix,
+    directories,
+    files,
+    pageSize: params.pageSize || 100,
+    cursor: result.cursor,
+    hasMore: result.isTruncated,
+  }) as FromSchema<typeof listDirectoryRes>;
+}
+
+const listDirectoryApi = {
+  req: listDirectoryReq,
+  res: listDirectoryRes,
+  pathInfo: {
+    path: "/listDirectory",
+    method: "post",
+    summary: "List directories and files under a prefix",
+  },
+  adapter: bodyUserContextAdapter,
+  service: onListDirectory,
+  permission: { action: "read" },
+} satisfies API;
+
 async function onListAll(
   params: FromSchema<typeof listAllReq>,
-  userObj: any,
-  c: any
+  _userObj: unknown,
+  c: Context
 ): Promise<FromSchema<typeof listAllRes>> {
   const storage = await getActiveStorage(c.env);
-  const allObjects = [];
+  const allObjects: StorageObjectMetadata[] = [];
   let cursor: string | undefined = undefined;
   let hasMore = true;
 
   while (hasMore) {
     const result = await storage.list({
-      prefix: params.keyword,
+      prefix: params.keyword ? normalizePrefix(params.keyword) : undefined,
       limit: 1000,
       cursor,
     });
@@ -121,14 +224,9 @@ async function onListAll(
     hasMore = result.isTruncated;
   }
 
-  return cleanUndefined(
-    allObjects.map((item) => ({
-      key: item.key,
-      size: item.size,
-      lastModified: item.lastModified?.toISOString(),
-      contentType: item.contentType,
-    }))
-  );
+  return cleanUndefined(allObjects.map(toFileVO)) as FromSchema<
+    typeof listAllRes
+  >;
 }
 
 const listAllApi = {
@@ -137,24 +235,24 @@ const listAllApi = {
   pathInfo: {
     path: "/listAll",
     method: "post",
-    summary: "获取所有文件（不分页）",
+    summary: "List all files",
   },
   adapter: bodyUserContextAdapter,
   service: onListAll,
   permission: { action: "read" },
 } satisfies API;
 
-// 3. 获取单文件详情 (含下载链接)
 async function onGet(
   params: FromSchema<typeof getReq>,
-  userObj: any,
-  c: any
+  _userObj: unknown,
+  c: Context
 ): Promise<FromSchema<typeof getRes>> {
   const storage = await getActiveStorage(c.env);
-  const meta = await storage.head(params.key);
+  const key = normalizeObjectKey(params.key);
+  const meta = await storage.head(key);
   preventEmpty(meta);
 
-  const downloadUrl = await storage.getPresignedGetUrl(params.key, {
+  const downloadUrl = await storage.getPresignedGetUrl(key, {
     expiresIn: 3600,
   });
 
@@ -164,48 +262,50 @@ async function onGet(
     lastModified: meta.lastModified?.toISOString(),
     contentType: meta.contentType,
     downloadUrl,
-  });
+  }) as FromSchema<typeof getRes>;
 }
 
 const getApi = {
   req: getReq,
   res: getRes,
-  pathInfo: { path: "/get", method: "post", summary: "获取文件详情及下载链接" },
+  pathInfo: {
+    path: "/get",
+    method: "post",
+    summary: "Get file details and download URL",
+  },
   adapter: bodyUserContextAdapter,
   service: onGet,
   permission: { action: "read" },
 } satisfies API;
 
-// 4. 新增文件 (获取上传 URL)
 async function onAdd(
   params: FromSchema<typeof addReq>,
-  userObj: any,
-  c: any
+  _userObj: unknown,
+  c: Context
 ): Promise<FromSchema<typeof addRes>> {
   const storage = await getActiveStorage(c.env);
-  const url = await storage.getPresignedPutUrl(params.key, {
+  const key = normalizeObjectKey(params.key);
+  const url = await storage.getPresignedPutUrl(key, {
     contentType: params.contentType,
     expiresIn: params.expiresIn,
   });
-  return { url, key: params.key };
+  return { url, key };
 }
 
 const addApi = {
   req: addReq,
   res: addRes,
-  pathInfo: { path: "/add", method: "post", summary: "获取新建文件上传凭证" },
+  pathInfo: { path: "/add", method: "post", summary: "Create an upload URL" },
   adapter: bodyUserContextAdapter,
   service: onAdd,
   permission: { action: "add" },
 } satisfies API;
 
-// 5. 更新文件 (覆盖)
 async function onUpdate(
   params: FromSchema<typeof updateReq>,
-  userObj: any,
-  c: any
+  userObj: unknown,
+  c: Context
 ): Promise<FromSchema<typeof updateRes>> {
-  // 对于 OSS 来说，更新其实和新增一样，都是拿 PUT URL 去覆盖同名文件
   return onAdd(params, userObj, c);
 }
 
@@ -215,28 +315,28 @@ const updateApi = {
   pathInfo: {
     path: "/update",
     method: "post",
-    summary: "获取覆盖文件上传凭证",
+    summary: "Create an overwrite upload URL",
   },
   adapter: bodyUserContextAdapter,
   service: onUpdate,
   permission: { action: "edit" },
 } satisfies API;
 
-// 6. 删除文件
 async function onDelete(
   params: FromSchema<typeof deleteReq>,
-  userObj: any,
-  c: any
+  _userObj: unknown,
+  c: Context
 ): Promise<FromSchema<typeof deleteRes>> {
   const storage = await getActiveStorage(c.env);
-  await storage.delete(params.key);
-  return { key: params.key };
+  const key = normalizeObjectKey(params.key);
+  await storage.delete(key);
+  return { key };
 }
 
 const deleteApi = {
   req: deleteReq,
   res: deleteRes,
-  pathInfo: { path: "/delete", method: "post", summary: "删除文件" },
+  pathInfo: { path: "/delete", method: "post", summary: "Delete file" },
   adapter: bodyUserContextAdapter,
   service: onDelete,
   permission: { action: "delete" },
@@ -244,10 +344,13 @@ const deleteApi = {
 
 export const utils = {
   getActiveStorage,
+  normalizeObjectKey,
+  normalizePrefix,
 };
 
 export default {
   list: listApi,
+  listDirectory: listDirectoryApi,
   listAll: listAllApi,
   get: getApi,
   add: addApi,

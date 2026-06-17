@@ -1,76 +1,62 @@
-import { useState } from 'react';
-import { SchemaCrudPage } from '@/components/Crud';
-import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
-import { tableConfig, type FileRes } from './components/TheTable';
-import TheUploadDialog from './components/TheUploadDialog';
-import { ResponsiveButton } from '@/components/Responsive';
-import { CloudUpload as UploadIcon } from '@mui/icons-material';
+import FileManager from '@/components/FileManager';
+import type {
+  FileManagerAdapter,
+  FileManagerFile,
+  FileManagerListResult,
+} from '@/components/FileManager';
+import { OSS } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as OSSFileAPI from '@/api/oss/file';
-import type { ListFileReq } from '@/api/oss/type';
-import type { SchemaCrudConfig } from '@/components/Crud';
+
+const ossFileAdapter: FileManagerAdapter = {
+  listDirectory: async ({ prefix, pageSize, cursor }): Promise<FileManagerListResult> => {
+    const res = await OSSFileAPI.listDirectoryFn({
+      data: {
+        prefix,
+        pageSize,
+        cursor,
+      },
+    });
+    const data = res.data.data;
+    return {
+      prefix: data.prefix,
+      directories: data.directories,
+      files: data.files,
+      cursor: data.cursor,
+      hasMore: data.hasMore,
+    };
+  },
+  getDownloadUrl: async (file: FileManagerFile) => {
+    const res = await OSSFileAPI.getFn({ data: { key: file.key } });
+    return res.data.data.downloadUrl;
+  },
+  createUploadUrl: async ({ key, contentType, expiresIn }) => {
+    const res = await OSSFileAPI.addFn({
+      data: {
+        key,
+        contentType,
+        expiresIn,
+      },
+    });
+    return res.data.data.url;
+  },
+  uploadDirect: (url, file, contentType, onProgress) =>
+    OSSFileAPI.directUploadFn(url, file, contentType, onProgress),
+  deleteFile: (file) => OSSFileAPI.deleteFn({ data: { key: file.key } }),
+};
 
 export default function OSSFilePage() {
   const t = useTranslation();
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleSuccess = () => {
-    setRefreshKey((prev) => prev + 1);
-  };
-
-  // 通过底座 customActions 选配渲染顶部的自定义按钮
-  const customActions = (
-    <ResponsiveButton
-      variant="contained"
-      color="primary"
-      startIcon={<UploadIcon />}
-      onClick={() => setUploadOpen(true)}
-    >
-      {t('oss.file.upload')}
-    </ResponsiveButton>
-  );
-
-  const config: SchemaCrudConfig<FileRes, FilterState, ListFileReq> = {
-    titleKey: 'oss.file.title',
-    apiKeyName: 'key',
-    cursorPagination: true,
-    permissions: {},
-    api: {
-      list: OSSFileAPI.listFn,
-      delete: (
-        args: Parameters<
-          NonNullable<SchemaCrudConfig<FileRes, FilterState, ListFileReq>['api']['delete']>
-        >[0],
-      ) => OSSFileAPI.deleteFn({ data: { key: String(args.data.id) } }),
-    },
-    filter: {
-      defaultFilters,
-      fields: filterConfig.fields,
-      transformRequest: (filters) =>
-        ({
-          keyword: filters.keyword || undefined,
-        }) as ListFileReq,
-    },
-    table: {
-      columns: tableConfig.columns,
-      cardFields: tableConfig.cardFields,
-      actions: tableConfig.actions,
-    },
-    form: {
-      schema: { type: 'object', properties: {} },
-      defaultForm: {},
-    },
-  };
 
   return (
-    <>
-      <SchemaCrudPage key={refreshKey} config={config} customActions={customActions} />
-      <TheUploadDialog
-        open={uploadOpen}
-        onClose={() => setUploadOpen(false)}
-        onSuccess={handleSuccess}
-      />
-    </>
+    <FileManager
+      title={t('oss.file.title')}
+      adapter={ossFileAdapter}
+      permissions={{
+        upload: [OSS.FILE.ADD],
+        delete: [OSS.FILE.DELETE],
+        download: [OSS.FILE.READ],
+      }}
+    />
   );
 }

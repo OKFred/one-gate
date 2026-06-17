@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "prefix": {
+      "type": "string"
+    },
+    "pageSize": {
+      "type": "number"
+    },
+    "cursor": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

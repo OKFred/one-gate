@@ -7,7 +7,29 @@
     "data": {
       "type": "object",
       "properties": {
-        "list": {
+        "prefix": {
+          "type": "string"
+        },
+        "directories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "prefix": {
+                "type": "string"
+              }
+            },
+            "required": ["key", "name", "prefix"],
+            "additionalProperties": false
+          }
+        },
+        "files": {
           "type": "array",
           "items": {
             "type": "object",
@@ -29,9 +51,6 @@
             "additionalProperties": false
           }
         },
-        "total": {
-          "type": "number"
-        },
         "pageSize": {
           "type": "number"
         },
@@ -42,7 +61,7 @@
           "type": "boolean"
         }
       },
-      "required": ["list", "total", "pageSize", "hasMore"],
+      "required": ["prefix", "directories", "files", "pageSize", "hasMore"],
       "additionalProperties": false
     },
     "message": {
