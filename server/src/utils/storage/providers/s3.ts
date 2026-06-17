@@ -124,6 +124,7 @@ export class S3Provider implements StorageProvider {
       Prefix: options?.prefix,
       MaxKeys: options?.limit,
       ContinuationToken: options?.cursor,
+      Delimiter: options?.delimiter,
     });
     const response = await this.client.send(command);
     const objects = (response.Contents || []).map((item) => ({
@@ -133,6 +134,9 @@ export class S3Provider implements StorageProvider {
     }));
     return {
       objects,
+      prefixes: (response.CommonPrefixes || [])
+        .map((item) => item.Prefix)
+        .filter((prefix): prefix is string => !!prefix),
       cursor: response.NextContinuationToken,
       isTruncated: !!response.IsTruncated,
     };

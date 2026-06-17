@@ -7,11 +7,18 @@ import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 
 import keySvg from '@/assets/imgs/key.svg?raw';
 import { useState, useEffect } from 'react';
+import { useThemeMode } from '@/hooks/useThemeMode';
 
 function App() {
   const isTranslationsLoaded = useLoadTranslations();
   const [progress, setProgress] = useState(0);
   const [shouldRender, setShouldRender] = useState(false);
+  const { isDark, mode } = useThemeMode();
+
+  // 提前设置 data-theme，确保加载屏幕期间 CSS 变量也能正确生效
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', mode);
+  }, [mode]);
 
   useEffect(() => {
     let timer: number | undefined;
@@ -39,24 +46,62 @@ function App() {
 
   if (!shouldRender) {
     return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 transition-opacity duration-300">
-        <div className="flex flex-col items-center">
+      <div
+        style={{
+          display: 'flex',
+          height: '100vh',
+          width: '100vw',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: isDark ? '#111827' : '#f9fafb',
+          transition: 'opacity 0.3s',
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           {/* 扁平优雅的 SVG Key 标志 */}
           <div
-            className="w-12 h-12 text-[#1976d2] dark:text-[#90caf9] mb-8 opacity-80"
+            style={{
+              width: 48,
+              height: 48,
+              marginBottom: 32,
+              opacity: 0.8,
+              color: isDark ? '#90caf9' : '#1976d2',
+            }}
             dangerouslySetInnerHTML={{ __html: keySvg }}
           />
 
           {/* 进度条轨道 */}
-          <div className="w-[180px] h-[3px] bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden relative">
+          <div
+            style={{
+              width: 180,
+              height: 3,
+              borderRadius: 9999,
+              overflow: 'hidden',
+              position: 'relative',
+              backgroundColor: isDark ? '#1f2937' : '#e5e7eb',
+            }}
+          >
             <div
-              className="h-full bg-gradient-to-r from-[#1976d2] to-[#9c27b0] transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
+              style={{
+                height: '100%',
+                transition: 'all 0.3s ease-out',
+                background: 'linear-gradient(to right, #1976d2, #9c27b0)',
+                width: `${progress}%`,
+              }}
             />
           </div>
 
           {/* 加载文字提示 */}
-          <span className="text-[11px] text-gray-400 dark:text-gray-600 tracking-wider mt-5 font-mono">
+          <span
+            style={{
+              fontSize: 11,
+              letterSpacing: '0.1em',
+              marginTop: 20,
+              fontFamily: 'monospace',
+              color: isDark ? '#4b5563' : '#9ca3af',
+            }}
+          >
             Loading...
           </span>
         </div>

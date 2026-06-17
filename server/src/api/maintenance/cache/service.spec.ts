@@ -101,7 +101,7 @@ describe("Cache Service 单元测试", () => {
     it("应该成功清空所有缓存", async () => {
       vi.mocked(kv.clear).mockResolvedValue(undefined);
 
-      const res = await cacheService.clear.service({});
+      const res = await cacheService.clear.service();
 
       expect(kv.clear).toHaveBeenCalled();
       expect(res).toEqual({ success: true });

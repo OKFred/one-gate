@@ -166,6 +166,41 @@ export const ossTranslations = {
         "en-US": "Enter storage path, leave empty for root",
       },
     },
+    {
+      tKey: "oss.file.copySuccess",
+      langCodes: {
+        "zh-CN": "链接已复制到剪贴板",
+        "en-US": "URL copied to clipboard",
+      },
+    },
+    {
+      tKey: "oss.file.currentDirectorySearch",
+      langCodes: {
+        "zh-CN": "搜索当前目录",
+        "en-US": "Search current directory",
+      },
+    },
+    {
+      tKey: "oss.file.emptyDirectory",
+      langCodes: {
+        "zh-CN": "当前目录为空",
+        "en-US": "This directory is empty",
+      },
+    },
+    {
+      tKey: "oss.file.root",
+      langCodes: {
+        "zh-CN": "根目录",
+        "en-US": "Root",
+      },
+    },
+    {
+      tKey: "oss.file.uploadProgress",
+      langCodes: {
+        "zh-CN": "上传进度",
+        "en-US": "Upload Progress",
+      },
+    },
   ],
 } satisfies Record<
   Extract<BusinessKey, "oss.config" | "oss.file">,

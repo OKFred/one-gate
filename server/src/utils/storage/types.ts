@@ -20,10 +20,12 @@ export interface StorageListOptions {
   prefix?: string;
   limit?: number;
   cursor?: string;
+  delimiter?: string;
 }
 
 export interface StorageListResult {
   objects: StorageObjectMetadata[];
+  prefixes?: string[];
   cursor?: string;
   isTruncated: boolean;
 }

@@ -758,6 +758,20 @@ export const sharedTranslations = {
         "en-US": "Updater",
       },
     },
+    {
+      tKey: "pagination.prev",
+      langCodes: {
+        "zh-CN": "上一页",
+        "en-US": "Previous",
+      },
+    },
+    {
+      tKey: "pagination.next",
+      langCodes: {
+        "zh-CN": "下一页",
+        "en-US": "Next",
+      },
+    },
   ],
   common: [
     {
@@ -772,6 +786,13 @@ export const sharedTranslations = {
       langCodes: {
         "zh-CN": "退出全屏",
         "en-US": "Exit Full Screen",
+      },
+    },
+    {
+      tKey: "common.refresh",
+      langCodes: {
+        "zh-CN": "刷新",
+        "en-US": "Refresh",
       },
     },
   ],

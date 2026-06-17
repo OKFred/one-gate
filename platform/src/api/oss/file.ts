@@ -13,6 +13,17 @@ export const listFn = (
   });
 };
 
+/** 分页获取目录列表 */
+export const listDirectoryFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/listDirectory', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/oss/file/listDirectory',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 /** 获取全部文件列表 */
 export const listAllFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/oss/file/listAll', 'post'>, 'url' | 'method'>,

@@ -25,5 +25,12 @@ export type VerifyConfigRes = Awaited<ReturnType<typeof OSSConfigAPI.verifyFn>>[
 export type ListFileReq = NonNullable<Parameters<typeof OSSFileAPI.listFn>[0]['data']>;
 export type ListFileRes = Awaited<ReturnType<typeof OSSFileAPI.listFn>>['data']['data'];
 
+export type ListDirectoryFileReq = NonNullable<
+  Parameters<typeof OSSFileAPI.listDirectoryFn>[0]['data']
+>;
+export type ListDirectoryFileRes = Awaited<
+  ReturnType<typeof OSSFileAPI.listDirectoryFn>
+>['data']['data'];
+
 export type DeleteFileReq = NonNullable<Parameters<typeof OSSFileAPI.deleteFn>[0]['data']>;
 export type DeleteFileRes = Awaited<ReturnType<typeof OSSFileAPI.deleteFn>>['data']['data'];

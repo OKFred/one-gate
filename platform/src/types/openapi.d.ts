@@ -4250,7 +4250,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 列出存储桶中的文件(分页) */
+        /** List files in storage bucket */
         post: {
             parameters: {
                 query?: never;
@@ -4299,6 +4299,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/oss/file/listDirectory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List directories and files under a prefix */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["oss.fileListDirectoryReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["oss.fileListDirectoryRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/oss/file/listAll": {
         parameters: {
             query?: never;
@@ -4308,7 +4366,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取所有文件（不分页） */
+        /** List all files */
         post: {
             parameters: {
                 query?: never;
@@ -4366,7 +4424,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取文件详情及下载链接 */
+        /** Get file details and download URL */
         post: {
             parameters: {
                 query?: never;
@@ -4424,7 +4482,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取新建文件上传凭证 */
+        /** Create an upload URL */
         post: {
             parameters: {
                 query?: never;
@@ -4482,7 +4540,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取覆盖文件上传凭证 */
+        /** Create an overwrite upload URL */
         post: {
             parameters: {
                 query?: never;
@@ -4540,7 +4598,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除文件 */
+        /** Delete file */
         post: {
             parameters: {
                 query?: never;
@@ -13066,89 +13124,131 @@ export interface components {
             message: string;
         };
         "oss.fileListReq": {
-            /** @description 前缀/路径搜索 (对应 prefix) */
+            /** @description Prefix/path search */
             keyword?: string;
-            /** @description 页码 (游标分页下仅作兼容，不影响实际查询) */
+            /** @description Page number, kept for compatibility with cursor pagination */
             pageNo?: number;
             /**
-             * @description 每页数量 (对应 limit)
+             * @description Page size
              * @default 10
              */
             pageSize: number;
-            /** @description 下一页游标 */
+            /** @description Next page cursor */
             cursor?: string;
         };
         "oss.fileListRes": {
             ok: boolean;
             data: {
                 list: {
-                    /** @description 文件路径/键名 */
+                    /** @description Object key */
                     key: string;
-                    /** @description 文件大小 (字节) */
+                    /** @description File size in bytes */
                     size?: number;
-                    /** @description 最后修改时间 */
+                    /** @description Last modified time */
                     lastModified?: string;
-                    /** @description MIME类型 */
+                    /** @description MIME content type */
                     contentType?: string;
                 }[];
-                /** @description 当前页实际条数 */
+                /** @description Current page item count */
                 total: number;
                 pageSize: number;
-                /** @description 下一页游标 */
+                /** @description Next page cursor */
                 cursor?: string;
-                /** @description 是否还有更多数据 */
+                /** @description Whether more data is available */
+                hasMore: boolean;
+            };
+            message: string;
+        };
+        "oss.fileListDirectoryReq": {
+            /** @description Current directory prefix */
+            prefix?: string;
+            /**
+             * @description Page size
+             * @default 100
+             */
+            pageSize: number;
+            /** @description Next page cursor */
+            cursor?: string;
+        };
+        "oss.fileListDirectoryRes": {
+            ok: boolean;
+            data: {
+                /** @description Current directory prefix */
+                prefix: string;
+                directories: {
+                    /** @description Directory prefix */
+                    key: string;
+                    /** @description Directory name */
+                    name: string;
+                    /** @description Prefix used to enter this directory */
+                    prefix: string;
+                }[];
+                files: {
+                    /** @description Object key */
+                    key: string;
+                    /** @description File size in bytes */
+                    size?: number;
+                    /** @description Last modified time */
+                    lastModified?: string;
+                    /** @description MIME content type */
+                    contentType?: string;
+                }[];
+                pageSize: number;
+                /** @description Next page cursor */
+                cursor?: string;
+                /** @description Whether more data is available */
                 hasMore: boolean;
             };
             message: string;
         };
         "oss.fileListAllReq": {
-            /** @description 前缀/路径搜索 (对应 prefix) */
+            /** @description Prefix/path search */
             keyword?: string;
         };
         "oss.fileListAllRes": {
             ok: boolean;
             data: {
-                /** @description 文件路径/键名 */
+                /** @description Object key */
                 key: string;
-                /** @description 文件大小 (字节) */
+                /** @description File size in bytes */
                 size?: number;
-                /** @description 最后修改时间 */
+                /** @description Last modified time */
                 lastModified?: string;
-                /** @description MIME类型 */
+                /** @description MIME content type */
                 contentType?: string;
             }[];
             message: string;
         };
         "oss.fileGetReq": {
-            /** @description 文件路径/键名 */
+            /** @description Object key */
             key: string;
         };
         "oss.fileGetRes": {
             ok: boolean;
             data: {
-                /** @description 文件路径/键名 */
+                /** @description Object key */
                 key: string;
-                /** @description 文件大小 (字节) */
+                /** @description File size in bytes */
                 size?: number;
-                /** @description 最后修改时间 */
+                /** @description Last modified time */
                 lastModified?: string;
-                /** @description MIME类型 */
+                /** @description MIME content type */
                 contentType?: string;
-                /** @description 临时下载链接 */
+                /** @description Temporary download URL */
                 downloadUrl: string;
             };
             message: string;
         };
         "oss.fileAddReq": {
-            /** @description 文件路径/键名 */
+            /** @description Object key */
             key: string;
             /**
-             * @description 文件类型
+             * @description Content type
              * @default application/octet-stream
              */
             contentType: string;
             /**
-             * @description 凭证过期时间(秒)
+             * @description Presigned URL expiration in seconds
              * @default 3600
              */
             expiresIn: number;
@@ -13156,22 +13256,22 @@ export interface components {
         "oss.fileAddRes": {
             ok: boolean;
             data: {
-                /** @description 上传预签名URL */
+                /** @description Presigned upload URL */
                 url: string;
                 key: string;
             };
             message: string;
         };
         "oss.fileUpdateReq": {
-            /** @description 文件路径/键名 */
+            /** @description Object key */
             key: string;
             /**
-             * @description 文件类型
+             * @description Content type
              * @default application/octet-stream
              */
             contentType: string;
             /**
-             * @description 凭证过期时间(秒)
+             * @description Presigned URL expiration in seconds
              * @default 3600
              */
             expiresIn: number;
@@ -13179,14 +13279,14 @@ export interface components {
         "oss.fileUpdateRes": {
             ok: boolean;
             data: {
-                /** @description 上传预签名URL */
+                /** @description Presigned upload URL */
                 url: string;
                 key: string;
             };
             message: string;
         };
         "oss.fileDeleteReq": {
-            /** @description 文件路径/键名 */
+            /** @description Object key */
             key: string;
         };
         "oss.fileDeleteRes": {
