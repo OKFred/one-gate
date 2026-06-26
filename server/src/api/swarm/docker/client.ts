@@ -1,4 +1,8 @@
 import { getEnv, getAllEnv } from "@/utils/env";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError";
 
 export class DockerClient {
   private baseUrl: string;
@@ -172,12 +176,18 @@ export class DockerClient {
       return response.ok && (await response.text()).trim() === "OK";
     } catch (err) {
       console.error("testRawConnection connection failed:", err);
-      return false;
+      // 提取底层网络错误的可读描述
+      const cause = (err as any)?.cause;
+      const detail = (cause?.message || (err as Error)?.message || String(err))
+        .replace(/^Error: /, "")
+        .trim();
+      throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, { detail });
     }
   }
 
   private getUrl(path: string, queryParams?: Record<string, string>): string {
-    const url = `${this.baseUrl}/${this.apiVersion}${path}`;
+    const versionSegment = this.apiVersion ? `/${this.apiVersion}` : "";
+    const url = `${this.baseUrl}${versionSegment}${path}`;
     if (queryParams) {
       const q = new URLSearchParams(queryParams).toString();
       return q ? `${url}?${q}` : url;
@@ -211,9 +221,18 @@ export class DockerClient {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(
-        `Docker API Error: ${response.status} ${response.statusText} - ${text}`
-      );
+      let detail = text;
+      try {
+        const json = JSON.parse(text);
+        if (json.message) detail = json.message;
+      } catch {
+        // text 不是 JSON，直接使用原始文本
+      }
+      throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, {
+        detail,
+        status: response.status,
+        statusText: response.statusText,
+      });
     }
 
     const contentType = response.headers.get("content-type") || "";
@@ -305,9 +324,18 @@ export class DockerClient {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(
-        `Docker API Error: ${response.status} ${response.statusText} - ${text}`
-      );
+      let detail = text;
+      try {
+        const json = JSON.parse(text);
+        if (json.message) detail = json.message;
+      } catch {
+        // text 不是 JSON，直接使用原始文本
+      }
+      throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, {
+        detail,
+        status: response.status,
+        statusText: response.statusText,
+      });
     }
 
     const arrayBuffer = await response.arrayBuffer();

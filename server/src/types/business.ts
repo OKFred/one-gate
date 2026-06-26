@@ -63,6 +63,10 @@ export const BUSINESS = {
   enterprise: "enterprise",
   /** 企业考勤 */
   "enterprise.attendance": "enterprise.attendance",
+  /** 企业工作流 */
+  "enterprise.workflow": "enterprise.workflow",
+  /** 企业工作流配置 */
+  "enterprise.workflow_config": "enterprise.workflow_config",
   /** AI */
   ai: "ai",
   /** AI 配置 */

@@ -14,19 +14,31 @@
       "type": "boolean"
     },
     "caCert": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "clientCert": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "clientKey": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "cfMtlsBinding": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "isEnabled": {
@@ -36,11 +48,20 @@
       "type": "boolean"
     },
     "remark": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true,
       "maxLength": 500
     }
   },
-  "required": ["name", "host", "tlsVerify", "isEnabled", "isDefault"],
+  "required": [
+    "name",
+    "host",
+    "tlsVerify",
+    "isEnabled",
+    "isDefault"
+  ],
   "additionalProperties": false
 }

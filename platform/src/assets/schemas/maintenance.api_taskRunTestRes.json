@@ -17,11 +17,17 @@
           "type": "number"
         },
         "responseBody": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "nullable": true
         },
         "errorMessage": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "nullable": true
         },
         "responseHeaders": {
@@ -29,11 +35,17 @@
           "additionalProperties": true
         },
         "statusText": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "nullable": true
         },
         "url": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "nullable": true
         },
         "redirected": {
@@ -55,17 +67,28 @@
               }
             }
           },
-          "required": ["hasSchema", "valid"],
+          "required": [
+            "hasSchema",
+            "valid"
+          ],
           "additionalProperties": false
         }
       },
-      "required": ["success", "statusCode", "durationMs"],
+      "required": [
+        "success",
+        "statusCode",
+        "durationMs"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

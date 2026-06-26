@@ -200,6 +200,20 @@ export const ENTERPRISE = {
     EDIT: 'enterprise.attendance:edit',
     DELETE: 'enterprise.attendance:delete',
   },
+  /** 工作流编排 */
+  WORKFLOW: {
+    READ: 'enterprise.workflow:read',
+    ADD: 'enterprise.workflow:add',
+    EDIT: 'enterprise.workflow:edit',
+    DELETE: 'enterprise.workflow:delete',
+  },
+  /** 工作流配置 */
+  WORKFLOW_CONFIG: {
+    READ: 'enterprise.workflow_config:read',
+    ADD: 'enterprise.workflow_config:add',
+    EDIT: 'enterprise.workflow_config:edit',
+    DELETE: 'enterprise.workflow_config:delete',
+  },
 } as const;
 
 /** AI */

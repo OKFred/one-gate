@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "cdpUrl": {
+      "type": "string"
+    },
+    "isDefault": {
+      "type": "boolean"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "remark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    }
+  },
+  "required": [
+    "name",
+    "cdpUrl",
+    "isDefault",
+    "isEnabled"
+  ],
+  "additionalProperties": false
+}

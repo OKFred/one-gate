@@ -25,7 +25,11 @@
                 "type": "string"
               }
             },
-            "required": ["key", "name", "prefix"],
+            "required": [
+              "key",
+              "name",
+              "prefix"
+            ],
             "additionalProperties": false
           }
         },
@@ -47,7 +51,9 @@
                 "type": "string"
               }
             },
-            "required": ["key"],
+            "required": [
+              "key"
+            ],
             "additionalProperties": false
           }
         },
@@ -61,13 +67,23 @@
           "type": "boolean"
         }
       },
-      "required": ["prefix", "directories", "files", "pageSize", "hasMore"],
+      "required": [
+        "prefix",
+        "directories",
+        "files",
+        "pageSize",
+        "hasMore"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

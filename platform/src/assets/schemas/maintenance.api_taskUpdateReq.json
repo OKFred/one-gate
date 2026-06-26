@@ -14,7 +14,10 @@
       "maxLength": 100
     },
     "description": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true,
       "maxLength": 500
     },
@@ -28,18 +31,33 @@
     },
     "method": {
       "type": "string",
-      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+      "enum": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
     },
     "headers": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "requestSchema": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "responseSchema": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     },
     "timeoutMs": {
@@ -49,6 +67,8 @@
       "type": "boolean"
     }
   },
-  "required": ["id"],
+  "required": [
+    "id"
+  ],
   "additionalProperties": false
 }

@@ -18,7 +18,11 @@
     },
     "orderBy": {
       "type": "string",
-      "enum": ["id", "name", "createTimeUtc"]
+      "enum": [
+        "id",
+        "name",
+        "createTimeUtc"
+      ]
     }
   },
   "required": [],

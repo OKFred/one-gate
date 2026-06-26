@@ -130,6 +130,8 @@ const IGNORED_BUSINESS_KEYS = new Set([
   'oss.file',
   'enterprise',
   'enterprise.attendance',
+  'enterprise.workflow',
+  'enterprise.workflow_config',
   'ai',
   'ai.config',
   'ai.chat',

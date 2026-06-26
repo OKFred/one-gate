@@ -20,6 +20,8 @@
       "type": "number"
     }
   },
-  "required": ["jobId"],
+  "required": [
+    "jobId"
+  ],
   "additionalProperties": false
 }

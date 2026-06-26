@@ -81,6 +81,59 @@ const TheForm = memo(
       }
     }, []);
 
+    // 将扁平的菜单列表构建成有缩进展示的层级列表，同时过滤掉当前节点及子孙节点（防环）
+    const buildIndentedList = useCallback(
+      (list: MenuData[]): { id: number; displayName: string }[] => {
+        const invalidIds = new Set<number>();
+        if (editingMenu?.id) {
+          invalidIds.add(editingMenu.id);
+          const findDescendants = (id: number) => {
+            list.forEach((m) => {
+              if (m.parentId === id) {
+                invalidIds.add(m.id!);
+                findDescendants(m.id!);
+              }
+            });
+          };
+          findDescendants(editingMenu.id);
+        }
+
+        const map = new Map<number, MenuData & { children: MenuData[] }>();
+        list.forEach((item) => {
+          map.set(Number(item.id), { ...item, children: [] });
+        });
+
+        const roots: (MenuData & { children: MenuData[] })[] = [];
+        map.forEach((node) => {
+          const pid = node.parentId as number | null | undefined;
+          if (pid != null && map.has(pid)) {
+            const parent = map.get(pid)!;
+            parent.children.push(node);
+          } else {
+            roots.push(node);
+          }
+        });
+
+        const result: { id: number; displayName: string }[] = [];
+        const traverse = (nodes: (MenuData & { children: MenuData[] })[], depth = 0) => {
+          nodes.forEach((node) => {
+            if (invalidIds.has(node.id!)) return;
+            const prefix = '— '.repeat(depth);
+            result.push({
+              id: node.id!,
+              displayName: `${prefix}${t(node.name)}`,
+            });
+            if (node.children && node.children.length > 0) {
+              traverse(node.children as (MenuData & { children: MenuData[] })[], depth + 1);
+            }
+          });
+        };
+        traverse(roots);
+        return result;
+      },
+      [editingMenu, t],
+    );
+
     // 暴露给父组件的方法
     useImperativeHandle(
       ref,
@@ -262,13 +315,11 @@ const TheForm = memo(
                 <MenuItem value="">
                   <em>{t('menu.table.topLevelMenu')}</em>
                 </MenuItem>
-                {allMenus
-                  .filter((m) => m.id !== editingMenu?.id)
-                  .map((menu) => (
-                    <MenuItem key={menu.id} value={menu.id}>
-                      {menu.name}
-                    </MenuItem>
-                  ))}
+                {buildIndentedList(allMenus).map((menu) => (
+                  <MenuItem key={menu.id} value={menu.id}>
+                    {menu.displayName}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
 

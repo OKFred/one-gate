@@ -25,18 +25,29 @@
                 "type": "string"
               }
             },
-            "required": ["taskKey", "message"],
+            "required": [
+              "taskKey",
+              "message"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["successCount", "failedCount", "errors"],
+      "required": [
+        "successCount",
+        "failedCount",
+        "errors"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

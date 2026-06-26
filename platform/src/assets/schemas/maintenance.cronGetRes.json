@@ -27,16 +27,25 @@
           "type": "boolean"
         },
         "parameters": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "nullable": true,
           "maxLength": 1000
         },
         "lastRunTimeUtc": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "nullable": true
         },
         "nextRunTimeUtc": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "nullable": true
         },
         "runCount": {
@@ -49,11 +58,17 @@
           "type": "number"
         },
         "updaterId": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "nullable": true
         },
         "updateTimeUtc": {
-          "type": ["number", "null"],
+          "type": [
+            "number",
+            "null"
+          ],
           "nullable": true
         }
       },
@@ -75,6 +90,10 @@
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

@@ -265,21 +265,16 @@ const deleteApi = {
 // 验证连通性
 async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
   const config = await onGet(obj);
-  try {
-    // 调用 dockerClient 的测试连接静态方法
-    return await dockerClient.testRawConnection({
-      host: config.host,
-      apiVersion: config.apiVersion || "",
-      tlsVerify: config.tlsVerify,
-      caCert: config.caCert ?? undefined,
-      clientCert: config.clientCert ?? undefined,
-      clientKey: config.clientKey ?? undefined,
-      cfMtlsBinding: config.cfMtlsBinding ?? undefined,
-    });
-  } catch (e) {
-    console.error("验证 Docker 连通性失败:", e);
-    return false;
-  }
+  // testRawConnection 在连接失败时会抛出 BusinessError，由 errorHandler 统一处理
+  return await dockerClient.testRawConnection({
+    host: config.host,
+    apiVersion: config.apiVersion || "",
+    tlsVerify: config.tlsVerify,
+    caCert: config.caCert ?? undefined,
+    clientCert: config.clientCert ?? undefined,
+    clientKey: config.clientKey ?? undefined,
+    cfMtlsBinding: config.cfMtlsBinding ?? undefined,
+  });
 }
 
 const verifyApi = {

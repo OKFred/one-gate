@@ -8417,6 +8417,760 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enterprise/workflow/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 工作流详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 手动运行工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowRunReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowRunRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取工作流环境配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_listReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_listRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建工作流配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_addReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_addRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新工作流配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_updateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_updateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除工作流配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_deleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_deleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/config/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证 CDP 连接连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_verifyReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_verifyRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/workflow/log/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页查询工作流执行日志 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowLog_listReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowLog_listRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ai/config/listAll": {
         parameters: {
             query?: never;
@@ -13124,131 +13878,131 @@ export interface components {
             message: string;
         };
         "oss.fileListReq": {
-            /** @description Prefix/path search */
+            /** @description 前缀/路径搜索 */
             keyword?: string;
-            /** @description Page number, kept for compatibility with cursor pagination */
+            /** @description 页码,兼容游标分页 */
             pageNo?: number;
             /**
-             * @description Page size
+             * @description 每页数量
              * @default 10
              */
             pageSize: number;
-            /** @description Next page cursor */
+            /** @description 下一页游标 */
             cursor?: string;
         };
         "oss.fileListRes": {
             ok: boolean;
             data: {
                 list: {
-                    /** @description Object key */
+                    /** @description 文件路径/键名 */
                     key: string;
-                    /** @description File size in bytes */
+                    /** @description 文件大小 (字节) */
                     size?: number;
-                    /** @description Last modified time */
+                    /** @description 最后修改时间 */
                     lastModified?: string;
-                    /** @description MIME content type */
+                    /** @description MIME类型 */
                     contentType?: string;
                 }[];
-                /** @description Current page item count */
+                /** @description 当前页数量 */
                 total: number;
                 pageSize: number;
-                /** @description Next page cursor */
+                /** @description 下一页游标 */
                 cursor?: string;
-                /** @description Whether more data is available */
+                /** @description 是否有更多数据 */
                 hasMore: boolean;
             };
             message: string;
         };
         "oss.fileListDirectoryReq": {
-            /** @description Current directory prefix */
+            /** @description 当前目录前缀 */
             prefix?: string;
             /**
-             * @description Page size
+             * @description 每页数量
              * @default 100
              */
             pageSize: number;
-            /** @description Next page cursor */
+            /** @description 下一页游标 */
             cursor?: string;
         };
         "oss.fileListDirectoryRes": {
             ok: boolean;
             data: {
-                /** @description Current directory prefix */
+                /** @description 当前目录前缀 */
                 prefix: string;
                 directories: {
-                    /** @description Directory prefix */
+                    /** @description 目录路径 */
                     key: string;
-                    /** @description Directory name */
+                    /** @description 目录名称 */
                     name: string;
-                    /** @description Prefix used to enter this directory */
+                    /** @description 进入该目录所需的路径前缀 */
                     prefix: string;
                 }[];
                 files: {
-                    /** @description Object key */
+                    /** @description 文件路径/键名 */
                     key: string;
-                    /** @description File size in bytes */
+                    /** @description 文件大小 (字节) */
                     size?: number;
-                    /** @description Last modified time */
+                    /** @description 最后修改时间 */
                     lastModified?: string;
-                    /** @description MIME content type */
+                    /** @description MIME类型 */
                     contentType?: string;
                 }[];
                 pageSize: number;
-                /** @description Next page cursor */
+                /** @description 下一页游标 */
                 cursor?: string;
-                /** @description Whether more data is available */
+                /** @description 是否有更多数据 */
                 hasMore: boolean;
             };
             message: string;
         };
         "oss.fileListAllReq": {
-            /** @description Prefix/path search */
+            /** @description 前缀/路径搜索 */
             keyword?: string;
         };
         "oss.fileListAllRes": {
             ok: boolean;
             data: {
-                /** @description Object key */
+                /** @description 文件路径/键名 */
                 key: string;
-                /** @description File size in bytes */
+                /** @description 文件大小 (字节) */
                 size?: number;
-                /** @description Last modified time */
+                /** @description 最后修改时间 */
                 lastModified?: string;
-                /** @description MIME content type */
+                /** @description MIME类型 */
                 contentType?: string;
             }[];
             message: string;
         };
         "oss.fileGetReq": {
-            /** @description Object key */
+            /** @description 文件路径/键名 */
             key: string;
         };
         "oss.fileGetRes": {
             ok: boolean;
             data: {
-                /** @description Object key */
+                /** @description 文件路径/键名 */
                 key: string;
-                /** @description File size in bytes */
+                /** @description 文件大小 (字节) */
                 size?: number;
-                /** @description Last modified time */
+                /** @description 最后修改时间 */
                 lastModified?: string;
-                /** @description MIME content type */
+                /** @description MIME类型 */
                 contentType?: string;
-                /** @description Temporary download URL */
+                /** @description 临时下载链接 */
                 downloadUrl: string;
             };
             message: string;
         };
         "oss.fileAddReq": {
-            /** @description Object key */
+            /** @description 文件路径/键名 */
             key: string;
             /**
-             * @description Content type
+             * @description 文件类型
              * @default application/octet-stream
              */
             contentType: string;
             /**
-             * @description Presigned URL expiration in seconds
+             * @description 预签名URL过期时间(秒)
              * @default 3600
              */
             expiresIn: number;
@@ -13256,22 +14010,22 @@ export interface components {
         "oss.fileAddRes": {
             ok: boolean;
             data: {
-                /** @description Presigned upload URL */
+                /** @description 上传预签名URL */
                 url: string;
                 key: string;
             };
             message: string;
         };
         "oss.fileUpdateReq": {
-            /** @description Object key */
+            /** @description 文件路径/键名 */
             key: string;
             /**
-             * @description Content type
+             * @description 文件类型
              * @default application/octet-stream
              */
             contentType: string;
             /**
-             * @description Presigned URL expiration in seconds
+             * @description 预签名URL过期时间(秒)
              * @default 3600
              */
             expiresIn: number;
@@ -13279,14 +14033,14 @@ export interface components {
         "oss.fileUpdateRes": {
             ok: boolean;
             data: {
-                /** @description Presigned upload URL */
+                /** @description 上传预签名URL */
                 url: string;
                 key: string;
             };
             message: string;
         };
         "oss.fileDeleteReq": {
-            /** @description Object key */
+            /** @description 文件路径/键名 */
             key: string;
         };
         "oss.fileDeleteRes": {
@@ -14258,7 +15012,53 @@ export interface components {
                      * @example 1672531199000
                      */
                     updateTimeUtc: ((number | null) | null) | null;
-                    children: unknown[];
+                    children: {
+                        /**
+                         * @description id
+                         * @example 1
+                         */
+                        id: number;
+                        /**
+                         * @description 菜单名称
+                         * @example 主页
+                         */
+                        name: string;
+                        /**
+                         * @description 图标名称，使用 Iconify material-symbols 图标
+                         * @example material-symbols:home
+                         */
+                        icon: string;
+                        /**
+                         * @description 路由路径
+                         * @example /home
+                         */
+                        path: ((string | null) | null) | null;
+                        /** @description 父菜单ID，支持菜单层级 */
+                        parentId: ((number | null) | null) | null;
+                        /** @description 排序 */
+                        sort: number;
+                        /** @description 业务标识 */
+                        business: ((string | null) | null) | null;
+                        /** @description 备注说明 */
+                        remark: ((string | null) | null) | null;
+                        /** @description 是否启用 */
+                        isEnabled: boolean;
+                        /** @description 创建人ID */
+                        creatorId: number;
+                        /**
+                         * @description 创建时间
+                         * @example 1672531199000
+                         */
+                        createTimeUtc: number;
+                        /** @description 更新人ID */
+                        updaterId: ((number | null) | null) | null;
+                        /**
+                         * @description 更新时间
+                         * @example 1672531199000
+                         */
+                        updateTimeUtc: ((number | null) | null) | null;
+                        children: unknown[];
+                    }[];
                 }[];
             }[];
             message: string;
@@ -16248,6 +17048,383 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "enterprise.workflowListAllReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        "enterprise.workflowListAllRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 工作流名称 */
+                name: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+            }[];
+            message: string;
+        };
+        "enterprise.workflowListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        "enterprise.workflowListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 工作流名称 */
+                    name: string;
+                    /** @description 描述信息 */
+                    description: ((string | null) | null) | null;
+                    /** @description 图节点与连线数据 (React Flow JSON) */
+                    flowData?: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注说明 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "enterprise.workflowAddReq": {
+            /** @description 工作流名称 */
+            name: string;
+            /** @description 描述信息 */
+            description?: ((string | null) | null) | null;
+            /** @description 图节点与连线数据 (React Flow JSON) */
+            flowData: string;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+        };
+        "enterprise.workflowAddRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "enterprise.workflowUpdateReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 工作流名称 */
+            name?: string;
+            /** @description 描述信息 */
+            description?: ((string | null) | null) | null;
+            /** @description 图节点与连线数据 (React Flow JSON) */
+            flowData?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+        };
+        "enterprise.workflowUpdateRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "enterprise.workflowGetReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.workflowGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 工作流名称 */
+                name: string;
+                /** @description 描述信息 */
+                description?: ((string | null) | null) | null;
+                /** @description 图节点与连线数据 (React Flow JSON) */
+                flowData: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 备注说明 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "enterprise.workflowDeleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.workflowDeleteRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "enterprise.workflowRunReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.workflowRunRes": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "enterprise.workflowConfig_listReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
+        };
+        "enterprise.workflowConfig_listRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 配置名 */
+                    name: string;
+                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+                    cdpUrl: string;
+                    /** @description 是否为默认环境 */
+                    isDefault: boolean;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注信息 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "enterprise.workflowConfig_addReq": {
+            /** @description 配置名 */
+            name: string;
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            cdpUrl: string;
+            /** @description 是否为默认环境 */
+            isDefault: boolean;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+        };
+        "enterprise.workflowConfig_addRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "enterprise.workflowConfig_updateReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 配置名 */
+            name?: string;
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            cdpUrl?: string;
+            /** @description 是否为默认环境 */
+            isDefault?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+        };
+        "enterprise.workflowConfig_updateRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "enterprise.workflowConfig_deleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.workflowConfig_deleteRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "enterprise.workflowConfig_verifyReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "enterprise.workflowConfig_verifyRes": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "enterprise.workflowLog_listReq": {
+            pageNo?: number;
+            pageSize?: number;
+            workflowId: number;
+        };
+        "enterprise.workflowLog_listRes": {
+            ok: boolean;
+            data: {
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+                list: {
+                    id: number;
+                    workflowId: number;
+                    status: string;
+                    triggerType: string;
+                    startTimeUtc: number;
+                    endTimeUtc?: ((number | null) | null) | null;
+                    logs?: ((string | null) | null) | null;
+                    creatorId?: number;
+                    createTimeUtc?: number;
+                }[];
             };
             message: string;
         };

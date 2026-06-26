@@ -19,6 +19,8 @@ export const BusinessErrorCode = {
   DATABASE_BUSY: "DATABASE_BUSY",
   /** @description 数据库操作错误 */
   DATABASE_ERROR: "DATABASE_ERROR",
+  /** @description Docker API 调用错误 */
+  DOCKER_API_ERROR: "DOCKER_API_ERROR",
 } as const;
 
 export type BusinessErrorCode =
@@ -71,5 +73,9 @@ export const ERROR_PRESENTATION_MAP: Record<
   DATABASE_ERROR: {
     status: 500,
     i18nKey: "errorHandler.databaseError",
+  },
+  DOCKER_API_ERROR: {
+    status: 502,
+    i18nKey: "errorHandler.dockerApiError",
   },
 };

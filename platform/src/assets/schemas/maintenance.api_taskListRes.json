@@ -38,7 +38,10 @@
                 "maxLength": 100
               },
               "description": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "nullable": true,
                 "maxLength": 500
               },
@@ -52,18 +55,33 @@
               },
               "method": {
                 "type": "string",
-                "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+                "enum": [
+                  "GET",
+                  "POST",
+                  "PUT",
+                  "PATCH",
+                  "DELETE"
+                ]
               },
               "headers": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "nullable": true
               },
               "requestSchema": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "nullable": true
               },
               "responseSchema": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "nullable": true
               },
               "timeoutMs": {
@@ -79,11 +97,17 @@
                 "type": "number"
               },
               "updaterId": {
-                "type": ["number", "null"],
+                "type": [
+                  "number",
+                  "null"
+                ],
                 "nullable": true
               },
               "updateTimeUtc": {
-                "type": ["number", "null"],
+                "type": [
+                  "number",
+                  "null"
+                ],
                 "nullable": true
               }
             },
@@ -109,13 +133,23 @@
           }
         }
       },
-      "required": ["total", "totalPage", "currentPage", "pageSize", "list"],
+      "required": [
+        "total",
+        "totalPage",
+        "currentPage",
+        "pageSize",
+        "list"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

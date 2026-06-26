@@ -21,7 +21,13 @@
     },
     "orderBy": {
       "type": "string",
-      "enum": ["id", "name", "lastRunTimeUtc", "runCount", "createTimeUtc"]
+      "enum": [
+        "id",
+        "name",
+        "lastRunTimeUtc",
+        "runCount",
+        "createTimeUtc"
+      ]
     }
   },
   "required": [],

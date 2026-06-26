@@ -335,6 +335,32 @@ export const initialMenuData = [
     sort: 3,
     business: "swarm.docker_config",
   },
+  {
+    id: 39,
+    name: "sidebar.menu.enterprise.workflowGroup",
+    icon: "material-symbols:account-tree",
+    parentId: 26,
+    sort: 2,
+    business: "enterprise",
+  },
+  {
+    id: 40,
+    name: "sidebar.menu.enterprise.workflow",
+    icon: "material-symbols:schema",
+    path: "/enterprise/workflow",
+    parentId: 39,
+    sort: 1,
+    business: "enterprise.workflow",
+  },
+  {
+    id: 41,
+    name: "sidebar.menu.enterprise.workflowConfig",
+    icon: "material-symbols:settings-input-component",
+    path: "/enterprise/workflow/config",
+    parentId: 39,
+    sort: 2,
+    business: "enterprise.workflow_config",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

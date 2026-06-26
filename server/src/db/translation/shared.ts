@@ -563,6 +563,13 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "search.keyword",
+      langCodes: {
+        "zh-CN": "关键词",
+        "en-US": "Keyword",
+      },
+    },
+    {
       tKey: "filter.enabledStatus",
       langCodes: {
         "zh-CN": "启用状态",
@@ -811,6 +818,14 @@ export const sharedTranslations = {
       langCodes: {
         "zh-CN": "数据库操作错误",
         "en-US": "Database operation error",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.dockerApiError",
+      langCodes: {
+        "zh-CN": "Docker API 调用失败",
+        "en-US": "Docker API call failed",
       },
     },
     {
