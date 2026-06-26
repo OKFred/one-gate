@@ -52,11 +52,11 @@ jobs:
           BASE_API_PATH: "/api/v1"
           LOCALE: "zh-CN"
 
-  # Job 2：部署（仅在测试成功，且为 main/master/dev 分支时运行）
+  # Job 2：部署（仅在测试成功，且为 master/dev 分支时运行）
   deploy:
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
+    if: github.event_name == 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
