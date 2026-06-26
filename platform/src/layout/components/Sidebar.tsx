@@ -107,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         <ListItemButton
           onClick={() => handleMenuClick(item)}
           sx={{
-            pl: level > 0 ? 4 : 2,
+            pl: 2 + level * 2,
             backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
           }}
         >
