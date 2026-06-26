@@ -1,4 +1,8 @@
 import { getEnv, getAllEnv } from "@/utils/env";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@/middleware/errorHandler/businessError";
 
 export class DockerClient {
   private baseUrl: string;
@@ -212,9 +216,18 @@ export class DockerClient {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(
-        `Docker API Error: ${response.status} ${response.statusText} - ${text}`
-      );
+      let detail = text;
+      try {
+        const json = JSON.parse(text);
+        if (json.message) detail = json.message;
+      } catch {
+        // text 不是 JSON，直接使用原始文本
+      }
+      throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, {
+        detail,
+        status: response.status,
+        statusText: response.statusText,
+      });
     }
 
     const contentType = response.headers.get("content-type") || "";
@@ -306,9 +319,18 @@ export class DockerClient {
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(
-        `Docker API Error: ${response.status} ${response.statusText} - ${text}`
-      );
+      let detail = text;
+      try {
+        const json = JSON.parse(text);
+        if (json.message) detail = json.message;
+      } catch {
+        // text 不是 JSON，直接使用原始文本
+      }
+      throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, {
+        detail,
+        status: response.status,
+        statusText: response.statusText,
+      });
     }
 
     const arrayBuffer = await response.arrayBuffer();

@@ -815,6 +815,14 @@ export const sharedTranslations = {
     },
     {
       application: "backend",
+      tKey: "errorHandler.dockerApiError",
+      langCodes: {
+        "zh-CN": "Docker API 调用失败",
+        "en-US": "Docker API call failed",
+      },
+    },
+    {
+      application: "backend",
       tKey: "errorHandler.notFound",
       langCodes: {
         "zh-CN": "未找到请求的资源",
