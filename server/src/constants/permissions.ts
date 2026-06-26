@@ -89,6 +89,10 @@ export const permissionSeeds = {
     "": ["read"],
     /** 考勤管理 */
     attendance: ["read", "add", "edit", "delete"],
+    /** 工作流编排 */
+    workflow: ["read", "add", "edit", "delete"],
+    /** 工作流配置 */
+    workflow_config: ["read", "add", "edit", "delete"],
   },
   /** AI */
   ai: {

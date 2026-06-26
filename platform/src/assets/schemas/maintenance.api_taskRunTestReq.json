@@ -5,10 +5,15 @@
       "type": "number"
     },
     "parameters": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true
     }
   },
-  "required": ["id"],
+  "required": [
+    "id"
+  ],
   "additionalProperties": false
 }

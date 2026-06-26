@@ -338,8 +338,19 @@ const menuTreeItem = {
           ...MenuVO,
           children: {
             type: "array",
-            maxLength: 0,
-            minLength: 0,
+            items: {
+              type: "object",
+              properties: {
+                ...MenuVO,
+                children: {
+                  type: "array",
+                  maxLength: 0,
+                  minLength: 0,
+                },
+              },
+              required: [...MenuDetailKeys, "children"],
+              additionalProperties: false,
+            },
           },
         },
         required: [...MenuDetailKeys, "children"],

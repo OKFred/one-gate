@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "pageNo": {
+      "type": "number"
+    },
+    "pageSize": {
+      "type": "number"
+    },
+    "workflowId": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "workflowId"
+  ],
+  "additionalProperties": false
+}

@@ -21,7 +21,12 @@
     },
     "orderBy": {
       "type": "string",
-      "enum": ["id", "name", "taskKey", "createTimeUtc"]
+      "enum": [
+        "id",
+        "name",
+        "taskKey",
+        "createTimeUtc"
+      ]
     }
   },
   "required": [],

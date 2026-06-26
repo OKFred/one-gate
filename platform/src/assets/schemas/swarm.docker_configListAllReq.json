@@ -9,7 +9,13 @@
     },
     "orderBy": {
       "type": "string",
-      "enum": ["id", "name", "isEnabled", "isDefault", "createTimeUtc"]
+      "enum": [
+        "id",
+        "name",
+        "isEnabled",
+        "isDefault",
+        "createTimeUtc"
+      ]
     }
   },
   "required": [],

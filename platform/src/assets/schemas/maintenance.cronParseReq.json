@@ -5,6 +5,8 @@
       "type": "string"
     }
   },
-  "required": ["cronExpression"],
+  "required": [
+    "cronExpression"
+  ],
   "additionalProperties": false
 }

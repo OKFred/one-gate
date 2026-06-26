@@ -6,23 +6,37 @@
       "maxLength": 100
     },
     "version": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true,
       "maxLength": 50
     },
     "description": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "nullable": true,
       "maxLength": 500
     },
     "docType": {
       "type": "string",
-      "enum": ["swagger2.0", "openapi3.0", "openapi3.1"]
+      "enum": [
+        "swagger2.0",
+        "openapi3.0",
+        "openapi3.1"
+      ]
     },
     "content": {
       "type": "string"
     }
   },
-  "required": ["name", "docType", "content"],
+  "required": [
+    "name",
+    "docType",
+    "content"
+  ],
   "additionalProperties": false
 }

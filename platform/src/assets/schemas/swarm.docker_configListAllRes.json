@@ -26,7 +26,13 @@
             "type": "boolean"
           }
         },
-        "required": ["id", "name", "host", "isEnabled", "isDefault"],
+        "required": [
+          "id",
+          "name",
+          "host",
+          "isEnabled",
+          "isDefault"
+        ],
         "additionalProperties": false
       }
     },
@@ -34,6 +40,10 @@
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

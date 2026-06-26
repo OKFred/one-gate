@@ -34,11 +34,17 @@
                 "type": "boolean"
               },
               "errorMessage": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "nullable": true
               },
               "responseBody": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "nullable": true
               },
               "startTimeUtc": {
@@ -51,18 +57,35 @@
                 "type": "number"
               }
             },
-            "required": ["id", "jobId", "status", "startTimeUtc", "endTimeUtc", "durationMs"],
+            "required": [
+              "id",
+              "jobId",
+              "status",
+              "startTimeUtc",
+              "endTimeUtc",
+              "durationMs"
+            ],
             "additionalProperties": false
           }
         }
       },
-      "required": ["total", "totalPage", "currentPage", "pageSize", "list"],
+      "required": [
+        "total",
+        "totalPage",
+        "currentPage",
+        "pageSize",
+        "list"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

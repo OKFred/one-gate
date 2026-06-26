@@ -20,12 +20,23 @@
               "type": "string"
             }
           },
-          "required": ["title", "version", "description"],
+          "required": [
+            "title",
+            "version",
+            "description"
+          ],
           "additionalProperties": false
         },
         "docType": {
           "type": "string",
-          "enum": ["swagger2.0", "openapi3.0", "openapi3.1"]
+          "enum": [
+            "swagger2.0",
+            "openapi3.0",
+            "openapi3.1"
+          ]
+        },
+        "baseUrl": {
+          "type": "string"
         },
         "apis": {
           "type": "array",
@@ -63,13 +74,22 @@
           }
         }
       },
-      "required": ["info", "docType", "apis"],
+      "required": [
+        "info",
+        "docType",
+        "apis",
+        "baseUrl"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

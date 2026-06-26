@@ -158,8 +158,104 @@
                 },
                 "children": {
                   "type": "array",
-                  "maxLength": 0,
-                  "minLength": 0
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "minimum": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "icon": {
+                        "type": "string",
+                        "maxLength": 100
+                      },
+                      "path": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "nullable": true,
+                        "maxLength": 500
+                      },
+                      "parentId": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "nullable": true,
+                        "minimum": 1
+                      },
+                      "sort": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1000
+                      },
+                      "business": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "nullable": true
+                      },
+                      "remark": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "nullable": true,
+                        "maxLength": 500
+                      },
+                      "isEnabled": {
+                        "type": "boolean"
+                      },
+                      "creatorId": {
+                        "type": "number"
+                      },
+                      "createTimeUtc": {
+                        "type": "number"
+                      },
+                      "updaterId": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "nullable": true
+                      },
+                      "updateTimeUtc": {
+                        "type": [
+                          "number",
+                          "null"
+                        ],
+                        "nullable": true
+                      },
+                      "children": {
+                        "type": "array",
+                        "maxLength": 0,
+                        "minLength": 0
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "icon",
+                      "path",
+                      "parentId",
+                      "sort",
+                      "business",
+                      "remark",
+                      "isEnabled",
+                      "creatorId",
+                      "createTimeUtc",
+                      "updaterId",
+                      "updateTimeUtc",
+                      "children"
+                    ],
+                    "additionalProperties": false
+                  }
                 }
               },
               "required": [

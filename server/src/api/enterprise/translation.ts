@@ -120,7 +120,67 @@ export const enterpriseTranslations = {
       },
     },
   ],
+  "enterprise.workflow": [
+    {
+      tKey: "enterprise.workflow.title",
+      langCodes: {
+        "zh-CN": "工作流编排",
+        "en-US": "Workflow Orchestration",
+      },
+    },
+    {
+      tKey: "sidebar.menu.enterprise.workflowGroup",
+      langCodes: {
+        "zh-CN": "工作流",
+        "en-US": "Workflow",
+      },
+    },
+    {
+      tKey: "sidebar.menu.enterprise.workflow",
+      langCodes: {
+        "zh-CN": "工作流编排",
+        "en-US": "Workflow Orchestration",
+      },
+    },
+  ],
+  "enterprise.workflow_config": [
+    {
+      tKey: "enterprise.workflow_config.title",
+      langCodes: {
+        "zh-CN": "工作流配置",
+        "en-US": "Workflow Configuration",
+      },
+    },
+    {
+      tKey: "sidebar.menu.enterprise.workflowConfig",
+      langCodes: {
+        "zh-CN": "工作流配置",
+        "en-US": "Workflow Configuration",
+      },
+    },
+    {
+      tKey: "workflow.config.verifySuccess",
+      langCodes: {
+        "zh-CN": "CDP 浏览器环境连通性验证成功！",
+        "en-US": "CDP environment connection verified successfully!",
+      },
+    },
+    {
+      tKey: "workflow.config.verifyFailed",
+      langCodes: {
+        "zh-CN": "验证失败，请确认 CDP WebSocket 服务是否正常开启。",
+        "en-US":
+          "Verification failed. Please verify that the CDP WebSocket service is active.",
+      },
+    },
+  ],
 } satisfies Record<
-  Extract<BusinessKey, "enterprise.attendance" | "maintenance.api_docs">,
+  Extract<
+    BusinessKey,
+    | "enterprise.attendance"
+    | "maintenance.api_docs"
+    | "enterprise.workflow"
+    | "enterprise.workflow_config"
+  >,
   TranslationInputItem[]
 >;

@@ -11,7 +11,10 @@
           "type": "boolean"
         },
         "error": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "nullable": true
         },
         "frequency": {
@@ -24,13 +27,21 @@
           }
         }
       },
-      "required": ["valid", "frequency", "nextTimes"],
+      "required": [
+        "valid",
+        "frequency",
+        "nextTimes"
+      ],
       "additionalProperties": false
     },
     "message": {
       "type": "string"
     }
   },
-  "required": ["ok", "data", "message"],
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
   "additionalProperties": false
 }

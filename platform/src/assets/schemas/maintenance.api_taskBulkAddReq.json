@@ -13,7 +13,10 @@
             "type": "string"
           },
           "description": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "nullable": true
           },
           "baseUrl": {
@@ -24,18 +27,33 @@
           },
           "method": {
             "type": "string",
-            "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
           },
           "headers": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "nullable": true
           },
           "requestSchema": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "nullable": true
           },
           "responseSchema": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "nullable": true
           },
           "timeoutMs": {
@@ -45,11 +63,19 @@
             "type": "boolean"
           }
         },
-        "required": ["taskKey", "name", "baseUrl", "path", "method"],
+        "required": [
+          "taskKey",
+          "name",
+          "baseUrl",
+          "path",
+          "method"
+        ],
         "additionalProperties": false
       }
     }
   },
-  "required": ["tasks"],
+  "required": [
+    "tasks"
+  ],
   "additionalProperties": false
 }

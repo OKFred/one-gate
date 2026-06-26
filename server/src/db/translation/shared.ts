@@ -563,6 +563,13 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "search.keyword",
+      langCodes: {
+        "zh-CN": "关键词",
+        "en-US": "Keyword",
+      },
+    },
+    {
       tKey: "filter.enabledStatus",
       langCodes: {
         "zh-CN": "启用状态",
