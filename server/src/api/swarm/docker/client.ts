@@ -176,7 +176,12 @@ export class DockerClient {
       return response.ok && (await response.text()).trim() === "OK";
     } catch (err) {
       console.error("testRawConnection connection failed:", err);
-      return false;
+      // 提取底层网络错误的可读描述
+      const cause = (err as any)?.cause;
+      const detail = (cause?.message || (err as Error)?.message || String(err))
+        .replace(/^Error: /, "")
+        .trim();
+      throw new BusinessError(BusinessErrorCode.DOCKER_API_ERROR, { detail });
     }
   }
 
