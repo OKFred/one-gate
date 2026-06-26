@@ -8,11 +8,11 @@ on:
   push:
     branches:
       - feature/SOC-20260611-fred
+      - dev
   pull_request:
     branches:
       - main
       - master
-      - dev
 
 jobs:
   # Job 1：跑测试
@@ -56,7 +56,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'pull_request' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
