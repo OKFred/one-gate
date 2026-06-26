@@ -177,7 +177,8 @@ export class DockerClient {
   }
 
   private getUrl(path: string, queryParams?: Record<string, string>): string {
-    const url = `${this.baseUrl}/${this.apiVersion}${path}`;
+    const versionSegment = this.apiVersion ? `/${this.apiVersion}` : "";
+    const url = `${this.baseUrl}${versionSegment}${path}`;
     if (queryParams) {
       const q = new URLSearchParams(queryParams).toString();
       return q ? `${url}?${q}` : url;
