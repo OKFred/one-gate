@@ -145,13 +145,6 @@ export const enterpriseTranslations = {
   ],
   "enterprise.workflow_config": [
     {
-      tKey: "enterprise.workflow_config.title",
-      langCodes: {
-        "zh-CN": "工作流配置",
-        "en-US": "Workflow Configuration",
-      },
-    },
-    {
       tKey: "sidebar.menu.enterprise.workflowConfig",
       langCodes: {
         "zh-CN": "工作流配置",

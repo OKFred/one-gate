@@ -61,7 +61,7 @@ export interface SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra = unknown>
   };
 
   // 国际化与标识符主键定义
-  titleKey: string;
+  titleKey?: string;
   apiKeyName?: keyof TRecord; // 默认 'id'
 
   // 全局 CRUD 各类功能模块权限代码配置

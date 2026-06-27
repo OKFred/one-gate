@@ -62,6 +62,8 @@ import 'reactflow/dist/style.css';
 import * as WorkflowAPI from '@/api/enterprise/workflow';
 import { showSnackbar } from '@/components/Notification';
 import dayjs from 'dayjs';
+import { PageLayout } from '@/components/Responsive/index';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface WorkflowObj {
   id: number;
@@ -222,12 +224,7 @@ function FlowEditorInner({
         >
           {isFullscreen ? '退出全屏' : '全屏'}
         </Button>
-        <Button
-          variant="contained"
-          color="error"
-          startIcon={<CloseIcon />}
-          onClick={onExitEditor}
-        >
+        <Button variant="contained" color="error" startIcon={<CloseIcon />} onClick={onExitEditor}>
           退出编辑
         </Button>
       </Panel>
@@ -273,6 +270,7 @@ function FlowEditorInner({
 }
 
 export default function WorkflowManagement() {
+  const t = useTranslation();
   // 状态管理
   const [workflows, setWorkflows] = useState<WorkflowObj[]>([]);
   const [loading, setLoading] = useState(false);
@@ -637,11 +635,9 @@ export default function WorkflowManagement() {
   // 渲染工作流卡片列表页
   if (!editingWorkflow) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            可视化工作流编排 (Workflow)
-          </Typography>
+      <PageLayout
+        title={t('enterprise.workflow.title') || '可视化工作流编排 (Workflow)'}
+        actions={
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -649,8 +645,8 @@ export default function WorkflowManagement() {
           >
             新建工作流
           </Button>
-        </Box>
-
+        }
+      >
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
             <CircularProgress />
@@ -748,9 +744,7 @@ export default function WorkflowManagement() {
         >
           <DialogTitle>删除工作流</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              确定要删除该工作流吗？此操作无法撤销。
-            </DialogContentText>
+            <DialogContentText>确定要删除该工作流吗？此操作无法撤销。</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setDeleteTargetId(null)}>取消</Button>
@@ -892,7 +886,9 @@ export default function WorkflowManagement() {
                                   bgcolor: 'background.default',
                                 }}
                               >
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                <Box
+                                  sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
+                                >
                                   <Typography variant="subtitle2" sx={{ fontWeight: '600' }}>
                                     {step.nodeName || '系统节点'} ({step.type})
                                   </Typography>
@@ -967,7 +963,7 @@ export default function WorkflowManagement() {
                                   </Box>
                                 )}
                               </Box>
-                            )
+                            ),
                           );
                         } catch {
                           return <Typography color="error">解析日志步骤失败</Typography>;
@@ -984,7 +980,7 @@ export default function WorkflowManagement() {
             )}
           </DialogContent>
         </Dialog>
-      </Box>
+      </PageLayout>
     );
   }
 
@@ -1161,7 +1157,6 @@ export default function WorkflowManagement() {
                   />
                 </>
               )}
-
             </Stack>
           ) : (
             <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>

@@ -38,9 +38,17 @@ export default function WorkflowConfigManagement() {
       setVerifyingId(id);
       const res = await WorkflowAPI.verifyConfigFn({ data: { id } });
       if (res.data.data) {
-        showSnackbar({ message: t('workflow.config.verifySuccess') || 'CDP 浏览器环境连通性验证成功！', type: 'success' });
+        showSnackbar({
+          message: t('workflow.config.verifySuccess') || 'CDP 浏览器环境连通性验证成功！',
+          type: 'success',
+        });
       } else {
-        showSnackbar({ message: t('workflow.config.verifyFailed') || '验证失败，请确认 CDP WebSocket 服务是否正常开启。', type: 'error' });
+        showSnackbar({
+          message:
+            t('workflow.config.verifyFailed') ||
+            '验证失败，请确认 CDP WebSocket 服务是否正常开启。',
+          type: 'error',
+        });
       }
     } catch {
       showSnackbar({ message: '连通性验证请求出错，请重试。', type: 'error' });
@@ -55,7 +63,6 @@ export default function WorkflowConfigManagement() {
   };
 
   const config: SchemaCrudConfig<ConfigObj, FilterState, ListConfigReq, TableExtraContext> = {
-    titleKey: 'enterprise.workflow_config.title',
     apiKeyName: 'id',
     permissions: {
       add: [ENTERPRISE.WORKFLOW_CONFIG.ADD],
@@ -199,7 +206,6 @@ export default function WorkflowConfigManagement() {
           />
         </Box>
       ),
-
     },
   };
 
