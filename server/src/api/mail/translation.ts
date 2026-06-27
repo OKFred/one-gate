@@ -4,13 +4,6 @@ import type { BusinessKey } from "@/types/business";
 export const mailTranslations = {
   "mail.account": [
     {
-      tKey: "account.title",
-      langCodes: {
-        "zh-CN": "邮件账户管理",
-        "en-US": "Mail Account Management",
-      },
-    },
-    {
       tKey: "account.table.nickname",
       langCodes: {
         "zh-CN": "昵称",
@@ -169,13 +162,6 @@ export const mailTranslations = {
   ],
   "mail.template": [
     {
-      tKey: "template.title",
-      langCodes: {
-        "zh-CN": "邮件模板管理",
-        "en-US": "Mail Template Management",
-      },
-    },
-    {
       tKey: "template.table.name",
       langCodes: {
         "zh-CN": "模板名称",
@@ -287,13 +273,6 @@ export const mailTranslations = {
       langCodes: {
         "zh-CN": "错误详情",
         "en-US": "Error Details",
-      },
-    },
-    {
-      tKey: "log.title",
-      langCodes: {
-        "zh-CN": "邮件发送日志",
-        "en-US": "Mail Send Log",
       },
     },
     {

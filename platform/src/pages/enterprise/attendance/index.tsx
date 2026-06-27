@@ -108,7 +108,6 @@ export default function AttendanceManagement() {
     ListAttendanceReq,
     AttendanceContext
   > = {
-    titleKey: 'enterprise.attendance.title',
     apiKeyName: 'id',
     permissions: {},
     api: {

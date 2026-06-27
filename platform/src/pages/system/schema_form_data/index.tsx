@@ -31,7 +31,6 @@ export default function SchemaFormDataManagement() {
     ListSchemaFormDataReq,
     SchemaFormDataContext
   > = {
-    titleKey: 'schemaFormData.title',
     apiKeyName: 'id',
     permissions: {},
     api: {

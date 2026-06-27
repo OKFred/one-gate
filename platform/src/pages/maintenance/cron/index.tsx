@@ -37,7 +37,6 @@ export default function CronManagement() {
   const [selectedJob, setSelectedJob] = useState<CronObj | null>(null);
 
   const config: SchemaCrudConfig<CronObj, FilterState, ListCronReq> = {
-    titleKey: 'sidebar.menu.maintenance.cron',
     apiKeyName: 'id',
     permissions: {
       add: [MAINTENANCE.CRON.ADD],

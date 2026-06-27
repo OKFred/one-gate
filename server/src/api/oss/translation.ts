@@ -4,13 +4,6 @@ import type { BusinessKey } from "@/types/business";
 export const ossTranslations = {
   "oss.config": [
     {
-      tKey: "oss.config.title",
-      langCodes: {
-        "zh-CN": "OSS 配置",
-        "en-US": "OSS Configuration",
-      },
-    },
-    {
       tKey: "oss.config.name",
       langCodes: {
         "zh-CN": "配置名称",

@@ -44,7 +44,6 @@ export default function SwarmDockerConfigPage() {
     ListDockerConfigReq,
     TableExtraContext
   > = {
-    titleKey: 'sidebar.menu.swarm.dockerConfig',
     apiKeyName: 'id',
     permissions: {
       add: [SWARM.DOCKER_CONFIG.ADD],

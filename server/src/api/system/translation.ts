@@ -480,13 +480,6 @@ export const systemTranslations = {
   ],
   "system.user": [
     {
-      tKey: "user.title",
-      langCodes: {
-        "zh-CN": "用户管理",
-        "en-US": "User Management",
-      },
-    },
-    {
       tKey: "user.table.password",
       langCodes: {
         "zh-CN": "密码",
@@ -558,13 +551,6 @@ export const systemTranslations = {
       langCodes: {
         "zh-CN": "权限列表为JSON数组格式",
         "en-US": "Permissions list in JSON array format",
-      },
-    },
-    {
-      tKey: "role.title",
-      langCodes: {
-        "zh-CN": "角色管理",
-        "en-US": "Role Management",
       },
     },
     {
@@ -698,13 +684,6 @@ export const systemTranslations = {
   ],
   "system.permission": [
     {
-      tKey: "permission.title",
-      langCodes: {
-        "zh-CN": "权限管理",
-        "en-US": "Permission Management",
-      },
-    },
-    {
       tKey: "permission.code",
       langCodes: {
         "zh-CN": "权限代码",
@@ -792,13 +771,6 @@ export const systemTranslations = {
     },
   ],
   "system.schema_form": [
-    {
-      tKey: "schemaForm.title",
-      langCodes: {
-        "zh-CN": "动态表单配置",
-        "en-US": "Schema Form Config",
-      },
-    },
     {
       tKey: "schemaForm.searchPlaceholder",
       langCodes: {
@@ -1015,13 +987,6 @@ export const systemTranslations = {
     },
   ],
   "system.schema_form_data": [
-    {
-      tKey: "schemaFormData.title",
-      langCodes: {
-        "zh-CN": "表单提交数据",
-        "en-US": "Schema Form Data",
-      },
-    },
     {
       tKey: "schemaFormData.filter.associatedForm",
       langCodes: {

@@ -4,13 +4,6 @@ import type { BusinessKey } from "@/types/business";
 export const enterpriseTranslations = {
   "enterprise.attendance": [
     {
-      tKey: "enterprise.attendance.title",
-      langCodes: {
-        "zh-CN": "考勤管理",
-        "en-US": "Attendance Management",
-      },
-    },
-    {
       tKey: "enterprise.attendance.employee",
       langCodes: {
         "zh-CN": "员工",
@@ -121,13 +114,6 @@ export const enterpriseTranslations = {
     },
   ],
   "enterprise.workflow": [
-    {
-      tKey: "enterprise.workflow.title",
-      langCodes: {
-        "zh-CN": "工作流编排",
-        "en-US": "Workflow Orchestration",
-      },
-    },
     {
       tKey: "sidebar.menu.enterprise.workflowGroup",
       langCodes: {

@@ -63,7 +63,7 @@ import * as WorkflowAPI from '@/api/enterprise/workflow';
 import { showSnackbar } from '@/components/Notification';
 import dayjs from 'dayjs';
 import { PageLayout } from '@/components/Responsive/index';
-import { useTranslation } from '@/hooks/useTranslation';
+// import { useTranslation } from '@/hooks/useTranslation';
 
 interface WorkflowObj {
   id: number;
@@ -270,7 +270,7 @@ function FlowEditorInner({
 }
 
 export default function WorkflowManagement() {
-  const t = useTranslation();
+  // const t = useTranslation();
   // 状态管理
   const [workflows, setWorkflows] = useState<WorkflowObj[]>([]);
   const [loading, setLoading] = useState(false);
@@ -636,7 +636,6 @@ export default function WorkflowManagement() {
   if (!editingWorkflow) {
     return (
       <PageLayout
-        title={t('enterprise.workflow.title') || '可视化工作流编排 (Workflow)'}
         actions={
           <Button
             variant="contained"

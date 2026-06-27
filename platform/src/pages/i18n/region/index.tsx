@@ -29,7 +29,6 @@ export default function RegionPage() {
     ListRegionReq,
     { enabledLanguages: ListAllLanguageRes }
   > = {
-    titleKey: 'region.title',
     apiKeyName: 'id',
     permissions: {
       add: [I18N.REGION.ADD],

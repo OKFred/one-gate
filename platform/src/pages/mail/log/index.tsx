@@ -24,7 +24,6 @@ export default function MailLogPage() {
   };
 
   const config: SchemaCrudConfig<LogRes, FilterState, ListMailLogReq, TableExtraContext> = {
-    titleKey: 'log.title',
     apiKeyName: 'id',
     api: {
       list: mailLogAPI.listFn,

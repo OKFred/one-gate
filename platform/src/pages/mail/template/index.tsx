@@ -24,7 +24,6 @@ export default function MailTemplatePage() {
 
   const config: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemplateReq, TableExtraContext> =
     {
-      titleKey: 'template.title',
       apiKeyName: 'id',
       permissions: {
         add: [MAIL.TEMPLATE.ADD],

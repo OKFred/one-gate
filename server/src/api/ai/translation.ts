@@ -4,13 +4,6 @@ import type { BusinessKey } from "@/types/business";
 export const aiTranslations = {
   "ai.config": [
     {
-      tKey: "ai.config.title",
-      langCodes: {
-        "zh-CN": "LLM 配置管理",
-        "en-US": "LLM Configuration",
-      },
-    },
-    {
       tKey: "ai.config.name",
       langCodes: {
         "zh-CN": "配置名称",

@@ -11,7 +11,6 @@ export type RoleRecord = RoleRes & { selectedDeptIds?: number[] };
 
 export default function RoleManagement() {
   const config: SchemaCrudConfig<RoleRecord, FilterState, ListRoleReq> = {
-    titleKey: 'role.title',
     apiKeyName: 'id',
     permissions: {
       add: [SYSTEM.ROLE.ADD],

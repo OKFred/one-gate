@@ -32,7 +32,6 @@ export default function MailAccountPage() {
   };
 
   const config: SchemaCrudConfig<AccountRes, FilterState, ListMailAccountReq, TableExtraContext> = {
-    titleKey: 'account.title',
     apiKeyName: 'id',
     permissions: {
       add: [MAIL.ACCOUNT.ADD],

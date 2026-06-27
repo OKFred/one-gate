@@ -8,7 +8,6 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 
 export default function OSSConfigPage() {
   const config: SchemaCrudConfig<ConfigRes, FilterState, ListConfigReq> = {
-    titleKey: 'oss.config.title',
     apiKeyName: 'id',
     permissions: {},
     api: {

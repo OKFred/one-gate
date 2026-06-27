@@ -51,7 +51,6 @@ export default function DockerSwarmManagement() {
     { keyword?: string },
     DockerContext
   > = {
-    titleKey: 'swarm.docker.title',
     apiKeyName: 'ID',
     permissions: {
       add: [SWARM.DOCKER.ADD],

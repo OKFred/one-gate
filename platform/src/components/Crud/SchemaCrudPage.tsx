@@ -494,7 +494,6 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
 
   return (
     <PageLayout
-      title={config.titleKey ? t(config.titleKey) : undefined}
       actions={
         <Stack direction="row" spacing={1}>
           {customActions}

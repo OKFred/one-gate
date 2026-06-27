@@ -12,7 +12,6 @@ export default function AuditLoginPage() {
     { userId?: number; orderBy: string; descend: boolean },
     ListLoginAuditReq
   > = {
-    titleKey: 'maintenance.auditLogin.title',
     apiKeyName: 'id',
     permissions: {},
     api: {

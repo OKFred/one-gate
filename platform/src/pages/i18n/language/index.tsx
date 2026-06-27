@@ -8,7 +8,6 @@ import { I18N } from '@/hooks/usePermission';
 
 export default function LanguagePage() {
   const config: SchemaCrudConfig<LanguageRes, FilterState, ListLanguageReq> = {
-    titleKey: 'language.title',
     apiKeyName: 'id',
     permissions: {
       add: [I18N.LANGUAGE.ADD],

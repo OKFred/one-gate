@@ -41,7 +41,6 @@ export default function ApiTaskManagement() {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const config: SchemaCrudConfig<ApiTaskObj, typeof defaultFilters, ListApiTaskReq> = {
-    titleKey: 'sidebar.menu.maintenance.apiTask',
     apiKeyName: 'id',
     permissions: {
       add: [MAINTENANCE.API_TASK.ADD],

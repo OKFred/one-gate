@@ -4,13 +4,6 @@ import type { BusinessKey } from "@/types/business";
 export const i18nTranslations = {
   "i18n.translation": [
     {
-      tKey: "translation.title",
-      langCodes: {
-        "zh-CN": "翻译管理",
-        "en-US": "Translation Management",
-      },
-    },
-    {
       tKey: "translation.table.application",
       langCodes: {
         "zh-CN": "应用",
@@ -63,13 +56,6 @@ export const i18nTranslations = {
   ],
   "i18n.region": [
     {
-      tKey: "region.title",
-      langCodes: {
-        "zh-CN": "国家地区管理",
-        "en-US": "Region Management",
-      },
-    },
-    {
       tKey: "region.table.alpha2Code",
       langCodes: {
         "zh-CN": "ISO两位代码",
@@ -106,13 +92,6 @@ export const i18nTranslations = {
     },
   ],
   "i18n.language": [
-    {
-      tKey: "language.title",
-      langCodes: {
-        "zh-CN": "语言管理",
-        "en-US": "Language Management",
-      },
-    },
     {
       tKey: "language.table.langCode",
       langCodes: {

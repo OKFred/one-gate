@@ -303,13 +303,6 @@ export const maintenanceTranslations = {
   ],
   "maintenance.cache": [
     {
-      tKey: "cache.title",
-      langCodes: {
-        "zh-CN": "缓存管理",
-        "en-US": "Cache Management",
-      },
-    },
-    {
       tKey: "cache.columns.namespace",
       langCodes: {
         "zh-CN": "命名空间",
@@ -484,13 +477,6 @@ export const maintenanceTranslations = {
       langCodes: {
         "zh-CN": "登录审计",
         "en-US": "Login Audit",
-      },
-    },
-    {
-      tKey: "maintenance.auditLogin.title",
-      langCodes: {
-        "zh-CN": "登录审计日志",
-        "en-US": "Login Audit Log",
       },
     },
     {

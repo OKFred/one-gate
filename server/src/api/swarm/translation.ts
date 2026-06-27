@@ -132,13 +132,6 @@ export const swarmTranslations = {
       },
     },
     {
-      tKey: "swarm.docker.title",
-      langCodes: {
-        "zh-CN": "Docker Swarm 服务",
-        "en-US": "Docker Swarm Services",
-      },
-    },
-    {
       tKey: "swarm.docker.pause",
       langCodes: {
         "zh-CN": "暂停服务",

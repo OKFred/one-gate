@@ -29,7 +29,6 @@ export default function CacheManagementPage() {
 
   const config: SchemaCrudConfig<CacheRow, { prefix: string }, { prefix?: string }, CacheContext> =
     {
-      titleKey: 'cache.title',
       apiKeyName: 'name',
       permissions: {},
       api: {

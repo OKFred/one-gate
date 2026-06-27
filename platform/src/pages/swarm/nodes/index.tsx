@@ -40,7 +40,6 @@ export default function SwarmNodesManagement() {
     { keyword?: string },
     NodeContext
   > = {
-    titleKey: 'sidebar.menu.swarm.nodes',
     apiKeyName: 'id',
     api: {
       list: async (args) => {

@@ -129,7 +129,6 @@ export default function UserManagement() {
   );
 
   const config: SchemaCrudConfig<UserRecord, FilterState, ListUserReq, UserTableContext> = {
-    titleKey: 'user.title',
     apiKeyName: 'id',
     permissions: {
       add: [SYSTEM.USER.ADD],

@@ -35,7 +35,6 @@ export default function PermissionManagement() {
     ListPermissionReq,
     PermissionExtraContext
   > = {
-    titleKey: 'permission.title',
     apiKeyName: 'id',
     permissions: {
       add: [SYSTEM.PERMISSION.ADD],

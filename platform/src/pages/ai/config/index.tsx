@@ -48,7 +48,6 @@ export default function AiConfigManagement() {
   };
 
   const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq, TableExtraContext> = {
-    titleKey: 'ai.config.title',
     apiKeyName: 'id',
     permissions: {
       add: [AI.CONFIG.ADD],

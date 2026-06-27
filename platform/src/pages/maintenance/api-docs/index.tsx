@@ -43,7 +43,6 @@ export default function ApiDocsManagement() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const config: SchemaCrudConfig<ApiDocsObj, typeof defaultFilters, ListApiDocsReq> = {
-    titleKey: 'sidebar.menu.maintenance.apiDocs',
     apiKeyName: 'id',
     permissions: {
       add: [MAINTENANCE.API_DOCS.ADD],

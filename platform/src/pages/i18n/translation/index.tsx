@@ -17,7 +17,6 @@ const calculateSHA256 = async (text: string): Promise<string> => {
 
 export default function TranslationPage() {
   const config: SchemaCrudConfig<TranslationRes, FilterState, ListTranslationReq> = {
-    titleKey: 'translation.title',
     apiKeyName: 'id',
     permissions: {
       add: [I18N.TRANSLATION.ADD],
