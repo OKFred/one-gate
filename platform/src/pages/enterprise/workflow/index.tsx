@@ -63,7 +63,7 @@ import * as WorkflowAPI from '@/api/enterprise/workflow';
 import { showSnackbar } from '@/components/Notification';
 import dayjs from 'dayjs';
 import { PageLayout } from '@/components/Responsive/index';
-// import { useTranslation } from '@/hooks/useTranslation';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface WorkflowObj {
   id: number;
@@ -129,6 +129,7 @@ function FlowEditorInner({
   onExitEditor,
 }: FlowEditorInnerProps) {
   const { screenToFlowPosition } = useReactFlow();
+  const t = useTranslation();
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -191,9 +192,9 @@ function FlowEditorInner({
         }}
       >
         <Button variant="outlined" startIcon={<SaveIcon />} onClick={onSaveFlow}>
-          保存
+          {t('workflow.save')}
         </Button>
-        <Tooltip title="撤销 (Ctrl+Z)">
+        <Tooltip title={t('workflow.undoTooltip')}>
           <span>
             <Button
               variant="outlined"
@@ -201,11 +202,11 @@ function FlowEditorInner({
               onClick={onUndo}
               disabled={past.length === 0}
             >
-              撤销
+              {t('workflow.undo')}
             </Button>
           </span>
         </Tooltip>
-        <Tooltip title="重做 (Ctrl+Y)">
+        <Tooltip title={t('workflow.redoTooltip')}>
           <span>
             <Button
               variant="outlined"
@@ -213,7 +214,7 @@ function FlowEditorInner({
               onClick={onRedo}
               disabled={future.length === 0}
             >
-              重做
+              {t('workflow.redo')}
             </Button>
           </span>
         </Tooltip>
@@ -222,10 +223,10 @@ function FlowEditorInner({
           startIcon={isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
           onClick={onToggleFullscreen}
         >
-          {isFullscreen ? '退出全屏' : '全屏'}
+          {isFullscreen ? t('workflow.exitFullscreen') : t('workflow.fullscreen')}
         </Button>
         <Button variant="contained" color="error" startIcon={<CloseIcon />} onClick={onExitEditor}>
-          退出编辑
+          {t('workflow.exitEditor')}
         </Button>
       </Panel>
 
@@ -240,7 +241,7 @@ function FlowEditorInner({
         }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: '600' }} gutterBottom>
-          【{editingWorkflow.name}】拖拽节点栏
+          {t('workflow.dragPanelTitle', { name: editingWorkflow.name })}
         </Typography>
         <Stack spacing={1} direction="row">
           <div
@@ -270,7 +271,7 @@ function FlowEditorInner({
 }
 
 export default function WorkflowManagement() {
-  // const t = useTranslation();
+  const t = useTranslation();
   // 状态管理
   const [workflows, setWorkflows] = useState<WorkflowObj[]>([]);
   const [loading, setLoading] = useState(false);
@@ -386,11 +387,11 @@ export default function WorkflowManagement() {
       const res = await WorkflowAPI.listFn({ data: { pageNo: 1, pageSize: 100 } });
       setWorkflows(res.data.data.list as WorkflowObj[]);
     } catch {
-      showSnackbar({ message: '获取工作流列表失败', type: 'error' });
+      showSnackbar({ message: t('workflow.listFailed'), type: 'error' });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchWorkflows();
@@ -399,7 +400,7 @@ export default function WorkflowManagement() {
   // 2. 新建工作流
   const handleCreateWorkflow = async () => {
     if (!newWorkflowName.trim()) {
-      showSnackbar({ message: '请输入工作流名称', type: 'warning' });
+      showSnackbar({ message: t('workflow.inputNameRequired'), type: 'warning' });
       return;
     }
 
@@ -410,7 +411,7 @@ export default function WorkflowManagement() {
           {
             id: 'node-start',
             type: 'input',
-            data: { label: '开始 (手动或定时触发)' },
+            data: { label: t('workflow.startNodeLabel') },
             position: { x: 250, y: 50 },
             style: { background: '#1976d2', color: '#fff', borderRadius: '8px' },
           },
@@ -427,13 +428,13 @@ export default function WorkflowManagement() {
         },
       });
 
-      showSnackbar({ message: '工作流创建成功', type: 'success' });
+      showSnackbar({ message: t('workflow.createSuccess'), type: 'success' });
       setOpenAddDialog(false);
       setNewWorkflowName('');
       setNewWorkflowDesc('');
       fetchWorkflows();
     } catch {
-      showSnackbar({ message: '创建工作流失败', type: 'error' });
+      showSnackbar({ message: t('workflow.createFailed'), type: 'error' });
     }
   };
 
@@ -467,14 +468,14 @@ export default function WorkflowManagement() {
           flowData: flowDataStr,
         },
       });
-      showSnackbar({ message: '工作流图数据保存成功！', type: 'success' });
+      showSnackbar({ message: t('workflow.saveSuccess'), type: 'success' });
 
       // 更新本地列表
       setWorkflows((prev) =>
         prev.map((w) => (w.id === editingWorkflow.id ? { ...w, flowData: flowDataStr } : w)),
       );
     } catch {
-      showSnackbar({ message: '保存失败，请重试。', type: 'error' });
+      showSnackbar({ message: t('workflow.saveFailed'), type: 'error' });
     }
   };
 
@@ -488,9 +489,9 @@ export default function WorkflowManagement() {
   const handleRunWorkflow = async (id: number) => {
     try {
       await WorkflowAPI.runFn({ data: { id } });
-      showSnackbar({ message: '已触发后台工作流执行，请稍后查看日志', type: 'success' });
+      showSnackbar({ message: t('workflow.runSuccess'), type: 'success' });
     } catch {
-      showSnackbar({ message: '启动工作流执行失败', type: 'error' });
+      showSnackbar({ message: t('workflow.runFailed'), type: 'error' });
     }
   };
 
@@ -504,10 +505,10 @@ export default function WorkflowManagement() {
     if (deleteTargetId === null) return;
     try {
       await WorkflowAPI.deleteFn({ data: { id: deleteTargetId } });
-      showSnackbar({ message: '删除工作流成功', type: 'success' });
+      showSnackbar({ message: t('workflow.deleteSuccess'), type: 'success' });
       fetchWorkflows();
     } catch {
-      showSnackbar({ message: '删除失败', type: 'error' });
+      showSnackbar({ message: t('workflow.deleteFailed'), type: 'error' });
     } finally {
       setDeleteTargetId(null);
     }
@@ -524,7 +525,7 @@ export default function WorkflowManagement() {
       });
       setLogsList(res.data.data.list as LogObj[]);
     } catch {
-      showSnackbar({ message: '获取运行日志失败', type: 'error' });
+      showSnackbar({ message: t('workflow.getLogsFailed'), type: 'error' });
     } finally {
       setLogsLoading(false);
     }
@@ -572,11 +573,11 @@ export default function WorkflowManagement() {
       let color = '#ccc';
 
       if (type === 'cdp') {
-        label = 'CDP 浏览器操作';
+        label = t('workflow.nodeCdpLabel');
         nodeData = { action: 'navigate', selector: '', value: '' };
         color = '#2e7d32';
       } else if (type === 'docker') {
-        label = 'Docker 任务';
+        label = t('workflow.nodeDockerLabel');
         nodeData = { image: 'alpine', command: 'echo hello' };
         color = '#0288d1';
       }
@@ -591,7 +592,7 @@ export default function WorkflowManagement() {
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [takeSnapshot, setNodes],
+    [takeSnapshot, setNodes, t],
   );
 
   // 12. 更新当前选中节点的参数
@@ -620,7 +621,7 @@ export default function WorkflowManagement() {
   const handleDeleteSelectedNode = () => {
     if (!selectedNode) return;
     if (selectedNode.id === 'node-start') {
-      showSnackbar({ message: '起点节点不可删除', type: 'warning' });
+      showSnackbar({ message: t('workflow.startNodeCannotDelete'), type: 'warning' });
       return;
     }
     takeSnapshot();
@@ -642,7 +643,7 @@ export default function WorkflowManagement() {
             startIcon={<AddIcon />}
             onClick={() => setOpenAddDialog(true)}
           >
-            新建工作流
+            {t('workflow.newWorkflow')}
           </Button>
         }
       >
@@ -664,30 +665,31 @@ export default function WorkflowManagement() {
                       color="text.secondary"
                       sx={{ minHeight: 40, mb: 2 }}
                     >
-                      {wf.description || '暂无描述信息'}
+                      {wf.description || t('workflow.noDescription')}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      创建时间: {dayjs(wf.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')}
+                      {t('workflow.createTime')}:{' '}
+                      {dayjs(wf.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')}
                     </Typography>
                   </CardContent>
                   <Divider />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, py: 1 }}>
-                    <Tooltip title="编辑图连线">
+                    <Tooltip title={t('workflow.editFlow')}>
                       <IconButton color="primary" onClick={() => handleEnterEditor(wf)}>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="手动运行一次">
+                    <Tooltip title={t('workflow.runOnce')}>
                       <IconButton color="success" onClick={() => handleRunWorkflow(wf.id)}>
                         <RunIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="查看执行历史">
+                    <Tooltip title={t('workflow.viewHistory')}>
                       <IconButton color="info" onClick={() => handleOpenLogs(wf)}>
                         <LogIcon />
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="删除工作流">
+                    <Tooltip title={t('workflow.deleteWorkflow')}>
                       <IconButton color="error" onClick={() => handleDeleteWorkflow(wf.id)}>
                         <DeleteIcon />
                       </IconButton>
@@ -706,18 +708,18 @@ export default function WorkflowManagement() {
           fullWidth
           maxWidth="sm"
         >
-          <DialogTitle>新建工作流</DialogTitle>
+          <DialogTitle>{t('workflow.newWorkflow')}</DialogTitle>
           <DialogContent>
             <Stack spacing={2} sx={{ mt: 1 }}>
               <TextField
-                label="工作流名称"
+                label={t('workflow.workflowName')}
                 value={newWorkflowName}
                 onChange={(e) => setNewWorkflowName(e.target.value)}
                 fullWidth
                 required
               />
               <TextField
-                label="描述"
+                label={t('workflow.description')}
                 value={newWorkflowDesc}
                 onChange={(e) => setNewWorkflowDesc(e.target.value)}
                 fullWidth
@@ -727,9 +729,9 @@ export default function WorkflowManagement() {
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenAddDialog(false)}>取消</Button>
+            <Button onClick={() => setOpenAddDialog(false)}>{t('workflow.cancel')}</Button>
             <Button onClick={handleCreateWorkflow} variant="contained">
-              确认创建
+              {t('workflow.confirmCreate')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -741,14 +743,14 @@ export default function WorkflowManagement() {
           maxWidth="xs"
           fullWidth
         >
-          <DialogTitle>删除工作流</DialogTitle>
+          <DialogTitle>{t('workflow.deleteWorkflow')}</DialogTitle>
           <DialogContent>
-            <DialogContentText>确定要删除该工作流吗？此操作无法撤销。</DialogContentText>
+            <DialogContentText>{t('workflow.deleteConfirmText')}</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeleteTargetId(null)}>取消</Button>
+            <Button onClick={() => setDeleteTargetId(null)}>{t('workflow.cancel')}</Button>
             <Button onClick={handleConfirmDelete} color="error" variant="contained" autoFocus>
-              确认删除
+              {t('workflow.confirmDelete')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -758,7 +760,7 @@ export default function WorkflowManagement() {
           <DialogTitle
             sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
           >
-            <span>【{logWorkflow?.name}】执行日志</span>
+            <span>{t('workflow.logTitle', { name: logWorkflow?.name || '' })}</span>
             <IconButton onClick={() => setLogWorkflow(null)}>
               <CloseIcon />
             </IconButton>
@@ -773,7 +775,7 @@ export default function WorkflowManagement() {
                 {/* 日志历史记录 */}
                 <Grid size={4} sx={{ borderRight: '1px solid', borderColor: 'divider', pr: 2 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: '600' }} gutterBottom>
-                    运行批次列表
+                    {t('workflow.runBatchList')}
                   </Typography>
                   <List>
                     {logsList.map((log) => (
@@ -804,10 +806,10 @@ export default function WorkflowManagement() {
                               <Chip
                                 label={
                                   log.status === 'success'
-                                    ? '成功'
+                                    ? t('workflow.statusSuccess')
                                     : log.status === 'running'
-                                      ? '运行中'
-                                      : '失败'
+                                      ? t('workflow.statusRunning')
+                                      : t('workflow.statusFailed')
                                 }
                                 color={
                                   log.status === 'success'
@@ -828,10 +830,17 @@ export default function WorkflowManagement() {
                                 sx={{ display: 'block' }}
                                 color="text.secondary"
                               >
-                                时间: {dayjs(log.startTimeUtc).format('MM-DD HH:mm:ss')}
+                                {t('workflow.time', {
+                                  time: dayjs(log.startTimeUtc).format('MM-DD HH:mm:ss'),
+                                })}
                               </Typography>
                               <Typography variant="caption" color="text.secondary">
-                                方式: {log.triggerType === 'manual' ? '手动触发' : '定时任务'}
+                                {t('workflow.triggerType', {
+                                  type:
+                                    log.triggerType === 'manual'
+                                      ? t('workflow.triggerManual')
+                                      : t('workflow.triggerCron'),
+                                })}
                               </Typography>
                             </>
                           }
@@ -840,7 +849,7 @@ export default function WorkflowManagement() {
                     ))}
                     {logsList.length === 0 && (
                       <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                        暂无执行日志记录
+                        {t('workflow.noLogs')}
                       </Typography>
                     )}
                   </List>
@@ -848,7 +857,7 @@ export default function WorkflowManagement() {
                 {/* 单批次步骤日志详情 */}
                 <Grid size={8} sx={{ pl: 2 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: '600' }} gutterBottom>
-                    单次步骤执行轨迹
+                    {t('workflow.stepExecutionTrack')}
                   </Typography>
                   {selectedLog ? (
                     <Box
@@ -889,10 +898,14 @@ export default function WorkflowManagement() {
                                   sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}
                                 >
                                   <Typography variant="subtitle2" sx={{ fontWeight: '600' }}>
-                                    {step.nodeName || '系统节点'} ({step.type})
+                                    {step.nodeName || t('workflow.systemNode')} ({step.type})
                                   </Typography>
                                   <Chip
-                                    label={step.status === 'success' ? '已运行' : '运行失败'}
+                                    label={
+                                      step.status === 'success'
+                                        ? t('workflow.stepRan')
+                                        : t('workflow.stepFailed')
+                                    }
                                     color={step.status === 'success' ? 'success' : 'error'}
                                     size="small"
                                   />
@@ -920,7 +933,7 @@ export default function WorkflowManagement() {
                                       component="div"
                                       sx={{ fontWeight: '600', mb: 0.5, color: 'text.secondary' }}
                                     >
-                                      执行返回值 (Result):
+                                      {t('workflow.executionResult')}
                                     </Typography>
                                     <Box
                                       component="pre"
@@ -948,7 +961,7 @@ export default function WorkflowManagement() {
                                       sx={{ display: 'block', fontWeight: '600' }}
                                       gutterBottom
                                     >
-                                      浏览器截图:
+                                      {t('workflow.browserScreenshot')}
                                     </Typography>
                                     <img
                                       src={`data:image/png;base64,${step.screenshot}`}
@@ -965,13 +978,15 @@ export default function WorkflowManagement() {
                             ),
                           );
                         } catch {
-                          return <Typography color="error">解析日志步骤失败</Typography>;
+                          return (
+                            <Typography color="error">{t('workflow.parseLogsFailed')}</Typography>
+                          );
                         }
                       })()}
                     </Box>
                   ) : (
                     <Typography color="text.secondary" sx={{ textAlign: 'center', py: 8 }}>
-                      请在左侧选择一次运行记录查看步骤
+                      {t('workflow.selectLogToViewSteps')}
                     </Typography>
                   )}
                 </Grid>
@@ -1049,17 +1064,17 @@ export default function WorkflowManagement() {
       >
         <Box>
           <Typography variant="subtitle2" sx={{ fontWeight: '600' }} gutterBottom>
-            节点参数配置
+            {t('workflow.nodeParamConfig')}
           </Typography>
           <Divider sx={{ mb: 2 }} />
 
           {selectedNode ? (
             <Stack spacing={2}>
               <Typography variant="body2" color="text.secondary">
-                节点 ID: {selectedNode.id}
+                {t('workflow.nodeId', { id: selectedNode.id })}
               </Typography>
               <TextField
-                label="节点名称"
+                label={t('workflow.nodeName')}
                 value={selectedNode.data.label || ''}
                 onChange={(e) => handleUpdateNodeData('label', e.target.value)}
                 onFocus={() => takeSnapshot()}
@@ -1070,28 +1085,28 @@ export default function WorkflowManagement() {
               {selectedNode.id.includes('cdp') && (
                 <>
                   <FormControl fullWidth>
-                    <InputLabel>操作类型</InputLabel>
+                    <InputLabel>{t('workflow.actionType')}</InputLabel>
                     <Select
                       value={selectedNode.data.action || 'navigate'}
-                      label="操作类型"
+                      label={t('workflow.actionType')}
                       onChange={(e) => {
                         takeSnapshot();
                         handleUpdateNodeData('action', e.target.value);
                       }}
                       onFocus={() => takeSnapshot()}
                     >
-                      <MenuItem value="navigate">网页导航 (Navigate)</MenuItem>
-                      <MenuItem value="click">元素点击 (Click)</MenuItem>
-                      <MenuItem value="input">文字输入 (Input)</MenuItem>
-                      <MenuItem value="screenshot">屏幕截图 (Screenshot)</MenuItem>
-                      <MenuItem value="extract">提取文字 (Extract Text)</MenuItem>
-                      <MenuItem value="evaluate">执行页面脚本 (Evaluate JS)</MenuItem>
+                      <MenuItem value="navigate">{t('workflow.actionNavigate')}</MenuItem>
+                      <MenuItem value="click">{t('workflow.actionClick')}</MenuItem>
+                      <MenuItem value="input">{t('workflow.actionInput')}</MenuItem>
+                      <MenuItem value="screenshot">{t('workflow.actionScreenshot')}</MenuItem>
+                      <MenuItem value="extract">{t('workflow.actionExtractText')}</MenuItem>
+                      <MenuItem value="evaluate">{t('workflow.actionEvaluateJs')}</MenuItem>
                     </Select>
                   </FormControl>
 
                   {['click', 'input', 'extract'].includes(selectedNode.data.action) && (
                     <TextField
-                      label="CSS 选择器 (Selector)"
+                      label={t('workflow.cssSelector')}
                       value={selectedNode.data.selector || ''}
                       onChange={(e) => handleUpdateNodeData('selector', e.target.value)}
                       onFocus={() => takeSnapshot()}
@@ -1103,7 +1118,9 @@ export default function WorkflowManagement() {
                   {['navigate', 'input'].includes(selectedNode.data.action) && (
                     <TextField
                       label={
-                        selectedNode.data.action === 'navigate' ? '目标 URL' : '输入值 (Value)'
+                        selectedNode.data.action === 'navigate'
+                          ? t('workflow.targetUrl')
+                          : t('workflow.inputValue')
                       }
                       value={selectedNode.data.value || ''}
                       onChange={(e) => handleUpdateNodeData('value', e.target.value)}
@@ -1111,7 +1128,7 @@ export default function WorkflowManagement() {
                       placeholder={
                         selectedNode.data.action === 'navigate'
                           ? 'https://google.com'
-                          : '输入的内容'
+                          : t('workflow.inputContentPlaceholder')
                       }
                       fullWidth
                     />
@@ -1119,14 +1136,14 @@ export default function WorkflowManagement() {
 
                   {selectedNode.data.action === 'evaluate' && (
                     <TextField
-                      label="页面脚本 (浏览器内执行)"
+                      label={t('workflow.pageScript')}
                       value={selectedNode.data.code || ''}
                       onChange={(e) => handleUpdateNodeData('code', e.target.value)}
                       onFocus={() => takeSnapshot()}
                       multiline
                       rows={8}
                       fullWidth
-                      placeholder={`// 此脚本在 CDP 浏览器页面内执行，可访问 DOM\nreturn document.title;`}
+                      placeholder={t('workflow.evaluateJsPlaceholder')}
                       slotProps={{
                         htmlInput: { style: { fontFamily: 'monospace', fontSize: '12px' } },
                       }}
@@ -1139,7 +1156,7 @@ export default function WorkflowManagement() {
               {selectedNode.id.includes('docker') && (
                 <>
                   <TextField
-                    label="Docker 镜像 (Image)"
+                    label={t('workflow.dockerImage')}
                     value={selectedNode.data.image || ''}
                     onChange={(e) => handleUpdateNodeData('image', e.target.value)}
                     onFocus={() => takeSnapshot()}
@@ -1147,7 +1164,7 @@ export default function WorkflowManagement() {
                     fullWidth
                   />
                   <TextField
-                    label="命令行参数 (Command)"
+                    label={t('workflow.commandArgs')}
                     value={selectedNode.data.command || ''}
                     onChange={(e) => handleUpdateNodeData('command', e.target.value)}
                     onFocus={() => takeSnapshot()}
@@ -1159,7 +1176,7 @@ export default function WorkflowManagement() {
             </Stack>
           ) : (
             <Typography color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
-              请在左侧画布上选择一个节点进行配置
+              {t('workflow.selectNodeToConfigure')}
             </Typography>
           )}
         </Box>
@@ -1173,7 +1190,7 @@ export default function WorkflowManagement() {
               startIcon={<DeleteIcon />}
               onClick={handleDeleteSelectedNode}
             >
-              删除该节点
+              {t('workflow.deleteNode')}
             </Button>
           </Box>
         )}

@@ -39,19 +39,17 @@ export default function WorkflowConfigManagement() {
       const res = await WorkflowAPI.verifyConfigFn({ data: { id } });
       if (res.data.data) {
         showSnackbar({
-          message: t('workflow.config.verifySuccess') || 'CDP 浏览器环境连通性验证成功！',
+          message: t('workflow.config.verifySuccess'),
           type: 'success',
         });
       } else {
         showSnackbar({
-          message:
-            t('workflow.config.verifyFailed') ||
-            '验证失败，请确认 CDP WebSocket 服务是否正常开启。',
+          message: t('workflow.config.verifyFailed'),
           type: 'error',
         });
       }
     } catch {
-      showSnackbar({ message: '连通性验证请求出错，请重试。', type: 'error' });
+      showSnackbar({ message: t('workflow.config.verifyError'), type: 'error' });
     } finally {
       setVerifyingId(null);
     }
@@ -80,7 +78,7 @@ export default function WorkflowConfigManagement() {
       fields: (t) => [
         {
           name: 'keyword',
-          label: t('search.keyword') || '关键词',
+          label: t('search.keyword'),
           type: 'text',
         },
       ],
@@ -90,25 +88,25 @@ export default function WorkflowConfigManagement() {
         }) as ListConfigReq,
     },
     table: {
-      columns: () => [
+      columns: (t) => [
         { title: 'ID', render: (row) => row.id },
-        { title: '配置名称', render: (row) => row.name },
-        { title: 'CDP 调试地址', render: (row) => row.cdpUrl },
+        { title: t('workflow.config.name'), render: (row) => row.name },
+        { title: t('workflow.config.cdpUrlLabel'), render: (row) => row.cdpUrl },
         {
-          title: '默认环境',
+          title: t('workflow.config.defaultEnv'),
           render: (row) => (
             <Chip
-              label={row.isDefault ? '是' : '否'}
+              label={row.isDefault ? t('workflow.config.yes') : t('workflow.config.no')}
               color={row.isDefault ? 'success' : 'default'}
               size="small"
             />
           ),
         },
         {
-          title: '状态',
+          title: t('workflow.config.status'),
           render: (row) => (
             <Chip
-              label={row.isEnabled ? '启用' : '禁用'}
+              label={row.isEnabled ? t('workflow.config.enabled') : t('workflow.config.disabled')}
               color={row.isEnabled ? 'success' : 'error'}
               size="small"
               variant="outlined"
@@ -116,11 +114,11 @@ export default function WorkflowConfigManagement() {
           ),
         },
       ],
-      cardFields: () => [
+      cardFields: (t) => [
         { type: 'title', render: (row) => row.name },
         {
           type: 'subtitle',
-          label: 'CDP 地址',
+          label: t('workflow.config.cdpUrlCardLabel'),
           render: (row) => row.cdpUrl,
         },
         {
@@ -128,19 +126,21 @@ export default function WorkflowConfigManagement() {
           render: (row) => (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Chip
-                label={row.isEnabled ? '启用' : '禁用'}
+                label={row.isEnabled ? t('workflow.config.enabled') : t('workflow.config.disabled')}
                 color={row.isEnabled ? 'success' : 'error'}
                 size="small"
               />
-              {row.isDefault && <Chip label="默认" color="success" size="small" />}
+              {row.isDefault && (
+                <Chip label={t('workflow.config.default')} color="success" size="small" />
+              )}
             </Box>
           ),
         },
       ],
-      actions: (_t, extraContext) => [
+      actions: (t, extraContext) => [
         {
           key: 'verify',
-          label: '测试连接',
+          label: t('workflow.config.testConnection'),
           color: 'success',
           permissionCodes: [ENTERPRISE.WORKFLOW_CONFIG.READ],
           icon: (row) => {
@@ -161,22 +161,22 @@ export default function WorkflowConfigManagement() {
     form: {
       schema,
       defaultForm: DEFAULT_FORM,
-      renderForm: (form, setForm) => (
+      renderForm: (form, setForm, _isMobile, t) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           <TextField
-            label="配置名称"
+            label={t('workflow.config.name')}
             value={form.name || ''}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             fullWidth
             required
           />
           <TextField
-            label="CDP 连接地址 (ws:// 或 host:port)"
+            label={t('workflow.config.cdpUrlFormLabel')}
             value={form.cdpUrl || ''}
             onChange={(e) => setForm({ ...form, cdpUrl: e.target.value })}
             fullWidth
             required
-            helperText="示例: 127.0.0.1:9222 或 ws://127.0.0.1:9222/devtools/browser/..."
+            helperText={t('workflow.config.cdpUrlHelper')}
           />
           <FormControlLabel
             control={
@@ -185,7 +185,7 @@ export default function WorkflowConfigManagement() {
                 onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
               />
             }
-            label="设为默认环境 (设置为默认后将自动取消其他环境的默认标识)"
+            label={t('workflow.config.setDefaultEnv')}
           />
           <FormControlLabel
             control={
@@ -194,10 +194,10 @@ export default function WorkflowConfigManagement() {
                 onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
               />
             }
-            label="启用环境"
+            label={t('workflow.config.enableEnv')}
           />
           <TextField
-            label="备注"
+            label={t('workflow.config.remark')}
             value={form.remark || ''}
             onChange={(e) => setForm({ ...form, remark: e.target.value })}
             fullWidth
