@@ -245,9 +245,10 @@ const deleteApi = {
 
 // 执行工作流
 async function onRun(obj: FromSchema<typeof getReq>) {
-  runWorkflow(obj.id as number, "manual").catch((err) => {
+  await runWorkflow(obj.id as number, "manual").catch((err) => {
     console.error(`Workflow engine execute failed async:`, err);
   });
+
   return true;
 }
 
