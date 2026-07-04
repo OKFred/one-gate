@@ -3,14 +3,14 @@ import { Card, CardContent, Typography, Box, Chip, Paper, Tooltip } from '@mui/m
 import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { SYSTEM } from '@/hooks/usePermission';
-import type { GetUserRes } from '@/api/system/type';
+import type { GetUserRes } from '@/api/infra/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheEditDialog, { type TheEditDialogRef } from './TheEditDialog';
-import * as RegionAPI from '@/api/i18n/region';
-import * as LanguageAPI from '@/api/i18n/language';
-import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/i18n/type';
+import * as RegionAPI from '@/api/infra/i18n/region';
+import * as LanguageAPI from '@/api/infra/i18n/language';
+import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/infra/i18n/type';
 
 // 暴露给父组件的方法
 export interface TheDetailsRef {

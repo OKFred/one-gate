@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/i18n/language/listAll": {
+    "/api/v1/infra/i18n/language/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -62,7 +62,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/list": {
+    "/api/v1/infra/i18n/language/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -120,7 +120,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/add": {
+    "/api/v1/infra/i18n/language/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -178,7 +178,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/update": {
+    "/api/v1/infra/i18n/language/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -236,7 +236,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/delete": {
+    "/api/v1/infra/i18n/language/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -294,7 +294,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/language/get": {
+    "/api/v1/infra/i18n/language/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -352,7 +352,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/region/listAll": {
+    "/api/v1/infra/i18n/region/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -410,7 +410,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/region/list": {
+    "/api/v1/infra/i18n/region/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -468,7 +468,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/region/add": {
+    "/api/v1/infra/i18n/region/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -526,7 +526,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/region/update": {
+    "/api/v1/infra/i18n/region/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -584,7 +584,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/region/delete": {
+    "/api/v1/infra/i18n/region/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -642,7 +642,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/region/get": {
+    "/api/v1/infra/i18n/region/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -700,7 +700,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/listAll": {
+    "/api/v1/infra/i18n/translation/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -758,7 +758,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/list": {
+    "/api/v1/infra/i18n/translation/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -816,7 +816,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/add": {
+    "/api/v1/infra/i18n/translation/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -874,7 +874,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/update": {
+    "/api/v1/infra/i18n/translation/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -932,7 +932,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/delete": {
+    "/api/v1/infra/i18n/translation/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -990,7 +990,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/get": {
+    "/api/v1/infra/i18n/translation/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -1048,7 +1048,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/i18n/translation/checkDuplicate": {
+    "/api/v1/infra/i18n/translation/checkDuplicate": {
         parameters: {
             query?: never;
             header?: never;
@@ -1106,7 +1106,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/listAll": {
+    "/api/v1/infra/mail/account/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1164,7 +1164,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/list": {
+    "/api/v1/infra/mail/account/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -1222,7 +1222,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/add": {
+    "/api/v1/infra/mail/account/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -1280,7 +1280,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/update": {
+    "/api/v1/infra/mail/account/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -1338,7 +1338,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/delete": {
+    "/api/v1/infra/mail/account/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -1396,7 +1396,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/account/get": {
+    "/api/v1/infra/mail/account/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -1454,7 +1454,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/action/send": {
+    "/api/v1/infra/mail/action/send": {
         parameters: {
             query?: never;
             header?: never;
@@ -1512,7 +1512,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/action/verify": {
+    "/api/v1/infra/mail/action/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -1570,7 +1570,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/listAll": {
+    "/api/v1/infra/mail/log/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1628,7 +1628,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/list": {
+    "/api/v1/infra/mail/log/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -1686,7 +1686,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/add": {
+    "/api/v1/infra/mail/log/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -1744,7 +1744,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/update": {
+    "/api/v1/infra/mail/log/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -1802,7 +1802,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/delete": {
+    "/api/v1/infra/mail/log/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -1860,7 +1860,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/log/get": {
+    "/api/v1/infra/mail/log/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -1918,7 +1918,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/listAll": {
+    "/api/v1/infra/mail/template/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1976,7 +1976,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/list": {
+    "/api/v1/infra/mail/template/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2034,7 +2034,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/add": {
+    "/api/v1/infra/mail/template/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -2092,7 +2092,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/update": {
+    "/api/v1/infra/mail/template/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -2150,7 +2150,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/delete": {
+    "/api/v1/infra/mail/template/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2208,7 +2208,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/mail/template/get": {
+    "/api/v1/infra/mail/template/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2266,7 +2266,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/audit_login/list": {
+    "/api/v1/infra/maintenance/audit_login/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2324,7 +2324,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cache/listKeys": {
+    "/api/v1/infra/maintenance/cache/listKeys": {
         parameters: {
             query?: never;
             header?: never;
@@ -2382,7 +2382,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cache/get": {
+    "/api/v1/infra/maintenance/cache/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2440,7 +2440,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cache/put": {
+    "/api/v1/infra/maintenance/cache/put": {
         parameters: {
             query?: never;
             header?: never;
@@ -2498,7 +2498,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cache/delete": {
+    "/api/v1/infra/maintenance/cache/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2556,7 +2556,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cache/clear": {
+    "/api/v1/infra/maintenance/cache/clear": {
         parameters: {
             query?: never;
             header?: never;
@@ -2614,7 +2614,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/init/db": {
+    "/api/v1/infra/maintenance/init/db": {
         parameters: {
             query?: never;
             header?: never;
@@ -2675,7 +2675,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/list": {
+    "/api/v1/infra/maintenance/cron/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2733,7 +2733,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/add": {
+    "/api/v1/infra/maintenance/cron/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -2791,7 +2791,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/update": {
+    "/api/v1/infra/maintenance/cron/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -2849,7 +2849,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/delete": {
+    "/api/v1/infra/maintenance/cron/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2907,7 +2907,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/get": {
+    "/api/v1/infra/maintenance/cron/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2965,7 +2965,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/listLogs": {
+    "/api/v1/infra/maintenance/cron/listLogs": {
         parameters: {
             query?: never;
             header?: never;
@@ -3023,7 +3023,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/cron/parse": {
+    "/api/v1/infra/maintenance/cron/parse": {
         parameters: {
             query?: never;
             header?: never;
@@ -3081,7 +3081,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/list": {
+    "/api/v1/infra/maintenance/api-task/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3139,7 +3139,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/add": {
+    "/api/v1/infra/maintenance/api-task/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -3197,7 +3197,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/update": {
+    "/api/v1/infra/maintenance/api-task/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -3255,7 +3255,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/delete": {
+    "/api/v1/infra/maintenance/api-task/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -3313,7 +3313,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/get": {
+    "/api/v1/infra/maintenance/api-task/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -3371,7 +3371,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/runTest": {
+    "/api/v1/infra/maintenance/api-task/runTest": {
         parameters: {
             query?: never;
             header?: never;
@@ -3429,7 +3429,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-task/bulkAdd": {
+    "/api/v1/infra/maintenance/api-task/bulkAdd": {
         parameters: {
             query?: never;
             header?: never;
@@ -3487,7 +3487,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-docs/list": {
+    "/api/v1/infra/maintenance/api-docs/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3545,7 +3545,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-docs/add": {
+    "/api/v1/infra/maintenance/api-docs/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -3603,7 +3603,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-docs/update": {
+    "/api/v1/infra/maintenance/api-docs/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -3661,7 +3661,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-docs/delete": {
+    "/api/v1/infra/maintenance/api-docs/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -3719,7 +3719,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-docs/get": {
+    "/api/v1/infra/maintenance/api-docs/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -3777,7 +3777,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/maintenance/api-docs/parse": {
+    "/api/v1/infra/maintenance/api-docs/parse": {
         parameters: {
             query?: never;
             header?: never;
@@ -3835,7 +3835,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/listAll": {
+    "/api/v1/infra/oss/config/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -3893,7 +3893,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/list": {
+    "/api/v1/infra/oss/config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3951,7 +3951,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/add": {
+    "/api/v1/infra/oss/config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -4009,7 +4009,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/update": {
+    "/api/v1/infra/oss/config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -4067,7 +4067,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/get": {
+    "/api/v1/infra/oss/config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -4125,7 +4125,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/delete": {
+    "/api/v1/infra/oss/config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -4183,7 +4183,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/config/verify": {
+    "/api/v1/infra/oss/config/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -4241,7 +4241,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/list": {
+    "/api/v1/infra/oss/file/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -4299,7 +4299,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/listDirectory": {
+    "/api/v1/infra/oss/file/listDirectory": {
         parameters: {
             query?: never;
             header?: never;
@@ -4357,7 +4357,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/listAll": {
+    "/api/v1/infra/oss/file/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -4415,7 +4415,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/get": {
+    "/api/v1/infra/oss/file/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -4473,7 +4473,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/add": {
+    "/api/v1/infra/oss/file/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -4531,7 +4531,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/update": {
+    "/api/v1/infra/oss/file/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -4589,7 +4589,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/oss/file/delete": {
+    "/api/v1/infra/oss/file/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -4647,7 +4647,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/login": {
+    "/api/v1/infra/system/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -4705,7 +4705,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/wechat": {
+    "/api/v1/infra/system/auth/wechat": {
         parameters: {
             query?: never;
             header?: never;
@@ -4763,7 +4763,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/refresh": {
+    "/api/v1/infra/system/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -4821,7 +4821,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/check": {
+    "/api/v1/infra/system/auth/check": {
         parameters: {
             query?: never;
             header?: never;
@@ -4879,7 +4879,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/profile": {
+    "/api/v1/infra/system/auth/profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -4937,7 +4937,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/updateProfile": {
+    "/api/v1/infra/system/auth/updateProfile": {
         parameters: {
             query?: never;
             header?: never;
@@ -4995,7 +4995,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/updateLangCode": {
+    "/api/v1/infra/system/auth/updateLangCode": {
         parameters: {
             query?: never;
             header?: never;
@@ -5053,7 +5053,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/updatePassword": {
+    "/api/v1/infra/system/auth/updatePassword": {
         parameters: {
             query?: never;
             header?: never;
@@ -5111,7 +5111,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/getButtonPermission": {
+    "/api/v1/infra/system/auth/getButtonPermission": {
         parameters: {
             query?: never;
             header?: never;
@@ -5169,7 +5169,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/listAll": {
+    "/api/v1/infra/system/department/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -5227,7 +5227,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/list": {
+    "/api/v1/infra/system/department/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -5285,7 +5285,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/add": {
+    "/api/v1/infra/system/department/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -5343,7 +5343,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/delete": {
+    "/api/v1/infra/system/department/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -5401,7 +5401,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/update": {
+    "/api/v1/infra/system/department/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -5459,7 +5459,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/get": {
+    "/api/v1/infra/system/department/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -5517,7 +5517,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/department/tree": {
+    "/api/v1/infra/system/department/tree": {
         parameters: {
             query?: never;
             header?: never;
@@ -5575,7 +5575,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/listAll": {
+    "/api/v1/infra/system/menu/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -5633,7 +5633,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/list": {
+    "/api/v1/infra/system/menu/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -5691,7 +5691,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/add": {
+    "/api/v1/infra/system/menu/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -5749,7 +5749,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/update": {
+    "/api/v1/infra/system/menu/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -5807,7 +5807,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/delete": {
+    "/api/v1/infra/system/menu/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -5865,7 +5865,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/get": {
+    "/api/v1/infra/system/menu/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -5923,7 +5923,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/menu/tree": {
+    "/api/v1/infra/system/menu/tree": {
         parameters: {
             query?: never;
             header?: never;
@@ -5981,7 +5981,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/permission/listAll": {
+    "/api/v1/infra/system/permission/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -6039,7 +6039,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/permission/list": {
+    "/api/v1/infra/system/permission/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -6097,7 +6097,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/permission/add": {
+    "/api/v1/infra/system/permission/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -6155,7 +6155,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/permission/update": {
+    "/api/v1/infra/system/permission/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -6213,7 +6213,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/permission/delete": {
+    "/api/v1/infra/system/permission/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -6271,7 +6271,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/permission/get": {
+    "/api/v1/infra/system/permission/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -6329,7 +6329,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role/listAll": {
+    "/api/v1/infra/system/role/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -6387,7 +6387,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role/list": {
+    "/api/v1/infra/system/role/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -6445,7 +6445,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role/add": {
+    "/api/v1/infra/system/role/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -6503,7 +6503,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role/update": {
+    "/api/v1/infra/system/role/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -6561,7 +6561,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role/delete": {
+    "/api/v1/infra/system/role/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -6619,7 +6619,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role/get": {
+    "/api/v1/infra/system/role/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -6677,7 +6677,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/listAll": {
+    "/api/v1/infra/system/role_permission/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -6735,7 +6735,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/list": {
+    "/api/v1/infra/system/role_permission/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -6793,7 +6793,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/add": {
+    "/api/v1/infra/system/role_permission/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -6851,7 +6851,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/batchAdd": {
+    "/api/v1/infra/system/role_permission/batchAdd": {
         parameters: {
             query?: never;
             header?: never;
@@ -6909,7 +6909,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/update": {
+    "/api/v1/infra/system/role_permission/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -6967,7 +6967,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/delete": {
+    "/api/v1/infra/system/role_permission/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7025,7 +7025,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/batchDelete": {
+    "/api/v1/infra/system/role_permission/batchDelete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7083,7 +7083,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/get": {
+    "/api/v1/infra/system/role_permission/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -7141,7 +7141,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/role_permission/getPermissionsByRole": {
+    "/api/v1/infra/system/role_permission/getPermissionsByRole": {
         parameters: {
             query?: never;
             header?: never;
@@ -7199,7 +7199,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/user/listAll": {
+    "/api/v1/infra/system/user/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -7257,7 +7257,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/user/list": {
+    "/api/v1/infra/system/user/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -7315,7 +7315,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/user/add": {
+    "/api/v1/infra/system/user/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -7373,7 +7373,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/user/update": {
+    "/api/v1/infra/system/user/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -7431,7 +7431,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/user/delete": {
+    "/api/v1/infra/system/user/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7489,7 +7489,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/user/get": {
+    "/api/v1/infra/system/user/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -7547,7 +7547,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form/list": {
+    "/api/v1/infra/system/schema_form/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -7605,7 +7605,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form/add": {
+    "/api/v1/infra/system/schema_form/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -7663,7 +7663,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form/update": {
+    "/api/v1/infra/system/schema_form/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -7721,7 +7721,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form/delete": {
+    "/api/v1/infra/system/schema_form/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7779,7 +7779,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form/get": {
+    "/api/v1/infra/system/schema_form/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -7837,7 +7837,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form_data/list": {
+    "/api/v1/infra/system/schema_form_data/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -7895,7 +7895,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form_data/submit": {
+    "/api/v1/infra/system/schema_form_data/submit": {
         parameters: {
             query?: never;
             header?: never;
@@ -7953,7 +7953,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form_data/delete": {
+    "/api/v1/infra/system/schema_form_data/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -8011,7 +8011,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/schema_form_data/get": {
+    "/api/v1/infra/system/schema_form_data/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -8069,1573 +8069,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/enterprise/attendance/listAll": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取所有考勤记录（不分页） */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceListAllReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceListAllRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/attendance/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取考勤记录列表 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/attendance/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 添加考勤记录 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceAddReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/attendance/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新考勤记录 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceUpdateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceUpdateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/attendance/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除考勤记录 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/attendance/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取考勤记录详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/listAll": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取所有工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowListAllReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowListAllRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 新建工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowAddReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowUpdateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowUpdateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 工作流详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/run": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 手动运行工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowRunReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowRunRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/config/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取工作流环境配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_listReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_listRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/config/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 新建工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_addReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_addRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/config/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_updateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_updateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/config/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_deleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_deleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/config/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 验证 CDP 连接连通性 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_verifyReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_verifyRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enterprise/workflow/log/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页查询工作流执行日志 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowLog_listReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowLog_listRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/listAll": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取所有 AI 配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configListAllReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configListAllRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取 AI 配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 添加 AI 配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configAddReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新 AI 配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configUpdateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configUpdateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取配置详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/config/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 验证 AI 连通性 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.configVerifyReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.configVerifyRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/chat/ask": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** AI 对话接口 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ai.chatAskReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ai.chatAskRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/swarm/docker/list": {
+    "/api/v1/infra/swarm/docker/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -9693,7 +8127,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker/inspect": {
+    "/api/v1/infra/swarm/docker/inspect": {
         parameters: {
             query?: never;
             header?: never;
@@ -9751,7 +8185,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker/create": {
+    "/api/v1/infra/swarm/docker/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -9809,7 +8243,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker/update": {
+    "/api/v1/infra/swarm/docker/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -9867,7 +8301,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker/remove": {
+    "/api/v1/infra/swarm/docker/remove": {
         parameters: {
             query?: never;
             header?: never;
@@ -9925,7 +8359,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker/logs": {
+    "/api/v1/infra/swarm/docker/logs": {
         parameters: {
             query?: never;
             header?: never;
@@ -9983,7 +8417,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker/stats": {
+    "/api/v1/infra/swarm/docker/stats": {
         parameters: {
             query?: never;
             header?: never;
@@ -10041,7 +8475,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/nodes/list": {
+    "/api/v1/infra/swarm/nodes/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -10099,7 +8533,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/listAll": {
+    "/api/v1/infra/swarm/docker_config/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -10157,7 +8591,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/list": {
+    "/api/v1/infra/swarm/docker_config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -10215,7 +8649,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/add": {
+    "/api/v1/infra/swarm/docker_config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -10273,7 +8707,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/update": {
+    "/api/v1/infra/swarm/docker_config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -10331,7 +8765,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/get": {
+    "/api/v1/infra/swarm/docker_config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -10389,7 +8823,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/delete": {
+    "/api/v1/infra/swarm/docker_config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -10447,7 +8881,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/swarm/docker_config/verify": {
+    "/api/v1/infra/swarm/docker_config/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -10477,6 +8911,1572 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["swarm.docker_configVerifyRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/attendance/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有考勤记录（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/attendance/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取考勤记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/attendance/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/attendance/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/attendance/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/attendance/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取考勤记录详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.attendanceGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.attendanceGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 工作流详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 手动运行工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowRunReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowRunRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取工作流环境配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_listReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_listRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建工作流配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_addReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_addRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新工作流配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_updateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_updateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除工作流配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_deleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_deleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/config/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证 CDP 连接连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowConfig_verifyReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowConfig_verifyRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/enterprise/workflow/log/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页查询工作流执行日志 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.workflowLog_listReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.workflowLog_listRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有 AI 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取 AI 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加 AI 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新 AI 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取配置详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/config/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证 AI 连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.configVerifyReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.configVerifyRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/biz/ai/chat/ask": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** AI 对话接口 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ai.chatAskReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ai.chatAskRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -16638,6 +16638,583 @@ export interface components {
             };
             message: string;
         };
+        "swarm.dockerListReq": {
+            /**
+             * @description 过滤条件，如 { name: ['my-service'] }
+             * @example {
+             *       "name": [
+             *         "my-service"
+             *       ]
+             *     }
+             */
+            filters?: {
+                [key: string]: string[];
+            };
+        };
+        "swarm.dockerListRes": {
+            ok: boolean;
+            /** @description Docker Service 列表 */
+            data: Record<string, never>[];
+            message: string;
+        };
+        "swarm.dockerInspectReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+        };
+        "swarm.dockerInspectRes": {
+            ok: boolean;
+            /** @description Docker Service 详细配置及运行状态 */
+            data: Record<string, never>;
+            message: string;
+        };
+        "swarm.dockerCreateReq": {
+            /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
+            spec: {
+                /**
+                 * @description 服务名称
+                 * @example my-service
+                 */
+                Name: string;
+                /** @description 服务标签对 */
+                Labels?: {
+                    [key: string]: string;
+                };
+                /** @description 任务模板，定义容器的规格和调度属性 */
+                TaskTemplate: {
+                    ContainerSpec: {
+                        /**
+                         * @description 容器镜像
+                         * @example nginx:latest
+                         */
+                        Image: string;
+                        /** @description 环境变量列表 */
+                        Env?: string[];
+                        Command?: string[];
+                        Args?: string[];
+                    };
+                };
+                Mode?: {
+                    Replicated?: {
+                        /**
+                         * @description 服务副本数
+                         * @example 3
+                         */
+                        Replicas?: number;
+                    };
+                    Global?: Record<string, never>;
+                };
+                UpdateConfig?: Record<string, never>;
+                RollbackConfig?: Record<string, never>;
+                EndpointSpec?: {
+                    Ports?: {
+                        /** @enum {string} */
+                        Protocol?: "tcp" | "udp";
+                        PublishMode?: string;
+                        PublishedPort: number;
+                        TargetPort: number;
+                    }[];
+                };
+            };
+        };
+        "swarm.dockerCreateRes": {
+            ok: boolean;
+            data: {
+                /** @description 新建服务的 ID */
+                ID: string;
+            };
+            message: string;
+        };
+        "swarm.dockerUpdateReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+            /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
+            spec: {
+                /**
+                 * @description 服务名称
+                 * @example my-service
+                 */
+                Name: string;
+                /** @description 服务标签对 */
+                Labels?: {
+                    [key: string]: string;
+                };
+                /** @description 任务模板，定义容器的规格和调度属性 */
+                TaskTemplate: {
+                    ContainerSpec: {
+                        /**
+                         * @description 容器镜像
+                         * @example nginx:latest
+                         */
+                        Image: string;
+                        /** @description 环境变量列表 */
+                        Env?: string[];
+                        Command?: string[];
+                        Args?: string[];
+                    };
+                };
+                Mode?: {
+                    Replicated?: {
+                        /**
+                         * @description 服务副本数
+                         * @example 3
+                         */
+                        Replicas?: number;
+                    };
+                    Global?: Record<string, never>;
+                };
+                UpdateConfig?: Record<string, never>;
+                RollbackConfig?: Record<string, never>;
+                EndpointSpec?: {
+                    Ports?: {
+                        /** @enum {string} */
+                        Protocol?: "tcp" | "udp";
+                        PublishMode?: string;
+                        PublishedPort: number;
+                        TargetPort: number;
+                    }[];
+                };
+            };
+            /**
+             * @description 服务的当前配置版本号（即 Spec 的 Version.Index），用于更新校验
+             * @example 12
+             */
+            version: number;
+        };
+        "swarm.dockerUpdateRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "swarm.dockerRemoveReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+        };
+        "swarm.dockerRemoveRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 操作是否成功
+                 * @example true
+                 */
+                success: boolean;
+            };
+            message: string;
+        };
+        "swarm.dockerLogsReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+            /**
+             * @description 返回的日志行数
+             * @default 100
+             */
+            tail: number;
+        };
+        "swarm.dockerLogsRes": {
+            ok: boolean;
+            data: {
+                /** @description 服务日志文本内容 */
+                logs: string;
+            };
+            message: string;
+        };
+        "swarm.dockerStatsReq": {
+            /**
+             * @description 服务 ID 或服务名称
+             * @example u8p2jh82h2x9
+             * @example my-service
+             */
+            id: string;
+        };
+        "swarm.dockerStatsRes": {
+            ok: boolean;
+            /** @description Swarm 服务各运行中 Task 副本负载指标 */
+            data: {
+                taskId: string;
+                containerId: string;
+                nodeId: string;
+                cpuPercent: number;
+                memoryUsage: number;
+                memoryLimit: number;
+                memoryPercent: number;
+                networkRx: number;
+                networkTx: number;
+                blkRead: number;
+                blkWrite: number;
+            }[];
+            message: string;
+        };
+        "swarm.nodesListReq": {
+            /** @description 过滤条件 */
+            filters?: {
+                [key: string]: string[];
+            };
+        };
+        "swarm.nodesListRes": {
+            ok: boolean;
+            /** @description Swarm Nodes 节点列表及其承载的负载状态 */
+            data: {
+                /** @description 节点 ID */
+                id: string;
+                /** @description 主机名称 */
+                hostname: string;
+                /**
+                 * @description 角色
+                 * @enum {string}
+                 */
+                role: "manager" | "worker";
+                /**
+                 * @description 状态
+                 * @enum {string}
+                 */
+                status: "ready" | "down" | "disconnected";
+                /**
+                 * @description 调度可用性
+                 * @enum {string}
+                 */
+                availability: "active" | "drain" | "pause";
+                /** @description 节点 IP */
+                ip: string;
+                /** @description Docker 引擎版本 */
+                engineVersion: string;
+                /** @description CPU 核心数 */
+                nanoCpus: number;
+                /** @description 总物理内存 */
+                memoryBytes: number;
+                /** @description 在该节点运行中的 Task 数量 */
+                runningTaskCount: number;
+                /** @description 已分配 CPU (核数) */
+                allocatedCpus: number;
+                /** @description 已分配内存 (字节) */
+                allocatedMemory: number;
+                /** @description 原始 JSON 数据 */
+                rawJson: string;
+            }[];
+            message: string;
+        };
+        "swarm.docker_configListAllReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
+        };
+        "swarm.docker_configListAllRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 配置名称
+                 * @example My Docker Swarm
+                 */
+                name: string;
+                /**
+                 * @description Docker Host 地址
+                 * @example https://127.0.0.1:2376
+                 */
+                host: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 是否为默认配置 */
+                isDefault: boolean;
+            }[];
+            message: string;
+        };
+        "swarm.docker_configListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
+        };
+        "swarm.docker_configListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 配置名称
+                     * @example My Docker Swarm
+                     */
+                    name: string;
+                    /**
+                     * @description Docker Host 地址
+                     * @example https://127.0.0.1:2376
+                     */
+                    host: string;
+                    /**
+                     * @description Docker API 版本
+                     * @example v1.47
+                     */
+                    apiVersion?: string;
+                    /** @description 是否启用 TLS 验证 */
+                    tlsVerify: boolean;
+                    /** @description CA 证书内容 */
+                    caCert?: ((string | null) | null) | null;
+                    /** @description 客户端证书内容 */
+                    clientCert?: ((string | null) | null) | null;
+                    /** @description 客户端私钥 */
+                    clientKey?: ((string | null) | null) | null;
+                    /** @description Cloudflare mTLS 证书绑定名称 */
+                    cfMtlsBinding?: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 是否为默认配置 */
+                    isDefault: boolean;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "swarm.docker_configAddReq": {
+            /**
+             * @description 配置名称
+             * @example My Docker Swarm
+             */
+            name: string;
+            /**
+             * @description Docker Host 地址
+             * @example https://127.0.0.1:2376
+             */
+            host: string;
+            /**
+             * @description Docker API 版本
+             * @example v1.47
+             */
+            apiVersion?: string;
+            /** @description 是否启用 TLS 验证 */
+            tlsVerify: boolean;
+            /** @description CA 证书内容 */
+            caCert?: ((string | null) | null) | null;
+            /** @description 客户端证书内容 */
+            clientCert?: ((string | null) | null) | null;
+            /** @description 客户端私钥 */
+            clientKey?: ((string | null) | null) | null;
+            /** @description Cloudflare mTLS 证书绑定名称 */
+            cfMtlsBinding?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 是否为默认配置 */
+            isDefault: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "swarm.docker_configAddRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "swarm.docker_configUpdateReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 配置名称
+             * @example My Docker Swarm
+             */
+            name?: string;
+            /**
+             * @description Docker Host 地址
+             * @example https://127.0.0.1:2376
+             */
+            host?: string;
+            /**
+             * @description Docker API 版本
+             * @example v1.47
+             */
+            apiVersion?: string;
+            /** @description 是否启用 TLS 验证 */
+            tlsVerify?: boolean;
+            /** @description CA 证书内容 */
+            caCert?: ((string | null) | null) | null;
+            /** @description 客户端证书内容 */
+            clientCert?: ((string | null) | null) | null;
+            /** @description 客户端私钥 */
+            clientKey?: ((string | null) | null) | null;
+            /** @description Cloudflare mTLS 证书绑定名称 */
+            cfMtlsBinding?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 是否为默认配置 */
+            isDefault?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "swarm.docker_configUpdateRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "swarm.docker_configGetReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "swarm.docker_configGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 配置名称
+                 * @example My Docker Swarm
+                 */
+                name: string;
+                /**
+                 * @description Docker Host 地址
+                 * @example https://127.0.0.1:2376
+                 */
+                host: string;
+                /**
+                 * @description Docker API 版本
+                 * @example v1.47
+                 */
+                apiVersion?: string;
+                /** @description 是否启用 TLS 验证 */
+                tlsVerify: boolean;
+                /** @description CA 证书内容 */
+                caCert?: ((string | null) | null) | null;
+                /** @description 客户端证书内容 */
+                clientCert?: ((string | null) | null) | null;
+                /** @description 客户端私钥 */
+                clientKey?: ((string | null) | null) | null;
+                /** @description Cloudflare mTLS 证书绑定名称 */
+                cfMtlsBinding?: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 是否为默认配置 */
+                isDefault: boolean;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "swarm.docker_configDeleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "swarm.docker_configDeleteRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "swarm.docker_configVerifyReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "swarm.docker_configVerifyRes": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
         "enterprise.attendanceListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -17739,583 +18316,6 @@ export interface components {
             ok: boolean;
             /** @description AI 返回的内容 */
             data: string;
-            message: string;
-        };
-        "swarm.dockerListReq": {
-            /**
-             * @description 过滤条件，如 { name: ['my-service'] }
-             * @example {
-             *       "name": [
-             *         "my-service"
-             *       ]
-             *     }
-             */
-            filters?: {
-                [key: string]: string[];
-            };
-        };
-        "swarm.dockerListRes": {
-            ok: boolean;
-            /** @description Docker Service 列表 */
-            data: Record<string, never>[];
-            message: string;
-        };
-        "swarm.dockerInspectReq": {
-            /**
-             * @description 服务 ID 或服务名称
-             * @example u8p2jh82h2x9
-             * @example my-service
-             */
-            id: string;
-        };
-        "swarm.dockerInspectRes": {
-            ok: boolean;
-            /** @description Docker Service 详细配置及运行状态 */
-            data: Record<string, never>;
-            message: string;
-        };
-        "swarm.dockerCreateReq": {
-            /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
-            spec: {
-                /**
-                 * @description 服务名称
-                 * @example my-service
-                 */
-                Name: string;
-                /** @description 服务标签对 */
-                Labels?: {
-                    [key: string]: string;
-                };
-                /** @description 任务模板，定义容器的规格和调度属性 */
-                TaskTemplate: {
-                    ContainerSpec: {
-                        /**
-                         * @description 容器镜像
-                         * @example nginx:latest
-                         */
-                        Image: string;
-                        /** @description 环境变量列表 */
-                        Env?: string[];
-                        Command?: string[];
-                        Args?: string[];
-                    };
-                };
-                Mode?: {
-                    Replicated?: {
-                        /**
-                         * @description 服务副本数
-                         * @example 3
-                         */
-                        Replicas?: number;
-                    };
-                    Global?: Record<string, never>;
-                };
-                UpdateConfig?: Record<string, never>;
-                RollbackConfig?: Record<string, never>;
-                EndpointSpec?: {
-                    Ports?: {
-                        /** @enum {string} */
-                        Protocol?: "tcp" | "udp";
-                        PublishMode?: string;
-                        PublishedPort: number;
-                        TargetPort: number;
-                    }[];
-                };
-            };
-        };
-        "swarm.dockerCreateRes": {
-            ok: boolean;
-            data: {
-                /** @description 新建服务的 ID */
-                ID: string;
-            };
-            message: string;
-        };
-        "swarm.dockerUpdateReq": {
-            /**
-             * @description 服务 ID 或服务名称
-             * @example u8p2jh82h2x9
-             * @example my-service
-             */
-            id: string;
-            /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
-            spec: {
-                /**
-                 * @description 服务名称
-                 * @example my-service
-                 */
-                Name: string;
-                /** @description 服务标签对 */
-                Labels?: {
-                    [key: string]: string;
-                };
-                /** @description 任务模板，定义容器的规格和调度属性 */
-                TaskTemplate: {
-                    ContainerSpec: {
-                        /**
-                         * @description 容器镜像
-                         * @example nginx:latest
-                         */
-                        Image: string;
-                        /** @description 环境变量列表 */
-                        Env?: string[];
-                        Command?: string[];
-                        Args?: string[];
-                    };
-                };
-                Mode?: {
-                    Replicated?: {
-                        /**
-                         * @description 服务副本数
-                         * @example 3
-                         */
-                        Replicas?: number;
-                    };
-                    Global?: Record<string, never>;
-                };
-                UpdateConfig?: Record<string, never>;
-                RollbackConfig?: Record<string, never>;
-                EndpointSpec?: {
-                    Ports?: {
-                        /** @enum {string} */
-                        Protocol?: "tcp" | "udp";
-                        PublishMode?: string;
-                        PublishedPort: number;
-                        TargetPort: number;
-                    }[];
-                };
-            };
-            /**
-             * @description 服务的当前配置版本号（即 Spec 的 Version.Index），用于更新校验
-             * @example 12
-             */
-            version: number;
-        };
-        "swarm.dockerUpdateRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description 操作是否成功
-                 * @example true
-                 */
-                success: boolean;
-            };
-            message: string;
-        };
-        "swarm.dockerRemoveReq": {
-            /**
-             * @description 服务 ID 或服务名称
-             * @example u8p2jh82h2x9
-             * @example my-service
-             */
-            id: string;
-        };
-        "swarm.dockerRemoveRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description 操作是否成功
-                 * @example true
-                 */
-                success: boolean;
-            };
-            message: string;
-        };
-        "swarm.dockerLogsReq": {
-            /**
-             * @description 服务 ID 或服务名称
-             * @example u8p2jh82h2x9
-             * @example my-service
-             */
-            id: string;
-            /**
-             * @description 返回的日志行数
-             * @default 100
-             */
-            tail: number;
-        };
-        "swarm.dockerLogsRes": {
-            ok: boolean;
-            data: {
-                /** @description 服务日志文本内容 */
-                logs: string;
-            };
-            message: string;
-        };
-        "swarm.dockerStatsReq": {
-            /**
-             * @description 服务 ID 或服务名称
-             * @example u8p2jh82h2x9
-             * @example my-service
-             */
-            id: string;
-        };
-        "swarm.dockerStatsRes": {
-            ok: boolean;
-            /** @description Swarm 服务各运行中 Task 副本负载指标 */
-            data: {
-                taskId: string;
-                containerId: string;
-                nodeId: string;
-                cpuPercent: number;
-                memoryUsage: number;
-                memoryLimit: number;
-                memoryPercent: number;
-                networkRx: number;
-                networkTx: number;
-                blkRead: number;
-                blkWrite: number;
-            }[];
-            message: string;
-        };
-        "swarm.nodesListReq": {
-            /** @description 过滤条件 */
-            filters?: {
-                [key: string]: string[];
-            };
-        };
-        "swarm.nodesListRes": {
-            ok: boolean;
-            /** @description Swarm Nodes 节点列表及其承载的负载状态 */
-            data: {
-                /** @description 节点 ID */
-                id: string;
-                /** @description 主机名称 */
-                hostname: string;
-                /**
-                 * @description 角色
-                 * @enum {string}
-                 */
-                role: "manager" | "worker";
-                /**
-                 * @description 状态
-                 * @enum {string}
-                 */
-                status: "ready" | "down" | "disconnected";
-                /**
-                 * @description 调度可用性
-                 * @enum {string}
-                 */
-                availability: "active" | "drain" | "pause";
-                /** @description 节点 IP */
-                ip: string;
-                /** @description Docker 引擎版本 */
-                engineVersion: string;
-                /** @description CPU 核心数 */
-                nanoCpus: number;
-                /** @description 总物理内存 */
-                memoryBytes: number;
-                /** @description 在该节点运行中的 Task 数量 */
-                runningTaskCount: number;
-                /** @description 已分配 CPU (核数) */
-                allocatedCpus: number;
-                /** @description 已分配内存 (字节) */
-                allocatedMemory: number;
-                /** @description 原始 JSON 数据 */
-                rawJson: string;
-            }[];
-            message: string;
-        };
-        "swarm.docker_configListAllReq": {
-            /** @description 是否降序 */
-            descend?: boolean;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @enum {string} */
-            orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
-        };
-        "swarm.docker_configListAllRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 配置名称
-                 * @example My Docker Swarm
-                 */
-                name: string;
-                /**
-                 * @description Docker Host 地址
-                 * @example https://127.0.0.1:2376
-                 */
-                host: string;
-                /** @description 是否启用 */
-                isEnabled: boolean;
-                /** @description 是否为默认配置 */
-                isDefault: boolean;
-            }[];
-            message: string;
-        };
-        "swarm.docker_configListReq": {
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @enum {string} */
-            orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
-        };
-        "swarm.docker_configListRes": {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total: number;
-                /** @description 总页数 */
-                totalPage: number;
-                /** @description 当前页码 */
-                currentPage: number;
-                /** @description 每页记录数 */
-                pageSize: number;
-                list: {
-                    /**
-                     * @description id
-                     * @example 1
-                     */
-                    id: number;
-                    /**
-                     * @description 配置名称
-                     * @example My Docker Swarm
-                     */
-                    name: string;
-                    /**
-                     * @description Docker Host 地址
-                     * @example https://127.0.0.1:2376
-                     */
-                    host: string;
-                    /**
-                     * @description Docker API 版本
-                     * @example v1.47
-                     */
-                    apiVersion?: string;
-                    /** @description 是否启用 TLS 验证 */
-                    tlsVerify: boolean;
-                    /** @description CA 证书内容 */
-                    caCert?: ((string | null) | null) | null;
-                    /** @description 客户端证书内容 */
-                    clientCert?: ((string | null) | null) | null;
-                    /** @description 客户端私钥 */
-                    clientKey?: ((string | null) | null) | null;
-                    /** @description Cloudflare mTLS 证书绑定名称 */
-                    cfMtlsBinding?: ((string | null) | null) | null;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 是否为默认配置 */
-                    isDefault: boolean;
-                    /** @description 备注 */
-                    remark?: ((string | null) | null) | null;
-                    /** @description 创建人ID */
-                    creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
-                }[];
-            };
-            message: string;
-        };
-        "swarm.docker_configAddReq": {
-            /**
-             * @description 配置名称
-             * @example My Docker Swarm
-             */
-            name: string;
-            /**
-             * @description Docker Host 地址
-             * @example https://127.0.0.1:2376
-             */
-            host: string;
-            /**
-             * @description Docker API 版本
-             * @example v1.47
-             */
-            apiVersion?: string;
-            /** @description 是否启用 TLS 验证 */
-            tlsVerify: boolean;
-            /** @description CA 证书内容 */
-            caCert?: ((string | null) | null) | null;
-            /** @description 客户端证书内容 */
-            clientCert?: ((string | null) | null) | null;
-            /** @description 客户端私钥 */
-            clientKey?: ((string | null) | null) | null;
-            /** @description Cloudflare mTLS 证书绑定名称 */
-            cfMtlsBinding?: ((string | null) | null) | null;
-            /** @description 是否启用 */
-            isEnabled: boolean;
-            /** @description 是否为默认配置 */
-            isDefault: boolean;
-            /** @description 备注 */
-            remark?: ((string | null) | null) | null;
-        };
-        "swarm.docker_configAddRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "swarm.docker_configUpdateReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-            /**
-             * @description 配置名称
-             * @example My Docker Swarm
-             */
-            name?: string;
-            /**
-             * @description Docker Host 地址
-             * @example https://127.0.0.1:2376
-             */
-            host?: string;
-            /**
-             * @description Docker API 版本
-             * @example v1.47
-             */
-            apiVersion?: string;
-            /** @description 是否启用 TLS 验证 */
-            tlsVerify?: boolean;
-            /** @description CA 证书内容 */
-            caCert?: ((string | null) | null) | null;
-            /** @description 客户端证书内容 */
-            clientCert?: ((string | null) | null) | null;
-            /** @description 客户端私钥 */
-            clientKey?: ((string | null) | null) | null;
-            /** @description Cloudflare mTLS 证书绑定名称 */
-            cfMtlsBinding?: ((string | null) | null) | null;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @description 是否为默认配置 */
-            isDefault?: boolean;
-            /** @description 备注 */
-            remark?: ((string | null) | null) | null;
-        };
-        "swarm.docker_configUpdateRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "swarm.docker_configGetReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "swarm.docker_configGetRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 配置名称
-                 * @example My Docker Swarm
-                 */
-                name: string;
-                /**
-                 * @description Docker Host 地址
-                 * @example https://127.0.0.1:2376
-                 */
-                host: string;
-                /**
-                 * @description Docker API 版本
-                 * @example v1.47
-                 */
-                apiVersion?: string;
-                /** @description 是否启用 TLS 验证 */
-                tlsVerify: boolean;
-                /** @description CA 证书内容 */
-                caCert?: ((string | null) | null) | null;
-                /** @description 客户端证书内容 */
-                clientCert?: ((string | null) | null) | null;
-                /** @description 客户端私钥 */
-                clientKey?: ((string | null) | null) | null;
-                /** @description Cloudflare mTLS 证书绑定名称 */
-                cfMtlsBinding?: ((string | null) | null) | null;
-                /** @description 是否启用 */
-                isEnabled: boolean;
-                /** @description 是否为默认配置 */
-                isDefault: boolean;
-                /** @description 备注 */
-                remark?: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
-            };
-            message: string;
-        };
-        "swarm.docker_configDeleteReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "swarm.docker_configDeleteRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "swarm.docker_configVerifyReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "swarm.docker_configVerifyRes": {
-            ok: boolean;
-            data: boolean;
             message: string;
         };
     };

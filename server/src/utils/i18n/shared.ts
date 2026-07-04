@@ -1,5 +1,5 @@
 import { kv } from "@/middleware/cache";
-import translationService from "@/api/i18n/translation/service";
+import translationService from "@/api/infra/i18n/translation/service";
 
 /**
  * 获取翻译文案 (懒加载模式)

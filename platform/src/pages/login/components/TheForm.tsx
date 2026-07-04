@@ -5,8 +5,8 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginFn } from '@/api/system/auth';
-import type { LoginReq } from '@/api/system/type';
+import { loginFn } from '@/api/infra/system/auth';
+import type { LoginReq } from '@/api/infra/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
 import { findFirstValidPath } from '@/hooks/useFirstValidPath';

@@ -1,9 +1,9 @@
 import { tokenUtils } from "@/utils/token";
 import { Context } from "@/types/app";
-import userService, { UserObj } from "@/api/system/user/service";
+import userService, { UserObj } from "@/api/infra/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "@/db/init";
-import { utils as rolePermissionUtils } from "@/api/system/role_permission/service";
-import { roleTable } from "@/api/system/role/model";
+import { utils as rolePermissionUtils } from "@/api/infra/system/role_permission/service";
+import { roleTable } from "@/api/infra/system/role/model";
 import {
   DataScope,
   SCOPE_PRIORITY,

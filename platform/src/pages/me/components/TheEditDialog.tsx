@@ -15,12 +15,12 @@ import {
 } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
-import * as AuthAPI from '@/api/system/auth';
+import * as AuthAPI from '@/api/infra/system/auth';
 import { showSnackbar } from '@/components/Notification';
-import type { GetUserRes, UpdateProfileReq } from '@/api/system/type';
+import type { GetUserRes, UpdateProfileReq } from '@/api/infra/system/type';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';
-import type { ListAllRegionRes } from '@/api/i18n/type';
+import type { ListAllRegionRes } from '@/api/infra/i18n/type';
 
 // 暴露给父组件的方法
 export interface TheEditDialogRef {

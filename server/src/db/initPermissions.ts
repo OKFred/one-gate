@@ -4,7 +4,7 @@
  */
 
 import db from "@/db/index";
-import { permissionTable } from "@/api/system/permission/model";
+import { permissionTable } from "@/api/infra/system/permission/model";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "@/utils/env";

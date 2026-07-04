@@ -1,17 +1,17 @@
 import db from "@/db/index";
-import { translationTable } from "@/api/i18n/translation/model";
-import { utils as translationUtils } from "@/api/i18n/translation/service";
+import { translationTable } from "@/api/infra/i18n/translation/model";
+import { utils as translationUtils } from "@/api/infra/i18n/translation/service";
 import { SUPER_ADMIN_ID } from "./init";
 import { sql } from "drizzle-orm";
 
-import { aiTranslations } from "@/api/ai/translation";
-import { swarmTranslations } from "@/api/swarm/translation";
-import { i18nTranslations } from "@/api/i18n/translation";
-import { mailTranslations } from "@/api/mail/translation";
-import { maintenanceTranslations } from "@/api/maintenance/translation";
-import { ossTranslations } from "@/api/oss/translation";
-import { enterpriseTranslations } from "@/api/enterprise/translation";
-import { systemTranslations } from "@/api/system/translation";
+import { aiTranslations } from "@/api/biz/ai/translation";
+import { swarmTranslations } from "@/api/infra/swarm/translation";
+import { i18nTranslations } from "@/api/infra/i18n/translation";
+import { mailTranslations } from "@/api/infra/mail/translation";
+import { maintenanceTranslations } from "@/api/infra/maintenance/translation";
+import { ossTranslations } from "@/api/infra/oss/translation";
+import { enterpriseTranslations } from "@/api/biz/enterprise/translation";
+import { systemTranslations } from "@/api/infra/system/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "@/types/business";
 import type { LanguageCode } from "@/db/initLanguage";

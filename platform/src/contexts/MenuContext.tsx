@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, type ReactNode, useCallback } from 'react';
 import type { SystemMenuTree } from '@/layout/components/type';
-import { treeFn } from '@/api/system/menu';
+import { treeFn } from '@/api/infra/system/menu';
 import { useTranslation } from '@/hooks/useTranslation';
 import { showSnackbar } from '@/components/Notification';
 interface MenuNode extends Omit<SystemMenuTree, 'children'> {

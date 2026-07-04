@@ -4,7 +4,7 @@ import { Person as PersonIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import { SYSTEM } from '@/hooks/usePermission';
-import type { GetUserRes } from '@/api/system/type';
+import type { GetUserRes } from '@/api/infra/system/type';
 import type { Props } from '../index';
 import ThePasswordDialog, { type ThePasswordDialogRef } from './ThePasswordDialog';
 import { useUserInfo } from '@/hooks/useUserInfo';

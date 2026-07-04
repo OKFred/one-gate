@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { authUtils } from '@/utils/auth';
-import { checkTokenFn } from '@/api/system/auth';
+import { checkTokenFn } from '@/api/infra/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 import { useMenu } from '@/hooks/useMenu';
 import type { MenuNode } from '@/contexts/MenuContext';

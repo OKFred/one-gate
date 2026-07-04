@@ -4,7 +4,7 @@ import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheProfile, { type TheProfileRef } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
-import * as AuthApi from '@/api/system/auth';
+import * as AuthApi from '@/api/infra/system/auth';
 export interface Props {
   localObj: LocalObj;
 }

@@ -1,5 +1,5 @@
 import db from "@/db/index";
-import { regionTable } from "@/api/i18n/region/model";
+import { regionTable } from "@/api/infra/i18n/region/model";
 import { SUPER_ADMIN_ID } from "./init";
 import { sql } from "drizzle-orm";
 

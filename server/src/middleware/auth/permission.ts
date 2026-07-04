@@ -1,4 +1,4 @@
-import type { UserObj } from "@/api/system/user/service";
+import type { UserObj } from "@/api/infra/system/user/service";
 
 /** 通用动作映射，将抽象动作映射到具体的权限码后缀 */
 const ACTION_MAP: Record<string, string[]> = {

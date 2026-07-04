@@ -18,11 +18,11 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { getThemeMode } from '@/hooks/useThemeMode';
 import { authUtils } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
-import * as LanguageAPI from '@/api/i18n/language';
-import * as AuthAPI from '@/api/system/auth';
+import * as LanguageAPI from '@/api/infra/i18n/language';
+import * as AuthAPI from '@/api/infra/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useUserInfo } from '@/hooks/useUserInfo';
-import type { ListAllLanguageRes } from '@/api/i18n/type';
+import type { ListAllLanguageRes } from '@/api/infra/i18n/type';
 import { loginPath } from '@/routes';
 
 interface TopbarProps {

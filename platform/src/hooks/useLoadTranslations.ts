@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { listAllFn } from '@/api/i18n/translation';
+import { listAllFn } from '@/api/infra/i18n/translation';
 import { setTranslations } from './useTranslation';
 
 /**
