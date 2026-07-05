@@ -83,7 +83,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "server"
+          workingDirectory: "server/apps/server"
           command: deploy
 
       # ─── 步骤 2: 部署前端 Pages ───
