@@ -1,0 +1,352 @@
+import db from "@hodor/core/db/index";
+import {
+  workflowTable,
+  workflowLogTable,
+  workflowConfigTable,
+  type WorkflowPOLike,
+  type WorkflowConfigPOLike,
+  type WorkflowLogPOLike,
+} from "./model";
+import { eq, and, or, like, asc, desc, count } from "drizzle-orm";
+import type { InferInsertModel } from "drizzle-orm";
+import hasValue from "@hodor/core/utils/hasValue";
+
+//====================================================================
+// 1. Workflow Repository
+//====================================================================
+
+function buildWorkflowWhere(condition?: {
+  keyword?: string;
+  isEnabled?: boolean;
+}) {
+  const { keyword, isEnabled } = condition || {};
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(
+      or(
+        like(workflowTable.name, `%${keyword}%`),
+        like(workflowTable.description, `%${keyword}%`)
+      )
+    );
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(workflowTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+}
+
+export async function findWorkflowPageAll(params: {
+  orderBy?: keyof WorkflowPOLike;
+  descend?: boolean;
+  keyword?: string;
+  isEnabled?: boolean;
+}) {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = workflowTable[orderBy] || workflowTable.id;
+  return await db
+    .select()
+    .from(workflowTable)
+    .where(buildWorkflowWhere(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(10000);
+}
+
+export async function findWorkflowPage(params: {
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof WorkflowPOLike;
+  descend?: boolean;
+  keyword?: string;
+  isEnabled?: boolean;
+}) {
+  const { pageNo, pageSize, orderBy = "id", descend = true } = params;
+  const offset = (pageNo - 1) * pageSize;
+  const orderField = workflowTable[orderBy] || workflowTable.id;
+  const where = buildWorkflowWhere(params);
+
+  const countResult = await db
+    .select({ total: count(workflowTable.id).as("total") })
+    .from(workflowTable)
+    .where(where);
+
+  const total = countResult[0]?.total || 0;
+
+  if (total === 0) {
+    return { total, list: [] };
+  }
+
+  const list = await db
+    .select()
+    .from(workflowTable)
+    .where(where)
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(pageSize)
+    .offset(offset);
+
+  return { total, list };
+}
+
+export async function findWorkflowById(id: number) {
+  const rows = await db
+    .select()
+    .from(workflowTable)
+    .where(eq(workflowTable.id, id))
+    .limit(1);
+  return rows[0] || null;
+}
+
+export async function onWorkflowInsert(
+  data: InferInsertModel<typeof workflowTable>
+) {
+  const result = await db
+    .insert(workflowTable)
+    .values(data)
+    .returning({ id: workflowTable.id });
+  return result[0]?.id;
+}
+
+export async function onWorkflowUpdate(
+  id: number,
+  data: Partial<Omit<InferInsertModel<typeof workflowTable>, "id">>
+) {
+  const result = await db
+    .update(workflowTable)
+    .set(data)
+    .where(eq(workflowTable.id, id))
+    .returning({ id: workflowTable.id });
+  return result[0] || null;
+}
+
+export async function onWorkflowDelete(id: number) {
+  const result = await db
+    .delete(workflowTable)
+    .where(eq(workflowTable.id, id))
+    .returning({ id: workflowTable.id });
+  return result[0] || null;
+}
+
+//====================================================================
+// 2. Workflow Config Repository
+//====================================================================
+
+function buildConfigWhere(condition?: {
+  keyword?: string;
+  isEnabled?: boolean;
+}) {
+  const { keyword, isEnabled } = condition || {};
+  const conditions = [];
+  if (hasValue(keyword)) {
+    conditions.push(
+      or(
+        like(workflowConfigTable.name, `%${keyword}%`),
+        like(workflowConfigTable.cdpUrl, `%${keyword}%`)
+      )
+    );
+  }
+  if (isEnabled !== undefined) {
+    conditions.push(eq(workflowConfigTable.isEnabled, isEnabled));
+  }
+  return conditions.length > 0
+    ? conditions.length === 1
+      ? conditions[0]
+      : and(...conditions)
+    : undefined;
+}
+
+export async function findConfigPageAll(params: {
+  orderBy?: keyof WorkflowConfigPOLike;
+  descend?: boolean;
+  keyword?: string;
+  isEnabled?: boolean;
+}) {
+  const { orderBy = "id", descend = true } = params;
+  const orderField = workflowConfigTable[orderBy] || workflowConfigTable.id;
+  return await db
+    .select()
+    .from(workflowConfigTable)
+    .where(buildConfigWhere(params))
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(10000);
+}
+
+export async function findConfigPage(params: {
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof WorkflowConfigPOLike;
+  descend?: boolean;
+  keyword?: string;
+  isEnabled?: boolean;
+}) {
+  const { pageNo, pageSize, orderBy = "id", descend = true } = params;
+  const offset = (pageNo - 1) * pageSize;
+  const orderField = workflowConfigTable[orderBy] || workflowConfigTable.id;
+  const where = buildConfigWhere(params);
+
+  const countResult = await db
+    .select({ total: count(workflowConfigTable.id).as("total") })
+    .from(workflowConfigTable)
+    .where(where);
+
+  const total = countResult[0]?.total || 0;
+
+  if (total === 0) {
+    return { total, list: [] };
+  }
+
+  const list = await db
+    .select()
+    .from(workflowConfigTable)
+    .where(where)
+    .orderBy(!descend ? asc(orderField) : desc(orderField))
+    .limit(pageSize)
+    .offset(offset);
+
+  return { total, list };
+}
+
+export async function findConfigById(id: number) {
+  const rows = await db
+    .select()
+    .from(workflowConfigTable)
+    .where(eq(workflowConfigTable.id, id))
+    .limit(1);
+  return rows[0] || null;
+}
+
+export async function findDefaultActiveConfig(): Promise<WorkflowConfigPOLike | null> {
+  const rows = await db
+    .select()
+    .from(workflowConfigTable)
+    .where(
+      and(
+        eq(workflowConfigTable.isDefault, true),
+        eq(workflowConfigTable.isEnabled, true)
+      )
+    )
+    .limit(1);
+  return rows[0] || null;
+}
+
+export async function disableOtherConfigDefaults(exceptId?: number) {
+  const conditions = [eq(workflowConfigTable.isDefault, true)];
+  if (exceptId !== undefined) {
+    conditions.push(
+      or(eq(workflowConfigTable.id, exceptId))
+        ? (and(conditions[0], eq(workflowConfigTable.isDefault, true)) as any)
+        : (undefined as any)
+    );
+    // 实质上我们是要把除了 exceptId 之外的所有 isDefault = true 改为 false
+    await db
+      .update(workflowConfigTable)
+      .set({ isDefault: false })
+      .where(
+        and(
+          eq(workflowConfigTable.isDefault, true),
+          eq(workflowConfigTable.id, exceptId ? exceptId : 0)
+            ? (undefined as any)
+            : undefined
+        )
+      );
+  } else {
+    await db.update(workflowConfigTable).set({ isDefault: false });
+  }
+}
+
+export async function onConfigInsert(
+  data: InferInsertModel<typeof workflowConfigTable>
+) {
+  const result = await db
+    .insert(workflowConfigTable)
+    .values(data)
+    .returning({ id: workflowConfigTable.id });
+  return result[0]?.id;
+}
+
+export async function onConfigUpdate(
+  id: number,
+  data: Partial<Omit<InferInsertModel<typeof workflowConfigTable>, "id">>
+) {
+  const result = await db
+    .update(workflowConfigTable)
+    .set(data)
+    .where(eq(workflowConfigTable.id, id))
+    .returning({ id: workflowConfigTable.id });
+  return result[0] || null;
+}
+
+export async function onConfigDelete(id: number) {
+  const result = await db
+    .delete(workflowConfigTable)
+    .where(eq(workflowConfigTable.id, id))
+    .returning({ id: workflowConfigTable.id });
+  return result[0] || null;
+}
+
+//====================================================================
+// 3. Workflow Log Repository
+//====================================================================
+
+export async function findLogPage(params: {
+  pageNo: number;
+  pageSize: number;
+  workflowId: number;
+}) {
+  const { pageNo, pageSize, workflowId } = params;
+  const offset = (pageNo - 1) * pageSize;
+
+  const countResult = await db
+    .select({ total: count(workflowLogTable.id).as("total") })
+    .from(workflowLogTable)
+    .where(eq(workflowLogTable.workflowId, workflowId));
+
+  const total = countResult[0]?.total || 0;
+
+  if (total === 0) {
+    return { total, list: [] };
+  }
+
+  const list = await db
+    .select()
+    .from(workflowLogTable)
+    .where(eq(workflowLogTable.workflowId, workflowId))
+    .orderBy(desc(workflowLogTable.id))
+    .limit(pageSize)
+    .offset(offset);
+
+  return { total, list };
+}
+
+export async function findLogById(id: number) {
+  const rows = await db
+    .select()
+    .from(workflowLogTable)
+    .where(eq(workflowLogTable.id, id))
+    .limit(1);
+  return rows[0] || null;
+}
+
+export async function onLogInsert(
+  data: InferInsertModel<typeof workflowLogTable>
+) {
+  const result = await db
+    .insert(workflowLogTable)
+    .values(data)
+    .returning({ id: workflowLogTable.id });
+  return result[0]?.id;
+}
+
+export async function onLogUpdate(
+  id: number,
+  data: Partial<Omit<InferInsertModel<typeof workflowLogTable>, "id">>
+) {
+  const result = await db
+    .update(workflowLogTable)
+    .set(data)
+    .where(eq(workflowLogTable.id, id))
+    .returning({ id: workflowLogTable.id });
+  return result[0] || null;
+}

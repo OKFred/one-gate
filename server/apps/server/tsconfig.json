@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "target": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "strict": false,
+    "skipLibCheck": true,
+    "noUncheckedSideEffectImports": true,
+    "resolveJsonModule": true,
+    "lib": ["ESNext"],
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@hodor/core/*": ["../../packages/core/src/*"],
+      "@hodor/infra/*": ["../../packages/infra/src/*"],
+      "@hodor/biz/*": ["../../packages/biz/src/*"]
+    }
+  },
+  "include": ["src/**/*", "worker-configuration.d.ts"],
+  "exclude": ["node_modules", "dist", "build", "coverage", "test/**/**"],
+  "tsc-alias": {
+    "verbose": true,
+    "resolveFullPaths": true
+  }
+}

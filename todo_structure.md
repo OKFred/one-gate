@@ -19,6 +19,7 @@
 ### 阶段 1：Monorepo 包结构搭建
 
 - [ ] **1.1 规划 packages 目录结构**
+
   ```
   node_server/
   ├── packages/
@@ -57,11 +58,12 @@
   ```
 
 - [ ] **1.2 更新根目录 `pnpm-workspace.yaml`**
+
   ```yaml
   packages:
-    - 'packages/*'
-    - 'apps/*'
-    - 'platform'
+    - "packages/*"
+    - "apps/*"
+    - "platform"
   ```
 
 - [ ] **1.3 为每个 package 创建 `package.json` 和 `tsconfig.json`**
@@ -113,11 +115,12 @@
   - `server/src/api/biz/swarm/` → `packages/biz/swarm/`
 
 - [ ] **3.3 更新 apps/server 入口**
+
   ```typescript
   // apps/server/src/index.ts
   import { createInfraApp } from "@hodor/infra";
   import { createBizApp } from "@hodor/biz";
-  
+
   function createApp() {
     const app = new OpenAPIHono<AppBindings>();
     app.route("/infra", createInfraApp());
@@ -152,6 +155,7 @@
 > **核心思路**：将前端拆为 3 个独立应用 + 1 个共享包，各应用独立构建部署，但共享底层组件和工具库。
 
 - [ ] **5.1 规划前端应用拆分结构**
+
   ```
   node_server/
   ├── packages/
@@ -287,9 +291,9 @@
     ```typescript
     // @hodor/ui/api/config.ts
     export const API_BASE = {
-      infra: import.meta.env.VITE_API_INFRA_URL || '/api/v1/infra',
-      biz: import.meta.env.VITE_API_BIZ_URL || '/api/v1/biz',
-      personal: import.meta.env.VITE_API_PERSONAL_URL || '/api/v1/personal',
+      infra: import.meta.env.VITE_API_INFRA_URL || "/api/v1/infra",
+      biz: import.meta.env.VITE_API_BIZ_URL || "/api/v1/biz",
+      personal: import.meta.env.VITE_API_PERSONAL_URL || "/api/v1/personal",
     };
     ```
 
@@ -309,13 +313,6 @@
 ---
 
 ## ⚠️ 注意事项
-
-1. **什么时候触发方案 C**：
-   - 模块数超过 15-20 个
-   - 有多个开发者需要独立负责不同模块
-   - Worker 脚本大小接近 10MB 限制
-   - 需要不同模块有不同的发布节奏
-   - 前端打包体积过大，需要按应用独立构建
 
 2. **方案 B 的产出在 C 中完全保留**：
    - 路由分层（`infra/` `biz/`）→ 直接对应 packages 目录

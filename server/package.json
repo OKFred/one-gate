@@ -1,26 +1,20 @@
 {
-  "name": "rbac-server",
+  "name": "rbac-monorepo-root",
   "version": "1.0.1",
-  "description": "rbac server",
-  "main": "./src/node.js",
+  "private": true,
+  "description": "rbac server monorepo root",
   "type": "module",
   "scripts": {
-    "dev": "npx tsx --watch --env-file=.dev.vars ./src/node.ts",
-    "debug": "npx tsx --inspect-brk --env-file=.dev.vars ./src/node.ts",
-    "build": "npx tsgo && npx tsc-alias",
-    "start": "node ./dist/node.js",
-    "visualize": "npx tsx scripts/dependency-visualize.ts",
-    "worker:dev": "npx wrangler dev",
-    "worker:types": "npx wrangler types",
-    "db:init": "npx tsx -r dotenv/config ./src/db/initTable.ts",
-    "sync:permissions": "npx tsx scripts/sync-permissions.ts",
+    "dev": "pnpm --filter @hodor/server dev",
+    "debug": "pnpm --filter @hodor/server debug",
+    "build": "pnpm --filter @hodor/server build",
+    "start": "pnpm --filter @hodor/server start",
+    "worker:dev": "pnpm --filter @hodor/server worker:dev",
+    "worker:types": "pnpm --filter @hodor/server worker:types",
+    "db:init": "pnpm --filter @hodor/server db:init",
+    "sync:permissions": "pnpm --filter @hodor/server sync:permissions",
     "format": "prettier --write .",
     "lint": "eslint . --fix"
-  },
-  "lint-staged": {
-    "*.{js,ts,json,md}": [
-      "prettier --write"
-    ]
   },
   "keywords": [],
   "author": "FZ",
