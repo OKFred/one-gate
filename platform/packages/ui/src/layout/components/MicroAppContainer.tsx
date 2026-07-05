@@ -21,8 +21,38 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
         enterprise: 5174,
         personal: 5175,
       };
-      return `http://localhost:${ports[scopeName] || 5173}`;
+      const protocol = window.location.protocol;
+      const hostname = window.location.hostname;
+      return `${protocol}//${hostname}:${ports[scopeName] || 5173}`;
     } else {
+      // 优先从环境变量中获取真实子域名配置，达到最高扩展度
+      if (scopeName === 'enterprise' && (import.meta as any).env.VITE_ENTERPRISE_URL) {
+        return (import.meta as any).env.VITE_ENTERPRISE_URL;
+      }
+      if (scopeName === 'personal' && (import.meta as any).env.VITE_PERSONAL_URL) {
+        return (import.meta as any).env.VITE_PERSONAL_URL;
+      }
+
+      // 如果未配置环境变量，则根据当前访问的域名进行智能推导 (支持 Pages.dev 默认多项目域名或子域名切换)
+      const protocol = window.location.protocol;
+      const hostname = window.location.hostname;
+
+      // 匹配 Cloudflare Pages 默认多项目结构: e.g. gate-admin.pages.dev -> gate-enterprise.pages.dev
+      if (hostname.endsWith('.pages.dev')) {
+        const baseName = hostname.replace(/\.pages\.dev$/, '');
+        const cleanBase = baseName.replace(/-(admin|enterprise|personal)$/, '');
+        return `${protocol}//${cleanBase}-${scopeName}.pages.dev`;
+      }
+
+      // 匹配自定义二级域名结构: e.g. admin.example.com -> enterprise.example.com
+      if (hostname.includes('.')) {
+        const parts = hostname.split('.');
+        if (parts[0] === 'admin' || parts[0] === 'enterprise' || parts[0] === 'personal') {
+          parts[0] = scopeName;
+          return `${protocol}//${parts.join('.')}`;
+        }
+      }
+
       return scopeName === 'admin' ? '/' : `/${scopeName}`;
     }
   };
@@ -50,7 +80,7 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
       const currentPath = location.pathname + location.search;
       const separator = currentPath.includes('?') ? '&' : '?';
       const ssoTokenParam = token ? `${separator}token=${encodeURIComponent(token)}` : '';
-      
+
       const targetUrl = `${baseUrl}/#${currentPath}${ssoTokenParam}`;
       setIframeSrc(targetUrl);
       lastSentPathRef.current = currentPath;
@@ -60,15 +90,16 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
   // 当宿主路由变化，且是同系统内的子路由切换时，只通过 postMessage 同步，避免 iframe 强刷
   useEffect(() => {
     if (!visible || !isLoadedRef.current) return;
-    
+
     const currentPath = location.pathname + location.search;
     // 检查这个路径是否属于当前 scope 的路径，如果是才同步给子应用
-    const isTargetRoute = (scope === 'enterprise' && currentPath.startsWith('/biz/')) ||
-                          (scope === 'personal' && currentPath.startsWith('/personal/'));
-                          
+    const isTargetRoute =
+      (scope === 'enterprise' && currentPath.startsWith('/biz/')) ||
+      (scope === 'personal' && currentPath.startsWith('/personal/'));
+
     if (
       isTargetRoute &&
-      iframeRef.current?.contentWindow && 
+      iframeRef.current?.contentWindow &&
       lastSentPathRef.current !== currentPath
     ) {
       lastSentPathRef.current = currentPath;
@@ -91,17 +122,18 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
       if (event.origin !== targetOrigin) {
         return;
       }
-      
+
       if (event.data?.type === 'CHILD_ROUTE_CHANGE') {
         const childPath = event.data.path;
-        
+
         // 校验收到的子应用路由确实属于当前 scope
-        const isCurrentScopeRoute = (scope === 'enterprise' && childPath.startsWith('/biz/')) ||
-                                    (scope === 'personal' && childPath.startsWith('/personal/'));
+        const isCurrentScopeRoute =
+          (scope === 'enterprise' && childPath.startsWith('/biz/')) ||
+          (scope === 'personal' && childPath.startsWith('/personal/'));
         if (!isCurrentScopeRoute) return;
 
         const currentHostPath = location.pathname + location.search;
-        
+
         if (childPath && childPath !== currentHostPath) {
           lastSentPathRef.current = childPath;
           window.history.replaceState(null, '', `/#${childPath}`);
@@ -114,13 +146,13 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
   }, [visible, location.pathname, location.search, scope, targetOrigin]);
 
   return (
-    <div 
-      style={{ 
-        width: '100%', 
-        height: '100%', 
-        overflow: 'hidden', 
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
         position: 'relative',
-        display: visible ? 'block' : 'none'
+        display: visible ? 'block' : 'none',
       }}
     >
       {iframeSrc && (

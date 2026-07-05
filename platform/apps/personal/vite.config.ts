@@ -16,9 +16,9 @@ export default defineConfig(({ command, mode }) => {
     SERVER_URL?: string;
     VITE_SERVER_URL?: string;
   };
-  
+
   env = { ...env, ...loadEnv(mode, path.resolve(__dirname, '../../')) };
-  
+
   const result = {
     root: __dirname,
     publicDir: path.resolve(__dirname, '../../public'),
@@ -34,16 +34,11 @@ export default defineConfig(({ command, mode }) => {
         presets: [reactCompilerPreset()],
       }),
       UnoCSS({
-        configFile: '../../uno.config.ts'
+        configFile: '../../uno.config.ts',
       }),
     ],
     optimizeDeps: {
-      include: [
-        'react',
-        'react-dom',
-        'react-router-dom',
-        '@mui/material',
-      ],
+      include: ['react', 'react-dom', 'react-router-dom', '@mui/material'],
     },
     build: {
       outDir: 'dist',
@@ -71,7 +66,7 @@ export default defineConfig(({ command, mode }) => {
       },
     },
   };
-  
+
   if (mode === 'development') {
     if (env.SERVER_URL || env.VITE_SERVER_URL) {
       result.server.proxy = {
