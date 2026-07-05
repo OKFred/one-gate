@@ -1,0 +1,43 @@
+{
+  "name": "@hodor/admin",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode=development",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hodor/ui": "workspace:*",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@iconify-icons/material-symbols": "^1.2.58",
+    "@iconify/react": "^6.0.2",
+    "@mui/icons-material": "^9.0.1",
+    "@mui/lab": "^9.0.0-beta.3",
+    "@mui/material": "^9.0.1",
+    "@mui/x-data-grid": "^9.2.0",
+    "@mui/x-tree-view": "^9.1.0",
+    "ajv": "^8.20.0",
+    "ajv-errors": "^3.0.0",
+    "ajv-i18n": "^4.2.0",
+    "axios": "^1.16.1",
+    "dayjs": "^1.11.21",
+    "font-awesome": "^4.7.0",
+    "jodit-react": "^5.3.21",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-markdown": "^10.1.0",
+    "react-router": "^7.16.0",
+    "react-router-dom": "^7.16.0",
+    "react-syntax-highlighter": "^16.1.1",
+    "reactflow": "^11.11.4",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "~5.8.3",
+    "vite": "^8.0.14"
+  }
+}
