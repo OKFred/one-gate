@@ -39,8 +39,8 @@ jobs:
         working-directory: ./server
 
       - name: Run All Tests
-        run: npx vitest run
-        working-directory: ./server
+        run: npx vitest run --config vitest.config.node.mts
+        working-directory: ./server/apps/server
         # ─── 核心步骤：将 GitHub 存储的 Secrets 注入到测试的运行环境变量中 ───
         env:
           TEST_MAIL_ADDRESS: ${{ secrets.TEST_MAIL_ADDRESS }}
