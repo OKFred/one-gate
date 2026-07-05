@@ -1,0 +1,55 @@
+import React from 'react';
+import Box from '@mui/material/Box';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useResponsive } from '@/hooks/useResponsive';
+import { MicroAppContainer } from './MicroAppContainer';
+
+interface ContentProps {
+  sidebarOpen: boolean;
+  isIframe?: boolean;
+}
+
+const drawerWidth = 240;
+
+const Content: React.FC<ContentProps> = ({ sidebarOpen, isIframe }) => {
+  const { isMobile } = useResponsive();
+  const location = useLocation();
+
+  const currentScope = ((import.meta as any).env.VITE_APP_SCOPE as string) || 'admin';
+  const isHost = currentScope === 'admin';
+
+  // 识别当前路由属于哪一个子应用
+  const isEnterpriseActive = isHost && (location.pathname.startsWith('/biz/') || location.pathname.startsWith('biz/'));
+  const isPersonalActive = isHost && (location.pathname.startsWith('/personal/') || location.pathname.startsWith('personal/'));
+  const isMicroAppActive = isEnterpriseActive || isPersonalActive;
+
+  return (
+    <Box
+      component="main"
+      className={isMobile && !isIframe ? 'content-mobile-padding' : ''}
+      sx={{
+        flexGrow: 1,
+        p: isIframe ? 0 : { xs: 2, md: 3 },
+        width: isIframe ? '100%' : { sm: sidebarOpen ? `calc(100vw - ${drawerWidth}px)` : `calc(100vw - 56px)` },
+        minHeight: isIframe ? '100vh' : 'calc(100vh - 64px)',
+        pb: isIframe ? 0 : (isMobile ? 'calc(72px + env(safe-area-inset-bottom, 16px))' : { xs: 2, md: 3 }),
+        transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
+      }}
+    >
+      {/* 如果是 Host 应用，我们把 MicroAppContainer 直接常驻渲染在这里，通过 visible 属性控制显隐，实现 keep-alive */}
+      {isHost && (
+        <>
+          <MicroAppContainer scope="enterprise" visible={isEnterpriseActive} />
+          <MicroAppContainer scope="personal" visible={isPersonalActive} />
+        </>
+      )}
+
+      {/* 只有在非微前端子页面处于激活状态时才渲染当前的 Outlet（对于 Host 应用就是普通的 Admin 页面） */}
+      <div style={{ display: isMicroAppActive ? 'none' : 'block', width: '100%', height: '100%' }}>
+        <Outlet />
+      </div>
+    </Box>
+  );
+};
+
+export default Content;

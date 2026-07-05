@@ -39,8 +39,8 @@ jobs:
         working-directory: ./server
 
       - name: Run All Tests
-        run: npx vitest run
-        working-directory: ./server
+        run: npx vitest run --config vitest.config.node.mts
+        working-directory: ./server/apps/server
         # ─── 核心步骤：将 GitHub 存储的 Secrets 注入到测试的运行环境变量中 ───
         env:
           TEST_MAIL_ADDRESS: ${{ secrets.TEST_MAIL_ADDRESS }}
@@ -92,14 +92,33 @@ jobs:
         working-directory: ./platform
 
       - name: Build Frontend
-        run: pnpm run build
+        run: pnpm run build:all
         working-directory: ./platform
         env:
           VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+          VITE_ENTERPRISE_URL: ${{ secrets.VITE_ENTERPRISE_URL }}
+          VITE_PERSONAL_URL: ${{ secrets.VITE_PERSONAL_URL }}
 
-      - name: Deploy Pages Frontend
+      # ─── 步骤 2a: 部署主系统 Admin (gate) ───
+      - name: Deploy Admin Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./platform/dist --project-name=gate
+          command: pages deploy ./platform/apps/admin/dist --project-name=gate
+
+      # ─── 步骤 2b: 部署企业系统 Enterprise (gate-enterprise) ───
+      - name: Deploy Enterprise Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./platform/apps/enterprise/dist --project-name=gate-enterprise
+
+      # ─── 步骤 2c: 部署个人系统 Personal (gate-personal) ───
+      - name: Deploy Personal Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy ./platform/apps/personal/dist --project-name=gate-personal

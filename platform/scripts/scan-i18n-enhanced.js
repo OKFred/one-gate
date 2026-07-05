@@ -209,7 +209,7 @@ function extractInitI18nKeys(filePath) {
       let resolvedPath;
       if (importPath.startsWith('@/')) {
         resolvedPath = join(serverSrcDir, importPath.slice(2));
-      } else if (importPath.startsWith('./')) {
+      } else if (importPath.startsWith('.') || importPath.startsWith('..')) {
         resolvedPath = join(dbDir, importPath);
       } else {
         continue;
@@ -327,8 +327,7 @@ async function main() {
   const outputPath = args.find((arg) => arg.startsWith('--output='))?.split('=')[1];
 
   const baseDir = join(__dirname, '..');
-  const platformSrcDir = join(baseDir, 'src');
-  const initI18nPath = join(baseDir, '../server/src/db/initTranslation.ts');
+  const initI18nPath = join(baseDir, '../server/packages/core/src/db/initTranslation.ts');
 
   const defaultOutputPath =
     outputFormat === 'json'
@@ -342,8 +341,23 @@ async function main() {
   console.log('='.repeat(50) + '\n');
 
   // 1. 扫描前端代码
-  console.log(`📁 扫描前端代码: ${platformSrcDir}`);
-  const files = getAllFiles(platformSrcDir);
+  const platformSrcDirs = [
+    join(baseDir, 'apps/admin/src'),
+    join(baseDir, 'apps/enterprise/src'),
+    join(baseDir, 'apps/personal/src'),
+    join(baseDir, 'packages/ui/src'),
+  ];
+  console.log(`📁 扫描前端代码目录: \n${platformSrcDirs.map((d) => '  - ' + d).join('\n')}`);
+  
+  const files = [];
+  platformSrcDirs.forEach((dir) => {
+    try {
+      const filesInDir = getAllFiles(dir);
+      files.push(...filesInDir);
+    } catch (err) {
+      console.warn(`⚠️ Warning: Failed to scan directory ${dir}:`, err.message);
+    }
+  });
   console.log(`✓ 找到 ${files.length} 个 TS/TSX 文件\n`);
 
   const usedKeys = new Set();
@@ -367,15 +381,28 @@ async function main() {
   });
 
   // 2. 扫描后端代码
-  const serverSrcDir = join(baseDir, '../server/src');
-  console.log(`📁 扫描后端代码: ${serverSrcDir}`);
-  const serverFiles = getAllFiles(serverSrcDir).filter(
-    (file) =>
-      !file.includes('db/migrations') &&
-      !file.includes('db/init') && // 排除 initTranslation.ts etc 自身以避免循环自检测
-      !file.includes('translation') && // 排除 translation 定义文件
-      file.endsWith('.ts'),
-  );
+  const serverDirs = [
+    join(baseDir, '../server/packages/core/src'),
+    join(baseDir, '../server/packages/infra/src'),
+    join(baseDir, '../server/packages/biz/src'),
+    join(baseDir, '../server/apps/server/src'),
+  ];
+  console.log(`📁 扫描后端代码目录: \n${serverDirs.map((d) => '  - ' + d).join('\n')}`);
+  const serverFiles = [];
+  serverDirs.forEach((dir) => {
+    try {
+      const filesInDir = getAllFiles(dir).filter(
+        (file) =>
+          !file.includes('db/migrations') &&
+          !file.includes('db/init') && // 排除 initTranslation.ts etc 自身以避免循环自检测
+          !file.includes('translation') && // 排除 translation 定义文件
+          file.endsWith('.ts'),
+      );
+      serverFiles.push(...filesInDir);
+    } catch (err) {
+      console.warn(`⚠️ Warning: Failed to scan directory ${dir}:`, err.message);
+    }
+  });
   console.log(`✓ 找到 ${serverFiles.length} 个后端 TS 文件\n`);
 
   const serverBaseDir = join(baseDir, '..');

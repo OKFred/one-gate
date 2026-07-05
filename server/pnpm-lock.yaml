@@ -148,6 +148,259 @@ importers:
         specifier: ^4.100.0
         version: 4.100.0
 
+  apps/server:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1029.0
+        version: 3.1029.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.1029.0
+        version: 3.1029.0
+      '@cfworker/json-schema':
+        specifier: ^4.1.1
+        version: 4.1.1
+      '@hodor/biz':
+        specifier: workspace:*
+        version: link:../../packages/biz
+      '@hodor/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@hodor/infra':
+        specifier: workspace:*
+        version: link:../../packages/infra
+      '@hono/node-server':
+        specifier: ^1.13.8
+        version: 1.19.14(hono@4.12.12)
+      '@hono/swagger-ui':
+        specifier: ^0.6.1
+        version: 0.6.1(hono@4.12.12)
+      '@hono/zod-openapi':
+        specifier: ^1.3.0
+        version: 1.3.0(hono@4.12.12)(zod@4.4.3)
+      '@scalar/hono-api-reference':
+        specifier: ^0.10.7
+        version: 0.10.7(hono@4.12.12)
+      cache-manager:
+        specifier: ^7.2.8
+        version: 7.2.8
+      cron-parser:
+        specifier: ^5.5.0
+        version: 5.5.0
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@libsql/client@0.15.12)
+      hono:
+        specifier: ^4.12.12
+        version: 4.12.12
+      hono-openapi:
+        specifier: ^1.3.0
+        version: 1.3.0(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod@4.4.3))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3))(@types/json-schema@7.0.15)(hono@4.12.12)(openapi-types@12.1.3)
+      hono-pino:
+        specifier: ^0.10.3
+        version: 0.10.3(hono@4.12.12)(pino@10.3.1)
+      http-status-codes:
+        specifier: ^2.3.0
+        version: 2.3.0
+      node-cron:
+        specifier: ^4.2.1
+        version: 4.2.1
+      nodemailer:
+        specifier: ^7.0.3
+        version: 7.0.13
+      openapi3-ts:
+        specifier: ^4.5.0
+        version: 4.6.0
+      pino:
+        specifier: ^10.3.1
+        version: 10.3.1
+      pino-roll:
+        specifier: ^4.0.0
+        version: 4.0.0
+      worker-mailer:
+        specifier: ^1.2.1
+        version: 1.2.1
+      xmldom:
+        specifier: ^0.6.0
+        version: 0.6.0
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
+    devDependencies:
+      '@babel/parser':
+        specifier: ^7.28.4
+        version: 7.29.7
+      '@babel/traverse':
+        specifier: ^7.28.4
+        version: 7.29.7
+      '@cloudflare/vitest-pool-workers':
+        specifier: ^0.16.15
+        version: 0.16.15(@vitest/runner@4.1.8)(@vitest/snapshot@4.1.8)(vitest@4.1.8(@types/node@22.19.19)(vite@7.3.1(@types/node@22.19.19)(tsx@4.21.0)(yaml@2.9.0)))
+      '@eslint/js':
+        specifier: ^9.22.0
+        version: 9.39.4
+      '@libsql/client':
+        specifier: ^0.15.12
+        version: 0.15.12
+      '@types/babel__traverse':
+        specifier: ^7.28.0
+        version: 7.28.0
+      '@types/node':
+        specifier: ^22.13.10
+        version: 22.19.19
+      '@types/node-cron':
+        specifier: ^3.0.11
+        version: 3.0.11
+      '@types/nodemailer':
+        specifier: ^6.4.17
+        version: 6.4.23
+      '@types/xmldom':
+        specifier: ^0.1.34
+        version: 0.1.34
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.27.0
+        version: 8.60.0(@typescript-eslint/parser@8.28.0(eslint@9.39.4)(typescript@5.8.3))(eslint@9.39.4)(typescript@5.8.3)
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20250623.1
+        version: 7.0.0-dev.20250623.1
+      dotenv:
+        specifier: ^17.2.1
+        version: 17.4.2
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
+      eslint:
+        specifier: ^9.22.0
+        version: 9.39.4
+      eslint-plugin-prettier:
+        specifier: ^5.2.3
+        version: 5.5.6(eslint@9.39.4)(prettier@3.8.3)
+      globals:
+        specifier: ^16.0.0
+        version: 16.0.0
+      json-schema-to-ts:
+        specifier: ^3.1.1
+        version: 3.1.1
+      lint-staged:
+        specifier: ^17.0.2
+        version: 17.0.2
+      prettier:
+        specifier: ^3.5.3
+        version: 3.8.3
+      tsc-alias:
+        specifier: ^1.8.11
+        version: 1.8.17
+      typescript:
+        specifier: ^5.8.2
+        version: 5.8.3
+      vitest:
+        specifier: ~4.1.8
+        version: 4.1.8(@types/node@22.19.19)(vite@7.3.1(@types/node@22.19.19)(tsx@4.21.0)(yaml@2.9.0))
+      wrangler:
+        specifier: ^4.100.0
+        version: 4.100.0
+
+  packages/biz:
+    dependencies:
+      '@hodor/core':
+        specifier: workspace:*
+        version: link:../core
+      '@hodor/infra':
+        specifier: workspace:*
+        version: link:../infra
+      '@hono/zod-openapi':
+        specifier: ^1.3.0
+        version: 1.3.0(hono@4.12.12)(zod@4.4.3)
+      hono:
+        specifier: ^4.12.12
+        version: 4.12.12
+
+  packages/core:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.1029.0
+        version: 3.1029.0
+      '@aws-sdk/s3-request-presigner':
+        specifier: ^3.1029.0
+        version: 3.1029.0
+      '@cfworker/json-schema':
+        specifier: ^4.1.1
+        version: 4.1.1
+      '@hono/node-server':
+        specifier: ^1.13.8
+        version: 1.19.14(hono@4.12.12)
+      '@hono/swagger-ui':
+        specifier: ^0.6.1
+        version: 0.6.1(hono@4.12.12)
+      '@hono/zod-openapi':
+        specifier: ^1.3.0
+        version: 1.3.0(hono@4.12.12)(zod@4.4.3)
+      '@libsql/client':
+        specifier: ^0.15.12
+        version: 0.15.12
+      '@scalar/hono-api-reference':
+        specifier: ^0.10.7
+        version: 0.10.7(hono@4.12.12)
+      cache-manager:
+        specifier: ^7.2.8
+        version: 7.2.8
+      cron-parser:
+        specifier: ^5.5.0
+        version: 5.5.0
+      dotenv:
+        specifier: ^17.2.1
+        version: 17.4.2
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2(@libsql/client@0.15.12)
+      hono:
+        specifier: ^4.12.12
+        version: 4.12.12
+      hono-openapi:
+        specifier: ^1.3.0
+        version: 1.3.0(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod@4.4.3))(@standard-community/standard-openapi@0.2.9(@standard-community/standard-json@0.3.5(@standard-schema/spec@1.1.0)(@types/json-schema@7.0.15)(quansync@0.2.11)(zod@4.4.3))(@standard-schema/spec@1.1.0)(openapi-types@12.1.3)(zod@4.4.3))(@types/json-schema@7.0.15)(hono@4.12.12)(openapi-types@12.1.3)
+      hono-pino:
+        specifier: ^0.10.3
+        version: 0.10.3(hono@4.12.12)(pino@10.3.1)
+      http-status-codes:
+        specifier: ^2.3.0
+        version: 2.3.0
+      node-cron:
+        specifier: ^4.2.1
+        version: 4.2.1
+      nodemailer:
+        specifier: ^7.0.3
+        version: 7.0.13
+      openapi3-ts:
+        specifier: ^4.5.0
+        version: 4.6.0
+      pino:
+        specifier: ^10.3.1
+        version: 10.3.1
+      pino-roll:
+        specifier: ^4.0.0
+        version: 4.0.0
+      worker-mailer:
+        specifier: ^1.2.1
+        version: 1.2.1
+      xmldom:
+        specifier: ^0.6.0
+        version: 0.6.0
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
+
+  packages/infra:
+    dependencies:
+      '@hodor/core':
+        specifier: workspace:*
+        version: link:../core
+      '@hono/zod-openapi':
+        specifier: ^1.3.0
+        version: 1.3.0(hono@4.12.12)(zod@4.4.3)
+      hono:
+        specifier: ^4.12.12
+        version: 4.12.12
+
 packages:
 
   '@asteasolutions/zod-to-openapi@8.5.0':
@@ -2078,9 +2331,6 @@ packages:
   atomic-sleep@1.0.0:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
-
-  balanced-match@1.0.0:
-    resolution: {integrity: sha512-9Y0g0Q8rmSt+H33DfKv7FOc3v+iRI+o1lbzt8jGcIosYW37IIW/2XVYq5NPdmaD5NQ59Nk26Kl/vZbwW9Fr8vg==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -5062,7 +5312,7 @@ snapshots:
   '@typescript-eslint/visitor-keys@8.28.0':
     dependencies:
       '@typescript-eslint/types': 8.28.0
-      eslint-visitor-keys: 4.2.0
+      eslint-visitor-keys: 4.2.1
 
   '@typescript-eslint/visitor-keys@8.60.0':
     dependencies:
@@ -5179,8 +5429,6 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  balanced-match@1.0.0: {}
-
   balanced-match@1.0.2: {}
 
   balanced-match@4.0.4: {}
@@ -5198,7 +5446,7 @@ snapshots:
 
   brace-expansion@2.1.1:
     dependencies:
-      balanced-match: 1.0.0
+      balanced-match: 1.0.2
 
   brace-expansion@5.0.6:
     dependencies:

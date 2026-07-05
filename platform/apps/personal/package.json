@@ -1,0 +1,23 @@
+{
+  "name": "@hodor/personal",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode=development",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@hodor/ui": "workspace:*",
+    "@mui/material": "^9.0.1",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.16.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "~5.8.3",
+    "vite": "^8.0.14"
+  }
+}
