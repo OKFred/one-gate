@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "keyword": {
+      "type": "string"
+    },
+    "pageNo": {
+      "type": "number"
+    },
+    "pageSize": {
+      "type": "number"
+    },
+    "cursor": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -4,6 +4,20 @@ import type { BusinessKey } from "@hodor/core/types/business";
 export const sharedTranslations = {
   "business.type": [
     {
+      tKey: "sidebar.menu.infra",
+      langCodes: {
+        "zh-CN": "基础设施",
+        "en-US": "Infrastructure",
+      },
+    },
+    {
+      tKey: "sidebar.menu.data",
+      langCodes: {
+        "zh-CN": "数据管理",
+        "en-US": "Data Management",
+      },
+    },
+    {
       tKey: "sidebar.menu.maintenance.cron",
       langCodes: {
         "zh-CN": "定时任务",
@@ -181,14 +195,14 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "sidebar.menu.system.schemaForm",
+      tKey: "sidebar.menu.data.schemaForm",
       langCodes: {
         "zh-CN": "动态表单配置",
         "en-US": "Schema Form Config",
       },
     },
     {
-      tKey: "sidebar.menu.system.schemaFormData",
+      tKey: "sidebar.menu.data.schemaFormData",
       langCodes: {
         "zh-CN": "表单提交数据",
         "en-US": "Schema Form Data",
@@ -1312,21 +1326,35 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "businessType.oss",
+      tKey: "businessType.infra",
+      langCodes: {
+        "zh-CN": "基础设施",
+        "en-US": "Infrastructure",
+      },
+    },
+    {
+      tKey: "businessType.data",
+      langCodes: {
+        "zh-CN": "数据管理",
+        "en-US": "Data Management",
+      },
+    },
+    {
+      tKey: "businessType.data.oss",
       langCodes: {
         "zh-CN": "对象存储",
         "en-US": "Object Storage",
       },
     },
     {
-      tKey: "businessType.oss.config",
+      tKey: "businessType.data.oss.config",
       langCodes: {
         "zh-CN": "存储配置",
         "en-US": "OSS Config",
       },
     },
     {
-      tKey: "businessType.oss.file",
+      tKey: "businessType.data.oss.file",
       langCodes: {
         "zh-CN": "文件管理",
         "en-US": "File Management",
@@ -1368,7 +1396,7 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "businessType.system.schema_form_data",
+      tKey: "businessType.data.schema_form_data",
       langCodes: {
         "zh-CN": "表单提交数据",
         "en-US": "Schema Form Data",

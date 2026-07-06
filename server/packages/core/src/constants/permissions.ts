@@ -37,10 +37,6 @@ export const permissionSeeds = {
     role_permission: ["read", "add", "edit", "delete", "batch-delete"],
     /** 个人信息 */
     auth: ["read", "edit"],
-    /** 动态表单配置 */
-    schema_form: ["read", "add", "edit", "delete"],
-    /** 动态表单数据 */
-    schema_form_data: ["read", "add", "edit", "delete"],
   },
   /** 邮件 */
   mail: {
@@ -76,13 +72,19 @@ export const permissionSeeds = {
     /** API 文档管理 */
     api_docs: ["read", "add", "edit", "delete"],
   },
-  /** 存储 */
-  oss: {
+  /** 数据管理 */
+  data: {
     "": ["read"],
+    /** 动态表单配置 */
+    schema_form: ["read", "add", "edit", "delete"],
+    /** 动态表单数据 */
+    schema_form_data: ["read", "add", "edit", "delete"],
+    /** 对象存储 */
+    oss: ["read"],
     /** 存储配置 */
-    config: ["read", "add", "edit", "delete"],
+    "oss.config": ["read", "add", "edit", "delete"],
     /** 文件管理 */
-    file: ["read", "add", "edit", "delete"],
+    "oss.file": ["read", "add", "edit", "delete"],
   },
   /** 企业 */
   enterprise: {

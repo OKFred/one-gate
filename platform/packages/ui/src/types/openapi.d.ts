@@ -3835,6 +3835,1340 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/infra/data/schema_form_data/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取动态表单提交的数据列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_form_dataListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_form_dataListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form_data/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 提交动态表单数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_form_dataSubmitReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_form_dataSubmitRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form_data/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除动态表单数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_form_dataDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_form_dataDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form_data/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取动态表单数据详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_form_dataGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_form_dataGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取动态表单配置列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_formListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_formListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加动态表单配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_formAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_formAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新动态表单配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_formUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_formUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除动态表单配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_formDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_formDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/schema_form/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取动态表单配置信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.schema_formGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.schema_formGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有存储配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取存储配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加存储配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新存储配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取配置详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/config/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证存储连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.configVerifyReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.configVerifyRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List files in storage bucket */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileListReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileListRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/listDirectory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List directories and files under a prefix */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileListDirectoryReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileListDirectoryRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List all files */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileListAllReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileListAllRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Get file details and download URL */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileGetReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileGetRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an upload URL */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileAddReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileAddRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an overwrite upload URL */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileUpdateReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileUpdateRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/data/oss/file/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Delete file */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["data.oss.fileDeleteReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["data.oss.fileDeleteRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/infra/oss/config/listAll": {
         parameters: {
             query?: never;
@@ -3854,7 +5188,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configListAllReq"];
+                    "application/json": components["schemas"]["data.oss.configListAllReq"];
                 };
             };
             responses: {
@@ -3864,7 +5198,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configListAllRes"];
+                        "application/json": components["schemas"]["data.oss.configListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3912,7 +5246,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configListReq"];
+                    "application/json": components["schemas"]["data.oss.configListReq"];
                 };
             };
             responses: {
@@ -3922,7 +5256,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configListRes"];
+                        "application/json": components["schemas"]["data.oss.configListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3970,7 +5304,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configAddReq"];
+                    "application/json": components["schemas"]["data.oss.configAddReq"];
                 };
             };
             responses: {
@@ -3980,7 +5314,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configAddRes"];
+                        "application/json": components["schemas"]["data.oss.configAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4028,7 +5362,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configUpdateReq"];
+                    "application/json": components["schemas"]["data.oss.configUpdateReq"];
                 };
             };
             responses: {
@@ -4038,7 +5372,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configUpdateRes"];
+                        "application/json": components["schemas"]["data.oss.configUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4086,7 +5420,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configGetReq"];
+                    "application/json": components["schemas"]["data.oss.configGetReq"];
                 };
             };
             responses: {
@@ -4096,7 +5430,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configGetRes"];
+                        "application/json": components["schemas"]["data.oss.configGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4144,7 +5478,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configDeleteReq"];
+                    "application/json": components["schemas"]["data.oss.configDeleteReq"];
                 };
             };
             responses: {
@@ -4154,7 +5488,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configDeleteRes"];
+                        "application/json": components["schemas"]["data.oss.configDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4202,7 +5536,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.configVerifyReq"];
+                    "application/json": components["schemas"]["data.oss.configVerifyReq"];
                 };
             };
             responses: {
@@ -4212,7 +5546,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.configVerifyRes"];
+                        "application/json": components["schemas"]["data.oss.configVerifyRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4260,7 +5594,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileListReq"];
+                    "application/json": components["schemas"]["data.oss.fileListReq"];
                 };
             };
             responses: {
@@ -4270,7 +5604,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileListRes"];
+                        "application/json": components["schemas"]["data.oss.fileListRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4318,7 +5652,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileListDirectoryReq"];
+                    "application/json": components["schemas"]["data.oss.fileListDirectoryReq"];
                 };
             };
             responses: {
@@ -4328,7 +5662,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileListDirectoryRes"];
+                        "application/json": components["schemas"]["data.oss.fileListDirectoryRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4376,7 +5710,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileListAllReq"];
+                    "application/json": components["schemas"]["data.oss.fileListAllReq"];
                 };
             };
             responses: {
@@ -4386,7 +5720,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileListAllRes"];
+                        "application/json": components["schemas"]["data.oss.fileListAllRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4434,7 +5768,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileGetReq"];
+                    "application/json": components["schemas"]["data.oss.fileGetReq"];
                 };
             };
             responses: {
@@ -4444,7 +5778,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileGetRes"];
+                        "application/json": components["schemas"]["data.oss.fileGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4492,7 +5826,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileAddReq"];
+                    "application/json": components["schemas"]["data.oss.fileAddReq"];
                 };
             };
             responses: {
@@ -4502,7 +5836,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileAddRes"];
+                        "application/json": components["schemas"]["data.oss.fileAddRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4550,7 +5884,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileUpdateReq"];
+                    "application/json": components["schemas"]["data.oss.fileUpdateReq"];
                 };
             };
             responses: {
@@ -4560,7 +5894,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileUpdateRes"];
+                        "application/json": components["schemas"]["data.oss.fileUpdateRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4608,7 +5942,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["oss.fileDeleteReq"];
+                    "application/json": components["schemas"]["data.oss.fileDeleteReq"];
                 };
             };
             responses: {
@@ -4618,7 +5952,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["oss.fileDeleteRes"];
+                        "application/json": components["schemas"]["data.oss.fileDeleteRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7519,528 +8853,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["system.userGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取动态表单配置列表 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_formListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_formListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 添加动态表单配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_formAddReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_formAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新动态表单配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_formUpdateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_formUpdateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除动态表单配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_formDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_formDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取动态表单配置信息 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_formGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_formGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form_data/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取动态表单提交的数据列表 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_form_dataListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_form_dataListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form_data/submit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 提交动态表单数据 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_form_dataSubmitReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_form_dataSubmitRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form_data/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除动态表单数据 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_form_dataDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_form_dataDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/infra/system/schema_form_data/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取动态表单数据详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["system.schema_form_dataGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["system.schema_form_dataGetRes"];
                     };
                 };
                 /** @description 校验失败 */
@@ -13563,7 +14375,360 @@ export interface components {
             };
             message: string;
         };
-        "oss.configListAllReq": {
+        "data.schema_form_dataListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 关联的表单 Code */
+            formCode?: string;
+            /** @description 关联的业务记录 ID */
+            businessId?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "formCode" | "businessId" | "createTimeUtc";
+        };
+        "data.schema_form_dataListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 关联的表单 Code */
+                    formCode: string;
+                    /** @description 关联的业务记录 ID */
+                    businessId: number;
+                    /** @description 用户提交的 JSON 数据内容（序列化字符串） */
+                    dataContent: string;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                    /** @description 创建人姓名 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 修改人姓名 */
+                    updaterName: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "data.schema_form_dataSubmitReq": {
+            formCode: string;
+            businessId: number;
+            /** @description 表单数据 (JSON 对象) */
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        "data.schema_form_dataSubmitRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "data.schema_form_dataDeleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "data.schema_form_dataDeleteRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "data.schema_form_dataGetReq": {
+            id?: number;
+            formCode?: string;
+            businessId?: number;
+        } | unknown | unknown;
+        "data.schema_form_dataGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 关联的表单 Code */
+                formCode: string;
+                /** @description 关联的业务记录 ID */
+                businessId: number;
+                /** @description 用户提交的 JSON 数据内容（序列化字符串） */
+                dataContent: string;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+                /** @description 创建人姓名 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 修改人姓名 */
+                updaterName: ((string | null) | null) | null;
+            };
+            message: string;
+        };
+        "data.schema_formListReq": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "code" | "isEnabled" | "createTimeUtc";
+        };
+        "data.schema_formListRes": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 表单唯一标识
+                     * @example survey_01
+                     */
+                    code: string;
+                    /**
+                     * @description 表单名称
+                     * @example 用户调查问卷
+                     */
+                    name: string;
+                    /** @description JSON Schema 字符串 */
+                    schemaData: string;
+                    /** @description UI Schema 字符串 */
+                    uiSchemaData: ((string | null) | null) | null;
+                    /** @description 备注说明 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                    /** @description 创建人姓名 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 更新人姓名 */
+                    updaterName: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "data.schema_formAddReq": {
+            /**
+             * @description 表单唯一标识
+             * @example survey_01
+             */
+            code: string;
+            /**
+             * @description 表单名称
+             * @example 用户调查问卷
+             */
+            name: string;
+            /** @description JSON Schema 字符串 */
+            schemaData: string;
+            /** @description UI Schema 字符串 */
+            uiSchemaData: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+        };
+        "data.schema_formAddRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "data.schema_formUpdateReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 表单唯一标识
+             * @example survey_01
+             */
+            code?: string;
+            /**
+             * @description 表单名称
+             * @example 用户调查问卷
+             */
+            name?: string;
+            /** @description JSON Schema 字符串 */
+            schemaData?: string;
+            /** @description UI Schema 字符串 */
+            uiSchemaData?: ((string | null) | null) | null;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+        };
+        "data.schema_formUpdateRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "data.schema_formDeleteReq": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "data.schema_formDeleteRes": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "data.schema_formGetReq": {
+            id?: number;
+            code?: string;
+        } | unknown | unknown;
+        "data.schema_formGetRes": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 表单唯一标识
+                 * @example survey_01
+                 */
+                code: string;
+                /**
+                 * @description 表单名称
+                 * @example 用户调查问卷
+                 */
+                name: string;
+                /** @description JSON Schema 字符串 */
+                schemaData: string;
+                /** @description UI Schema 字符串 */
+                uiSchemaData: ((string | null) | null) | null;
+                /** @description 备注说明 */
+                remark: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+                /** @description 创建人姓名 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 更新人姓名 */
+                updaterName: ((string | null) | null) | null;
+            };
+            message: string;
+        };
+        "data.oss.configListAllReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -13571,7 +14736,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "oss.configListAllRes": {
+        "data.oss.configListAllRes": {
             ok: boolean;
             data: {
                 /**
@@ -13596,7 +14761,7 @@ export interface components {
             }[];
             message: string;
         };
-        "oss.configListReq": {
+        "data.oss.configListReq": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13619,7 +14784,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "oss.configListRes": {
+        "data.oss.configListRes": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13688,7 +14853,7 @@ export interface components {
             };
             message: string;
         };
-        "oss.configAddReq": {
+        "data.oss.configAddReq": {
             /**
              * @description 配置名称
              * @example My S3 Storage
@@ -13724,7 +14889,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "oss.configAddRes": {
+        "data.oss.configAddRes": {
             ok: boolean;
             /**
              * @description id
@@ -13733,7 +14898,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "oss.configUpdateReq": {
+        "data.oss.configUpdateReq": {
             /**
              * @description id
              * @example 1
@@ -13774,7 +14939,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "oss.configUpdateRes": {
+        "data.oss.configUpdateRes": {
             ok: boolean;
             /**
              * @description id
@@ -13783,14 +14948,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "oss.configGetReq": {
+        "data.oss.configGetReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "oss.configGetRes": {
+        "data.oss.configGetRes": {
             ok: boolean;
             data: {
                 /**
@@ -13849,14 +15014,14 @@ export interface components {
             };
             message: string;
         };
-        "oss.configDeleteReq": {
+        "data.oss.configDeleteReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "oss.configDeleteRes": {
+        "data.oss.configDeleteRes": {
             ok: boolean;
             /**
              * @description id
@@ -13865,19 +15030,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "oss.configVerifyReq": {
+        "data.oss.configVerifyReq": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "oss.configVerifyRes": {
+        "data.oss.configVerifyRes": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "oss.fileListReq": {
+        "data.oss.fileListReq": {
             /** @description 前缀/路径搜索 */
             keyword?: string;
             /** @description 页码,兼容游标分页 */
@@ -13890,7 +15055,7 @@ export interface components {
             /** @description 下一页游标 */
             cursor?: string;
         };
-        "oss.fileListRes": {
+        "data.oss.fileListRes": {
             ok: boolean;
             data: {
                 list: {
@@ -13913,7 +15078,7 @@ export interface components {
             };
             message: string;
         };
-        "oss.fileListDirectoryReq": {
+        "data.oss.fileListDirectoryReq": {
             /** @description 当前目录前缀 */
             prefix?: string;
             /**
@@ -13924,7 +15089,7 @@ export interface components {
             /** @description 下一页游标 */
             cursor?: string;
         };
-        "oss.fileListDirectoryRes": {
+        "data.oss.fileListDirectoryRes": {
             ok: boolean;
             data: {
                 /** @description 当前目录前缀 */
@@ -13955,11 +15120,11 @@ export interface components {
             };
             message: string;
         };
-        "oss.fileListAllReq": {
+        "data.oss.fileListAllReq": {
             /** @description 前缀/路径搜索 */
             keyword?: string;
         };
-        "oss.fileListAllRes": {
+        "data.oss.fileListAllRes": {
             ok: boolean;
             data: {
                 /** @description 文件路径/键名 */
@@ -13973,11 +15138,11 @@ export interface components {
             }[];
             message: string;
         };
-        "oss.fileGetReq": {
+        "data.oss.fileGetReq": {
             /** @description 文件路径/键名 */
             key: string;
         };
-        "oss.fileGetRes": {
+        "data.oss.fileGetRes": {
             ok: boolean;
             data: {
                 /** @description 文件路径/键名 */
@@ -13993,7 +15158,7 @@ export interface components {
             };
             message: string;
         };
-        "oss.fileAddReq": {
+        "data.oss.fileAddReq": {
             /** @description 文件路径/键名 */
             key: string;
             /**
@@ -14007,7 +15172,7 @@ export interface components {
              */
             expiresIn: number;
         };
-        "oss.fileAddRes": {
+        "data.oss.fileAddRes": {
             ok: boolean;
             data: {
                 /** @description 上传预签名URL */
@@ -14016,7 +15181,7 @@ export interface components {
             };
             message: string;
         };
-        "oss.fileUpdateReq": {
+        "data.oss.fileUpdateReq": {
             /** @description 文件路径/键名 */
             key: string;
             /**
@@ -14030,7 +15195,7 @@ export interface components {
              */
             expiresIn: number;
         };
-        "oss.fileUpdateRes": {
+        "data.oss.fileUpdateRes": {
             ok: boolean;
             data: {
                 /** @description 上传预签名URL */
@@ -14039,11 +15204,11 @@ export interface components {
             };
             message: string;
         };
-        "oss.fileDeleteReq": {
+        "data.oss.fileDeleteReq": {
             /** @description 文件路径/键名 */
             key: string;
         };
-        "oss.fileDeleteRes": {
+        "data.oss.fileDeleteRes": {
             ok: boolean;
             data: {
                 key: string;
@@ -16282,359 +17447,6 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
-            };
-            message: string;
-        };
-        "system.schema_formListReq": {
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @enum {string} */
-            orderBy?: "id" | "name" | "code" | "isEnabled" | "createTimeUtc";
-        };
-        "system.schema_formListRes": {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total: number;
-                /** @description 总页数 */
-                totalPage: number;
-                /** @description 当前页码 */
-                currentPage: number;
-                /** @description 每页记录数 */
-                pageSize: number;
-                list: {
-                    /**
-                     * @description id
-                     * @example 1
-                     */
-                    id: number;
-                    /**
-                     * @description 表单唯一标识
-                     * @example survey_01
-                     */
-                    code: string;
-                    /**
-                     * @description 表单名称
-                     * @example 用户调查问卷
-                     */
-                    name: string;
-                    /** @description JSON Schema 字符串 */
-                    schemaData: string;
-                    /** @description UI Schema 字符串 */
-                    uiSchemaData: ((string | null) | null) | null;
-                    /** @description 备注说明 */
-                    remark: ((string | null) | null) | null;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 创建人ID */
-                    creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
-                    /** @description 创建人姓名 */
-                    creatorName: ((string | null) | null) | null;
-                    /** @description 更新人姓名 */
-                    updaterName: ((string | null) | null) | null;
-                }[];
-            };
-            message: string;
-        };
-        "system.schema_formAddReq": {
-            /**
-             * @description 表单唯一标识
-             * @example survey_01
-             */
-            code: string;
-            /**
-             * @description 表单名称
-             * @example 用户调查问卷
-             */
-            name: string;
-            /** @description JSON Schema 字符串 */
-            schemaData: string;
-            /** @description UI Schema 字符串 */
-            uiSchemaData: ((string | null) | null) | null;
-            /** @description 备注说明 */
-            remark: ((string | null) | null) | null;
-            /** @description 是否启用 */
-            isEnabled: boolean;
-        };
-        "system.schema_formAddRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "system.schema_formUpdateReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-            /**
-             * @description 表单唯一标识
-             * @example survey_01
-             */
-            code?: string;
-            /**
-             * @description 表单名称
-             * @example 用户调查问卷
-             */
-            name?: string;
-            /** @description JSON Schema 字符串 */
-            schemaData?: string;
-            /** @description UI Schema 字符串 */
-            uiSchemaData?: ((string | null) | null) | null;
-            /** @description 备注说明 */
-            remark?: ((string | null) | null) | null;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-        };
-        "system.schema_formUpdateRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "system.schema_formDeleteReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "system.schema_formDeleteRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "system.schema_formGetReq": {
-            id?: number;
-            code?: string;
-        } | unknown | unknown;
-        "system.schema_formGetRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 表单唯一标识
-                 * @example survey_01
-                 */
-                code: string;
-                /**
-                 * @description 表单名称
-                 * @example 用户调查问卷
-                 */
-                name: string;
-                /** @description JSON Schema 字符串 */
-                schemaData: string;
-                /** @description UI Schema 字符串 */
-                uiSchemaData: ((string | null) | null) | null;
-                /** @description 备注说明 */
-                remark: ((string | null) | null) | null;
-                /** @description 是否启用 */
-                isEnabled: boolean;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
-                /** @description 创建人姓名 */
-                creatorName: ((string | null) | null) | null;
-                /** @description 更新人姓名 */
-                updaterName: ((string | null) | null) | null;
-            };
-            message: string;
-        };
-        "system.schema_form_dataListReq": {
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-            /** @description 关联的表单 Code */
-            formCode?: string;
-            /** @description 关联的业务记录 ID */
-            businessId?: number;
-            /** @enum {string} */
-            orderBy?: "id" | "formCode" | "businessId" | "createTimeUtc";
-        };
-        "system.schema_form_dataListRes": {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total: number;
-                /** @description 总页数 */
-                totalPage: number;
-                /** @description 当前页码 */
-                currentPage: number;
-                /** @description 每页记录数 */
-                pageSize: number;
-                list: {
-                    /**
-                     * @description id
-                     * @example 1
-                     */
-                    id: number;
-                    /** @description 关联的表单 Code */
-                    formCode: string;
-                    /** @description 关联的业务记录 ID */
-                    businessId: number;
-                    /** @description 用户提交的 JSON 数据内容（序列化字符串） */
-                    dataContent: string;
-                    /** @description 创建人ID */
-                    creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
-                    /** @description 创建人姓名 */
-                    creatorName: ((string | null) | null) | null;
-                    /** @description 修改人姓名 */
-                    updaterName: ((string | null) | null) | null;
-                }[];
-            };
-            message: string;
-        };
-        "system.schema_form_dataSubmitReq": {
-            formCode: string;
-            businessId: number;
-            /** @description 表单数据 (JSON 对象) */
-            data: {
-                [key: string]: unknown;
-            };
-        };
-        "system.schema_form_dataSubmitRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "system.schema_form_dataDeleteReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "system.schema_form_dataDeleteRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "system.schema_form_dataGetReq": {
-            id?: number;
-            formCode?: string;
-            businessId?: number;
-        } | unknown | unknown;
-        "system.schema_form_dataGetRes": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /** @description 关联的表单 Code */
-                formCode: string;
-                /** @description 关联的业务记录 ID */
-                businessId: number;
-                /** @description 用户提交的 JSON 数据内容（序列化字符串） */
-                dataContent: string;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
-                /** @description 创建人姓名 */
-                creatorName: ((string | null) | null) | null;
-                /** @description 修改人姓名 */
-                updaterName: ((string | null) | null) | null;
             };
             message: string;
         };

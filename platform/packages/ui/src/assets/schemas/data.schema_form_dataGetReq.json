@@ -1,0 +1,23 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "formCode": {
+      "type": "string"
+    },
+    "businessId": {
+      "type": "number"
+    }
+  },
+  "anyOf": [
+    {
+      "required": ["id"]
+    },
+    {
+      "required": ["formCode", "businessId"]
+    }
+  ],
+  "additionalProperties": false
+}
