@@ -20,6 +20,7 @@
     "@emotion/styled": "^11.14.1",
     "@iconify-icons/material-symbols": "^1.2.58",
     "@iconify/react": "^6.0.2",
+    "@module-federation/enhanced": "^2.6.0",
     "@mui/icons-material": "^9.0.1",
     "@mui/lab": "9.0.0-beta.3",
     "@mui/material": "^9.0.1",

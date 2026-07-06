@@ -16,7 +16,15 @@ interface MenuContextType {
   loadMenus: () => Promise<MenuNode[]>;
 }
 
-const MenuContext = createContext<MenuContextType | undefined>(undefined);
+const GLOBAL_MENU_CONTEXT_KEY = Symbol.for('__HODOR_GLOBAL_MENU_CONTEXT__');
+const MenuContext = (
+  typeof window !== 'undefined'
+    ? (window as any)[GLOBAL_MENU_CONTEXT_KEY] ||
+      ((window as any)[GLOBAL_MENU_CONTEXT_KEY] = createContext<MenuContextType | undefined>(
+        undefined,
+      ))
+    : createContext<MenuContextType | undefined>(undefined)
+) as React.Context<MenuContextType | undefined>;
 
 // 递归过滤符合当前应用 Scope 的菜单
 const filterMenuByScope = (nodes: MenuNode[], scope: string): MenuNode[] => {

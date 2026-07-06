@@ -45,7 +45,8 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
 const childrenRoutes = [
   ...buildRouteTree(
     (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
-      ([filePath]) => !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/')
+      ([filePath]) =>
+        !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/'),
     ),
   ),
   {
@@ -78,7 +79,7 @@ export default function AppRoutes() {
       ),
     },
     {
-      path: '/',
+      path: '/*',
       element: (
         <ProtectedRoute>
           <Layout />

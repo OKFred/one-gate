@@ -4,14 +4,20 @@ import { authUtils } from '@/utils/auth';
 type LangCode = string;
 type Translations = Record<string, string>;
 
-// 内存中的翻译缓存与订阅机制
-let translationCache: Record<LangCode, Translations> = {};
-let version = 0;
-const subscribers = new Set<() => void>();
+// 全局共享翻译状态与订阅机制（防止多实例微前端下状态隔离）
+const globalKey = Symbol.for('__HODOR_TRANSLATION_STATE__');
+const globalState = (globalThis as any)[globalKey] || {
+  translationCache: {} as Record<LangCode, Translations>,
+  version: 0,
+  subscribers: new Set<() => void>(),
+};
+(globalThis as any)[globalKey] = globalState;
+
 const fallbackLangCode = navigator.languages.some((str) => str.includes('zh')) ? 'zh-CN' : 'en-US';
+
 const notify = () => {
-  version += 1;
-  subscribers.forEach((fn) => {
+  globalState.version += 1;
+  globalState.subscribers.forEach((fn: () => void) => {
     try {
       fn();
     } catch {
@@ -23,28 +29,31 @@ const notify = () => {
 // 对外暴露的内存操作 API
 export const setTranslations = (langCode: LangCode, map: Translations) => {
   const lang = langCode || fallbackLangCode;
-  translationCache[lang] = map || {};
+  globalState.translationCache[lang] = map || {};
   notify();
 };
 
 export const mergeTranslations = (langCode: LangCode, map: Translations) => {
   const lang = langCode || fallbackLangCode;
-  translationCache[lang] = { ...(translationCache[lang] || {}), ...(map || {}) };
+  globalState.translationCache[lang] = {
+    ...(globalState.translationCache[lang] || {}),
+    ...(map || {}),
+  };
   notify();
 };
 
 export const clearTranslations = (langCode?: LangCode) => {
   if (langCode) {
-    delete translationCache[langCode];
+    delete globalState.translationCache[langCode];
   } else {
-    translationCache = {};
+    globalState.translationCache = {};
   }
   notify();
 };
 
 export const getTranslations = (langCode?: LangCode): Translations => {
   const lang = langCode || fallbackLangCode;
-  return translationCache[lang] || {};
+  return globalState.translationCache[lang] || {};
 };
 
 /**
@@ -56,7 +65,7 @@ export const createTranslator = (langCode?: LangCode) => {
   const language = langCode || fallbackLangCode;
 
   return (key: string, params?: Record<string, string | number>): string => {
-    const translations = translationCache[language] || {};
+    const translations = globalState.translationCache[language] || {};
     let text = translations[key] || key;
     if (params) {
       Object.entries(params).forEach(([k, v]) => {
@@ -69,10 +78,10 @@ export const createTranslator = (langCode?: LangCode) => {
 
 // React 18 推荐的外部状态订阅方式
 const subscribe = (callback: () => void) => {
-  subscribers.add(callback);
-  return () => subscribers.delete(callback);
+  globalState.subscribers.add(callback);
+  return () => globalState.subscribers.delete(callback);
 };
-const getSnapshot = () => version;
+const getSnapshot = () => globalState.version;
 
 /**
  * 翻译钩子：依赖用户语言与内存版本进行更新

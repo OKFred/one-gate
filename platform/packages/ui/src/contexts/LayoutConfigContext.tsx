@@ -10,7 +10,15 @@ interface LayoutConfigContextType {
   setConfig: React.Dispatch<React.SetStateAction<LayoutConfig>>;
 }
 
-const LayoutConfigContext = createContext<LayoutConfigContextType | undefined>(undefined);
+const GLOBAL_LAYOUT_CONFIG_CONTEXT_KEY = Symbol.for('__HODOR_GLOBAL_LAYOUT_CONFIG_CONTEXT__');
+const LayoutConfigContext = (
+  typeof window !== 'undefined'
+    ? (window as any)[GLOBAL_LAYOUT_CONFIG_CONTEXT_KEY] ||
+      ((window as any)[GLOBAL_LAYOUT_CONFIG_CONTEXT_KEY] = createContext<
+        LayoutConfigContextType | undefined
+      >(undefined))
+    : createContext<LayoutConfigContextType | undefined>(undefined)
+) as React.Context<LayoutConfigContextType | undefined>;
 
 export const LayoutConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [config, setConfig] = useState<LayoutConfig>({});

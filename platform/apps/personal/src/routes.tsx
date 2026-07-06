@@ -42,9 +42,10 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   return routes;
 }
 
-const childrenRoutes = buildRouteTree(
+export const childrenRoutes = buildRouteTree(
   (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
-    ([filePath]) => !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/')
+    ([filePath]) =>
+      !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/'),
   ),
 );
 
