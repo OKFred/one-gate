@@ -11,11 +11,38 @@ export default defineConfig({
   test: {
     name: "node",
     alias: [
-      { find: /^@\/(.*)/, replacement: path.resolve(__dirname, "./src").replace(/\\/g, "/") + "/$1" },
-      { find: /^@hodor\/core\/(.*)/, replacement: path.resolve(__dirname, "../../packages/core/src").replace(/\\/g, "/") + "/$1" },
-      { find: /^@hodor\/infra\/(.*)/, replacement: path.resolve(__dirname, "../../packages/infra/src").replace(/\\/g, "/") + "/$1" },
-      { find: /^@hodor\/biz\/(.*)/, replacement: path.resolve(__dirname, "../../packages/biz/src").replace(/\\/g, "/") + "/$1" },
-      { find: "pino", replacement: path.resolve(__dirname, "./test/mocks/pino.ts").replace(/\\/g, "/") },
+      {
+        find: /^@\/(.*)/,
+        replacement:
+          path.resolve(__dirname, "./src").replace(/\\/g, "/") + "/$1",
+      },
+      {
+        find: /^@hodor\/core\/(.*)/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/core/src")
+            .replace(/\\/g, "/") + "/$1",
+      },
+      {
+        find: /^@hodor\/infra\/(.*)/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/infra/src")
+            .replace(/\\/g, "/") + "/$1",
+      },
+      {
+        find: /^@hodor\/biz\/(.*)/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/biz/src")
+            .replace(/\\/g, "/") + "/$1",
+      },
+      {
+        find: "pino",
+        replacement: path
+          .resolve(__dirname, "./test/mocks/pino.ts")
+          .replace(/\\/g, "/"),
+      },
     ],
     include: [
       "src/**/*.spec.ts",
@@ -29,4 +56,3 @@ export default defineConfig({
     ],
   },
 });
-

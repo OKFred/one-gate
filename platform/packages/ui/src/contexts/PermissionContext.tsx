@@ -27,7 +27,20 @@ interface PermissionContextType {
   refreshPermissions: () => Promise<void>;
 }
 
-const PermissionContext = createContext<PermissionContextType | undefined>(undefined);
+const GLOBAL_PERMISSION_CONTEXT_KEY = Symbol.for('__HODOR_GLOBAL_PERMISSION_CONTEXT__');
+
+type GlobalWindow = typeof window & {
+  [GLOBAL_PERMISSION_CONTEXT_KEY]?: React.Context<PermissionContextType | undefined>;
+};
+
+const PermissionContext = (
+  typeof window !== 'undefined'
+    ? (window as unknown as GlobalWindow)[GLOBAL_PERMISSION_CONTEXT_KEY] ||
+      ((window as unknown as GlobalWindow)[GLOBAL_PERMISSION_CONTEXT_KEY] = createContext<
+        PermissionContextType | undefined
+      >(undefined))
+    : createContext<PermissionContextType | undefined>(undefined)
+) as React.Context<PermissionContextType | undefined>;
 
 export const PermissionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [permissions, setPermissions] = useState<PermissionItem[]>([]);

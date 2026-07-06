@@ -16,6 +16,11 @@
     "format": "prettier --write .",
     "lint": "eslint . --fix"
   },
+  "lint-staged": {
+    "*.{js,ts,json,md}": [
+      "prettier --write"
+    ]
+  },
   "keywords": [],
   "author": "FZ",
   "license": "MIT",
@@ -49,6 +54,7 @@
     "@babel/parser": "^7.28.4",
     "@babel/traverse": "^7.28.4",
     "@cloudflare/vitest-pool-workers": "^0.16.15",
+    "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.22.0",
     "@libsql/client": "^0.15.12",
     "@types/babel__traverse": "^7.28.0",
@@ -61,6 +67,7 @@
     "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^16.0.0",
     "json-schema-to-ts": "^3.1.1",
@@ -70,18 +77,5 @@
     "typescript": "^5.8.2",
     "vitest": "~4.1.8",
     "wrangler": "^4.100.0"
-  },
-  "cloudflare": {
-    "bindings": {
-      "DB": {
-        "description": "D1 database instance for RBAC core data storage."
-      },
-      "KV": {
-        "description": "KV namespace used for user sessions, caching, and rate limiting."
-      },
-      "BUCKET": {
-        "description": "R2 bucket for static file and media uploads."
-      }
-    }
   }
 }

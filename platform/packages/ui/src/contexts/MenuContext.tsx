@@ -16,7 +16,20 @@ interface MenuContextType {
   loadMenus: () => Promise<MenuNode[]>;
 }
 
-const MenuContext = createContext<MenuContextType | undefined>(undefined);
+const GLOBAL_MENU_CONTEXT_KEY = Symbol.for('__HODOR_GLOBAL_MENU_CONTEXT__');
+
+type GlobalWindow = typeof window & {
+  [GLOBAL_MENU_CONTEXT_KEY]?: React.Context<MenuContextType | undefined>;
+};
+
+const MenuContext = (
+  typeof window !== 'undefined'
+    ? (window as unknown as GlobalWindow)[GLOBAL_MENU_CONTEXT_KEY] ||
+      ((window as unknown as GlobalWindow)[GLOBAL_MENU_CONTEXT_KEY] = createContext<MenuContextType | undefined>(
+        undefined,
+      ))
+    : createContext<MenuContextType | undefined>(undefined)
+) as React.Context<MenuContextType | undefined>;
 
 // 递归过滤符合当前应用 Scope 的菜单
 const filterMenuByScope = (nodes: MenuNode[], scope: string): MenuNode[] => {
@@ -75,7 +88,7 @@ export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const resData = await treeFn({ data: {} });
       const normalizedMenus = normalizeMenus(resData.data.data);
-      const scope = ((import.meta as any).env?.VITE_APP_SCOPE as string) || 'admin';
+      const scope = (import.meta as unknown as { env: Record<string, string> }).env?.VITE_APP_SCOPE || 'admin';
       const filteredMenus = filterMenuByScope(normalizedMenus, scope);
       if (!filteredMenus?.length) {
         // 给到提示：菜单为空，请联系管理员添加菜单

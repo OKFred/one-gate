@@ -4,11 +4,12 @@ import path from 'path';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
 import UnoCSS from 'unocss/vite';
+import { federation } from '@module-federation/vite';
 
 const pathUiSrc = path.resolve(__dirname, '../../packages/ui/src');
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   let env = {
     SERVER_URL: '',
     VITE_SERVER_URL: '',
@@ -27,7 +28,13 @@ export default defineConfig(({ command, mode }) => {
         '@/': pathUiSrc + '/',
       },
     },
-    server: { port: 5175, proxy: {} },
+    server: {
+      port: 5175,
+      proxy: {},
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    },
     plugins: [
       react(),
       babel({
@@ -36,11 +43,36 @@ export default defineConfig(({ command, mode }) => {
       UnoCSS({
         configFile: '../../uno.config.ts',
       }),
+      federation({
+        name: 'personal',
+        filename: 'remoteEntry.js',
+        dts: false,
+        exposes: {
+          './App': './src/AppContent.tsx',
+        },
+        shared: {
+          react: { singleton: true, requiredVersion: '^19.2.3' },
+          'react-dom': { singleton: true, requiredVersion: '^19.2.3' },
+          'react-router-dom': { singleton: true, requiredVersion: '^7.16.0' },
+          '@mui/material': { singleton: true },
+          '@emotion/react': { singleton: true },
+          '@emotion/styled': { singleton: true },
+          '@hodor/ui': { singleton: true },
+        },
+      }),
     ],
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom', '@mui/material'],
+      include: [
+        'react',
+        'react-dom',
+        'react-router-dom',
+        '@mui/material',
+        '@emotion/react',
+        '@emotion/styled',
+      ],
     },
     build: {
+      target: 'esnext',
       outDir: 'dist',
       rollupOptions: {
         output: {

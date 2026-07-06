@@ -7,6 +7,7 @@ import UnoCSS from 'unocss/vite';
 import childProcess from 'child_process';
 import fs from 'fs/promises';
 import axios from 'axios';
+import { federation } from '@module-federation/vite';
 
 const pathUiSrc = path.resolve(__dirname, '../../packages/ui/src');
 
@@ -15,7 +16,7 @@ async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }
   const baseUrl = SERVER_URL || VITE_SERVER_URL;
   if (!baseUrl) return;
   const docUrl = `${baseUrl}/doc.json`;
-  
+
   // 1. 生成 TypeScript 类型，输出到共享包 @hodor/ui
   const command = `npx openapi-typescript ${docUrl} -o ../../packages/ui/src/types/openapi.d.ts`;
   console.log('Executing command:', command);
@@ -57,7 +58,7 @@ async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }
 }
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   let env = {
     SERVER_URL: '',
     VITE_SERVER_URL: '',
@@ -65,10 +66,10 @@ export default defineConfig(({ command, mode }) => {
     SERVER_URL?: string;
     VITE_SERVER_URL?: string;
   };
-  
+
   // 加载当前根目录下的环境变量配置
   env = { ...env, ...loadEnv(mode, path.resolve(__dirname, '../../')) };
-  
+
   const result = {
     root: __dirname,
     publicDir: path.resolve(__dirname, '../../public'),
@@ -84,7 +85,21 @@ export default defineConfig(({ command, mode }) => {
         presets: [reactCompilerPreset()],
       }),
       UnoCSS({
-        configFile: '../../uno.config.ts'
+        configFile: '../../uno.config.ts',
+      }),
+      federation({
+        name: 'admin',
+        dts: false,
+        remotes: {},
+        shared: {
+          react: { singleton: true, requiredVersion: '^19.2.3' },
+          'react-dom': { singleton: true, requiredVersion: '^19.2.3' },
+          'react-router-dom': { singleton: true, requiredVersion: '^7.16.0' },
+          '@mui/material': { singleton: true },
+          '@emotion/react': { singleton: true },
+          '@emotion/styled': { singleton: true },
+          '@hodor/ui': { singleton: true },
+        },
       }),
     ],
     optimizeDeps: {
@@ -94,11 +109,14 @@ export default defineConfig(({ command, mode }) => {
         'react-router-dom',
         '@mui/material',
         '@mui/icons-material',
+        '@emotion/react',
+        '@emotion/styled',
         '@iconify/react',
         'axios',
       ],
     },
     build: {
+      target: 'esnext',
       outDir: 'dist',
       rollupOptions: {
         output: {
@@ -124,7 +142,7 @@ export default defineConfig(({ command, mode }) => {
       },
     },
   };
-  
+
   if (mode === 'development') {
     if (env.SERVER_URL || env.VITE_SERVER_URL) {
       result.server.proxy = {

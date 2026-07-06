@@ -2,10 +2,19 @@ import React from 'react';
 import { Stack } from '@mui/material';
 import { Field } from './Field';
 
+interface SchemaProperty {
+  [key: string]: unknown;
+  title?: string;
+  type?: string;
+  enum?: unknown[];
+  properties?: Record<string, SchemaProperty>;
+  required?: string[];
+}
+
 interface DynamicFormProps {
-  schema: Record<string, any> | null | undefined;
-  value: Record<string, any>;
-  onChange: (value: Record<string, any>) => void;
+  schema: SchemaProperty | null | undefined;
+  value: Record<string, unknown>;
+  onChange: (value: Record<string, unknown>) => void;
   disabled?: boolean;
 }
 
@@ -22,7 +31,7 @@ export const DynamicForm = ({
   const properties = schema.properties;
   const keys = Object.keys(properties);
 
-  const handleFieldChange = (key: string, fieldValue: any) => {
+  const handleFieldChange = (key: string, fieldValue: unknown) => {
     onChange({
       ...value,
       [key]: fieldValue,
@@ -56,12 +65,13 @@ export const DynamicForm = ({
             type={fieldType}
             label={title}
             value={value[key]}
-            onChange={(val: any) => {
+            onChange={(val: unknown) => {
               if (fieldType === 'text' || fieldType === 'number') {
                 const e = val as React.ChangeEvent<HTMLInputElement>;
-                let parsedVal: any = e.target.value;
+                const rawVal = e.target.value;
+                let parsedVal: unknown = rawVal;
                 if (fieldType === 'number') {
-                  parsedVal = parsedVal === '' ? undefined : Number(parsedVal);
+                  parsedVal = rawVal === '' ? undefined : Number(rawVal);
                 }
                 handleFieldChange(key, parsedVal);
               } else {
