@@ -16,6 +16,11 @@
     "format": "prettier --write .",
     "lint": "eslint . --fix"
   },
+  "lint-staged": {
+    "*.{js,ts,json,md}": [
+      "prettier --write"
+    ]
+  },
   "keywords": [],
   "author": "FZ",
   "license": "MIT",

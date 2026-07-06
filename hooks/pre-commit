@@ -72,10 +72,10 @@ echo "  ✅ I18n compliance check passed"
 # --- 6. Format changed files ---
 echo "🧹 Formatting changed files..."
 echo "  🔹 server..."
-cd server && pnpm run lint
+cd server && npx lint-staged
 cd ..
 echo "  🔹 platform..."
-cd platform && pnpm run lint
+cd platform && npx lint-staged
 cd ..
 
 echo "✨ VERSION update complete"
