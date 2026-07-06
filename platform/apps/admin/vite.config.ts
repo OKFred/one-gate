@@ -58,7 +58,7 @@ async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }
 }
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   let env = {
     SERVER_URL: '',
     VITE_SERVER_URL: '',

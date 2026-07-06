@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       if (item.path.startsWith('http')) {
         window.open(item.path, '_blank');
       } else {
-        const currentScope = ((import.meta as any).env.VITE_APP_SCOPE as string) || 'admin';
+        const currentScope = (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
         let targetScope = 'admin';
         
         if (item.path.startsWith('/biz/') || item.path.startsWith('biz/')) {

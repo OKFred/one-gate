@@ -4,14 +4,24 @@ import { authUtils } from '@/utils/auth';
 type LangCode = string;
 type Translations = Record<string, string>;
 
+interface GlobalState {
+  translationCache: Record<LangCode, Translations>;
+  version: number;
+  subscribers: Set<() => void>;
+}
+
 // 全局共享翻译状态与订阅机制（防止多实例微前端下状态隔离）
 const globalKey = Symbol.for('__HODOR_TRANSLATION_STATE__');
-const globalState = (globalThis as any)[globalKey] || {
+type GlobalThisWithState = typeof globalThis & {
+  [globalKey]?: GlobalState;
+};
+
+const globalState = (globalThis as unknown as GlobalThisWithState)[globalKey] || {
   translationCache: {} as Record<LangCode, Translations>,
   version: 0,
   subscribers: new Set<() => void>(),
 };
-(globalThis as any)[globalKey] = globalState;
+(globalThis as unknown as GlobalThisWithState)[globalKey] = globalState;
 
 const fallbackLangCode = navigator.languages.some((str) => str.includes('zh')) ? 'zh-CN' : 'en-US';
 

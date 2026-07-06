@@ -6,12 +6,12 @@ interface MicroAppContainerProps {
   visible: boolean;
 }
 
-const componentCache: Record<string, React.ComponentType<any>> = {};
+const componentCache: Record<string, React.ComponentType<Record<string, unknown>>> = {};
 
 export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, visible }) => {
-  const [FederatedComponent, setFederatedComponent] = useState<React.ComponentType<any> | null>(
-    null,
-  );
+  const [FederatedComponent, setFederatedComponent] = useState<React.ComponentType<
+    Record<string, unknown>
+  > | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // 计算子系统的 Base URL
@@ -26,12 +26,12 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
       const hostname = window.location.hostname;
       return `${protocol}//${hostname}:${ports[scopeName] || 5173}`;
     } else {
-      // 优先从环境变量中获取真实子域名配置，达到最高扩展度
-      if (scopeName === 'enterprise' && (import.meta as any).env.VITE_ENTERPRISE_URL) {
-        return (import.meta as any).env.VITE_ENTERPRISE_URL;
+      const metaEnv = (import.meta as unknown as { env: Record<string, string> }).env;
+      if (scopeName === 'enterprise' && metaEnv.VITE_ENTERPRISE_URL) {
+        return metaEnv.VITE_ENTERPRISE_URL;
       }
-      if (scopeName === 'personal' && (import.meta as any).env.VITE_PERSONAL_URL) {
-        return (import.meta as any).env.VITE_PERSONAL_URL;
+      if (scopeName === 'personal' && metaEnv.VITE_PERSONAL_URL) {
+        return metaEnv.VITE_PERSONAL_URL;
       }
 
       // 如果未配置环境变量，则根据当前访问的域名进行智能推导 (支持 Pages.dev 默认多项目域名或子域名切换)
@@ -80,14 +80,14 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
           },
         ]);
 
-        // 动态加载远程模块暴露的 `./App`
         const module = await loadRemote(`${scope}/App`);
-        const Component = (module as any).default;
+        const Component = (module as { default: React.ComponentType<Record<string, unknown>> }).default;
         componentCache[scope] = Component;
         setFederatedComponent(() => Component);
-      } catch (err: any) {
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
         console.error(`[ModuleFederation] Failed to load remote app ${scope}:`, err);
-        setError(err.message || `Failed to load micro-frontend application: ${scope}`);
+        setError(errorMsg || `Failed to load micro-frontend application: ${scope}`);
       }
     };
 

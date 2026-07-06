@@ -14,7 +14,7 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
   const { isMobile } = useResponsive();
   const location = useLocation();
 
-  const currentScope = ((import.meta as any).env.VITE_APP_SCOPE as string) || 'admin';
+  const currentScope = (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
   const isHost = currentScope === 'admin';
 
   // 识别当前路由属于哪一个子应用

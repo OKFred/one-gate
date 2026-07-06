@@ -7,7 +7,8 @@ import Sidebar from './components/Sidebar';
 import Content from './components/Content';
 import ScrollTop from './components/ScrollTop';
 import { useResponsive } from '../hooks/useResponsive';
-import { LayoutConfigProvider, useLayoutConfig } from '../contexts/LayoutConfigContext';
+import { LayoutConfigProvider } from '../contexts/LayoutConfigContext';
+import { useLayoutConfig } from '../contexts/LayoutConfigContextCore';
 
 interface RouteHandle {
   hideSidebar?: boolean;
@@ -18,12 +19,7 @@ function ResponsiveLayoutInner() {
   const { isMobile } = useResponsive();
   const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile);
 
-  let matches: any[] = [];
-  try {
-    matches = useMatches();
-  } catch (e) {
-    // 降级支持非 Data Router
-  }
+  const matches = useMatches();
 
   // 监听屏幕尺寸变化，移动端时关闭侧边栏，桌面端时打开侧边栏
   React.useEffect(() => {

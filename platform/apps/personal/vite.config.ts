@@ -9,7 +9,7 @@ import { federation } from '@module-federation/vite';
 const pathUiSrc = path.resolve(__dirname, '../../packages/ui/src');
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   let env = {
     SERVER_URL: '',
     VITE_SERVER_URL: '',

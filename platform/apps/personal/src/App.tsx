@@ -1,4 +1,5 @@
-import AppRoutes from './routes';
+import { routes } from './routes';
+import { useRoutes } from 'react-router-dom';
 import { useLoadTranslations } from '@/hooks/useLoadTranslations';
 import { ThemeProvider } from '@/theme';
 import { MenuProvider } from '@/contexts/MenuContext';
@@ -114,12 +115,16 @@ function App() {
       <ThemeProvider>
         <PermissionProvider>
           <MenuProvider>
-            <AppRoutes />
+            <AppContent />
           </MenuProvider>
         </PermissionProvider>
       </ThemeProvider>
     </ChunkErrorBoundary>
   );
+}
+
+function AppContent() {
+  return useRoutes(routes);
 }
 
 export default App;
