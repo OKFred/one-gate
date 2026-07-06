@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { authUtils } from '@/utils/auth';
 
 interface MicroAppContainerProps {
   scope: 'enterprise' | 'personal';
@@ -75,7 +76,7 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
   useEffect(() => {
     if (visible && !isLoadedRef.current) {
       isLoadedRef.current = true;
-      const token = localStorage.getItem('token') || '';
+      const token = authUtils.getUserInfo()?.token || '';
       // 注意：由于是第一次加载，路由应该取当前浏览器的地址
       const currentPath = location.pathname + location.search;
       const separator = currentPath.includes('?') ? '&' : '?';
