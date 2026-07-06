@@ -113,7 +113,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./platform/apps/enterprise/dist --project-name=gate-enterprise --branch=main # 强制指定为 production 分支
+          command: pages deploy ./platform/apps/enterprise/dist --project-name=gate-enterprise
+          environment: production
 
       # ─── 步骤 2c: 部署个人系统 Personal (gate-personal) ───
       - name: Deploy Personal Pages
@@ -121,4 +122,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./platform/apps/personal/dist --project-name=gate-personal --branch=main # 强制指定为 production 分支
+          command: pages deploy ./platform/apps/personal/dist --project-name=gate-personal
+          environment: production
