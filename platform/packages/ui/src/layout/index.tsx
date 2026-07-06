@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
-import { useMatches } from 'react-router-dom';
+import { UNSAFE_DataRouterStateContext } from 'react-router-dom';
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
 import Content from './components/Content';
@@ -19,7 +19,8 @@ function ResponsiveLayoutInner() {
   const { isMobile } = useResponsive();
   const [sidebarOpen, setSidebarOpen] = React.useState(!isMobile);
 
-  const matches = useMatches();
+  const routerState = React.useContext(UNSAFE_DataRouterStateContext);
+  const matches = React.useMemo(() => routerState?.matches || [], [routerState]);
 
   // 监听屏幕尺寸变化，移动端时关闭侧边栏，桌面端时打开侧边栏
   React.useEffect(() => {
@@ -39,7 +40,7 @@ function ResponsiveLayoutInner() {
 
     if (!hideSidebar || !hideTopbar) {
       matches.forEach((match) => {
-        const handle = match.handle as RouteHandle | undefined;
+        const handle = (match as unknown as { handle?: RouteHandle }).handle;
         if (handle) {
           if (handle.hideSidebar !== undefined) hideSidebar = hideSidebar || handle.hideSidebar;
           if (handle.hideTopbar !== undefined) hideTopbar = hideTopbar || handle.hideTopbar;
