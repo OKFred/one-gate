@@ -1,6 +1,9 @@
 import { eq, and, or, isNull, lte, sql } from "drizzle-orm";
 import { db } from "../db/index";
-import { cronTable, cronLogTable } from "../../../infra/src/maintenance/cron/model";
+import {
+  cronTable,
+  cronLogTable,
+} from "../../../infra/src/maintenance/cron/model";
 import { CronExpressionParser } from "cron-parser";
 import { jobExecutors } from "./executor";
 

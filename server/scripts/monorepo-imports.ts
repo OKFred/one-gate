@@ -17,8 +17,14 @@ const targetDirs = [
 const mappings = [
   { from: /@\/api\/infra\//g, to: "@hodor/infra/" },
   { from: /@\/api\/biz\//g, to: "@hodor/biz/" },
-  { from: /@\/api\/pathRegister(?:\.js)?/g, to: "@hodor/core/utils/pathRegister.js" },
-  { from: /@\/api\/schemaToParam(?:\.js)?/g, to: "@hodor/core/utils/schemaToParam.js" },
+  {
+    from: /@\/api\/pathRegister(?:\.js)?/g,
+    to: "@hodor/core/utils/pathRegister.js",
+  },
+  {
+    from: /@\/api\/schemaToParam(?:\.js)?/g,
+    to: "@hodor/core/utils/schemaToParam.js",
+  },
   { from: /@\/constants\//g, to: "@hodor/core/constants/" },
   { from: /@\/db\//g, to: "@hodor/core/db/" },
   { from: /@\/jobs\//g, to: "@hodor/core/jobs/" },
