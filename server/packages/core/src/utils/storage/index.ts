@@ -3,7 +3,7 @@ import { S3Provider } from "./providers/s3";
 import { R2Provider } from "./providers/r2";
 import { Context } from "hono";
 import { App } from "../../types/app";
-import { utils as ossUtils } from "../../../../infra/src/oss/file/service";
+import { utils as ossUtils } from "../../../../infra/src/data/oss/file/service";
 /**
  * OSS 配置接口
  */

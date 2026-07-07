@@ -21,7 +21,7 @@ import {
   bodyUserAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import type { UserObj } from "@hodor/infra/system/user/service";
+import type { UserObj } from "@hodor/core/types/app.js";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { preventTimeTravel } from "./prevention";
 import * as attendanceRepository from "./repository";

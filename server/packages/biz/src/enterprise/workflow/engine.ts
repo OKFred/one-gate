@@ -4,7 +4,7 @@ import {
   onLogInsert,
   onLogUpdate,
 } from "./repository";
-import { dockerClient } from "@hodor/infra/swarm/docker/client";
+import { registry } from "@hodor/infra/common/registry.js";
 import { SUPER_ADMIN_ID } from "@hodor/core/db/init";
 
 // 轻量级原生 CDP 客户端封装，基于全局 WebSocket
@@ -435,7 +435,7 @@ ${expression}
         };
 
         // 创建服务
-        const createRes = await dockerClient.createService(spec);
+        const createRes = await registry.swarm.createService(spec);
         const serviceId = createRes.ID;
 
         // 轮询服务运行状态，最大等待 5 分钟
@@ -446,7 +446,7 @@ ${expression}
           await new Promise((r) => setTimeout(r, 2000));
           try {
             // 获取任务详情
-            const tasks = await dockerClient.listTasks({
+            const tasks = await registry.swarm.listTasks({
               service: [serviceName],
             });
             if (tasks.length > 0) {
@@ -470,18 +470,18 @@ ${expression}
 
         if (!isDone) {
           // 超时处理
-          await dockerClient.removeService(serviceId);
+          await registry.swarm.removeService(serviceId);
           throw new Error("Docker Swarm 任务运行超时(5分钟)。");
         }
 
         // 获取输出日志
         let taskLogs = "无日志输出。";
         try {
-          taskLogs = await dockerClient.getServiceLogs(serviceName, 200);
+          taskLogs = await registry.swarm.getServiceLogs(serviceName, 200);
         } catch (e) {}
 
         // 删除服务释放资源
-        await dockerClient.removeService(serviceId);
+        await registry.swarm.removeService(serviceId);
 
         if (finalStatus === "failed" || finalStatus === "rejected") {
           throw new Error(

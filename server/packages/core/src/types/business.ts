@@ -49,16 +49,8 @@ export const BUSINESS = {
   "system.role_permission": "system.role_permission",
   /** 系统用户 */
   "system.user": "system.user",
-  /** 系统动态表单配置 */
-  "system.schema_form": "system.schema_form",
-  /** 系统动态表单数据 */
-  "system.schema_form_data": "system.schema_form_data",
-  /** OSS */
-  oss: "oss",
-  /** OSS 配置 */
-  "oss.config": "oss.config",
-  /** OSS 文件 */
-  "oss.file": "oss.file",
+  /** 数据管理动态表单配置 */
+  "data.schema_form": "data.schema_form",
   /** 企业 */
   enterprise: "enterprise",
   /** 企业考勤 */
@@ -91,6 +83,18 @@ export const BUSINESS = {
   "business.exception": "business.exception",
   /** 基础业务类型 */
   "infra.businessType": "infra.businessType",
+  /** 基础设施 */
+  infra: "infra",
+  /** 数据管理 */
+  data: "data",
+  /** 数据管理 动态表单数据 */
+  "data.schema_form_data": "data.schema_form_data",
+  /** 数据管理 OSS */
+  "data.oss": "data.oss",
+  /** 数据管理 OSS 配置 */
+  "data.oss.config": "data.oss.config",
+  /** 数据管理 OSS 文件 */
+  "data.oss.file": "data.oss.file",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

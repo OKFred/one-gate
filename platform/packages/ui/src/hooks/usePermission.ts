@@ -67,20 +67,6 @@ export const SYSTEM = {
     READ: 'system.auth:read',
     EDIT: 'system.auth:edit',
   },
-  /** 动态表单配置 */
-  SCHEMA_FORM: {
-    READ: 'system.schema_form:read',
-    ADD: 'system.schema_form:add',
-    EDIT: 'system.schema_form:edit',
-    DELETE: 'system.schema_form:delete',
-  },
-  /** 动态表单数据 */
-  SCHEMA_FORM_DATA: {
-    READ: 'system.schema_form_data:read',
-    ADD: 'system.schema_form_data:add',
-    EDIT: 'system.schema_form_data:edit',
-    DELETE: 'system.schema_form_data:delete',
-  },
 } as const;
 
 /** 邮件 */
@@ -171,22 +157,40 @@ export const MAINTENANCE = {
   },
 } as const;
 
-/** 存储 */
-export const OSS = {
-  READ: 'oss:read',
+/** 数据管理 */
+export const DATA = {
+  READ: 'data:read',
+  /** 动态表单配置 */
+  SCHEMA_FORM: {
+    READ: 'data.schema_form:read',
+    ADD: 'data.schema_form:add',
+    EDIT: 'data.schema_form:edit',
+    DELETE: 'data.schema_form:delete',
+  },
+  /** 动态表单数据 */
+  SCHEMA_FORM_DATA: {
+    READ: 'data.schema_form_data:read',
+    ADD: 'data.schema_form_data:add',
+    EDIT: 'data.schema_form_data:edit',
+    DELETE: 'data.schema_form_data:delete',
+  },
+  /** 对象存储 */
+  OSS: {
+    READ: 'data.oss:read',
+  },
   /** 存储配置 */
-  CONFIG: {
-    READ: 'oss.config:read',
-    ADD: 'oss.config:add',
-    EDIT: 'oss.config:edit',
-    DELETE: 'oss.config:delete',
+  OSS_CONFIG: {
+    READ: 'data.oss.config:read',
+    ADD: 'data.oss.config:add',
+    EDIT: 'data.oss.config:edit',
+    DELETE: 'data.oss.config:delete',
   },
   /** 文件管理 */
-  FILE: {
-    READ: 'oss.file:read',
-    ADD: 'oss.file:add',
-    EDIT: 'oss.file:edit',
-    DELETE: 'oss.file:delete',
+  OSS_FILE: {
+    READ: 'data.oss.file:read',
+    ADD: 'data.oss.file:add',
+    EDIT: 'data.oss.file:edit',
+    DELETE: 'data.oss.file:delete',
   },
 } as const;
 

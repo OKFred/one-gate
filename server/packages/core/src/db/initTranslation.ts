@@ -9,7 +9,8 @@ import { swarmTranslations } from "../../../infra/src/swarm/translation";
 import { i18nTranslations } from "../../../infra/src/i18n/translation";
 import { mailTranslations } from "../../../infra/src/mail/translation";
 import { maintenanceTranslations } from "../../../infra/src/maintenance/translation";
-import { ossTranslations } from "../../../infra/src/oss/translation";
+import { ossTranslations } from "../../../infra/src/data/oss/translation";
+import { dataTranslations } from "../../../infra/src/data/translation";
 import { enterpriseTranslations } from "../../../biz/src/enterprise/translation";
 import { systemTranslations } from "../../../infra/src/system/translation";
 import { sharedTranslations } from "./translation/shared";
@@ -127,6 +128,7 @@ export const initialTranslationData = mapTranslations({
   ...i18nTranslations,
   ...mailTranslations,
   ...maintenanceTranslations,
+  ...dataTranslations,
   ...ossTranslations,
   ...enterpriseTranslations,
   ...systemTranslations,
