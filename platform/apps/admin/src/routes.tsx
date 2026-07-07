@@ -79,7 +79,7 @@ export default function AppRoutes() {
       ),
     },
     {
-      path: '/*',
+      path: '/',
       element: (
         <ProtectedRoute>
           <Layout />
