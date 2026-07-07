@@ -5,8 +5,7 @@ import {
 import { SUPER_ADMIN_ROLE_ID } from "@hodor/core/db/init";
 import { utils as departmentUtils } from "../department/service";
 import { utils as roleUtils } from "../role/service";
-import { utils as regionUtils } from "../../i18n/region/service";
-import { utils as languageUtils } from "../../i18n/language/service";
+import { registry } from "../../common/registry.js";
 
 /**
  * 用户模块错误码映射
@@ -79,7 +78,7 @@ export const preventMissingRoles = async (roleIdArr: number[]) => {
  */
 export const preventMissingRegion = async (regionId: number | null) => {
   if (regionId) {
-    await regionUtils.verifyRegion(regionId);
+    await registry.i18n.verifyRegion(regionId);
   }
 };
 
@@ -88,6 +87,6 @@ export const preventMissingRegion = async (regionId: number | null) => {
  */
 export const preventInvalidLangCode = async (langCode: string | undefined) => {
   if (langCode) {
-    await languageUtils.verifyLangCode(langCode);
+    await registry.i18n.verifyLangCode(langCode);
   }
 };

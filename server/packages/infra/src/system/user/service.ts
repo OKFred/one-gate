@@ -24,7 +24,7 @@ import {
 } from "./model";
 import { utils as departmentUtils } from "../department/service";
 import { utils as roleUtils } from "../role/service";
-import regionService, { utils as regionUtils } from "../../i18n/region/service";
+import { registry } from "../../common/registry.js";
 import type { PermissionInfo } from "../permission/service";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { hashPassword, verifyPassword } from "@hodor/core/utils/crypto";
@@ -452,7 +452,7 @@ async function getRegionObj(
 ): Promise<{ value: number; label: string } | null> {
   if (regionId === null) return null;
   try {
-    const regionData = await regionService.get.service({ id: regionId });
+    const regionData = await registry.i18n.getRegion(regionId);
     if (!regionData) return null;
     return {
       value: regionId,
@@ -505,7 +505,7 @@ async function updateUserInfo(
   };
   if (regionObj !== undefined) {
     const regionId = regionObj ? regionObj.value : null;
-    if (regionId) await regionUtils.verifyRegion(regionId);
+    if (regionId) await registry.i18n.verifyRegion(regionId);
     setData.regionId = regionId;
   }
   if (remark !== undefined) {

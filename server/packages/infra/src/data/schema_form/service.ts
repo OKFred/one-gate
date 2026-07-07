@@ -1,4 +1,4 @@
-import { utils as userUtils } from "../../system/user/service";
+import { registry } from "../../common/registry.js";
 import {
   IndexVO,
   SchemaFormVO,
@@ -112,7 +112,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const creatorName = await userUtils.getUserNameById(creatorId);
+  const creatorName = await registry.system.getUserNameById(creatorId);
 
   const updateData = {
     ...params,
@@ -161,7 +161,7 @@ async function onUpdate(
   // 获取当前记录
   const currentForm = await schemaFormRepository.findById(id);
   preventEmpty(currentForm);
-  const updaterName = await userUtils.getUserNameById(updaterId);
+  const updaterName = await registry.system.getUserNameById(updaterId);
 
   const updateData = {
     ...rest,

@@ -1,6 +1,6 @@
 import userService, { utils as userUtils } from "../user/service";
 import permissionService from "../permission/service";
-import { utils as regionUtils } from "../../i18n/region/service";
+import { registry } from "../../common/registry.js";
 import { tokenUtils } from "@hodor/core/utils/token";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj } from "@hodor/core/types/app";
@@ -17,7 +17,6 @@ import {
   bodyUserAdapter,
   bodyClientInfoAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
-import { utils as auditUtils } from "../../maintenance/audit_login/service";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import {
   BusinessError,
@@ -87,7 +86,11 @@ async function onLogin(
   });
 
   // 记录登录审计
-  await auditUtils.recordLogin(id, clientInfo.ip, clientInfo.userAgent);
+  await registry.maintenance.recordLogin(
+    id,
+    clientInfo.ip,
+    clientInfo.userAgent
+  );
 
   return {
     userObj: {
@@ -294,7 +297,7 @@ async function onUpdateProfile(
   const { userId: id } = userObj;
   const { regionObj, remark } = params;
   const regionId = regionObj ? regionObj.value : null;
-  if (regionId) await regionUtils.verifyRegion(regionId);
+  if (regionId) await registry.i18n.verifyRegion(regionId);
   const res = await userUtils.updateUserInfo(
     { id, regionObj, remark },
     userObj

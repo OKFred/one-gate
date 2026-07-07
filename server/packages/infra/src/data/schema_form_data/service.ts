@@ -1,4 +1,4 @@
-import { utils as userUtils } from "../../system/user/service";
+import { registry } from "../../common/registry.js";
 import {
   IndexVO,
   SchemaFormDataVO,
@@ -147,7 +147,7 @@ async function onSubmit(
   const dataContent = JSON.stringify(data);
 
   // 获取当前操作人的用户名
-  const username = await userUtils.getUserNameById(creatorId);
+  const username = await registry.system.getUserNameById(creatorId);
 
   // 3. 检查是否已经存在相同 formCode + businessId 的记录，如果存在则更新(upsert)
   const record = await schemaFormDataRepository.findByFormCodeAndBusinessId(

@@ -29,7 +29,7 @@ import {
 } from "@hodor/core/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import { exportDeletionRecord } from "../../maintenance/compliance/index.js";
+import { registry } from "../../common/registry.js";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -276,7 +276,7 @@ async function onDelete(
 
   // 归档删除记录
   try {
-    await exportDeletionRecord(
+    await registry.maintenance.exportDeletionRecord(
       {
         sourceTable: "department",
         sourcePrimaryKey: String(id),

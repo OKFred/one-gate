@@ -3,6 +3,7 @@ import { pinoLogger } from "hono-pino";
 import type { DebugLogOptions } from "hono-pino/debug-log";
 import pino from "pino";
 import { requestId } from "hono/request-id";
+import { getRuntimeKey } from "hono/adapter";
 // import path from "path";
 
 const options: DebugLogOptions = {
@@ -15,6 +16,7 @@ export default function logHandler(app: App) {
   // const logDir = path.join(process.cwd(), "logs");
   // const logFile = path.join(logDir, "access.log");
   app.use(requestId());
+  if (getRuntimeKey() !== "node") return;
   app.use(
     pinoLogger({
       pino: pino({

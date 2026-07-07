@@ -7,8 +7,10 @@ import system from "./system/index.js";
 import swarm from "./swarm/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import { initInfraRegistry } from "./register.js";
 
 function createInfraApp(): App {
+  initInfraRegistry();
   const app = new OpenAPIHono<AppBindings>();
   app.route("/i18n", i18n());
   app.route("/mail", mail());
