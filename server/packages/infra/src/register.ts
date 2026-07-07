@@ -5,13 +5,14 @@ import { utils as languageUtils } from "./i18n/language/service.js";
 import regionService from "./i18n/region/service.js";
 import { utils as auditUtils } from "./maintenance/audit_login/service.js";
 import { exportDeletionRecord } from "./maintenance/compliance/index.js";
+import { dockerClient } from "./swarm/docker/client.js";
 
 // 1. 组装各领域模块的具体服务实现
-const systemRegister = {
+export const systemRegister = {
   ...userUtils,
 };
 
-const i18nRegister = {
+export const i18nRegister = {
   ...regionUtils,
   ...languageUtils,
   getRegion: async (id: number) => {
@@ -19,10 +20,12 @@ const i18nRegister = {
   },
 };
 
-const maintenanceRegister = {
+export const maintenanceRegister = {
   recordLogin: auditUtils.recordLogin,
   exportDeletionRecord,
 };
+
+export const swarmRegister = dockerClient;
 
 // 2. 初始化注册中心并绑定服务
 export function initInfraRegistry() {
@@ -31,15 +34,7 @@ export function initInfraRegistry() {
   reg.register("system", systemRegister);
   reg.register("i18n", i18nRegister);
   reg.register("maintenance", maintenanceRegister);
+  reg.register("swarm", swarmRegister);
   console.log(`[INFRA] registered domains`, reg.domains);
   setRegistry(reg);
-}
-
-// 3. 通过声明合并将装配好的对象类型注入到 IInfraServices 中，实现唯一类型源，避免类型与实现脱节
-declare module "./common/registry.js" {
-  interface IInfraServices {
-    system: typeof systemRegister;
-    i18n: typeof i18nRegister;
-    maintenance: typeof maintenanceRegister;
-  }
 }

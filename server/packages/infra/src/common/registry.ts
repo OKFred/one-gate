@@ -1,8 +1,17 @@
 // 通用类型安全服务注册中心 (Service Registry)
-// 子模块的具体类型契约将通过 TypeScript 声明合并 (Declaration Merging) 动态注入，以保证类型唯一源。
+// 引入装配常量的推导类型，构建唯一的类型安全层，杜绝在开发环境下 IDE 类型缺失的问题
+import type {
+  systemRegister,
+  i18nRegister,
+  maintenanceRegister,
+  swarmRegister,
+} from "../register.js";
 
 export interface IInfraServices {
-  // 留空，由具体装配文件（例如 register.ts）通过 declare module 动态扩充属性和方法类型
+  system: typeof systemRegister;
+  i18n: typeof i18nRegister;
+  maintenance: typeof maintenanceRegister;
+  swarm: typeof swarmRegister;
 }
 
 export class ServiceRegistry {
