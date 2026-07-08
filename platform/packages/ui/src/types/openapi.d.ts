@@ -2625,7 +2625,7 @@ export interface paths {
         put?: never;
         /**
          * 初始化/同步数据库基础数据
-         * @description 同步系统所需的权限、菜单、多语言、地区等基础数据。支持增量同步或完全重置。安全验证：请求头 X_INIT_TOKEN 或超级管理员账号登录。
+         * @description 同步系统所需的权限、菜单、多语言、地区等基础数据。支持增量同步或完全重置。安全验证：超级管理员账号登录。
          */
         post: {
             parameters: {
