@@ -3,12 +3,12 @@ import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type AiConfigRes, type TableExtraContext } from './components/TheTable';
 import AiConfigFormFields from './components/TheForm';
-import * as AiConfigAPI from '@/api/biz/ai/config';
-import type { ListAiConfigReq } from '@/api/biz/ai/type';
+import * as AiConfigAPI from '@/api/infra/ai/config';
+import type { ListAiConfigReq } from '@/api/infra/ai/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ai } from '@/hooks/usePermission';
+import { infra_ai } from '@/hooks/usePermission';
 
 const DEFAULT_FORM: Partial<AiConfigRes> = {
   name: '',
@@ -30,7 +30,7 @@ export default function AiConfigManagement() {
   const handleVerify = async (id: number) => {
     try {
       setVerifyingId(id);
-      const res = await AiConfigAPI.verifyFn({ data: { id } });
+      const res = (await AiConfigAPI.verifyFn({ data: { id } })) as any;
       if (res.data.data) {
         showSnackbar({ message: t('ai.config.verifySuccess'), type: 'success' });
       } else {
@@ -49,9 +49,9 @@ export default function AiConfigManagement() {
   const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [ai.config.add],
-      edit: [ai.config.edit],
-      delete: [ai.config.delete],
+      add: [infra_ai.config.add],
+      edit: [infra_ai.config.edit],
+      delete: [infra_ai.config.delete],
     },
     api: {
       list: AiConfigAPI.listFn,
@@ -73,7 +73,7 @@ export default function AiConfigManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema: 'ai.configAddReq',
+      schema: 'infra.ai.configAddReq',
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit) => {
         const capabilitiesStr = form.capabilities;

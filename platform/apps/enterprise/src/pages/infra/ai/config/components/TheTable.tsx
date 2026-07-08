@@ -1,11 +1,21 @@
 import { Chip, Box, CircularProgress } from '@mui/material';
 import { QuestionMark as VerifyIcon } from '@mui/icons-material';
 import type { SchemaCrudConfig } from '@/components/Crud';
-import type { ListAiConfigReq, ListAiConfigRes } from '@/api/biz/ai/type';
 import type { FilterState } from './TheFilter';
-import { ai } from '@/hooks/usePermission';
+import { infra_ai } from '@/hooks/usePermission';
 
-export type AiConfigRes = NonNullable<ListAiConfigRes['list']>[0];
+export interface AiConfigRes {
+  id: number;
+  name: string;
+  provider: string;
+  model: string;
+  baseUrl?: string;
+  apiKey?: string;
+  capabilities?: string | null;
+  isDefault?: boolean;
+  isEnabled?: boolean;
+  remark?: string | null;
+}
 
 export interface TableExtraContext {
   verifyingId: number | null;
@@ -15,7 +25,7 @@ export interface TableExtraContext {
 export const tableConfig: SchemaCrudConfig<
   AiConfigRes,
   FilterState,
-  ListAiConfigReq,
+  any,
   TableExtraContext
 >['table'] = {
   columns: (t) => [
@@ -110,7 +120,7 @@ export const tableConfig: SchemaCrudConfig<
       key: 'verify',
       label: _t('ai.config.verify'),
       color: 'success',
-      permissionCodes: [ai.config.read],
+      permissionCodes: [infra_ai.config.read],
       icon: (row) => {
         const isVerifying = extraContext?.verifyingId === row.id;
         return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

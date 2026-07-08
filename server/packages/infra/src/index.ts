@@ -5,6 +5,7 @@ import data from "./data/index.js";
 import oss from "./data/oss/index.js";
 import system from "./system/index.js";
 import swarm from "./swarm/index.js";
+import ai from "./ai/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { initInfraRegistry } from "./register.js";
@@ -19,6 +20,7 @@ function createInfraApp(): App {
   app.route("/oss", oss());
   app.route("/system", system());
   app.route("/swarm", swarm());
+  app.route("/ai", ai());
   return app;
 }
 export default createInfraApp;

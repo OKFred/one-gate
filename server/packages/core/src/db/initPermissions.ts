@@ -9,7 +9,7 @@ import { rolePermissionTable } from "../../../infra/src/system/role_permission/m
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "../utils/env";
-import { sql, notInArray } from "drizzle-orm";
+import { sql, notInArray, inArray } from "drizzle-orm";
 import { permissionSeeds } from "../constants/permissions";
 import { actionTranslations } from "./translation/shared";
 
@@ -81,11 +81,29 @@ export async function preparePermissions(options?: { reset?: boolean }) {
     // 自动清理已经废弃的权限（即不在当前 permissionSeeds 中的权限）
     const validCodes = mappedData.map((d) => d.code);
     if (validCodes.length > 0) {
-      queries.push(
-        db
-          .delete(permissionTable)
-          .where(notInArray(permissionTable.code, validCodes))
-      );
+      // 1. 先查出数据库中现有的所有权限代码
+      const existing = await db
+        .select({ code: permissionTable.code })
+        .from(permissionTable);
+
+      // 2. 内存过滤出被废弃的权限代码
+      const codesToDelete = existing
+        .map((row) => row.code)
+        .filter((code) => !validCodes.includes(code));
+
+      // 3. 只有当确实存在已被废弃的权限时才执行删除操作
+      if (codesToDelete.length > 0) {
+        const DELETE_BATCH = 100;
+        for (let i = 0; i < codesToDelete.length; i += DELETE_BATCH) {
+          const chunk = codesToDelete.slice(i, i + DELETE_BATCH);
+          queries.push(
+            db
+              .delete(permissionTable)
+              .where(inArray(permissionTable.code, chunk))
+          );
+        }
+      }
+
       // 同时清理 system_role_permission 中已失效的 permissionId 关联
       queries.push(
         db

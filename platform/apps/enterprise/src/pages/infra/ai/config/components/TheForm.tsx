@@ -35,7 +35,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           fullWidth
           label={t('ai.config.name')}
           value={form.name ?? ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+          onChange={(e) => setForm((prev: any) => ({ ...prev, name: e.target.value }))}
           required
         />
       </Grid>
@@ -45,7 +45,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           fullWidth
           label={t('ai.config.provider')}
           value={form.provider || 'OpenAI'}
-          onChange={(e) => setForm((prev) => ({ ...prev, provider: e.target.value }))}
+          onChange={(e) => setForm((prev: any) => ({ ...prev, provider: e.target.value }))}
         >
           <MenuItem value="OpenAI">OpenAI</MenuItem>
           <MenuItem value="DeepSeek">DeepSeek</MenuItem>
@@ -59,7 +59,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           fullWidth
           label={t('ai.config.model')}
           value={form.model ?? ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, model: e.target.value }))}
+          onChange={(e) => setForm((prev: any) => ({ ...prev, model: e.target.value }))}
           required
         />
       </Grid>
@@ -68,7 +68,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           fullWidth
           label={t('ai.config.baseUrl')}
           value={form.baseUrl ?? ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, baseUrl: e.target.value }))}
+          onChange={(e) => setForm((prev: any) => ({ ...prev, baseUrl: e.target.value }))}
           placeholder="https://api.openai.com/v1"
         />
       </Grid>
@@ -78,7 +78,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           type="password"
           label={t('ai.config.apiKey')}
           value={form.apiKey ?? ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, apiKey: e.target.value }))}
+          onChange={(e) => setForm((prev: any) => ({ ...prev, apiKey: e.target.value }))}
           required
         />
       </Grid>
@@ -89,7 +89,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
             multiple
             value={capabilities}
             onChange={(e) =>
-              setForm((prev) => ({ ...prev, _capabilitiesArr: e.target.value as string[] }))
+              setForm((prev: any) => ({ ...prev, _capabilitiesArr: e.target.value as string[] }))
             }
             input={<OutlinedInput label={t('ai.config.capabilities')} />}
             renderValue={(selected) => (
@@ -113,7 +113,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           control={
             <Switch
               checked={!!form.isDefault}
-              onChange={(e) => setForm((prev) => ({ ...prev, isDefault: e.target.checked }))}
+              onChange={(e) => setForm((prev: any) => ({ ...prev, isDefault: e.target.checked }))}
             />
           }
           label={t('ai.config.isDefault')}
@@ -124,7 +124,7 @@ export default function AiConfigFormFields({ form, setForm, t }: AiConfigFormFie
           control={
             <Switch
               checked={!!form.isEnabled}
-              onChange={(e) => setForm((prev) => ({ ...prev, isEnabled: e.target.checked }))}
+              onChange={(e) => setForm((prev: any) => ({ ...prev, isEnabled: e.target.checked }))}
             />
           }
           label={t('status.enabled')}

@@ -60,11 +60,11 @@ export const BUSINESS = {
   /** 企业工作流配置 */
   "enterprise.workflow_config": "enterprise.workflow_config",
   /** AI */
-  ai: "ai",
+  "infra.ai": "infra.ai",
   /** AI 配置 */
-  "ai.config": "ai.config",
+  "infra.ai.config": "infra.ai.config",
   /** AI 对话 */
-  "ai.chat": "ai.chat",
+  "infra.ai.chat": "infra.ai.chat",
   /** Swarm */
   "infra.swarm": "infra.swarm",
   /** Swarm Docker Service */

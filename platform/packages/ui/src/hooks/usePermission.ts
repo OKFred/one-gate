@@ -239,18 +239,18 @@ export const enterprise = {
 } as const;
 
 /** AI */
-export const ai = {
-  read: 'ai:read',
+export const infra_ai = {
+  read: 'infra.ai:read',
   /** AI 配置 */
   config: {
-    read: 'ai.config:read',
-    add: 'ai.config:add',
-    edit: 'ai.config:edit',
-    delete: 'ai.config:delete',
+    read: 'infra.ai.config:read',
+    add: 'infra.ai.config:add',
+    edit: 'infra.ai.config:edit',
+    delete: 'infra.ai.config:delete',
   },
   /** AI 对话 */
   chat: {
-    read: 'ai.chat:read',
+    read: 'infra.ai.chat:read',
   },
 } as const;
 

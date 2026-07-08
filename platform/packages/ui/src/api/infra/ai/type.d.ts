@@ -1,5 +1,5 @@
-import * as AiConfigAPI from '@/api/biz/ai/config';
-import * as AiChatAPI from '@/api/biz/ai/chat';
+import * as AiConfigAPI from '@/api/infra/ai/config';
+import * as AiChatAPI from '@/api/infra/ai/chat';
 
 // ==================== AI LLM Configuration ====================
 

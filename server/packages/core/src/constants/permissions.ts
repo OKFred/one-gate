@@ -107,7 +107,7 @@ export const permissionSeeds = {
     workflow_config: ["read", "add", "edit", "delete"],
   },
   /** AI */
-  ai: {
+  "infra.ai": {
     "": ["read"],
     /** AI 配置 */
     config: ["read", "add", "edit", "delete"],

@@ -17,7 +17,7 @@ export const askFn = (
   } & Omit<AxiosRequestConfig, 'url' | 'method' | 'data'>,
 ) => {
   return axiosPlus({
-    url: '/api/v1/biz/ai/chat/ask',
+    url: '/api/v1/infra/ai/chat/ask',
     method: 'post',
     ...axiosConfig,
   } as unknown as Parameters<typeof axiosPlus>[0]) as Promise<{
