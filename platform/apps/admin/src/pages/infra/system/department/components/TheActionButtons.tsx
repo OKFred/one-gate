@@ -11,7 +11,7 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
-import { SYSTEM } from '@/hooks/usePermission';
+import { infra_system } from '@/hooks/usePermission';
 import type { TheFormRef, DepartmentData } from './TheForm';
 
 // ==================== 新增部门按钮 ====================
@@ -35,7 +35,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
       variant="contained"
       startIcon={<AddIcon />}
       onClick={handleAdd}
-      permissionCodes={[SYSTEM.DEPARTMENT.ADD]}
+      permissionCodes={[infra_system.department.add]}
     >
       {t('dialog.add')}
     </ResponsiveButton>
@@ -108,7 +108,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={handleAddChild}
             title={t('department.dialog.addChild')}
-            permissionCodes={[SYSTEM.DEPARTMENT.ADD]}
+            permissionCodes={[infra_system.department.add]}
           >
             <AddIcon fontSize="small" />
           </ResponsiveIconButton>
@@ -116,7 +116,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={handleEdit}
             title={t('dialog.edit')}
-            permissionCodes={[SYSTEM.DEPARTMENT.EDIT]}
+            permissionCodes={[infra_system.department.edit]}
           >
             <EditIcon fontSize="small" />
           </ResponsiveIconButton>
@@ -125,7 +125,7 @@ export const TreeNodeActionButtons = memo(
             onClick={openDeleteDialog}
             title={t('dialog.delete')}
             disabled={hasChildren}
-            permissionCodes={[SYSTEM.DEPARTMENT.DELETE]}
+            permissionCodes={[infra_system.department.delete]}
           >
             <DeleteIcon fontSize="small" />
           </ResponsiveIconButton>

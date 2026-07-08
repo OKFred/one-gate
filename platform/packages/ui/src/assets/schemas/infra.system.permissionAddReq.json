@@ -1,0 +1,55 @@
+{
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "action"
+      ]
+    },
+    "resource": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    },
+    "business": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "remark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    },
+    "isEnabled": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "code",
+    "name",
+    "category",
+    "resource",
+    "business",
+    "remark",
+    "isEnabled"
+  ],
+  "additionalProperties": false
+}

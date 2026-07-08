@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "name",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

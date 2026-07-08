@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "langCode": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "remark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    }
+  },
+  "required": [
+    "name",
+    "title",
+    "langCode",
+    "content",
+    "isEnabled"
+  ],
+  "additionalProperties": false
+}

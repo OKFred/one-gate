@@ -5,6 +5,8 @@
       "type": "string"
     }
   },
-  "required": ["key"],
+  "required": [
+    "key"
+  ],
   "additionalProperties": false
 }

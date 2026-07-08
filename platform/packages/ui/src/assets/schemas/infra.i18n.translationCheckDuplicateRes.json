@@ -1,0 +1,66 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "hasDuplicate": {
+          "type": "boolean"
+        },
+        "duplicates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "minimum": 1
+              },
+              "application": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "business": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "langCode": {
+                "type": "string",
+                "maxLength": 10
+              },
+              "tKey": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9_]+(?:\\.[a-zA-Z0-9_]+)*$",
+                "maxLength": 100
+              },
+              "tValue": {
+                "type": "string",
+                "maxLength": 500
+              },
+              "isEnabled": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "hasDuplicate",
+        "duplicates"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

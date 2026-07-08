@@ -1,0 +1,19 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "tail": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 5000
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false
+}

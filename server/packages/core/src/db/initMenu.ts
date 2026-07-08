@@ -17,7 +17,7 @@ export const initialMenuData = [
     icon: "material-symbols:home",
     path: "/home",
     sort: 1,
-    business: "system.auth",
+    business: "infra.system.auth",
   },
   {
     id: 2,
@@ -25,7 +25,7 @@ export const initialMenuData = [
     icon: "material-symbols:account-circle",
     path: "/me",
     sort: 2,
-    business: "system.auth",
+    business: "infra.system.auth",
   },
   {
     id: 42,
@@ -40,7 +40,7 @@ export const initialMenuData = [
     icon: "material-symbols:database",
     parentId: 42,
     sort: 2,
-    business: "data",
+    business: "infra.data",
   },
   {
     id: 3,
@@ -48,7 +48,7 @@ export const initialMenuData = [
     icon: "material-symbols:mail",
     parentId: 42,
     sort: 3,
-    business: "mail",
+    business: "infra.mail",
   },
   {
     id: 4,
@@ -57,7 +57,7 @@ export const initialMenuData = [
     path: "/infra/mail/template",
     parentId: 3,
     sort: 1,
-    business: "mail.template",
+    business: "infra.mail.template",
   },
   {
     id: 5,
@@ -66,7 +66,7 @@ export const initialMenuData = [
     path: "/infra/mail/log",
     parentId: 3,
     sort: 2,
-    business: "mail.log",
+    business: "infra.mail.log",
   },
   {
     id: 6,
@@ -75,7 +75,7 @@ export const initialMenuData = [
     path: "/infra/mail/send",
     parentId: 3,
     sort: 3,
-    business: "mail.action",
+    business: "infra.mail.action",
   },
   {
     id: 7,
@@ -84,7 +84,7 @@ export const initialMenuData = [
     path: "/infra/mail/account",
     parentId: 3,
     sort: 4,
-    business: "mail.account",
+    business: "infra.mail.account",
   },
   {
     id: 8,
@@ -92,7 +92,7 @@ export const initialMenuData = [
     icon: "material-symbols:settings",
     parentId: 42,
     sort: 1,
-    business: "system",
+    business: "infra.system",
   },
   {
     id: 9,
@@ -101,7 +101,7 @@ export const initialMenuData = [
     path: "/infra/system/role",
     parentId: 8,
     sort: 1,
-    business: "system.role",
+    business: "infra.system.role",
   },
   {
     id: 10,
@@ -110,7 +110,7 @@ export const initialMenuData = [
     path: "/infra/system/user",
     parentId: 8,
     sort: 2,
-    business: "system.user",
+    business: "infra.system.user",
   },
   {
     id: 11,
@@ -119,7 +119,7 @@ export const initialMenuData = [
     path: "/infra/system/department",
     parentId: 8,
     sort: 3,
-    business: "system.department",
+    business: "infra.system.department",
   },
   {
     id: 12,
@@ -128,7 +128,7 @@ export const initialMenuData = [
     path: "/infra/system/menu",
     parentId: 8,
     sort: 4,
-    business: "system.menu",
+    business: "infra.system.menu",
   },
   {
     id: 13,
@@ -136,7 +136,7 @@ export const initialMenuData = [
     icon: "material-symbols:language",
     parentId: 42,
     sort: 4,
-    business: "i18n",
+    business: "infra.i18n",
   },
   {
     id: 14,
@@ -145,7 +145,7 @@ export const initialMenuData = [
     path: "/infra/i18n/language",
     parentId: 13,
     sort: 1,
-    business: "i18n.language",
+    business: "infra.i18n.language",
   },
   {
     id: 15,
@@ -154,7 +154,7 @@ export const initialMenuData = [
     path: "/infra/i18n/translation",
     parentId: 13,
     sort: 2,
-    business: "i18n.translation",
+    business: "infra.i18n.translation",
   },
   {
     id: 16,
@@ -163,7 +163,7 @@ export const initialMenuData = [
     path: "/infra/i18n/region",
     parentId: 13,
     sort: 3,
-    business: "i18n.region",
+    business: "infra.i18n.region",
   },
   {
     id: 17,
@@ -172,7 +172,7 @@ export const initialMenuData = [
     path: "/infra/system/permission",
     parentId: 8,
     sort: 5,
-    business: "system.permission",
+    business: "infra.system.permission",
   },
   {
     id: 18,
@@ -181,7 +181,7 @@ export const initialMenuData = [
     path: "/infra/system/role_permission",
     parentId: 8,
     sort: 6,
-    business: "system.role_permission",
+    business: "infra.system.role_permission",
   },
   {
     id: 19,
@@ -189,7 +189,7 @@ export const initialMenuData = [
     icon: "material-symbols:build",
     parentId: 42,
     sort: 5,
-    business: "maintenance",
+    business: "infra.maintenance",
   },
   {
     id: 20,
@@ -198,7 +198,7 @@ export const initialMenuData = [
     path: "/infra/maintenance/cache",
     parentId: 19,
     sort: 1,
-    business: "maintenance.cache",
+    business: "infra.maintenance.cache",
   },
   {
     id: 21,
@@ -207,7 +207,7 @@ export const initialMenuData = [
     path: "/infra/maintenance/openapi",
     parentId: 19,
     sort: 2,
-    business: "maintenance",
+    business: "infra.maintenance",
   },
   {
     id: 22,
@@ -216,7 +216,7 @@ export const initialMenuData = [
     path: "/infra/maintenance/auditLogin",
     parentId: 19,
     sort: 3,
-    business: "maintenance.audit_login",
+    business: "infra.maintenance.audit_login",
   },
   {
     id: 35,
@@ -225,7 +225,7 @@ export const initialMenuData = [
     path: "/infra/maintenance/cron",
     parentId: 19,
     sort: 4,
-    business: "maintenance.cron",
+    business: "infra.maintenance.cron",
   },
   {
     id: 37,
@@ -234,7 +234,7 @@ export const initialMenuData = [
     path: "/infra/maintenance/api-task",
     parentId: 19,
     sort: 5,
-    business: "maintenance.api_task",
+    business: "infra.maintenance.api_task",
   },
   {
     id: 38,
@@ -243,7 +243,7 @@ export const initialMenuData = [
     path: "/infra/maintenance/api-docs",
     parentId: 19,
     sort: 6,
-    business: "maintenance.api_docs",
+    business: "infra.maintenance.api_docs",
   },
   {
     id: 23,
@@ -251,7 +251,7 @@ export const initialMenuData = [
     icon: "material-symbols:cloud",
     parentId: 43,
     sort: 2,
-    business: "data.oss.config",
+    business: "infra.data.oss.config",
   },
   {
     id: 24,
@@ -260,7 +260,7 @@ export const initialMenuData = [
     path: "/infra/data/oss/config",
     parentId: 23,
     sort: 1,
-    business: "data.oss.config",
+    business: "infra.data.oss.config",
   },
   {
     id: 25,
@@ -269,7 +269,7 @@ export const initialMenuData = [
     path: "/infra/data/oss/file",
     parentId: 23,
     sort: 2,
-    business: "data.oss.file",
+    business: "infra.data.oss.file",
   },
   {
     id: 26,
@@ -310,7 +310,7 @@ export const initialMenuData = [
     path: "/infra/data/schema_form",
     parentId: 43,
     sort: 7,
-    business: "data.schema_form",
+    business: "infra.data.schema_form",
   },
   {
     id: 31,
@@ -319,7 +319,7 @@ export const initialMenuData = [
     path: "/infra/data/schema_form_data",
     parentId: 43,
     sort: 1,
-    business: "data.schema_form_data",
+    business: "infra.data.schema_form_data",
   },
   {
     id: 32,
@@ -327,7 +327,7 @@ export const initialMenuData = [
     icon: "material-symbols:dns",
     parentId: 42,
     sort: 6,
-    business: "swarm",
+    business: "infra.swarm",
   },
   {
     id: 33,
@@ -336,7 +336,7 @@ export const initialMenuData = [
     path: "/infra/swarm/docker",
     parentId: 32,
     sort: 1,
-    business: "swarm.docker",
+    business: "infra.swarm.docker",
   },
   {
     id: 34,
@@ -345,7 +345,7 @@ export const initialMenuData = [
     path: "/infra/swarm/nodes",
     parentId: 32,
     sort: 2,
-    business: "swarm.nodes",
+    business: "infra.swarm.nodes",
   },
   {
     id: 36,
@@ -354,7 +354,7 @@ export const initialMenuData = [
     path: "/infra/swarm/docker_config",
     parentId: 32,
     sort: 3,
-    business: "swarm.docker_config",
+    business: "infra.swarm.docker_config",
   },
   {
     id: 39,

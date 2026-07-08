@@ -94,10 +94,7 @@
     "password",
     "langCode",
     "isEnabled",
-    "remark",
-    "regionObj",
-    "departmentObj",
-    "roleArr"
+    "remark"
   ],
   "additionalProperties": false
 }

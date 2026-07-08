@@ -13,7 +13,7 @@ import type {
   AddDockerConfigReq,
   UpdateDockerConfigReq,
 } from '@/api/infra/swarm/type';
-import { SWARM } from '@/hooks/usePermission';
+import { infra_swarm } from '@/hooks/usePermission';
 import { showSnackbar } from '@/components/Notification';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -46,9 +46,9 @@ export default function SwarmDockerConfigPage() {
   > = {
     apiKeyName: 'id',
     permissions: {
-      add: [SWARM.DOCKER_CONFIG.ADD],
-      edit: [SWARM.DOCKER_CONFIG.EDIT],
-      delete: [SWARM.DOCKER_CONFIG.DELETE],
+      add: [infra_swarm.docker_config.add],
+      edit: [infra_swarm.docker_config.edit],
+      delete: [infra_swarm.docker_config.delete],
     },
     api: {
       list: DockerConfigAPI.listFn as unknown as SchemaCrudConfig<

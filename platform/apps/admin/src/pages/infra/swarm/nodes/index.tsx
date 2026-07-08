@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { Visibility as ViewIcon } from '@mui/icons-material';
 import { listNodesFn } from '@/api/infra/swarm/nodes';
-import { SWARM } from '@/hooks/usePermission';
+import { infra_swarm } from '@/hooks/usePermission';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { SwarmNodeObj } from '@/api/infra/swarm/type';
 import TheNodeDetail from './components/TheNodeDetail';
@@ -281,7 +281,7 @@ export default function SwarmNodesManagement() {
           key: 'inspect',
           color: 'info',
           icon: <ViewIcon />,
-          permissionCodes: [SWARM.NODES.READ],
+          permissionCodes: [infra_swarm.nodes.read],
           onClick: (row) => {
             context?.onInspect(row);
           },

@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "keyword": {
+      "type": "string"
+    },
+    "pageNo": {
+      "type": "number",
+      "minimum": 1
+    },
+    "pageSize": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "roleId": {
+      "type": "number",
+      "minimum": 1
+    },
+    "permissionId": {
+      "type": "number",
+      "minimum": 1
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "roleId",
+        "permissionId",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

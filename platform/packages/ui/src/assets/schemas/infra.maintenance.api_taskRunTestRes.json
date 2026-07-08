@@ -1,0 +1,94 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean"
+        },
+        "statusCode": {
+          "type": "number"
+        },
+        "durationMs": {
+          "type": "number"
+        },
+        "responseBody": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "errorMessage": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "responseHeaders": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "statusText": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "nullable": true
+        },
+        "redirected": {
+          "type": "boolean"
+        },
+        "schemaValidation": {
+          "type": "object",
+          "properties": {
+            "hasSchema": {
+              "type": "boolean"
+            },
+            "valid": {
+              "type": "boolean"
+            },
+            "errors": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "hasSchema",
+            "valid"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "success",
+        "statusCode",
+        "durationMs"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

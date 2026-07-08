@@ -1,56 +1,56 @@
 export const BUSINESS = {
   /** 国际化 */
-  i18n: "i18n",
+  "infra.i18n": "infra.i18n",
   /** 国际化语言 */
-  "i18n.language": "i18n.language",
+  "infra.i18n.language": "infra.i18n.language",
   /** 国际化地区 */
-  "i18n.region": "i18n.region",
+  "infra.i18n.region": "infra.i18n.region",
   /** 国际化翻译 */
-  "i18n.translation": "i18n.translation",
+  "infra.i18n.translation": "infra.i18n.translation",
   /** 邮件 */
-  mail: "mail",
+  "infra.mail": "infra.mail",
   /** 邮件账户 */
-  "mail.account": "mail.account",
+  "infra.mail.account": "infra.mail.account",
   /** 邮件模板 */
-  "mail.template": "mail.template",
+  "infra.mail.template": "infra.mail.template",
   /** 邮件操作 */
-  "mail.action": "mail.action",
+  "infra.mail.action": "infra.mail.action",
   /** 邮件日志 */
-  "mail.log": "mail.log",
+  "infra.mail.log": "infra.mail.log",
   /** 运维 */
-  maintenance: "maintenance",
+  "infra.maintenance": "infra.maintenance",
   /** 运维缓存 */
-  "maintenance.cache": "maintenance.cache",
+  "infra.maintenance.cache": "infra.maintenance.cache",
   /** 运维接口文档 */
-  "maintenance.api_docs": "maintenance.api_docs",
+  "infra.maintenance.api_docs": "infra.maintenance.api_docs",
   /** 运维合规 */
-  "maintenance.compliance": "maintenance.compliance",
+  "infra.maintenance.compliance": "infra.maintenance.compliance",
   /** 运维定时任务 */
-  "maintenance.cron": "maintenance.cron",
+  "infra.maintenance.cron": "infra.maintenance.cron",
   /** 运维 API Task */
-  "maintenance.api_task": "maintenance.api_task",
+  "infra.maintenance.api_task": "infra.maintenance.api_task",
   /** 运维登录日志 */
-  "maintenance.audit_login": "maintenance.audit_login",
+  "infra.maintenance.audit_login": "infra.maintenance.audit_login",
   /** 运维初始化 */
-  "maintenance.init": "maintenance.init",
+  "infra.maintenance.init": "infra.maintenance.init",
   /** 系统 */
-  system: "system",
+  "infra.system": "infra.system",
   /** 系统鉴权 */
-  "system.auth": "system.auth",
+  "infra.system.auth": "infra.system.auth",
   /** 系统部门 */
-  "system.department": "system.department",
+  "infra.system.department": "infra.system.department",
   /** 系统菜单 */
-  "system.menu": "system.menu",
+  "infra.system.menu": "infra.system.menu",
   /** 系统权限 */
-  "system.permission": "system.permission",
+  "infra.system.permission": "infra.system.permission",
   /** 系统角色 */
-  "system.role": "system.role",
+  "infra.system.role": "infra.system.role",
   /** 系统角色权限 */
-  "system.role_permission": "system.role_permission",
+  "infra.system.role_permission": "infra.system.role_permission",
   /** 系统用户 */
-  "system.user": "system.user",
+  "infra.system.user": "infra.system.user",
   /** 数据管理动态表单配置 */
-  "data.schema_form": "data.schema_form",
+  "infra.data.schema_form": "infra.data.schema_form",
   /** 企业 */
   enterprise: "enterprise",
   /** 企业考勤 */
@@ -66,13 +66,13 @@ export const BUSINESS = {
   /** AI 对话 */
   "ai.chat": "ai.chat",
   /** Swarm */
-  swarm: "swarm",
+  "infra.swarm": "infra.swarm",
   /** Swarm Docker Service */
-  "swarm.docker": "swarm.docker",
+  "infra.swarm.docker": "infra.swarm.docker",
   /** Swarm Nodes */
-  "swarm.nodes": "swarm.nodes",
+  "infra.swarm.nodes": "infra.swarm.nodes",
   /** Swarm Docker 配置 */
-  "swarm.docker_config": "swarm.docker_config",
+  "infra.swarm.docker_config": "infra.swarm.docker_config",
   /** 业务类型 */
   "business.type": "business.type",
   /** 组件 */
@@ -86,15 +86,15 @@ export const BUSINESS = {
   /** 基础设施 */
   infra: "infra",
   /** 数据管理 */
-  data: "data",
+  "infra.data": "infra.data",
   /** 数据管理 动态表单数据 */
-  "data.schema_form_data": "data.schema_form_data",
+  "infra.data.schema_form_data": "infra.data.schema_form_data",
   /** 数据管理 OSS */
-  "data.oss": "data.oss",
+  "infra.data.oss": "infra.data.oss",
   /** 数据管理 OSS 配置 */
-  "data.oss.config": "data.oss.config",
+  "infra.data.oss.config": "infra.data.oss.config",
   /** 数据管理 OSS 文件 */
-  "data.oss.file": "data.oss.file",
+  "infra.data.oss.file": "infra.data.oss.file",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

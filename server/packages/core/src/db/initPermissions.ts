@@ -5,10 +5,11 @@
 
 import db from "./index";
 import { permissionTable } from "../../../infra/src/system/permission/model";
+import { rolePermissionTable } from "../../../infra/src/system/role_permission/model";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "../utils/env";
-import { sql } from "drizzle-orm";
+import { sql, notInArray } from "drizzle-orm";
 import { permissionSeeds } from "../constants/permissions";
 import { actionTranslations } from "./translation/shared";
 
@@ -26,10 +27,6 @@ export async function preparePermissions(options?: { reset?: boolean }) {
   };
 
   const queries: any[] = [];
-
-  if (options?.reset) {
-    queries.push(db.delete(permissionTable));
-  }
 
   const creatorId = SUPER_ADMIN_ID; // 系统初始化
 
@@ -76,6 +73,27 @@ export async function preparePermissions(options?: { reset?: boolean }) {
   }
 
   stats.total = mappedData.length;
+
+  if (options?.reset) {
+    queries.push(db.delete(permissionTable));
+    queries.push(db.delete(rolePermissionTable));
+  } else {
+    // 自动清理已经废弃的权限（即不在当前 permissionSeeds 中的权限）
+    const validCodes = mappedData.map((d) => d.code);
+    if (validCodes.length > 0) {
+      queries.push(
+        db
+          .delete(permissionTable)
+          .where(notInArray(permissionTable.code, validCodes))
+      );
+      // 同时清理 system_role_permission 中已失效的 permissionId 关联
+      queries.push(
+        db
+          .delete(rolePermissionTable)
+          .where(sql`permission_id NOT IN (SELECT id FROM system_permission)`)
+      );
+    }
+  }
 
   // 2. 分批执行以规避 SQL 变量限制
   const BATCH_SIZE = 10;

@@ -2,8 +2,8 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { UserRecord, UserTableContext } from '../index';
 import type { ListUserReq } from '@/api/infra/system/type';
-import schema from '@/assets/schemas/system.userAddReq.json';
-import updateSchema from '@/assets/schemas/system.userUpdateReq.json';
+import schema from '@/assets/schemas/infra.system.userAddReq.json';
+import updateSchema from '@/assets/schemas/infra.system.userUpdateReq.json';
 import { UserFormFields } from './UserFormFields';
 
 export const formConfig: SchemaCrudConfig<

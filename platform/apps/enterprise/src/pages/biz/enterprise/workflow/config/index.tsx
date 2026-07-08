@@ -6,7 +6,7 @@ import type { ListConfigReq, ConfigObj } from '@/api/biz/enterprise/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ENTERPRISE } from '@/hooks/usePermission';
+import { enterprise } from '@/hooks/usePermission';
 import { Chip, Box, CircularProgress, TextField, FormControlLabel, Switch } from '@mui/material';
 
 import { PlayArrow as VerifyIcon } from '@mui/icons-material';
@@ -63,9 +63,9 @@ export default function WorkflowConfigManagement() {
   const config: SchemaCrudConfig<ConfigObj, FilterState, ListConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [ENTERPRISE.WORKFLOW_CONFIG.ADD],
-      edit: [ENTERPRISE.WORKFLOW_CONFIG.EDIT],
-      delete: [ENTERPRISE.WORKFLOW_CONFIG.DELETE],
+      add: [enterprise.workflow_config.add],
+      edit: [enterprise.workflow_config.edit],
+      delete: [enterprise.workflow_config.delete],
     },
     api: {
       list: WorkflowAPI.listConfigFn,
@@ -142,7 +142,7 @@ export default function WorkflowConfigManagement() {
           key: 'verify',
           label: t('workflow.config.testConnection'),
           color: 'success',
-          permissionCodes: [ENTERPRISE.WORKFLOW_CONFIG.READ],
+          permissionCodes: [enterprise.workflow_config.read],
           icon: (row) => {
             const isVerifying = extraContext?.verifyingId === row.id;
             return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

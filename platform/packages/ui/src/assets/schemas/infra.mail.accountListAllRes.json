@@ -1,0 +1,61 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "minimum": 1
+          },
+          "password": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          },
+          "remark": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "nullable": true,
+            "maxLength": 500
+          },
+          "mailAddress": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "id",
+          "mailAddress"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,72 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string"
+          },
+          "containerId": {
+            "type": "string"
+          },
+          "nodeId": {
+            "type": "string"
+          },
+          "cpuPercent": {
+            "type": "number"
+          },
+          "memoryUsage": {
+            "type": "number"
+          },
+          "memoryLimit": {
+            "type": "number"
+          },
+          "memoryPercent": {
+            "type": "number"
+          },
+          "networkRx": {
+            "type": "number"
+          },
+          "networkTx": {
+            "type": "number"
+          },
+          "blkRead": {
+            "type": "number"
+          },
+          "blkWrite": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "taskId",
+          "containerId",
+          "nodeId",
+          "cpuPercent",
+          "memoryUsage",
+          "memoryLimit",
+          "memoryPercent",
+          "networkRx",
+          "networkTx",
+          "blkRead",
+          "blkWrite"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

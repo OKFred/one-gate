@@ -9,7 +9,7 @@ import type { ListAiConfigReq } from '@/api/biz/ai/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { AI } from '@/hooks/usePermission';
+import { ai } from '@/hooks/usePermission';
 
 const DEFAULT_FORM: Partial<AiConfigRes> = {
   name: '',
@@ -50,9 +50,9 @@ export default function AiConfigManagement() {
   const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [AI.CONFIG.ADD],
-      edit: [AI.CONFIG.EDIT],
-      delete: [AI.CONFIG.DELETE],
+      add: [ai.config.add],
+      edit: [ai.config.edit],
+      delete: [ai.config.delete],
     },
     api: {
       list: AiConfigAPI.listFn,

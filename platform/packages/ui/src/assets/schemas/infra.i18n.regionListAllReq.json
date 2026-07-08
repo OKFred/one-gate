@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "labels",
+        "alpha2Code",
+        "alpha3Code",
+        "numeric",
+        "iso3166Independent",
+        "isEnabled",
+        "businessLanguages",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

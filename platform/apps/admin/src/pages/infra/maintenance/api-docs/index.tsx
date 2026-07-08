@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import * as ApiDocsAPI from '@/api/infra/maintenance/api-docs';
-import { MAINTENANCE } from '@/hooks/usePermission';
+import { infra_maintenance } from '@/hooks/usePermission';
 import type { ApiDocsObj, ListApiDocsReq } from '@/api/infra/maintenance/type';
 import { Box, Stack, Typography, Chip, Button } from '@mui/material';
 import { CloudUpload as UploadIcon } from '@mui/icons-material';
@@ -45,9 +45,9 @@ export default function ApiDocsManagement() {
   const config: SchemaCrudConfig<ApiDocsObj, typeof defaultFilters, ListApiDocsReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [MAINTENANCE.API_DOCS.ADD],
-      edit: [MAINTENANCE.API_DOCS.EDIT],
-      delete: [MAINTENANCE.API_DOCS.DELETE],
+      add: [infra_maintenance.api_docs.add],
+      edit: [infra_maintenance.api_docs.edit],
+      delete: [infra_maintenance.api_docs.delete],
     },
     api: {
       list: ApiDocsAPI.listFn,

@@ -1,0 +1,103 @@
+{
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "password": {
+      "type": "string"
+    },
+    "langCode": {
+      "type": "string",
+      "maxLength": 10
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "remark": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    },
+    "regionObj": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "nullable": true,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "value",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "departmentObj": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "nullable": true,
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 1
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "value",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "roleArr": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "number",
+            "minimum": 1
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "username",
+    "password",
+    "langCode",
+    "isEnabled",
+    "remark",
+    "regionObj",
+    "departmentObj",
+    "roleArr"
+  ],
+  "additionalProperties": false
+}

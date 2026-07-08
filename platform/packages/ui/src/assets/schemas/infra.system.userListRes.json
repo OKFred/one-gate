@@ -1,0 +1,131 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number"
+        },
+        "totalPage": {
+          "type": "number"
+        },
+        "currentPage": {
+          "type": "number"
+        },
+        "pageSize": {
+          "type": "number"
+        },
+        "list": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "minimum": 1
+              },
+              "username": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "langCode": {
+                "type": "string",
+                "maxLength": 10
+              },
+              "isEnabled": {
+                "type": "boolean"
+              },
+              "remark": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true,
+                "maxLength": 500
+              },
+              "regionId": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "nullable": true,
+                "minimum": 1
+              },
+              "departmentId": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "nullable": true,
+                "minimum": 1
+              },
+              "roleIdArr": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 1
+                }
+              },
+              "creatorId": {
+                "type": "number"
+              },
+              "createTimeUtc": {
+                "type": "number"
+              },
+              "updaterId": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "updateTimeUtc": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "username",
+              "langCode",
+              "isEnabled",
+              "creatorId",
+              "createTimeUtc",
+              "updaterId",
+              "updateTimeUtc",
+              "regionId",
+              "departmentId",
+              "roleIdArr"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "total",
+        "totalPage",
+        "currentPage",
+        "pageSize",
+        "list"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

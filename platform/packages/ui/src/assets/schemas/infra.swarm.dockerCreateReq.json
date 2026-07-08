@@ -1,0 +1,119 @@
+{
+  "type": "object",
+  "properties": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "TaskTemplate": {
+          "type": "object",
+          "properties": {
+            "ContainerSpec": {
+              "type": "object",
+              "properties": {
+                "Image": {
+                  "type": "string"
+                },
+                "Env": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "Command": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "Args": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "Image"
+              ]
+            }
+          },
+          "required": [
+            "ContainerSpec"
+          ]
+        },
+        "Mode": {
+          "type": "object",
+          "properties": {
+            "Replicated": {
+              "type": "object",
+              "properties": {
+                "Replicas": {
+                  "type": "number"
+                }
+              }
+            },
+            "Global": {
+              "type": "object"
+            }
+          }
+        },
+        "UpdateConfig": {
+          "type": "object"
+        },
+        "RollbackConfig": {
+          "type": "object"
+        },
+        "EndpointSpec": {
+          "type": "object",
+          "properties": {
+            "Ports": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "Protocol": {
+                    "type": "string",
+                    "enum": [
+                      "tcp",
+                      "udp"
+                    ]
+                  },
+                  "PublishMode": {
+                    "type": "string"
+                  },
+                  "PublishedPort": {
+                    "type": "number"
+                  },
+                  "TargetPort": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "PublishedPort",
+                  "TargetPort"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "Name",
+        "TaskTemplate"
+      ]
+    }
+  },
+  "required": [
+    "spec"
+  ],
+  "additionalProperties": false
+}

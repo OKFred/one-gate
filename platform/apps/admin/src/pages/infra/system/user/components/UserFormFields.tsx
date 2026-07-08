@@ -14,6 +14,7 @@ import {
   Typography,
   Popover,
   IconButton,
+  FormHelperText,
 } from '@mui/material';
 import { TextField } from '@/components/Form';
 import type { SelectChangeEvent } from '@mui/material';
@@ -29,6 +30,7 @@ import * as DepartmentAPI from '@/api/infra/system/department';
 import type { TreeDepartmentRes } from '@/api/infra/system/type';
 import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/infra/i18n/type';
 import { useUserInfo } from '@/hooks/useUserInfo';
+import { useFormErrorContext } from '@/hooks/useFormError';
 import type { UserRecord } from '../index';
 
 export interface UserFormFieldsProps {
@@ -53,6 +55,11 @@ export function UserFormFields({
   const [roleOptions, setRoleOptions] = useState<{ value: number; label: string }[]>([]);
   const [departmentTree, setDepartmentTree] = useState<TreeDepartmentRes>([]);
   const { userInfo } = useUserInfo();
+  const errorContext = useFormErrorContext();
+  const langCodeError = errorContext?.fieldErrors['langCode'];
+  const regionObjError = errorContext?.fieldErrors['regionObj'];
+  const roleArrError = errorContext?.fieldErrors['roleArr'];
+  const departmentObjError = errorContext?.fieldErrors['departmentObj'];
 
   useEffect(() => {
     async function fetchRoles() {
@@ -107,6 +114,9 @@ export function UserFormFields({
       ...prev,
       departmentObj: nodeId === 0 ? null : { value: nodeId, label: nodeName },
     }));
+    if (errorContext?.clearFieldError) {
+      errorContext.clearFieldError('departmentObj');
+    }
     handleDepartmentClose();
   };
 
@@ -174,8 +184,10 @@ export function UserFormFields({
         />
       )}
 
-      <Box>
-        <InputLabel sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary' }}>
+      <FormControl fullWidth error={!!departmentObjError}>
+        <InputLabel
+          sx={{ mb: 1, fontSize: '0.75rem', color: 'text.secondary', position: 'static' }}
+        >
           {t('me.department')}
         </InputLabel>
         <Paper
@@ -188,16 +200,18 @@ export function UserFormFields({
             justifyContent: 'space-between',
             alignItems: 'center',
             minHeight: '56px',
+            borderColor: departmentObjError ? 'error.main' : 'rgba(0, 0, 0, 0.23)',
             '&:hover': {
-              borderColor: 'primary.main',
+              borderColor: departmentObjError ? 'error.main' : 'primary.main',
             },
           }}
         >
           <Typography color={form.departmentObj ? 'text.primary' : 'text.secondary'}>
             {form.departmentObj?.label || t('form.select')}
           </Typography>
-          <ArrowDropDownIcon color="action" />
+          <ArrowDropDownIcon color={departmentObjError ? 'error' : 'action'} />
         </Paper>
+        {departmentObjError && <FormHelperText>{departmentObjError}</FormHelperText>}
 
         <Popover
           open={departmentPopoverOpen}
@@ -234,9 +248,9 @@ export function UserFormFields({
             )}
           </Box>
         </Popover>
-      </Box>
+      </FormControl>
 
-      <FormControl fullWidth>
+      <FormControl fullWidth error={!!regionObjError}>
         <InputLabel>{t('me.region')}</InputLabel>
         <Select
           value={form.regionObj?.value || ''}
@@ -250,6 +264,9 @@ export function UserFormFields({
               }));
             } else {
               setForm((prev) => ({ ...prev, regionObj: null }));
+            }
+            if (errorContext?.clearFieldError) {
+              errorContext.clearFieldError('regionObj');
             }
           }}
           label={t('me.region')}
@@ -267,15 +284,19 @@ export function UserFormFields({
             );
           })}
         </Select>
+        {regionObjError && <FormHelperText>{regionObjError}</FormHelperText>}
       </FormControl>
 
-      <FormControl fullWidth>
+      <FormControl fullWidth error={!!langCodeError}>
         <InputLabel>{t('column.language')}</InputLabel>
         <Select
           value={form.langCode || ''}
           onChange={(e) => {
             const value = e.target.value;
             setForm((prev) => ({ ...prev, langCode: value || '' }));
+            if (errorContext?.clearFieldError) {
+              errorContext.clearFieldError('langCode');
+            }
           }}
           label={t('column.language')}
         >
@@ -288,14 +309,20 @@ export function UserFormFields({
             </MenuItem>
           ))}
         </Select>
+        {langCodeError && <FormHelperText>{langCodeError}</FormHelperText>}
       </FormControl>
 
-      <FormControl fullWidth required>
+      <FormControl fullWidth required error={!!roleArrError}>
         <InputLabel>{t('me.role')}</InputLabel>
         <Select
           multiple
           value={selectedRoleValues}
-          onChange={handleRoleChange}
+          onChange={(e) => {
+            handleRoleChange(e);
+            if (errorContext?.clearFieldError) {
+              errorContext.clearFieldError('roleArr');
+            }
+          }}
           input={<OutlinedInput label={t('me.role')} />}
           renderValue={(selected) => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
@@ -315,6 +342,7 @@ export function UserFormFields({
             </MenuItem>
           ))}
         </Select>
+        {roleArrError && <FormHelperText>{roleArrError}</FormHelperText>}
       </FormControl>
 
       <FormControlLabel

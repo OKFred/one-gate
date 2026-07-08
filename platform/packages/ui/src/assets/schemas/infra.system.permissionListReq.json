@@ -1,0 +1,50 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "keyword": {
+      "type": "string"
+    },
+    "pageNo": {
+      "type": "number",
+      "minimum": 1
+    },
+    "pageSize": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 1000
+    },
+    "code": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "action"
+      ]
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "code",
+        "name",
+        "category",
+        "isEnabled",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

@@ -5,7 +5,7 @@ import { tableConfig, type TemplateRes, type TableExtraContext } from './compone
 import { formConfig } from './components/TheForm';
 import ThePreview from './components/ThePreview';
 import * as MailTemplateAPI from '@/api/infra/mail/template';
-import { MAIL } from '@/hooks/usePermission';
+import { infra_mail } from '@/hooks/usePermission';
 import type { ListMailTemplateReq } from '@/api/infra/mail/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
@@ -26,9 +26,9 @@ export default function MailTemplatePage() {
     {
       apiKeyName: 'id',
       permissions: {
-        add: [MAIL.TEMPLATE.ADD],
-        edit: [MAIL.TEMPLATE.EDIT],
-        delete: [MAIL.TEMPLATE.DELETE],
+        add: [infra_mail.template.add],
+        edit: [infra_mail.template.edit],
+        delete: [infra_mail.template.delete],
       },
       api: {
         list: MailTemplateAPI.listFn,

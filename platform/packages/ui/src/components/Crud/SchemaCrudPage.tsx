@@ -318,6 +318,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     // 前端预验证
     const clientErrors = validate(form);
     if (Object.keys(clientErrors).length > 0) {
+      console.warn('Form validation failed:', clientErrors);
       setFieldErrors(clientErrors);
       return;
     }

@@ -1,0 +1,54 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "userObj": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "number",
+              "minimum": 1
+            },
+            "username": {
+              "type": "string",
+              "maxLength": 100
+            },
+            "langCode": {
+              "type": "string",
+              "maxLength": 10
+            },
+            "token": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "required": [
+            "token",
+            "id",
+            "username",
+            "langCode"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "userObj"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

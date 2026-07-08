@@ -1,0 +1,95 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "info": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "title",
+            "version",
+            "description"
+          ],
+          "additionalProperties": false
+        },
+        "docType": {
+          "type": "string",
+          "enum": [
+            "swagger2.0",
+            "openapi3.0",
+            "openapi3.1"
+          ]
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "apis": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "requestSchema": {
+                "type": "string"
+              },
+              "responseSchema": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "method",
+              "summary",
+              "description",
+              "requestSchema",
+              "responseSchema"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "info",
+        "docType",
+        "apis",
+        "baseUrl"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}

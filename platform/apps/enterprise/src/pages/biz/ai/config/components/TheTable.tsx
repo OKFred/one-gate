@@ -3,7 +3,7 @@ import { QuestionMark as VerifyIcon } from '@mui/icons-material';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { ListAiConfigReq, ListAiConfigRes } from '@/api/biz/ai/type';
 import type { FilterState } from './TheFilter';
-import { AI } from '@/hooks/usePermission';
+import { ai } from '@/hooks/usePermission';
 
 export type AiConfigRes = NonNullable<ListAiConfigRes['list']>[0];
 
@@ -110,7 +110,7 @@ export const tableConfig: SchemaCrudConfig<
       key: 'verify',
       label: _t('ai.config.verify'),
       color: 'success',
-      permissionCodes: [AI.CONFIG.READ],
+      permissionCodes: [ai.config.read],
       icon: (row) => {
         const isVerifying = extraContext?.verifyingId === row.id;
         return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

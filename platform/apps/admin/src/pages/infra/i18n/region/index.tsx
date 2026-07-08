@@ -6,7 +6,7 @@ import { formConfig } from './components/TheForm';
 import * as RegionAPI from '@/api/infra/i18n/region';
 import * as LanguageAPI from '@/api/infra/i18n/language';
 import type { ListAllLanguageRes, ListRegionReq } from '@/api/infra/i18n/type';
-import { I18N } from '@/hooks/usePermission';
+import { infra_i18n } from '@/hooks/usePermission';
 
 export default function RegionPage() {
   const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
@@ -31,9 +31,9 @@ export default function RegionPage() {
   > = {
     apiKeyName: 'id',
     permissions: {
-      add: [I18N.REGION.ADD],
-      edit: [I18N.REGION.EDIT],
-      delete: [I18N.REGION.DELETE],
+      add: [infra_i18n.region.add],
+      edit: [infra_i18n.region.edit],
+      delete: [infra_i18n.region.delete],
     },
     api: {
       list: RegionAPI.listFn,

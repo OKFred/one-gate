@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "descend": {
+      "type": "boolean"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    },
+    "orderBy": {
+      "type": "string",
+      "enum": [
+        "id",
+        "mailAddress",
+        "isEnabled",
+        "createTimeUtc"
+      ]
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

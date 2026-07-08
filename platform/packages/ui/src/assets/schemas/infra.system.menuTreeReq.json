@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "properties": {
+    "showAll": {
+      "type": "boolean"
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

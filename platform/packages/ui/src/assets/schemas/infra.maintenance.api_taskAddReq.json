@@ -1,0 +1,76 @@
+{
+  "type": "object",
+  "properties": {
+    "taskKey": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "description": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true,
+      "maxLength": 500
+    },
+    "baseUrl": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "path": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE"
+      ]
+    },
+    "headers": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "requestSchema": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "responseSchema": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "nullable": true
+    },
+    "timeoutMs": {
+      "type": "number"
+    },
+    "isEnabled": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "taskKey",
+    "name",
+    "baseUrl",
+    "path",
+    "method",
+    "timeoutMs",
+    "isEnabled"
+  ],
+  "additionalProperties": false
+}

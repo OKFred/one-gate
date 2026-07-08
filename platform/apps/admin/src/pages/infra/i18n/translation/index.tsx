@@ -4,7 +4,7 @@ import { tableConfig, type TranslationRes } from './components/TheTable';
 import TranslationFormFields from './components/TheForm';
 import * as TranslationAPI from '@/api/infra/i18n/translation';
 import type { ListTranslationReq } from '@/api/infra/i18n/type';
-import { I18N } from '@/hooks/usePermission';
+import { infra_i18n } from '@/hooks/usePermission';
 import translationSchema from '@/assets/schemas/i18n.translationAddReq.json';
 
 const calculateSHA256 = async (text: string): Promise<string> => {
@@ -19,9 +19,9 @@ export default function TranslationPage() {
   const config: SchemaCrudConfig<TranslationRes, FilterState, ListTranslationReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [I18N.TRANSLATION.ADD],
-      edit: [I18N.TRANSLATION.EDIT],
-      delete: [I18N.TRANSLATION.DELETE],
+      add: [infra_i18n.translation.add],
+      edit: [infra_i18n.translation.edit],
+      delete: [infra_i18n.translation.delete],
     },
     api: {
       list: TranslationAPI.listFn,

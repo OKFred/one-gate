@@ -4,7 +4,7 @@ import type {
   FileManagerFile,
   FileManagerListResult,
 } from '@/components/FileManager';
-import { DATA } from '@/hooks/usePermission';
+import { infra_data } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as OSSFileAPI from '@/api/infra/data/oss/file';
 
@@ -53,9 +53,9 @@ export default function OSSFilePage() {
       title={t('oss.file.title')}
       adapter={ossFileAdapter}
       permissions={{
-        upload: [DATA.OSS_FILE.ADD],
-        delete: [DATA.OSS_FILE.DELETE],
-        download: [DATA.OSS_FILE.READ],
+        upload: [infra_data.oss_file.add],
+        delete: [infra_data.oss_file.delete],
+        download: [infra_data.oss_file.read],
       }}
     />
   );

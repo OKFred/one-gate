@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "properties": {
+    "filters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

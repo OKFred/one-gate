@@ -1,0 +1,137 @@
+{
+  "type": "object",
+  "properties": {
+    "ok": {
+      "type": "boolean"
+    },
+    "data": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "number"
+        },
+        "totalPage": {
+          "type": "number"
+        },
+        "currentPage": {
+          "type": "number"
+        },
+        "pageSize": {
+          "type": "number"
+        },
+        "list": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number",
+                "minimum": 1
+              },
+              "mailTo": {
+                "type": "string",
+                "format": "email"
+              },
+              "mailFrom": {
+                "type": "string",
+                "format": "email"
+              },
+              "title": {
+                "type": "string"
+              },
+              "templateId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "templateParams": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "sendStatus": {
+                "type": "boolean"
+              },
+              "exceptionCode": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "exceptionDetails": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "remark": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "nullable": true,
+                "maxLength": 500
+              },
+              "creatorId": {
+                "type": "number"
+              },
+              "createTimeUtc": {
+                "type": "number"
+              },
+              "updaterId": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "nullable": true
+              },
+              "updateTimeUtc": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "mailTo",
+              "mailFrom",
+              "title",
+              "sendStatus",
+              "creatorId",
+              "createTimeUtc",
+              "updaterId",
+              "updateTimeUtc"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "total",
+        "totalPage",
+        "currentPage",
+        "pageSize",
+        "list"
+      ],
+      "additionalProperties": false
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "ok",
+    "data",
+    "message"
+  ],
+  "additionalProperties": false
+}
