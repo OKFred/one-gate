@@ -4,7 +4,7 @@ import { defaultFilters, filterConfig, type FilterState } from './components/The
 import { tableConfig, type PermissionRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as PermissionAPI from '@/api/infra/system/permission';
-import { infra_system } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../constant';
 import type { ListPermissionReq, ListAllPermissionRes } from '@/api/infra/system/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
@@ -37,9 +37,9 @@ export default function PermissionManagement() {
   > = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_system.permission.add],
-      edit: [infra_system.permission.edit],
-      delete: [infra_system.permission.delete],
+      add: [THIS_PERMISSION.permission.add],
+      edit: [THIS_PERMISSION.permission.edit],
+      delete: [THIS_PERMISSION.permission.delete],
     },
     api: {
       list: PermissionAPI.listFn,

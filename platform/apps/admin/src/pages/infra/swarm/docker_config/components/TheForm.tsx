@@ -5,14 +5,15 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { ListDockerConfigReq } from '@/api/infra/swarm/type';
 import type { SwarmDockerConfigRes } from './TheTable';
+import { FULL_PREFIX } from '../../constant';
 
 export const formConfig: SchemaCrudConfig<
   SwarmDockerConfigRes,
   FilterState,
   ListDockerConfigReq
 >['form'] = {
-  schema: 'infra.swarm.docker_configAddReq',
-  updateSchema: 'infra.swarm.docker_configUpdateReq',
+  schema: `${FULL_PREFIX}.docker_configAddReq`,
+  updateSchema: `${FULL_PREFIX}.docker_configUpdateReq`,
   defaultForm: {
     name: '',
     host: '',

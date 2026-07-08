@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { ListMailAccountReq, ListMailAccountRes } from '@/api/infra/mail/type';
 import type { FilterState } from './TheFilter';
-import { infra_mail } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../../constant';
 
 export type AccountRes = NonNullable<ListMailAccountRes['list']>[0];
 
@@ -59,7 +59,7 @@ export const tableConfig: SchemaCrudConfig<
     {
       key: 'verify',
       color: 'success',
-      permissionCodes: [infra_mail.account.edit],
+      permissionCodes: [THIS_PERMISSION.account.edit],
       icon: (row) => {
         const isVerifying = extraContext?.verifyingId === row.id;
         return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

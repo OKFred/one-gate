@@ -5,7 +5,7 @@ import { tableConfig, type AccountRes, type TableExtraContext } from './componen
 import { formConfig } from './components/TheForm';
 import * as AccountAPI from '@/api/infra/mail/account';
 import * as ActionAPI from '@/api/infra/mail/action';
-import { infra_mail } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../constant';
 import { showSnackbar } from '@/components/Notification';
 import type { ListMailAccountReq } from '@/api/infra/mail/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -34,9 +34,9 @@ export default function MailAccountPage() {
   const config: SchemaCrudConfig<AccountRes, FilterState, ListMailAccountReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_mail.account.add],
-      edit: [infra_mail.account.edit],
-      delete: [infra_mail.account.delete],
+      add: [THIS_PERMISSION.account.add],
+      edit: [THIS_PERMISSION.account.edit],
+      delete: [THIS_PERMISSION.account.delete],
     },
     api: {
       list: AccountAPI.listFn,

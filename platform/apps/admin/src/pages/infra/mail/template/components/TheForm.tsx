@@ -6,6 +6,7 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { TemplateRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { AddMailTemplateReq, ListMailTemplateReq } from '@/api/infra/mail/type';
+import { FULL_PREFIX } from '../../constant';
 // 动态导入 JoditEditor 实现代码分割
 const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
 
@@ -17,8 +18,8 @@ export interface TemplateFormFieldsProps {
 }
 
 export const formConfig: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemplateReq>['form'] = {
-  schema: 'infra.mail.templateAddReq',
-  updateSchema: 'infra.mail.templateUpdateReq',
+  schema: `${FULL_PREFIX}.templateAddReq`,
+  updateSchema: `${FULL_PREFIX}.templateUpdateReq`,
   defaultForm: {
     name: '',
     title: '',

@@ -4,15 +4,15 @@ import { tableConfig, type LanguageRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as LanguageAPI from '@/api/infra/i18n/language';
 import type { ListLanguageReq } from '@/api/infra/i18n/type';
-import { infra_i18n } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../constant';
 
 export default function LanguagePage() {
   const config: SchemaCrudConfig<LanguageRes, FilterState, ListLanguageReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_i18n.language.add],
-      edit: [infra_i18n.language.edit],
-      delete: [infra_i18n.language.delete],
+      add: [THIS_PERMISSION.language.add],
+      edit: [THIS_PERMISSION.language.edit],
+      delete: [THIS_PERMISSION.language.delete],
     },
     api: {
       list: LanguageAPI.listFn,

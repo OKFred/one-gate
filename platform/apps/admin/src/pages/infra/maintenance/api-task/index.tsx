@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PlayArrow as PlayIcon, SystemUpdateAlt as ImportIcon } from '@mui/icons-material';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import * as ApiTaskAPI from '@/api/infra/maintenance/api-task';
-import { infra_maintenance } from '@/hooks/usePermission';
+import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ApiTaskObj, ListApiTaskReq } from '@/api/infra/maintenance/type';
 import { Button, Chip, Typography } from '@mui/material';
@@ -42,9 +42,9 @@ export default function ApiTaskManagement() {
   const config: SchemaCrudConfig<ApiTaskObj, typeof defaultFilters, ListApiTaskReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_maintenance.api_task.add],
-      edit: [infra_maintenance.api_task.edit],
-      delete: [infra_maintenance.api_task.delete],
+      add: [THIS_PERMISSION.api_task.add],
+      edit: [THIS_PERMISSION.api_task.edit],
+      delete: [THIS_PERMISSION.api_task.delete],
     },
     api: {
       list: ApiTaskAPI.listFn,
@@ -153,7 +153,7 @@ export default function ApiTaskManagement() {
           key: 'run',
           icon: <PlayIcon />,
           color: 'success',
-          permissionCodes: [infra_maintenance.api_task.edit],
+          permissionCodes: [THIS_PERMISSION.api_task.edit],
           onClick: (row) => {
             setSelectedTask(row);
             setRunDialogOpen(true);
@@ -162,7 +162,7 @@ export default function ApiTaskManagement() {
       ],
     },
     form: {
-      schema: 'infra.maintenance.api_taskAddReq',
+      schema: `${FULL_PREFIX}.api_taskAddReq`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {

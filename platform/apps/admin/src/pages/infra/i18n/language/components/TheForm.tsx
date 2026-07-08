@@ -5,9 +5,10 @@ import type { LanguageRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { ListLanguageReq } from '@/api/infra/i18n/type';
 import hasValue from '@/utils/hasValue';
+import { FULL_PREFIX } from '../../constant';
 
 export const formConfig: SchemaCrudConfig<LanguageRes, FilterState, ListLanguageReq>['form'] = {
-  schema: 'infra.i18n.languageAddReq',
+  schema: `${FULL_PREFIX}.languageAddReq`,
   defaultForm: {
     langCode: '',
     nativeName: '',

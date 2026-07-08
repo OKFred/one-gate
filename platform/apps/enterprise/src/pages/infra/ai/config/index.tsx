@@ -8,7 +8,7 @@ import type { ListAiConfigReq } from '@/api/infra/ai/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { infra_ai } from '@/hooks/usePermission';
+import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
 
 const DEFAULT_FORM: Partial<AiConfigRes> = {
   name: '',
@@ -49,9 +49,9 @@ export default function AiConfigManagement() {
   const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_ai.config.add],
-      edit: [infra_ai.config.edit],
-      delete: [infra_ai.config.delete],
+      add: [THIS_PERMISSION.config.add],
+      edit: [THIS_PERMISSION.config.edit],
+      delete: [THIS_PERMISSION.config.delete],
     },
     api: {
       list: AiConfigAPI.listFn,
@@ -73,7 +73,7 @@ export default function AiConfigManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema: 'infra.ai.configAddReq',
+      schema: `${FULL_PREFIX}.configAddReq`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit) => {
         const capabilitiesStr = form.capabilities;

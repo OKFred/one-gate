@@ -4,14 +4,16 @@ import type { UserRecord, UserTableContext } from '../index';
 import type { ListUserReq } from '@/api/infra/system/type';
 import { UserFormFields } from './UserFormFields';
 
+import { FULL_PREFIX } from '../../constant';
+
 export const formConfig: SchemaCrudConfig<
   UserRecord,
   FilterState,
   ListUserReq,
   UserTableContext
 >['form'] = {
-  schema: 'infra.system.userAddReq',
-  updateSchema: 'infra.system.userUpdateReq',
+  schema: `${FULL_PREFIX}.userAddReq`,
+  updateSchema: `${FULL_PREFIX}.userUpdateReq`,
   defaultForm: {
     username: '',
     password: '',

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { History as HistoryIcon } from '@mui/icons-material';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import * as CronAPI from '@/api/infra/maintenance/cron';
-import { infra_maintenance } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../constant';
 import type { CronObj, ListCronReq } from '@/api/infra/maintenance/type';
 
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
@@ -39,9 +39,9 @@ export default function CronManagement() {
   const config: SchemaCrudConfig<CronObj, FilterState, ListCronReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_maintenance.cron.add],
-      edit: [infra_maintenance.cron.edit],
-      delete: [infra_maintenance.cron.delete],
+      add: [THIS_PERMISSION.cron.add],
+      edit: [THIS_PERMISSION.cron.edit],
+      delete: [THIS_PERMISSION.cron.delete],
     },
     api: {
       list: CronAPI.listFn,
@@ -66,7 +66,7 @@ export default function CronManagement() {
           key: 'logs',
           icon: <HistoryIcon />,
           color: 'info',
-          permissionCodes: [infra_maintenance.cron.read],
+          permissionCodes: [THIS_PERMISSION.cron.read],
           onClick: (row) => {
             setSelectedJob(row);
             setLogDialogOpen(true);

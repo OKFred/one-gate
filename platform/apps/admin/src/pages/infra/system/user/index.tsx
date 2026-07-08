@@ -8,7 +8,7 @@ import * as RoleAPI from '@/api/infra/system/role';
 import * as DepartmentAPI from '@/api/infra/system/department';
 import * as RegionAPI from '@/api/infra/i18n/region';
 import * as LanguageAPI from '@/api/infra/i18n/language';
-import { infra_system } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../constant';
 import type { ListUserReq, TreeDepartmentRes } from '@/api/infra/system/type';
 import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/infra/i18n/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -131,9 +131,9 @@ export default function UserManagement() {
   const config: SchemaCrudConfig<UserRecord, FilterState, ListUserReq, UserTableContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_system.user.add],
-      edit: [infra_system.user.edit],
-      delete: [infra_system.user.delete],
+      add: [THIS_PERMISSION.user.add],
+      edit: [THIS_PERMISSION.user.edit],
+      delete: [THIS_PERMISSION.user.delete],
     },
     api: {
       list: UserAPI.listFn as unknown as SchemaCrudConfig<

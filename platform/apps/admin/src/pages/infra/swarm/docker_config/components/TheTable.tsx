@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { ListDockerConfigReq } from '@/api/infra/swarm/type';
-import { infra_swarm } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../../constant';
 
 export interface SwarmDockerConfigRes {
   id: number;
@@ -107,7 +107,7 @@ export const tableConfig: SchemaCrudConfig<
       key: 'verify',
       label: _t('swarm.docker_config.actions.verify'),
       color: 'success',
-      permissionCodes: [infra_swarm.docker_config.read],
+      permissionCodes: [THIS_PERMISSION.docker_config.read],
       icon: (row) => {
         const isVerifying = extraContext?.verifyingId === row.id;
         return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

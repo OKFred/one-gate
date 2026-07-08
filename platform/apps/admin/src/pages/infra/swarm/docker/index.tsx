@@ -8,7 +8,7 @@ import {
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import * as DockerAPI from '@/api/infra/swarm/docker';
-import { infra_swarm } from '@/hooks/usePermission';
+import { THIS_PERMISSION } from '../constant';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { DockerServiceObj } from '@/api/infra/swarm/type';
 import {
@@ -53,9 +53,9 @@ export default function DockerSwarmManagement() {
   > = {
     apiKeyName: 'ID',
     permissions: {
-      add: [infra_swarm.docker.add],
-      edit: [infra_swarm.docker.edit],
-      delete: [infra_swarm.docker.delete],
+      add: [THIS_PERMISSION.docker.add],
+      edit: [THIS_PERMISSION.docker.edit],
+      delete: [THIS_PERMISSION.docker.delete],
     },
     api: {
       list: async (args) => {
@@ -200,7 +200,7 @@ export default function DockerSwarmManagement() {
           key: 'inspect',
           color: 'info',
           icon: <ViewIcon />,
-          permissionCodes: [infra_swarm.docker.read],
+          permissionCodes: [THIS_PERMISSION.docker.read],
           onClick: (row) => {
             context?.onInspect(row);
           },
@@ -209,7 +209,7 @@ export default function DockerSwarmManagement() {
           key: 'logs',
           color: 'secondary',
           icon: <LogIcon />,
-          permissionCodes: [infra_swarm.docker.read],
+          permissionCodes: [THIS_PERMISSION.docker.read],
           onClick: (row) => {
             context?.onLogs(row);
           },
@@ -222,7 +222,7 @@ export default function DockerSwarmManagement() {
               <PauseIcon />
             </Tooltip>
           ),
-          permissionCodes: [infra_swarm.docker.edit],
+          permissionCodes: [THIS_PERMISSION.docker.edit],
           visible: (row) =>
             !!row.Spec?.Mode?.Replicated && (row.Spec?.Mode?.Replicated?.Replicas ?? 0) > 0,
           onClick: async (row, helpers) => {
@@ -260,7 +260,7 @@ export default function DockerSwarmManagement() {
               <PlayIcon />
             </Tooltip>
           ),
-          permissionCodes: [infra_swarm.docker.edit],
+          permissionCodes: [THIS_PERMISSION.docker.edit],
           visible: (row) =>
             !!row.Spec?.Mode?.Replicated && (row.Spec?.Mode?.Replicated?.Replicas ?? 0) === 0,
           onClick: async (row, helpers) => {

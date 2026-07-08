@@ -22,6 +22,8 @@ import type { PermissionRes } from './TheTable';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { PermissionExtraContext } from '../index';
+import { FULL_PREFIX } from '../../constant';
+
 export interface PermissionFormFieldsProps {
   form: Partial<PermissionRes>;
   setForm: React.Dispatch<React.SetStateAction<Partial<PermissionRes>>>;
@@ -35,8 +37,8 @@ export const formConfig: SchemaCrudConfig<
   ListPermissionReq,
   PermissionExtraContext
 >['form'] = {
-  schema: 'infra.system.permissionAddReq',
-  updateSchema: 'infra.system.permissionUpdateReq',
+  schema: `${FULL_PREFIX}.permissionAddReq`,
+  updateSchema: `${FULL_PREFIX}.permissionUpdateReq`,
   defaultForm: {
     code: '',
     name: '',
