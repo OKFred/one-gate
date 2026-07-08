@@ -276,3 +276,18 @@ export const infra_swarm = {
     read: 'infra.swarm.nodes:read',
   },
 } as const;
+
+export const permissions = {
+  // 树状层级
+  infra: {
+    ...infra,
+    system: infra_system,
+    mail: infra_mail,
+    i18n: infra_i18n,
+    maintenance: infra_maintenance,
+    data: infra_data,
+    ai: infra_ai,
+    swarm: infra_swarm,
+  },
+  enterprise: enterprise,
+} as const;

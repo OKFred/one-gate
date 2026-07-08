@@ -19,6 +19,7 @@ import * as DepartmentAPI from '@/api/infra/system/department';
 import type { ListAllDepartmentRes, ListRoleReq } from '@/api/infra/system/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
+import { FULL_PREFIX } from '../../constant';
 import type { RoleRecord } from '../index';
 
 export interface RoleFormFieldsProps {
@@ -38,8 +39,8 @@ type FlatDepartment = {
 };
 
 export const formConfig: SchemaCrudConfig<RoleRecord, FilterState, ListRoleReq>['form'] = {
-  schema: 'infra.system.roleAddReq',
-  updateSchema: 'infra.system.roleUpdateReq',
+  schema: `${FULL_PREFIX}.roleAddReq`,
+  updateSchema: `${FULL_PREFIX}.roleUpdateReq`,
   defaultForm: {
     name: '',
     remark: null,

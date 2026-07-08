@@ -3,9 +3,9 @@ import { defaultFilters, filterConfig, type FilterState } from './components/The
 import { tableConfig, type RoleRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as RoleAPI from '@/api/infra/system/role';
-import { infra_system } from '@/hooks/usePermission';
 import type { ListRoleReq } from '@/api/infra/system/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
+import { THIS_PERMISSION } from '.././constant';
 
 export type RoleRecord = RoleRes & { selectedDeptIds?: number[] };
 
@@ -13,9 +13,9 @@ export default function RoleManagement() {
   const config: SchemaCrudConfig<RoleRecord, FilterState, ListRoleReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [infra_system.role.add],
-      edit: [infra_system.role.edit],
-      delete: [infra_system.role.delete],
+      add: [THIS_PERMISSION.role.add],
+      edit: [THIS_PERMISSION.role.edit],
+      delete: [THIS_PERMISSION.role.delete],
     },
     api: {
       list: RoleAPI.listFn,

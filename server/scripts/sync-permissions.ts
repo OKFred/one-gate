@@ -59,7 +59,7 @@ function getJSDocComment(node: ts.Node): string | undefined {
     const commentText = sourceText.slice(commentRange.pos, commentRange.end);
     return commentText
       .replace(/\/\*\*+\s*/, "")
-      .replace(/\s*\*+\/\s*/, "")
+      .replace(/\s\*+\/\s*/, "")
       .replace(/^\s*\*\s*/gm, "")
       .trim();
   }
@@ -159,6 +159,23 @@ permissionSeedsNode.properties.forEach((parentProp) => {
 
   content += `} as const;\n`;
 });
+
+// 输出全局树状嵌套 permissions 大对象
+content += `
+export const permissions = {
+  infra: {
+    ...infra,
+    system: infra_system,
+    mail: infra_mail,
+    i18n: infra_i18n,
+    maintenance: infra_maintenance,
+    data: infra_data,
+    ai: infra_ai,
+    swarm: infra_swarm
+  },
+  enterprise: enterprise
+} as const;
+`;
 
 // Ensure the directory exists
 const dir = path.dirname(targetPath);
