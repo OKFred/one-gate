@@ -3,7 +3,6 @@ import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type AiConfigRes, type TableExtraContext } from './components/TheTable';
 import AiConfigFormFields from './components/TheForm';
-import schema from '@/assets/schemas/ai.configAddReq.json';
 import * as AiConfigAPI from '@/api/biz/ai/config';
 import type { ListAiConfigReq } from '@/api/biz/ai/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -74,7 +73,7 @@ export default function AiConfigManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema,
+      schema: 'ai.configAddReq',
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit) => {
         const capabilitiesStr = form.capabilities;

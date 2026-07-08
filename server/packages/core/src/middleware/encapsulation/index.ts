@@ -16,6 +16,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "../../utils/pathRegister.js";
+import { registerSchema } from "../../utils/schemaRegistry.js";
 import { authMiddleware } from "../auth";
 import { can } from "../auth/permission";
 
@@ -193,6 +194,7 @@ export default function main(apiObj: Record<string, API>, nameSpace: string) {
         component.name,
         component.component as any
       );
+      registerSchema(component.name, component.component as object);
     });
   });
   return app;

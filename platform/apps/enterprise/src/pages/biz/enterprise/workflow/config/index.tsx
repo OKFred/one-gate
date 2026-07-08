@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
-import schema from '@/assets/schemas/workflow.configAddReq.json';
 import * as WorkflowAPI from '@/api/biz/enterprise/workflow';
 import type { ListConfigReq, ConfigObj } from '@/api/biz/enterprise/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -159,7 +158,7 @@ export default function WorkflowConfigManagement() {
       ],
     },
     form: {
-      schema,
+      schema: 'enterprise.workflowConfig_addReq',
       defaultForm: DEFAULT_FORM,
       renderForm: (form, setForm, _isMobile, t) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>

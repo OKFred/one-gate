@@ -4,7 +4,6 @@ import { defaultFilters, filterConfig, type FilterState } from './components/The
 import { tableConfig, type SchemaFormItem, type SchemaFormContext } from './components/TheTable';
 import SchemaFormFields from './components/TheForm';
 import ThePreviewDialog from './components/ThePreviewDialog';
-import schema from '@/assets/schemas/data.schema_formAddReq.json';
 import * as SchemaFormAPI from '@/api/infra/data/schemaForm';
 import type { ListSchemaFormReq } from '@/api/infra/data/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -60,7 +59,7 @@ export default function SchemaFormManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema,
+      schema: 'infra.data.schema_formAddReq',
       defaultForm: DEFAULT_FORM,
       beforeSubmit: (form) => {
         // 在提交前对输入的 schemaData / uiSchemaData 做 JSON 合法性强校验

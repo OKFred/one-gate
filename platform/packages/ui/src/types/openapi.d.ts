@@ -4357,6 +4357,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/infra/data/schema_form/batch_get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 批量获取 Schema（支持版本缓存比对） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["infra.data.schema_formBatch_getReq"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["infra.data.schema_formBatch_getRes"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/infra/data/oss/config/listAll": {
         parameters: {
             query?: never;
@@ -14576,6 +14634,11 @@ export interface components {
                     remark: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /**
+                     * @description 来源类型
+                     * @enum {string}
+                     */
+                    source: "system" | "user";
                     /** @description 创建人ID */
                     creatorId: number;
                     /**
@@ -14617,6 +14680,11 @@ export interface components {
             remark: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /**
+             * @description 来源类型
+             * @enum {string}
+             */
+            source?: "system" | "user";
         };
         "infra.data.schema_formAddRes": {
             ok: boolean;
@@ -14651,6 +14719,11 @@ export interface components {
             remark?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /**
+             * @description 来源类型
+             * @enum {string}
+             */
+            source?: "system" | "user";
         };
         "infra.data.schema_formUpdateRes": {
             ok: boolean;
@@ -14707,6 +14780,11 @@ export interface components {
                 remark: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
+                /**
+                 * @description 来源类型
+                 * @enum {string}
+                 */
+                source: "system" | "user";
                 /** @description 创建人ID */
                 creatorId: number;
                 /**
@@ -14725,6 +14803,26 @@ export interface components {
                 creatorName: ((string | null) | null) | null;
                 /** @description 更新人姓名 */
                 updaterName: ((string | null) | null) | null;
+            };
+            message: string;
+        };
+        "infra.data.schema_formBatch_getReq": {
+            /** @description 要查询的 schema code 列表 */
+            names: string[];
+            /** @description 客户端缓存的版本号，若与当前一致则返回空数据 */
+            version?: string;
+        };
+        "infra.data.schema_formBatch_getRes": {
+            ok: boolean;
+            data: {
+                /** @description code → schemaData JSON 字符串 的映射 */
+                schemas?: {
+                    [key: string]: string;
+                };
+                /** @description 当前全局 schema 版本号 */
+                version: string;
+                /** @description 若为 true，表示客户端缓存仍然有效 */
+                notModified: boolean;
             };
             message: string;
         };

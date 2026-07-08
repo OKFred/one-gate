@@ -7,6 +7,7 @@ import {
   Button,
   Box,
   IconButton,
+  CircularProgress,
   useTheme,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
@@ -26,6 +27,7 @@ interface FormDialogProps<TRecord, TFilters, TApiData, TExtra = unknown> {
     rootSchema?: Record<string, unknown>;
   };
   config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra>;
+  resolvedSchema: Record<string, unknown> | null;
   extraContext?: TExtra;
   onSubmit: (e: React.FormEvent) => void;
   isMobile: boolean;
@@ -41,6 +43,7 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
   formLoading,
   errorContextValue,
   config,
+  resolvedSchema,
   extraContext,
   onSubmit,
   isMobile,
@@ -86,20 +89,28 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
           px: isMobile ? 2 : 3,
         }}
       >
-        <SchemaForm schema={config.form.schema} contextValue={errorContextValue}>
-          <Box sx={{ pt: 2 }}>
-            {config.form.renderForm ? (
-              config.form.renderForm(form, setForm, isMobile, t, extraContext)
-            ) : (
-              <DynamicForm
-                schema={config.form.schema}
-                value={form as Record<string, unknown>}
-                onChange={(val) => setForm(val as Partial<TRecord>)}
-                disabled={formLoading}
-              />
-            )}
+        {!resolvedSchema ? (
+          <Box
+            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}
+          >
+            <CircularProgress />
           </Box>
-        </SchemaForm>
+        ) : (
+          <SchemaForm schema={resolvedSchema} contextValue={errorContextValue}>
+            <Box sx={{ pt: 2 }}>
+              {config.form.renderForm ? (
+                config.form.renderForm(form, setForm, isMobile, t, extraContext)
+              ) : (
+                <DynamicForm
+                  schema={resolvedSchema}
+                  value={form as Record<string, unknown>}
+                  onChange={(val) => setForm(val as Partial<TRecord>)}
+                  disabled={formLoading}
+                />
+              )}
+            </Box>
+          </SchemaForm>
+        )}
       </DialogContent>
 
       <DialogActions
@@ -125,7 +136,7 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
           color="primary"
           fullWidth={isMobile}
           size={isMobile ? 'large' : 'medium'}
-          disabled={formLoading}
+          disabled={formLoading || !resolvedSchema}
         >
           {t('dialog.save')}
         </Button>

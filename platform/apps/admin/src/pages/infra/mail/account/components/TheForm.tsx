@@ -10,9 +10,6 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { AccountRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { AddMailAccountReq, ListMailAccountReq } from '@/api/infra/mail/type';
-import schema from '@/assets/schemas/mail.accountAddReq.json';
-import updateSchema from '@/assets/schemas/mail.accountUpdateReq.json';
-
 export interface AccountFormFieldsProps {
   form: Partial<AddMailAccountReq>;
   setForm: React.Dispatch<React.SetStateAction<Partial<AddMailAccountReq>>>;
@@ -21,8 +18,8 @@ export interface AccountFormFieldsProps {
 }
 
 export const formConfig: SchemaCrudConfig<AccountRes, FilterState, ListMailAccountReq>['form'] = {
-  schema,
-  updateSchema,
+  schema: 'infra.mail.accountAddReq',
+  updateSchema: 'infra.mail.accountUpdateReq',
   defaultForm: {
     nickname: '',
     mailAddress: '',

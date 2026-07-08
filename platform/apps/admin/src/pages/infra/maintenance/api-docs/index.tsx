@@ -7,7 +7,6 @@ import { Box, Stack, Typography, Chip, Button } from '@mui/material';
 import { CloudUpload as UploadIcon } from '@mui/icons-material';
 import { Field } from '@/components/Form';
 import dayjs from 'dayjs';
-import schema from '@/assets/schemas/maintenance.api_docsAddReq.json';
 
 const DOC_TYPES: { label: string; value: string }[] = [
   { label: 'Swagger 2.0', value: 'swagger2.0' },
@@ -139,7 +138,7 @@ export default function ApiDocsManagement() {
       ],
     },
     form: {
-      schema,
+      schema: 'infra.maintenance.api_docsAddReq',
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {

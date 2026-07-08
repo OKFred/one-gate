@@ -86,8 +86,8 @@ export interface SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra = unknown>
 
   // 表单与 JSON Schema 渲染配置
   form: {
-    schema: Record<string, unknown>;
-    updateSchema?: Record<string, unknown>;
+    schema: Record<string, unknown> | string;
+    updateSchema?: Record<string, unknown> | string;
     defaultForm: Partial<TRecord>;
     afterOpen?: (
       form: Partial<TRecord>,

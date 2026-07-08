@@ -5,7 +5,6 @@ import TranslationFormFields from './components/TheForm';
 import * as TranslationAPI from '@/api/infra/i18n/translation';
 import type { ListTranslationReq } from '@/api/infra/i18n/type';
 import { infra_i18n } from '@/hooks/usePermission';
-import translationSchema from '@/assets/schemas/i18n.translationAddReq.json';
 
 const calculateSHA256 = async (text: string): Promise<string> => {
   const encoder = new TextEncoder();
@@ -48,7 +47,7 @@ export default function TranslationPage() {
     filter: filterConfig,
     table: tableConfig,
     form: {
-      schema: translationSchema,
+      schema: 'infra.i18n.translationAddReq',
       defaultForm: {
         application: '',
         business: '',

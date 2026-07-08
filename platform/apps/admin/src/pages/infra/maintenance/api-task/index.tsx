@@ -7,7 +7,6 @@ import { useTranslation } from '@/hooks/useTranslation';
 import type { ApiTaskObj, ListApiTaskReq } from '@/api/infra/maintenance/type';
 import { Button, Chip, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import apiTaskSchema from '@/assets/schemas/maintenance.api_taskAddReq.json';
 
 // Subcomponents
 import { TheForm } from './components/TheForm';
@@ -163,7 +162,7 @@ export default function ApiTaskManagement() {
       ],
     },
     form: {
-      schema: apiTaskSchema,
+      schema: 'infra.maintenance.api_taskAddReq',
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {

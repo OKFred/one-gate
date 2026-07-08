@@ -272,10 +272,96 @@ const getApi = {
   permission: { action: "read" },
 } satisfies API;
 
+// ---- batch_get ----
+const batchGetReq = {
+  type: "object",
+  properties: {
+    names: {
+      type: "array",
+      items: { type: "string" },
+      description: "要查询的 schema code 列表",
+      maxItems: 100,
+    },
+    version: {
+      type: "string",
+      description: "客户端缓存的版本号，若与当前一致则返回空数据",
+    },
+  },
+  required: ["names"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const batchGetRes = {
+  type: "object",
+  properties: {
+    schemas: {
+      type: "object",
+      additionalProperties: { type: "string" },
+      description: "code → schemaData JSON 字符串 的映射",
+    },
+    version: {
+      type: "string",
+      description: "当前全局 schema 版本号",
+    },
+    notModified: {
+      type: "boolean",
+      description: "若为 true，表示客户端缓存仍然有效",
+    },
+  },
+  required: ["version", "notModified"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onBatchGet(
+  params: FromSchema<typeof batchGetReq>
+): Promise<FromSchema<typeof batchGetRes>> {
+  const { names, version: clientVersion } = params;
+
+  // 从全局 registry 获取当前版本号
+  const { getVersionHash } = await import("@hodor/core/utils/schemaRegistry");
+  const currentVersion = getVersionHash();
+
+  // 版本号一致，返回 notModified
+  if (clientVersion && clientVersion === currentVersion) {
+    return {
+      schemas: {},
+      version: currentVersion,
+      notModified: true,
+    };
+  }
+
+  // 从数据库批量查询
+  const rows = await schemaFormRepository.findByCodes(names);
+  const schemas: Record<string, string> = {};
+  for (const row of rows) {
+    schemas[row.code] = row.schemaData;
+  }
+
+  return {
+    schemas,
+    version: currentVersion,
+    notModified: false,
+  };
+}
+
+const batchGetApi = {
+  req: batchGetReq,
+  res: batchGetRes,
+  pathInfo: {
+    path: "/batch_get",
+    method: "post",
+    summary: "批量获取 Schema（支持版本缓存比对）",
+  } as const,
+  adapter: bodyAdapter,
+  service: onBatchGet,
+  permission: false as const,
+} satisfies API;
+
 export default {
   list: listApi,
   add: addApi,
   update: updateApi,
   delete: deleteApi,
   get: getApi,
+  batch_get: batchGetApi,
 };
