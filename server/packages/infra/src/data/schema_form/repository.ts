@@ -164,14 +164,6 @@ export class SchemaFormRepository {
         .delete(schemaFormTable)
         .where(eq(schemaFormTable.source, "system"));
     } else {
-      // 删除 source='system' 且 code 不在 activeCodes 中的记录
-      await db.delete(schemaFormTable).where(
-        and(
-          eq(schemaFormTable.source, "system")
-          // SQLite 不支持 NOT IN + subquery，用 inArray 反转
-          // 这里获取需要删除的记录
-        )
-      );
       // 简化实现：查出所有 system 记录，过滤后删除
       const allSystem = await db
         .select({ id: schemaFormTable.id, code: schemaFormTable.code })
