@@ -1,3 +1,4 @@
+import { THIS_PERMISSION } from '../constant';
 import { useState, useCallback, memo } from 'react';
 import {
   Box,
@@ -11,7 +12,6 @@ import {
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
-import { THIS_PERMISSION } from '../../constant';
 import type { TheFormRef, DepartmentData } from './TheForm';
 
 // ==================== 新增部门按钮 ====================
@@ -35,7 +35,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
       variant="contained"
       startIcon={<AddIcon />}
       onClick={handleAdd}
-      permissionCodes={[THIS_PERMISSION.department.add]}
+      permissionCodes={[THIS_PERMISSION.add]}
     >
       {t('dialog.add')}
     </ResponsiveButton>
@@ -108,7 +108,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={handleAddChild}
             title={t('department.dialog.addChild')}
-            permissionCodes={[THIS_PERMISSION.department.add]}
+            permissionCodes={[THIS_PERMISSION.add]}
           >
             <AddIcon fontSize="small" />
           </ResponsiveIconButton>
@@ -116,7 +116,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={handleEdit}
             title={t('dialog.edit')}
-            permissionCodes={[THIS_PERMISSION.department.edit]}
+            permissionCodes={[THIS_PERMISSION.edit]}
           >
             <EditIcon fontSize="small" />
           </ResponsiveIconButton>
@@ -125,7 +125,7 @@ export const TreeNodeActionButtons = memo(
             onClick={openDeleteDialog}
             title={t('dialog.delete')}
             disabled={hasChildren}
-            permissionCodes={[THIS_PERMISSION.department.delete]}
+            permissionCodes={[THIS_PERMISSION.delete]}
           >
             <DeleteIcon fontSize="small" />
           </ResponsiveIconButton>

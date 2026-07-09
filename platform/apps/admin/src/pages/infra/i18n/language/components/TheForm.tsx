@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 import { Stack, Box } from '@mui/material';
 import { Field } from '@/components/Form';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -5,7 +6,6 @@ import type { LanguageRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { ListLanguageReq } from '@/api/infra/i18n/type';
 import hasValue from '@/utils/hasValue';
-import { FULL_PREFIX } from '../constant';
 
 export const formConfig: SchemaCrudConfig<LanguageRes, FilterState, ListLanguageReq>['form'] = {
   schema: `${FULL_PREFIX}.add.req`,

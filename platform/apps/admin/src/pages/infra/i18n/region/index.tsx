@@ -1,3 +1,4 @@
+import { THIS_PERMISSION } from './constant';
 import { useState, useEffect } from 'react';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import { filterConfig, type FilterState } from './components/TheFilter';
@@ -6,7 +7,6 @@ import { formConfig } from './components/TheForm';
 import * as RegionAPI from '@/api/infra/i18n/region';
 import * as LanguageAPI from '@/api/infra/i18n/language';
 import type { ListAllLanguageRes, ListRegionReq } from '@/api/infra/i18n/type';
-import { THIS_PERMISSION } from './constant';
 
 export default function RegionPage() {
   const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);

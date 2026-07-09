@@ -9,14 +9,14 @@ export type PermissionAction =
   | "view"
   | "batch-delete";
 
-export type CheckPermissionSeeds<T> = {
-  [P in keyof T & string]: {
-    [M in keyof T[P] & string]: (
-      M extends "" ? P : `${P}.${M}`
-    ) extends BusinessKey
+export type CheckPermissionSeeds<T, Parent extends string = ""> = {
+  [K in keyof T & string]: T[K] extends readonly PermissionAction[]
+    ? (
+        K extends "" ? Parent : Parent extends "" ? K : `${Parent}.${K}`
+      ) extends BusinessKey
       ? readonly PermissionAction[]
-      : never;
-  };
+      : never
+    : CheckPermissionSeeds<T[K], Parent extends "" ? K : `${Parent}.${K}`>;
 };
 
 export const permissionSeeds = {
@@ -90,11 +90,13 @@ export const permissionSeeds = {
     /** 动态表单数据 */
     schema_form_data: ["read", "add", "edit", "delete"],
     /** 对象存储 */
-    oss: ["read"],
-    /** 存储配置 */
-    "oss.config": ["read", "add", "edit", "delete"],
-    /** 文件管理 */
-    "oss.file": ["read", "add", "edit", "delete"],
+    oss: {
+      "": ["read"],
+      /** 存储配置 */
+      config: ["read", "add", "edit", "delete"],
+      /** 文件管理 */
+      file: ["read", "add", "edit", "delete"],
+    },
   },
   /** 企业管理 */
   enterprise: {

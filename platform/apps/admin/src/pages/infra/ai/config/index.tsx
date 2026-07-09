@@ -1,3 +1,4 @@
+import { FULL_PREFIX, THIS_PERMISSION } from './constant';
 import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
@@ -8,7 +9,6 @@ import type { ListAiConfigReq } from '@/api/infra/ai/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
 
 const DEFAULT_FORM: Partial<AiConfigRes> = {
   name: '',
@@ -49,9 +49,9 @@ export default function AiConfigManagement() {
   const config: SchemaCrudConfig<AiConfigRes, FilterState, ListAiConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [THIS_PERMISSION.config.add],
-      edit: [THIS_PERMISSION.config.edit],
-      delete: [THIS_PERMISSION.config.delete],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: AiConfigAPI.listFn,
@@ -73,7 +73,7 @@ export default function AiConfigManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema: `${FULL_PREFIX}.config.add.req`,
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit) => {
         const capabilitiesStr = form.capabilities;

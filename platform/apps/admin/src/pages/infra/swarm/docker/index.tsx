@@ -1,3 +1,4 @@
+import { THIS_PERMISSION } from './constant';
 import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import {
@@ -8,7 +9,6 @@ import {
 } from '@mui/icons-material';
 import { Tooltip } from '@mui/material';
 import * as DockerAPI from '@/api/infra/swarm/docker';
-import { THIS_PERMISSION } from '../constant';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { DockerServiceObj } from '@/api/infra/swarm/type';
 import {
@@ -53,9 +53,9 @@ export default function DockerSwarmManagement() {
   > = {
     apiKeyName: 'ID',
     permissions: {
-      add: [THIS_PERMISSION.docker.add],
-      edit: [THIS_PERMISSION.docker.edit],
-      delete: [THIS_PERMISSION.docker.delete],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: async (args) => {
@@ -200,7 +200,7 @@ export default function DockerSwarmManagement() {
           key: 'inspect',
           color: 'info',
           icon: <ViewIcon />,
-          permissionCodes: [THIS_PERMISSION.docker.read],
+          permissionCodes: [THIS_PERMISSION.read],
           onClick: (row) => {
             context?.onInspect(row);
           },
@@ -209,7 +209,7 @@ export default function DockerSwarmManagement() {
           key: 'logs',
           color: 'secondary',
           icon: <LogIcon />,
-          permissionCodes: [THIS_PERMISSION.docker.read],
+          permissionCodes: [THIS_PERMISSION.read],
           onClick: (row) => {
             context?.onLogs(row);
           },
@@ -222,7 +222,7 @@ export default function DockerSwarmManagement() {
               <PauseIcon />
             </Tooltip>
           ),
-          permissionCodes: [THIS_PERMISSION.docker.edit],
+          permissionCodes: [THIS_PERMISSION.edit],
           visible: (row) =>
             !!row.Spec?.Mode?.Replicated && (row.Spec?.Mode?.Replicated?.Replicas ?? 0) > 0,
           onClick: async (row, helpers) => {
@@ -260,7 +260,7 @@ export default function DockerSwarmManagement() {
               <PlayIcon />
             </Tooltip>
           ),
-          permissionCodes: [THIS_PERMISSION.docker.edit],
+          permissionCodes: [THIS_PERMISSION.edit],
           visible: (row) =>
             !!row.Spec?.Mode?.Replicated && (row.Spec?.Mode?.Replicated?.Replicas ?? 0) === 0,
           onClick: async (row, helpers) => {

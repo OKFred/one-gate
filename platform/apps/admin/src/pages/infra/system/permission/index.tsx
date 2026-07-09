@@ -1,10 +1,10 @@
+import { THIS_PERMISSION } from './constant';
 import { useState, useEffect, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type PermissionRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as PermissionAPI from '@/api/infra/system/permission';
-import { THIS_PERMISSION } from '../constant';
 import type { ListPermissionReq, ListAllPermissionRes } from '@/api/infra/system/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
@@ -37,9 +37,9 @@ export default function PermissionManagement() {
   > = {
     apiKeyName: 'id',
     permissions: {
-      add: [THIS_PERMISSION.permission.add],
-      edit: [THIS_PERMISSION.permission.edit],
-      delete: [THIS_PERMISSION.permission.delete],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: PermissionAPI.listFn,

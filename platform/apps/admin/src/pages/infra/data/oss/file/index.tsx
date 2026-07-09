@@ -1,10 +1,10 @@
+import { THIS_PERMISSION } from './constant';
 import FileManager from '@/components/FileManager';
 import type {
   FileManagerAdapter,
   FileManagerFile,
   FileManagerListResult,
 } from '@/components/FileManager';
-import { THIS_PERMISSION } from '../../constant';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as OSSFileAPI from '@/api/infra/data/oss/file';
 
@@ -53,9 +53,9 @@ export default function OSSFilePage() {
       title={t('oss.file.title')}
       adapter={ossFileAdapter}
       permissions={{
-        upload: [THIS_PERMISSION.oss_file.add],
-        delete: [THIS_PERMISSION.oss_file.delete],
-        download: [THIS_PERMISSION.oss_file.read],
+        upload: [THIS_PERMISSION.add],
+        delete: [THIS_PERMISSION.delete],
+        download: [THIS_PERMISSION.read],
       }}
     />
   );

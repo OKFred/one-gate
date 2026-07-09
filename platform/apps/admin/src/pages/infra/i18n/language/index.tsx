@@ -1,10 +1,10 @@
+import { THIS_PERMISSION } from './constant';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import { filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type LanguageRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as LanguageAPI from '@/api/infra/i18n/language';
 import type { ListLanguageReq } from '@/api/infra/i18n/type';
-import { THIS_PERMISSION } from './constant';
 
 export default function LanguagePage() {
   const config: SchemaCrudConfig<LanguageRes, FilterState, ListLanguageReq> = {

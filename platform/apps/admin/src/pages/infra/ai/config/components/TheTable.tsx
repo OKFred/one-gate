@@ -1,8 +1,8 @@
+import { THIS_PERMISSION } from '../constant';
 import { Chip, Box, CircularProgress } from '@mui/material';
 import { QuestionMark as VerifyIcon } from '@mui/icons-material';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
-import { THIS_PERMISSION } from '../../constant';
 
 export interface AiConfigRes {
   id: number;
@@ -120,7 +120,7 @@ export const tableConfig: SchemaCrudConfig<
       key: 'verify',
       label: _t('ai.config.verify'),
       color: 'success',
-      permissionCodes: [THIS_PERMISSION.config.read],
+      permissionCodes: [THIS_PERMISSION.read],
       icon: (row) => {
         const isVerifying = extraContext?.verifyingId === row.id;
         return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

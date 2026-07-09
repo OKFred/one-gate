@@ -125,7 +125,77 @@ permissionSeedsNode.properties.forEach((parentProp) => {
       }
     }
 
-    // 2. Output modules
+    // 2. Output modules (with recursion support for nested objects)
+    function renderProperty(
+      prop: ts.PropertyAssignment,
+      currentPrefix: string,
+      indent: string
+    ): string {
+      let keyName = "";
+      if (ts.isIdentifier(prop.name)) {
+        keyName = prop.name.text;
+      } else if (ts.isStringLiteral(prop.name)) {
+        keyName = prop.name.text;
+      }
+      if (keyName === "") return "";
+
+      const constName = formatKey(keyName);
+      const desc = getJSDocComment(prop) || keyName;
+      const init = prop.initializer;
+
+      let res = `${indent}/** ${desc} */\n`;
+      res += `${indent}${constName}: {\n`;
+
+      if (ts.isArrayLiteralExpression(init)) {
+        init.elements.forEach((el) => {
+          if (ts.isStringLiteral(el)) {
+            const action = el.text;
+            const actionKey = formatKey(action);
+            res += `${indent}  ${actionKey}: '${currentPrefix}.${keyName}:${action}',\n`;
+          }
+        });
+      } else if (ts.isObjectLiteralExpression(init)) {
+        // Output self actions first
+        const selfActionsProp = init.properties.find((p) => {
+          if (!ts.isPropertyAssignment(p)) return false;
+          const name = ts.isStringLiteral(p.name) ? p.name.text : "";
+          return name === "";
+        });
+
+        if (selfActionsProp && ts.isPropertyAssignment(selfActionsProp)) {
+          const arr = selfActionsProp.initializer;
+          if (ts.isArrayLiteralExpression(arr)) {
+            arr.elements.forEach((el) => {
+              if (ts.isStringLiteral(el)) {
+                const action = el.text;
+                const actionKey = formatKey(action);
+                res += `${indent}  ${actionKey}: '${currentPrefix}.${keyName}:${action}',\n`;
+              }
+            });
+          }
+        }
+
+        // Recursively output child properties
+        init.properties.forEach((subProp) => {
+          if (!ts.isPropertyAssignment(subProp)) return;
+          const name = ts.isStringLiteral(subProp.name)
+            ? subProp.name.text
+            : ts.isIdentifier(subProp.name)
+              ? subProp.name.text
+              : "";
+          if (name === "") return;
+          res += renderProperty(
+            subProp,
+            `${currentPrefix}.${keyName}`,
+            `${indent}  `
+          );
+        });
+      }
+
+      res += `${indent}},\n`;
+      return res;
+    }
+
     modulesObj.properties.forEach((moduleProp) => {
       if (!ts.isPropertyAssignment(moduleProp)) return;
       let moduleKey = "";
@@ -136,24 +206,7 @@ permissionSeedsNode.properties.forEach((parentProp) => {
       }
 
       if (moduleKey === "") return;
-
-      const moduleConstName = formatKey(moduleKey);
-      const moduleDesc = getJSDocComment(moduleProp) || moduleKey;
-
-      content += `  /** ${moduleDesc} */\n`;
-      content += `  ${moduleConstName}: {\n`;
-
-      const actionsArr = moduleProp.initializer;
-      if (ts.isArrayLiteralExpression(actionsArr)) {
-        actionsArr.elements.forEach((el) => {
-          if (ts.isStringLiteral(el)) {
-            const action = el.text;
-            const actionKey = formatKey(action);
-            content += `    ${actionKey}: '${parentKey}.${moduleKey}:${action}',\n`;
-          }
-        });
-      }
-      content += `  },\n`;
+      content += renderProperty(moduleProp, parentKey, "  ");
     });
   }
 

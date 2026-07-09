@@ -1,12 +1,11 @@
+import { FULL_PREFIX, THIS_PERMISSION } from './constant';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import { filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type TranslationRes } from './components/TheTable';
 import TranslationFormFields from './components/TheForm';
 import * as TranslationAPI from '@/api/infra/i18n/translation';
 import type { ListTranslationReq } from '@/api/infra/i18n/type';
-// import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
-import { THIS_PERMISSION, FULL_PREFIX } from './constant';
-
+//
 const calculateSHA256 = async (text: string): Promise<string> => {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);

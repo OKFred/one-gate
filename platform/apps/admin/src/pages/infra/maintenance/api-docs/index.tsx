@@ -1,7 +1,7 @@
+import { FULL_PREFIX, THIS_PERMISSION } from './constant';
 import React, { useRef } from 'react';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import * as ApiDocsAPI from '@/api/infra/maintenance/api-docs';
-import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
 import type { ApiDocsObj, ListApiDocsReq } from '@/api/infra/maintenance/type';
 import { Box, Stack, Typography, Chip, Button } from '@mui/material';
 import { CloudUpload as UploadIcon } from '@mui/icons-material';
@@ -44,9 +44,9 @@ export default function ApiDocsManagement() {
   const config: SchemaCrudConfig<ApiDocsObj, typeof defaultFilters, ListApiDocsReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [THIS_PERMISSION.api_docs.add],
-      edit: [THIS_PERMISSION.api_docs.edit],
-      delete: [THIS_PERMISSION.api_docs.delete],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: ApiDocsAPI.listFn,
@@ -138,7 +138,7 @@ export default function ApiDocsManagement() {
       ],
     },
     form: {
-      schema: `${FULL_PREFIX}.api_docs.add.req`,
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {

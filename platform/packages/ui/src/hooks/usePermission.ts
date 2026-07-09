@@ -195,20 +195,20 @@ export const infra_data = {
   /** 对象存储 */
   oss: {
     read: 'infra.data.oss:read',
-  },
-  /** 存储配置 */
-  oss_config: {
-    read: 'infra.data.oss.config:read',
-    add: 'infra.data.oss.config:add',
-    edit: 'infra.data.oss.config:edit',
-    delete: 'infra.data.oss.config:delete',
-  },
-  /** 文件管理 */
-  oss_file: {
-    read: 'infra.data.oss.file:read',
-    add: 'infra.data.oss.file:add',
-    edit: 'infra.data.oss.file:edit',
-    delete: 'infra.data.oss.file:delete',
+    /** 存储配置 */
+    config: {
+      read: 'infra.data.oss.config:read',
+      add: 'infra.data.oss.config:add',
+      edit: 'infra.data.oss.config:edit',
+      delete: 'infra.data.oss.config:delete',
+    },
+    /** 文件管理 */
+    file: {
+      read: 'infra.data.oss.file:read',
+      add: 'infra.data.oss.file:add',
+      edit: 'infra.data.oss.file:edit',
+      delete: 'infra.data.oss.file:delete',
+    },
   },
 } as const;
 
@@ -278,7 +278,6 @@ export const infra_swarm = {
 } as const;
 
 export const permissions = {
-  // 树状层级
   infra: {
     ...infra,
     system: infra_system,

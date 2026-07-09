@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from './constant';
 import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
@@ -59,7 +60,7 @@ export default function SchemaFormManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema: 'infra.data.schema_form.add.req',
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: DEFAULT_FORM,
       beforeSubmit: (form) => {
         // 在提交前对输入的 schemaData / uiSchemaData 做 JSON 合法性强校验

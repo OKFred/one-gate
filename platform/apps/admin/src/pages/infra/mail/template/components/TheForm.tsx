@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 /* eslint-disable react-refresh/only-export-components */
 import { Suspense, lazy } from 'react';
 import { Stack, Box, Typography, CircularProgress } from '@mui/material';
@@ -6,7 +7,6 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { TemplateRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { AddMailTemplateReq, ListMailTemplateReq } from '@/api/infra/mail/type';
-import { FULL_PREFIX } from '../../constant';
 // 动态导入 JoditEditor 实现代码分割
 const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
 
@@ -18,8 +18,8 @@ export interface TemplateFormFieldsProps {
 }
 
 export const formConfig: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemplateReq>['form'] = {
-  schema: `${FULL_PREFIX}.template.add.req`,
-  updateSchema: `${FULL_PREFIX}.template.update.req`,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     name: '',
     title: '',

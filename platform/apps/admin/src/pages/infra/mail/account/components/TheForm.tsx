@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 /* eslint-disable react-refresh/only-export-components */
 import { useState } from 'react';
 import { Stack, IconButton } from '@mui/material';
@@ -10,7 +11,6 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { AccountRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { AddMailAccountReq, ListMailAccountReq } from '@/api/infra/mail/type';
-import { FULL_PREFIX } from '../../constant';
 
 export interface AccountFormFieldsProps {
   form: Partial<AddMailAccountReq>;
@@ -20,8 +20,8 @@ export interface AccountFormFieldsProps {
 }
 
 export const formConfig: SchemaCrudConfig<AccountRes, FilterState, ListMailAccountReq>['form'] = {
-  schema: `${FULL_PREFIX}.account.add.req`,
-  updateSchema: `${FULL_PREFIX}.account.update.req`,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     nickname: '',
     mailAddress: '',

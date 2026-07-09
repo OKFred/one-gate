@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 import React from 'react';
 import { FormControlLabel, Switch, Grid } from '@mui/material';
 import { TextField } from '@/components/Form';
@@ -5,15 +6,14 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { ListDockerConfigReq } from '@/api/infra/swarm/type';
 import type { SwarmDockerConfigRes } from './TheTable';
-import { FULL_PREFIX } from '../../constant';
 
 export const formConfig: SchemaCrudConfig<
   SwarmDockerConfigRes,
   FilterState,
   ListDockerConfigReq
 >['form'] = {
-  schema: `${FULL_PREFIX}.docker_config.add.req`,
-  updateSchema: `${FULL_PREFIX}.docker_config.update.req`,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     name: '',
     host: '',
