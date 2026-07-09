@@ -43,6 +43,8 @@ export async function preparePermissions(options?: { reset?: boolean }) {
         // 获取显示名称
         const getActionName = () => {
           const tKeySubString = module ? `${parent}.${module}` : parent;
+
+          // 仅从 businessType 获取前缀翻译
           const trans = initialTranslationData.find(
             (item) => item.tKey === "businessType." + tKeySubString
           );
@@ -51,11 +53,9 @@ export async function preparePermissions(options?: { reset?: boolean }) {
           const actionTrans =
             actionTranslations[action as keyof typeof actionTranslations];
           const actionName = actionTrans?.[LOCALE] || action;
-          const unknownName =
-            actionTranslations.unknown[
-              LOCALE as keyof typeof actionTranslations.unknown
-            ];
-          return prefix ? `${prefix}-${actionName}` : code + unknownName;
+
+          // 有前缀翻译则拼前缀，否则以 code-动作名 进行优雅回退
+          return prefix ? `${prefix}-${actionName}` : `${code}-${actionName}`;
         };
 
         mappedData.push({

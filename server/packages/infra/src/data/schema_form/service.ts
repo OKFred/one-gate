@@ -1,4 +1,5 @@
 import { registry } from "../../common/registry.js";
+import { can } from "@hodor/core/middleware/auth/permission";
 import {
   IndexVO,
   SchemaFormVO,
@@ -276,18 +277,16 @@ const getApi = {
 const batchGetReq = {
   type: "object",
   properties: {
-    names: {
-      type: "array",
-      items: { type: "string" },
-      description: "要查询的 schema code 列表",
-      maxItems: 100,
+    prefix: {
+      type: "string",
+      description: "要查询的 schema code 前缀（如 infra.ai.chat）",
     },
     version: {
       type: "string",
       description: "客户端缓存的版本号，若与当前一致则返回空数据",
     },
   },
-  required: ["names"],
+  required: ["prefix"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -312,10 +311,75 @@ const batchGetRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
+function cleanSchema(schema: any): any {
+  if (schema === null || typeof schema !== "object") {
+    return schema;
+  }
+  if (Array.isArray(schema)) {
+    return schema.map(cleanSchema);
+  }
+  const result: Record<string, any> = {};
+  for (const key of Object.keys(schema)) {
+    if (key === "example" || key === "examples" || key === "description") {
+      continue;
+    }
+    result[key] = cleanSchema(schema[key]);
+  }
+  return result;
+}
+
+function hasPermissionForSchema(
+  rowCode: string,
+  permissions: { code: string }[],
+  isSuperAdmin: boolean
+): boolean {
+  if (isSuperAdmin) return true;
+
+  const lowerRowCode = rowCode.toLowerCase();
+
+  return permissions.some((p) => {
+    const [resource, action] = p.code.split(":");
+    if (!resource || !action) return false;
+
+    const lowerResource = resource.toLowerCase();
+    if (!lowerRowCode.startsWith(lowerResource)) return false;
+
+    const remaining = lowerRowCode.slice(lowerResource.length);
+    if (remaining.startsWith("_") || remaining.startsWith("-")) {
+      return false;
+    }
+
+    const lowerAction = action.toLowerCase();
+    if (lowerAction === "add") {
+      return lowerRowCode.includes("add") || lowerRowCode.includes("create");
+    }
+    if (lowerAction === "edit" || lowerAction === "update") {
+      return lowerRowCode.includes("update") || lowerRowCode.includes("edit");
+    }
+    if (lowerAction === "delete") {
+      return lowerRowCode.includes("delete") || lowerRowCode.includes("remove");
+    }
+    if (lowerAction === "read") {
+      const hasWriteAction = [
+        "add",
+        "create",
+        "update",
+        "edit",
+        "delete",
+        "remove",
+      ].some((act) => lowerRowCode.includes(act));
+      return !hasWriteAction;
+    }
+
+    return false;
+  });
+}
+
 async function onBatchGet(
-  params: FromSchema<typeof batchGetReq>
+  params: FromSchema<typeof batchGetReq>,
+  userObj: UserObj
 ): Promise<FromSchema<typeof batchGetRes>> {
-  const { names, version: clientVersion } = params;
+  const { prefix, version: clientVersion } = params;
 
   // 从全局 registry 获取当前版本号
   const { getVersionHash } = await import("@hodor/core/utils/schemaRegistry");
@@ -330,11 +394,44 @@ async function onBatchGet(
     };
   }
 
-  // 从数据库批量查询
-  const rows = await schemaFormRepository.findByCodes(names);
+  // 鉴权检查：如果是系统资源前缀，校验是否有模块的 read 权限
+  const isSystem = /^(infra|enterprise)(\.|$)/.test(prefix);
+  if (isSystem) {
+    const hasPerm = await can(userObj, "read", prefix);
+    if (!hasPerm) {
+      return {
+        schemas: {},
+        version: currentVersion,
+        notModified: false,
+      };
+    }
+  }
+
+  // 从数据库按前缀模糊查询
+  const rows = await schemaFormRepository.findByPrefix(prefix);
+
   const schemas: Record<string, string> = {};
   for (const row of rows) {
-    schemas[row.code] = row.schemaData;
+    // 权限校验过滤：只返回用户拥有权限的 schema
+    if (
+      isSystem &&
+      !hasPermissionForSchema(
+        row.code,
+        userObj.permissions,
+        userObj.isSuperAdmin
+      )
+    ) {
+      continue;
+    }
+
+    // 清洗无关字段
+    try {
+      const parsed = JSON.parse(row.schemaData);
+      const cleaned = cleanSchema(parsed);
+      schemas[row.code] = JSON.stringify(cleaned);
+    } catch (e) {
+      schemas[row.code] = row.schemaData;
+    }
   }
 
   return {
@@ -352,7 +449,7 @@ const batchGetApi = {
     method: "post",
     summary: "批量获取 Schema（支持版本缓存比对）",
   } as const,
-  adapter: bodyAdapter,
+  adapter: bodyUserAdapter,
   service: onBatchGet,
   permission: false as const,
 } satisfies API;

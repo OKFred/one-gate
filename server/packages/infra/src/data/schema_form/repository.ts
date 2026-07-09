@@ -119,6 +119,22 @@ export class SchemaFormRepository {
   }
 
   /**
+   * 按前缀批量查询 schema（用于按权限前缀动态加载）
+   */
+  async findByPrefix(
+    prefix: string
+  ): Promise<Pick<SchemaFormPOLike, "code" | "schemaData">[]> {
+    if (!prefix) return [];
+    return db
+      .select({
+        code: schemaFormTable.code,
+        schemaData: schemaFormTable.schemaData,
+      })
+      .from(schemaFormTable)
+      .where(like(schemaFormTable.code, `${prefix}%`));
+  }
+
+  /**
    * 插入或更新系统来源的 schema（按 code upsert）
    */
   async upsertSystemSchema(data: {

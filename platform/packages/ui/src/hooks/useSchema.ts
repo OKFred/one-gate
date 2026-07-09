@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { authUtils } from '@/utils/auth';
+import { batchGetFn } from '@/api/infra/data/schemaForm';
 
 // ---- IndexedDB 工具 ----
 const DB_NAME = 'hodor_schema_cache';
@@ -55,6 +54,14 @@ let memoryCache: SchemaCacheEntry | null = null;
 // 请求去重：同一批 names 只发一次请求
 const pendingRequests = new Map<string, Promise<SchemaCacheEntry | null>>();
 
+function getPrefixFromCode(code: string): string {
+  const lastDotIndex = code.lastIndexOf('.');
+  if (lastDotIndex === -1) {
+    return code;
+  }
+  return code.slice(0, lastDotIndex);
+}
+
 async function fetchSchemas(
   names: string[],
   cachedVersion?: string,
@@ -63,21 +70,11 @@ async function fetchSchemas(
   const existing = pendingRequests.get(cacheKey);
   if (existing) return existing;
 
-  const token = authUtils.getUserInfo()?.token;
-  const baseURL = import.meta.env.MODE === 'production' ? import.meta.env.VITE_SERVER_URL : '';
+  const prefix = names.length > 0 ? getPrefixFromCode(names[0]) : '';
 
-  const promise = axios
-    .post(
-      `${baseURL}/api/v1/infra/data/schema_form/batch_get`,
-      { names, version: cachedVersion },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        timeout: 10000,
-      },
-    )
+  const promise = batchGetFn({
+    data: { prefix, version: cachedVersion },
+  })
     .then((res) => {
       const data = res.data?.data;
       if (!data) return null;

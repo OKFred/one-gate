@@ -14807,8 +14807,8 @@ export interface components {
             message: string;
         };
         "infra.data.schema_formBatch_getReq": {
-            /** @description 要查询的 schema code 列表 */
-            names: string[];
+            /** @description 要查询的 schema code 前缀（如 infra.ai.chat） */
+            prefix: string;
             /** @description 客户端缓存的版本号，若与当前一致则返回空数据 */
             version?: string;
         };

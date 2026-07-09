@@ -81,8 +81,7 @@ export const BUSINESS = {
   common: "common",
   /** 业务异常 */
   "business.exception": "business.exception",
-  /** 基础业务类型 */
-  "infra.businessType": "infra.businessType",
+
   /** 基础设施 */
   infra: "infra",
   /** 数据管理 */
