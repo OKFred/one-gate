@@ -12,8 +12,8 @@ export const formConfig: SchemaCrudConfig<
   ListUserReq,
   UserTableContext
 >['form'] = {
-  schema: `${FULL_PREFIX}.userAddReq`,
-  updateSchema: `${FULL_PREFIX}.userUpdateReq`,
+  schema: `${FULL_PREFIX}.user.add.req`,
+  updateSchema: `${FULL_PREFIX}.user.update.req`,
   defaultForm: {
     username: '',
     password: '',

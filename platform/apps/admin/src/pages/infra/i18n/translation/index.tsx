@@ -4,7 +4,8 @@ import { tableConfig, type TranslationRes } from './components/TheTable';
 import TranslationFormFields from './components/TheForm';
 import * as TranslationAPI from '@/api/infra/i18n/translation';
 import type { ListTranslationReq } from '@/api/infra/i18n/type';
-import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
+// import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
+import { THIS_PERMISSION, FULL_PREFIX } from './constant';
 
 const calculateSHA256 = async (text: string): Promise<string> => {
   const encoder = new TextEncoder();
@@ -18,9 +19,9 @@ export default function TranslationPage() {
   const config: SchemaCrudConfig<TranslationRes, FilterState, ListTranslationReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [THIS_PERMISSION.translation.add],
-      edit: [THIS_PERMISSION.translation.edit],
-      delete: [THIS_PERMISSION.translation.delete],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: TranslationAPI.listFn,
@@ -47,7 +48,7 @@ export default function TranslationPage() {
     filter: filterConfig,
     table: tableConfig,
     form: {
-      schema: `${FULL_PREFIX}.translationAddReq`,
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: {
         application: '',
         business: '',

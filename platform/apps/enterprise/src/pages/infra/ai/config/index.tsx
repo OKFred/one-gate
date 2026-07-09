@@ -73,7 +73,7 @@ export default function AiConfigManagement() {
       actions: tableConfig.actions,
     },
     form: {
-      schema: `${FULL_PREFIX}.configAddReq`,
+      schema: `${FULL_PREFIX}.config.add.req`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit) => {
         const capabilitiesStr = form.capabilities;

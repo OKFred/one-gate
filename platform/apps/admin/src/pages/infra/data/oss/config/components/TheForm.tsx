@@ -6,8 +6,8 @@ import type { FilterState } from './TheFilter';
 import type { ConfigRes } from './TheTable';
 import type { AddConfigReq, ListConfigReq } from '@/api/infra/data/oss/type';
 export const formConfig: SchemaCrudConfig<ConfigRes, FilterState, ListConfigReq>['form'] = {
-  schema: 'infra.data.oss.configAddReq',
-  updateSchema: 'infra.data.oss.configUpdateReq',
+  schema: 'infra.data.oss.config.add.req',
+  updateSchema: 'infra.data.oss.config.update.req',
   defaultForm: {
     name: '',
     provider: 'S3',

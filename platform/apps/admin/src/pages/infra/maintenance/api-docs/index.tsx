@@ -138,7 +138,7 @@ export default function ApiDocsManagement() {
       ],
     },
     form: {
-      schema: `${FULL_PREFIX}.api_docsAddReq`,
+      schema: `${FULL_PREFIX}.api_docs.add.req`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {

@@ -20,8 +20,8 @@ export interface AccountFormFieldsProps {
 }
 
 export const formConfig: SchemaCrudConfig<AccountRes, FilterState, ListMailAccountReq>['form'] = {
-  schema: `${FULL_PREFIX}.accountAddReq`,
-  updateSchema: `${FULL_PREFIX}.accountUpdateReq`,
+  schema: `${FULL_PREFIX}.account.add.req`,
+  updateSchema: `${FULL_PREFIX}.account.update.req`,
   defaultForm: {
     nickname: '',
     mailAddress: '',

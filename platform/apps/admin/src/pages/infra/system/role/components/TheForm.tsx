@@ -39,8 +39,8 @@ type FlatDepartment = {
 };
 
 export const formConfig: SchemaCrudConfig<RoleRecord, FilterState, ListRoleReq>['form'] = {
-  schema: `${FULL_PREFIX}.roleAddReq`,
-  updateSchema: `${FULL_PREFIX}.roleUpdateReq`,
+  schema: `${FULL_PREFIX}.role.add.req`,
+  updateSchema: `${FULL_PREFIX}.role.update.req`,
   defaultForm: {
     name: '',
     remark: null,

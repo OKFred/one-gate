@@ -12,8 +12,8 @@ export const formConfig: SchemaCrudConfig<
   FilterState,
   ListDockerConfigReq
 >['form'] = {
-  schema: `${FULL_PREFIX}.docker_configAddReq`,
-  updateSchema: `${FULL_PREFIX}.docker_configUpdateReq`,
+  schema: `${FULL_PREFIX}.docker_config.add.req`,
+  updateSchema: `${FULL_PREFIX}.docker_config.update.req`,
   defaultForm: {
     name: '',
     host: '',

@@ -162,7 +162,7 @@ export default function ApiTaskManagement() {
       ],
     },
     form: {
-      schema: `${FULL_PREFIX}.api_taskAddReq`,
+      schema: `${FULL_PREFIX}.api_task.add.req`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {

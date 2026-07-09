@@ -5,7 +5,7 @@ import type { RegionRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { ListRegionReq, ListAllLanguageRes } from '@/api/infra/i18n/type';
 import hasValue from '@/utils/hasValue';
-import { FULL_PREFIX } from '../../constant';
+import { FULL_PREFIX } from '../constant';
 
 export const formConfig: SchemaCrudConfig<
   RegionRes,
@@ -13,7 +13,7 @@ export const formConfig: SchemaCrudConfig<
   ListRegionReq,
   { enabledLanguages: ListAllLanguageRes }
 >['form'] = {
-  schema: `${FULL_PREFIX}.regionAddReq`,
+  schema: `${FULL_PREFIX}.add.req`,
   defaultForm: {
     labels: {},
     alpha2Code: '',

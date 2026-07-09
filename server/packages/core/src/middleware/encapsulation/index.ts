@@ -167,16 +167,16 @@ export default function main(apiObj: Record<string, API>, nameSpace: string) {
   Array.from(Object.values(apiObj)).forEach((obj) => {
     const { req, res, pathInfo } = obj;
     const subNameSpace = pathInfo.path
-      .replace(/\//g, "_")
+      .replace(/\//g, ".")
       .slice(1)
-      .replace(/^\w/, (c) => c.toUpperCase());
+      .toLowerCase();
     const componentArr = [
       componentMaker("request", {
-        name: `${nameSpace}${subNameSpace}Req`,
+        name: `${nameSpace}.${subNameSpace}.req`,
         component: req,
       }),
       componentMaker("response", {
-        name: `${nameSpace}${subNameSpace}Res`,
+        name: `${nameSpace}.${subNameSpace}.res`,
         component: res,
       }),
     ];

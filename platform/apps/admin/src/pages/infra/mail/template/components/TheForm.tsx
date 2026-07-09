@@ -18,8 +18,8 @@ export interface TemplateFormFieldsProps {
 }
 
 export const formConfig: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemplateReq>['form'] = {
-  schema: `${FULL_PREFIX}.templateAddReq`,
-  updateSchema: `${FULL_PREFIX}.templateUpdateReq`,
+  schema: `${FULL_PREFIX}.template.add.req`,
+  updateSchema: `${FULL_PREFIX}.template.update.req`,
   defaultForm: {
     name: '',
     title: '',

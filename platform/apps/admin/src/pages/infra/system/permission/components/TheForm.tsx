@@ -37,8 +37,8 @@ export const formConfig: SchemaCrudConfig<
   ListPermissionReq,
   PermissionExtraContext
 >['form'] = {
-  schema: `${FULL_PREFIX}.permissionAddReq`,
-  updateSchema: `${FULL_PREFIX}.permissionUpdateReq`,
+  schema: `${FULL_PREFIX}.permission.add.req`,
+  updateSchema: `${FULL_PREFIX}.permission.update.req`,
   defaultForm: {
     code: '',
     name: '',
