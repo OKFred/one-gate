@@ -5,8 +5,6 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
 import UnoCSS from 'unocss/vite';
 import childProcess from 'child_process';
-import fs from 'fs/promises';
-import axios from 'axios';
 
 const pathSrc = path.resolve(__dirname, 'src');
 
@@ -19,41 +17,6 @@ async function getAPIDocs(env: { SERVER_URL?: string; VITE_SERVER_URL?: string }
   const command = `npx openapi-typescript ${docUrl} -o ./src/types/openapi.d.ts`;
   console.log('Executing command:', command);
   childProcess.exec(command);
-
-  // 2. 处理并拆分 JSON Schemas
-  try {
-    const response = await axios.get(docUrl);
-    const doc = response.data;
-    const schemas = doc.components?.schemas;
-
-    if (schemas) {
-      const outputDir = path.resolve(__dirname, 'src/assets/schemas');
-      await fs.mkdir(outputDir, { recursive: true });
-
-      // 递归删除无用字段的函数，但不要删掉 properties 里的 description 字段
-      const cleanSchema = (obj: Record<string, unknown>, isProperties = false) => {
-        if (typeof obj !== 'object' || obj === null) return;
-        if (!isProperties) {
-          const keysToRemove = ['description', 'examples', 'default', 'x-displayName', 'x-id'];
-          keysToRemove.forEach((key) => delete obj[key]);
-        }
-        for (const [key, value] of Object.entries(obj)) {
-          if (typeof value === 'object' && value !== null) {
-            cleanSchema(value as Record<string, unknown>, key === 'properties');
-          }
-        }
-      };
-
-      for (const [name, schema] of Object.entries(schemas)) {
-        const cleaned = JSON.parse(JSON.stringify(schema));
-        cleanSchema(cleaned);
-        await fs.writeFile(path.join(outputDir, `${name}.json`), JSON.stringify(cleaned, null, 2));
-      }
-      console.log(`Successfully generated ${Object.keys(schemas).length} schemas.`);
-    }
-  } catch (error) {
-    console.error('Failed to split schemas:', error);
-  }
 }
 
 // https://vite.dev/config/

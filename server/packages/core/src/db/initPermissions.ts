@@ -5,10 +5,11 @@
 
 import db from "./index";
 import { permissionTable } from "../../../infra/src/system/permission/model";
+import { rolePermissionTable } from "../../../infra/src/system/role_permission/model";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "../utils/env";
-import { sql } from "drizzle-orm";
+import { sql, notInArray, inArray } from "drizzle-orm";
 import { permissionSeeds } from "../constants/permissions";
 import { actionTranslations } from "./translation/shared";
 
@@ -27,10 +28,6 @@ export async function preparePermissions(options?: { reset?: boolean }) {
 
   const queries: any[] = [];
 
-  if (options?.reset) {
-    queries.push(db.delete(permissionTable));
-  }
-
   const creatorId = SUPER_ADMIN_ID; // 系统初始化
 
   // 1. 嵌套循环生成打平后的权限数据
@@ -46,6 +43,8 @@ export async function preparePermissions(options?: { reset?: boolean }) {
         // 获取显示名称
         const getActionName = () => {
           const tKeySubString = module ? `${parent}.${module}` : parent;
+
+          // 仅从 businessType 获取前缀翻译
           const trans = initialTranslationData.find(
             (item) => item.tKey === "businessType." + tKeySubString
           );
@@ -54,11 +53,9 @@ export async function preparePermissions(options?: { reset?: boolean }) {
           const actionTrans =
             actionTranslations[action as keyof typeof actionTranslations];
           const actionName = actionTrans?.[LOCALE] || action;
-          const unknownName =
-            actionTranslations.unknown[
-              LOCALE as keyof typeof actionTranslations.unknown
-            ];
-          return prefix ? `${prefix}-${actionName}` : code + unknownName;
+
+          // 有前缀翻译则拼前缀，否则以 code-动作名 进行优雅回退
+          return prefix ? `${prefix}-${actionName}` : `${code}-${actionName}`;
         };
 
         mappedData.push({
@@ -76,6 +73,45 @@ export async function preparePermissions(options?: { reset?: boolean }) {
   }
 
   stats.total = mappedData.length;
+
+  if (options?.reset) {
+    queries.push(db.delete(permissionTable));
+    queries.push(db.delete(rolePermissionTable));
+  } else {
+    // 自动清理已经废弃的权限（即不在当前 permissionSeeds 中的权限）
+    const validCodes = mappedData.map((d) => d.code);
+    if (validCodes.length > 0) {
+      // 1. 先查出数据库中现有的所有权限代码
+      const existing = await db
+        .select({ code: permissionTable.code })
+        .from(permissionTable);
+
+      // 2. 内存过滤出被废弃的权限代码
+      const codesToDelete = existing
+        .map((row) => row.code)
+        .filter((code) => !validCodes.includes(code));
+
+      // 3. 只有当确实存在已被废弃的权限时才执行删除操作
+      if (codesToDelete.length > 0) {
+        const DELETE_BATCH = 100;
+        for (let i = 0; i < codesToDelete.length; i += DELETE_BATCH) {
+          const chunk = codesToDelete.slice(i, i + DELETE_BATCH);
+          queries.push(
+            db
+              .delete(permissionTable)
+              .where(inArray(permissionTable.code, chunk))
+          );
+        }
+      }
+
+      // 同时清理 system_role_permission 中已失效的 permissionId 关联
+      queries.push(
+        db
+          .delete(rolePermissionTable)
+          .where(sql`permission_id NOT IN (SELECT id FROM system_permission)`)
+      );
+    }
+  }
 
   // 2. 分批执行以规避 SQL 变量限制
   const BATCH_SIZE = 10;

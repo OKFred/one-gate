@@ -16,245 +16,277 @@ export const usePermission = () => {
 // 权限码常量
 
 /** 系统管理 */
-export const SYSTEM = {
-  READ: 'system:read',
+export const infra_system = {
+  read: 'infra.system:read',
   /** 用户管理 */
-  USER: {
-    READ: 'system.user:read',
-    ADD: 'system.user:add',
-    EDIT: 'system.user:edit',
-    DELETE: 'system.user:delete',
-    EXPORT: 'system.user:export',
+  user: {
+    read: 'infra.system.user:read',
+    add: 'infra.system.user:add',
+    edit: 'infra.system.user:edit',
+    delete: 'infra.system.user:delete',
+    export: 'infra.system.user:export',
   },
   /** 角色管理 */
-  ROLE: {
-    READ: 'system.role:read',
-    ADD: 'system.role:add',
-    EDIT: 'system.role:edit',
-    DELETE: 'system.role:delete',
+  role: {
+    read: 'infra.system.role:read',
+    add: 'infra.system.role:add',
+    edit: 'infra.system.role:edit',
+    delete: 'infra.system.role:delete',
   },
   /** 权限管理 */
-  PERMISSION: {
-    READ: 'system.permission:read',
-    ADD: 'system.permission:add',
-    EDIT: 'system.permission:edit',
-    DELETE: 'system.permission:delete',
+  permission: {
+    read: 'infra.system.permission:read',
+    add: 'infra.system.permission:add',
+    edit: 'infra.system.permission:edit',
+    delete: 'infra.system.permission:delete',
   },
   /** 部门管理 */
-  DEPARTMENT: {
-    READ: 'system.department:read',
-    ADD: 'system.department:add',
-    EDIT: 'system.department:edit',
-    DELETE: 'system.department:delete',
+  department: {
+    read: 'infra.system.department:read',
+    add: 'infra.system.department:add',
+    edit: 'infra.system.department:edit',
+    delete: 'infra.system.department:delete',
   },
   /** 菜单管理 */
-  MENU: {
-    READ: 'system.menu:read',
-    ADD: 'system.menu:add',
-    EDIT: 'system.menu:edit',
-    DELETE: 'system.menu:delete',
+  menu: {
+    read: 'infra.system.menu:read',
+    add: 'infra.system.menu:add',
+    edit: 'infra.system.menu:edit',
+    delete: 'infra.system.menu:delete',
   },
   /** 角色权限管理 */
-  ROLE_PERMISSION: {
-    READ: 'system.role_permission:read',
-    ADD: 'system.role_permission:add',
-    EDIT: 'system.role_permission:edit',
-    DELETE: 'system.role_permission:delete',
-    BATCH_DELETE: 'system.role_permission:batch-delete',
+  role_permission: {
+    read: 'infra.system.role_permission:read',
+    add: 'infra.system.role_permission:add',
+    edit: 'infra.system.role_permission:edit',
+    delete: 'infra.system.role_permission:delete',
+    batch_delete: 'infra.system.role_permission:batch-delete',
   },
   /** 个人信息 */
-  AUTH: {
-    READ: 'system.auth:read',
-    EDIT: 'system.auth:edit',
+  auth: {
+    read: 'infra.system.auth:read',
+    edit: 'infra.system.auth:edit',
   },
 } as const;
 
 /** 邮件 */
-export const MAIL = {
-  READ: 'mail:read',
+export const infra_mail = {
+  read: 'infra.mail:read',
   /** 邮件账户 */
-  ACCOUNT: {
-    READ: 'mail.account:read',
-    ADD: 'mail.account:add',
-    EDIT: 'mail.account:edit',
-    DELETE: 'mail.account:delete',
+  account: {
+    read: 'infra.mail.account:read',
+    add: 'infra.mail.account:add',
+    edit: 'infra.mail.account:edit',
+    delete: 'infra.mail.account:delete',
   },
   /** 邮件模板 */
-  TEMPLATE: {
-    READ: 'mail.template:read',
-    ADD: 'mail.template:add',
-    EDIT: 'mail.template:edit',
-    DELETE: 'mail.template:delete',
+  template: {
+    read: 'infra.mail.template:read',
+    add: 'infra.mail.template:add',
+    edit: 'infra.mail.template:edit',
+    delete: 'infra.mail.template:delete',
   },
   /** 邮件日志 */
-  LOG: {
-    READ: 'mail.log:read',
-    VIEW: 'mail.log:view',
+  log: {
+    read: 'infra.mail.log:read',
+    view: 'infra.mail.log:view',
+  },
+  /** 邮件操作 */
+  action: {
+    read: 'infra.mail.action:read',
+    add: 'infra.mail.action:add',
   },
 } as const;
 
 /** 国际化 */
-export const I18N = {
-  READ: 'i18n:read',
+export const infra_i18n = {
+  read: 'infra.i18n:read',
   /** 语言管理 */
-  LANGUAGE: {
-    READ: 'i18n.language:read',
-    ADD: 'i18n.language:add',
-    EDIT: 'i18n.language:edit',
-    DELETE: 'i18n.language:delete',
+  language: {
+    read: 'infra.i18n.language:read',
+    add: 'infra.i18n.language:add',
+    edit: 'infra.i18n.language:edit',
+    delete: 'infra.i18n.language:delete',
   },
   /** 地区管理 */
-  REGION: {
-    READ: 'i18n.region:read',
-    ADD: 'i18n.region:add',
-    EDIT: 'i18n.region:edit',
-    DELETE: 'i18n.region:delete',
+  region: {
+    read: 'infra.i18n.region:read',
+    add: 'infra.i18n.region:add',
+    edit: 'infra.i18n.region:edit',
+    delete: 'infra.i18n.region:delete',
   },
   /** 翻译管理 */
-  TRANSLATION: {
-    READ: 'i18n.translation:read',
-    ADD: 'i18n.translation:add',
-    EDIT: 'i18n.translation:edit',
-    DELETE: 'i18n.translation:delete',
+  translation: {
+    read: 'infra.i18n.translation:read',
+    add: 'infra.i18n.translation:add',
+    edit: 'infra.i18n.translation:edit',
+    delete: 'infra.i18n.translation:delete',
   },
 } as const;
 
 /** 运维 */
-export const MAINTENANCE = {
-  READ: 'maintenance:read',
+export const infra_maintenance = {
+  read: 'infra.maintenance:read',
   /** 缓存管理 */
-  CACHE: {
-    READ: 'maintenance.cache:read',
-    ADD: 'maintenance.cache:add',
-    EDIT: 'maintenance.cache:edit',
-    DELETE: 'maintenance.cache:delete',
-    VIEW: 'maintenance.cache:view',
+  cache: {
+    read: 'infra.maintenance.cache:read',
+    add: 'infra.maintenance.cache:add',
+    edit: 'infra.maintenance.cache:edit',
+    delete: 'infra.maintenance.cache:delete',
+    view: 'infra.maintenance.cache:view',
   },
   /** 登录日志 */
-  AUDIT_LOGIN: {
-    READ: 'maintenance.audit_login:read',
+  audit_login: {
+    read: 'infra.maintenance.audit_login:read',
   },
   /** 定时任务管理 */
-  CRON: {
-    READ: 'maintenance.cron:read',
-    ADD: 'maintenance.cron:add',
-    EDIT: 'maintenance.cron:edit',
-    DELETE: 'maintenance.cron:delete',
+  cron: {
+    read: 'infra.maintenance.cron:read',
+    add: 'infra.maintenance.cron:add',
+    edit: 'infra.maintenance.cron:edit',
+    delete: 'infra.maintenance.cron:delete',
   },
   /** API 采集任务管理 */
-  API_TASK: {
-    READ: 'maintenance.api_task:read',
-    ADD: 'maintenance.api_task:add',
-    EDIT: 'maintenance.api_task:edit',
-    DELETE: 'maintenance.api_task:delete',
+  api_task: {
+    read: 'infra.maintenance.api_task:read',
+    add: 'infra.maintenance.api_task:add',
+    edit: 'infra.maintenance.api_task:edit',
+    delete: 'infra.maintenance.api_task:delete',
   },
   /** API 文档管理 */
-  API_DOCS: {
-    READ: 'maintenance.api_docs:read',
-    ADD: 'maintenance.api_docs:add',
-    EDIT: 'maintenance.api_docs:edit',
-    DELETE: 'maintenance.api_docs:delete',
+  api_docs: {
+    read: 'infra.maintenance.api_docs:read',
+    add: 'infra.maintenance.api_docs:add',
+    edit: 'infra.maintenance.api_docs:edit',
+    delete: 'infra.maintenance.api_docs:delete',
   },
+  /** 合规归档 */
+  compliance: {
+    read: 'infra.maintenance.compliance:read',
+  },
+  /** 初始化数据 */
+  init: {
+    read: 'infra.maintenance.init:read',
+  },
+} as const;
+
+/** 基础设施 */
+export const infra = {
+  read: 'infra:read',
 } as const;
 
 /** 数据管理 */
-export const DATA = {
-  READ: 'data:read',
+export const infra_data = {
+  read: 'infra.data:read',
   /** 动态表单配置 */
-  SCHEMA_FORM: {
-    READ: 'data.schema_form:read',
-    ADD: 'data.schema_form:add',
-    EDIT: 'data.schema_form:edit',
-    DELETE: 'data.schema_form:delete',
+  schema_form: {
+    read: 'infra.data.schema_form:read',
+    add: 'infra.data.schema_form:add',
+    edit: 'infra.data.schema_form:edit',
+    delete: 'infra.data.schema_form:delete',
   },
   /** 动态表单数据 */
-  SCHEMA_FORM_DATA: {
-    READ: 'data.schema_form_data:read',
-    ADD: 'data.schema_form_data:add',
-    EDIT: 'data.schema_form_data:edit',
-    DELETE: 'data.schema_form_data:delete',
+  schema_form_data: {
+    read: 'infra.data.schema_form_data:read',
+    add: 'infra.data.schema_form_data:add',
+    edit: 'infra.data.schema_form_data:edit',
+    delete: 'infra.data.schema_form_data:delete',
   },
   /** 对象存储 */
-  OSS: {
-    READ: 'data.oss:read',
-  },
-  /** 存储配置 */
-  OSS_CONFIG: {
-    READ: 'data.oss.config:read',
-    ADD: 'data.oss.config:add',
-    EDIT: 'data.oss.config:edit',
-    DELETE: 'data.oss.config:delete',
-  },
-  /** 文件管理 */
-  OSS_FILE: {
-    READ: 'data.oss.file:read',
-    ADD: 'data.oss.file:add',
-    EDIT: 'data.oss.file:edit',
-    DELETE: 'data.oss.file:delete',
+  oss: {
+    read: 'infra.data.oss:read',
+    /** 存储配置 */
+    config: {
+      read: 'infra.data.oss.config:read',
+      add: 'infra.data.oss.config:add',
+      edit: 'infra.data.oss.config:edit',
+      delete: 'infra.data.oss.config:delete',
+    },
+    /** 文件管理 */
+    file: {
+      read: 'infra.data.oss.file:read',
+      add: 'infra.data.oss.file:add',
+      edit: 'infra.data.oss.file:edit',
+      delete: 'infra.data.oss.file:delete',
+    },
   },
 } as const;
 
-/** 企业 */
-export const ENTERPRISE = {
-  READ: 'enterprise:read',
+/** 企业管理 */
+export const enterprise = {
+  read: 'enterprise:read',
   /** 考勤管理 */
-  ATTENDANCE: {
-    READ: 'enterprise.attendance:read',
-    ADD: 'enterprise.attendance:add',
-    EDIT: 'enterprise.attendance:edit',
-    DELETE: 'enterprise.attendance:delete',
+  attendance: {
+    read: 'enterprise.attendance:read',
+    add: 'enterprise.attendance:add',
+    edit: 'enterprise.attendance:edit',
+    delete: 'enterprise.attendance:delete',
   },
   /** 工作流编排 */
-  WORKFLOW: {
-    READ: 'enterprise.workflow:read',
-    ADD: 'enterprise.workflow:add',
-    EDIT: 'enterprise.workflow:edit',
-    DELETE: 'enterprise.workflow:delete',
+  workflow: {
+    read: 'enterprise.workflow:read',
+    add: 'enterprise.workflow:add',
+    edit: 'enterprise.workflow:edit',
+    delete: 'enterprise.workflow:delete',
   },
   /** 工作流配置 */
-  WORKFLOW_CONFIG: {
-    READ: 'enterprise.workflow_config:read',
-    ADD: 'enterprise.workflow_config:add',
-    EDIT: 'enterprise.workflow_config:edit',
-    DELETE: 'enterprise.workflow_config:delete',
+  workflow_config: {
+    read: 'enterprise.workflow_config:read',
+    add: 'enterprise.workflow_config:add',
+    edit: 'enterprise.workflow_config:edit',
+    delete: 'enterprise.workflow_config:delete',
   },
 } as const;
 
 /** AI */
-export const AI = {
-  READ: 'ai:read',
+export const infra_ai = {
+  read: 'infra.ai:read',
   /** AI 配置 */
-  CONFIG: {
-    READ: 'ai.config:read',
-    ADD: 'ai.config:add',
-    EDIT: 'ai.config:edit',
-    DELETE: 'ai.config:delete',
+  config: {
+    read: 'infra.ai.config:read',
+    add: 'infra.ai.config:add',
+    edit: 'infra.ai.config:edit',
+    delete: 'infra.ai.config:delete',
   },
   /** AI 对话 */
-  CHAT: {
-    READ: 'ai.chat:read',
+  chat: {
+    read: 'infra.ai.chat:read',
   },
 } as const;
 
 /** Swarm 集群 */
-export const SWARM = {
-  READ: 'swarm:read',
+export const infra_swarm = {
+  read: 'infra.swarm:read',
   /** Swarm 集群 Docker 服务管理 */
-  DOCKER: {
-    READ: 'swarm.docker:read',
-    ADD: 'swarm.docker:add',
-    EDIT: 'swarm.docker:edit',
-    DELETE: 'swarm.docker:delete',
+  docker: {
+    read: 'infra.swarm.docker:read',
+    add: 'infra.swarm.docker:add',
+    edit: 'infra.swarm.docker:edit',
+    delete: 'infra.swarm.docker:delete',
   },
   /** Swarm Docker配置管理 */
-  DOCKER_CONFIG: {
-    READ: 'swarm.docker_config:read',
-    ADD: 'swarm.docker_config:add',
-    EDIT: 'swarm.docker_config:edit',
-    DELETE: 'swarm.docker_config:delete',
+  docker_config: {
+    read: 'infra.swarm.docker_config:read',
+    add: 'infra.swarm.docker_config:add',
+    edit: 'infra.swarm.docker_config:edit',
+    delete: 'infra.swarm.docker_config:delete',
   },
   /** Swarm 节点管理 */
-  NODES: {
-    READ: 'swarm.nodes:read',
+  nodes: {
+    read: 'infra.swarm.nodes:read',
   },
+} as const;
+
+export const permissions = {
+  infra: {
+    ...infra,
+    system: infra_system,
+    mail: infra_mail,
+    i18n: infra_i18n,
+    maintenance: infra_maintenance,
+    data: infra_data,
+    ai: infra_ai,
+    swarm: infra_swarm,
+  },
+  enterprise: enterprise,
 } as const;

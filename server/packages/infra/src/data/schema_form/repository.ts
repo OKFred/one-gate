@@ -8,6 +8,7 @@ import {
   or,
   and,
   like,
+  inArray,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
@@ -99,6 +100,100 @@ export class SchemaFormRepository {
       .where(eq(schemaFormTable.code, code))
       .limit(1);
     return rows[0] || null;
+  }
+
+  /**
+   * 按 code 列表批量查询 schema
+   */
+  async findByCodes(
+    codes: string[]
+  ): Promise<Pick<SchemaFormPOLike, "code" | "schemaData">[]> {
+    if (codes.length === 0) return [];
+    return db
+      .select({
+        code: schemaFormTable.code,
+        schemaData: schemaFormTable.schemaData,
+      })
+      .from(schemaFormTable)
+      .where(inArray(schemaFormTable.code, codes));
+  }
+
+  /**
+   * 按前缀批量查询 schema（用于按权限前缀动态加载）
+   */
+  async findByPrefix(
+    prefix: string
+  ): Promise<Pick<SchemaFormPOLike, "code" | "schemaData">[]> {
+    if (!prefix) return [];
+    return db
+      .select({
+        code: schemaFormTable.code,
+        schemaData: schemaFormTable.schemaData,
+      })
+      .from(schemaFormTable)
+      .where(like(schemaFormTable.code, `${prefix}%`));
+  }
+
+  /**
+   * 插入或更新系统来源的 schema（按 code upsert）
+   */
+  async upsertSystemSchema(data: {
+    code: string;
+    name: string;
+    schemaData: string;
+  }): Promise<void> {
+    const existing = await this.findByCode(data.code);
+    if (existing) {
+      // 仅当 schemaData 变化时才更新
+      if (existing.schemaData !== data.schemaData) {
+        await db
+          .update(schemaFormTable)
+          .set({
+            name: data.name,
+            schemaData: data.schemaData,
+            source: "system",
+            updateTimeUtc: Date.now(),
+          })
+          .where(eq(schemaFormTable.id, existing.id));
+      }
+    } else {
+      await db.insert(schemaFormTable).values({
+        code: data.code,
+        name: data.name,
+        schemaData: data.schemaData,
+        source: "system",
+        isEnabled: true,
+        creatorId: 0, // 系统自动生成
+        creatorName: "System",
+        createTimeUtc: Date.now(),
+      });
+    }
+  }
+
+  /**
+   * 删除不再存在于 registry 的系统 schema 记录
+   */
+  async deleteStaleSystemSchemas(activeCodes: string[]): Promise<void> {
+    if (activeCodes.length === 0) {
+      // 删除所有系统来源的
+      await db
+        .delete(schemaFormTable)
+        .where(eq(schemaFormTable.source, "system"));
+    } else {
+      // 简化实现：查出所有 system 记录，过滤后删除
+      const allSystem = await db
+        .select({ id: schemaFormTable.id, code: schemaFormTable.code })
+        .from(schemaFormTable)
+        .where(eq(schemaFormTable.source, "system"));
+      const staleIds = allSystem
+        .filter((r) => !activeCodes.includes(r.code))
+        .map((r) => r.id);
+      if (staleIds.length > 0) {
+        await db
+          .delete(schemaFormTable)
+          .where(inArray(schemaFormTable.id, staleIds));
+      }
+    }
   }
 
   async onInsert(

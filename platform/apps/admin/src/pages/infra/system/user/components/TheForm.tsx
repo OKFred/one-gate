@@ -1,9 +1,8 @@
+import { FULL_PREFIX } from '../constant';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { UserRecord, UserTableContext } from '../index';
 import type { ListUserReq } from '@/api/infra/system/type';
-import schema from '@/assets/schemas/system.userAddReq.json';
-import updateSchema from '@/assets/schemas/system.userUpdateReq.json';
 import { UserFormFields } from './UserFormFields';
 
 export const formConfig: SchemaCrudConfig<
@@ -12,8 +11,8 @@ export const formConfig: SchemaCrudConfig<
   ListUserReq,
   UserTableContext
 >['form'] = {
-  schema,
-  updateSchema,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     username: '',
     password: '',

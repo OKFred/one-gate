@@ -1,3 +1,4 @@
+import { THIS_PERMISSION } from '../constant';
 import { useState, useCallback, memo } from 'react';
 import {
   Box,
@@ -12,7 +13,6 @@ import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/ico
 import type { TheFormRef, MenuData } from './TheForm';
 import { useTranslation } from '@/hooks/useTranslation';
 import { ResponsiveButton, ResponsiveIconButton } from '@/components/Responsive/index';
-import { SYSTEM } from '@/hooks/usePermission';
 
 // ==================== 新增菜单按钮 ====================
 
@@ -35,7 +35,7 @@ export const TheActionButtons = memo(({ formRef }: AddButtonProps) => {
       variant="contained"
       startIcon={<AddIcon />}
       onClick={handleAdd}
-      permissionCodes={[SYSTEM.MENU.ADD]}
+      permissionCodes={[THIS_PERMISSION.add]}
     >
       {t('dialog.add')}
     </ResponsiveButton>
@@ -103,7 +103,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={handleAddChild}
             title={t('menu.dialog.addSubMenu')}
-            permissionCodes={[SYSTEM.MENU.ADD]}
+            permissionCodes={[THIS_PERMISSION.add]}
           >
             <AddIcon fontSize="small" />
           </ResponsiveIconButton>
@@ -111,7 +111,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={handleEdit}
             title={t('dialog.edit')}
-            permissionCodes={[SYSTEM.MENU.EDIT]}
+            permissionCodes={[THIS_PERMISSION.edit]}
           >
             <EditIcon fontSize="small" />
           </ResponsiveIconButton>
@@ -119,7 +119,7 @@ export const TreeNodeActionButtons = memo(
             size="small"
             onClick={openDeleteDialog}
             title={t('dialog.delete')}
-            permissionCodes={[SYSTEM.MENU.DELETE]}
+            permissionCodes={[THIS_PERMISSION.delete]}
           >
             <DeleteIcon fontSize="small" />
           </ResponsiveIconButton>

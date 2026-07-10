@@ -81,38 +81,6 @@ export const enterpriseTranslations = {
       },
     },
   ],
-  "maintenance.api_docs": [
-    {
-      tKey: "errorHandler.apiDocs.invalidFormat",
-      langCodes: {
-        "zh-CN": "文档格式错误，无法解析为 JSON 或 YAML",
-        "en-US": "Document format error, cannot be parsed as JSON or YAML",
-      },
-    },
-    {
-      tKey: "errorHandler.apiDocs.unsupportedFormat",
-      langCodes: {
-        "zh-CN": "不支持的文档格式，仅支持 Swagger 2.0 或 OpenAPI 3.x",
-        "en-US":
-          "Unsupported document format, only Swagger 2.0 or OpenAPI 3.x is supported",
-      },
-    },
-    {
-      tKey: "errorHandler.apiDocs.parseFailed",
-      langCodes: {
-        "zh-CN": "文档解析失败，请检查 Swagger 2.0 / OAS 3.0 格式",
-        "en-US":
-          "Document parsing failed, please check Swagger 2.0 / OAS 3.0 format",
-      },
-    },
-    {
-      tKey: "errorHandler.apiDocs.parseFailedGeneral",
-      langCodes: {
-        "zh-CN": "文档解析失败，请检查格式",
-        "en-US": "Document parsing failed, please check the format",
-      },
-    },
-  ],
   "enterprise.workflow": [
     {
       tKey: "sidebar.menu.enterprise.workflowGroup",
@@ -808,7 +776,6 @@ export const enterpriseTranslations = {
   Extract<
     BusinessKey,
     | "enterprise.attendance"
-    | "maintenance.api_docs"
     | "enterprise.workflow"
     | "enterprise.workflow_config"
   >,

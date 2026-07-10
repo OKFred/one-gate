@@ -3,7 +3,10 @@ import service from "./service";
 import { BusinessKey } from "@hodor/core/types/business";
 
 function createApp() {
-  return encapsulation(service, "system.role_permission" satisfies BusinessKey);
+  return encapsulation(
+    service,
+    "infra.system.role_permission" satisfies BusinessKey
+  );
 }
 
 export default createApp;

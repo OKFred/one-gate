@@ -1,10 +1,10 @@
+import { FULL_PREFIX } from '../constant';
 import { Stack, Box } from '@mui/material';
 import { Field } from '@/components/Form';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { RegionRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { ListRegionReq, ListAllLanguageRes } from '@/api/infra/i18n/type';
-import regionSchema from '@/assets/schemas/i18n.regionAddReq.json';
 import hasValue from '@/utils/hasValue';
 
 export const formConfig: SchemaCrudConfig<
@@ -13,7 +13,7 @@ export const formConfig: SchemaCrudConfig<
   ListRegionReq,
   { enabledLanguages: ListAllLanguageRes }
 >['form'] = {
-  schema: regionSchema,
+  schema: `${FULL_PREFIX}.add.req`,
   defaultForm: {
     labels: {},
     alpha2Code: '',

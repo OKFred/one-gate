@@ -191,7 +191,7 @@ import { filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type RegionRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as RegionAPI from '@/api/i18n/region';
-import { I18N } from '@/hooks/usePermission';
+import { infra_i18n } from '@/hooks/usePermission';
 
 export default function RegionPage() {
   const [languages, setLanguages] = useState([]);
@@ -206,9 +206,9 @@ export default function RegionPage() {
     titleKey: 'region.title',
     apiKeyName: 'id', // 主键字段名，默认为 'id'
     permissions: {
-      add: [I18N.REGION.ADD],
-      edit: [I18N.REGION.EDIT],
-      delete: [I18N.REGION.DELETE],
+      add: [infra_i18n.region.add],
+      edit: [infra_i18n.region.edit],
+      delete: [infra_i18n.region.delete],
     },
     api: {
       list: RegionAPI.listFn,

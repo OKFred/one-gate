@@ -21,6 +21,19 @@ export const getFn = (
   });
 };
 
+export const batchGetFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/infra/data/schema_form/batch_get', 'post'>,
+    'url' | 'method'
+  >,
+) => {
+  return axiosPlus({
+    url: '/api/v1/infra/data/schema_form/batch_get',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const addFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/infra/data/schema_form/add', 'post'>, 'url' | 'method'>,
 ) => {

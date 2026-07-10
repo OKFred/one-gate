@@ -9,19 +9,19 @@ export type PermissionAction =
   | "view"
   | "batch-delete";
 
-export type CheckPermissionSeeds<T> = {
-  [P in keyof T & string]: {
-    [M in keyof T[P] & string]: (
-      M extends "" ? P : `${P}.${M}`
-    ) extends BusinessKey
+export type CheckPermissionSeeds<T, Parent extends string = ""> = {
+  [K in keyof T & string]: T[K] extends readonly PermissionAction[]
+    ? (
+        K extends "" ? Parent : Parent extends "" ? K : `${Parent}.${K}`
+      ) extends BusinessKey
       ? readonly PermissionAction[]
-      : never;
-  };
+      : never
+    : CheckPermissionSeeds<T[K], Parent extends "" ? K : `${Parent}.${K}`>;
 };
 
 export const permissionSeeds = {
   /** 系统管理 */
-  system: {
+  "infra.system": {
     "": ["read"],
     /** 用户管理 */
     user: ["read", "add", "edit", "delete", "export"],
@@ -39,7 +39,7 @@ export const permissionSeeds = {
     auth: ["read", "edit"],
   },
   /** 邮件 */
-  mail: {
+  "infra.mail": {
     "": ["read"],
     /** 邮件账户 */
     account: ["read", "add", "edit", "delete"],
@@ -47,9 +47,11 @@ export const permissionSeeds = {
     template: ["read", "add", "edit", "delete"],
     /** 邮件日志 */
     log: ["read", "view"],
+    /** 邮件操作 */
+    action: ["read", "add"],
   },
   /** 国际化 */
-  i18n: {
+  "infra.i18n": {
     "": ["read"],
     /** 语言管理 */
     language: ["read", "add", "edit", "delete"],
@@ -59,7 +61,7 @@ export const permissionSeeds = {
     translation: ["read", "add", "edit", "delete"],
   },
   /** 运维 */
-  maintenance: {
+  "infra.maintenance": {
     "": ["read"],
     /** 缓存管理 */
     cache: ["read", "add", "edit", "delete", "view"],
@@ -71,22 +73,32 @@ export const permissionSeeds = {
     api_task: ["read", "add", "edit", "delete"],
     /** API 文档管理 */
     api_docs: ["read", "add", "edit", "delete"],
+    /** 合规归档 */
+    compliance: ["read"],
+    /** 初始化数据 */
+    init: ["read"],
+  },
+  /** 基础设施 */
+  infra: {
+    "": ["read"],
   },
   /** 数据管理 */
-  data: {
+  "infra.data": {
     "": ["read"],
     /** 动态表单配置 */
     schema_form: ["read", "add", "edit", "delete"],
     /** 动态表单数据 */
     schema_form_data: ["read", "add", "edit", "delete"],
     /** 对象存储 */
-    oss: ["read"],
-    /** 存储配置 */
-    "oss.config": ["read", "add", "edit", "delete"],
-    /** 文件管理 */
-    "oss.file": ["read", "add", "edit", "delete"],
+    oss: {
+      "": ["read"],
+      /** 存储配置 */
+      config: ["read", "add", "edit", "delete"],
+      /** 文件管理 */
+      file: ["read", "add", "edit", "delete"],
+    },
   },
-  /** 企业 */
+  /** 企业管理 */
   enterprise: {
     "": ["read"],
     /** 考勤管理 */
@@ -97,7 +109,7 @@ export const permissionSeeds = {
     workflow_config: ["read", "add", "edit", "delete"],
   },
   /** AI */
-  ai: {
+  "infra.ai": {
     "": ["read"],
     /** AI 配置 */
     config: ["read", "add", "edit", "delete"],
@@ -105,7 +117,7 @@ export const permissionSeeds = {
     chat: ["read"],
   },
   /** Swarm 集群 */
-  swarm: {
+  "infra.swarm": {
     "": ["read"],
     /** Swarm 集群 Docker 服务管理 */
     docker: ["read", "add", "edit", "delete"],

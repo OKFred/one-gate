@@ -4,7 +4,7 @@ import { utils as translationUtils } from "../../../infra/src/i18n/translation/s
 import { SUPER_ADMIN_ID } from "./init";
 import { sql } from "drizzle-orm";
 
-import { aiTranslations } from "../../../biz/src/ai/translation";
+import { aiTranslations } from "../../../infra/src/ai/translation";
 import { swarmTranslations } from "../../../infra/src/swarm/translation";
 import { i18nTranslations } from "../../../infra/src/i18n/translation";
 import { mailTranslations } from "../../../infra/src/mail/translation";

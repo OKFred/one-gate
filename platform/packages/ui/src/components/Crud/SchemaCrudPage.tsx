@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Stack } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
@@ -10,6 +10,7 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useFormError } from '@/hooks/useFormError';
 import { useValidator } from '@/utils/validator';
+import { useSchema } from '@/hooks/useSchema';
 
 import type { SchemaCrudConfig, CrudHelpers, QueryState } from './types';
 import { Filter } from './components/Filter';
@@ -109,11 +110,35 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
     [],
   );
 
-  // 5. AJV 表单验证与校验错误处理 Hook
+  // 5. 动态 Schema 解析：支持 string（按名称动态获取）和 object（直接使用）两种模式
+  const isStringSchema = typeof config.form.schema === 'string';
+  const dynamicSchema = useSchema(
+    isStringSchema
+      ? {
+          schema: config.form.schema as string,
+          updateSchema:
+            typeof config.form.updateSchema === 'string'
+              ? (config.form.updateSchema as string)
+              : undefined,
+        }
+      : { schema: '' }, // 不启用动态获取
+  );
+
+  const resolvedSchema = useMemo(() => {
+    if (isStringSchema) return dynamicSchema.schema;
+    return config.form.schema as Record<string, unknown>;
+  }, [isStringSchema, dynamicSchema.schema, config.form.schema]);
+
+  const resolvedUpdateSchema = useMemo(() => {
+    if (typeof config.form.updateSchema === 'string') return dynamicSchema.updateSchema;
+    return config.form.updateSchema as Record<string, unknown> | undefined;
+  }, [config.form.updateSchema, dynamicSchema.updateSchema]);
+
+  // AJV 表单验证与校验错误处理 Hook
   const { fieldErrors, handleFormError, clearErrors, setFieldErrors, clearFieldError, rootSchema } =
-    useFormError(config.form.schema);
-  const { validate: validateAdd } = useValidator(config.form.schema);
-  const { validate: validateUpdate } = useValidator(config.form.updateSchema || config.form.schema);
+    useFormError(resolvedSchema ?? undefined);
+  const { validate: validateAdd } = useValidator(resolvedSchema);
+  const { validate: validateUpdate } = useValidator(resolvedUpdateSchema || resolvedSchema);
 
   const errorContextValue = { fieldErrors, clearFieldError, rootSchema };
 
@@ -310,14 +335,13 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
 
     const isEdit = !!editId;
     // 根据操作类型选择对应的 schema 和验证器
-    const activeSchema = isEdit
-      ? configRef.current.form.updateSchema || configRef.current.form.schema
-      : configRef.current.form.schema;
+    const activeSchema = isEdit ? resolvedUpdateSchema || resolvedSchema : resolvedSchema;
     const validate = isEdit ? validateUpdate : validateAdd;
 
     // 前端预验证
     const clientErrors = validate(form);
     if (Object.keys(clientErrors).length > 0) {
+      console.warn('Form validation failed:', clientErrors);
       setFieldErrors(clientErrors);
       return;
     }
@@ -559,6 +583,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         formLoading={formLoading}
         errorContextValue={errorContextValue}
         config={config}
+        resolvedSchema={resolvedSchema}
         extraContext={extraContext}
         onSubmit={handleFormSubmit}
         isMobile={isMobile}

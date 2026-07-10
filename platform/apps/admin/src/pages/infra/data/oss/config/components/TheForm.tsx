@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 import React from 'react';
 import { MenuItem, FormControlLabel, Switch, Grid } from '@mui/material';
 import { TextField } from '@/components/Form';
@@ -5,12 +6,9 @@ import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { ConfigRes } from './TheTable';
 import type { AddConfigReq, ListConfigReq } from '@/api/infra/data/oss/type';
-import schema from '@/assets/schemas/data.oss.configAddReq.json';
-import updateSchema from '@/assets/schemas/data.oss.configUpdateReq.json';
-
 export const formConfig: SchemaCrudConfig<ConfigRes, FilterState, ListConfigReq>['form'] = {
-  schema,
-  updateSchema,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     name: '',
     provider: 'S3',

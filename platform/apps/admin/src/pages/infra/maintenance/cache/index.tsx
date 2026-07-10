@@ -1,8 +1,8 @@
+import { THIS_PERMISSION } from './constant';
 import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { Visibility as ViewIcon } from '@mui/icons-material';
 import * as CacheAPI from '@/api/infra/maintenance/cache';
-import { MAINTENANCE } from '@/hooks/usePermission';
 import type { ListKeysRes } from '@/api/infra/maintenance/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import TheDetail from './components/TheDetail';
@@ -76,7 +76,7 @@ export default function CacheManagementPage() {
             key: 'view',
             color: 'info',
             icon: <ViewIcon />,
-            permissionCodes: [MAINTENANCE.CACHE.VIEW],
+            permissionCodes: [THIS_PERMISSION.view],
             onClick: (row) => {
               context?.onPreview(row);
             },

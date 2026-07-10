@@ -1,3 +1,4 @@
+import { THIS_PERMISSION } from './constant';
 import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
@@ -13,7 +14,6 @@ import type {
   AddDockerConfigReq,
   UpdateDockerConfigReq,
 } from '@/api/infra/swarm/type';
-import { SWARM } from '@/hooks/usePermission';
 import { showSnackbar } from '@/components/Notification';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -46,9 +46,9 @@ export default function SwarmDockerConfigPage() {
   > = {
     apiKeyName: 'id',
     permissions: {
-      add: [SWARM.DOCKER_CONFIG.ADD],
-      edit: [SWARM.DOCKER_CONFIG.EDIT],
-      delete: [SWARM.DOCKER_CONFIG.DELETE],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: DockerConfigAPI.listFn as unknown as SchemaCrudConfig<

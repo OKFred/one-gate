@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 /* eslint-disable react-refresh/only-export-components */
 import React, { useState, useMemo } from 'react';
 import {
@@ -22,8 +23,6 @@ import type { PermissionRes } from './TheTable';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { PermissionExtraContext } from '../index';
-import schema from '@/assets/schemas/system.permissionAddReq.json';
-import updateSchema from '@/assets/schemas/system.permissionUpdateReq.json';
 
 export interface PermissionFormFieldsProps {
   form: Partial<PermissionRes>;
@@ -38,8 +37,8 @@ export const formConfig: SchemaCrudConfig<
   ListPermissionReq,
   PermissionExtraContext
 >['form'] = {
-  schema,
-  updateSchema,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     code: '',
     name: '',

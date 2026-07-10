@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
-import schema from '@/assets/schemas/workflow.configAddReq.json';
 import * as WorkflowAPI from '@/api/biz/enterprise/workflow';
 import type { ListConfigReq, ConfigObj } from '@/api/biz/enterprise/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { ENTERPRISE } from '@/hooks/usePermission';
+import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
 import { Chip, Box, CircularProgress, TextField, FormControlLabel, Switch } from '@mui/material';
 
 import { PlayArrow as VerifyIcon } from '@mui/icons-material';
@@ -63,9 +62,9 @@ export default function WorkflowConfigManagement() {
   const config: SchemaCrudConfig<ConfigObj, FilterState, ListConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
-      add: [ENTERPRISE.WORKFLOW_CONFIG.ADD],
-      edit: [ENTERPRISE.WORKFLOW_CONFIG.EDIT],
-      delete: [ENTERPRISE.WORKFLOW_CONFIG.DELETE],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: WorkflowAPI.listConfigFn,
@@ -142,7 +141,7 @@ export default function WorkflowConfigManagement() {
           key: 'verify',
           label: t('workflow.config.testConnection'),
           color: 'success',
-          permissionCodes: [ENTERPRISE.WORKFLOW_CONFIG.READ],
+          permissionCodes: [THIS_PERMISSION.read],
           icon: (row) => {
             const isVerifying = extraContext?.verifyingId === row.id;
             return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;
@@ -159,7 +158,7 @@ export default function WorkflowConfigManagement() {
       ],
     },
     form: {
-      schema,
+      schema: `${FULL_PREFIX}.workflowConfig_addReq`,
       defaultForm: DEFAULT_FORM,
       renderForm: (form, setForm, _isMobile, t) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>

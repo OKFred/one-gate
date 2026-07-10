@@ -60,7 +60,10 @@ const RolePO = {
 } as const satisfies Record<keyof RolePOLike, JSONSchema>;
 export type RolePOLike = InferSelectModel<typeof roleTable>; // 列表
 type RoleSelectPOLike = InferInsertModel<typeof roleTable>;
-type RoleAddPOLike = Omit<RolePOLike, IndexKeyLike | AuditAddOmitKeyLike>;
+type RoleAddPOLike = Omit<
+  RolePOLike,
+  IndexKeyLike | AuditAddOmitKeyLike | "permissionCount"
+>;
 type RoleUpdatePOLike = Partial<
   Omit<RoleSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
@@ -79,8 +82,9 @@ export const RoleVO = {
 export const RoleListVO = RoleVO; // 列表
 export const RoleAddVO = {
   ...RoleUniqueVO,
-  ...RoleBaseVO,
-} as const satisfies Partial<Record<keyof RoleVOLike, JSONSchema>>; // 新增
+  remark: RoleBaseVO.remark,
+  isEnabled: RoleBaseVO.isEnabled,
+} as const satisfies Partial<Record<keyof RoleAddVOLike, JSONSchema>>; // 新增
 export const RoleUpdateVO = {
   ...IndexVO,
   ...RoleUniqueVO,
@@ -97,7 +101,6 @@ export const RoleAddKeys = [
   "name",
   "remark",
   "isEnabled",
-  "permissionCount",
   "dataScope",
   "customDeptIds",
 ] as const satisfies RequiredKeys<RoleAddVOLike>[];

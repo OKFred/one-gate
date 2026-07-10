@@ -1,12 +1,11 @@
+import { FULL_PREFIX, THIS_PERMISSION } from './constant';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import { filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type TranslationRes } from './components/TheTable';
 import TranslationFormFields from './components/TheForm';
 import * as TranslationAPI from '@/api/infra/i18n/translation';
 import type { ListTranslationReq } from '@/api/infra/i18n/type';
-import { I18N } from '@/hooks/usePermission';
-import translationSchema from '@/assets/schemas/i18n.translationAddReq.json';
-
+//
 const calculateSHA256 = async (text: string): Promise<string> => {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
@@ -19,9 +18,9 @@ export default function TranslationPage() {
   const config: SchemaCrudConfig<TranslationRes, FilterState, ListTranslationReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [I18N.TRANSLATION.ADD],
-      edit: [I18N.TRANSLATION.EDIT],
-      delete: [I18N.TRANSLATION.DELETE],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: TranslationAPI.listFn,
@@ -48,7 +47,7 @@ export default function TranslationPage() {
     filter: filterConfig,
     table: tableConfig,
     form: {
-      schema: translationSchema,
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: {
         application: '',
         business: '',

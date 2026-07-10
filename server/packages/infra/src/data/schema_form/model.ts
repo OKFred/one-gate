@@ -48,6 +48,11 @@ const SchemaFormBasePO = {
     type: "boolean",
     description: "是否启用",
   },
+  source: {
+    type: "string",
+    description: "来源类型",
+    enum: ["system", "user"],
+  },
 } as const satisfies Partial<Record<keyof SchemaFormPOLike, JSONSchema>>;
 
 const SchemaFormPO = {
@@ -140,6 +145,7 @@ const SchemaFormBaseKeys = [
   ...IndexKey,
   ...SchemaFormAddKeys,
   ...AuditKeys,
+  "source",
   "creatorName",
   "updaterName",
 ] as const satisfies RequiredKeys<SchemaFormPOLike>[];
@@ -164,6 +170,7 @@ export const schemaFormTable = sqliteTable("system_schema_form", {
   uiSchemaData: text("ui_schema_data"),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+  source: text("source").notNull().default("user"),
   creatorId: integer("creator_id").notNull(),
   creatorName: text("creator_name"),
   updaterId: integer("updater_id"),

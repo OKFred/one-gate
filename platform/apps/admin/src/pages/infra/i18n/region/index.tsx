@@ -1,3 +1,4 @@
+import { THIS_PERMISSION } from './constant';
 import { useState, useEffect } from 'react';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import { filterConfig, type FilterState } from './components/TheFilter';
@@ -6,7 +7,6 @@ import { formConfig } from './components/TheForm';
 import * as RegionAPI from '@/api/infra/i18n/region';
 import * as LanguageAPI from '@/api/infra/i18n/language';
 import type { ListAllLanguageRes, ListRegionReq } from '@/api/infra/i18n/type';
-import { I18N } from '@/hooks/usePermission';
 
 export default function RegionPage() {
   const [enabledLanguages, setEnabledLanguages] = useState<ListAllLanguageRes>([]);
@@ -31,9 +31,9 @@ export default function RegionPage() {
   > = {
     apiKeyName: 'id',
     permissions: {
-      add: [I18N.REGION.ADD],
-      edit: [I18N.REGION.EDIT],
-      delete: [I18N.REGION.DELETE],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: RegionAPI.listFn,

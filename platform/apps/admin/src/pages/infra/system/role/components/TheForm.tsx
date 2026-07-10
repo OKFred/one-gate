@@ -1,3 +1,4 @@
+import { FULL_PREFIX } from '../constant';
 /* eslint-disable react-refresh/only-export-components */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
@@ -20,8 +21,6 @@ import type { ListAllDepartmentRes, ListRoleReq } from '@/api/infra/system/type'
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { RoleRecord } from '../index';
-import schema from '@/assets/schemas/system.roleAddReq.json';
-import updateSchema from '@/assets/schemas/system.roleUpdateReq.json';
 
 export interface RoleFormFieldsProps {
   form: Partial<RoleRecord>;
@@ -40,8 +39,8 @@ type FlatDepartment = {
 };
 
 export const formConfig: SchemaCrudConfig<RoleRecord, FilterState, ListRoleReq>['form'] = {
-  schema,
-  updateSchema,
+  schema: `${FULL_PREFIX}.add.req`,
+  updateSchema: `${FULL_PREFIX}.update.req`,
   defaultForm: {
     name: '',
     remark: null,

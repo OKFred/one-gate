@@ -278,6 +278,178 @@ export const sharedTranslations = {
         "en-US": "Maintenance-API Docs",
       },
     },
+    {
+      tKey: "businessType.infra.system",
+      langCodes: { "zh-CN": "系统管理", "en-US": "System" },
+    },
+    {
+      tKey: "businessType.infra.system.user",
+      langCodes: { "zh-CN": "用户管理", "en-US": "User" },
+    },
+    {
+      tKey: "businessType.infra.system.role",
+      langCodes: { "zh-CN": "角色管理", "en-US": "Role" },
+    },
+    {
+      tKey: "businessType.infra.system.permission",
+      langCodes: { "zh-CN": "权限管理", "en-US": "Permission" },
+    },
+    {
+      tKey: "businessType.infra.system.department",
+      langCodes: { "zh-CN": "部门管理", "en-US": "Department" },
+    },
+    {
+      tKey: "businessType.infra.system.menu",
+      langCodes: { "zh-CN": "菜单管理", "en-US": "Menu" },
+    },
+    {
+      tKey: "businessType.infra.system.role_permission",
+      langCodes: { "zh-CN": "角色权限管理", "en-US": "Role Permission" },
+    },
+    {
+      tKey: "businessType.infra.system.auth",
+      langCodes: { "zh-CN": "个人信息", "en-US": "Profile" },
+    },
+    {
+      tKey: "businessType.infra.mail",
+      langCodes: { "zh-CN": "邮件管理", "en-US": "Mail Management" },
+    },
+    {
+      tKey: "businessType.infra.mail.account",
+      langCodes: { "zh-CN": "邮件账户", "en-US": "Mail Account" },
+    },
+    {
+      tKey: "businessType.infra.mail.template",
+      langCodes: { "zh-CN": "邮件模板", "en-US": "Mail Template" },
+    },
+    {
+      tKey: "businessType.infra.mail.log",
+      langCodes: { "zh-CN": "邮件日志", "en-US": "Mail Log" },
+    },
+    {
+      tKey: "businessType.infra.mail.action",
+      langCodes: { "zh-CN": "邮件操作", "en-US": "Mail Action" },
+    },
+    {
+      tKey: "businessType.infra.i18n",
+      langCodes: { "zh-CN": "国际化管理", "en-US": "Internationalization" },
+    },
+    {
+      tKey: "businessType.infra.i18n.language",
+      langCodes: { "zh-CN": "语言管理", "en-US": "Language" },
+    },
+    {
+      tKey: "businessType.infra.i18n.region",
+      langCodes: { "zh-CN": "地区管理", "en-US": "Region" },
+    },
+    {
+      tKey: "businessType.infra.i18n.translation",
+      langCodes: { "zh-CN": "翻译管理", "en-US": "Translation" },
+    },
+    {
+      tKey: "businessType.infra.maintenance",
+      langCodes: { "zh-CN": "系统运维", "en-US": "System Maintenance" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.cache",
+      langCodes: { "zh-CN": "缓存管理", "en-US": "Cache" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.audit_login",
+      langCodes: { "zh-CN": "登录日志", "en-US": "Login Audit" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.cron",
+      langCodes: { "zh-CN": "定时任务", "en-US": "Scheduled Tasks" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.api_task",
+      langCodes: { "zh-CN": "API采集任务", "en-US": "API Task" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.api_docs",
+      langCodes: { "zh-CN": "API文档管理", "en-US": "API Docs" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.compliance",
+      langCodes: { "zh-CN": "合规归档", "en-US": "Compliance Audit" },
+    },
+    {
+      tKey: "businessType.infra.maintenance.init",
+      langCodes: { "zh-CN": "初始化数据", "en-US": "Init Data" },
+    },
+    {
+      tKey: "businessType.infra",
+      langCodes: { "zh-CN": "基础设施", "en-US": "Infrastructure" },
+    },
+    {
+      tKey: "businessType.infra.data",
+      langCodes: { "zh-CN": "数据管理", "en-US": "Data Management" },
+    },
+    {
+      tKey: "businessType.infra.data.schema_form",
+      langCodes: { "zh-CN": "动态表单配置", "en-US": "Schema Form Config" },
+    },
+    {
+      tKey: "businessType.infra.data.schema_form_data",
+      langCodes: { "zh-CN": "表单提交数据", "en-US": "Schema Form Data" },
+    },
+    {
+      tKey: "businessType.infra.data.oss",
+      langCodes: { "zh-CN": "对象存储", "en-US": "Object Storage" },
+    },
+    {
+      tKey: "businessType.infra.data.oss.config",
+      langCodes: { "zh-CN": "存储配置", "en-US": "Storage Config" },
+    },
+    {
+      tKey: "businessType.infra.data.oss.file",
+      langCodes: { "zh-CN": "文件管理", "en-US": "File Management" },
+    },
+    {
+      tKey: "businessType.enterprise",
+      langCodes: { "zh-CN": "企业管理", "en-US": "Enterprise" },
+    },
+    {
+      tKey: "businessType.enterprise.attendance",
+      langCodes: { "zh-CN": "考勤管理", "en-US": "Attendance" },
+    },
+    {
+      tKey: "businessType.enterprise.workflow",
+      langCodes: { "zh-CN": "工作流编排", "en-US": "Workflow" },
+    },
+    {
+      tKey: "businessType.enterprise.workflow_config",
+      langCodes: { "zh-CN": "工作流配置", "en-US": "Workflow Config" },
+    },
+    {
+      tKey: "businessType.infra.ai",
+      langCodes: { "zh-CN": "AI", "en-US": "AI" },
+    },
+    {
+      tKey: "businessType.infra.ai.config",
+      langCodes: { "zh-CN": "AI配置", "en-US": "AI Config" },
+    },
+    {
+      tKey: "businessType.infra.ai.chat",
+      langCodes: { "zh-CN": "AI对话", "en-US": "AI Chat" },
+    },
+    {
+      tKey: "businessType.infra.swarm",
+      langCodes: { "zh-CN": "Swarm集群", "en-US": "Swarm Cluster" },
+    },
+    {
+      tKey: "businessType.infra.swarm.docker",
+      langCodes: { "zh-CN": "Docker服务", "en-US": "Docker Service" },
+    },
+    {
+      tKey: "businessType.infra.swarm.docker_config",
+      langCodes: { "zh-CN": "Docker配置", "en-US": "Docker Config" },
+    },
+    {
+      tKey: "businessType.infra.swarm.nodes",
+      langCodes: { "zh-CN": "节点管理", "en-US": "Node Management" },
+    },
   ],
   components: [
     {
@@ -1184,254 +1356,10 @@ export const sharedTranslations = {
       },
     },
   ],
-  "infra.businessType": [
-    {
-      tKey: "businessType.i18n",
-      langCodes: {
-        "zh-CN": "国际化",
-        "en-US": "Internationalization",
-      },
-    },
-    {
-      tKey: "businessType.i18n.language",
-      langCodes: {
-        "zh-CN": "国际化语言",
-        "en-US": "Internationalization Language",
-      },
-    },
-    {
-      tKey: "businessType.i18n.region",
-      langCodes: {
-        "zh-CN": "国际化地区",
-        "en-US": "Internationalization Region",
-      },
-    },
-    {
-      tKey: "businessType.i18n.translation",
-      langCodes: {
-        "zh-CN": "国际化翻译",
-        "en-US": "Internationalization Translation",
-      },
-    },
-    {
-      tKey: "businessType.mail",
-      langCodes: {
-        "zh-CN": "邮件",
-        "en-US": "Mail",
-      },
-    },
-    {
-      tKey: "businessType.mail.account",
-      langCodes: {
-        "zh-CN": "邮件账户",
-        "en-US": "Mail Account",
-      },
-    },
-    {
-      tKey: "businessType.mail.template",
-      langCodes: {
-        "zh-CN": "邮件模板",
-        "en-US": "Mail Template",
-      },
-    },
-    {
-      tKey: "businessType.mail.action",
-      langCodes: {
-        "zh-CN": "邮件操作",
-        "en-US": "Mail Action",
-      },
-    },
-    {
-      tKey: "businessType.mail.log",
-      langCodes: {
-        "zh-CN": "邮件日志",
-        "en-US": "Mail Log",
-      },
-    },
-    {
-      tKey: "businessType.maintenance",
-      langCodes: {
-        "zh-CN": "运维",
-        "en-US": "Operation Maintenance",
-      },
-    },
-    {
-      tKey: "businessType.maintenance.cache",
-      langCodes: {
-        "zh-CN": "运维缓存",
-        "en-US": "Operation Maintenance Cache",
-      },
-    },
-    {
-      tKey: "businessType.maintenance.compliance",
-      langCodes: {
-        "zh-CN": "运维合规",
-        "en-US": "Operation Maintenance Compliance",
-      },
-    },
-    {
-      tKey: "businessType.system",
-      langCodes: {
-        "zh-CN": "系统",
-        "en-US": "System",
-      },
-    },
-    {
-      tKey: "businessType.system.auth",
-      langCodes: {
-        "zh-CN": "系统鉴权",
-        "en-US": "System Auth",
-      },
-    },
-    {
-      tKey: "businessType.system.department",
-      langCodes: {
-        "zh-CN": "系统部门",
-        "en-US": "System Department",
-      },
-    },
-    {
-      tKey: "businessType.system.menu",
-      langCodes: {
-        "zh-CN": "系统菜单",
-        "en-US": "System Menu",
-      },
-    },
-    {
-      tKey: "businessType.system.permission",
-      langCodes: {
-        "zh-CN": "系统权限",
-        "en-US": "System Permission",
-      },
-    },
-    {
-      tKey: "businessType.system.role",
-      langCodes: {
-        "zh-CN": "系统角色",
-        "en-US": "System Role",
-      },
-    },
-    {
-      tKey: "businessType.system.role_permission",
-      langCodes: {
-        "zh-CN": "系统角色权限",
-        "en-US": "System Role Permission",
-      },
-    },
-    {
-      tKey: "businessType.system.user",
-      langCodes: {
-        "zh-CN": "系统用户",
-        "en-US": "System User",
-      },
-    },
-    {
-      tKey: "businessType.infra",
-      langCodes: {
-        "zh-CN": "基础设施",
-        "en-US": "Infrastructure",
-      },
-    },
-    {
-      tKey: "businessType.data",
-      langCodes: {
-        "zh-CN": "数据管理",
-        "en-US": "Data Management",
-      },
-    },
-    {
-      tKey: "businessType.data.oss",
-      langCodes: {
-        "zh-CN": "对象存储",
-        "en-US": "Object Storage",
-      },
-    },
-    {
-      tKey: "businessType.data.oss.config",
-      langCodes: {
-        "zh-CN": "存储配置",
-        "en-US": "OSS Config",
-      },
-    },
-    {
-      tKey: "businessType.data.oss.file",
-      langCodes: {
-        "zh-CN": "文件管理",
-        "en-US": "File Management",
-      },
-    },
-    {
-      tKey: "businessType.enterprise",
-      langCodes: {
-        "zh-CN": "企业管理",
-        "en-US": "Enterprise",
-      },
-    },
-    {
-      tKey: "businessType.enterprise.attendance",
-      langCodes: {
-        "zh-CN": "考勤管理",
-        "en-US": "Attendance",
-      },
-    },
-    {
-      tKey: "businessType.swarm",
-      langCodes: {
-        "zh-CN": "Swarm集群",
-        "en-US": "Swarm Cluster",
-      },
-    },
-    {
-      tKey: "businessType.swarm.docker",
-      langCodes: {
-        "zh-CN": "Docker服务",
-        "en-US": "Docker Service",
-      },
-    },
-    {
-      tKey: "businessType.system.schema_form",
-      langCodes: {
-        "zh-CN": "动态表单配置",
-        "en-US": "Schema Form Config",
-      },
-    },
-    {
-      tKey: "businessType.data.schema_form_data",
-      langCodes: {
-        "zh-CN": "表单提交数据",
-        "en-US": "Schema Form Data",
-      },
-    },
-    {
-      tKey: "businessType.ai",
-      langCodes: {
-        "zh-CN": "AI",
-        "en-US": "AI",
-      },
-    },
-    {
-      tKey: "businessType.ai.config",
-      langCodes: {
-        "zh-CN": "AI配置",
-        "en-US": "AI Config",
-      },
-    },
-    {
-      tKey: "businessType.ai.chat",
-      langCodes: {
-        "zh-CN": "AI对话",
-        "en-US": "AI Chat",
-      },
-    },
-  ],
 } satisfies Record<
   Extract<
     BusinessKey,
-    | "business.type"
-    | "components"
-    | "common"
-    | "business.exception"
-    | "infra.businessType"
+    "business.type" | "components" | "common" | "business.exception"
   >,
   TranslationInputItem[]
 >;

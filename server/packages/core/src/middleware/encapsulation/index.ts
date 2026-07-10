@@ -16,6 +16,7 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import type { JSONSchema } from "json-schema-to-ts";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "../../utils/pathRegister.js";
+import { registerSchema } from "../../utils/schemaRegistry.js";
 import { authMiddleware } from "../auth";
 import { can } from "../auth/permission";
 
@@ -47,11 +48,7 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = [
-  "/system/auth/login",
-  "/i18n/translation/listAll",
-  "/maintenance/init/db",
-];
+const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
 
 function routeMaker({
   pathInfo,
@@ -170,16 +167,16 @@ export default function main(apiObj: Record<string, API>, nameSpace: string) {
   Array.from(Object.values(apiObj)).forEach((obj) => {
     const { req, res, pathInfo } = obj;
     const subNameSpace = pathInfo.path
-      .replace(/\//g, "_")
+      .replace(/\//g, ".")
       .slice(1)
-      .replace(/^\w/, (c) => c.toUpperCase());
+      .toLowerCase();
     const componentArr = [
       componentMaker("request", {
-        name: `${nameSpace}${subNameSpace}Req`,
+        name: `${nameSpace}.${subNameSpace}.req`,
         component: req,
       }),
       componentMaker("response", {
-        name: `${nameSpace}${subNameSpace}Res`,
+        name: `${nameSpace}.${subNameSpace}.res`,
         component: res,
       }),
     ];
@@ -197,6 +194,7 @@ export default function main(apiObj: Record<string, API>, nameSpace: string) {
         component.name,
         component.component as any
       );
+      registerSchema(component.name, component.component as object);
     });
   });
   return app;

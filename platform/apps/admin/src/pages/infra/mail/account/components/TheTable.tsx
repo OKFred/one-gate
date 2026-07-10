@@ -1,10 +1,10 @@
+import { THIS_PERMISSION } from '../constant';
 import { Chip, CircularProgress } from '@mui/material';
 import { QuestionMark as VerifyIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { ListMailAccountReq, ListMailAccountRes } from '@/api/infra/mail/type';
 import type { FilterState } from './TheFilter';
-import { MAIL } from '@/hooks/usePermission';
 
 export type AccountRes = NonNullable<ListMailAccountRes['list']>[0];
 
@@ -59,7 +59,7 @@ export const tableConfig: SchemaCrudConfig<
     {
       key: 'verify',
       color: 'success',
-      permissionCodes: [MAIL.ACCOUNT.EDIT],
+      permissionCodes: [THIS_PERMISSION.edit],
       icon: (row) => {
         const isVerifying = extraContext?.verifyingId === row.id;
         return isVerifying ? <CircularProgress size={20} color="inherit" /> : <VerifyIcon />;

@@ -1,13 +1,12 @@
+import { FULL_PREFIX, THIS_PERMISSION } from './constant';
 import React, { useRef } from 'react';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import * as ApiDocsAPI from '@/api/infra/maintenance/api-docs';
-import { MAINTENANCE } from '@/hooks/usePermission';
 import type { ApiDocsObj, ListApiDocsReq } from '@/api/infra/maintenance/type';
 import { Box, Stack, Typography, Chip, Button } from '@mui/material';
 import { CloudUpload as UploadIcon } from '@mui/icons-material';
 import { Field } from '@/components/Form';
 import dayjs from 'dayjs';
-import schema from '@/assets/schemas/maintenance.api_docsAddReq.json';
 
 const DOC_TYPES: { label: string; value: string }[] = [
   { label: 'Swagger 2.0', value: 'swagger2.0' },
@@ -45,9 +44,9 @@ export default function ApiDocsManagement() {
   const config: SchemaCrudConfig<ApiDocsObj, typeof defaultFilters, ListApiDocsReq> = {
     apiKeyName: 'id',
     permissions: {
-      add: [MAINTENANCE.API_DOCS.ADD],
-      edit: [MAINTENANCE.API_DOCS.EDIT],
-      delete: [MAINTENANCE.API_DOCS.DELETE],
+      add: [THIS_PERMISSION.add],
+      edit: [THIS_PERMISSION.edit],
+      delete: [THIS_PERMISSION.delete],
     },
     api: {
       list: ApiDocsAPI.listFn,
@@ -139,7 +138,7 @@ export default function ApiDocsManagement() {
       ],
     },
     form: {
-      schema,
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: DEFAULT_FORM,
       afterOpen: (form, isEdit, row) => {
         if (isEdit && row) {
