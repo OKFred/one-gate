@@ -30,23 +30,20 @@ export async function preparePermissions(options?: { reset?: boolean }) {
 
   const creatorId = SUPER_ADMIN_ID; // 系统初始化
 
-  // 1. 嵌套循环生成打平后的权限数据
-  const mappedData = [];
-  for (const [parent, modules] of Object.entries(permissionSeeds)) {
-    for (const [module, actions] of Object.entries(modules)) {
-      for (const action of actions) {
-        const code = module
-          ? `${parent}.${module}:${action}`
-          : `${parent}:${action}`;
-        const business = module ? `${parent}.${module}` : parent;
+  // 1. 递归生成打平后的权限数据
+  const mappedData: any[] = [];
+
+  function traverse(node: any, pathParts: string[]) {
+    if (Array.isArray(node)) {
+      const business = pathParts.filter(Boolean).join(".");
+      for (const action of node) {
+        const code = `${business}:${action}`;
 
         // 获取显示名称
         const getActionName = () => {
-          const tKeySubString = module ? `${parent}.${module}` : parent;
-
           // 仅从 businessType 获取前缀翻译
           const trans = initialTranslationData.find(
-            (item) => item.tKey === "businessType." + tKeySubString
+            (item) => item.tKey === "businessType." + business
           );
           const prefix = trans?.langCodes?.[LOCALE];
 
@@ -69,8 +66,14 @@ export async function preparePermissions(options?: { reset?: boolean }) {
           creatorId,
         });
       }
+    } else if (typeof node === "object" && node !== null) {
+      for (const [key, value] of Object.entries(node)) {
+        traverse(value, [...pathParts, key]);
+      }
     }
   }
+
+  traverse(permissionSeeds, []);
 
   stats.total = mappedData.length;
 
