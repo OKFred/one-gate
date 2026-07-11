@@ -158,7 +158,7 @@ export default function WorkflowConfigManagement() {
       ],
     },
     form: {
-      schema: `${FULL_PREFIX}.workflowConfig_addReq`,
+      schema: `${FULL_PREFIX}.workflow.config.add.req`,
       defaultForm: DEFAULT_FORM,
       renderForm: (form, setForm, _isMobile, t) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
