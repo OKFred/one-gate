@@ -123,3 +123,31 @@ pnpm run db:init node
 ```bash
 npx openapi-typescript http://localhost:8787/doc.json --output platform/packages/ui/src/types/openapi.d.ts
 ```
+
+### Step 4.5: 页面权限常量自动生成 (`generate-constants.js`)
+
+每个页面目录下的 `constant.ts` 均由脚本自动生成，**不要手动编辑**。
+
+**脚本路径**: `platform/scripts/generate-constants.js`
+
+**执行命令**（在 `platform/` 目录下）：
+
+```bash
+node ./scripts/generate-constants.js
+```
+
+**生成规则**：
+
+- 脚本会扫描 `platform/apps/[app]/src/pages/` 下的所有子目录，对照 `packages/ui/src/hooks/usePermission.ts` 中 `permissions` 对象的实际键结构，判断该页面目录是否有对应的权限条目。
+- **有权限条目**：生成 `THIS_PERMISSION = permissions.xxx.yyy`（完整类型安全，无 `as any`）。
+- **无权限条目**（如 `mail/send`、`maintenance/openapi`）：只生成前缀常量，不生成 `THIS_PERMISSION`。
+- **排除目录**（`home`、`login`、`me`）：删除已有的 `constant.ts` 并跳过，因为这些页面与权限系统无关。
+
+**何时需要重新执行**：
+
+1. 在 `usePermission.ts` 中新增或删除权限条目后。
+2. 在 `pages/` 下新增了页面子目录后。
+3. 修改了 `EXCLUDED_DIRS` 排除列表后。
+
+> **注意**：`usePermission.ts` 由 `server/scripts/sync-permissions.ts` 自动生成，不要手动编辑。因此正确的链式操作为：
+> 修改 `initPermissions.ts` → 执行 `pnpm run db:init node` → 执行 `node ./scripts/generate-constants.js`。
