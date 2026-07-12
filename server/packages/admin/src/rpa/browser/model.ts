@@ -30,7 +30,14 @@ export const BrowserBasePO = {
   cdpUrl: {
     type: "string",
     description:
-      "CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)",
+      "CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com",
+  },
+  authToken: {
+    type: ["string", "null"],
+    nullable: true,
+    description:
+      "认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证",
+    maxLength: 500,
   },
   isDefault: {
     type: "boolean",
@@ -92,6 +99,7 @@ export const BrowserListKeys = [
   ...IndexKey,
   "name",
   "cdpUrl",
+  "authToken",
   "isDefault",
   "isEnabled",
   ...AuditKeys,
@@ -109,6 +117,7 @@ export const browserTable = sqliteTable("infra_browser", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   cdpUrl: text("cdp_url").notNull(),
+  authToken: text("auth_token"),
   isDefault: integer("is_default", { mode: "boolean" })
     .notNull()
     .default(false),
