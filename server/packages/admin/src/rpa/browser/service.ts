@@ -193,43 +193,79 @@ async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
   const config = await repository.findBrowserById(obj.id as number);
   preventEmpty(config);
 
-  let targetUrl = config.cdpUrl;
-  // 1. 标准化协议：如果是 WebSocket 地址，转换为 HTTP 地址以执行连通性校验
-  if (targetUrl.startsWith("ws://")) {
-    targetUrl = targetUrl.replace(/^ws:\/\//, "http://");
-  } else if (targetUrl.startsWith("wss://")) {
-    targetUrl = targetUrl.replace(/^wss:\/\//, "https://");
-  } else if (
-    !targetUrl.startsWith("http://") &&
-    !targetUrl.startsWith("https://")
-  ) {
-    targetUrl = `http://${targetUrl}`;
+  const headers: Record<string, string> = {};
+  if (config.authToken) {
+    headers["Authorization"] = `Bearer ${config.authToken}`;
   }
 
-  // 2. 解析 Host 部分并请求 CDP 服务的 /json/version 接口
   try {
-    const urlObj = new URL(targetUrl);
-    const hostUrl = `${urlObj.protocol}//${urlObj.host}`;
+    if (config.authToken) {
+      // ── Cloudflare Browser Run 模式 ──
+      // POST /devtools/browser 创建一个临时 session，验证 API Token 是否有效
+      let baseUrl = config.cdpUrl.trim().replace(/\/$/, "");
+      // 将 ws(s):// 转为 https://
+      if (baseUrl.startsWith("wss://")) {
+        baseUrl = baseUrl.replace(/^wss:\/\//, "https://");
+      } else if (baseUrl.startsWith("ws://")) {
+        baseUrl = baseUrl.replace(/^ws:\/\//, "http://");
+      } else if (!baseUrl.startsWith("http")) {
+        baseUrl = `https://${baseUrl}`;
+      }
 
-    console.log(
-      `[Verify Browser] Fast HTTP connectivity testing on: ${hostUrl}/json/version`
-    );
-    const res = await fetch(`${hostUrl}/json/version`, {
-      signal: AbortSignal.timeout(3000),
-    });
-    const versionData = (await res.json()) as { webSocketDebuggerUrl?: string };
+      console.log(
+        `[Verify Browser] CF Browser Run mode — POST ${baseUrl}/devtools/browser`
+      );
+      const res = await fetch(`${baseUrl}/devtools/browser`, {
+        method: "POST",
+        headers,
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!res.ok) {
+        console.error(
+          `[Verify Browser] CF API returned ${res.status}: ${await res.text()}`
+        );
+        return false;
+      }
+      const data = (await res.json()) as { webSocketDebuggerUrl?: string };
+      const isSuccessful = !!data.webSocketDebuggerUrl;
+      console.log(
+        `[Verify Browser] CF Browser Run result: ${isSuccessful ? "SUCCESS" : "FAILED (no webSocketDebuggerUrl)"}`
+      );
+      return isSuccessful;
+    } else {
+      // ── 自托管 CDP 模式 ──
+      let targetUrl = config.cdpUrl;
+      if (targetUrl.startsWith("ws://")) {
+        targetUrl = targetUrl.replace(/^ws:\/\//, "http://");
+      } else if (targetUrl.startsWith("wss://")) {
+        targetUrl = targetUrl.replace(/^wss:\/\//, "https://");
+      } else if (
+        !targetUrl.startsWith("http://") &&
+        !targetUrl.startsWith("https://")
+      ) {
+        targetUrl = `http://${targetUrl}`;
+      }
 
-    // 如果能够获取到 webSocketDebuggerUrl，说明 CDP 调试服务正在正常提供服务且端口完全畅通
-    const isSuccessful = !!versionData.webSocketDebuggerUrl;
-    console.log(
-      `[Verify Browser] Connectivity result: ${isSuccessful ? "SUCCESS" : "FAILED"}`
-    );
-    return isSuccessful;
+      const urlObj = new URL(targetUrl);
+      const hostUrl = `${urlObj.protocol}//${urlObj.host}`;
+
+      console.log(
+        `[Verify Browser] Self-hosted CDP mode — GET ${hostUrl}/json/version`
+      );
+      const res = await fetch(`${hostUrl}/json/version`, {
+        signal: AbortSignal.timeout(3000),
+      });
+      const versionData = (await res.json()) as {
+        webSocketDebuggerUrl?: string;
+      };
+      const isSuccessful = !!versionData.webSocketDebuggerUrl;
+      console.log(
+        `[Verify Browser] Connectivity result: ${isSuccessful ? "SUCCESS" : "FAILED"}`
+      );
+      return isSuccessful;
+    }
   } catch (err: any) {
-    console.error(
-      "[Verify Browser] Fast HTTP connectivity test failed:",
-      err.message
-    );
+    console.error("[Verify Browser] Connectivity test failed:", err.message);
     return false;
   }
 }
