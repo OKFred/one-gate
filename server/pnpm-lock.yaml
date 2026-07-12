@@ -165,15 +165,18 @@ importers:
       '@cfworker/json-schema':
         specifier: ^4.1.1
         version: 4.1.1
-      '@hodor/biz':
+      '@hodor/admin':
         specifier: workspace:*
-        version: link:../../packages/biz
+        version: link:../../packages/admin
       '@hodor/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@hodor/infra':
+      '@hodor/enterprise':
         specifier: workspace:*
-        version: link:../../packages/infra
+        version: link:../../packages/enterprise
+      '@hodor/personal':
+        specifier: workspace:*
+        version: link:../../packages/personal
       '@hono/node-server':
         specifier: ^1.13.8
         version: 1.19.14(hono@4.12.12)
@@ -305,14 +308,11 @@ importers:
         specifier: ^4.100.0
         version: 4.100.0
 
-  packages/biz:
+  packages/admin:
     dependencies:
       '@hodor/core':
         specifier: workspace:*
         version: link:../core
-      '@hodor/infra':
-        specifier: workspace:*
-        version: link:../infra
       '@hono/zod-openapi':
         specifier: ^1.3.0
         version: 1.3.0(hono@4.12.12)(zod@4.4.3)
@@ -395,8 +395,26 @@ importers:
         specifier: ^2.9.0
         version: 2.9.0
 
-  packages/infra:
+  packages/enterprise:
     dependencies:
+      '@hodor/admin':
+        specifier: workspace:*
+        version: link:../admin
+      '@hodor/core':
+        specifier: workspace:*
+        version: link:../core
+      '@hono/zod-openapi':
+        specifier: ^1.3.0
+        version: 1.3.0(hono@4.12.12)(zod@4.4.3)
+      hono:
+        specifier: ^4.12.12
+        version: 4.12.12
+
+  packages/personal:
+    dependencies:
+      '@hodor/admin':
+        specifier: workspace:*
+        version: link:../admin
       '@hodor/core':
         specifier: workspace:*
         version: link:../core

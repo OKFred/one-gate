@@ -1,4 +1,4 @@
-import { languageTable } from "../../../infra/src/i18n/language/model";
+import { languageTable } from "../../../admin/src/i18n/language/model";
 import db from "./index";
 import { SUPER_ADMIN_ID } from "./init";
 

@@ -50,7 +50,11 @@ const childrenRoutes = [
     ),
   ),
   {
-    path: 'biz/*',
+    path: 'organization/*',
+    element: <div />,
+  },
+  {
+    path: 'executive/*',
     element: <div />,
   },
   {

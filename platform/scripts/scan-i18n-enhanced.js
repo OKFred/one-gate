@@ -383,8 +383,9 @@ async function main() {
   // 2. 扫描后端代码
   const serverDirs = [
     join(baseDir, '../server/packages/core/src'),
-    join(baseDir, '../server/packages/infra/src'),
-    join(baseDir, '../server/packages/biz/src'),
+    join(baseDir, '../server/packages/admin/src'),
+    join(baseDir, '../server/packages/enterprise/src'),
+    join(baseDir, '../server/packages/personal/src'),
     join(baseDir, '../server/apps/server/src'),
   ];
   console.log(`📁 扫描后端代码目录: \n${serverDirs.map((d) => '  - ' + d).join('\n')}`);

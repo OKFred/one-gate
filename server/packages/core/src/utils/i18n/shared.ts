@@ -1,5 +1,5 @@
 import { kv } from "../../middleware/cache/index.js";
-import translationService from "../../../../infra/src/i18n/translation/service";
+import translationService from "../../../../admin/src/i18n/translation/service";
 
 /**
  * 获取翻译文案 (懒加载模式)

@@ -3,7 +3,7 @@ import { db } from "../db/index";
 import {
   cronTable,
   cronLogTable,
-} from "../../../infra/src/maintenance/cron/model";
+} from "../../../admin/src/maintenance/cron/model";
 import { CronExpressionParser } from "cron-parser";
 import { jobExecutors } from "./executor";
 

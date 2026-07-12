@@ -6,8 +6,8 @@ import React, {
   useMemo,
   type ReactNode,
 } from 'react';
-import { getButtonPermissionFn } from '@/api/infra/system/auth';
-import type { GetButtonPermissionsRes } from '@/api/infra/system/type';
+import { getButtonPermissionFn } from '@/api/admin/system/auth';
+import type { GetButtonPermissionsRes } from '@/api/admin/system/type';
 import { useTranslation } from '@/hooks/useTranslation';
 import { showSnackbar } from '@/components/Notification';
 

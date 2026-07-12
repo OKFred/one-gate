@@ -4,10 +4,45 @@ import type { BusinessKey } from "@hodor/core/types/business";
 export const sharedTranslations = {
   "business.type": [
     {
-      tKey: "sidebar.menu.infra",
+      tKey: "sidebar.menu.admin",
       langCodes: {
-        "zh-CN": "基础设施",
-        "en-US": "Infrastructure",
+        "zh-CN": "管理后台",
+        "en-US": "Admin Backend",
+      },
+    },
+    {
+      tKey: "sidebar.menu.organization",
+      langCodes: {
+        "zh-CN": "组织管理",
+        "en-US": "Organization",
+      },
+    },
+    {
+      tKey: "sidebar.menu.organization.attendance",
+      langCodes: {
+        "zh-CN": "考勤",
+        "en-US": "Attendance",
+      },
+    },
+    {
+      tKey: "sidebar.menu.executive",
+      langCodes: {
+        "zh-CN": "事务管理",
+        "en-US": "Executive",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal",
+      langCodes: {
+        "zh-CN": "个人中心",
+        "en-US": "Personal",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.profile",
+      langCodes: {
+        "zh-CN": "个人信息",
+        "en-US": "Personal Profile",
       },
     },
     {
@@ -39,7 +74,7 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "sidebar.menu.infra.rpa",
+      tKey: "sidebar.menu.admin.rpa",
       langCodes: {
         "zh-CN": "RPA",
         "en-US": "RPA",
@@ -286,131 +321,131 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "businessType.infra.system",
+      tKey: "businessType.admin.system",
       langCodes: { "zh-CN": "系统管理", "en-US": "System" },
     },
     {
-      tKey: "businessType.infra.system.user",
+      tKey: "businessType.admin.system.user",
       langCodes: { "zh-CN": "用户管理", "en-US": "User" },
     },
     {
-      tKey: "businessType.infra.system.role",
+      tKey: "businessType.admin.system.role",
       langCodes: { "zh-CN": "角色管理", "en-US": "Role" },
     },
     {
-      tKey: "businessType.infra.system.permission",
+      tKey: "businessType.admin.system.permission",
       langCodes: { "zh-CN": "权限管理", "en-US": "Permission" },
     },
     {
-      tKey: "businessType.infra.system.department",
+      tKey: "businessType.admin.system.department",
       langCodes: { "zh-CN": "部门管理", "en-US": "Department" },
     },
     {
-      tKey: "businessType.infra.system.menu",
+      tKey: "businessType.admin.system.menu",
       langCodes: { "zh-CN": "菜单管理", "en-US": "Menu" },
     },
     {
-      tKey: "businessType.infra.system.role_permission",
+      tKey: "businessType.admin.system.role_permission",
       langCodes: { "zh-CN": "角色权限管理", "en-US": "Role Permission" },
     },
     {
-      tKey: "businessType.infra.system.auth",
+      tKey: "businessType.admin.system.auth",
       langCodes: { "zh-CN": "个人信息", "en-US": "Profile" },
     },
     {
-      tKey: "businessType.infra.mail",
+      tKey: "businessType.admin.mail",
       langCodes: { "zh-CN": "邮件管理", "en-US": "Mail Management" },
     },
     {
-      tKey: "businessType.infra.mail.account",
+      tKey: "businessType.admin.mail.account",
       langCodes: { "zh-CN": "邮件账户", "en-US": "Mail Account" },
     },
     {
-      tKey: "businessType.infra.mail.template",
+      tKey: "businessType.admin.mail.template",
       langCodes: { "zh-CN": "邮件模板", "en-US": "Mail Template" },
     },
     {
-      tKey: "businessType.infra.mail.log",
+      tKey: "businessType.admin.mail.log",
       langCodes: { "zh-CN": "邮件日志", "en-US": "Mail Log" },
     },
     {
-      tKey: "businessType.infra.mail.action",
+      tKey: "businessType.admin.mail.action",
       langCodes: { "zh-CN": "邮件操作", "en-US": "Mail Action" },
     },
     {
-      tKey: "businessType.infra.i18n",
+      tKey: "businessType.admin.i18n",
       langCodes: { "zh-CN": "国际化管理", "en-US": "Internationalization" },
     },
     {
-      tKey: "businessType.infra.i18n.language",
+      tKey: "businessType.admin.i18n.language",
       langCodes: { "zh-CN": "语言管理", "en-US": "Language" },
     },
     {
-      tKey: "businessType.infra.i18n.region",
+      tKey: "businessType.admin.i18n.region",
       langCodes: { "zh-CN": "地区管理", "en-US": "Region" },
     },
     {
-      tKey: "businessType.infra.i18n.translation",
+      tKey: "businessType.admin.i18n.translation",
       langCodes: { "zh-CN": "翻译管理", "en-US": "Translation" },
     },
     {
-      tKey: "businessType.infra.maintenance",
+      tKey: "businessType.admin.maintenance",
       langCodes: { "zh-CN": "系统运维", "en-US": "System Maintenance" },
     },
     {
-      tKey: "businessType.infra.maintenance.cache",
+      tKey: "businessType.admin.maintenance.cache",
       langCodes: { "zh-CN": "缓存管理", "en-US": "Cache" },
     },
     {
-      tKey: "businessType.infra.maintenance.audit_login",
+      tKey: "businessType.admin.maintenance.audit_login",
       langCodes: { "zh-CN": "登录日志", "en-US": "Login Audit" },
     },
     {
-      tKey: "businessType.infra.maintenance.cron",
+      tKey: "businessType.admin.maintenance.cron",
       langCodes: { "zh-CN": "定时任务", "en-US": "Scheduled Tasks" },
     },
     {
-      tKey: "businessType.infra.maintenance.api_task",
+      tKey: "businessType.admin.maintenance.api_task",
       langCodes: { "zh-CN": "API采集任务", "en-US": "API Task" },
     },
     {
-      tKey: "businessType.infra.maintenance.api_docs",
+      tKey: "businessType.admin.maintenance.api_docs",
       langCodes: { "zh-CN": "API文档管理", "en-US": "API Docs" },
     },
     {
-      tKey: "businessType.infra.maintenance.compliance",
+      tKey: "businessType.admin.maintenance.compliance",
       langCodes: { "zh-CN": "合规归档", "en-US": "Compliance Audit" },
     },
     {
-      tKey: "businessType.infra.maintenance.init",
+      tKey: "businessType.admin.maintenance.init",
       langCodes: { "zh-CN": "初始化数据", "en-US": "Init Data" },
     },
     {
-      tKey: "businessType.infra",
-      langCodes: { "zh-CN": "基础设施", "en-US": "Infrastructure" },
+      tKey: "businessType.admin",
+      langCodes: { "zh-CN": "管理后台", "en-US": "Admin Backend" },
     },
     {
-      tKey: "businessType.infra.data",
+      tKey: "businessType.admin.data",
       langCodes: { "zh-CN": "数据管理", "en-US": "Data Management" },
     },
     {
-      tKey: "businessType.infra.data.schema_form",
+      tKey: "businessType.admin.data.schema_form",
       langCodes: { "zh-CN": "动态表单配置", "en-US": "Schema Form Config" },
     },
     {
-      tKey: "businessType.infra.data.schema_form_data",
+      tKey: "businessType.admin.data.schema_form_data",
       langCodes: { "zh-CN": "表单提交数据", "en-US": "Schema Form Data" },
     },
     {
-      tKey: "businessType.infra.data.oss",
+      tKey: "businessType.admin.data.oss",
       langCodes: { "zh-CN": "对象存储", "en-US": "Object Storage" },
     },
     {
-      tKey: "businessType.infra.data.oss.config",
+      tKey: "businessType.admin.data.oss.config",
       langCodes: { "zh-CN": "存储配置", "en-US": "Storage Config" },
     },
     {
-      tKey: "businessType.infra.data.oss.file",
+      tKey: "businessType.admin.data.oss.file",
       langCodes: { "zh-CN": "文件管理", "en-US": "File Management" },
     },
     {
@@ -418,47 +453,63 @@ export const sharedTranslations = {
       langCodes: { "zh-CN": "企业管理", "en-US": "Enterprise" },
     },
     {
-      tKey: "businessType.enterprise.attendance",
+      tKey: "businessType.organization",
+      langCodes: { "zh-CN": "组织管理", "en-US": "Organization" },
+    },
+    {
+      tKey: "businessType.organization.attendance",
       langCodes: { "zh-CN": "考勤管理", "en-US": "Attendance" },
     },
     {
-      tKey: "businessType.enterprise.workflow",
+      tKey: "businessType.executive",
+      langCodes: { "zh-CN": "事务管理", "en-US": "Executive" },
+    },
+    {
+      tKey: "businessType.executive.workflow",
       langCodes: { "zh-CN": "工作流编排", "en-US": "Workflow" },
     },
     {
-      tKey: "businessType.infra.rpa",
+      tKey: "businessType.personal",
+      langCodes: { "zh-CN": "个人中心", "en-US": "Personal" },
+    },
+    {
+      tKey: "businessType.personal.profile",
+      langCodes: { "zh-CN": "个人信息", "en-US": "Personal Profile" },
+    },
+    {
+      tKey: "businessType.admin.rpa",
       langCodes: { "zh-CN": "RPA", "en-US": "RPA" },
     },
     {
-      tKey: "businessType.infra.rpa.browser",
+      tKey: "businessType.admin.rpa.browser",
       langCodes: { "zh-CN": "RPA-浏览器配置", "en-US": "RPA-Browser Config" },
     },
     {
-      tKey: "businessType.infra.ai",
+      tKey: "businessType.admin.ai",
       langCodes: { "zh-CN": "AI", "en-US": "AI" },
     },
     {
-      tKey: "businessType.infra.ai.config",
+      tKey: "businessType.admin.ai.config",
       langCodes: { "zh-CN": "AI配置", "en-US": "AI Config" },
     },
     {
-      tKey: "businessType.infra.ai.chat",
+      tKey: "businessType.admin.ai.chat",
       langCodes: { "zh-CN": "AI对话", "en-US": "AI Chat" },
     },
     {
-      tKey: "businessType.infra.swarm",
+      tKey: "businessType.admin.swarm",
       langCodes: { "zh-CN": "Swarm集群", "en-US": "Swarm Cluster" },
     },
     {
-      tKey: "businessType.infra.swarm.docker",
+      tKey: "businessType.admin.swarm.docker",
       langCodes: { "zh-CN": "Docker服务", "en-US": "Docker Service" },
     },
     {
-      tKey: "businessType.infra.swarm.docker_config",
+      tKey: "businessType.admin.swarm.docker_config",
       langCodes: { "zh-CN": "Docker配置", "en-US": "Docker Config" },
     },
     {
-      tKey: "businessType.infra.swarm.nodes",
+      tKey: "businessType.admin.swarm.nodes",
       langCodes: { "zh-CN": "节点管理", "en-US": "Node Management" },
     },
   ],
@@ -999,6 +1050,20 @@ export const sharedTranslations = {
         "en-US": "Refresh",
       },
     },
+    {
+      tKey: "common.welcome",
+      langCodes: {
+        "zh-CN": "欢迎使用管理系统",
+        "en-US": "Welcome to the Management System",
+      },
+    },
+    {
+      tKey: "common.welcomeSubtitle",
+      langCodes: {
+        "zh-CN": "提供高效便捷的工作流与组织管理方案",
+        "en-US": "Efficient workflows and organizational management solutions at your fingertips.",
+      },
+    },
   ],
   "business.exception": [
     {
@@ -1364,6 +1429,20 @@ export const sharedTranslations = {
         "zh-CN": "无法初始化存储实例，请检查配置信息或运行环境",
         "en-US":
           "Failed to initialize storage instance. Please check configuration or environment.",
+      },
+    },
+    {
+      tKey: "gender.male",
+      langCodes: {
+        "zh-CN": "男",
+        "en-US": "Male",
+      },
+    },
+    {
+      tKey: "gender.female",
+      langCodes: {
+        "zh-CN": "女",
+        "en-US": "Female",
       },
     },
   ],

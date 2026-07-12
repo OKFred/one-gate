@@ -15,8 +15,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@hodor/core/*": ["../../packages/core/src/*"],
-      "@hodor/infra/*": ["../../packages/infra/src/*"],
-      "@hodor/biz/*": ["../../packages/biz/src/*"]
+      "@hodor/admin/*": ["../../packages/admin/src/*"],
+      "@hodor/enterprise/*": ["../../packages/enterprise/src/*"],
+      "@hodor/personal/*": ["../../packages/personal/src/*"]
     }
   },
   "include": ["src/**/*", "worker-configuration.d.ts"],

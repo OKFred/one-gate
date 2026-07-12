@@ -2,15 +2,15 @@ import { forwardRef, useImperativeHandle, useState, memo, useRef, useEffect } fr
 import { Card, CardContent, Typography, Box, Chip, Paper, Tooltip } from '@mui/material';
 import { AccountBox as AccountBoxIcon, Edit as EditIcon } from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
-import { infra_system } from '@/hooks/usePermission';
-import type { GetUserRes } from '@/api/infra/system/type';
+import { admin_system } from '@/hooks/usePermission';
+import type { GetUserRes } from '@/api/admin/system/type';
 import type { Props } from '../index';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 import TheEditDialog, { type TheEditDialogRef } from './TheEditDialog';
-import * as RegionAPI from '@/api/infra/i18n/region';
-import * as LanguageAPI from '@/api/infra/i18n/language';
-import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/infra/i18n/type';
+import * as RegionAPI from '@/api/admin/i18n/region';
+import * as LanguageAPI from '@/api/admin/i18n/language';
+import type { ListAllRegionRes, ListAllLanguageRes } from '@/api/admin/i18n/type';
 
 // 暴露给父组件的方法
 export interface TheDetailsRef {
@@ -89,7 +89,7 @@ const TheDetails = memo(
                 variant="contained"
                 startIcon={<EditIcon />}
                 onClick={handleEdit}
-                permissionCodes={[infra_system.auth.edit]}
+                permissionCodes={[admin_system.auth.edit]}
               >
                 {t('dialog.edit')}
               </ResponsiveButton>

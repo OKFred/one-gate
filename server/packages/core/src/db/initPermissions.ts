@@ -4,8 +4,8 @@
  */
 
 import db from "./index";
-import { permissionTable } from "../../../infra/src/system/permission/model";
-import { rolePermissionTable } from "../../../infra/src/system/role_permission/model";
+import { permissionTable } from "../../../admin/src/system/permission/model";
+import { rolePermissionTable } from "../../../admin/src/system/role_permission/model";
 import { initialTranslationData } from "./initTranslation";
 import { SUPER_ADMIN_ID } from "./init";
 import { getEnv } from "../utils/env";

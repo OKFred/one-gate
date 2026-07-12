@@ -17,7 +17,6 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   const routes: RouteObject[] = [];
 
   for (const [filePath, loader] of paths) {
-    // ./pages/mail/template/index.tsx => mail/template
     const match = filePath.match(/\.\/pages\/(.*?)\/index\.tsx$/);
     if (!match) continue;
 

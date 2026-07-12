@@ -8,15 +8,17 @@ const rootDir = path.resolve(__dirname, "..");
 
 const targetDirs = [
   path.join(rootDir, "packages/core/src"),
-  path.join(rootDir, "packages/infra/src"),
-  path.join(rootDir, "packages/biz/src"),
+  path.join(rootDir, "packages/admin/src"),
+  path.join(rootDir, "packages/enterprise/src"),
+  path.join(rootDir, "packages/personal/src"),
   path.join(rootDir, "apps/server/src"),
   path.join(rootDir, "apps/server/test"),
 ];
 
 const mappings = [
-  { from: /@\/api\/infra\//g, to: "@hodor/infra/" },
-  { from: /@\/api\/biz\//g, to: "@hodor/biz/" },
+  { from: /@\/api\/admin\//g, to: "@hodor/admin/" },
+  { from: /@\/api\/enterprise\//g, to: "@hodor/enterprise/" },
+  { from: /@\/api\/personal\//g, to: "@hodor/personal/" },
   {
     from: /@\/api\/pathRegister(?:\.js)?/g,
     to: "@hodor/core/utils/pathRegister.js",

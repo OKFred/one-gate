@@ -2,7 +2,7 @@
 import type { components } from '@/types/openapi';
 
 const USER_KEY = 'userInfo';
-export type LoginResponse = components['schemas']['infra.system.auth.login.res']['data'];
+export type LoginResponse = components['schemas']['admin.system.auth.login.res']['data'];
 export type UserInfo = LoginResponse['userObj'];
 
 // Token管理

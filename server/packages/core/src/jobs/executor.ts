@@ -5,7 +5,7 @@
 
 import { AppDatabase } from "../db/index";
 import { jobsRegistry } from "./registry";
-import { apiTaskTable } from "../../../infra/src/maintenance/api-task/model";
+import { apiTaskTable } from "../../../admin/src/maintenance/api-task/model";
 import { eq, and } from "drizzle-orm";
 
 export interface ApiTaskDef {
