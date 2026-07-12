@@ -13,7 +13,6 @@
     "worker:types": "pnpm --filter @hodor/server worker:types",
     "db:init": "pnpm --filter @hodor/server db:init",
     "sync:permissions": "pnpm --filter @hodor/server sync:permissions",
-    "sync:schemas": "pnpm --filter @hodor/server sync:schemas",
     "format": "prettier --write .",
     "lint": "eslint . --fix"
   },
