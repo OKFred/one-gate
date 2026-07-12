@@ -85,6 +85,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "server/apps/server"
           packageManager: pnpm
+          wranglerVersion: "4.100.0"
           command: deploy
 
       # ─── 步骤 2: 部署前端 Pages ───
@@ -106,6 +107,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.100.0"
           command: pages deploy ./platform/apps/admin/dist --project-name=gate
 
       # ─── 步骤 2b: 部署企业系统 Enterprise (gate-enterprise) ───
@@ -114,6 +116,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.100.0"
           command: pages deploy ./platform/apps/enterprise/dist --project-name=gate-enterprise --branch=dev # 强制指定为 production 分支
 
       # ─── 步骤 2c: 部署个人系统 Personal (gate-personal) ───
@@ -122,4 +125,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.100.0"
           command: pages deploy ./platform/apps/personal/dist --project-name=gate-personal --branch=dev # 强制指定为 production 分支
