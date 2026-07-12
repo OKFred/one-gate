@@ -105,8 +105,6 @@ export const permissionSeeds = {
     attendance: ["read", "add", "edit", "delete"],
     /** 工作流编排 */
     workflow: ["read", "add", "edit", "delete"],
-    /** 工作流配置 */
-    workflow_config: ["read", "add", "edit", "delete"],
   },
   /** AI */
   "infra.ai": {
@@ -125,6 +123,12 @@ export const permissionSeeds = {
     docker_config: ["read", "add", "edit", "delete"],
     /** Swarm 节点管理 */
     nodes: ["read"],
+  },
+  /** RPA */
+  "infra.rpa": {
+    "": ["read"],
+    /** 浏览器配置 */
+    browser: ["read", "add", "edit", "delete"],
   },
 } as const;
 

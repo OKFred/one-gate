@@ -57,8 +57,6 @@ export const BUSINESS = {
   "enterprise.attendance": "enterprise.attendance",
   /** 企业工作流 */
   "enterprise.workflow": "enterprise.workflow",
-  /** 企业工作流配置 */
-  "enterprise.workflow_config": "enterprise.workflow_config",
   /** AI */
   "infra.ai": "infra.ai",
   /** AI 配置 */
@@ -84,6 +82,10 @@ export const BUSINESS = {
 
   /** 基础设施 */
   infra: "infra",
+  /** RPA */
+  "infra.rpa": "infra.rpa",
+  /** 浏览器环境调试配置 */
+  "infra.rpa.browser": "infra.rpa.browser",
   /** 数据管理 */
   "infra.data": "infra.data",
   /** 数据管理 动态表单数据 */

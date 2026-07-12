@@ -13,6 +13,7 @@ import { ossTranslations } from "../../../infra/src/data/oss/translation";
 import { dataTranslations } from "../../../infra/src/data/translation";
 import { enterpriseTranslations } from "../../../biz/src/enterprise/translation";
 import { systemTranslations } from "../../../infra/src/system/translation";
+import { browserTranslations } from "../../../infra/src/rpa/browser/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "../types/business";
 import type { LanguageCode } from "./initLanguage";
@@ -132,4 +133,5 @@ export const initialTranslationData = mapTranslations({
   ...ossTranslations,
   ...enterpriseTranslations,
   ...systemTranslations,
+  ...browserTranslations,
 }) satisfies BatchTranslationItem[];

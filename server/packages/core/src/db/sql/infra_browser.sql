@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS enterprise_workflow_config (
+CREATE TABLE IF NOT EXISTS infra_browser (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     cdp_url TEXT NOT NULL,

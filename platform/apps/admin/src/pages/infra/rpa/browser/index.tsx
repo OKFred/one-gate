@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
-import * as WorkflowAPI from '@/api/biz/enterprise/workflow';
-import type { ListConfigReq, ConfigObj } from '@/api/biz/enterprise/type';
+import * as BrowserConfigAPI from '@/api/infra/rpa/browser/config';
+import type { ListBrowserConfigReq, BrowserConfigObj } from '@/api/infra/rpa/browser/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { THIS_PERMISSION, FULL_PREFIX } from '../constant';
+import { THIS_PERMISSION, FULL_PREFIX } from './constant';
 import { Chip, Box, CircularProgress, TextField, FormControlLabel, Switch } from '@mui/material';
 
 import { PlayArrow as VerifyIcon } from '@mui/icons-material';
@@ -19,7 +19,7 @@ interface TableExtraContext {
   handleVerify: (id: number) => Promise<void>;
 }
 
-const DEFAULT_FORM: Partial<ConfigObj> = {
+const DEFAULT_FORM: Partial<BrowserConfigObj> = {
   name: '',
   cdpUrl: '',
   isDefault: false,
@@ -27,7 +27,7 @@ const DEFAULT_FORM: Partial<ConfigObj> = {
   remark: '',
 };
 
-export default function WorkflowConfigManagement() {
+export default function BrowserConfigManagement() {
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
   const t = useTranslation();
 
@@ -35,20 +35,20 @@ export default function WorkflowConfigManagement() {
   const handleVerify = async (id: number) => {
     try {
       setVerifyingId(id);
-      const res = await WorkflowAPI.verifyConfigFn({ data: { id } });
+      const res = await BrowserConfigAPI.verifyFn({ data: { id } });
       if (res.data.data) {
         showSnackbar({
-          message: t('workflow.config.verifySuccess'),
+          message: t('infra.rpa.browser.verifySuccess'),
           type: 'success',
         });
       } else {
         showSnackbar({
-          message: t('workflow.config.verifyFailed'),
+          message: t('infra.rpa.browser.verifyFailed'),
           type: 'error',
         });
       }
     } catch {
-      showSnackbar({ message: t('workflow.config.verifyError'), type: 'error' });
+      showSnackbar({ message: t('infra.rpa.browser.verifyError'), type: 'error' });
     } finally {
       setVerifyingId(null);
     }
@@ -59,7 +59,12 @@ export default function WorkflowConfigManagement() {
     handleVerify,
   };
 
-  const config: SchemaCrudConfig<ConfigObj, FilterState, ListConfigReq, TableExtraContext> = {
+  const config: SchemaCrudConfig<
+    BrowserConfigObj,
+    FilterState,
+    ListBrowserConfigReq,
+    TableExtraContext
+  > = {
     apiKeyName: 'id',
     permissions: {
       add: [THIS_PERMISSION.add],
@@ -67,10 +72,10 @@ export default function WorkflowConfigManagement() {
       delete: [THIS_PERMISSION.delete],
     },
     api: {
-      list: WorkflowAPI.listConfigFn,
-      add: WorkflowAPI.addConfigFn,
-      update: WorkflowAPI.updateConfigFn,
-      delete: WorkflowAPI.deleteConfigFn,
+      list: BrowserConfigAPI.listFn,
+      add: BrowserConfigAPI.addFn,
+      update: BrowserConfigAPI.updateFn,
+      delete: BrowserConfigAPI.deleteFn,
     },
     filter: {
       defaultFilters: { keyword: '' },
@@ -84,28 +89,30 @@ export default function WorkflowConfigManagement() {
       transformRequest: (filters) =>
         ({
           keyword: filters.keyword || undefined,
-        }) as ListConfigReq,
+        }) as ListBrowserConfigReq,
     },
     table: {
       columns: (t) => [
         { title: 'ID', render: (row) => row.id },
-        { title: t('workflow.config.name'), render: (row) => row.name },
-        { title: t('workflow.config.cdpUrlLabel'), render: (row) => row.cdpUrl },
+        { title: t('infra.rpa.browser.name'), render: (row) => row.name },
+        { title: t('infra.rpa.browser.cdpUrlLabel'), render: (row) => row.cdpUrl },
         {
-          title: t('workflow.config.defaultEnv'),
+          title: t('infra.rpa.browser.defaultEnv'),
           render: (row) => (
             <Chip
-              label={row.isDefault ? t('workflow.config.yes') : t('workflow.config.no')}
+              label={row.isDefault ? t('infra.rpa.browser.yes') : t('infra.rpa.browser.no')}
               color={row.isDefault ? 'success' : 'default'}
               size="small"
             />
           ),
         },
         {
-          title: t('workflow.config.status'),
+          title: t('infra.rpa.browser.status'),
           render: (row) => (
             <Chip
-              label={row.isEnabled ? t('workflow.config.enabled') : t('workflow.config.disabled')}
+              label={
+                row.isEnabled ? t('infra.rpa.browser.enabled') : t('infra.rpa.browser.disabled')
+              }
               color={row.isEnabled ? 'success' : 'error'}
               size="small"
               variant="outlined"
@@ -117,7 +124,7 @@ export default function WorkflowConfigManagement() {
         { type: 'title', render: (row) => row.name },
         {
           type: 'subtitle',
-          label: t('workflow.config.cdpUrlCardLabel'),
+          label: t('infra.rpa.browser.cdpUrlCardLabel'),
           render: (row) => row.cdpUrl,
         },
         {
@@ -125,12 +132,14 @@ export default function WorkflowConfigManagement() {
           render: (row) => (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Chip
-                label={row.isEnabled ? t('workflow.config.enabled') : t('workflow.config.disabled')}
+                label={
+                  row.isEnabled ? t('infra.rpa.browser.enabled') : t('infra.rpa.browser.disabled')
+                }
                 color={row.isEnabled ? 'success' : 'error'}
                 size="small"
               />
               {row.isDefault && (
-                <Chip label={t('workflow.config.default')} color="success" size="small" />
+                <Chip label={t('infra.rpa.browser.default')} color="success" size="small" />
               )}
             </Box>
           ),
@@ -139,7 +148,7 @@ export default function WorkflowConfigManagement() {
       actions: (t, extraContext) => [
         {
           key: 'verify',
-          label: t('workflow.config.testConnection'),
+          label: t('infra.rpa.browser.testConnection'),
           color: 'success',
           permissionCodes: [THIS_PERMISSION.read],
           icon: (row) => {
@@ -158,24 +167,24 @@ export default function WorkflowConfigManagement() {
       ],
     },
     form: {
-      schema: `${FULL_PREFIX}.workflow.config.add.req`,
+      schema: `${FULL_PREFIX}.add.req`,
       defaultForm: DEFAULT_FORM,
       renderForm: (form, setForm, _isMobile, t) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           <TextField
-            label={t('workflow.config.name')}
+            label={t('infra.rpa.browser.name')}
             value={form.name || ''}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             fullWidth
             required
           />
           <TextField
-            label={t('workflow.config.cdpUrlFormLabel')}
+            label={t('infra.rpa.browser.cdpUrlFormLabel')}
             value={form.cdpUrl || ''}
             onChange={(e) => setForm({ ...form, cdpUrl: e.target.value })}
             fullWidth
             required
-            helperText={t('workflow.config.cdpUrlHelper')}
+            helperText={t('infra.rpa.browser.cdpUrlHelper')}
           />
           <FormControlLabel
             control={
@@ -184,7 +193,7 @@ export default function WorkflowConfigManagement() {
                 onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
               />
             }
-            label={t('workflow.config.setDefaultEnv')}
+            label={t('infra.rpa.browser.setDefaultEnv')}
           />
           <FormControlLabel
             control={
@@ -193,10 +202,10 @@ export default function WorkflowConfigManagement() {
                 onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
               />
             }
-            label={t('workflow.config.enableEnv')}
+            label={t('infra.rpa.browser.enableEnv')}
           />
           <TextField
-            label={t('workflow.config.remark')}
+            label={t('infra.rpa.browser.remark')}
             value={form.remark || ''}
             onChange={(e) => setForm({ ...form, remark: e.target.value })}
             fullWidth

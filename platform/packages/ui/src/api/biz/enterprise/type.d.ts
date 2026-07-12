@@ -4,9 +4,13 @@ import * as AttendanceAPI from '@/api/biz/enterprise/attendance';
 // ==================== Attendance ====================
 
 /** 获取所有考勤记录请求 */
-export type ListAllAttendanceReq = NonNullable<Parameters<typeof AttendanceAPI.listAllFn>[0]['data']>;
+export type ListAllAttendanceReq = NonNullable<
+  Parameters<typeof AttendanceAPI.listAllFn>[0]['data']
+>;
 /** 获取所有考勤记录响应 */
-export type ListAllAttendanceRes = Awaited<ReturnType<typeof AttendanceAPI.listAllFn>>['data']['data'];
+export type ListAllAttendanceRes = Awaited<
+  ReturnType<typeof AttendanceAPI.listAllFn>
+>['data']['data'];
 
 /** 分页获取考勤记录请求 */
 export type ListAttendanceReq = NonNullable<Parameters<typeof AttendanceAPI.listFn>[0]['data']>;
@@ -26,12 +30,16 @@ export type AddAttendanceRes = Awaited<ReturnType<typeof AttendanceAPI.addFn>>['
 /** 更新考勤记录请求 */
 export type UpdateAttendanceReq = NonNullable<Parameters<typeof AttendanceAPI.updateFn>[0]['data']>;
 /** 更新考勤记录响应 */
-export type UpdateAttendanceRes = Awaited<ReturnType<typeof AttendanceAPI.updateFn>>['data']['data'];
+export type UpdateAttendanceRes = Awaited<
+  ReturnType<typeof AttendanceAPI.updateFn>
+>['data']['data'];
 
 /** 删除考勤记录请求 */
 export type DeleteAttendanceReq = NonNullable<Parameters<typeof AttendanceAPI.deleteFn>[0]['data']>;
 /** 删除考勤记录响应 */
-export type DeleteAttendanceRes = Awaited<ReturnType<typeof AttendanceAPI.deleteFn>>['data']['data'];
+export type DeleteAttendanceRes = Awaited<
+  ReturnType<typeof AttendanceAPI.deleteFn>
+>['data']['data'];
 
 /** 考勤对象 */
 export type AttendanceObj = ListAttendanceRes['list'][number];
@@ -75,36 +83,6 @@ export type RunWorkflowRes = Awaited<ReturnType<typeof WorkflowAPI.runFn>>['data
 
 /** 工作流对象 */
 export type WorkflowObj = ListWorkflowRes['list'][number];
-
-// ==================== Workflow Config ====================
-
-/** 分页获取工作流配置请求 */
-export type ListConfigReq = NonNullable<Parameters<typeof WorkflowAPI.listConfigFn>[0]['data']>;
-/** 分页获取工作流配置响应 */
-export type ListConfigRes = Awaited<ReturnType<typeof WorkflowAPI.listConfigFn>>['data']['data'];
-
-/** 添加工作流配置请求 */
-export type AddConfigReq = NonNullable<Parameters<typeof WorkflowAPI.addConfigFn>[0]['data']>;
-/** 添加工作流配置响应 */
-export type AddConfigRes = Awaited<ReturnType<typeof WorkflowAPI.addConfigFn>>['data']['data'];
-
-/** 更新工作流配置请求 */
-export type UpdateConfigReq = NonNullable<Parameters<typeof WorkflowAPI.updateConfigFn>[0]['data']>;
-/** 更新工作流配置响应 */
-export type UpdateConfigRes = Awaited<ReturnType<typeof WorkflowAPI.updateConfigFn>>['data']['data'];
-
-/** 删除工作流配置请求 */
-export type DeleteConfigReq = NonNullable<Parameters<typeof WorkflowAPI.deleteConfigFn>[0]['data']>;
-/** 删除工作流配置响应 */
-export type DeleteConfigRes = Awaited<ReturnType<typeof WorkflowAPI.deleteConfigFn>>['data']['data'];
-
-/** 验证工作流配置连通性请求 */
-export type VerifyConfigReq = NonNullable<Parameters<typeof WorkflowAPI.verifyConfigFn>[0]['data']>;
-/** 验证工作流配置连通性响应 */
-export type VerifyConfigRes = Awaited<ReturnType<typeof WorkflowAPI.verifyConfigFn>>['data']['data'];
-
-/** 工作流配置对象 */
-export type ConfigObj = ListConfigRes['list'][number];
 
 // ==================== Workflow Log ====================
 

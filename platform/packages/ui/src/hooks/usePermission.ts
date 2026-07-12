@@ -229,13 +229,6 @@ export const enterprise = {
     edit: 'enterprise.workflow:edit',
     delete: 'enterprise.workflow:delete',
   },
-  /** 工作流配置 */
-  workflow_config: {
-    read: 'enterprise.workflow_config:read',
-    add: 'enterprise.workflow_config:add',
-    edit: 'enterprise.workflow_config:edit',
-    delete: 'enterprise.workflow_config:delete',
-  },
 } as const;
 
 /** AI */
@@ -277,6 +270,18 @@ export const infra_swarm = {
   },
 } as const;
 
+/** RPA */
+export const infra_rpa = {
+  read: 'infra.rpa:read',
+  /** 浏览器配置 */
+  browser: {
+    read: 'infra.rpa.browser:read',
+    add: 'infra.rpa.browser:add',
+    edit: 'infra.rpa.browser:edit',
+    delete: 'infra.rpa.browser:delete',
+  },
+} as const;
+
 export const permissions = {
   infra: {
     ...infra,
@@ -287,6 +292,7 @@ export const permissions = {
     data: infra_data,
     ai: infra_ai,
     swarm: infra_swarm,
+    rpa: infra_rpa,
   },
   enterprise: enterprise,
 } as const;

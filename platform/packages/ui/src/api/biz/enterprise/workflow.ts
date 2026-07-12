@@ -6,7 +6,10 @@ import type { AxiosConfig } from '../../config';
 //====================================================================
 
 export const listAllFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/listAll', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/biz/enterprise/workflow/listAll', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/biz/enterprise/workflow/listAll',
@@ -46,7 +49,10 @@ export const addFn = (
 };
 
 export const updateFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/update', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/biz/enterprise/workflow/update', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/biz/enterprise/workflow/update',
@@ -56,7 +62,10 @@ export const updateFn = (
 };
 
 export const deleteFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/delete', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/biz/enterprise/workflow/delete', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/biz/enterprise/workflow/delete',
@@ -76,65 +85,14 @@ export const runFn = (
 };
 
 //====================================================================
-// Config API
-//====================================================================
-
-export const listConfigFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/config/list', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/biz/enterprise/workflow/config/list',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const addConfigFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/config/add', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/biz/enterprise/workflow/config/add',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const updateConfigFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/config/update', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/biz/enterprise/workflow/config/update',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const deleteConfigFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/config/delete', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/biz/enterprise/workflow/config/delete',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const verifyConfigFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/config/verify', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/biz/enterprise/workflow/config/verify',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-//====================================================================
 // Log API
 //====================================================================
 
 export const listLogsFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/biz/enterprise/workflow/log/list', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/biz/enterprise/workflow/log/list', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/biz/enterprise/workflow/log/list',

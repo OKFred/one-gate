@@ -39,6 +39,13 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "sidebar.menu.infra.rpa",
+      langCodes: {
+        "zh-CN": "RPA",
+        "en-US": "RPA",
+      },
+    },
+    {
       tKey: "sidebar.menu.ai.config",
       langCodes: {
         "zh-CN": "LLM 配置",
@@ -419,8 +426,12 @@ export const sharedTranslations = {
       langCodes: { "zh-CN": "工作流编排", "en-US": "Workflow" },
     },
     {
-      tKey: "businessType.enterprise.workflow_config",
-      langCodes: { "zh-CN": "工作流配置", "en-US": "Workflow Config" },
+      tKey: "businessType.infra.rpa",
+      langCodes: { "zh-CN": "RPA", "en-US": "RPA" },
+    },
+    {
+      tKey: "businessType.infra.rpa.browser",
+      langCodes: { "zh-CN": "RPA-浏览器配置", "en-US": "RPA-Browser Config" },
     },
     {
       tKey: "businessType.infra.ai",

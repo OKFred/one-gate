@@ -10273,6 +10273,296 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/infra/rpa/browser/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取浏览器环境配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["infra.rpa.browser.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["infra.rpa.browser.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/rpa/browser/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建浏览器配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["infra.rpa.browser.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["infra.rpa.browser.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/rpa/browser/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新浏览器配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["infra.rpa.browser.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["infra.rpa.browser.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/rpa/browser/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除浏览器配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["infra.rpa.browser.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["infra.rpa.browser.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/infra/rpa/browser/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证 CDP 连接连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["infra.rpa.browser.verify.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["infra.rpa.browser.verify.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/biz/enterprise/attendance/listAll": {
         parameters: {
             query?: never;
@@ -10999,296 +11289,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["enterprise.workflow.run.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取工作流环境配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflow.config.list.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflow.config.list.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 新建工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflow.config.add.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflow.config.add.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflow.config.update.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflow.config.update.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflow.config.delete.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflow.config.delete.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 验证 CDP 连接连通性 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflow.config.verify.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflow.config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -18436,6 +18436,149 @@ export interface components {
             data: string;
             message: string;
         };
+        "infra.rpa.browser.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
+        };
+        "infra.rpa.browser.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 配置名 */
+                    name: string;
+                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+                    cdpUrl: string;
+                    /** @description 是否为默认环境 */
+                    isDefault: boolean;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注信息 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "infra.rpa.browser.add.req": {
+            /** @description 配置名 */
+            name: string;
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            cdpUrl: string;
+            /** @description 是否为默认环境 */
+            isDefault: boolean;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+        };
+        "infra.rpa.browser.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "infra.rpa.browser.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 配置名 */
+            name?: string;
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            cdpUrl?: string;
+            /** @description 是否为默认环境 */
+            isDefault?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+        };
+        "infra.rpa.browser.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "infra.rpa.browser.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "infra.rpa.browser.delete.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "infra.rpa.browser.verify.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "infra.rpa.browser.verify.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
         "enterprise.attendance.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -19053,149 +19196,6 @@ export interface components {
             id: number;
         };
         "enterprise.workflow.run.res": {
-            ok: boolean;
-            data: boolean;
-            message: string;
-        };
-        "enterprise.workflow.config.list.req": {
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关键词
-             * @example
-             */
-            keyword?: string;
-            /**
-             * @description 页码
-             * @default 1
-             */
-            pageNo: number;
-            /**
-             * @description 每页记录数
-             * @default 10
-             */
-            pageSize: number;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @enum {string} */
-            orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
-        };
-        "enterprise.workflow.config.list.res": {
-            ok: boolean;
-            data: {
-                /** @description 总记录数 */
-                total: number;
-                /** @description 总页数 */
-                totalPage: number;
-                /** @description 当前页码 */
-                currentPage: number;
-                /** @description 每页记录数 */
-                pageSize: number;
-                list: {
-                    /**
-                     * @description id
-                     * @example 1
-                     */
-                    id: number;
-                    /** @description 配置名 */
-                    name: string;
-                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
-                    cdpUrl: string;
-                    /** @description 是否为默认环境 */
-                    isDefault: boolean;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
-                    /** @description 备注信息 */
-                    remark?: ((string | null) | null) | null;
-                    /** @description 创建人ID */
-                    creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
-                    createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
-                }[];
-            };
-            message: string;
-        };
-        "enterprise.workflow.config.add.req": {
-            /** @description 配置名 */
-            name: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
-            cdpUrl: string;
-            /** @description 是否为默认环境 */
-            isDefault: boolean;
-            /** @description 是否启用 */
-            isEnabled: boolean;
-            /** @description 备注信息 */
-            remark?: ((string | null) | null) | null;
-        };
-        "enterprise.workflow.config.add.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "enterprise.workflow.config.update.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-            /** @description 配置名 */
-            name?: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
-            cdpUrl?: string;
-            /** @description 是否为默认环境 */
-            isDefault?: boolean;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @description 备注信息 */
-            remark?: ((string | null) | null) | null;
-        };
-        "enterprise.workflow.config.update.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "enterprise.workflow.config.delete.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "enterprise.workflow.config.delete.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "enterprise.workflow.config.verify.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "enterprise.workflow.config.verify.res": {
             ok: boolean;
             data: boolean;
             message: string;

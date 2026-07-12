@@ -292,7 +292,7 @@ export const initialMenuData = [
     name: "sidebar.menu.ai",
     icon: "material-symbols:smart-toy",
     parentId: 42,
-    sort: 5,
+    sort: 6,
     business: "infra.ai",
   },
   {
@@ -327,7 +327,7 @@ export const initialMenuData = [
     name: "sidebar.menu.swarm",
     icon: "material-symbols:dns",
     parentId: 42,
-    sort: 6,
+    sort: 8,
     business: "infra.swarm",
   },
   {
@@ -375,13 +375,21 @@ export const initialMenuData = [
     business: "enterprise.workflow",
   },
   {
+    id: 44,
+    name: "sidebar.menu.infra.rpa",
+    icon: "material-symbols:robot",
+    parentId: 42,
+    sort: 7,
+    business: "infra.rpa",
+  },
+  {
     id: 41,
-    name: "sidebar.menu.enterprise.workflowConfig",
+    name: "sidebar.menu.infra.rpa.browser",
     icon: "material-symbols:settings-input-component",
-    path: "/biz/enterprise/workflow/config",
-    parentId: 39,
-    sort: 2,
-    business: "enterprise.workflow_config",
+    path: "/infra/rpa/browser",
+    parentId: 44,
+    sort: 1,
+    business: "infra.rpa.browser",
   },
 ] satisfies menuLike[];
 
