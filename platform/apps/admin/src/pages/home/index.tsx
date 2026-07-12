@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import { askFn } from '@/api/infra/ai/chat';
+import { askFn } from '@/api/admin/ai/chat';
 import Markdown from '@/components/Markdown';
 
 interface Message {

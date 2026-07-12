@@ -1,8 +1,8 @@
 import db from "./index";
 import { hashPassword } from "../utils/crypto";
 import { sql, eq } from "drizzle-orm";
-import { userTable } from "../../../infra/src/system/user/model";
-import { roleTable } from "../../../infra/src/system/role/model";
+import { userTable } from "../../../admin/src/system/user/model";
+import { roleTable } from "../../../admin/src/system/role/model";
 import {
   SUPER_ADMIN_ROLE_ID,
   SUPER_ADMIN,

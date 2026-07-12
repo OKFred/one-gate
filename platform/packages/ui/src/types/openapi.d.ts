@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/infra/i18n/language/listAll": {
+    "/api/v1/admin/i18n/language/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -23,7 +23,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.languageListAllReq"];
+                    "application/json": components["schemas"]["admin.i18n.language.listall.req"];
                 };
             };
             responses: {
@@ -33,7 +33,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.languageListAllRes"];
+                        "application/json": components["schemas"]["admin.i18n.language.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -62,7 +62,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/language/list": {
+    "/api/v1/admin/i18n/language/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -81,7 +81,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.languageListReq"];
+                    "application/json": components["schemas"]["admin.i18n.language.list.req"];
                 };
             };
             responses: {
@@ -91,7 +91,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.languageListRes"];
+                        "application/json": components["schemas"]["admin.i18n.language.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -120,7 +120,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/language/add": {
+    "/api/v1/admin/i18n/language/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -139,7 +139,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.languageAddReq"];
+                    "application/json": components["schemas"]["admin.i18n.language.add.req"];
                 };
             };
             responses: {
@@ -149,7 +149,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.languageAddRes"];
+                        "application/json": components["schemas"]["admin.i18n.language.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -178,7 +178,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/language/update": {
+    "/api/v1/admin/i18n/language/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -197,7 +197,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.languageUpdateReq"];
+                    "application/json": components["schemas"]["admin.i18n.language.update.req"];
                 };
             };
             responses: {
@@ -207,7 +207,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.languageUpdateRes"];
+                        "application/json": components["schemas"]["admin.i18n.language.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -236,7 +236,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/language/delete": {
+    "/api/v1/admin/i18n/language/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -255,7 +255,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.languageDeleteReq"];
+                    "application/json": components["schemas"]["admin.i18n.language.delete.req"];
                 };
             };
             responses: {
@@ -265,7 +265,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.languageDeleteRes"];
+                        "application/json": components["schemas"]["admin.i18n.language.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -294,7 +294,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/language/get": {
+    "/api/v1/admin/i18n/language/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -313,7 +313,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.languageGetReq"];
+                    "application/json": components["schemas"]["admin.i18n.language.get.req"];
                 };
             };
             responses: {
@@ -323,7 +323,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.languageGetRes"];
+                        "application/json": components["schemas"]["admin.i18n.language.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -352,7 +352,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/region/listAll": {
+    "/api/v1/admin/i18n/region/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -371,7 +371,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.regionListAllReq"];
+                    "application/json": components["schemas"]["admin.i18n.region.listall.req"];
                 };
             };
             responses: {
@@ -381,7 +381,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.regionListAllRes"];
+                        "application/json": components["schemas"]["admin.i18n.region.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -410,7 +410,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/region/list": {
+    "/api/v1/admin/i18n/region/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -429,7 +429,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.regionListReq"];
+                    "application/json": components["schemas"]["admin.i18n.region.list.req"];
                 };
             };
             responses: {
@@ -439,7 +439,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.regionListRes"];
+                        "application/json": components["schemas"]["admin.i18n.region.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -468,7 +468,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/region/add": {
+    "/api/v1/admin/i18n/region/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -487,7 +487,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.regionAddReq"];
+                    "application/json": components["schemas"]["admin.i18n.region.add.req"];
                 };
             };
             responses: {
@@ -497,7 +497,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.regionAddRes"];
+                        "application/json": components["schemas"]["admin.i18n.region.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -526,7 +526,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/region/update": {
+    "/api/v1/admin/i18n/region/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -545,7 +545,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.regionUpdateReq"];
+                    "application/json": components["schemas"]["admin.i18n.region.update.req"];
                 };
             };
             responses: {
@@ -555,7 +555,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.regionUpdateRes"];
+                        "application/json": components["schemas"]["admin.i18n.region.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -584,7 +584,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/region/delete": {
+    "/api/v1/admin/i18n/region/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -603,7 +603,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.regionDeleteReq"];
+                    "application/json": components["schemas"]["admin.i18n.region.delete.req"];
                 };
             };
             responses: {
@@ -613,7 +613,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.regionDeleteRes"];
+                        "application/json": components["schemas"]["admin.i18n.region.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -642,7 +642,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/region/get": {
+    "/api/v1/admin/i18n/region/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -661,7 +661,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.regionGetReq"];
+                    "application/json": components["schemas"]["admin.i18n.region.get.req"];
                 };
             };
             responses: {
@@ -671,7 +671,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.regionGetRes"];
+                        "application/json": components["schemas"]["admin.i18n.region.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -700,7 +700,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/listAll": {
+    "/api/v1/admin/i18n/translation/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -719,7 +719,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationListAllReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.listall.req"];
                 };
             };
             responses: {
@@ -729,7 +729,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationListAllRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -758,7 +758,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/list": {
+    "/api/v1/admin/i18n/translation/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -777,7 +777,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationListReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.list.req"];
                 };
             };
             responses: {
@@ -787,7 +787,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationListRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -816,7 +816,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/add": {
+    "/api/v1/admin/i18n/translation/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -835,7 +835,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationAddReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.add.req"];
                 };
             };
             responses: {
@@ -845,7 +845,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationAddRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -874,7 +874,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/update": {
+    "/api/v1/admin/i18n/translation/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -893,7 +893,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationUpdateReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.update.req"];
                 };
             };
             responses: {
@@ -903,7 +903,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationUpdateRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -932,7 +932,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/delete": {
+    "/api/v1/admin/i18n/translation/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -951,7 +951,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationDeleteReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.delete.req"];
                 };
             };
             responses: {
@@ -961,7 +961,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationDeleteRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -990,7 +990,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/get": {
+    "/api/v1/admin/i18n/translation/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -1009,7 +1009,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationGetReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.get.req"];
                 };
             };
             responses: {
@@ -1019,7 +1019,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationGetRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1048,7 +1048,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/i18n/translation/checkDuplicate": {
+    "/api/v1/admin/i18n/translation/checkDuplicate": {
         parameters: {
             query?: never;
             header?: never;
@@ -1067,7 +1067,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.i18n.translationCheckDuplicateReq"];
+                    "application/json": components["schemas"]["admin.i18n.translation.checkduplicate.req"];
                 };
             };
             responses: {
@@ -1077,7 +1077,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.i18n.translationCheckDuplicateRes"];
+                        "application/json": components["schemas"]["admin.i18n.translation.checkduplicate.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1106,7 +1106,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/account/listAll": {
+    "/api/v1/admin/mail/account/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1125,7 +1125,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.accountListAllReq"];
+                    "application/json": components["schemas"]["admin.mail.account.listall.req"];
                 };
             };
             responses: {
@@ -1135,7 +1135,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.accountListAllRes"];
+                        "application/json": components["schemas"]["admin.mail.account.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1164,7 +1164,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/account/list": {
+    "/api/v1/admin/mail/account/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -1183,7 +1183,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.accountListReq"];
+                    "application/json": components["schemas"]["admin.mail.account.list.req"];
                 };
             };
             responses: {
@@ -1193,7 +1193,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.accountListRes"];
+                        "application/json": components["schemas"]["admin.mail.account.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1222,7 +1222,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/account/add": {
+    "/api/v1/admin/mail/account/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -1241,7 +1241,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.accountAddReq"];
+                    "application/json": components["schemas"]["admin.mail.account.add.req"];
                 };
             };
             responses: {
@@ -1251,7 +1251,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.accountAddRes"];
+                        "application/json": components["schemas"]["admin.mail.account.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1280,7 +1280,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/account/update": {
+    "/api/v1/admin/mail/account/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -1299,7 +1299,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.accountUpdateReq"];
+                    "application/json": components["schemas"]["admin.mail.account.update.req"];
                 };
             };
             responses: {
@@ -1309,7 +1309,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.accountUpdateRes"];
+                        "application/json": components["schemas"]["admin.mail.account.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1338,7 +1338,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/account/delete": {
+    "/api/v1/admin/mail/account/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -1357,7 +1357,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.accountDeleteReq"];
+                    "application/json": components["schemas"]["admin.mail.account.delete.req"];
                 };
             };
             responses: {
@@ -1367,7 +1367,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.accountDeleteRes"];
+                        "application/json": components["schemas"]["admin.mail.account.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1396,7 +1396,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/account/get": {
+    "/api/v1/admin/mail/account/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -1415,7 +1415,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.accountGetReq"];
+                    "application/json": components["schemas"]["admin.mail.account.get.req"];
                 };
             };
             responses: {
@@ -1425,7 +1425,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.accountGetRes"];
+                        "application/json": components["schemas"]["admin.mail.account.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1454,7 +1454,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/action/send": {
+    "/api/v1/admin/mail/action/send": {
         parameters: {
             query?: never;
             header?: never;
@@ -1473,7 +1473,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.actionSendReq"];
+                    "application/json": components["schemas"]["admin.mail.action.send.req"];
                 };
             };
             responses: {
@@ -1483,7 +1483,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.actionSendRes"];
+                        "application/json": components["schemas"]["admin.mail.action.send.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1512,7 +1512,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/action/verify": {
+    "/api/v1/admin/mail/action/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -1531,7 +1531,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.actionVerifyReq"];
+                    "application/json": components["schemas"]["admin.mail.action.verify.req"];
                 };
             };
             responses: {
@@ -1541,7 +1541,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.actionVerifyRes"];
+                        "application/json": components["schemas"]["admin.mail.action.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1570,7 +1570,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/log/listAll": {
+    "/api/v1/admin/mail/log/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1589,7 +1589,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.logListAllReq"];
+                    "application/json": components["schemas"]["admin.mail.log.listall.req"];
                 };
             };
             responses: {
@@ -1599,7 +1599,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.logListAllRes"];
+                        "application/json": components["schemas"]["admin.mail.log.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1628,7 +1628,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/log/list": {
+    "/api/v1/admin/mail/log/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -1647,7 +1647,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.logListReq"];
+                    "application/json": components["schemas"]["admin.mail.log.list.req"];
                 };
             };
             responses: {
@@ -1657,7 +1657,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.logListRes"];
+                        "application/json": components["schemas"]["admin.mail.log.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1686,7 +1686,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/log/add": {
+    "/api/v1/admin/mail/log/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -1705,7 +1705,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.logAddReq"];
+                    "application/json": components["schemas"]["admin.mail.log.add.req"];
                 };
             };
             responses: {
@@ -1715,7 +1715,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.logAddRes"];
+                        "application/json": components["schemas"]["admin.mail.log.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1744,7 +1744,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/log/update": {
+    "/api/v1/admin/mail/log/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -1763,7 +1763,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.logUpdateReq"];
+                    "application/json": components["schemas"]["admin.mail.log.update.req"];
                 };
             };
             responses: {
@@ -1773,7 +1773,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.logUpdateRes"];
+                        "application/json": components["schemas"]["admin.mail.log.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1802,7 +1802,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/log/delete": {
+    "/api/v1/admin/mail/log/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -1821,7 +1821,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.logDeleteReq"];
+                    "application/json": components["schemas"]["admin.mail.log.delete.req"];
                 };
             };
             responses: {
@@ -1831,7 +1831,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.logDeleteRes"];
+                        "application/json": components["schemas"]["admin.mail.log.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1860,7 +1860,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/log/get": {
+    "/api/v1/admin/mail/log/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -1879,7 +1879,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.logGetReq"];
+                    "application/json": components["schemas"]["admin.mail.log.get.req"];
                 };
             };
             responses: {
@@ -1889,7 +1889,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.logGetRes"];
+                        "application/json": components["schemas"]["admin.mail.log.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1918,7 +1918,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/template/listAll": {
+    "/api/v1/admin/mail/template/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -1937,7 +1937,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.templateListAllReq"];
+                    "application/json": components["schemas"]["admin.mail.template.listall.req"];
                 };
             };
             responses: {
@@ -1947,7 +1947,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.templateListAllRes"];
+                        "application/json": components["schemas"]["admin.mail.template.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1976,7 +1976,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/template/list": {
+    "/api/v1/admin/mail/template/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -1995,7 +1995,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.templateListReq"];
+                    "application/json": components["schemas"]["admin.mail.template.list.req"];
                 };
             };
             responses: {
@@ -2005,7 +2005,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.templateListRes"];
+                        "application/json": components["schemas"]["admin.mail.template.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2034,7 +2034,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/template/add": {
+    "/api/v1/admin/mail/template/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -2053,7 +2053,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.templateAddReq"];
+                    "application/json": components["schemas"]["admin.mail.template.add.req"];
                 };
             };
             responses: {
@@ -2063,7 +2063,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.templateAddRes"];
+                        "application/json": components["schemas"]["admin.mail.template.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2092,7 +2092,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/template/update": {
+    "/api/v1/admin/mail/template/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -2111,7 +2111,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.templateUpdateReq"];
+                    "application/json": components["schemas"]["admin.mail.template.update.req"];
                 };
             };
             responses: {
@@ -2121,7 +2121,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.templateUpdateRes"];
+                        "application/json": components["schemas"]["admin.mail.template.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2150,7 +2150,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/template/delete": {
+    "/api/v1/admin/mail/template/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2169,7 +2169,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.templateDeleteReq"];
+                    "application/json": components["schemas"]["admin.mail.template.delete.req"];
                 };
             };
             responses: {
@@ -2179,7 +2179,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.templateDeleteRes"];
+                        "application/json": components["schemas"]["admin.mail.template.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2208,7 +2208,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/mail/template/get": {
+    "/api/v1/admin/mail/template/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2227,7 +2227,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.mail.templateGetReq"];
+                    "application/json": components["schemas"]["admin.mail.template.get.req"];
                 };
             };
             responses: {
@@ -2237,7 +2237,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.mail.templateGetRes"];
+                        "application/json": components["schemas"]["admin.mail.template.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2266,7 +2266,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/audit_login/list": {
+    "/api/v1/admin/maintenance/audit_login/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2285,7 +2285,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.audit_loginListReq"];
+                    "application/json": components["schemas"]["admin.maintenance.audit_login.list.req"];
                 };
             };
             responses: {
@@ -2295,7 +2295,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.audit_loginListRes"];
+                        "application/json": components["schemas"]["admin.maintenance.audit_login.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2324,7 +2324,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cache/listKeys": {
+    "/api/v1/admin/maintenance/cache/listKeys": {
         parameters: {
             query?: never;
             header?: never;
@@ -2343,7 +2343,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cacheListKeysReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cache.listkeys.req"];
                 };
             };
             responses: {
@@ -2353,7 +2353,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cacheListKeysRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cache.listkeys.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2382,7 +2382,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cache/get": {
+    "/api/v1/admin/maintenance/cache/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2401,7 +2401,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cacheGetReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cache.get.req"];
                 };
             };
             responses: {
@@ -2411,7 +2411,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cacheGetRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cache.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2440,7 +2440,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cache/put": {
+    "/api/v1/admin/maintenance/cache/put": {
         parameters: {
             query?: never;
             header?: never;
@@ -2459,7 +2459,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cachePutReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cache.put.req"];
                 };
             };
             responses: {
@@ -2469,7 +2469,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cachePutRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cache.put.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2498,7 +2498,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cache/delete": {
+    "/api/v1/admin/maintenance/cache/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2517,7 +2517,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cacheDeleteReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cache.delete.req"];
                 };
             };
             responses: {
@@ -2527,7 +2527,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cacheDeleteRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cache.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2556,7 +2556,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cache/clear": {
+    "/api/v1/admin/maintenance/cache/clear": {
         parameters: {
             query?: never;
             header?: never;
@@ -2575,7 +2575,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cacheClearReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cache.clear.req"];
                 };
             };
             responses: {
@@ -2585,7 +2585,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cacheClearRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cache.clear.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2614,7 +2614,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/init/db": {
+    "/api/v1/admin/maintenance/init/db": {
         parameters: {
             query?: never;
             header?: never;
@@ -2636,7 +2636,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.initDbReq"];
+                    "application/json": components["schemas"]["admin.maintenance.init.db.req"];
                 };
             };
             responses: {
@@ -2646,7 +2646,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.initDbRes"];
+                        "application/json": components["schemas"]["admin.maintenance.init.db.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2675,7 +2675,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/list": {
+    "/api/v1/admin/maintenance/cron/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2694,7 +2694,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronListReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.list.req"];
                 };
             };
             responses: {
@@ -2704,7 +2704,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronListRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2733,7 +2733,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/add": {
+    "/api/v1/admin/maintenance/cron/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -2752,7 +2752,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronAddReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.add.req"];
                 };
             };
             responses: {
@@ -2762,7 +2762,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronAddRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2791,7 +2791,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/update": {
+    "/api/v1/admin/maintenance/cron/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -2810,7 +2810,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronUpdateReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.update.req"];
                 };
             };
             responses: {
@@ -2820,7 +2820,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronUpdateRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2849,7 +2849,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/delete": {
+    "/api/v1/admin/maintenance/cron/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -2868,7 +2868,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronDeleteReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.delete.req"];
                 };
             };
             responses: {
@@ -2878,7 +2878,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronDeleteRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2907,7 +2907,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/get": {
+    "/api/v1/admin/maintenance/cron/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -2926,7 +2926,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronGetReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.get.req"];
                 };
             };
             responses: {
@@ -2936,7 +2936,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronGetRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2965,7 +2965,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/listLogs": {
+    "/api/v1/admin/maintenance/cron/listLogs": {
         parameters: {
             query?: never;
             header?: never;
@@ -2984,7 +2984,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronListLogsReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.listlogs.req"];
                 };
             };
             responses: {
@@ -2994,7 +2994,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronListLogsRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.listlogs.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3023,7 +3023,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/cron/parse": {
+    "/api/v1/admin/maintenance/cron/parse": {
         parameters: {
             query?: never;
             header?: never;
@@ -3042,7 +3042,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.cronParseReq"];
+                    "application/json": components["schemas"]["admin.maintenance.cron.parse.req"];
                 };
             };
             responses: {
@@ -3052,7 +3052,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.cronParseRes"];
+                        "application/json": components["schemas"]["admin.maintenance.cron.parse.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3081,7 +3081,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/list": {
+    "/api/v1/admin/maintenance/api-task/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3100,7 +3100,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskListReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.list.req"];
                 };
             };
             responses: {
@@ -3110,7 +3110,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskListRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3139,7 +3139,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/add": {
+    "/api/v1/admin/maintenance/api-task/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -3158,7 +3158,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskAddReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.add.req"];
                 };
             };
             responses: {
@@ -3168,7 +3168,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskAddRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3197,7 +3197,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/update": {
+    "/api/v1/admin/maintenance/api-task/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -3216,7 +3216,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskUpdateReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.update.req"];
                 };
             };
             responses: {
@@ -3226,7 +3226,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskUpdateRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3255,7 +3255,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/delete": {
+    "/api/v1/admin/maintenance/api-task/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -3274,7 +3274,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskDeleteReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.delete.req"];
                 };
             };
             responses: {
@@ -3284,7 +3284,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskDeleteRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3313,7 +3313,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/get": {
+    "/api/v1/admin/maintenance/api-task/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -3332,7 +3332,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskGetReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.get.req"];
                 };
             };
             responses: {
@@ -3342,7 +3342,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskGetRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3371,7 +3371,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/runTest": {
+    "/api/v1/admin/maintenance/api-task/runTest": {
         parameters: {
             query?: never;
             header?: never;
@@ -3390,7 +3390,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskRunTestReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.runtest.req"];
                 };
             };
             responses: {
@@ -3400,7 +3400,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskRunTestRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.runtest.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3429,7 +3429,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-task/bulkAdd": {
+    "/api/v1/admin/maintenance/api-task/bulkAdd": {
         parameters: {
             query?: never;
             header?: never;
@@ -3448,7 +3448,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_taskBulkAddReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_task.bulkadd.req"];
                 };
             };
             responses: {
@@ -3458,7 +3458,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_taskBulkAddRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_task.bulkadd.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3487,7 +3487,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-docs/list": {
+    "/api/v1/admin/maintenance/api-docs/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3506,7 +3506,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_docsListReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_docs.list.req"];
                 };
             };
             responses: {
@@ -3516,7 +3516,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_docsListRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_docs.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3545,7 +3545,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-docs/add": {
+    "/api/v1/admin/maintenance/api-docs/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -3564,7 +3564,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_docsAddReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_docs.add.req"];
                 };
             };
             responses: {
@@ -3574,7 +3574,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_docsAddRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_docs.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3603,7 +3603,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-docs/update": {
+    "/api/v1/admin/maintenance/api-docs/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -3622,7 +3622,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_docsUpdateReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_docs.update.req"];
                 };
             };
             responses: {
@@ -3632,7 +3632,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_docsUpdateRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_docs.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3661,7 +3661,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-docs/delete": {
+    "/api/v1/admin/maintenance/api-docs/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -3680,7 +3680,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_docsDeleteReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_docs.delete.req"];
                 };
             };
             responses: {
@@ -3690,7 +3690,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_docsDeleteRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_docs.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3719,7 +3719,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-docs/get": {
+    "/api/v1/admin/maintenance/api-docs/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -3738,7 +3738,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_docsGetReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_docs.get.req"];
                 };
             };
             responses: {
@@ -3748,7 +3748,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_docsGetRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_docs.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3777,7 +3777,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/maintenance/api-docs/parse": {
+    "/api/v1/admin/maintenance/api-docs/parse": {
         parameters: {
             query?: never;
             header?: never;
@@ -3796,7 +3796,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.maintenance.api_docsParseReq"];
+                    "application/json": components["schemas"]["admin.maintenance.api_docs.parse.req"];
                 };
             };
             responses: {
@@ -3806,7 +3806,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.maintenance.api_docsParseRes"];
+                        "application/json": components["schemas"]["admin.maintenance.api_docs.parse.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3835,7 +3835,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form_data/list": {
+    "/api/v1/admin/data/schema_form_data/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -3854,7 +3854,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_form_dataListReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form_data.list.req"];
                 };
             };
             responses: {
@@ -3864,7 +3864,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_form_dataListRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form_data.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3893,7 +3893,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form_data/submit": {
+    "/api/v1/admin/data/schema_form_data/submit": {
         parameters: {
             query?: never;
             header?: never;
@@ -3912,7 +3912,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_form_dataSubmitReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form_data.submit.req"];
                 };
             };
             responses: {
@@ -3922,7 +3922,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_form_dataSubmitRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form_data.submit.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -3951,7 +3951,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form_data/delete": {
+    "/api/v1/admin/data/schema_form_data/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -3970,7 +3970,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_form_dataDeleteReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form_data.delete.req"];
                 };
             };
             responses: {
@@ -3980,7 +3980,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_form_dataDeleteRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form_data.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4009,7 +4009,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form_data/get": {
+    "/api/v1/admin/data/schema_form_data/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -4028,7 +4028,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_form_dataGetReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form_data.get.req"];
                 };
             };
             responses: {
@@ -4038,7 +4038,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_form_dataGetRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form_data.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4067,7 +4067,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form/list": {
+    "/api/v1/admin/data/schema_form/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -4086,7 +4086,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_formListReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form.list.req"];
                 };
             };
             responses: {
@@ -4096,7 +4096,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_formListRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4125,7 +4125,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form/add": {
+    "/api/v1/admin/data/schema_form/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -4144,7 +4144,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_formAddReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form.add.req"];
                 };
             };
             responses: {
@@ -4154,7 +4154,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_formAddRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4183,7 +4183,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form/update": {
+    "/api/v1/admin/data/schema_form/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -4202,7 +4202,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_formUpdateReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form.update.req"];
                 };
             };
             responses: {
@@ -4212,7 +4212,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_formUpdateRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4241,7 +4241,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form/delete": {
+    "/api/v1/admin/data/schema_form/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -4260,7 +4260,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_formDeleteReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form.delete.req"];
                 };
             };
             responses: {
@@ -4270,7 +4270,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_formDeleteRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4299,7 +4299,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form/get": {
+    "/api/v1/admin/data/schema_form/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -4318,7 +4318,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_formGetReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form.get.req"];
                 };
             };
             responses: {
@@ -4328,7 +4328,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_formGetRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4357,7 +4357,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/schema_form/batch_get": {
+    "/api/v1/admin/data/schema_form/batch_get": {
         parameters: {
             query?: never;
             header?: never;
@@ -4376,7 +4376,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.schema_formBatch_getReq"];
+                    "application/json": components["schemas"]["admin.data.schema_form.batch_get.req"];
                 };
             };
             responses: {
@@ -4386,7 +4386,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.schema_formBatch_getRes"];
+                        "application/json": components["schemas"]["admin.data.schema_form.batch_get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4415,7 +4415,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/listAll": {
+    "/api/v1/admin/data/oss/config/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -4434,7 +4434,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configListAllReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.listall.req"];
                 };
             };
             responses: {
@@ -4444,7 +4444,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configListAllRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4473,7 +4473,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/list": {
+    "/api/v1/admin/data/oss/config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -4492,7 +4492,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configListReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.list.req"];
                 };
             };
             responses: {
@@ -4502,7 +4502,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configListRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4531,7 +4531,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/add": {
+    "/api/v1/admin/data/oss/config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -4550,7 +4550,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configAddReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.add.req"];
                 };
             };
             responses: {
@@ -4560,7 +4560,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configAddRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4589,7 +4589,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/update": {
+    "/api/v1/admin/data/oss/config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -4608,7 +4608,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configUpdateReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.update.req"];
                 };
             };
             responses: {
@@ -4618,7 +4618,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configUpdateRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4647,7 +4647,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/get": {
+    "/api/v1/admin/data/oss/config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -4666,7 +4666,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configGetReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.get.req"];
                 };
             };
             responses: {
@@ -4676,7 +4676,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configGetRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4705,7 +4705,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/delete": {
+    "/api/v1/admin/data/oss/config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -4724,7 +4724,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configDeleteReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.delete.req"];
                 };
             };
             responses: {
@@ -4734,7 +4734,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configDeleteRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4763,7 +4763,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/config/verify": {
+    "/api/v1/admin/data/oss/config/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -4782,7 +4782,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configVerifyReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.verify.req"];
                 };
             };
             responses: {
@@ -4792,7 +4792,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configVerifyRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4821,7 +4821,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/list": {
+    "/api/v1/admin/data/oss/file/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -4840,7 +4840,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileListReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.list.req"];
                 };
             };
             responses: {
@@ -4850,7 +4850,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileListRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4879,7 +4879,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/listDirectory": {
+    "/api/v1/admin/data/oss/file/listDirectory": {
         parameters: {
             query?: never;
             header?: never;
@@ -4898,7 +4898,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileListDirectoryReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.listdirectory.req"];
                 };
             };
             responses: {
@@ -4908,7 +4908,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileListDirectoryRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.listdirectory.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4937,7 +4937,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/listAll": {
+    "/api/v1/admin/data/oss/file/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -4956,7 +4956,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileListAllReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.listall.req"];
                 };
             };
             responses: {
@@ -4966,7 +4966,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileListAllRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -4995,7 +4995,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/get": {
+    "/api/v1/admin/data/oss/file/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -5014,7 +5014,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileGetReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.get.req"];
                 };
             };
             responses: {
@@ -5024,7 +5024,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileGetRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5053,7 +5053,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/add": {
+    "/api/v1/admin/data/oss/file/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -5072,7 +5072,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileAddReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.add.req"];
                 };
             };
             responses: {
@@ -5082,7 +5082,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileAddRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5111,7 +5111,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/update": {
+    "/api/v1/admin/data/oss/file/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -5130,7 +5130,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileUpdateReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.update.req"];
                 };
             };
             responses: {
@@ -5140,7 +5140,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileUpdateRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5169,7 +5169,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/data/oss/file/delete": {
+    "/api/v1/admin/data/oss/file/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -5188,7 +5188,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileDeleteReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.delete.req"];
                 };
             };
             responses: {
@@ -5198,7 +5198,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileDeleteRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5227,7 +5227,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/listAll": {
+    "/api/v1/admin/oss/config/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -5246,7 +5246,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configListAllReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.listall.req"];
                 };
             };
             responses: {
@@ -5256,7 +5256,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configListAllRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5285,7 +5285,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/list": {
+    "/api/v1/admin/oss/config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -5304,7 +5304,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configListReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.list.req"];
                 };
             };
             responses: {
@@ -5314,7 +5314,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configListRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5343,7 +5343,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/add": {
+    "/api/v1/admin/oss/config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -5362,7 +5362,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configAddReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.add.req"];
                 };
             };
             responses: {
@@ -5372,7 +5372,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configAddRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5401,7 +5401,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/update": {
+    "/api/v1/admin/oss/config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -5420,7 +5420,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configUpdateReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.update.req"];
                 };
             };
             responses: {
@@ -5430,7 +5430,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configUpdateRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5459,7 +5459,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/get": {
+    "/api/v1/admin/oss/config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -5478,7 +5478,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configGetReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.get.req"];
                 };
             };
             responses: {
@@ -5488,7 +5488,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configGetRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5517,7 +5517,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/delete": {
+    "/api/v1/admin/oss/config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -5536,7 +5536,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configDeleteReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.delete.req"];
                 };
             };
             responses: {
@@ -5546,7 +5546,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configDeleteRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5575,7 +5575,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/config/verify": {
+    "/api/v1/admin/oss/config/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -5594,7 +5594,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.configVerifyReq"];
+                    "application/json": components["schemas"]["admin.data.oss.config.verify.req"];
                 };
             };
             responses: {
@@ -5604,7 +5604,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.configVerifyRes"];
+                        "application/json": components["schemas"]["admin.data.oss.config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5633,7 +5633,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/list": {
+    "/api/v1/admin/oss/file/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -5652,7 +5652,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileListReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.list.req"];
                 };
             };
             responses: {
@@ -5662,7 +5662,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileListRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5691,7 +5691,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/listDirectory": {
+    "/api/v1/admin/oss/file/listDirectory": {
         parameters: {
             query?: never;
             header?: never;
@@ -5710,7 +5710,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileListDirectoryReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.listdirectory.req"];
                 };
             };
             responses: {
@@ -5720,7 +5720,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileListDirectoryRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.listdirectory.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5749,7 +5749,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/listAll": {
+    "/api/v1/admin/oss/file/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -5768,7 +5768,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileListAllReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.listall.req"];
                 };
             };
             responses: {
@@ -5778,7 +5778,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileListAllRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5807,7 +5807,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/get": {
+    "/api/v1/admin/oss/file/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -5826,7 +5826,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileGetReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.get.req"];
                 };
             };
             responses: {
@@ -5836,7 +5836,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileGetRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5865,7 +5865,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/add": {
+    "/api/v1/admin/oss/file/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -5884,7 +5884,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileAddReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.add.req"];
                 };
             };
             responses: {
@@ -5894,7 +5894,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileAddRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5923,7 +5923,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/update": {
+    "/api/v1/admin/oss/file/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -5942,7 +5942,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileUpdateReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.update.req"];
                 };
             };
             responses: {
@@ -5952,7 +5952,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileUpdateRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5981,7 +5981,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/oss/file/delete": {
+    "/api/v1/admin/oss/file/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -6000,7 +6000,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.data.oss.fileDeleteReq"];
+                    "application/json": components["schemas"]["admin.data.oss.file.delete.req"];
                 };
             };
             responses: {
@@ -6010,7 +6010,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.data.oss.fileDeleteRes"];
+                        "application/json": components["schemas"]["admin.data.oss.file.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6039,7 +6039,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/login": {
+    "/api/v1/admin/system/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -6058,7 +6058,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authLoginReq"];
+                    "application/json": components["schemas"]["admin.system.auth.login.req"];
                 };
             };
             responses: {
@@ -6068,7 +6068,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authLoginRes"];
+                        "application/json": components["schemas"]["admin.system.auth.login.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6097,7 +6097,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/wechat": {
+    "/api/v1/admin/system/auth/wechat": {
         parameters: {
             query?: never;
             header?: never;
@@ -6116,7 +6116,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authWechatReq"];
+                    "application/json": components["schemas"]["admin.system.auth.wechat.req"];
                 };
             };
             responses: {
@@ -6126,7 +6126,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authWechatRes"];
+                        "application/json": components["schemas"]["admin.system.auth.wechat.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6155,7 +6155,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/refresh": {
+    "/api/v1/admin/system/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -6174,7 +6174,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authRefreshReq"];
+                    "application/json": components["schemas"]["admin.system.auth.refresh.req"];
                 };
             };
             responses: {
@@ -6184,7 +6184,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authRefreshRes"];
+                        "application/json": components["schemas"]["admin.system.auth.refresh.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6213,7 +6213,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/check": {
+    "/api/v1/admin/system/auth/check": {
         parameters: {
             query?: never;
             header?: never;
@@ -6232,7 +6232,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authCheckReq"];
+                    "application/json": components["schemas"]["admin.system.auth.check.req"];
                 };
             };
             responses: {
@@ -6242,7 +6242,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authCheckRes"];
+                        "application/json": components["schemas"]["admin.system.auth.check.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6271,7 +6271,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/profile": {
+    "/api/v1/admin/system/auth/profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -6290,7 +6290,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authProfileReq"];
+                    "application/json": components["schemas"]["admin.system.auth.profile.req"];
                 };
             };
             responses: {
@@ -6300,7 +6300,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authProfileRes"];
+                        "application/json": components["schemas"]["admin.system.auth.profile.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6329,7 +6329,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/updateProfile": {
+    "/api/v1/admin/system/auth/updateProfile": {
         parameters: {
             query?: never;
             header?: never;
@@ -6348,7 +6348,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authUpdateProfileReq"];
+                    "application/json": components["schemas"]["admin.system.auth.updateprofile.req"];
                 };
             };
             responses: {
@@ -6358,7 +6358,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authUpdateProfileRes"];
+                        "application/json": components["schemas"]["admin.system.auth.updateprofile.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6387,7 +6387,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/updateLangCode": {
+    "/api/v1/admin/system/auth/updateLangCode": {
         parameters: {
             query?: never;
             header?: never;
@@ -6406,7 +6406,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authUpdateLangCodeReq"];
+                    "application/json": components["schemas"]["admin.system.auth.updatelangcode.req"];
                 };
             };
             responses: {
@@ -6416,7 +6416,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authUpdateLangCodeRes"];
+                        "application/json": components["schemas"]["admin.system.auth.updatelangcode.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6445,7 +6445,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/updatePassword": {
+    "/api/v1/admin/system/auth/updatePassword": {
         parameters: {
             query?: never;
             header?: never;
@@ -6464,7 +6464,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authUpdatePasswordReq"];
+                    "application/json": components["schemas"]["admin.system.auth.updatepassword.req"];
                 };
             };
             responses: {
@@ -6474,7 +6474,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authUpdatePasswordRes"];
+                        "application/json": components["schemas"]["admin.system.auth.updatepassword.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6503,7 +6503,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/auth/getButtonPermission": {
+    "/api/v1/admin/system/auth/getButtonPermission": {
         parameters: {
             query?: never;
             header?: never;
@@ -6522,7 +6522,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.authGetButtonPermissionReq"];
+                    "application/json": components["schemas"]["admin.system.auth.getbuttonpermission.req"];
                 };
             };
             responses: {
@@ -6532,7 +6532,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.authGetButtonPermissionRes"];
+                        "application/json": components["schemas"]["admin.system.auth.getbuttonpermission.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6561,7 +6561,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/listAll": {
+    "/api/v1/admin/system/department/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -6580,7 +6580,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentListAllReq"];
+                    "application/json": components["schemas"]["admin.system.department.listall.req"];
                 };
             };
             responses: {
@@ -6590,7 +6590,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentListAllRes"];
+                        "application/json": components["schemas"]["admin.system.department.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6619,7 +6619,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/list": {
+    "/api/v1/admin/system/department/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -6638,7 +6638,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentListReq"];
+                    "application/json": components["schemas"]["admin.system.department.list.req"];
                 };
             };
             responses: {
@@ -6648,7 +6648,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentListRes"];
+                        "application/json": components["schemas"]["admin.system.department.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6677,7 +6677,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/add": {
+    "/api/v1/admin/system/department/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -6696,7 +6696,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentAddReq"];
+                    "application/json": components["schemas"]["admin.system.department.add.req"];
                 };
             };
             responses: {
@@ -6706,7 +6706,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentAddRes"];
+                        "application/json": components["schemas"]["admin.system.department.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6735,7 +6735,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/delete": {
+    "/api/v1/admin/system/department/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -6754,7 +6754,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.department.delete.req"];
                 };
             };
             responses: {
@@ -6764,7 +6764,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.department.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6793,7 +6793,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/update": {
+    "/api/v1/admin/system/department/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -6812,7 +6812,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentUpdateReq"];
+                    "application/json": components["schemas"]["admin.system.department.update.req"];
                 };
             };
             responses: {
@@ -6822,7 +6822,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentUpdateRes"];
+                        "application/json": components["schemas"]["admin.system.department.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6851,7 +6851,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/get": {
+    "/api/v1/admin/system/department/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -6870,7 +6870,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentGetReq"];
+                    "application/json": components["schemas"]["admin.system.department.get.req"];
                 };
             };
             responses: {
@@ -6880,7 +6880,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentGetRes"];
+                        "application/json": components["schemas"]["admin.system.department.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6909,7 +6909,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/department/tree": {
+    "/api/v1/admin/system/department/tree": {
         parameters: {
             query?: never;
             header?: never;
@@ -6928,7 +6928,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.departmentTreeReq"];
+                    "application/json": components["schemas"]["admin.system.department.tree.req"];
                 };
             };
             responses: {
@@ -6938,7 +6938,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.departmentTreeRes"];
+                        "application/json": components["schemas"]["admin.system.department.tree.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6967,7 +6967,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/listAll": {
+    "/api/v1/admin/system/menu/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -6986,7 +6986,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuListAllReq"];
+                    "application/json": components["schemas"]["admin.system.menu.listall.req"];
                 };
             };
             responses: {
@@ -6996,7 +6996,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuListAllRes"];
+                        "application/json": components["schemas"]["admin.system.menu.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7025,7 +7025,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/list": {
+    "/api/v1/admin/system/menu/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -7044,7 +7044,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuListReq"];
+                    "application/json": components["schemas"]["admin.system.menu.list.req"];
                 };
             };
             responses: {
@@ -7054,7 +7054,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuListRes"];
+                        "application/json": components["schemas"]["admin.system.menu.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7083,7 +7083,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/add": {
+    "/api/v1/admin/system/menu/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -7102,7 +7102,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuAddReq"];
+                    "application/json": components["schemas"]["admin.system.menu.add.req"];
                 };
             };
             responses: {
@@ -7112,7 +7112,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuAddRes"];
+                        "application/json": components["schemas"]["admin.system.menu.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7141,7 +7141,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/update": {
+    "/api/v1/admin/system/menu/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -7160,7 +7160,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuUpdateReq"];
+                    "application/json": components["schemas"]["admin.system.menu.update.req"];
                 };
             };
             responses: {
@@ -7170,7 +7170,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuUpdateRes"];
+                        "application/json": components["schemas"]["admin.system.menu.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7199,7 +7199,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/delete": {
+    "/api/v1/admin/system/menu/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7218,7 +7218,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.menu.delete.req"];
                 };
             };
             responses: {
@@ -7228,7 +7228,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.menu.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7257,7 +7257,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/get": {
+    "/api/v1/admin/system/menu/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -7276,7 +7276,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuGetReq"];
+                    "application/json": components["schemas"]["admin.system.menu.get.req"];
                 };
             };
             responses: {
@@ -7286,7 +7286,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuGetRes"];
+                        "application/json": components["schemas"]["admin.system.menu.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7315,7 +7315,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/menu/tree": {
+    "/api/v1/admin/system/menu/tree": {
         parameters: {
             query?: never;
             header?: never;
@@ -7334,7 +7334,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.menuTreeReq"];
+                    "application/json": components["schemas"]["admin.system.menu.tree.req"];
                 };
             };
             responses: {
@@ -7344,7 +7344,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.menuTreeRes"];
+                        "application/json": components["schemas"]["admin.system.menu.tree.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7373,7 +7373,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/permission/listAll": {
+    "/api/v1/admin/system/permission/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -7392,7 +7392,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.permissionListAllReq"];
+                    "application/json": components["schemas"]["admin.system.permission.listall.req"];
                 };
             };
             responses: {
@@ -7402,7 +7402,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.permissionListAllRes"];
+                        "application/json": components["schemas"]["admin.system.permission.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7431,7 +7431,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/permission/list": {
+    "/api/v1/admin/system/permission/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -7450,7 +7450,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.permissionListReq"];
+                    "application/json": components["schemas"]["admin.system.permission.list.req"];
                 };
             };
             responses: {
@@ -7460,7 +7460,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.permissionListRes"];
+                        "application/json": components["schemas"]["admin.system.permission.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7489,7 +7489,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/permission/add": {
+    "/api/v1/admin/system/permission/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -7508,7 +7508,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.permissionAddReq"];
+                    "application/json": components["schemas"]["admin.system.permission.add.req"];
                 };
             };
             responses: {
@@ -7518,7 +7518,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.permissionAddRes"];
+                        "application/json": components["schemas"]["admin.system.permission.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7547,7 +7547,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/permission/update": {
+    "/api/v1/admin/system/permission/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -7566,7 +7566,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.permissionUpdateReq"];
+                    "application/json": components["schemas"]["admin.system.permission.update.req"];
                 };
             };
             responses: {
@@ -7576,7 +7576,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.permissionUpdateRes"];
+                        "application/json": components["schemas"]["admin.system.permission.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7605,7 +7605,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/permission/delete": {
+    "/api/v1/admin/system/permission/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7624,7 +7624,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.permissionDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.permission.delete.req"];
                 };
             };
             responses: {
@@ -7634,7 +7634,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.permissionDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.permission.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7663,7 +7663,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/permission/get": {
+    "/api/v1/admin/system/permission/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -7682,7 +7682,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.permissionGetReq"];
+                    "application/json": components["schemas"]["admin.system.permission.get.req"];
                 };
             };
             responses: {
@@ -7692,7 +7692,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.permissionGetRes"];
+                        "application/json": components["schemas"]["admin.system.permission.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7721,7 +7721,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role/listAll": {
+    "/api/v1/admin/system/role/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -7740,7 +7740,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.roleListAllReq"];
+                    "application/json": components["schemas"]["admin.system.role.listall.req"];
                 };
             };
             responses: {
@@ -7750,7 +7750,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.roleListAllRes"];
+                        "application/json": components["schemas"]["admin.system.role.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7779,7 +7779,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role/list": {
+    "/api/v1/admin/system/role/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -7798,7 +7798,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.roleListReq"];
+                    "application/json": components["schemas"]["admin.system.role.list.req"];
                 };
             };
             responses: {
@@ -7808,7 +7808,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.roleListRes"];
+                        "application/json": components["schemas"]["admin.system.role.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7837,7 +7837,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role/add": {
+    "/api/v1/admin/system/role/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -7856,7 +7856,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.roleAddReq"];
+                    "application/json": components["schemas"]["admin.system.role.add.req"];
                 };
             };
             responses: {
@@ -7866,7 +7866,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.roleAddRes"];
+                        "application/json": components["schemas"]["admin.system.role.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7895,7 +7895,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role/update": {
+    "/api/v1/admin/system/role/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -7914,7 +7914,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.roleUpdateReq"];
+                    "application/json": components["schemas"]["admin.system.role.update.req"];
                 };
             };
             responses: {
@@ -7924,7 +7924,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.roleUpdateRes"];
+                        "application/json": components["schemas"]["admin.system.role.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -7953,7 +7953,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role/delete": {
+    "/api/v1/admin/system/role/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -7972,7 +7972,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.roleDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.role.delete.req"];
                 };
             };
             responses: {
@@ -7982,7 +7982,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.roleDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.role.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8011,7 +8011,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role/get": {
+    "/api/v1/admin/system/role/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -8030,7 +8030,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.roleGetReq"];
+                    "application/json": components["schemas"]["admin.system.role.get.req"];
                 };
             };
             responses: {
@@ -8040,7 +8040,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.roleGetRes"];
+                        "application/json": components["schemas"]["admin.system.role.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8069,7 +8069,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/listAll": {
+    "/api/v1/admin/system/role_permission/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -8088,7 +8088,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionListAllReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.listall.req"];
                 };
             };
             responses: {
@@ -8098,7 +8098,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionListAllRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8127,7 +8127,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/list": {
+    "/api/v1/admin/system/role_permission/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -8146,7 +8146,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionListReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.list.req"];
                 };
             };
             responses: {
@@ -8156,7 +8156,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionListRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8185,7 +8185,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/add": {
+    "/api/v1/admin/system/role_permission/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -8204,7 +8204,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionAddReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.add.req"];
                 };
             };
             responses: {
@@ -8214,7 +8214,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionAddRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8243,7 +8243,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/batchAdd": {
+    "/api/v1/admin/system/role_permission/batchAdd": {
         parameters: {
             query?: never;
             header?: never;
@@ -8262,7 +8262,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionBatchAddReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.batchadd.req"];
                 };
             };
             responses: {
@@ -8272,7 +8272,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionBatchAddRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.batchadd.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8301,7 +8301,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/update": {
+    "/api/v1/admin/system/role_permission/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -8320,7 +8320,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionUpdateReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.update.req"];
                 };
             };
             responses: {
@@ -8330,7 +8330,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionUpdateRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8359,7 +8359,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/delete": {
+    "/api/v1/admin/system/role_permission/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -8378,7 +8378,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.delete.req"];
                 };
             };
             responses: {
@@ -8388,7 +8388,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8417,7 +8417,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/batchDelete": {
+    "/api/v1/admin/system/role_permission/batchDelete": {
         parameters: {
             query?: never;
             header?: never;
@@ -8436,7 +8436,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionBatchDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.batchdelete.req"];
                 };
             };
             responses: {
@@ -8446,7 +8446,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionBatchDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.batchdelete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8475,7 +8475,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/get": {
+    "/api/v1/admin/system/role_permission/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -8494,7 +8494,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionGetReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.get.req"];
                 };
             };
             responses: {
@@ -8504,7 +8504,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionGetRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8533,7 +8533,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/role_permission/getPermissionsByRole": {
+    "/api/v1/admin/system/role_permission/getPermissionsByRole": {
         parameters: {
             query?: never;
             header?: never;
@@ -8552,7 +8552,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.role_permissionGetPermissionsByRoleReq"];
+                    "application/json": components["schemas"]["admin.system.role_permission.getpermissionsbyrole.req"];
                 };
             };
             responses: {
@@ -8562,7 +8562,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.role_permissionGetPermissionsByRoleRes"];
+                        "application/json": components["schemas"]["admin.system.role_permission.getpermissionsbyrole.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8591,7 +8591,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/user/listAll": {
+    "/api/v1/admin/system/user/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -8610,7 +8610,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.userListAllReq"];
+                    "application/json": components["schemas"]["admin.system.user.listall.req"];
                 };
             };
             responses: {
@@ -8620,7 +8620,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.userListAllRes"];
+                        "application/json": components["schemas"]["admin.system.user.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8649,7 +8649,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/user/list": {
+    "/api/v1/admin/system/user/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -8668,7 +8668,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.userListReq"];
+                    "application/json": components["schemas"]["admin.system.user.list.req"];
                 };
             };
             responses: {
@@ -8678,7 +8678,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.userListRes"];
+                        "application/json": components["schemas"]["admin.system.user.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8707,7 +8707,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/user/add": {
+    "/api/v1/admin/system/user/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -8726,7 +8726,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.userAddReq"];
+                    "application/json": components["schemas"]["admin.system.user.add.req"];
                 };
             };
             responses: {
@@ -8736,7 +8736,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.userAddRes"];
+                        "application/json": components["schemas"]["admin.system.user.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8765,7 +8765,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/user/update": {
+    "/api/v1/admin/system/user/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -8784,7 +8784,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.userUpdateReq"];
+                    "application/json": components["schemas"]["admin.system.user.update.req"];
                 };
             };
             responses: {
@@ -8794,7 +8794,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.userUpdateRes"];
+                        "application/json": components["schemas"]["admin.system.user.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8823,7 +8823,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/user/delete": {
+    "/api/v1/admin/system/user/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -8842,7 +8842,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.userDeleteReq"];
+                    "application/json": components["schemas"]["admin.system.user.delete.req"];
                 };
             };
             responses: {
@@ -8852,7 +8852,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.userDeleteRes"];
+                        "application/json": components["schemas"]["admin.system.user.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8881,7 +8881,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/system/user/get": {
+    "/api/v1/admin/system/user/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -8900,7 +8900,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.system.userGetReq"];
+                    "application/json": components["schemas"]["admin.system.user.get.req"];
                 };
             };
             responses: {
@@ -8910,7 +8910,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.system.userGetRes"];
+                        "application/json": components["schemas"]["admin.system.user.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8939,7 +8939,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/list": {
+    "/api/v1/admin/swarm/docker/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -8958,7 +8958,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerListReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.list.req"];
                 };
             };
             responses: {
@@ -8968,7 +8968,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerListRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -8997,7 +8997,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/inspect": {
+    "/api/v1/admin/swarm/docker/inspect": {
         parameters: {
             query?: never;
             header?: never;
@@ -9016,7 +9016,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerInspectReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.inspect.req"];
                 };
             };
             responses: {
@@ -9026,7 +9026,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerInspectRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.inspect.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9055,7 +9055,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/create": {
+    "/api/v1/admin/swarm/docker/create": {
         parameters: {
             query?: never;
             header?: never;
@@ -9074,7 +9074,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerCreateReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.create.req"];
                 };
             };
             responses: {
@@ -9084,7 +9084,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerCreateRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.create.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9113,7 +9113,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/update": {
+    "/api/v1/admin/swarm/docker/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -9132,7 +9132,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerUpdateReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.update.req"];
                 };
             };
             responses: {
@@ -9142,7 +9142,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerUpdateRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9171,7 +9171,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/remove": {
+    "/api/v1/admin/swarm/docker/remove": {
         parameters: {
             query?: never;
             header?: never;
@@ -9190,7 +9190,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerRemoveReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.remove.req"];
                 };
             };
             responses: {
@@ -9200,7 +9200,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerRemoveRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.remove.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9229,7 +9229,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/logs": {
+    "/api/v1/admin/swarm/docker/logs": {
         parameters: {
             query?: never;
             header?: never;
@@ -9248,7 +9248,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerLogsReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.logs.req"];
                 };
             };
             responses: {
@@ -9258,7 +9258,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerLogsRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.logs.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9287,7 +9287,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker/stats": {
+    "/api/v1/admin/swarm/docker/stats": {
         parameters: {
             query?: never;
             header?: never;
@@ -9306,7 +9306,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.dockerStatsReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker.stats.req"];
                 };
             };
             responses: {
@@ -9316,7 +9316,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.dockerStatsRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker.stats.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9345,7 +9345,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/nodes/list": {
+    "/api/v1/admin/swarm/nodes/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -9364,7 +9364,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.nodesListReq"];
+                    "application/json": components["schemas"]["admin.swarm.nodes.list.req"];
                 };
             };
             responses: {
@@ -9374,7 +9374,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.nodesListRes"];
+                        "application/json": components["schemas"]["admin.swarm.nodes.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9403,7 +9403,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/listAll": {
+    "/api/v1/admin/swarm/docker_config/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -9422,7 +9422,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configListAllReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.listall.req"];
                 };
             };
             responses: {
@@ -9432,7 +9432,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configListAllRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9461,7 +9461,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/list": {
+    "/api/v1/admin/swarm/docker_config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -9480,7 +9480,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configListReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.list.req"];
                 };
             };
             responses: {
@@ -9490,7 +9490,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configListRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9519,7 +9519,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/add": {
+    "/api/v1/admin/swarm/docker_config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -9538,7 +9538,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configAddReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.add.req"];
                 };
             };
             responses: {
@@ -9548,7 +9548,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configAddRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9577,7 +9577,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/update": {
+    "/api/v1/admin/swarm/docker_config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -9596,7 +9596,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configUpdateReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.update.req"];
                 };
             };
             responses: {
@@ -9606,7 +9606,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configUpdateRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9635,7 +9635,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/get": {
+    "/api/v1/admin/swarm/docker_config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -9654,7 +9654,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configGetReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.get.req"];
                 };
             };
             responses: {
@@ -9664,7 +9664,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configGetRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9693,7 +9693,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/delete": {
+    "/api/v1/admin/swarm/docker_config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -9712,7 +9712,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configDeleteReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.delete.req"];
                 };
             };
             responses: {
@@ -9722,7 +9722,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configDeleteRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9751,7 +9751,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/swarm/docker_config/verify": {
+    "/api/v1/admin/swarm/docker_config/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -9770,7 +9770,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.swarm.docker_configVerifyReq"];
+                    "application/json": components["schemas"]["admin.swarm.docker_config.verify.req"];
                 };
             };
             responses: {
@@ -9780,7 +9780,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.swarm.docker_configVerifyRes"];
+                        "application/json": components["schemas"]["admin.swarm.docker_config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9809,7 +9809,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/listAll": {
+    "/api/v1/admin/ai/config/listAll": {
         parameters: {
             query?: never;
             header?: never;
@@ -9828,7 +9828,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configListAllReq"];
+                    "application/json": components["schemas"]["admin.ai.config.listall.req"];
                 };
             };
             responses: {
@@ -9838,7 +9838,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configListAllRes"];
+                        "application/json": components["schemas"]["admin.ai.config.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9867,7 +9867,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/list": {
+    "/api/v1/admin/ai/config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -9886,7 +9886,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configListReq"];
+                    "application/json": components["schemas"]["admin.ai.config.list.req"];
                 };
             };
             responses: {
@@ -9896,7 +9896,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configListRes"];
+                        "application/json": components["schemas"]["admin.ai.config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9925,7 +9925,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/add": {
+    "/api/v1/admin/ai/config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -9944,7 +9944,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configAddReq"];
+                    "application/json": components["schemas"]["admin.ai.config.add.req"];
                 };
             };
             responses: {
@@ -9954,7 +9954,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configAddRes"];
+                        "application/json": components["schemas"]["admin.ai.config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9983,7 +9983,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/update": {
+    "/api/v1/admin/ai/config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -10002,7 +10002,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configUpdateReq"];
+                    "application/json": components["schemas"]["admin.ai.config.update.req"];
                 };
             };
             responses: {
@@ -10012,7 +10012,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configUpdateRes"];
+                        "application/json": components["schemas"]["admin.ai.config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10041,7 +10041,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/get": {
+    "/api/v1/admin/ai/config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -10060,7 +10060,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configGetReq"];
+                    "application/json": components["schemas"]["admin.ai.config.get.req"];
                 };
             };
             responses: {
@@ -10070,7 +10070,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configGetRes"];
+                        "application/json": components["schemas"]["admin.ai.config.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10099,7 +10099,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/delete": {
+    "/api/v1/admin/ai/config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -10118,7 +10118,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configDeleteReq"];
+                    "application/json": components["schemas"]["admin.ai.config.delete.req"];
                 };
             };
             responses: {
@@ -10128,7 +10128,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configDeleteRes"];
+                        "application/json": components["schemas"]["admin.ai.config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10157,7 +10157,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/config/verify": {
+    "/api/v1/admin/ai/config/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -10176,7 +10176,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.configVerifyReq"];
+                    "application/json": components["schemas"]["admin.ai.config.verify.req"];
                 };
             };
             responses: {
@@ -10186,7 +10186,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.configVerifyRes"];
+                        "application/json": components["schemas"]["admin.ai.config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10215,7 +10215,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/infra/ai/chat/ask": {
+    "/api/v1/admin/ai/chat/ask": {
         parameters: {
             query?: never;
             header?: never;
@@ -10234,7 +10234,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["infra.ai.chatAskReq"];
+                    "application/json": components["schemas"]["admin.ai.chat.ask.req"];
                 };
             };
             responses: {
@@ -10244,7 +10244,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["infra.ai.chatAskRes"];
+                        "application/json": components["schemas"]["admin.ai.chat.ask.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10273,7 +10273,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/biz/enterprise/attendance/listAll": {
+    "/api/v1/admin/rpa/browser/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -10282,7 +10282,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取所有考勤记录（不分页） */
+        /** 分页获取浏览器环境配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10292,7 +10292,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["enterprise.attendanceListAllReq"];
+                    "application/json": components["schemas"]["admin.rpa.browser.list.req"];
                 };
             };
             responses: {
@@ -10302,7 +10302,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["enterprise.attendanceListAllRes"];
+                        "application/json": components["schemas"]["admin.rpa.browser.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10331,7 +10331,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/biz/enterprise/attendance/list": {
+    "/api/v1/admin/rpa/browser/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -10340,7 +10340,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取考勤记录列表 */
+        /** 新建浏览器配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10350,7 +10350,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["enterprise.attendanceListReq"];
+                    "application/json": components["schemas"]["admin.rpa.browser.add.req"];
                 };
             };
             responses: {
@@ -10360,7 +10360,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["enterprise.attendanceListRes"];
+                        "application/json": components["schemas"]["admin.rpa.browser.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10389,7 +10389,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/biz/enterprise/attendance/add": {
+    "/api/v1/admin/rpa/browser/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -10398,7 +10398,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加考勤记录 */
+        /** 更新浏览器配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10408,7 +10408,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["enterprise.attendanceAddReq"];
+                    "application/json": components["schemas"]["admin.rpa.browser.update.req"];
                 };
             };
             responses: {
@@ -10418,7 +10418,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["enterprise.attendanceAddRes"];
+                        "application/json": components["schemas"]["admin.rpa.browser.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10447,7 +10447,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/biz/enterprise/attendance/update": {
+    "/api/v1/admin/rpa/browser/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -10456,7 +10456,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 更新考勤记录 */
+        /** 删除浏览器配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10466,7 +10466,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["enterprise.attendanceUpdateReq"];
+                    "application/json": components["schemas"]["admin.rpa.browser.delete.req"];
                 };
             };
             responses: {
@@ -10476,7 +10476,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["enterprise.attendanceUpdateRes"];
+                        "application/json": components["schemas"]["admin.rpa.browser.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10505,761 +10505,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/biz/enterprise/attendance/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除考勤记录 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/attendance/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取考勤记录详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.attendanceGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.attendanceGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/listAll": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取所有工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowListAllReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowListAllRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowListReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowListRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 新建工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowAddReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowAddRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowUpdateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowUpdateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 工作流详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowGetReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowGetRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowDeleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowDeleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/run": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 手动运行工作流 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowRunReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowRunRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取工作流环境配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_listReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_listRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 新建工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_addReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_addRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_updateReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_updateRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除工作流配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_deleteReq"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_deleteRes"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/biz/enterprise/workflow/config/verify": {
+    "/api/v1/admin/rpa/browser/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -11278,7 +10524,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["enterprise.workflowConfig_verifyReq"];
+                    "application/json": components["schemas"]["admin.rpa.browser.verify.req"];
                 };
             };
             responses: {
@@ -11288,7 +10534,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["enterprise.workflowConfig_verifyRes"];
+                        "application/json": components["schemas"]["admin.rpa.browser.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -11317,7 +10563,761 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/biz/enterprise/workflow/log/list": {
+    "/api/v1/enterprise/organization/attendance/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有考勤记录（不分页） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["organization.attendance.listall.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["organization.attendance.listall.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/organization/attendance/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取考勤记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["organization.attendance.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["organization.attendance.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/organization/attendance/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["organization.attendance.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["organization.attendance.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/organization/attendance/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["organization.attendance.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["organization.attendance.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/organization/attendance/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除考勤记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["organization.attendance.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["organization.attendance.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/organization/attendance/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取考勤记录详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["organization.attendance.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["organization.attendance.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.listall.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.listall.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 工作流详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 手动运行工作流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["executive.workflow.run.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["executive.workflow.run.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/executive/workflow/log/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -11336,7 +11336,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["enterprise.workflowLog_listReq"];
+                    "application/json": components["schemas"]["executive.workflow.log.list.req"];
                 };
             };
             responses: {
@@ -11346,7 +11346,355 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["enterprise.workflowLog_listRes"];
+                        "application/json": components["schemas"]["executive.workflow.log.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/profile/listAll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取所有个人信息记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.profile.listall.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.profile.listall.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/profile/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取个人信息列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.profile.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.profile.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/profile/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增个人信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.profile.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.profile.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/profile/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 修改个人信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.profile.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.profile.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/profile/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除个人信息记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.profile.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.profile.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/profile/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取个人信息详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.profile.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.profile.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -11384,7 +11732,7 @@ export interface components {
             message: string;
             data: Record<string, never> | null;
         };
-        "infra.i18n.languageListAllReq": {
+        "admin.i18n.language.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -11396,7 +11744,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
         };
-        "infra.i18n.languageListAllRes": {
+        "admin.i18n.language.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -11432,7 +11780,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.i18n.languageListReq": {
+        "admin.i18n.language.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -11459,7 +11807,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "langCode" | "sortOrder" | "createTimeUtc";
         };
-        "infra.i18n.languageListRes": {
+        "admin.i18n.language.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -11521,7 +11869,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.i18n.languageAddReq": {
+        "admin.i18n.language.add.req": {
             /**
              * @description 语言代码
              * @example zh-CN
@@ -11550,7 +11898,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.i18n.languageAddRes": {
+        "admin.i18n.language.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -11559,7 +11907,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.languageUpdateReq": {
+        "admin.i18n.language.update.req": {
             /**
              * @description id
              * @example 1
@@ -11593,7 +11941,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.i18n.languageUpdateRes": {
+        "admin.i18n.language.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -11602,14 +11950,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.languageDeleteReq": {
+        "admin.i18n.language.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.i18n.languageDeleteRes": {
+        "admin.i18n.language.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -11618,14 +11966,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.languageGetReq": {
+        "admin.i18n.language.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.i18n.languageGetRes": {
+        "admin.i18n.language.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -11677,7 +12025,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.i18n.regionListAllReq": {
+        "admin.i18n.region.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -11689,7 +12037,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
         };
-        "infra.i18n.regionListAllRes": {
+        "admin.i18n.region.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -11728,7 +12076,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.i18n.regionListReq": {
+        "admin.i18n.region.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -11755,7 +12103,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "labels" | "alpha2Code" | "alpha3Code" | "numeric" | "iso3166Independent" | "isEnabled" | "businessLanguages" | "createTimeUtc";
         };
-        "infra.i18n.regionListRes": {
+        "admin.i18n.region.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -11820,7 +12168,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.i18n.regionAddReq": {
+        "admin.i18n.region.add.req": {
             /** @description ISO 3166-1 alpha-2 */
             alpha2Code: string;
             /** @description ISO 3166-1 alpha-3 */
@@ -11852,7 +12200,7 @@ export interface components {
             /** @description 备注 */
             remark: ((string | null) | null) | null;
         };
-        "infra.i18n.regionAddRes": {
+        "admin.i18n.region.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -11861,7 +12209,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.regionUpdateReq": {
+        "admin.i18n.region.update.req": {
             /**
              * @description id
              * @example 1
@@ -11898,7 +12246,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.i18n.regionUpdateRes": {
+        "admin.i18n.region.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -11907,14 +12255,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.regionDeleteReq": {
+        "admin.i18n.region.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.i18n.regionDeleteRes": {
+        "admin.i18n.region.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -11923,14 +12271,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.regionGetReq": {
+        "admin.i18n.region.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.i18n.regionGetRes": {
+        "admin.i18n.region.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -11985,7 +12333,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.i18n.translationListAllReq": {
+        "admin.i18n.translation.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -12016,7 +12364,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
         };
-        "infra.i18n.translationListAllRes": {
+        "admin.i18n.translation.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -12063,7 +12411,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.i18n.translationListReq": {
+        "admin.i18n.translation.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -12109,7 +12457,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "application" | "business" | "langCode" | "tKey" | "createTimeUtc";
         };
-        "infra.i18n.translationListRes": {
+        "admin.i18n.translation.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -12190,7 +12538,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.i18n.translationAddReq": {
+        "admin.i18n.translation.add.req": {
             /**
              * @description 翻译键
              * @example welcome.message
@@ -12238,7 +12586,7 @@ export interface components {
              */
             isEnabled: boolean;
         };
-        "infra.i18n.translationAddRes": {
+        "admin.i18n.translation.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -12247,7 +12595,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.translationUpdateReq": {
+        "admin.i18n.translation.update.req": {
             /**
              * @description id
              * @example 1
@@ -12300,7 +12648,7 @@ export interface components {
              */
             isEnabled?: boolean;
         };
-        "infra.i18n.translationUpdateRes": {
+        "admin.i18n.translation.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -12309,14 +12657,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.translationDeleteReq": {
+        "admin.i18n.translation.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.i18n.translationDeleteRes": {
+        "admin.i18n.translation.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -12325,14 +12673,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.i18n.translationGetReq": {
+        "admin.i18n.translation.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.i18n.translationGetRes": {
+        "admin.i18n.translation.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -12403,7 +12751,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.i18n.translationCheckDuplicateReq": {
+        "admin.i18n.translation.checkduplicate.req": {
             /**
              * @description 翻译值
              * @example Welcome to our application
@@ -12420,7 +12768,7 @@ export interface components {
              */
             excludeId?: ((number | null) | null) | null;
         };
-        "infra.i18n.translationCheckDuplicateRes": {
+        "admin.i18n.translation.checkduplicate.res": {
             ok: boolean;
             data: {
                 /** @description 是否有重复 */
@@ -12471,7 +12819,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.accountListAllReq": {
+        "admin.mail.account.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -12479,7 +12827,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailAddress" | "isEnabled" | "createTimeUtc";
         };
-        "infra.mail.accountListAllRes": {
+        "admin.mail.account.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -12524,7 +12872,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.mail.accountListReq": {
+        "admin.mail.account.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -12547,7 +12895,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailAddress" | "isEnabled" | "createTimeUtc";
         };
-        "infra.mail.accountListRes": {
+        "admin.mail.account.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -12616,7 +12964,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.accountAddReq": {
+        "admin.mail.account.add.req": {
             /**
              * Format: email
              * @description 邮箱地址
@@ -12652,7 +13000,7 @@ export interface components {
              */
             remark: ((string | null) | null) | null;
         };
-        "infra.mail.accountAddRes": {
+        "admin.mail.account.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -12661,7 +13009,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.accountUpdateReq": {
+        "admin.mail.account.update.req": {
             /**
              * @description id
              * @example 1
@@ -12702,7 +13050,7 @@ export interface components {
              */
             remark?: ((string | null) | null) | null;
         };
-        "infra.mail.accountUpdateRes": {
+        "admin.mail.account.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -12711,14 +13059,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.accountDeleteReq": {
+        "admin.mail.account.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.mail.accountDeleteRes": {
+        "admin.mail.account.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -12727,14 +13075,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.accountGetReq": {
+        "admin.mail.account.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.mail.accountGetRes": {
+        "admin.mail.account.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -12793,7 +13141,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.actionSendReq": {
+        "admin.mail.action.send.req": {
             /**
              * @description 邮箱账号ID
              * @example 1
@@ -12826,7 +13174,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        "infra.mail.actionSendRes": {
+        "admin.mail.action.send.res": {
             ok: boolean;
             data: {
                 /** @description 成功接收的邮箱地址列表 */
@@ -12844,20 +13192,20 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.actionVerifyReq": {
+        "admin.mail.action.verify.req": {
             /**
              * @description 邮箱账号ID
              * @example 1
              */
             accountId: number;
         };
-        "infra.mail.actionVerifyRes": {
+        "admin.mail.action.verify.res": {
             ok: boolean;
             /** @description 验证结果，true 表示验证成功 */
             data: boolean;
             message: string;
         };
-        "infra.mail.logListAllReq": {
+        "admin.mail.log.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 发送状态 */
@@ -12871,7 +13219,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
         };
-        "infra.mail.logListAllRes": {
+        "admin.mail.log.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -12911,7 +13259,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.mail.logListReq": {
+        "admin.mail.log.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -12940,7 +13288,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
         };
-        "infra.mail.logListRes": {
+        "admin.mail.log.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13004,7 +13352,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.logAddReq": {
+        "admin.mail.log.add.req": {
             /**
              * Format: email
              * @description 收件人邮箱地址
@@ -13035,7 +13383,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.mail.logAddRes": {
+        "admin.mail.log.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -13044,7 +13392,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.logUpdateReq": {
+        "admin.mail.log.update.req": {
             /**
              * @description id
              * @example 1
@@ -13080,7 +13428,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.mail.logUpdateRes": {
+        "admin.mail.log.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -13089,14 +13437,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.logDeleteReq": {
+        "admin.mail.log.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.mail.logDeleteRes": {
+        "admin.mail.log.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -13105,14 +13453,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.logGetReq": {
+        "admin.mail.log.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.mail.logGetRes": {
+        "admin.mail.log.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -13166,7 +13514,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.templateListAllReq": {
+        "admin.mail.template.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -13174,7 +13522,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        "infra.mail.templateListAllRes": {
+        "admin.mail.template.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -13211,7 +13559,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.mail.templateListReq": {
+        "admin.mail.template.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13234,7 +13582,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        "infra.mail.templateListRes": {
+        "admin.mail.template.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13295,7 +13643,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.mail.templateAddReq": {
+        "admin.mail.template.add.req": {
             /**
              * @description 邮件模板名称
              * @example welcome_email
@@ -13323,7 +13671,7 @@ export interface components {
              */
             remark?: ((string | null) | null) | null;
         };
-        "infra.mail.templateAddRes": {
+        "admin.mail.template.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -13332,7 +13680,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.templateUpdateReq": {
+        "admin.mail.template.update.req": {
             /**
              * @description id
              * @example 1
@@ -13365,7 +13713,7 @@ export interface components {
              */
             remark?: ((string | null) | null) | null;
         };
-        "infra.mail.templateUpdateRes": {
+        "admin.mail.template.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -13374,14 +13722,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.templateDeleteReq": {
+        "admin.mail.template.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.mail.templateDeleteRes": {
+        "admin.mail.template.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -13390,14 +13738,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.mail.templateGetReq": {
+        "admin.mail.template.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.mail.templateGetRes": {
+        "admin.mail.template.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -13448,7 +13796,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.audit_loginListReq": {
+        "admin.maintenance.audit_login.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13474,7 +13822,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "userId" | "loginTimeUtc" | "createTimeUtc";
         };
-        "infra.maintenance.audit_loginListRes": {
+        "admin.maintenance.audit_login.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13531,7 +13879,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cacheListKeysReq": {
+        "admin.maintenance.cache.listkeys.req": {
             /**
              * @description 键名前缀过滤
              * @example zh-CN:
@@ -13546,7 +13894,7 @@ export interface components {
              */
             limit?: number;
         };
-        "infra.maintenance.cacheListKeysRes": {
+        "admin.maintenance.cache.listkeys.res": {
             ok: boolean;
             data: {
                 keys: {
@@ -13567,7 +13915,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cacheGetReq": {
+        "admin.maintenance.cache.get.req": {
             /**
              * @description 缓存键名
              * @example zh-CN:common.save
@@ -13582,7 +13930,7 @@ export interface components {
              */
             type?: "text" | "json";
         };
-        "infra.maintenance.cacheGetRes": {
+        "admin.maintenance.cache.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -13603,7 +13951,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cachePutReq": {
+        "admin.maintenance.cache.put.req": {
             /**
              * @description 缓存键名
              * @example zh-CN:common.save
@@ -13632,7 +13980,7 @@ export interface components {
              */
             expirationTtl?: ((number | null) | null) | null;
         };
-        "infra.maintenance.cachePutRes": {
+        "admin.maintenance.cache.put.res": {
             ok: boolean;
             data: {
                 /**
@@ -13643,7 +13991,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cacheDeleteReq": {
+        "admin.maintenance.cache.delete.req": {
             /**
              * @description 缓存键名
              * @example zh-CN:common.save
@@ -13651,7 +13999,7 @@ export interface components {
              */
             key: string;
         };
-        "infra.maintenance.cacheDeleteRes": {
+        "admin.maintenance.cache.delete.res": {
             ok: boolean;
             data: {
                 /**
@@ -13662,8 +14010,8 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cacheClearReq": Record<string, never>;
-        "infra.maintenance.cacheClearRes": {
+        "admin.maintenance.cache.clear.req": Record<string, never>;
+        "admin.maintenance.cache.clear.res": {
             ok: boolean;
             data: {
                 /**
@@ -13674,7 +14022,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.initDbReq": {
+        "admin.maintenance.init.db.req": {
             /**
              * @description 是否重置数据（清空表后重新插入）
              * @default false
@@ -13683,7 +14031,7 @@ export interface components {
             /** @description 是否跳过初始化管理员账号 */
             skipSuper?: boolean;
         };
-        "infra.maintenance.initDbRes": {
+        "admin.maintenance.init.db.res": {
             ok: boolean;
             data: {
                 /** @description 各模块初始化结果统计 */
@@ -13693,7 +14041,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cronListReq": {
+        "admin.maintenance.cron.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13716,7 +14064,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "lastRunTimeUtc" | "runCount" | "createTimeUtc";
         };
-        "infra.maintenance.cronListRes": {
+        "admin.maintenance.cron.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13767,7 +14115,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cronAddReq": {
+        "admin.maintenance.cron.add.req": {
             /** @description 任务唯一标识键 */
             jobKey: string;
             /** @description 任务名称 */
@@ -13779,7 +14127,7 @@ export interface components {
             /** @description JSON 格式参数 */
             parameters?: ((string | null) | null) | null;
         };
-        "infra.maintenance.cronAddRes": {
+        "admin.maintenance.cron.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -13788,7 +14136,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.cronUpdateReq": {
+        "admin.maintenance.cron.update.req": {
             /**
              * @description id
              * @example 1
@@ -13805,7 +14153,7 @@ export interface components {
             /** @description JSON 格式参数 */
             parameters?: ((string | null) | null) | null;
         };
-        "infra.maintenance.cronUpdateRes": {
+        "admin.maintenance.cron.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -13814,14 +14162,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.cronDeleteReq": {
+        "admin.maintenance.cron.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.maintenance.cronDeleteRes": {
+        "admin.maintenance.cron.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -13830,14 +14178,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.cronGetReq": {
+        "admin.maintenance.cron.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.maintenance.cronGetRes": {
+        "admin.maintenance.cron.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -13878,7 +14226,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cronListLogsReq": {
+        "admin.maintenance.cron.listlogs.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13899,7 +14247,7 @@ export interface components {
             /** @description 关联的任务ID */
             jobId: number;
         };
-        "infra.maintenance.cronListLogsRes": {
+        "admin.maintenance.cron.listlogs.res": {
             ok: boolean;
             data: {
                 total: number;
@@ -13919,11 +14267,11 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.cronParseReq": {
+        "admin.maintenance.cron.parse.req": {
             /** @description Cron 表达式 */
             cronExpression: string;
         };
-        "infra.maintenance.cronParseRes": {
+        "admin.maintenance.cron.parse.res": {
             ok: boolean;
             data: {
                 valid: boolean;
@@ -13935,7 +14283,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_taskListReq": {
+        "admin.maintenance.api_task.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13958,7 +14306,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "taskKey" | "createTimeUtc";
         };
-        "infra.maintenance.api_taskListRes": {
+        "admin.maintenance.api_task.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -14018,7 +14366,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_taskAddReq": {
+        "admin.maintenance.api_task.add.req": {
             /** @description 任务唯一标识键 */
             taskKey: string;
             /** @description 任务名称 */
@@ -14045,7 +14393,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
         };
-        "infra.maintenance.api_taskAddRes": {
+        "admin.maintenance.api_task.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -14054,7 +14402,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.api_taskUpdateReq": {
+        "admin.maintenance.api_task.update.req": {
             /**
              * @description id
              * @example 1
@@ -14086,7 +14434,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
-        "infra.maintenance.api_taskUpdateRes": {
+        "admin.maintenance.api_task.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -14095,14 +14443,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.api_taskDeleteReq": {
+        "admin.maintenance.api_task.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.maintenance.api_taskDeleteRes": {
+        "admin.maintenance.api_task.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -14111,14 +14459,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.api_taskGetReq": {
+        "admin.maintenance.api_task.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.maintenance.api_taskGetRes": {
+        "admin.maintenance.api_task.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -14168,13 +14516,13 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_taskRunTestReq": {
+        "admin.maintenance.api_task.runtest.req": {
             /** @description 任务ID */
             id: number;
             /** @description JSON 入参（覆盖默认参数） */
             parameters?: ((string | null) | null) | null;
         };
-        "infra.maintenance.api_taskRunTestRes": {
+        "admin.maintenance.api_task.runtest.res": {
             ok: boolean;
             data: {
                 success: boolean;
@@ -14196,7 +14544,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_taskBulkAddReq": {
+        "admin.maintenance.api_task.bulkadd.req": {
             tasks: {
                 taskKey: string;
                 name: string;
@@ -14212,7 +14560,7 @@ export interface components {
                 isEnabled?: boolean;
             }[];
         };
-        "infra.maintenance.api_taskBulkAddRes": {
+        "admin.maintenance.api_task.bulkadd.res": {
             ok: boolean;
             data: {
                 successCount: number;
@@ -14224,7 +14572,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_docsListReq": {
+        "admin.maintenance.api_docs.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -14245,7 +14593,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
         };
-        "infra.maintenance.api_docsListRes": {
+        "admin.maintenance.api_docs.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -14293,7 +14641,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_docsAddReq": {
+        "admin.maintenance.api_docs.add.req": {
             /** @description 文档名称 */
             name: string;
             /** @description 文档版本 */
@@ -14308,7 +14656,7 @@ export interface components {
             /** @description 文档内容 (JSON 字符串) */
             content: string;
         };
-        "infra.maintenance.api_docsAddRes": {
+        "admin.maintenance.api_docs.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -14317,7 +14665,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.api_docsUpdateReq": {
+        "admin.maintenance.api_docs.update.req": {
             /**
              * @description id
              * @example 1
@@ -14337,7 +14685,7 @@ export interface components {
             /** @description 文档内容 (JSON 字符串) */
             content?: string;
         };
-        "infra.maintenance.api_docsUpdateRes": {
+        "admin.maintenance.api_docs.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -14346,14 +14694,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.api_docsDeleteReq": {
+        "admin.maintenance.api_docs.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.maintenance.api_docsDeleteRes": {
+        "admin.maintenance.api_docs.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -14362,14 +14710,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.maintenance.api_docsGetReq": {
+        "admin.maintenance.api_docs.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.maintenance.api_docsGetRes": {
+        "admin.maintenance.api_docs.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -14407,11 +14755,11 @@ export interface components {
             };
             message: string;
         };
-        "infra.maintenance.api_docsParseReq": {
+        "admin.maintenance.api_docs.parse.req": {
             /** @description 文档ID */
             id: number;
         };
-        "infra.maintenance.api_docsParseRes": {
+        "admin.maintenance.api_docs.parse.res": {
             ok: boolean;
             data: {
                 info: {
@@ -14433,7 +14781,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.schema_form_dataListReq": {
+        "admin.data.schema_form_data.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -14458,7 +14806,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "formCode" | "businessId" | "createTimeUtc";
         };
-        "infra.data.schema_form_dataListRes": {
+        "admin.data.schema_form_data.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -14503,7 +14851,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.schema_form_dataSubmitReq": {
+        "admin.data.schema_form_data.submit.req": {
             formCode: string;
             businessId: number;
             /** @description 表单数据 (JSON 对象) */
@@ -14511,7 +14859,7 @@ export interface components {
                 [key: string]: unknown;
             };
         };
-        "infra.data.schema_form_dataSubmitRes": {
+        "admin.data.schema_form_data.submit.res": {
             ok: boolean;
             /**
              * @description id
@@ -14520,14 +14868,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.schema_form_dataDeleteReq": {
+        "admin.data.schema_form_data.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.data.schema_form_dataDeleteRes": {
+        "admin.data.schema_form_data.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -14536,12 +14884,12 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.schema_form_dataGetReq": {
+        "admin.data.schema_form_data.get.req": {
             id?: number;
             formCode?: string;
             businessId?: number;
         } | unknown | unknown;
-        "infra.data.schema_form_dataGetRes": {
+        "admin.data.schema_form_data.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -14576,7 +14924,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.schema_formListReq": {
+        "admin.data.schema_form.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -14599,7 +14947,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "code" | "isEnabled" | "createTimeUtc";
         };
-        "infra.data.schema_formListRes": {
+        "admin.data.schema_form.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -14661,7 +15009,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.schema_formAddReq": {
+        "admin.data.schema_form.add.req": {
             /**
              * @description 表单唯一标识
              * @example survey_01
@@ -14686,7 +15034,7 @@ export interface components {
              */
             source?: "system" | "user";
         };
-        "infra.data.schema_formAddRes": {
+        "admin.data.schema_form.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -14695,7 +15043,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.schema_formUpdateReq": {
+        "admin.data.schema_form.update.req": {
             /**
              * @description id
              * @example 1
@@ -14725,7 +15073,7 @@ export interface components {
              */
             source?: "system" | "user";
         };
-        "infra.data.schema_formUpdateRes": {
+        "admin.data.schema_form.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -14734,14 +15082,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.schema_formDeleteReq": {
+        "admin.data.schema_form.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.data.schema_formDeleteRes": {
+        "admin.data.schema_form.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -14750,11 +15098,11 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.schema_formGetReq": {
+        "admin.data.schema_form.get.req": {
             id?: number;
             code?: string;
         } | unknown | unknown;
-        "infra.data.schema_formGetRes": {
+        "admin.data.schema_form.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -14806,13 +15154,13 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.schema_formBatch_getReq": {
+        "admin.data.schema_form.batch_get.req": {
             /** @description 要查询的 schema code 前缀（如 infra.ai.chat） */
             prefix: string;
             /** @description 客户端缓存的版本号，若与当前一致则返回空数据 */
             version?: string;
         };
-        "infra.data.schema_formBatch_getRes": {
+        "admin.data.schema_form.batch_get.res": {
             ok: boolean;
             data: {
                 /** @description code → schemaData JSON 字符串 的映射 */
@@ -14826,7 +15174,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.configListAllReq": {
+        "admin.data.oss.config.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -14834,7 +15182,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "infra.data.oss.configListAllRes": {
+        "admin.data.oss.config.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -14859,7 +15207,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.data.oss.configListReq": {
+        "admin.data.oss.config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -14882,7 +15230,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "infra.data.oss.configListRes": {
+        "admin.data.oss.config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -14951,7 +15299,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.configAddReq": {
+        "admin.data.oss.config.add.req": {
             /**
              * @description 配置名称
              * @example My S3 Storage
@@ -14987,7 +15335,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.data.oss.configAddRes": {
+        "admin.data.oss.config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -14996,7 +15344,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.oss.configUpdateReq": {
+        "admin.data.oss.config.update.req": {
             /**
              * @description id
              * @example 1
@@ -15037,7 +15385,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.data.oss.configUpdateRes": {
+        "admin.data.oss.config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -15046,14 +15394,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.oss.configGetReq": {
+        "admin.data.oss.config.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.data.oss.configGetRes": {
+        "admin.data.oss.config.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -15112,14 +15460,14 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.configDeleteReq": {
+        "admin.data.oss.config.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.data.oss.configDeleteRes": {
+        "admin.data.oss.config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -15128,19 +15476,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.data.oss.configVerifyReq": {
+        "admin.data.oss.config.verify.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.data.oss.configVerifyRes": {
+        "admin.data.oss.config.verify.res": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "infra.data.oss.fileListReq": {
+        "admin.data.oss.file.list.req": {
             /** @description 前缀/路径搜索 */
             keyword?: string;
             /** @description 页码,兼容游标分页 */
@@ -15153,7 +15501,7 @@ export interface components {
             /** @description 下一页游标 */
             cursor?: string;
         };
-        "infra.data.oss.fileListRes": {
+        "admin.data.oss.file.list.res": {
             ok: boolean;
             data: {
                 list: {
@@ -15176,7 +15524,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.fileListDirectoryReq": {
+        "admin.data.oss.file.listdirectory.req": {
             /** @description 当前目录前缀 */
             prefix?: string;
             /**
@@ -15187,7 +15535,7 @@ export interface components {
             /** @description 下一页游标 */
             cursor?: string;
         };
-        "infra.data.oss.fileListDirectoryRes": {
+        "admin.data.oss.file.listdirectory.res": {
             ok: boolean;
             data: {
                 /** @description 当前目录前缀 */
@@ -15218,11 +15566,11 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.fileListAllReq": {
+        "admin.data.oss.file.listall.req": {
             /** @description 前缀/路径搜索 */
             keyword?: string;
         };
-        "infra.data.oss.fileListAllRes": {
+        "admin.data.oss.file.listall.res": {
             ok: boolean;
             data: {
                 /** @description 文件路径/键名 */
@@ -15236,11 +15584,11 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.data.oss.fileGetReq": {
+        "admin.data.oss.file.get.req": {
             /** @description 文件路径/键名 */
             key: string;
         };
-        "infra.data.oss.fileGetRes": {
+        "admin.data.oss.file.get.res": {
             ok: boolean;
             data: {
                 /** @description 文件路径/键名 */
@@ -15256,7 +15604,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.fileAddReq": {
+        "admin.data.oss.file.add.req": {
             /** @description 文件路径/键名 */
             key: string;
             /**
@@ -15270,7 +15618,7 @@ export interface components {
              */
             expiresIn: number;
         };
-        "infra.data.oss.fileAddRes": {
+        "admin.data.oss.file.add.res": {
             ok: boolean;
             data: {
                 /** @description 上传预签名URL */
@@ -15279,7 +15627,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.fileUpdateReq": {
+        "admin.data.oss.file.update.req": {
             /** @description 文件路径/键名 */
             key: string;
             /**
@@ -15293,7 +15641,7 @@ export interface components {
              */
             expiresIn: number;
         };
-        "infra.data.oss.fileUpdateRes": {
+        "admin.data.oss.file.update.res": {
             ok: boolean;
             data: {
                 /** @description 上传预签名URL */
@@ -15302,18 +15650,18 @@ export interface components {
             };
             message: string;
         };
-        "infra.data.oss.fileDeleteReq": {
+        "admin.data.oss.file.delete.req": {
             /** @description 文件路径/键名 */
             key: string;
         };
-        "infra.data.oss.fileDeleteRes": {
+        "admin.data.oss.file.delete.res": {
             ok: boolean;
             data: {
                 key: string;
             };
             message: string;
         };
-        "infra.system.authLoginReq": {
+        "admin.system.auth.login.req": {
             /**
              * @description 用户名
              * @example admin
@@ -15325,7 +15673,7 @@ export interface components {
              */
             password: string;
         };
-        "infra.system.authLoginRes": {
+        "admin.system.auth.login.res": {
             ok: boolean;
             data: {
                 userObj: {
@@ -15354,7 +15702,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.authWechatReq": {
+        "admin.system.auth.wechat.req": {
             /**
              * @description 微信授权码
              * @example 061abc123
@@ -15366,7 +15714,7 @@ export interface components {
              */
             state?: string;
         };
-        "infra.system.authWechatRes": {
+        "admin.system.auth.wechat.res": {
             ok: boolean;
             data: {
                 userObj: {
@@ -15395,8 +15743,8 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.authRefreshReq": Record<string, never>;
-        "infra.system.authRefreshRes": {
+        "admin.system.auth.refresh.req": Record<string, never>;
+        "admin.system.auth.refresh.res": {
             ok: boolean;
             data: {
                 /**
@@ -15407,14 +15755,14 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.authCheckReq": Record<string, never>;
-        "infra.system.authCheckRes": {
+        "admin.system.auth.check.req": Record<string, never>;
+        "admin.system.auth.check.res": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "infra.system.authProfileReq": Record<string, never>;
-        "infra.system.authProfileRes": {
+        "admin.system.auth.profile.req": Record<string, never>;
+        "admin.system.auth.profile.res": {
             ok: boolean;
             data: {
                 userObj: {
@@ -15495,7 +15843,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.authUpdateProfileReq": {
+        "admin.system.auth.updateprofile.req": {
             /** @description 国家地区对象 */
             regionObj?: (({
                 /**
@@ -15512,7 +15860,7 @@ export interface components {
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.system.authUpdateProfileRes": {
+        "admin.system.auth.updateprofile.res": {
             ok: boolean;
             /**
              * @description id
@@ -15521,7 +15869,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.authUpdateLangCodeReq": {
+        "admin.system.auth.updatelangcode.req": {
             /**
              * @description 语言代码
              * @example en-US
@@ -15529,7 +15877,7 @@ export interface components {
              */
             langCode: string;
         };
-        "infra.system.authUpdateLangCodeRes": {
+        "admin.system.auth.updatelangcode.res": {
             ok: boolean;
             /**
              * @description id
@@ -15538,7 +15886,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.authUpdatePasswordReq": {
+        "admin.system.auth.updatepassword.req": {
             /**
              * @description 旧密码
              * @example QWRtaW5AM==
@@ -15550,7 +15898,7 @@ export interface components {
              */
             newPassword: string;
         };
-        "infra.system.authUpdatePasswordRes": {
+        "admin.system.auth.updatepassword.res": {
             ok: boolean;
             /**
              * @description id
@@ -15559,8 +15907,8 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.authGetButtonPermissionReq": Record<string, never>;
-        "infra.system.authGetButtonPermissionRes": {
+        "admin.system.auth.getbuttonpermission.req": Record<string, never>;
+        "admin.system.auth.getbuttonpermission.res": {
             ok: boolean;
             data: {
                 permissions: {
@@ -15616,7 +15964,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.departmentListAllReq": {
+        "admin.system.department.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -15624,7 +15972,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
         };
-        "infra.system.departmentListAllRes": {
+        "admin.system.department.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -15646,7 +15994,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.departmentListReq": {
+        "admin.system.department.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -15674,7 +16022,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "createTimeUtc";
         };
-        "infra.system.departmentListRes": {
+        "admin.system.department.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -15720,7 +16068,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.departmentAddReq": {
+        "admin.system.department.add.req": {
             /**
              * @description 部门名称
              * @example 技术部
@@ -15733,7 +16081,7 @@ export interface components {
             /** @description 备注说明 */
             remark: ((string | null) | null) | null;
         };
-        "infra.system.departmentAddRes": {
+        "admin.system.department.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -15742,14 +16090,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.departmentDeleteReq": {
+        "admin.system.department.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.departmentDeleteRes": {
+        "admin.system.department.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -15758,7 +16106,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.departmentUpdateReq": {
+        "admin.system.department.update.req": {
             /**
              * @description id
              * @example 1
@@ -15776,7 +16124,7 @@ export interface components {
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.system.departmentUpdateRes": {
+        "admin.system.department.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -15785,14 +16133,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.departmentGetReq": {
+        "admin.system.department.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.departmentGetRes": {
+        "admin.system.department.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -15828,8 +16176,8 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.departmentTreeReq": Record<string, never>;
-        "infra.system.departmentTreeRes": {
+        "admin.system.department.tree.req": Record<string, never>;
+        "admin.system.department.tree.res": {
             ok: boolean;
             data: {
                 /**
@@ -15898,7 +16246,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.menuListAllReq": {
+        "admin.system.menu.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 业务标识 */
@@ -15908,7 +16256,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "business" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.menuListAllRes": {
+        "admin.system.menu.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -15944,7 +16292,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.menuListReq": {
+        "admin.system.menu.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -15969,7 +16317,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "business" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.menuListRes": {
+        "admin.system.menu.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -16029,7 +16377,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.menuAddReq": {
+        "admin.system.menu.add.req": {
             /**
              * @description 菜单名称
              * @example 主页
@@ -16056,7 +16404,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
         };
-        "infra.system.menuAddRes": {
+        "admin.system.menu.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -16065,7 +16413,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.menuUpdateReq": {
+        "admin.system.menu.update.req": {
             /**
              * @description id
              * @example 1
@@ -16097,7 +16445,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
-        "infra.system.menuUpdateRes": {
+        "admin.system.menu.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -16106,14 +16454,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.menuDeleteReq": {
+        "admin.system.menu.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.menuDeleteRes": {
+        "admin.system.menu.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -16122,14 +16470,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.menuGetReq": {
+        "admin.system.menu.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.menuGetRes": {
+        "admin.system.menu.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -16179,11 +16527,11 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.menuTreeReq": {
+        "admin.system.menu.tree.req": {
             /** @description 是否显示所有菜单（包括未启用的） */
             showAll?: boolean;
         };
-        "infra.system.menuTreeRes": {
+        "admin.system.menu.tree.res": {
             ok: boolean;
             data: {
                 /**
@@ -16326,7 +16674,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.permissionListAllReq": {
+        "admin.system.permission.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -16351,7 +16699,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "code" | "name" | "category" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.permissionListAllRes": {
+        "admin.system.permission.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -16391,7 +16739,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.permissionListReq": {
+        "admin.system.permission.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -16431,7 +16779,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "code" | "name" | "category" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.permissionListRes": {
+        "admin.system.permission.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -16495,7 +16843,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.permissionAddReq": {
+        "admin.system.permission.add.req": {
             /**
              * @description 权限代码，唯一标识
              * @example user:read
@@ -16526,7 +16874,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
         };
-        "infra.system.permissionAddRes": {
+        "admin.system.permission.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -16535,7 +16883,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.permissionUpdateReq": {
+        "admin.system.permission.update.req": {
             /**
              * @description id
              * @example 1
@@ -16571,7 +16919,7 @@ export interface components {
             /** @description 是否启用 */
             isEnabled?: boolean;
         };
-        "infra.system.permissionUpdateRes": {
+        "admin.system.permission.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -16580,14 +16928,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.permissionDeleteReq": {
+        "admin.system.permission.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.permissionDeleteRes": {
+        "admin.system.permission.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -16596,14 +16944,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.permissionGetReq": {
+        "admin.system.permission.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.permissionGetRes": {
+        "admin.system.permission.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -16657,7 +17005,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.roleListAllReq": {
+        "admin.system.role.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -16665,7 +17013,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.roleListAllRes": {
+        "admin.system.role.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -16695,7 +17043,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.roleListReq": {
+        "admin.system.role.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -16718,7 +17066,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.roleListRes": {
+        "admin.system.role.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -16772,7 +17120,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.roleAddReq": {
+        "admin.system.role.add.req": {
             /**
              * @description 角色名称
              * @example 管理员
@@ -16791,7 +17139,7 @@ export interface components {
             /** @description 自定义部门ID列表（JSON序列化） */
             customDeptIds: ((string | null) | null) | null;
         };
-        "infra.system.roleAddRes": {
+        "admin.system.role.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -16800,7 +17148,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.roleUpdateReq": {
+        "admin.system.role.update.req": {
             /**
              * @description id
              * @example 1
@@ -16825,7 +17173,7 @@ export interface components {
             /** @description 自定义部门ID列表（JSON序列化） */
             customDeptIds?: ((string | null) | null) | null;
         };
-        "infra.system.roleUpdateRes": {
+        "admin.system.role.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -16834,14 +17182,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.roleDeleteReq": {
+        "admin.system.role.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.roleDeleteRes": {
+        "admin.system.role.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -16850,14 +17198,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.roleGetReq": {
+        "admin.system.role.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.roleGetRes": {
+        "admin.system.role.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -16901,7 +17249,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.role_permissionListAllReq": {
+        "admin.system.role_permission.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 角色ID */
@@ -16911,7 +17259,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "roleId" | "permissionId" | "createTimeUtc";
         };
-        "infra.system.role_permissionListAllRes": {
+        "admin.system.role_permission.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -16940,7 +17288,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.role_permissionListReq": {
+        "admin.system.role_permission.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -16965,7 +17313,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "roleId" | "permissionId" | "createTimeUtc";
         };
-        "infra.system.role_permissionListRes": {
+        "admin.system.role_permission.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -17004,13 +17352,13 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.role_permissionAddReq": {
+        "admin.system.role_permission.add.req": {
             /** @description 角色ID */
             roleId: number;
             /** @description 权限ID */
             permissionId: number;
         };
-        "infra.system.role_permissionAddRes": {
+        "admin.system.role_permission.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -17019,19 +17367,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.role_permissionBatchAddReq": {
+        "admin.system.role_permission.batchadd.req": {
             /** @description 角色ID */
             roleId: number;
             /** @description 权限ID列表 */
             permissionIds: number[];
         };
-        "infra.system.role_permissionBatchAddRes": {
+        "admin.system.role_permission.batchadd.res": {
             ok: boolean;
             /** @description 成功添加的数量 */
             data: number;
             message: string;
         };
-        "infra.system.role_permissionUpdateReq": {
+        "admin.system.role_permission.update.req": {
             /**
              * @description id
              * @example 1
@@ -17042,7 +17390,7 @@ export interface components {
             /** @description 权限ID */
             permissionId?: number;
         };
-        "infra.system.role_permissionUpdateRes": {
+        "admin.system.role_permission.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -17051,14 +17399,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.role_permissionDeleteReq": {
+        "admin.system.role_permission.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.role_permissionDeleteRes": {
+        "admin.system.role_permission.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -17067,26 +17415,26 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.role_permissionBatchDeleteReq": {
+        "admin.system.role_permission.batchdelete.req": {
             /** @description 角色ID */
             roleId: number;
             /** @description 权限ID列表 */
             permissionIds: number[];
         };
-        "infra.system.role_permissionBatchDeleteRes": {
+        "admin.system.role_permission.batchdelete.res": {
             ok: boolean;
             /** @description 成功删除的数量 */
             data: number;
             message: string;
         };
-        "infra.system.role_permissionGetReq": {
+        "admin.system.role_permission.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.role_permissionGetRes": {
+        "admin.system.role_permission.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -17115,11 +17463,11 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.role_permissionGetPermissionsByRoleReq": {
+        "admin.system.role_permission.getpermissionsbyrole.req": {
             /** @description 角色ID */
             roleId: number;
         };
-        "infra.system.role_permissionGetPermissionsByRoleRes": {
+        "admin.system.role_permission.getpermissionsbyrole.res": {
             ok: boolean;
             data: {
                 /**
@@ -17173,7 +17521,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.userListAllReq": {
+        "admin.system.user.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -17181,7 +17529,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.userListAllRes": {
+        "admin.system.user.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -17219,7 +17567,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.system.userListReq": {
+        "admin.system.user.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -17242,7 +17590,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "username" | "langCode" | "regionId" | "departmentId" | "isEnabled" | "createTimeUtc";
         };
-        "infra.system.userListRes": {
+        "admin.system.user.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -17304,7 +17652,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.system.userAddReq": {
+        "admin.system.user.add.req": {
             /**
              * @description 用户名
              * @example user
@@ -17365,7 +17713,7 @@ export interface components {
                 label: string;
             }[];
         };
-        "infra.system.userAddRes": {
+        "admin.system.user.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -17374,7 +17722,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.userUpdateReq": {
+        "admin.system.user.update.req": {
             /**
              * @description id
              * @example 1
@@ -17435,7 +17783,7 @@ export interface components {
                 label: string;
             }[];
         };
-        "infra.system.userUpdateRes": {
+        "admin.system.user.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -17444,14 +17792,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.userDeleteReq": {
+        "admin.system.user.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.userDeleteRes": {
+        "admin.system.user.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -17460,14 +17808,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.system.userGetReq": {
+        "admin.system.user.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.system.userGetRes": {
+        "admin.system.user.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -17546,7 +17894,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.dockerListReq": {
+        "admin.swarm.docker.list.req": {
             /**
              * @description 过滤条件，如 { name: ['my-service'] }
              * @example {
@@ -17559,13 +17907,13 @@ export interface components {
                 [key: string]: string[];
             };
         };
-        "infra.swarm.dockerListRes": {
+        "admin.swarm.docker.list.res": {
             ok: boolean;
             /** @description Docker Service 列表 */
             data: Record<string, never>[];
             message: string;
         };
-        "infra.swarm.dockerInspectReq": {
+        "admin.swarm.docker.inspect.req": {
             /**
              * @description 服务 ID 或服务名称
              * @example u8p2jh82h2x9
@@ -17573,13 +17921,13 @@ export interface components {
              */
             id: string;
         };
-        "infra.swarm.dockerInspectRes": {
+        "admin.swarm.docker.inspect.res": {
             ok: boolean;
             /** @description Docker Service 详细配置及运行状态 */
             data: Record<string, never>;
             message: string;
         };
-        "infra.swarm.dockerCreateReq": {
+        "admin.swarm.docker.create.req": {
             /** @description Docker Swarm Service 配置对象 (ServiceSpec) */
             spec: {
                 /**
@@ -17628,7 +17976,7 @@ export interface components {
                 };
             };
         };
-        "infra.swarm.dockerCreateRes": {
+        "admin.swarm.docker.create.res": {
             ok: boolean;
             data: {
                 /** @description 新建服务的 ID */
@@ -17636,7 +17984,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.dockerUpdateReq": {
+        "admin.swarm.docker.update.req": {
             /**
              * @description 服务 ID 或服务名称
              * @example u8p2jh82h2x9
@@ -17696,7 +18044,7 @@ export interface components {
              */
             version: number;
         };
-        "infra.swarm.dockerUpdateRes": {
+        "admin.swarm.docker.update.res": {
             ok: boolean;
             data: {
                 /**
@@ -17707,7 +18055,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.dockerRemoveReq": {
+        "admin.swarm.docker.remove.req": {
             /**
              * @description 服务 ID 或服务名称
              * @example u8p2jh82h2x9
@@ -17715,7 +18063,7 @@ export interface components {
              */
             id: string;
         };
-        "infra.swarm.dockerRemoveRes": {
+        "admin.swarm.docker.remove.res": {
             ok: boolean;
             data: {
                 /**
@@ -17726,7 +18074,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.dockerLogsReq": {
+        "admin.swarm.docker.logs.req": {
             /**
              * @description 服务 ID 或服务名称
              * @example u8p2jh82h2x9
@@ -17739,7 +18087,7 @@ export interface components {
              */
             tail: number;
         };
-        "infra.swarm.dockerLogsRes": {
+        "admin.swarm.docker.logs.res": {
             ok: boolean;
             data: {
                 /** @description 服务日志文本内容 */
@@ -17747,7 +18095,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.dockerStatsReq": {
+        "admin.swarm.docker.stats.req": {
             /**
              * @description 服务 ID 或服务名称
              * @example u8p2jh82h2x9
@@ -17755,7 +18103,7 @@ export interface components {
              */
             id: string;
         };
-        "infra.swarm.dockerStatsRes": {
+        "admin.swarm.docker.stats.res": {
             ok: boolean;
             /** @description Swarm 服务各运行中 Task 副本负载指标 */
             data: {
@@ -17773,13 +18121,13 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.swarm.nodesListReq": {
+        "admin.swarm.nodes.list.req": {
             /** @description 过滤条件 */
             filters?: {
                 [key: string]: string[];
             };
         };
-        "infra.swarm.nodesListRes": {
+        "admin.swarm.nodes.list.res": {
             ok: boolean;
             /** @description Swarm Nodes 节点列表及其承载的负载状态 */
             data: {
@@ -17821,7 +18169,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.swarm.docker_configListAllReq": {
+        "admin.swarm.docker_config.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -17829,7 +18177,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "infra.swarm.docker_configListAllRes": {
+        "admin.swarm.docker_config.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -17854,7 +18202,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.swarm.docker_configListReq": {
+        "admin.swarm.docker_config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -17877,7 +18225,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "infra.swarm.docker_configListRes": {
+        "admin.swarm.docker_config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -17943,7 +18291,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.docker_configAddReq": {
+        "admin.swarm.docker_config.add.req": {
             /**
              * @description 配置名称
              * @example My Docker Swarm
@@ -17976,7 +18324,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.swarm.docker_configAddRes": {
+        "admin.swarm.docker_config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -17985,7 +18333,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.swarm.docker_configUpdateReq": {
+        "admin.swarm.docker_config.update.req": {
             /**
              * @description id
              * @example 1
@@ -18023,7 +18371,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.swarm.docker_configUpdateRes": {
+        "admin.swarm.docker_config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -18032,14 +18380,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.swarm.docker_configGetReq": {
+        "admin.swarm.docker_config.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.swarm.docker_configGetRes": {
+        "admin.swarm.docker_config.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -18095,14 +18443,14 @@ export interface components {
             };
             message: string;
         };
-        "infra.swarm.docker_configDeleteReq": {
+        "admin.swarm.docker_config.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.swarm.docker_configDeleteRes": {
+        "admin.swarm.docker_config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -18111,19 +18459,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.swarm.docker_configVerifyReq": {
+        "admin.swarm.docker_config.verify.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.swarm.docker_configVerifyRes": {
+        "admin.swarm.docker_config.verify.res": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "infra.ai.configListAllReq": {
+        "admin.ai.config.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -18131,7 +18479,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "infra.ai.configListAllRes": {
+        "admin.ai.config.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -18155,7 +18503,7 @@ export interface components {
             }[];
             message: string;
         };
-        "infra.ai.configListReq": {
+        "admin.ai.config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18178,7 +18526,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "infra.ai.configListRes": {
+        "admin.ai.config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18240,7 +18588,7 @@ export interface components {
             };
             message: string;
         };
-        "infra.ai.configAddReq": {
+        "admin.ai.config.add.req": {
             /**
              * @description 配置名称
              * @example My DeepSeek
@@ -18269,7 +18617,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.ai.configAddRes": {
+        "admin.ai.config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -18278,7 +18626,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.ai.configUpdateReq": {
+        "admin.ai.config.update.req": {
             /**
              * @description id
              * @example 1
@@ -18312,7 +18660,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "infra.ai.configUpdateRes": {
+        "admin.ai.config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -18321,14 +18669,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.ai.configGetReq": {
+        "admin.ai.config.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.ai.configGetRes": {
+        "admin.ai.config.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -18380,14 +18728,14 @@ export interface components {
             };
             message: string;
         };
-        "infra.ai.configDeleteReq": {
+        "admin.ai.config.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.ai.configDeleteRes": {
+        "admin.ai.config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -18396,19 +18744,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "infra.ai.configVerifyReq": {
+        "admin.ai.config.verify.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "infra.ai.configVerifyRes": {
+        "admin.ai.config.verify.res": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "infra.ai.chatAskReq": {
+        "admin.ai.chat.ask.req": {
             /** @description 用户提问内容 */
             q: string;
             /** @description 可选的图片 Base64 数据 */
@@ -18430,13 +18778,156 @@ export interface components {
                 })[];
             }[];
         };
-        "infra.ai.chatAskRes": {
+        "admin.ai.chat.ask.res": {
             ok: boolean;
             /** @description AI 返回的内容 */
             data: string;
             message: string;
         };
-        "enterprise.attendanceListAllReq": {
+        "admin.rpa.browser.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
+        };
+        "admin.rpa.browser.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 配置名 */
+                    name: string;
+                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+                    cdpUrl: string;
+                    /** @description 是否为默认环境 */
+                    isDefault: boolean;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注信息 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.rpa.browser.add.req": {
+            /** @description 配置名 */
+            name: string;
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            cdpUrl: string;
+            /** @description 是否为默认环境 */
+            isDefault: boolean;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.rpa.browser.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.rpa.browser.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 配置名 */
+            name?: string;
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            cdpUrl?: string;
+            /** @description 是否为默认环境 */
+            isDefault?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.rpa.browser.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.rpa.browser.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.rpa.browser.delete.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.rpa.browser.verify.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.rpa.browser.verify.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "organization.attendance.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18457,7 +18948,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "employeeId" | "date" | "status" | "createTimeUtc";
         };
-        "enterprise.attendanceListAllRes": {
+        "organization.attendance.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -18522,7 +19013,7 @@ export interface components {
             }[];
             message: string;
         };
-        "enterprise.attendanceListReq": {
+        "organization.attendance.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18558,7 +19049,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "employeeId" | "date" | "status" | "createTimeUtc";
         };
-        "enterprise.attendanceListRes": {
+        "organization.attendance.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18633,7 +19124,7 @@ export interface components {
             };
             message: string;
         };
-        "enterprise.attendanceAddReq": {
+        "organization.attendance.add.req": {
             /**
              * @description id
              * @example 1
@@ -18694,12 +19185,12 @@ export interface components {
              */
             updateTimeUtc?: ((number | null) | null) | null;
         };
-        "enterprise.attendanceAddRes": {
+        "organization.attendance.add.res": {
             ok: boolean;
             data: number;
             message: string;
         };
-        "enterprise.attendanceUpdateReq": {
+        "organization.attendance.update.req": {
             /**
              * @description id
              * @example 1
@@ -18760,31 +19251,31 @@ export interface components {
              */
             updateTimeUtc?: ((number | null) | null) | null;
         };
-        "enterprise.attendanceUpdateRes": {
+        "organization.attendance.update.res": {
             ok: boolean;
             data: number;
             message: string;
         };
-        "enterprise.attendanceDeleteReq": {
+        "organization.attendance.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "enterprise.attendanceDeleteRes": {
+        "organization.attendance.delete.res": {
             ok: boolean;
             data: number;
             message: string;
         };
-        "enterprise.attendanceGetReq": {
+        "organization.attendance.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "enterprise.attendanceGetRes": {
+        "organization.attendance.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -18849,7 +19340,7 @@ export interface components {
             };
             message: string;
         };
-        "enterprise.workflowListAllReq": {
+        "executive.workflow.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -18857,7 +19348,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        "enterprise.workflowListAllRes": {
+        "executive.workflow.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -18872,7 +19363,7 @@ export interface components {
             }[];
             message: string;
         };
-        "enterprise.workflowListReq": {
+        "executive.workflow.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18895,7 +19386,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "createTimeUtc";
         };
-        "enterprise.workflowListRes": {
+        "executive.workflow.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18940,7 +19431,7 @@ export interface components {
             };
             message: string;
         };
-        "enterprise.workflowAddReq": {
+        "executive.workflow.add.req": {
             /** @description 工作流名称 */
             name: string;
             /** @description 描述信息 */
@@ -18952,7 +19443,7 @@ export interface components {
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
         };
-        "enterprise.workflowAddRes": {
+        "executive.workflow.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -18961,7 +19452,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "enterprise.workflowUpdateReq": {
+        "executive.workflow.update.req": {
             /**
              * @description id
              * @example 1
@@ -18978,7 +19469,7 @@ export interface components {
             /** @description 备注说明 */
             remark?: ((string | null) | null) | null;
         };
-        "enterprise.workflowUpdateRes": {
+        "executive.workflow.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -18987,14 +19478,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "enterprise.workflowGetReq": {
+        "executive.workflow.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "enterprise.workflowGetRes": {
+        "executive.workflow.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -19029,14 +19520,14 @@ export interface components {
             };
             message: string;
         };
-        "enterprise.workflowDeleteReq": {
+        "executive.workflow.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "enterprise.workflowDeleteRes": {
+        "executive.workflow.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -19045,19 +19536,108 @@ export interface components {
             data: number;
             message: string;
         };
-        "enterprise.workflowRunReq": {
+        "executive.workflow.run.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "enterprise.workflowRunRes": {
+        "executive.workflow.run.res": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "enterprise.workflowConfig_listReq": {
+        "executive.workflow.log.list.req": {
+            pageNo?: number;
+            pageSize?: number;
+            workflowId: number;
+        };
+        "executive.workflow.log.list.res": {
+            ok: boolean;
+            data: {
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+                list: {
+                    id: number;
+                    workflowId: number;
+                    status: string;
+                    triggerType: string;
+                    startTimeUtc: number;
+                    endTimeUtc?: ((number | null) | null) | null;
+                    logs?: ((string | null) | null) | null;
+                    creatorId?: number;
+                    createTimeUtc?: number;
+                }[];
+            };
+            message: string;
+        };
+        "personal.profile.listall.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关联用户ID
+             * @example 1
+             */
+            userId?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "userId" | "realName" | "createTimeUtc";
+        };
+        "personal.profile.listall.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 关联用户ID
+                 * @example 1
+                 */
+                userId: number;
+                /**
+                 * @description 姓名
+                 * @example 张三
+                 */
+                realName: string;
+                /**
+                 * @description 性别 (male/female/other)
+                 * @example male
+                 */
+                gender?: ((string | null) | null) | null;
+                /**
+                 * @description 电子邮箱
+                 * @example zhangsan@example.com
+                 */
+                email?: ((string | null) | null) | null;
+                /**
+                 * @description 手机号码
+                 * @example 13800138000
+                 */
+                phone?: ((string | null) | null) | null;
+                /** @description 备注信息 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            }[];
+            message: string;
+        };
+        "personal.profile.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -19075,12 +19655,15 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
+            /**
+             * @description 关联用户ID
+             * @example 1
+             */
+            userId?: number;
             /** @enum {string} */
-            orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "userId" | "realName" | "createTimeUtc";
         };
-        "enterprise.workflowConfig_listRes": {
+        "personal.profile.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -19097,14 +19680,31 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /** @description 配置名 */
-                    name: string;
-                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
-                    cdpUrl: string;
-                    /** @description 是否为默认环境 */
-                    isDefault: boolean;
-                    /** @description 是否启用 */
-                    isEnabled: boolean;
+                    /**
+                     * @description 关联用户ID
+                     * @example 1
+                     */
+                    userId: number;
+                    /**
+                     * @description 姓名
+                     * @example 张三
+                     */
+                    realName: string;
+                    /**
+                     * @description 性别 (male/female/other)
+                     * @example male
+                     */
+                    gender?: ((string | null) | null) | null;
+                    /**
+                     * @description 电子邮箱
+                     * @example zhangsan@example.com
+                     */
+                    email?: ((string | null) | null) | null;
+                    /**
+                     * @description 手机号码
+                     * @example 13800138000
+                     */
+                    phone?: ((string | null) | null) | null;
                     /** @description 备注信息 */
                     remark?: ((string | null) | null) | null;
                     /** @description 创建人ID */
@@ -19125,104 +19725,321 @@ export interface components {
             };
             message: string;
         };
-        "enterprise.workflowConfig_addReq": {
-            /** @description 配置名 */
-            name: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
-            cdpUrl: string;
-            /** @description 是否为默认环境 */
-            isDefault: boolean;
-            /** @description 是否启用 */
-            isEnabled: boolean;
+        "personal.profile.add.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id?: number;
+            /**
+             * @description 关联用户ID
+             * @example 1
+             */
+            userId: number;
+            /**
+             * @description 姓名
+             * @example 张三
+             */
+            realName: string;
+            /**
+             * @description 性别 (male/female/other)
+             * @example male
+             */
+            gender?: ((string | null) | null) | null;
+            /**
+             * @description 电子邮箱
+             * @example zhangsan@example.com
+             */
+            email?: ((string | null) | null) | null;
+            /**
+             * @description 手机号码
+             * @example 13800138000
+             */
+            phone?: ((string | null) | null) | null;
             /** @description 备注信息 */
             remark?: ((string | null) | null) | null;
-        };
-        "enterprise.workflowConfig_addRes": {
-            ok: boolean;
+            /** @description 创建人ID */
+            creatorId?: number;
             /**
-             * @description id
-             * @example 1
+             * @description 创建时间
+             * @example 1672531199000
              */
-            data: number;
-            message: string;
-        };
-        "enterprise.workflowConfig_updateReq": {
+            createTimeUtc?: number;
+            /** @description 更新人ID */
+            updaterId?: ((number | null) | null) | null;
             /**
-             * @description id
-             * @example 1
+             * @description 更新时间
+             * @example 1672531199000
              */
-            id: number;
-            /** @description 配置名 */
-            name?: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
-            cdpUrl?: string;
-            /** @description 是否为默认环境 */
-            isDefault?: boolean;
-            /** @description 是否启用 */
-            isEnabled?: boolean;
-            /** @description 备注信息 */
-            remark?: ((string | null) | null) | null;
+            updateTimeUtc?: ((number | null) | null) | null;
         };
-        "enterprise.workflowConfig_updateRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "enterprise.workflowConfig_deleteReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "enterprise.workflowConfig_deleteRes": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "enterprise.workflowConfig_verifyReq": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "enterprise.workflowConfig_verifyRes": {
-            ok: boolean;
-            data: boolean;
-            message: string;
-        };
-        "enterprise.workflowLog_listReq": {
-            pageNo?: number;
-            pageSize?: number;
-            workflowId: number;
-        };
-        "enterprise.workflowLog_listRes": {
+        "personal.profile.add.res": {
             ok: boolean;
             data: {
-                total: number;
-                totalPage: number;
-                currentPage: number;
-                pageSize: number;
-                list: {
-                    id: number;
-                    workflowId: number;
-                    status: string;
-                    triggerType: string;
-                    startTimeUtc: number;
-                    endTimeUtc?: ((number | null) | null) | null;
-                    logs?: ((string | null) | null) | null;
-                    creatorId?: number;
-                    createTimeUtc?: number;
-                }[];
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 关联用户ID
+                 * @example 1
+                 */
+                userId: number;
+                /**
+                 * @description 姓名
+                 * @example 张三
+                 */
+                realName: string;
+                /**
+                 * @description 性别 (male/female/other)
+                 * @example male
+                 */
+                gender?: ((string | null) | null) | null;
+                /**
+                 * @description 电子邮箱
+                 * @example zhangsan@example.com
+                 */
+                email?: ((string | null) | null) | null;
+                /**
+                 * @description 手机号码
+                 * @example 13800138000
+                 */
+                phone?: ((string | null) | null) | null;
+                /** @description 备注信息 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "personal.profile.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 关联用户ID
+             * @example 1
+             */
+            userId?: number;
+            /**
+             * @description 姓名
+             * @example 张三
+             */
+            realName?: string;
+            /**
+             * @description 性别 (male/female/other)
+             * @example male
+             */
+            gender?: ((string | null) | null) | null;
+            /**
+             * @description 电子邮箱
+             * @example zhangsan@example.com
+             */
+            email?: ((string | null) | null) | null;
+            /**
+             * @description 手机号码
+             * @example 13800138000
+             */
+            phone?: ((string | null) | null) | null;
+            /** @description 备注信息 */
+            remark?: ((string | null) | null) | null;
+            /** @description 创建人ID */
+            creatorId?: number;
+            /**
+             * @description 创建时间
+             * @example 1672531199000
+             */
+            createTimeUtc?: number;
+            /** @description 更新人ID */
+            updaterId?: ((number | null) | null) | null;
+            /**
+             * @description 更新时间
+             * @example 1672531199000
+             */
+            updateTimeUtc?: ((number | null) | null) | null;
+        };
+        "personal.profile.update.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 关联用户ID
+                 * @example 1
+                 */
+                userId: number;
+                /**
+                 * @description 姓名
+                 * @example 张三
+                 */
+                realName: string;
+                /**
+                 * @description 性别 (male/female/other)
+                 * @example male
+                 */
+                gender?: ((string | null) | null) | null;
+                /**
+                 * @description 电子邮箱
+                 * @example zhangsan@example.com
+                 */
+                email?: ((string | null) | null) | null;
+                /**
+                 * @description 手机号码
+                 * @example 13800138000
+                 */
+                phone?: ((string | null) | null) | null;
+                /** @description 备注信息 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "personal.profile.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.profile.delete.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 关联用户ID
+                 * @example 1
+                 */
+                userId?: number;
+                /**
+                 * @description 姓名
+                 * @example 张三
+                 */
+                realName?: string;
+                /**
+                 * @description 性别 (male/female/other)
+                 * @example male
+                 */
+                gender?: ((string | null) | null) | null;
+                /**
+                 * @description 电子邮箱
+                 * @example zhangsan@example.com
+                 */
+                email?: ((string | null) | null) | null;
+                /**
+                 * @description 手机号码
+                 * @example 13800138000
+                 */
+                phone?: ((string | null) | null) | null;
+                /** @description 备注信息 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "personal.profile.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.profile.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /**
+                 * @description 关联用户ID
+                 * @example 1
+                 */
+                userId: number;
+                /**
+                 * @description 姓名
+                 * @example 张三
+                 */
+                realName: string;
+                /**
+                 * @description 性别 (male/female/other)
+                 * @example male
+                 */
+                gender?: ((string | null) | null) | null;
+                /**
+                 * @description 电子邮箱
+                 * @example zhangsan@example.com
+                 */
+                email?: ((string | null) | null) | null;
+                /**
+                 * @description 手机号码
+                 * @example 13800138000
+                 */
+                phone?: ((string | null) | null) | null;
+                /** @description 备注信息 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };

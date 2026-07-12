@@ -19,7 +19,11 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
 
   // 识别当前路由属于哪一个子应用
   const isEnterpriseActive =
-    isHost && (location.pathname.startsWith('/biz/') || location.pathname.startsWith('biz/'));
+    isHost &&
+    (location.pathname.startsWith('/organization/') ||
+      location.pathname.startsWith('organization/') ||
+      location.pathname.startsWith('/executive/') ||
+      location.pathname.startsWith('executive/'));
   const isPersonalActive =
     isHost &&
     (location.pathname.startsWith('/personal/') || location.pathname.startsWith('personal/'));

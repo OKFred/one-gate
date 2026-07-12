@@ -216,17 +216,23 @@ permissionSeedsNode.properties.forEach((parentProp) => {
 // 输出全局树状嵌套 permissions 大对象
 content += `
 export const permissions = {
-  infra: {
-    ...infra,
-    system: infra_system,
-    mail: infra_mail,
-    i18n: infra_i18n,
-    maintenance: infra_maintenance,
-    data: infra_data,
-    ai: infra_ai,
-    swarm: infra_swarm
+  admin: {
+    ...admin,
+    system: admin_system,
+    mail: admin_mail,
+    i18n: admin_i18n,
+    maintenance: admin_maintenance,
+    data: admin_data,
+    ai: admin_ai,
+    swarm: admin_swarm,
+    rpa: admin_rpa,
   },
-  enterprise: enterprise
+  enterprise: {
+    ...enterprise,
+    organization: organization,
+    executive: executive,
+  },
+  personal: personal,
 } as const;
 `;
 

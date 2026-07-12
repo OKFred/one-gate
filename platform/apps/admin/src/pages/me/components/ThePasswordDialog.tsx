@@ -15,7 +15,7 @@ import {
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
-import { updatePasswordFn } from '@/api/infra/system/auth';
+import { updatePasswordFn } from '@/api/admin/system/auth';
 import { showSnackbar } from '@/components/Notification';
 import type { Props } from '../index';
 import { useResponsive } from '@/hooks/useResponsive';

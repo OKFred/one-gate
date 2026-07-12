@@ -229,9 +229,15 @@ importers:
       '@hodor/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@mui/icons-material':
+        specifier: ^9.0.1
+        version: 9.0.1(@mui/material@9.0.1(@emotion/react@11.14.0(@types/react@19.2.15)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.15)(react@19.2.3))(@types/react@19.2.15)(react@19.2.3))(@types/react@19.2.15)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@types/react@19.2.15)(react@19.2.3)
       '@mui/material':
         specifier: ^9.0.1
         version: 9.0.1(@emotion/react@11.14.0(@types/react@19.2.15)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.15)(react@19.2.3))(@types/react@19.2.15)(react@19.2.3))(@types/react@19.2.15)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      dayjs:
+        specifier: ^1.11.21
+        version: 1.11.21
       react:
         specifier: ^19.2.3
         version: 19.2.3

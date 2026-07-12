@@ -2,10 +2,10 @@ import { tokenUtils } from "../../utils/token";
 import { Context } from "../../types/app";
 import userService, {
   UserObj,
-} from "../../../../infra/src/system/user/service";
+} from "../../../../admin/src/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "../../db/init";
-import { utils as rolePermissionUtils } from "../../../../infra/src/system/role_permission/service";
-import { roleTable } from "../../../../infra/src/system/role/model";
+import { utils as rolePermissionUtils } from "../../../../admin/src/system/role_permission/service";
+import { roleTable } from "../../../../admin/src/system/role/model";
 import {
   DataScope,
   SCOPE_PRIORITY,

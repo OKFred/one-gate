@@ -1,224 +1,153 @@
-# 全栈开发参考指南 (AI 助手版)
+# 全栈开发参考指南 (架构重构版)
 
-本指南旨在为 AI 助手提供在本项目中开发新功能（接口 + 页面）的标准流程和规范。
+本指南面向本项目在架构重构（包含 `admin`、`enterprise` 与 `personal` 模块独立化）后的最新规范，用于指导开发全新业务线与功能。
 
-## 1. 核心技术栈
+## 1. 核心技术栈与模块职责
 
-- **后端**: Hono (Web 框架), Drizzle ORM (数据库), JSON Schema (参数校验), SQLite.
-- **前端**: React 18, Vite, Material UI (MUI), Dayjs, Axios.
+项目结构划分为**后端微服务单体集控**（基于 Lerna/PNPM Workspace 的 Monorepo）与**前端微前端联邦应用**。
 
----
-
-## 2. 后端开发流程 (API)
-
-### Step 2.1: 定义数据库 SQL
-
-在 `server/src/db/sql/` 目录下创建 `[table_name].sql`。
-
-- 使用 `INTEGER PRIMARY KEY AUTOINCREMENT` 作为 ID。
-- 必须包含审计字段：`creator_id`, `updater_id`, `create_time_utc`, `update_time_utc`。
-
-### Step 2.2: 定义模型 (Model)
-
-在 `server/src/api/[module]/[sub_module]/model.ts` 中：
-
-- 使用 Drizzle 定义 `table`。
-- 定义 `PO`, `DTO`, `VO` 类型。
-
-### Step 2.3: 实现服务 (Service)
-
-在 `server/src/api/[module]/[sub_module]/service.ts` 中：
-
-- 实现 CRUD 函数。
-- 列表查询应支持 `pageNo`, `pageSize`, `orderBy`, `descend` 及关键词过滤。
-- 使用 `wrapHono` 封装 API。
-
-### Step 2.4: 注册路由 (Router)
-
-- 在 `server/src/api/[module]/index.ts` 中合并子模块路由。
-- 在 `server/src/api/index.ts` 中注册主模块路由。
+- **后端包** (`server/packages/`):
+  - `@hodor/core`: 核心公共组件（数据库连接、中间件、认证拦截、日志与工具函数）。
+  - `@hodor/admin`: 管理后台服务（系统用户、角色权限、菜单、地区与国际化、Swarm容器配置等）。
+  - `@hodor/enterprise`: 企业应用后台服务（组织架构、考勤、工作流任务驱动等）。
+  - `@hodor/personal`: 个人应用后台服务（用户个人中心、关联档案维护）。
+- **前端应用** (`platform/apps/`):
+  - `@hodor/admin`: 系统管理端 React APP（端口 5173）。
+  - `@hodor/enterprise`: 企业协作端 React APP（端口 5174）。
+  - `@hodor/personal`: 个人中心 React APP（端口 5175）。
+  - 所有前端应用共享 `@hodor/ui`（UI公共组件库、HTTP请求适配层与通用上下文）。
 
 ---
 
-## 3. 数据库初始化配置
+## 2. 后端开发规范 (以 Personal 模块为例)
 
-每增加一个新模块，必须更新以下文件以支持自动化初始化：
+### Step 2.1: 定义数据库 DDL
 
-1. **`server/src/db/initMenu.ts`**: 添加侧边栏菜单配置（注意分配唯一的 ID）。
-2. **`server/src/db/initPermissions.ts`**: 添加 `api` 和 `button` 类型的权限码。
-3. **`server/src/db/initTranslation.ts`**: 添加菜单、业务类型及页面组件的多语言翻译。
-4. **`server/src/types/business.d.ts`**: 扩展 `BusinessKey` 类型。
+在 `server/packages/core/src/db/sql/` 目录下创建 `[table_name].sql`（例如 `personal_profile.sql`）。
 
-运行初始化命令：
+- 主键定义: `id INTEGER PRIMARY KEY AUTOINCREMENT`。
+- 必须包含标准审计字段：
+  ```sql
+  creator_id INTEGER NOT NULL,
+  updater_id INTEGER,
+  create_time_utc INTEGER DEFAULT (
+    CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
+    CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
+  ),
+  update_time_utc INTEGER
+  ```
 
-```bash
-cd server && pnpm run db:init node
-```
+### Step 2.2: 声明数据表模型 (Model)
 
----
-
-## 4. 前端开发流程 (Page)
-
-### Step 4.0: 定义 TypeScript 类型
-
-在 `platform/src/api/[module]/type.d.ts` 中根据 API 函数自动推导类型：
+在对应的业务包内创建领域文件夹，并定义 Drizzle Schema。例如在 `packages/personal/src/profile/model.ts` 中：
 
 ```typescript
-import * as ModuleAPI from './module';
+import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 
-export type ListReq = NonNullable<Parameters<typeof ModuleAPI.listFn>[0]['data']>;
-export type ListRes = Awaited<ReturnType<typeof ModuleAPI.listFn>>['data']['data'];
-export type AddReq = NonNullable<Parameters<typeof ModuleAPI.addFn>[0]['data']>;
-export type UpdateReq = NonNullable<Parameters<typeof ModuleAPI.updateFn>[0]['data']>;
-export type GetRes = Awaited<ReturnType<typeof ModuleAPI.getFn>>['data']['data'];
-
-/** 业务对象类型 */
-export type [Module]Obj = ListRes['list'][number];
+export const profileTable = sqliteTable("personal_profile", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  realName: text("real_name").notNull(),
+  gender: text("gender"),
+  email: text("email"),
+  phone: text("phone"),
+  remark: text("remark"),
+  creatorId: integer("creator_id").notNull(),
+  updaterId: integer("updater_id"),
+  createTimeUtc: integer("create_time_utc")
+    .notNull()
+    .default(getCurrentTimestampUtcSql()),
+  updateTimeUtc: integer("update_time_utc"),
+});
 ```
 
-### Step 4.1: 定义 API 客户端
+### Step 2.3: 实现业务持久层 (Repository)
 
-在 `platform/src/api/[module]/[sub_module].ts` 中定义 Axios 调用函数，通常包括 `listFn`, `addFn`, `updateFn`, `deleteFn`, `getFn`。
+在 `repository.ts` 中完成低级别的数据库查询：
 
-### Step 4.2: 定义权限码 (Permissions)
+- 采用 Drizzle ORM 进行 DML 与单条/多条过滤。
+- 列表查询须支持动态 `orderBy` 列排序与降序。
 
-在 `platform/src/hooks/usePermission.ts` 中添加对应的权限常量，格式通常为 `module.sub_module:action`。
+### Step 2.4: 业务控制层与 OpenAPI 描述 (Service & App)
 
-### Step 4.3: 构建组件结构（增删改查页面的快速构建）
+在 `service.ts` 中描述并暴露 REST 端点：
 
-页面目录：`platform/src/pages/[module]/[sub_module]/`
-
-对于增删改查页面，根据复杂度的不同，分为**声明式低代码极速构建（推荐）**与**传统多组件独立构建**两种方式。
-
-#### 模式 A：声明式低代码极速构建 (基于 SchemaCrudPage 底座)
-
-当页面为典型的列表查询、表单增改、详情及删除时，**必须优先选用声明式底座进行快速构建**。这能让你的页面代码从 5 个组件文件减少到仅 1 至 2 个，并且原生享有完善的响应式和 loading 交互。
-
-1. **一阶：纯声明式极速构建 (0 冗余组件)**
-   - 整个页面仅需一个 `index.tsx` 文件。
-   - 在 `index.tsx` 中定义 `SchemaCrudConfig` 配置对象，直接挂载 `<SchemaCrudPage config={config} />`。
-   - 过滤项、表格列表字段、简单新增/编辑表单的 schema 都通过配置式定义。
-2. **二阶：声明式 + 局部自定义表单 (单组件扩展)**
-   - 页面由 `index.tsx` 和自定义表单组件 `components/TheForm.tsx` 组成。
-   - 适用于表单有特殊交互、需要异步加载下拉列表数据（如用户列表）、或需要对提交数据进行转换（如时间戳转换）的场景。
-   - 利用 `form.afterOpen` 与 `form.beforeSubmit` 等生命周期钩子，以及 `form.renderForm` 传入自定义表单渲染逻辑。
-
-#### 模式 B：传统多组件独立构建 (高定制树形/复杂图表等)
-
-仅当页面的交互逻辑与 CRUD 存在底层冲突（如需要支持折叠树拖拽菜单、复杂的拓扑交互图表）时，才使用传统的多组件构建：
-
-- **`index.tsx`**: 页面入口，使用 `PageLayout`。
-- **`components/TheTable.tsx`**: 响应式列表展示。
-- **`components/TheForm.tsx`**: 表单编辑/新增 Dialog。
-- **`components/TheFilter.tsx`**: 筛选区域。
-- **`components/TheActionButtons.tsx`**: 行操作按钮，绑定鉴权。
-
-### Step 4.4: 响应式规范
-
-- 使用 `@/components/Responsive/index` 下的 `ResponsiveList`, `ResponsiveButton` 等组件。
-- 利用 `useResponsive` Hook 处理移动端适配（如全屏 Dialog）。
+- 统一使用 `encapsulation` (封装好的高阶 Hono 控制器适配器) 挂载 API。
+- 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。
+- 领域服务在 `[module]/index.ts` 中导出，并在子包 `index.ts` 下挂载。
 
 ---
 
-## 5. 命名规范
+## 3. 全局种子与配置数据初始化
 
-- **文件**: 模块名使用小写（如 `attendance`），组件使用大驼峰并加 `The` 前缀（如 `TheTable.tsx`）。
-- **字段**: 数据库采用下划线 (`create_time_utc`)，JS/TS 采用小驼峰 (`createTimeUtc`)。
-- **多语言**: 翻译键采用点分隔（如 `sidebar.menu.enterprise.attendance`）。
+新增模块或接口路由后，必须同步执行以下流程以同步数据库及菜单：
 
----
+1. **`server/packages/core/src/db/initMenu.ts`**: 挂载侧边栏导航树。
+2. **`server/packages/core/src/db/initPermissions.ts`**: 新增对应的访问权限控制节点。
+3. **`server/packages/core/src/db/initTranslation.ts`**: 集中导入多语言翻译对象（中文/英文）。
+4. **`server/packages/core/src/types/business.ts`**: 扩展 `BusinessKey` 联合类型。
 
-## 6. 开发建议
+同步命令：
 
-- **代码复用**: 优先参考 `i18n/language` 或 `system/user` 模块的实现模式。
-- **安全性**: 所有写操作 API 必须校验权限，读操作尽可能通过子查询或 Join 丰富 VO 数据。
-- **交互**: 操作成功后必须调用 `tableRef.current?.refresh()` 刷新数据。
-
----
-
-## 7. TypeScript & 类型规范
-
-为了确保系统的稳定性和可维护性，必须遵循以下类型规范：
-
-### 7.1 严禁使用 `any`
-
-- 在组件、State、Props 和 API 调用中禁止出现 `any`。
-- 如果类型复杂或来自第三方库，使用 `unknown` 或具体的工具类型（如 `Parameters` / `ReturnType`）进行推导。
-
-### 7.2 显式类型转换 (Explicit Casting)
-
-- 在提交表单 Payload 时，应显式转换为 API 定义的请求类型：
-  ```typescript
-  const payload = { ...form } as AddReq;
-  await API.addFn({ data: payload });
-  ```
-
-### 7.3 MUI 组件样式属性类型
-
-- 当需要定义 MUI 组件属性（如 `color`, `variant`）的变量时，应使用其定义的字面量类型，而非 `string`：
-  ```typescript
-  const color: Parameters<typeof Chip>[0]["color"] = "success";
-  ```
-
-### 7.4 命名约定
-
-- **接口请求**: `[Action][Module]Req` (例如 `ListAttendanceReq`).
-- **接口响应**: `[Action][Module]Res` (例如 `ListAttendanceRes`).
-- **实体对象**: `[Module]Obj` (代表列表中的单行数据，例如 `AttendanceObj`).
+```bash
+# 在 server 目录下执行本地同步（刷新 local.db 并重新导出 schemas.sql）
+pnpm run db:init node
+```
 
 ---
 
-## 8. 前后端权限码统一规范
+## 4. 前端开发规范 (Vite + Module Federation)
 
-为了保证系统鉴权的严密性，前后端的权限控制码（Permission Code）必须遵循**绝对的统一性与对齐原则**：
+### Step 4.1: 新增 API 请求定义
 
-### 8.1 权限码命名规则
+在 `platform/packages/ui/src/api/` 的对应子目录下（例如 `personal/profile.ts`）编写封装函数：
 
-权限码统一采用点和冒号分隔的层级命名法：`[module].[sub_module]:[action]`。
-例如：
+- 采用 `axiosPlus` 统一处理请求。
+- API 路径前缀必须契合后端，例如：`/api/v1/personal/profile/list`。
 
-- `system.user:add` (系统管理-用户管理-新增)
-- `enterprise.attendance:export` (企业管理-考勤管理-导出)
-- `maintenance.cache:delete` (系统维护-缓存管理-删除)
+### Step 4.2: 前端路由挂载与扁平化设计
 
-### 8.2 后端权限码与鉴权
+- 前端物理页面路径应当**扁平化**，直接放置于 `pages/` 根目录下，避免繁琐的二级嵌套。
+- 路由挂载在各自独立应用的 `src/routes.tsx` 中，利用 `import.meta.glob` 自动加载。
+- 页面权限标识 `PREFIX_LV1` 分别为：`admin`、`enterprise` 或 `personal`。
 
-1. **数据源初始化**：
-   在后端初始化文件 `server/src/db/initPermissions.ts` 中，必须声明所有有效的 `api` 和 `button` 类型的权限码，确保在数据库中被自动初始化和入库。
-2. **中间件拦截强校验**：
-   在服务的路由层或控制器层，对写操作（POST、PUT、DELETE）和敏感的读操作进行统一的鉴权中间件过滤（如引用对应的权限码常量进行匹配校验），防止越权行为。
+### Step 4.3: 国际化多语言翻译机制
 
-### 8.3 前端权限控制与对齐
+- 严禁在页面组件中针对 `t()` 翻译函数使用备用文字（例如 `t('key') || '默认文本'`）。
+- 始终保持 `t('key')` 的干净输出，若缺少词条将直接展示键名，以防开发遗漏翻译，便于在运行时及时补全。
 
-1. **常量定义同步**：
-   在前端 `platform/src/hooks/usePermission.ts` 的 `permissions` 对象或对应的业务常量大对象中，必须声明与后端 `initPermissions.ts` **完全一致、字母完全对齐**的权限码常量：
-   ```typescript
-   export const MAINTENANCE = {
-     CACHE: {
-       VIEW: "maintenance.cache:view",
-       DELETE: "maintenance.cache:delete",
-     },
-   };
-   ```
-2. **交互按钮绑定**：
-   在渲染表格操作列按钮（如 `table.actions` 中的 `permissionCodes`）、页面通用按钮、或定制组件时，必须绑定该权限码常量。底座和鉴权 Hook 将根据当前用户的实际拥有的权限列表自动对按钮进行隐藏或禁用，从而做到全链路的安全协同。
+### Step 4.4: 同步 OpenAPI 接口类型
 
----
+若后端路由有增减，在后端启动状态下，执行以下命令同步前端类型：
 
-## 9. 后端 API 接口更新与前端 Schema 同步规范
+```bash
+npx openapi-typescript http://localhost:8787/doc.json --output platform/packages/ui/src/types/openapi.d.ts
+```
 
-每当后端 API 接口更新（修改了字段、路由或类型）时，前端需要重新同步接口元数据和 JSON Schemas，步骤如下：
+### Step 4.5: 页面权限常量自动生成 (`generate-constants.js`)
 
-### 9.1 类型与 Schema 自动同步触发条件
-- 前端 `platform` 的开发模式（`pnpm run dev`）在配置了本地后端地址（通过 `VITE_SERVER_URL`）时，会自动在启动或热重载时拉取后端的 `/doc.json`，并执行以下两项任务：
-  1. 生成最新的前端 TypeScript 类型文件 `platform/src/types/openapi.d.ts`。
-  2. 解析 `/doc.json` 内的 components 结构，提取拆分后写入到 `platform/src/assets/schemas/*.json` 中，供低代码表单底座使用。
+每个页面目录下的 `constant.ts` 均由脚本自动生成，**不要手动编辑**。
 
-### 9.2 手动或重新编译同步方法
-- 如果开发服务器已经在运行但后端接口发生了更新，可以通过以下方式强制重新同步：
-  - **方法 A**：在 `platform` 目录下重新运行 `pnpm run dev`（热启动会触发配置加载，从而调用 API 获取和拆分生成）。
-  - **方法 B**：或者如果开发服务器被配置了热更新，只需保存一下 `platform/vite.config.ts` 即可触发配置文件重新载入，进而重新请求并写入 Schema。
+**脚本路径**: `platform/scripts/generate-constants.js`
 
-### 9.3 编译过滤规范 (Vite cleanSchema 防御)
-- 在对 API 的 JSON Schemas 进行元数据清洗时（删除 `examples`、`default` 以及文档描述），**严禁**误删 `properties` 映射内部的数据表字段本身（例如 `"description"`、`"default"` 属性字段）。
-- 在修改 `vite.config.ts` 的清洗过滤函数时，必须使用上下文状态位（如 `isProperties`）进行防御，以防数据表字段被误过滤导致低代码表单底座（`SchemaCrudPage`）因匹配不到 properties 而过滤掉该字段的提交。
+**执行命令**（在 `platform/` 目录下）：
+
+```bash
+node ./scripts/generate-constants.js
+```
+
+**生成规则**：
+
+- 脚本会扫描 `platform/apps/[app]/src/pages/` 下的所有子目录，对照 `packages/ui/src/hooks/usePermission.ts` 中 `permissions` 对象的实际键结构，判断该页面目录是否有对应的权限条目。
+- **有权限条目**：生成 `THIS_PERMISSION = permissions.xxx.yyy`（完整类型安全，无 `as any`）。
+- **无权限条目**（如 `mail/send`、`maintenance/openapi`）：只生成前缀常量，不生成 `THIS_PERMISSION`。
+- **排除目录**（`home`、`login`、`me`）：删除已有的 `constant.ts` 并跳过，因为这些页面与权限系统无关。
+
+**何时需要重新执行**：
+
+1. 在 `usePermission.ts` 中新增或删除权限条目后。
+2. 在 `pages/` 下新增了页面子目录后。
+3. 修改了 `EXCLUDED_DIRS` 排除列表后。
+
+> **注意**：`usePermission.ts` 由 `server/scripts/sync-permissions.ts` 自动生成，不要手动编辑。因此正确的链式操作为：
+> 修改 `initPermissions.ts` → 执行 `pnpm run db:init node` → 执行 `node ./scripts/generate-constants.js`。

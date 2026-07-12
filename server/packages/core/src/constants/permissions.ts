@@ -21,7 +21,7 @@ export type CheckPermissionSeeds<T, Parent extends string = ""> = {
 
 export const permissionSeeds = {
   /** 系统管理 */
-  "infra.system": {
+  "admin.system": {
     "": ["read"],
     /** 用户管理 */
     user: ["read", "add", "edit", "delete", "export"],
@@ -39,7 +39,7 @@ export const permissionSeeds = {
     auth: ["read", "edit"],
   },
   /** 邮件 */
-  "infra.mail": {
+  "admin.mail": {
     "": ["read"],
     /** 邮件账户 */
     account: ["read", "add", "edit", "delete"],
@@ -51,7 +51,7 @@ export const permissionSeeds = {
     action: ["read", "add"],
   },
   /** 国际化 */
-  "infra.i18n": {
+  "admin.i18n": {
     "": ["read"],
     /** 语言管理 */
     language: ["read", "add", "edit", "delete"],
@@ -61,7 +61,7 @@ export const permissionSeeds = {
     translation: ["read", "add", "edit", "delete"],
   },
   /** 运维 */
-  "infra.maintenance": {
+  "admin.maintenance": {
     "": ["read"],
     /** 缓存管理 */
     cache: ["read", "add", "edit", "delete", "view"],
@@ -79,11 +79,11 @@ export const permissionSeeds = {
     init: ["read"],
   },
   /** 基础设施 */
-  infra: {
+  admin: {
     "": ["read"],
   },
   /** 数据管理 */
-  "infra.data": {
+  "admin.data": {
     "": ["read"],
     /** 动态表单配置 */
     schema_form: ["read", "add", "edit", "delete"],
@@ -101,15 +101,27 @@ export const permissionSeeds = {
   /** 企业管理 */
   enterprise: {
     "": ["read"],
+  },
+  /** 组织管理 */
+  organization: {
+    "": ["read"],
     /** 考勤管理 */
     attendance: ["read", "add", "edit", "delete"],
+  },
+  /** 事务管理 */
+  executive: {
+    "": ["read"],
     /** 工作流编排 */
     workflow: ["read", "add", "edit", "delete"],
-    /** 工作流配置 */
-    workflow_config: ["read", "add", "edit", "delete"],
+  },
+  /** 个人中心 */
+  personal: {
+    "": ["read"],
+    /** 个人信息 */
+    profile: ["read", "add", "edit", "delete"],
   },
   /** AI */
-  "infra.ai": {
+  "admin.ai": {
     "": ["read"],
     /** AI 配置 */
     config: ["read", "add", "edit", "delete"],
@@ -117,7 +129,7 @@ export const permissionSeeds = {
     chat: ["read"],
   },
   /** Swarm 集群 */
-  "infra.swarm": {
+  "admin.swarm": {
     "": ["read"],
     /** Swarm 集群 Docker 服务管理 */
     docker: ["read", "add", "edit", "delete"],
@@ -125,6 +137,12 @@ export const permissionSeeds = {
     docker_config: ["read", "add", "edit", "delete"],
     /** Swarm 节点管理 */
     nodes: ["read"],
+  },
+  /** RPA */
+  "admin.rpa": {
+    "": ["read"],
+    /** 浏览器配置 */
+    browser: ["read", "add", "edit", "delete"],
   },
 } as const;
 

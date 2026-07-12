@@ -89,8 +89,6 @@ html::-webkit-scrollbar {
   background: var(--scrollbar-thumb-hover);
 }
 
-/* 移动端滚动条样式 - 已移至上方的 custom-scrollbar 类 */
-
 ::-webkit-scrollbar-button {
   display: none;
 }

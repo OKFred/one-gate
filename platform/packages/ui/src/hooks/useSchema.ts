@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { batchGetFn } from '@/api/infra/data/schemaForm';
+import { batchGetFn } from '@/api/admin/data/schemaForm';
 
 // ---- IndexedDB 工具 ----
 const DB_NAME = 'hodor_schema_cache';

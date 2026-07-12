@@ -1,18 +1,21 @@
 import db from "./index";
-import { translationTable } from "../../../infra/src/i18n/translation/model";
-import { utils as translationUtils } from "../../../infra/src/i18n/translation/service";
+import { translationTable } from "../../../admin/src/i18n/translation/model";
+import { utils as translationUtils } from "../../../admin/src/i18n/translation/service";
 import { SUPER_ADMIN_ID } from "./init";
 import { sql } from "drizzle-orm";
 
-import { aiTranslations } from "../../../infra/src/ai/translation";
-import { swarmTranslations } from "../../../infra/src/swarm/translation";
-import { i18nTranslations } from "../../../infra/src/i18n/translation";
-import { mailTranslations } from "../../../infra/src/mail/translation";
-import { maintenanceTranslations } from "../../../infra/src/maintenance/translation";
-import { ossTranslations } from "../../../infra/src/data/oss/translation";
-import { dataTranslations } from "../../../infra/src/data/translation";
-import { enterpriseTranslations } from "../../../biz/src/enterprise/translation";
-import { systemTranslations } from "../../../infra/src/system/translation";
+import { aiTranslations } from "../../../admin/src/ai/translation";
+import { swarmTranslations } from "../../../admin/src/swarm/translation";
+import { i18nTranslations } from "../../../admin/src/i18n/translation";
+import { mailTranslations } from "../../../admin/src/mail/translation";
+import { maintenanceTranslations } from "../../../admin/src/maintenance/translation";
+import { ossTranslations } from "../../../admin/src/data/oss/translation";
+import { dataTranslations } from "../../../admin/src/data/translation";
+import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
+import { workflowTranslations } from "../../../enterprise/src/executive/workflow/translation";
+import { profileTranslations } from "../../../personal/src/profile/translation";
+import { systemTranslations } from "../../../admin/src/system/translation";
+import { browserTranslations } from "../../../admin/src/rpa/browser/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "../types/business";
 import type { LanguageCode } from "./initLanguage";
@@ -130,6 +133,9 @@ export const initialTranslationData = mapTranslations({
   ...maintenanceTranslations,
   ...dataTranslations,
   ...ossTranslations,
-  ...enterpriseTranslations,
+  ...attendanceTranslations,
+  ...workflowTranslations,
+  ...profileTranslations,
   ...systemTranslations,
+  ...browserTranslations,
 }) satisfies BatchTranslationItem[];

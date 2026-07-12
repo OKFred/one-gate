@@ -1,9 +1,0 @@
-import encapsulation from "@hodor/core/middleware/encapsulation";
-import service from "./service";
-import { BusinessKey } from "@hodor/core/types/business";
-
-function createApp() {
-  return encapsulation(service, "infra.i18n.region" satisfies BusinessKey);
-}
-
-export default createApp;

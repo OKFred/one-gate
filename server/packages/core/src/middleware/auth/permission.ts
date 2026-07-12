@@ -1,4 +1,4 @@
-import type { UserObj } from "@hodor/infra/system/user/service";
+import type { UserObj } from "@hodor/admin/system/user/service";
 
 /** 通用动作映射，将抽象动作映射到具体的权限码后缀 */
 const ACTION_MAP: Record<string, string[]> = {

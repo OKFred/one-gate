@@ -8,8 +8,9 @@ import serveStaticFiles from "@hodor/core/middleware/serveStatic/index.js";
 import { storageMiddleware } from "@hodor/core/utils/storage/index.js";
 import type { AppBindings, Context, ResJson } from "@hodor/core/types/app.js";
 import { getEnv } from "@hodor/core/utils/env.js";
-import createInfraApp from "@hodor/infra/index.js";
-import createBizApp from "@hodor/biz/index.js";
+import createAdminApp from "@hodor/admin/index.js";
+import createEnterpriseApp from "@hodor/enterprise/index.js";
+import createPersonalApp from "@hodor/personal/index.js";
 
 function createApp() {
   const app = new OpenAPIHono<AppBindings>();
@@ -23,8 +24,9 @@ function createApp() {
   getEnv("NODE_ENV") !== "production" && docRegister(app);
 
   const apiApp = new OpenAPIHono<AppBindings>();
-  apiApp.route("/infra", createInfraApp());
-  apiApp.route("/biz", createBizApp());
+  apiApp.route("/admin", createAdminApp());
+  apiApp.route("/enterprise", createEnterpriseApp());
+  apiApp.route("/personal", createPersonalApp());
 
   const baseApiPath = getEnv("BASE_API_PATH");
   !baseApiPath && console.error("❌.MISSING ENV: BASE_API_PATH");
