@@ -86,7 +86,7 @@ const listApi = {
   pathInfo: {
     path: "/list",
     method: "post",
-    summary: "获取动态表单提交的数据列表",
+    summary: "获取表单数据列表",
   } as const,
   adapter: bodyAdapter,
   service: onList,
@@ -181,7 +181,7 @@ const submitApi = {
   pathInfo: {
     path: "/submit",
     method: "post",
-    summary: "提交动态表单数据",
+    summary: "提交表单数据",
   } as const,
   adapter: bodyUserAdapter,
   service: onSubmit,
@@ -219,7 +219,7 @@ const deleteApi = {
   pathInfo: {
     path: "/delete",
     method: "post",
-    summary: "删除动态表单数据",
+    summary: "删除表单数据",
   } as const,
   adapter: bodyAdapter,
   service: onDelete,
@@ -271,7 +271,7 @@ const getApi = {
   pathInfo: {
     path: "/get",
     method: "post",
-    summary: "获取动态表单数据详情",
+    summary: "获取表单数据详情",
   } as const,
   adapter: bodyAdapter,
   service: onGet,

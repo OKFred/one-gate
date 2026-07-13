@@ -1,5 +1,5 @@
-import * as OSSConfigAPI from '@/api/admin/data/oss/config';
-import * as OSSFileAPI from '@/api/admin/data/oss/file';
+import * as OSSConfigAPI from '@/api/admin/oss/config';
+import * as OSSFileAPI from '@/api/admin/oss/file';
 
 export type ListAllConfigReq = NonNullable<Parameters<typeof OSSConfigAPI.listAllFn>[0]['data']>;
 export type ListAllConfigRes = Awaited<ReturnType<typeof OSSConfigAPI.listAllFn>>['data']['data'];

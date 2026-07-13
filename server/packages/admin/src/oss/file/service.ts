@@ -96,7 +96,7 @@ function toFileVO(item: StorageObjectMetadata) {
   };
 }
 
-async function getActiveStorage(env: unknown): Promise<StorageProvider> {
+export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
   const config = await getDefaultConfig();
   preventEmpty(config);
 

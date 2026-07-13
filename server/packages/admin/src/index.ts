@@ -2,7 +2,7 @@ import i18n from "./i18n/index.js";
 import mail from "./mail/index.js";
 import maintenance from "./maintenance/index.js";
 import data from "./data/index.js";
-import oss from "./data/oss/index.js";
+import oss from "./oss/index.js";
 import system from "./system/index.js";
 import swarm from "./swarm/index.js";
 import ai from "./ai/index.js";

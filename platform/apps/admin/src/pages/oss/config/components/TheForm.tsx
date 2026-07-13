@@ -5,7 +5,7 @@ import { TextField } from '@/components/Form';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 import type { ConfigRes } from './TheTable';
-import type { AddConfigReq, ListConfigReq } from '@/api/admin/data/oss/type';
+import type { AddConfigReq, ListConfigReq } from '@/api/admin/oss/type';
 export const formConfig: SchemaCrudConfig<ConfigRes, FilterState, ListConfigReq>['form'] = {
   schema: `${FULL_PREFIX}.add.req`,
   updateSchema: `${FULL_PREFIX}.update.req`,

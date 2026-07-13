@@ -6,7 +6,7 @@ import type {
   FileManagerListResult,
 } from '@/components/FileManager';
 import { useTranslation } from '@/hooks/useTranslation';
-import * as OSSFileAPI from '@/api/admin/data/oss/file';
+import * as OSSFileAPI from '@/api/admin/oss/file';
 
 const ossFileAdapter: FileManagerAdapter = {
   listDirectory: async ({ prefix, pageSize, cursor }): Promise<FileManagerListResult> => {

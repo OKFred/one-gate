@@ -68,7 +68,6 @@ export type AppBindings = {
     userObj?: UserObj;
     timing?: TimingVariables;
     logger: import("pino").Logger;
-    getOSS: () => Promise<StorageProvider>;
   };
   Bindings: Env;
 };

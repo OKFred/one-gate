@@ -751,8 +751,8 @@ export const systemTranslations = {
     {
       tKey: "sidebar.menu.oss",
       langCodes: {
-        "zh-CN": "存储管理",
-        "en-US": "Storage",
+        "zh-CN": "对象存储",
+        "en-US": "Object Storage",
       },
     },
     {

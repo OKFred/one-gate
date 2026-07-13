@@ -2,9 +2,9 @@ import { Chip } from '@mui/material';
 import { GetApp as DownloadIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
-import type { ListFileReq, ListFileRes } from '@/api/admin/data/oss/type';
+import type { ListFileReq, ListFileRes } from '@/api/admin/oss/type';
 import type { FilterState } from './TheFilter';
-import * as OSSFileAPI from '@/api/admin/data/oss/file';
+import * as OSSFileAPI from '@/api/admin/oss/file';
 
 export type FileRes = NonNullable<ListFileRes['list']>[0];
 

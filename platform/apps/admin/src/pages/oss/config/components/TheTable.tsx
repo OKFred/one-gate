@@ -1,7 +1,7 @@
 import { Chip } from '@mui/material';
 import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
-import type { ListConfigReq, ListConfigRes } from '@/api/admin/data/oss/type';
+import type { ListConfigReq, ListConfigRes } from '@/api/admin/oss/type';
 import type { FilterState } from './TheFilter';
 
 export type ConfigRes = NonNullable<ListConfigRes['list']>[0];

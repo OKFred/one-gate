@@ -2,8 +2,8 @@ import { SchemaCrudPage } from '@/components/Crud';
 import { defaultFilters, filterConfig, type FilterState } from './components/TheFilter';
 import { tableConfig, type ConfigRes } from './components/TheTable';
 import { formConfig } from './components/TheForm';
-import * as OSSConfigAPI from '@/api/admin/data/oss/config';
-import type { ListConfigReq } from '@/api/admin/data/oss/type';
+import * as OSSConfigAPI from '@/api/admin/oss/config';
+import type { ListConfigReq } from '@/api/admin/oss/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
 export default function OSSConfigPage() {

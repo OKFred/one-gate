@@ -2,7 +2,7 @@ import type { TranslationInputItem } from "@hodor/core/db/initTranslation";
 import type { BusinessKey } from "@hodor/core/types/business";
 
 export const ossTranslations = {
-  "data.oss.config": [
+  "oss.config": [
     {
       tKey: "oss.config.name",
       langCodes: {
@@ -74,7 +74,7 @@ export const ossTranslations = {
       },
     },
   ],
-  "data.oss.file": [
+  "oss.file": [
     {
       tKey: "oss.file.title",
       langCodes: {
@@ -196,6 +196,6 @@ export const ossTranslations = {
     },
   ],
 } satisfies Record<
-  Extract<BusinessKey, "data.oss.config" | "data.oss.file">,
+  Extract<BusinessKey, "oss.config" | "oss.file">,
   TranslationInputItem[]
 >;

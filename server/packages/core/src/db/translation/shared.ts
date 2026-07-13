@@ -48,8 +48,8 @@ export const sharedTranslations = {
     {
       tKey: "sidebar.menu.data",
       langCodes: {
-        "zh-CN": "数据管理",
-        "en-US": "Data Management",
+        "zh-CN": "数据库",
+        "en-US": "Database",
       },
     },
     {
@@ -239,14 +239,14 @@ export const sharedTranslations = {
     {
       tKey: "sidebar.menu.data.schemaForm",
       langCodes: {
-        "zh-CN": "动态表单配置",
-        "en-US": "Schema Form Config",
+        "zh-CN": "动态表单",
+        "en-US": "Schema Form",
       },
     },
     {
       tKey: "sidebar.menu.data.schemaFormData",
       langCodes: {
-        "zh-CN": "表单提交数据",
+        "zh-CN": "表单数据",
         "en-US": "Schema Form Data",
       },
     },
@@ -426,26 +426,26 @@ export const sharedTranslations = {
     },
     {
       tKey: "businessType.admin.data",
-      langCodes: { "zh-CN": "数据管理", "en-US": "Data Management" },
+      langCodes: { "zh-CN": "数据库", "en-US": "Database" },
     },
     {
       tKey: "businessType.admin.data.schema_form",
-      langCodes: { "zh-CN": "动态表单配置", "en-US": "Schema Form Config" },
+      langCodes: { "zh-CN": "动态表单", "en-US": "Schema Form" },
     },
     {
       tKey: "businessType.admin.data.schema_form_data",
-      langCodes: { "zh-CN": "表单提交数据", "en-US": "Schema Form Data" },
+      langCodes: { "zh-CN": "表单数据", "en-US": "Schema Form Data" },
     },
     {
-      tKey: "businessType.admin.data.oss",
+      tKey: "businessType.admin.oss",
       langCodes: { "zh-CN": "对象存储", "en-US": "Object Storage" },
     },
     {
-      tKey: "businessType.admin.data.oss.config",
+      tKey: "businessType.admin.oss.config",
       langCodes: { "zh-CN": "存储配置", "en-US": "Storage Config" },
     },
     {
-      tKey: "businessType.admin.data.oss.file",
+      tKey: "businessType.admin.oss.file",
       langCodes: { "zh-CN": "文件管理", "en-US": "File Management" },
     },
     {
@@ -1061,7 +1061,8 @@ export const sharedTranslations = {
       tKey: "common.welcomeSubtitle",
       langCodes: {
         "zh-CN": "提供高效便捷的工作流与组织管理方案",
-        "en-US": "Efficient workflows and organizational management solutions at your fingertips.",
+        "en-US":
+          "Efficient workflows and organizational management solutions at your fingertips.",
       },
     },
   ],

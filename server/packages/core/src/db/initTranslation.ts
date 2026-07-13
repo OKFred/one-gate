@@ -9,7 +9,7 @@ import { swarmTranslations } from "../../../admin/src/swarm/translation";
 import { i18nTranslations } from "../../../admin/src/i18n/translation";
 import { mailTranslations } from "../../../admin/src/mail/translation";
 import { maintenanceTranslations } from "../../../admin/src/maintenance/translation";
-import { ossTranslations } from "../../../admin/src/data/oss/translation";
+import { ossTranslations } from "../../../admin/src/oss/translation";
 import { dataTranslations } from "../../../admin/src/data/translation";
 import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
 import { workflowTranslations } from "../../../enterprise/src/executive/workflow/translation";

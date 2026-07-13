@@ -6,6 +6,7 @@ import type {
   maintenanceRegister,
   swarmRegister,
   rpaRegister,
+  ossRegister,
 } from "../register.js";
 
 export interface IInfraServices {
@@ -14,6 +15,7 @@ export interface IInfraServices {
   maintenance: typeof maintenanceRegister;
   swarm: typeof swarmRegister;
   rpa: typeof rpaRegister;
+  oss: typeof ossRegister;
 }
 
 export class ServiceRegistry {

@@ -3,7 +3,7 @@ import { S3Provider } from "./providers/s3";
 import { R2Provider } from "./providers/r2";
 import { Context } from "hono";
 import { App } from "../../types/app";
-import { utils as ossUtils } from "../../../../admin/src/data/oss/file/service";
+
 /**
  * OSS 配置接口
  */
@@ -49,13 +49,3 @@ export function getStorage(config: OssConfig, env: any = {}): StorageProvider {
     bucket: config.bucket,
   });
 }
-
-/**
- * Hono 中间件：默认注入 (如果需要默认配置)
- */
-export const storageMiddleware = (app: App) => {
-  app.use("*", async (c: Context, next) => {
-    c.set("getOSS", async () => await ossUtils.getActiveStorage(c.env));
-    await next();
-  });
-};
