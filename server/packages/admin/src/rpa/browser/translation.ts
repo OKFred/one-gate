@@ -120,9 +120,9 @@ export const browserTranslations = {
       tKey: "admin.rpa.browser.cdpUrlHelper",
       langCodes: {
         "zh-CN":
-          "示例: 127.0.0.1:9222 或 ws://127.0.0.1:9222/devtools/browser/...",
+          "自托管示例: 127.0.0.1:9222；Cloudflare 模式格式: https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering",
         "en-US":
-          "Example: 127.0.0.1:9222 or ws://127.0.0.1:9222/devtools/browser/...",
+          "Self-hosted e.g.: 127.0.0.1:9222; Cloudflare format: https://api.cloudflare.com/client/v4/accounts/<YOUR_ACCOUNT_ID>/browser-rendering",
       },
     },
     {

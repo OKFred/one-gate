@@ -265,7 +265,7 @@ async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
       return isSuccessful;
     }
   } catch (err: any) {
-    console.error("[Verify Browser] Connectivity test failed:", err.message);
+    console.error("[Verify Browser] Connectivity test failed:", err);
     return false;
   }
 }
