@@ -76,6 +76,20 @@ export const profileTable = sqliteTable("personal_profile", {
 - 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。
 - 领域服务在 `[module]/index.ts` 中导出，并在子包 `index.ts` 下挂载。
 
+### Step 2.5: 跨领域/模块解耦规范 (Service Registry)
+
+为了保证后端 Monorepo 子包（如 `admin`、`enterprise` 与 `personal` 等）之间的绝对解耦，**禁止直接跨包 `import` 其它包的私有 `repository` 或 `service` 逻辑**。
+
+若需要调用其它领域提供的底层服务，必须通过 `ServiceRegistry` 注册中心进行交互：
+
+1. **服务提供方（如 `admin` 模块）**：
+   - 在 `packages/admin/src/register.ts` 中引入要暴露的方法，并在对应的领域注册对象（如 `rpaRegister`）中导出。
+   - 在 `initAdminRegistry()` 中通过 `reg.register('rpa', rpaRegister)` 将服务注册到服务总线。
+   - 在 `packages/admin/src/common/registry.ts` 的 `IAdminServices` 接口中，添加相应的类型定义，确保全局 TypeScript 类型提示的健壮性。
+2. **服务调用方（如 `enterprise` 模块）**：
+   - 引入 `@hodor/admin/common/registry.js` 中的 `registry` 代理。
+   - 通过 `registry.[domain].[method]`（例如 `registry.rpa.findDefaultActiveBrowser()`）进行解耦调用。
+
 ---
 
 ## 3. 全局种子与配置数据初始化
@@ -90,7 +104,7 @@ export const profileTable = sqliteTable("personal_profile", {
 同步命令：
 
 ```bash
-# 在 server 目录下执行本地同步（刷新 local.db 并重新导出 schemas.sql）
+# 在 server 目录下执行本地同步（刷新 local.db）
 pnpm run db:init node
 ```
 

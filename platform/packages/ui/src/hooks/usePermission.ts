@@ -175,40 +175,41 @@ export const admin = {
   read: 'admin:read',
 } as const;
 
-/** 数据管理 */
+/** 数据库 */
 export const admin_data = {
   read: 'admin.data:read',
-  /** 动态表单配置 */
+  /** 动态表单 */
   schema_form: {
     read: 'admin.data.schema_form:read',
     add: 'admin.data.schema_form:add',
     edit: 'admin.data.schema_form:edit',
     delete: 'admin.data.schema_form:delete',
   },
-  /** 动态表单数据 */
+  /** 表单数据 */
   schema_form_data: {
     read: 'admin.data.schema_form_data:read',
     add: 'admin.data.schema_form_data:add',
     edit: 'admin.data.schema_form_data:edit',
     delete: 'admin.data.schema_form_data:delete',
   },
-  /** 对象存储 */
-  oss: {
-    read: 'admin.data.oss:read',
-    /** 存储配置 */
-    config: {
-      read: 'admin.data.oss.config:read',
-      add: 'admin.data.oss.config:add',
-      edit: 'admin.data.oss.config:edit',
-      delete: 'admin.data.oss.config:delete',
-    },
-    /** 文件管理 */
-    file: {
-      read: 'admin.data.oss.file:read',
-      add: 'admin.data.oss.file:add',
-      edit: 'admin.data.oss.file:edit',
-      delete: 'admin.data.oss.file:delete',
-    },
+} as const;
+
+/** 对象存储 */
+export const admin_oss = {
+  read: 'admin.oss:read',
+  /** 存储配置 */
+  config: {
+    read: 'admin.oss.config:read',
+    add: 'admin.oss.config:add',
+    edit: 'admin.oss.config:edit',
+    delete: 'admin.oss.config:delete',
+  },
+  /** 文件管理 */
+  file: {
+    read: 'admin.oss.file:read',
+    add: 'admin.oss.file:add',
+    edit: 'admin.oss.file:edit',
+    delete: 'admin.oss.file:delete',
   },
 } as const;
 
@@ -312,6 +313,7 @@ export const permissions = {
     i18n: admin_i18n,
     maintenance: admin_maintenance,
     data: admin_data,
+    oss: admin_oss,
     ai: admin_ai,
     swarm: admin_swarm,
     rpa: admin_rpa,

@@ -13,7 +13,7 @@ import { roleTable } from "../role/model";
 import { languageTable } from "../../i18n/language/model";
 import type { UserObj } from "@hodor/core/types/app";
 import { DataScope } from "@hodor/core/types/dataScope";
-import { initInfraRegistry } from "../../register.js";
+import { initAdminRegistry } from "../../register.js";
 
 // 静态导入 SQL 文件
 import userSql from "@hodor/core/db/sql/system_user.sql?raw";
@@ -42,7 +42,7 @@ describe("System User / Role / Permission RBAC 全链路集成测试", () => {
   const adminUserObj = { userId: 1, langCode: "zh-CN" } as unknown as UserObj;
 
   beforeAll(async () => {
-    initInfraRegistry();
+    initAdminRegistry();
     await setupTestDb(db, [
       userSql,
       roleSql,

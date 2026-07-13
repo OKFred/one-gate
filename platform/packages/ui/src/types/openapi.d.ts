@@ -3844,7 +3844,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取动态表单提交的数据列表 */
+        /** 获取表单数据列表 */
         post: {
             parameters: {
                 query?: never;
@@ -3902,7 +3902,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 提交动态表单数据 */
+        /** 提交表单数据 */
         post: {
             parameters: {
                 query?: never;
@@ -3960,7 +3960,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除动态表单数据 */
+        /** 删除表单数据 */
         post: {
             parameters: {
                 query?: never;
@@ -4018,7 +4018,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取动态表单数据详情 */
+        /** 获取表单数据详情 */
         post: {
             parameters: {
                 query?: never;
@@ -4076,7 +4076,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取动态表单配置列表 */
+        /** 获取动态表单列表 */
         post: {
             parameters: {
                 query?: never;
@@ -4134,7 +4134,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加动态表单配置 */
+        /** 添加动态表单 */
         post: {
             parameters: {
                 query?: never;
@@ -4192,7 +4192,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 更新动态表单配置 */
+        /** 更新动态表单 */
         post: {
             parameters: {
                 query?: never;
@@ -4250,7 +4250,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除动态表单配置 */
+        /** 删除动态表单 */
         post: {
             parameters: {
                 query?: never;
@@ -4308,7 +4308,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取动态表单配置信息 */
+        /** 获取动态表单信息 */
         post: {
             parameters: {
                 query?: never;
@@ -4415,818 +4415,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/data/oss/config/listAll": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取所有存储配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.listall.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.listall.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/config/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 分页获取存储配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.list.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.list.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/config/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 添加存储配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.add.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.add.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/config/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新存储配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.update.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.update.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/config/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 获取配置详情 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.get.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.get.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/config/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除配置 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.delete.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.delete.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/config/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 验证存储连通性 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.verify.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.verify.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/list": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** List files in storage bucket */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.list.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.list.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/listDirectory": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** List directories and files under a prefix */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.listdirectory.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.listdirectory.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/listAll": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** List all files */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.listall.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.listall.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/get": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Get file details and download URL */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.get.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.get.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create an upload URL */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.add.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.add.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create an overwrite upload URL */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.update.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.update.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/data/oss/file/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Delete file */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.delete.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.delete.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/admin/oss/config/listAll": {
         parameters: {
             query?: never;
@@ -5246,7 +4434,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.listall.req"];
+                    "application/json": components["schemas"]["admin.oss.config.listall.req"];
                 };
             };
             responses: {
@@ -5256,7 +4444,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.listall.res"];
+                        "application/json": components["schemas"]["admin.oss.config.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5304,7 +4492,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.list.req"];
+                    "application/json": components["schemas"]["admin.oss.config.list.req"];
                 };
             };
             responses: {
@@ -5314,7 +4502,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.list.res"];
+                        "application/json": components["schemas"]["admin.oss.config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5362,7 +4550,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.add.req"];
+                    "application/json": components["schemas"]["admin.oss.config.add.req"];
                 };
             };
             responses: {
@@ -5372,7 +4560,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.add.res"];
+                        "application/json": components["schemas"]["admin.oss.config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5420,7 +4608,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.update.req"];
+                    "application/json": components["schemas"]["admin.oss.config.update.req"];
                 };
             };
             responses: {
@@ -5430,7 +4618,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.update.res"];
+                        "application/json": components["schemas"]["admin.oss.config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5478,7 +4666,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.get.req"];
+                    "application/json": components["schemas"]["admin.oss.config.get.req"];
                 };
             };
             responses: {
@@ -5488,7 +4676,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.get.res"];
+                        "application/json": components["schemas"]["admin.oss.config.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5536,7 +4724,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.delete.req"];
+                    "application/json": components["schemas"]["admin.oss.config.delete.req"];
                 };
             };
             responses: {
@@ -5546,7 +4734,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.delete.res"];
+                        "application/json": components["schemas"]["admin.oss.config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5594,7 +4782,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.config.verify.req"];
+                    "application/json": components["schemas"]["admin.oss.config.verify.req"];
                 };
             };
             responses: {
@@ -5604,7 +4792,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.config.verify.res"];
+                        "application/json": components["schemas"]["admin.oss.config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5652,7 +4840,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.list.req"];
+                    "application/json": components["schemas"]["admin.oss.file.list.req"];
                 };
             };
             responses: {
@@ -5662,7 +4850,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.list.res"];
+                        "application/json": components["schemas"]["admin.oss.file.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5710,7 +4898,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.listdirectory.req"];
+                    "application/json": components["schemas"]["admin.oss.file.listdirectory.req"];
                 };
             };
             responses: {
@@ -5720,7 +4908,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.listdirectory.res"];
+                        "application/json": components["schemas"]["admin.oss.file.listdirectory.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5768,7 +4956,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.listall.req"];
+                    "application/json": components["schemas"]["admin.oss.file.listall.req"];
                 };
             };
             responses: {
@@ -5778,7 +4966,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.listall.res"];
+                        "application/json": components["schemas"]["admin.oss.file.listall.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5826,7 +5014,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.get.req"];
+                    "application/json": components["schemas"]["admin.oss.file.get.req"];
                 };
             };
             responses: {
@@ -5836,7 +5024,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.get.res"];
+                        "application/json": components["schemas"]["admin.oss.file.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5884,7 +5072,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.add.req"];
+                    "application/json": components["schemas"]["admin.oss.file.add.req"];
                 };
             };
             responses: {
@@ -5894,7 +5082,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.add.res"];
+                        "application/json": components["schemas"]["admin.oss.file.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5942,7 +5130,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.update.req"];
+                    "application/json": components["schemas"]["admin.oss.file.update.req"];
                 };
             };
             responses: {
@@ -5952,7 +5140,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.update.res"];
+                        "application/json": components["schemas"]["admin.oss.file.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6000,7 +5188,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.data.oss.file.delete.req"];
+                    "application/json": components["schemas"]["admin.oss.file.delete.req"];
                 };
             };
             responses: {
@@ -6010,7 +5198,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.data.oss.file.delete.res"];
+                        "application/json": components["schemas"]["admin.oss.file.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -15155,7 +14343,7 @@ export interface components {
             message: string;
         };
         "admin.data.schema_form.batch_get.req": {
-            /** @description 要查询的 schema code 前缀（如 infra.ai.chat） */
+            /** @description 要查询的 schema code 前缀（如 admin.ai.chat） */
             prefix: string;
             /** @description 客户端缓存的版本号，若与当前一致则返回空数据 */
             version?: string;
@@ -15174,7 +14362,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.config.listall.req": {
+        "admin.oss.config.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 是否启用 */
@@ -15182,7 +14370,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "admin.data.oss.config.listall.res": {
+        "admin.oss.config.listall.res": {
             ok: boolean;
             data: {
                 /**
@@ -15207,7 +14395,7 @@ export interface components {
             }[];
             message: string;
         };
-        "admin.data.oss.config.list.req": {
+        "admin.oss.config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -15230,7 +14418,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isEnabled" | "isDefault" | "createTimeUtc";
         };
-        "admin.data.oss.config.list.res": {
+        "admin.oss.config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -15299,7 +14487,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.config.add.req": {
+        "admin.oss.config.add.req": {
             /**
              * @description 配置名称
              * @example My S3 Storage
@@ -15335,7 +14523,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.data.oss.config.add.res": {
+        "admin.oss.config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -15344,7 +14532,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.data.oss.config.update.req": {
+        "admin.oss.config.update.req": {
             /**
              * @description id
              * @example 1
@@ -15385,7 +14573,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.data.oss.config.update.res": {
+        "admin.oss.config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -15394,14 +14582,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.data.oss.config.get.req": {
+        "admin.oss.config.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.data.oss.config.get.res": {
+        "admin.oss.config.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -15460,14 +14648,14 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.config.delete.req": {
+        "admin.oss.config.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.data.oss.config.delete.res": {
+        "admin.oss.config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -15476,19 +14664,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.data.oss.config.verify.req": {
+        "admin.oss.config.verify.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.data.oss.config.verify.res": {
+        "admin.oss.config.verify.res": {
             ok: boolean;
             data: boolean;
             message: string;
         };
-        "admin.data.oss.file.list.req": {
+        "admin.oss.file.list.req": {
             /** @description 前缀/路径搜索 */
             keyword?: string;
             /** @description 页码,兼容游标分页 */
@@ -15501,7 +14689,7 @@ export interface components {
             /** @description 下一页游标 */
             cursor?: string;
         };
-        "admin.data.oss.file.list.res": {
+        "admin.oss.file.list.res": {
             ok: boolean;
             data: {
                 list: {
@@ -15524,7 +14712,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.file.listdirectory.req": {
+        "admin.oss.file.listdirectory.req": {
             /** @description 当前目录前缀 */
             prefix?: string;
             /**
@@ -15535,7 +14723,7 @@ export interface components {
             /** @description 下一页游标 */
             cursor?: string;
         };
-        "admin.data.oss.file.listdirectory.res": {
+        "admin.oss.file.listdirectory.res": {
             ok: boolean;
             data: {
                 /** @description 当前目录前缀 */
@@ -15566,11 +14754,11 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.file.listall.req": {
+        "admin.oss.file.listall.req": {
             /** @description 前缀/路径搜索 */
             keyword?: string;
         };
-        "admin.data.oss.file.listall.res": {
+        "admin.oss.file.listall.res": {
             ok: boolean;
             data: {
                 /** @description 文件路径/键名 */
@@ -15584,11 +14772,11 @@ export interface components {
             }[];
             message: string;
         };
-        "admin.data.oss.file.get.req": {
+        "admin.oss.file.get.req": {
             /** @description 文件路径/键名 */
             key: string;
         };
-        "admin.data.oss.file.get.res": {
+        "admin.oss.file.get.res": {
             ok: boolean;
             data: {
                 /** @description 文件路径/键名 */
@@ -15604,7 +14792,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.file.add.req": {
+        "admin.oss.file.add.req": {
             /** @description 文件路径/键名 */
             key: string;
             /**
@@ -15618,7 +14806,7 @@ export interface components {
              */
             expiresIn: number;
         };
-        "admin.data.oss.file.add.res": {
+        "admin.oss.file.add.res": {
             ok: boolean;
             data: {
                 /** @description 上传预签名URL */
@@ -15627,7 +14815,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.file.update.req": {
+        "admin.oss.file.update.req": {
             /** @description 文件路径/键名 */
             key: string;
             /**
@@ -15641,7 +14829,7 @@ export interface components {
              */
             expiresIn: number;
         };
-        "admin.data.oss.file.update.res": {
+        "admin.oss.file.update.res": {
             ok: boolean;
             data: {
                 /** @description 上传预签名URL */
@@ -15650,11 +14838,11 @@ export interface components {
             };
             message: string;
         };
-        "admin.data.oss.file.delete.req": {
+        "admin.oss.file.delete.req": {
             /** @description 文件路径/键名 */
             key: string;
         };
-        "admin.data.oss.file.delete.res": {
+        "admin.oss.file.delete.res": {
             ok: boolean;
             data: {
                 key: string;
@@ -18826,8 +18014,10 @@ export interface components {
                     id: number;
                     /** @description 配置名 */
                     name: string;
-                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
                     cdpUrl: string;
+                    /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+                    authToken: ((string | null) | null) | null;
                     /** @description 是否为默认环境 */
                     isDefault: boolean;
                     /** @description 是否启用 */
@@ -18855,8 +18045,10 @@ export interface components {
         "admin.rpa.browser.add.req": {
             /** @description 配置名 */
             name: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
             cdpUrl: string;
+            /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+            authToken?: ((string | null) | null) | null;
             /** @description 是否为默认环境 */
             isDefault: boolean;
             /** @description 是否启用 */
@@ -18881,8 +18073,10 @@ export interface components {
             id: number;
             /** @description 配置名 */
             name?: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
             cdpUrl?: string;
+            /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+            authToken?: ((string | null) | null) | null;
             /** @description 是否为默认环境 */
             isDefault?: boolean;
             /** @description 是否启用 */

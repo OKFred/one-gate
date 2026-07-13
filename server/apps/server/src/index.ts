@@ -5,7 +5,6 @@ import docRegister from "@hodor/core/middleware/doc/docRegister.js";
 import corsHandler from "@hodor/core/middleware/cors/index.js";
 import serverTiming from "@hodor/core/middleware/serverTiming/index.js";
 import serveStaticFiles from "@hodor/core/middleware/serveStatic/index.js";
-import { storageMiddleware } from "@hodor/core/utils/storage/index.js";
 import type { AppBindings, Context, ResJson } from "@hodor/core/types/app.js";
 import { getEnv } from "@hodor/core/utils/env.js";
 import createAdminApp from "@hodor/admin/index.js";
@@ -16,7 +15,6 @@ function createApp() {
   const app = new OpenAPIHono<AppBindings>();
 
   serveStaticFiles(app);
-  storageMiddleware(app);
   errorHandler(app);
   corsHandler(app);
   serverTiming(app);

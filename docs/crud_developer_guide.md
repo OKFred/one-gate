@@ -40,7 +40,7 @@ graph TD
 定义表格上方的过滤器配置与类型：
 
 ```typescript
-import type { FilterFieldConfig } from '@/components/Crud';
+import type { FilterFieldConfig } from "@/components/Crud";
 
 // 1. 定义筛选器的状态类型
 export interface FilterState {
@@ -51,26 +51,26 @@ export interface FilterState {
 // 2. 导出 JSON-like 筛选器配置
 export const filterConfig = {
   defaultFilters: {
-    keyword: '',
+    keyword: "",
     enabled: undefined,
   } as FilterState,
 
   // 基于国际化 t 函数和 extraContext 的动态字段定义
   fields: (t: any): FilterFieldConfig<FilterState>[] => [
     {
-      name: 'keyword',
-      type: 'text',
-      label: t('filter.keyword'),
-      placeholder: t('filter.keywordLabel'),
+      name: "keyword",
+      type: "text",
+      label: t("filter.keyword"),
+      placeholder: t("filter.keywordLabel"),
     },
     {
-      name: 'enabled',
-      type: 'select',
-      label: t('region.fields.status'),
+      name: "enabled",
+      type: "select",
+      label: t("region.fields.status"),
       options: [
-        { label: t('region.status.all'), value: undefined },
-        { label: t('region.status.enabled'), value: true },
-        { label: t('region.status.disabled'), value: false },
+        { label: t("region.status.all"), value: undefined },
+        { label: t("region.status.enabled"), value: true },
+        { label: t("region.status.disabled"), value: false },
       ],
     },
   ],
@@ -82,39 +82,46 @@ export const filterConfig = {
 定义 PC 端表格列、移动端卡片式展示（Card List）和自定义扩展行操作按钮：
 
 ```tsx
-import type { TableColumnConfig, CardFieldConfig, CrudHelpers } from '@/components/Crud';
-import type { RegionRes } from '@/api/i18n/type';
-import { ToggleButton } from '@/components/Button'; // 假设有行内开关
+import type {
+  TableColumnConfig,
+  CardFieldConfig,
+  CrudHelpers,
+} from "@/components/Crud";
+import type { RegionRes } from "@/api/i18n/type";
+import { ToggleButton } from "@/components/Button"; // 假设有行内开关
 
 export { type RegionRes };
 
 export const tableConfig = {
   // 1. 定义 PC 表格列
   columns: (t: any, extraContext: any): TableColumnConfig<RegionRes>[] => [
-    { title: t('region.fields.code'), dataIndex: 'code' },
-    { title: t('region.fields.name'), dataIndex: 'name' },
+    { title: t("region.fields.code"), dataIndex: "code" },
+    { title: t("region.fields.name"), dataIndex: "name" },
     {
-      title: t('region.fields.status'),
+      title: t("region.fields.status"),
       render: (row, helpers) => (
-        <ToggleButton checked={row.enabled} onChange={() => handleToggle(row, helpers)} />
+        <ToggleButton
+          checked={row.enabled}
+          onChange={() => handleToggle(row, helpers)}
+        />
       ),
     },
   ],
 
   // 2. 定义移动端卡片列表展示项
   cardFields: (t: any): CardFieldConfig<RegionRes>[] => [
-    { label: t('region.fields.code'), dataIndex: 'code' },
-    { label: t('region.fields.name'), dataIndex: 'name' },
+    { label: t("region.fields.code"), dataIndex: "code" },
+    { label: t("region.fields.name"), dataIndex: "name" },
   ],
 
   // 3. 灵活扩展其他行内操作按钮（例如自定义详情、审核等）
   actions: (t: any): any[] => [
     {
-      key: 'custom-view',
+      key: "custom-view",
       icon: <InfoIcon />,
-      permissionCodes: ['custom:view'],
+      permissionCodes: ["custom:view"],
       onClick: (row: RegionRes, helpers: CrudHelpers<RegionRes>) => {
-        console.log('查看详情', row);
+        console.log("查看详情", row);
       },
     },
   ],
@@ -126,7 +133,7 @@ export const tableConfig = {
 配置 AJV 校验协议及表单的表层组件设计：
 
 ```tsx
-import { JSONSchemaType } from 'ajv';
+import { JSONSchemaType } from "ajv";
 
 export interface FormState {
   code: string;
@@ -135,16 +142,16 @@ export interface FormState {
 
 // 1. 严格的 AJV JSON Schema 声明，错误提示信息高度定制化
 export const formSchema: JSONSchemaType<FormState> = {
-  type: 'object',
+  type: "object",
   properties: {
-    code: { type: 'string', minLength: 2, errorMessage: '编码不能少于2个字符' },
-    name: { type: 'string', minLength: 1, errorMessage: '名称为必填项' },
+    code: { type: "string", minLength: 2, errorMessage: "编码不能少于2个字符" },
+    name: { type: "string", minLength: 1, errorMessage: "名称为必填项" },
   },
-  required: ['code', 'name'],
+  required: ["code", "name"],
   errorMessage: {
     required: {
-      code: '编码为必填项',
-      name: '名称为必填项',
+      code: "编码为必填项",
+      name: "名称为必填项",
     },
   },
 };
@@ -153,8 +160,8 @@ export const formSchema: JSONSchemaType<FormState> = {
 export const formConfig = {
   schema: formSchema,
   defaultForm: {
-    code: '',
-    name: '',
+    code: "",
+    name: "",
   } as FormState,
 
   // 3. 渲染表单内部字段，可接收外部 context 比如关联数据源列表
@@ -168,9 +175,11 @@ export const formConfig = {
     return (
       <Stack spacing={2}>
         <TextField
-          label={t('region.fields.code')}
-          value={form.code || ''}
-          onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
+          label={t("region.fields.code")}
+          value={form.code || ""}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, code: e.target.value }))
+          }
           fullWidth
         />
         {/* 可以直接在此消费 extraContext 动态渲染关联选择器 */}
@@ -185,13 +194,13 @@ export const formConfig = {
 极简声明，React Compiler 会在编译期接管全局状态防抖与缓存，无需添加任何 `useMemo` 与 `useCallback` 包裹：
 
 ```tsx
-import { useState, useEffect } from 'react';
-import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
-import { filterConfig, type FilterState } from './components/TheFilter';
-import { tableConfig, type RegionRes } from './components/TheTable';
-import { formConfig } from './components/TheForm';
-import * as RegionAPI from '@/api/i18n/region';
-import { infra_i18n } from '@/hooks/usePermission';
+import { useState, useEffect } from "react";
+import { SchemaCrudPage, type SchemaCrudConfig } from "@/components/Crud";
+import { filterConfig, type FilterState } from "./components/TheFilter";
+import { tableConfig, type RegionRes } from "./components/TheTable";
+import { formConfig } from "./components/TheForm";
+import * as RegionAPI from "@/api/i18n/region";
+import { admin_i18n } from "@/hooks/usePermission";
 
 export default function RegionPage() {
   const [languages, setLanguages] = useState([]);
@@ -203,12 +212,12 @@ export default function RegionPage() {
 
   // 声明极其直观干净 of CRUD 行为契约
   const config: SchemaCrudConfig<RegionRes, FilterState, any, any> = {
-    titleKey: 'region.title',
-    apiKeyName: 'id', // 主键字段名，默认为 'id'
+    titleKey: "region.title",
+    apiKeyName: "id", // 主键字段名，默认为 'id'
     permissions: {
-      add: [infra_i18n.region.add],
-      edit: [infra_i18n.region.edit],
-      delete: [infra_i18n.region.delete],
+      add: [admin_i18n.region.add],
+      edit: [admin_i18n.region.edit],
+      delete: [admin_i18n.region.delete],
     },
     api: {
       list: RegionAPI.listFn,

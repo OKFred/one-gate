@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS infra_browser (
+CREATE TABLE IF NOT EXISTS admin_browser (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     cdp_url TEXT NOT NULL,

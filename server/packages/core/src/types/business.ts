@@ -49,7 +49,7 @@ export const BUSINESS = {
   "admin.system.role_permission": "admin.system.role_permission",
   /** 系统用户 */
   "admin.system.user": "admin.system.user",
-  /** 数据管理动态表单配置 */
+  /** 动态表单 */
   "admin.data.schema_form": "admin.data.schema_form",
   /** 企业 */
   enterprise: "enterprise",
@@ -94,16 +94,16 @@ export const BUSINESS = {
   "admin.rpa": "admin.rpa",
   /** 浏览器环境调试配置 */
   "admin.rpa.browser": "admin.rpa.browser",
-  /** 数据管理 */
+  /** 数据库 */
   "admin.data": "admin.data",
-  /** 数据管理 动态表单数据 */
+  /** 表单数据 */
   "admin.data.schema_form_data": "admin.data.schema_form_data",
-  /** 数据管理 OSS */
-  "admin.data.oss": "admin.data.oss",
-  /** 数据管理 OSS 配置 */
-  "admin.data.oss.config": "admin.data.oss.config",
-  /** 数据管理 OSS 文件 */
-  "admin.data.oss.file": "admin.data.oss.file",
+  /** 对象存储 */
+  "admin.oss": "admin.oss",
+  /** 对象存储配置 */
+  "admin.oss.config": "admin.oss.config",
+  /** 对象存储文件 */
+  "admin.oss.file": "admin.oss.file",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

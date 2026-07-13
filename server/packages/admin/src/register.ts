@@ -6,6 +6,8 @@ import regionService from "./i18n/region/service.js";
 import { utils as auditUtils } from "./maintenance/audit_login/service.js";
 import { exportDeletionRecord } from "./maintenance/compliance/index.js";
 import { dockerClient } from "./swarm/docker/client.js";
+import { findDefaultActiveBrowser } from "./rpa/browser/repository.js";
+import { getActiveStorage } from "./oss/file/service.js";
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
@@ -27,14 +29,24 @@ export const maintenanceRegister = {
 
 export const swarmRegister = dockerClient;
 
+export const rpaRegister = {
+  findDefaultActiveBrowser,
+};
+
+export const ossRegister = {
+  getActiveStorage,
+};
+
 // 2. 初始化注册中心并绑定服务
-export function initInfraRegistry() {
+export function initAdminRegistry() {
   const reg = new ServiceRegistry();
 
   reg.register("system", systemRegister);
   reg.register("i18n", i18nRegister);
   reg.register("maintenance", maintenanceRegister);
   reg.register("swarm", swarmRegister);
-  console.log(`[INFRA] registered domains`, reg.domains);
+  reg.register("rpa", rpaRegister);
+  reg.register("oss", ossRegister);
+  console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);
 }

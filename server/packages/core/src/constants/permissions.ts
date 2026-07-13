@@ -82,21 +82,21 @@ export const permissionSeeds = {
   admin: {
     "": ["read"],
   },
-  /** 数据管理 */
+  /** 数据库 */
   "admin.data": {
     "": ["read"],
-    /** 动态表单配置 */
+    /** 动态表单 */
     schema_form: ["read", "add", "edit", "delete"],
-    /** 动态表单数据 */
+    /** 表单数据 */
     schema_form_data: ["read", "add", "edit", "delete"],
-    /** 对象存储 */
-    oss: {
-      "": ["read"],
-      /** 存储配置 */
-      config: ["read", "add", "edit", "delete"],
-      /** 文件管理 */
-      file: ["read", "add", "edit", "delete"],
-    },
+  },
+  /** 对象存储 */
+  "admin.oss": {
+    "": ["read"],
+    /** 存储配置 */
+    config: ["read", "add", "edit", "delete"],
+    /** 文件管理 */
+    file: ["read", "add", "edit", "delete"],
   },
   /** 企业管理 */
   enterprise: {

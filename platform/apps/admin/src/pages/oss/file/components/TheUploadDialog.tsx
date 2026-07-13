@@ -12,7 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import { useTranslation } from '@/hooks/useTranslation';
-import * as OSSFileAPI from '@/api/admin/data/oss/file';
+import * as OSSFileAPI from '@/api/admin/oss/file';
 import { showSnackbar } from '@/components/Notification';
 
 export interface TheUploadDialogProps {

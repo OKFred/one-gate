@@ -5,50 +5,54 @@ import type {
   i18nRegister,
   maintenanceRegister,
   swarmRegister,
+  rpaRegister,
+  ossRegister,
 } from "../register.js";
 
-export interface IInfraServices {
+export interface IAdminServices {
   system: typeof systemRegister;
   i18n: typeof i18nRegister;
   maintenance: typeof maintenanceRegister;
   swarm: typeof swarmRegister;
+  rpa: typeof rpaRegister;
+  oss: typeof ossRegister;
 }
 
 export class ServiceRegistry {
-  private services: Partial<IInfraServices> = {};
+  private services: Partial<IAdminServices> = {};
 
-  register<K extends keyof IInfraServices>(domain: K, impl: IInfraServices[K]) {
+  register<K extends keyof IAdminServices>(domain: K, impl: IAdminServices[K]) {
     this.services[domain] = impl;
   }
 
-  public get domains(): IInfraServices {
+  public get domains(): IAdminServices {
     return new Proxy(this.services, {
       get: (target, prop) => {
-        const domain = prop as keyof IInfraServices;
+        const domain = prop as keyof IAdminServices;
         const service = target[domain];
         if (!service) {
           throw new Error(
             `[ServiceRegistry] Domain service '${String(prop)}' is not registered yet. ` +
-              `Ensure 'initInfraRegistry()' is called at bootstrap.`
+              `Ensure 'initAdminRegistry()' is called at bootstrap.`
           );
         }
         return service;
       },
-    }) as unknown as IInfraServices;
+    }) as unknown as IAdminServices;
   }
 }
 
 let currentRegistry: ServiceRegistry | null = null;
 
-// 提供给消费端简洁调用的代理对象，其属性和方法类型完全与 IInfraServices 对齐
+// 提供给消费端简洁调用的代理对象，其属性和方法类型完全与 IAdminServices 对齐
 export const registry = new Proxy(
   {},
   {
     get: (target, prop) => {
-      return getActiveRegistry().domains[prop as keyof IInfraServices];
+      return getActiveRegistry().domains[prop as keyof IAdminServices];
     },
   }
-) as unknown as IInfraServices;
+) as unknown as IAdminServices;
 
 function getActiveRegistry(): ServiceRegistry {
   if (!currentRegistry) {
