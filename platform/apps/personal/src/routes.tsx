@@ -57,22 +57,20 @@ export const routes: RouteObject[] = [
     element: <RootRedirect />,
   },
   {
-    path: '/*',
+    path: '/',
     element: (
       <ProtectedRoute>
         <Layout />
       </ProtectedRoute>
     ),
-    children: [
-      ...childrenRoutes,
-      {
-        path: '*',
-        element: (
-          <Suspense fallback={renderPageLoading()}>
-            <NotFound />
-          </Suspense>
-        ),
-      },
-    ],
+    children: childrenRoutes,
+  },
+  {
+    path: '*',
+    element: (
+      <Suspense fallback={renderPageLoading()}>
+        <NotFound />
+      </Suspense>
+    ),
   },
 ];

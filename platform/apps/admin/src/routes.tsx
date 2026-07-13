@@ -83,23 +83,21 @@ export default function AppRoutes() {
       ),
     },
     {
-      path: '/*',
+      path: '/',
       element: (
         <ProtectedRoute>
           <Layout />
         </ProtectedRoute>
       ),
-      children: [
-        ...childrenRoutes,
-        {
-          path: '*',
-          element: (
-            <Suspense fallback={<PageLoading />}>
-              <NotFound />
-            </Suspense>
-          ),
-        },
-      ],
+      children: childrenRoutes,
+    },
+    {
+      path: '*',
+      element: (
+        <Suspense fallback={<PageLoading />}>
+          <NotFound />
+        </Suspense>
+      ),
     },
   ]);
 }
