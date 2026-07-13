@@ -147,6 +147,22 @@ export const browserTranslations = {
         "en-US": "Remark",
       },
     },
+    {
+      tKey: "admin.rpa.browser.authToken",
+      langCodes: {
+        "zh-CN": "认证 Token",
+        "en-US": "Authentication Token",
+      },
+    },
+    {
+      tKey: "admin.rpa.browser.authTokenHelper",
+      langCodes: {
+        "zh-CN":
+          "认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证",
+        "en-US":
+          "Authentication Token (Optional). Specifying this will automatically switch to Cloudflare Browser Run mode, using the Bearer Token for authentication.",
+      },
+    },
   ],
 } satisfies Record<
   Extract<BusinessKey, "admin.rpa.browser">,
