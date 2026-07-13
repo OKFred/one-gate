@@ -12,8 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@hodor/core/*": ["./src/*"],
-      "@hodor/admin/*": ["../admin/src/*"]
+      "@hodor/core/*": ["./src/*"]
     }
   },
   "include": ["src/**/*"]
