@@ -113,15 +113,7 @@ async function fetchSchemas(
   return promise;
 }
 
-/**
- * 从后端动态获取 JSON Schema，支持 IndexedDB 缓存 + 版本号比对
- *
- * @example
- * const { schema, updateSchema, loading } = useSchema({
- *   schema: 'infra.system.roleAddReq',
- *   updateSchema: 'infra.system.roleUpdateReq',
- * });
- */
+/** 从后端动态获取 JSON Schema，支持 IndexedDB 缓存 + 版本号比对 */
 export function useSchema(config: { schema: string; updateSchema?: string }): {
   schema: Record<string, unknown> | null;
   updateSchema: Record<string, unknown> | null;
