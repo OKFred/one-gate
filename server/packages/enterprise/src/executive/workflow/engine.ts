@@ -8,38 +8,111 @@ class CDPClient {
   private id = 0;
   private pending = new Map<number, (res: any) => void>();
 
-  constructor(private wsUrl: string) {}
+  constructor(
+    private wsUrl: string,
+    private authToken?: string | null
+  ) {}
 
   connect(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        // @ts-ignore
-        this.ws = new globalThis.WebSocket(this.wsUrl);
-      } catch (e) {
-        return reject(e);
-      }
-      this.ws.onopen = () => resolve();
-      this.ws.onerror = (err: any) =>
-        reject(
-          new Error(
-            "WebSocket 连接失败，请检查 CDP 调试地址是否已启动并正确配置。"
-          )
+        console.log(
+          `[Workflow Engine] Connecting to CDP WebSocket: ${this.wsUrl}`
         );
-      this.ws.onmessage = (event: any) => {
-        try {
-          const msg = JSON.parse(event.data);
-          if (msg.id && this.pending.has(msg.id)) {
-            const resolvePending = this.pending.get(msg.id);
-            if (resolvePending) {
-              resolvePending(msg);
-              this.pending.delete(msg.id);
-            }
+        if (this.authToken) {
+          // 将 wsUrl 转换为 https/http，以绕过本地 Fetch 校验不支持 wss/ws 协议的报错
+          let fetchUrl = this.wsUrl;
+          if (fetchUrl.startsWith("wss://")) {
+            fetchUrl = fetchUrl.replace(/^wss:\/\//, "https://");
+          } else if (fetchUrl.startsWith("ws://")) {
+            fetchUrl = fetchUrl.replace(/^ws:\/\//, "http://");
           }
-        } catch (e) {
-          console.error("CDP Message parse error:", e);
+          console.log(
+            `[Workflow Engine] Fetching upgrade for WebSocket: ${fetchUrl}`
+          );
+          // @ts-ignore
+          globalThis
+            .fetch(fetchUrl, {
+              headers: {
+                Upgrade: "websocket",
+                Connection: "Upgrade",
+                Authorization: `Bearer ${this.authToken}`,
+              },
+            })
+            .then((res: any) => {
+              const ws = res.webSocket;
+              if (!ws) {
+                return reject(
+                  new Error(
+                    "服务器未响应 101 Switching Protocols，WebSocket 升级失败。"
+                  )
+                );
+              }
+              ws.accept();
+              this.ws = ws;
+              this.setupHandlers(resolve, reject, true);
+            })
+            .catch((err: any) => {
+              reject(err);
+            });
+        } else {
+          // 自托管模式，使用普通的 globalThis.WebSocket
+          // @ts-ignore
+          this.ws = new globalThis.WebSocket(this.wsUrl);
+          this.setupHandlers(resolve, reject, false);
         }
-      };
+      } catch (e: any) {
+        return reject(new Error(`WebSocket 初始化失败: ${e.message}`));
+      }
     });
+  }
+
+  private setupHandlers(
+    resolve: () => void,
+    reject: (err: any) => void,
+    isAlreadyOpen: boolean
+  ) {
+    if (isAlreadyOpen) {
+      console.log(
+        `[Workflow Engine] WebSocket connected successfully (via Fetch Upgrade).`
+      );
+      resolve();
+    } else {
+      this.ws.onopen = () => {
+        console.log(`[Workflow Engine] WebSocket connected successfully.`);
+        resolve();
+      };
+    }
+    this.ws.onerror = (err: any) => {
+      console.error("[Workflow Engine] WebSocket error detail:", err);
+      const errDetail =
+        err?.message ||
+        (err && typeof err === "object" ? JSON.stringify(err) : String(err));
+      reject(
+        new Error(
+          `WebSocket 连接失败: ${errDetail || "未知错误"}。请检查 CDP 调试地址是否已启动并正确配置。`
+        )
+      );
+    };
+    this.ws.onclose = (event: any) => {
+      console.warn(
+        `[Workflow Engine] WebSocket closed. code: ${event?.code}, reason: ${event?.reason}, wasClean: ${event?.wasClean}`
+      );
+    };
+    this.ws.onmessage = (event: any) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.id && this.pending.has(msg.id)) {
+          const resolvePending = this.pending.get(msg.id);
+          if (resolvePending) {
+            resolvePending(msg);
+            this.pending.delete(msg.id);
+          }
+        }
+      } catch (e) {
+        console.error("CDP Message parse error:", e);
+      }
+    };
   }
 
   send(method: string, params: any = {}, sessionId?: string): Promise<any> {
@@ -196,8 +269,9 @@ export async function runWorkflow(
         // 如果客户端未建立连接，则初始化连接
         if (!cdpClient) {
           let wsUrl = activeConfig.cdpUrl;
-          // 如果填写的不是带有 /devtools/ 的完整 ws 调试地址，或者是以 http 开头，我们就通过 HTTP API 获取真正的 webSocketDebuggerUrl
+          // 如果填写的不是带有 /devtools/ 的完整 ws 调试地址，或者是以 http 开头，或者是 Cloudflare 模式，我们就需要获取真正的 webSocketDebuggerUrl
           const needFetchVersion =
+            activeConfig.authToken ||
             wsUrl.startsWith("http://") ||
             wsUrl.startsWith("https://") ||
             (!wsUrl.startsWith("ws://") && !wsUrl.startsWith("wss://")) ||
@@ -205,33 +279,79 @@ export async function runWorkflow(
             (wsUrl.startsWith("wss://") && !wsUrl.includes("/devtools/"));
 
           if (needFetchVersion) {
-            let hostUrl = wsUrl;
-            if (hostUrl.startsWith("ws://")) {
-              hostUrl = "http://" + hostUrl.slice(5);
-            } else if (hostUrl.startsWith("wss://")) {
-              hostUrl = "https://" + hostUrl.slice(6);
-            } else if (!hostUrl.startsWith("http")) {
-              hostUrl = `http://${hostUrl}`;
-            }
-
-            try {
-              const res = await fetch(`${hostUrl}/json/version`);
-              const versionData = (await res.json()) as {
-                webSocketDebuggerUrl?: string;
-              };
-              if (versionData.webSocketDebuggerUrl) {
-                wsUrl = versionData.webSocketDebuggerUrl;
-              } else {
-                throw new Error("无法从 HTTP 接口解析出 webSocketDebuggerUrl");
+            if (activeConfig.authToken) {
+              // ── Cloudflare Browser Run 模式 ──
+              let baseUrl = wsUrl.trim().replace(/\/$/, "");
+              if (baseUrl.startsWith("wss://")) {
+                baseUrl = baseUrl.replace(/^wss:\/\//, "https://");
+              } else if (baseUrl.startsWith("ws://")) {
+                baseUrl = baseUrl.replace(/^ws:\/\//, "http://");
+              } else if (!baseUrl.startsWith("http")) {
+                baseUrl = `https://${baseUrl}`;
               }
-            } catch (e: any) {
-              throw new Error(
-                `连接 CDP 调试地址 ${hostUrl} 失败: ${e.message}`
-              );
+
+              try {
+                const res = await fetch(`${baseUrl}/devtools/browser`, {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${activeConfig.authToken}`,
+                  },
+                  signal: AbortSignal.timeout(30000),
+                });
+                if (!res.ok) {
+                  throw new Error(
+                    `CF API returned ${res.status}: ${await res.text()}`
+                  );
+                }
+                const versionData = (await res.json()) as {
+                  webSocketDebuggerUrl?: string;
+                };
+                if (versionData.webSocketDebuggerUrl) {
+                  wsUrl = versionData.webSocketDebuggerUrl;
+                } else {
+                  throw new Error(
+                    "无法从 HTTP 接口解析出 webSocketDebuggerUrl"
+                  );
+                }
+              } catch (e: any) {
+                throw new Error(
+                  `连接 CDP 调试地址 ${baseUrl} 失败: ${e.message}`
+                );
+              }
+            } else {
+              // ── 自托管 CDP 模式 ──
+              let hostUrl = wsUrl;
+              if (hostUrl.startsWith("ws://")) {
+                hostUrl = "http://" + hostUrl.slice(5);
+              } else if (hostUrl.startsWith("wss://")) {
+                hostUrl = "https://" + hostUrl.slice(6);
+              } else if (!hostUrl.startsWith("http")) {
+                hostUrl = `http://${hostUrl}`;
+              }
+
+              try {
+                const res = await fetch(`${hostUrl}/json/version`, {
+                  signal: AbortSignal.timeout(15000),
+                });
+                const versionData = (await res.json()) as {
+                  webSocketDebuggerUrl?: string;
+                };
+                if (versionData.webSocketDebuggerUrl) {
+                  wsUrl = versionData.webSocketDebuggerUrl;
+                } else {
+                  throw new Error(
+                    "无法从 HTTP 接口解析出 webSocketDebuggerUrl"
+                  );
+                }
+              } catch (e: any) {
+                throw new Error(
+                  `连接 CDP 调试地址 ${hostUrl} 失败: ${e.message}`
+                );
+              }
             }
           }
 
-          cdpClient = new CDPClient(wsUrl);
+          cdpClient = new CDPClient(wsUrl, activeConfig.authToken);
           await cdpClient.connect();
 
           // 创建新 Page 页面
