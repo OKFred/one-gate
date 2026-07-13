@@ -22,6 +22,7 @@ interface TableExtraContext {
 const DEFAULT_FORM: Partial<BrowserConfigObj> = {
   name: '',
   cdpUrl: '',
+  authToken: '',
   isDefault: false,
   isEnabled: true,
   remark: '',
@@ -185,6 +186,13 @@ export default function BrowserConfigManagement() {
             fullWidth
             required
             helperText={t('admin.rpa.browser.cdpUrlHelper')}
+          />
+          <TextField
+            label={t('admin.rpa.browser.authToken')}
+            value={form.authToken || ''}
+            onChange={(e) => setForm({ ...form, authToken: e.target.value })}
+            fullWidth
+            helperText={t('admin.rpa.browser.authTokenHelper')}
           />
           <FormControlLabel
             control={

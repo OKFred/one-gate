@@ -120,9 +120,9 @@ export const browserTranslations = {
       tKey: "admin.rpa.browser.cdpUrlHelper",
       langCodes: {
         "zh-CN":
-          "示例: 127.0.0.1:9222 或 ws://127.0.0.1:9222/devtools/browser/...",
+          "自托管示例: 127.0.0.1:9222；Cloudflare 模式格式: https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering",
         "en-US":
-          "Example: 127.0.0.1:9222 or ws://127.0.0.1:9222/devtools/browser/...",
+          "Self-hosted e.g.: 127.0.0.1:9222; Cloudflare format: https://api.cloudflare.com/client/v4/accounts/<YOUR_ACCOUNT_ID>/browser-rendering",
       },
     },
     {
@@ -145,6 +145,22 @@ export const browserTranslations = {
       langCodes: {
         "zh-CN": "备注",
         "en-US": "Remark",
+      },
+    },
+    {
+      tKey: "admin.rpa.browser.authToken",
+      langCodes: {
+        "zh-CN": "认证 Token",
+        "en-US": "Authentication Token",
+      },
+    },
+    {
+      tKey: "admin.rpa.browser.authTokenHelper",
+      langCodes: {
+        "zh-CN":
+          "认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证",
+        "en-US":
+          "Authentication Token (Optional). Specifying this will automatically switch to Cloudflare Browser Run mode, using the Bearer Token for authentication.",
       },
     },
   ],

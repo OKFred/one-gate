@@ -30,7 +30,7 @@ export const BrowserBasePO = {
   cdpUrl: {
     type: "string",
     description:
-      "CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com",
+      "CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering",
   },
   authToken: {
     type: ["string", "null"],
