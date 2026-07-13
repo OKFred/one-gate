@@ -191,15 +191,6 @@ async function main() {
     try {
       await initDatabase();
       console.log("✅ 数据库基础数据同步成功");
-
-      console.log("\n🔄 正在同步系统 Schema 到数据库...");
-      // 使用 execSync 跨平台安全地运行 schema 同步脚本，不需要依赖 shell 拼接
-      execSync("npx tsx ../../../../scripts/sync-schemas.ts", {
-        stdio: "inherit",
-        // 保证相对于 initTable.ts 目录定位
-        cwd: __dirname,
-      });
-      console.log("✅ 系统 Schema 同步成功");
     } catch (error) {
       console.error("❌ 数据库基础数据同步失败:", error);
       process.exit(1);

@@ -1,5 +1,4 @@
 import { findWorkflowById, onLogInsert, onLogUpdate } from "./repository";
-import { findDefaultActiveBrowser } from "@hodor/admin/rpa/browser/repository";
 import { registry } from "@hodor/admin/common/registry.js";
 import { SUPER_ADMIN_ID } from "@hodor/core/db/init";
 
@@ -148,7 +147,7 @@ export async function runWorkflow(
     const visited = new Set<string>();
 
     // 获取激活的默认配置，用于 CDP 浏览器连接
-    const activeConfig = await findDefaultActiveBrowser();
+    const activeConfig = await registry.rpa.findDefaultActiveBrowser();
 
     while (currentNode && !visited.has(currentNode.id)) {
       visited.add(currentNode.id);
