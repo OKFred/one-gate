@@ -38,7 +38,7 @@ export const ossRegister = {
 };
 
 // 2. 初始化注册中心并绑定服务
-export function initInfraRegistry() {
+export function initAdminRegistry() {
   const reg = new ServiceRegistry();
 
   reg.register("system", systemRegister);
@@ -47,6 +47,6 @@ export function initInfraRegistry() {
   reg.register("swarm", swarmRegister);
   reg.register("rpa", rpaRegister);
   reg.register("oss", ossRegister);
-  console.log(`[INFRA] registered domains`, reg.domains);
+  console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);
 }

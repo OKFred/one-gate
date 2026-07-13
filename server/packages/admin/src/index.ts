@@ -9,10 +9,10 @@ import ai from "./ai/index.js";
 import rpa from "./rpa/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { initInfraRegistry } from "./register.js";
+import { initAdminRegistry } from "./register.js";
 
-function createInfraApp(): App {
-  initInfraRegistry();
+function createAdminApp(): App {
+  initAdminRegistry();
   const app = new OpenAPIHono<AppBindings>();
   app.route("/i18n", i18n());
   app.route("/mail", mail());
@@ -25,4 +25,4 @@ function createInfraApp(): App {
   app.route("/rpa", rpa());
   return app;
 }
-export default createInfraApp;
+export default createAdminApp;

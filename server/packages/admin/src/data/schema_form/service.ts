@@ -279,7 +279,7 @@ const batchGetReq = {
   properties: {
     prefix: {
       type: "string",
-      description: "要查询的 schema code 前缀（如 infra.ai.chat）",
+      description: "要查询的 schema code 前缀（如 admin.ai.chat）",
     },
     version: {
       type: "string",
@@ -395,7 +395,7 @@ async function onBatchGet(
   }
 
   // 鉴权检查：如果是系统资源前缀，校验是否有模块的 read 权限
-  const isSystem = /^(infra|enterprise)(\.|$)/.test(prefix);
+  const isSystem = /^(admin|enterprise)(\.|$)/.test(prefix);
   if (isSystem) {
     const hasPerm = await can(userObj, "read", prefix);
     if (!hasPerm) {

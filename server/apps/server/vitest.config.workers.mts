@@ -37,31 +37,45 @@ export default defineConfig({
             .replace(/\\/g, "/") + "/$1",
       },
       {
-        find: /^@hodor\/infra\/(.*)\.js$/,
+        find: /^@hodor\/admin\/(.*)\.js$/,
         replacement:
           path
-            .resolve(__dirname, "../../packages/infra/src")
+            .resolve(__dirname, "../../packages/admin/src")
             .replace(/\\/g, "/") + "/$1",
       },
       {
-        find: /^@hodor\/infra\/(.*)$/,
+        find: /^@hodor\/admin\/(.*)$/,
         replacement:
           path
-            .resolve(__dirname, "../../packages/infra/src")
+            .resolve(__dirname, "../../packages/admin/src")
             .replace(/\\/g, "/") + "/$1",
       },
       {
-        find: /^@hodor\/biz\/(.*)\.js$/,
+        find: /^@hodor\/enterprise\/(.*)\.js$/,
         replacement:
           path
-            .resolve(__dirname, "../../packages/biz/src")
+            .resolve(__dirname, "../../packages/enterprise/src")
             .replace(/\\/g, "/") + "/$1",
       },
       {
-        find: /^@hodor\/biz\/(.*)$/,
+        find: /^@hodor\/enterprise\/(.*)$/,
         replacement:
           path
-            .resolve(__dirname, "../../packages/biz/src")
+            .resolve(__dirname, "../../packages/enterprise/src")
+            .replace(/\\/g, "/") + "/$1",
+      },
+      {
+        find: /^@hodor\/personal\/(.*)\.js$/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/personal/src")
+            .replace(/\\/g, "/") + "/$1",
+      },
+      {
+        find: /^@hodor\/personal\/(.*)$/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/personal/src")
             .replace(/\\/g, "/") + "/$1",
       },
       {

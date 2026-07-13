@@ -5,7 +5,7 @@ import schemaFormService from "../schema_form/service";
 import schemaFormDataService from "../schema_form_data/service";
 import { userTable } from "../../system/user/model";
 import type { UserObj } from "@hodor/core/types/app";
-import { initInfraRegistry } from "../../register.js";
+import { initAdminRegistry } from "../../register.js";
 
 // 静态导入 SQL 文件
 import schemaFormSql from "@hodor/core/db/sql/system_schema_form.sql?raw";
@@ -34,7 +34,7 @@ describe("System SchemaForm & SchemaFormData 全链路集成测试", () => {
   const adminUserObj = { userId: 1, langCode: "zh-CN" } as unknown as UserObj;
 
   beforeAll(async () => {
-    initInfraRegistry();
+    initAdminRegistry();
     await setupTestDb(db, [userSql, schemaFormSql, schemaFormDataSql]);
 
     // 插入一个用于关联 creatorName 的测试用户

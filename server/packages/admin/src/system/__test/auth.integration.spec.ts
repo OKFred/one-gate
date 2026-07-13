@@ -14,7 +14,7 @@ import { languageTable } from "../../i18n/language/model";
 import { roleTable } from "../role/model";
 import { can } from "@hodor/core/middleware/auth/permission";
 import type { UserObj } from "@hodor/core/types/app";
-import { initInfraRegistry } from "../../register.js";
+import { initAdminRegistry } from "../../register.js";
 
 // 静态导入 SQL 文件
 import userSql from "@hodor/core/db/sql/system_user.sql?raw";
@@ -41,7 +41,7 @@ describe("System Auth 模块全链路集成测试", () => {
   ];
 
   beforeAll(async () => {
-    initInfraRegistry();
+    initAdminRegistry();
     await setupTestDb(db, [
       userSql,
       roleSql,

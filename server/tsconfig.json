@@ -5,7 +5,13 @@
     "moduleResolution": "bundler",
     "strict": false,
     "skipLibCheck": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@hodor/core/*": ["packages/core/src/*"],
+      "@hodor/admin/*": ["packages/admin/src/*"],
+      "@hodor/enterprise/*": ["packages/enterprise/src/*"],
+      "@hodor/personal/*": ["packages/personal/src/*"]
+    }
   },
   "exclude": ["node_modules", "**/dist"]
 }

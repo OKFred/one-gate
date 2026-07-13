@@ -113,7 +113,7 @@ export const BrowserSortableKeys = [
   "createTimeUtc",
 ] as const satisfies RequiredKeys<BrowserPOLike>[];
 
-export const browserTable = sqliteTable("infra_browser", {
+export const browserTable = sqliteTable("admin_browser", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   cdpUrl: text("cdp_url").notNull(),
