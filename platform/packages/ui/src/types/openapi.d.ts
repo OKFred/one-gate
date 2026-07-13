@@ -18826,8 +18826,10 @@ export interface components {
                     id: number;
                     /** @description 配置名 */
                     name: string;
-                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
                     cdpUrl: string;
+                    /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+                    authToken: ((string | null) | null) | null;
                     /** @description 是否为默认环境 */
                     isDefault: boolean;
                     /** @description 是否启用 */
@@ -18855,8 +18857,10 @@ export interface components {
         "admin.rpa.browser.add.req": {
             /** @description 配置名 */
             name: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
             cdpUrl: string;
+            /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+            authToken?: ((string | null) | null) | null;
             /** @description 是否为默认环境 */
             isDefault: boolean;
             /** @description 是否启用 */
@@ -18881,8 +18885,10 @@ export interface components {
             id: number;
             /** @description 配置名 */
             name?: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口) */
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
             cdpUrl?: string;
+            /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+            authToken?: ((string | null) | null) | null;
             /** @description 是否为默认环境 */
             isDefault?: boolean;
             /** @description 是否启用 */
