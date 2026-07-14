@@ -223,6 +223,7 @@ export const permissions = {
     i18n: admin_i18n,
     maintenance: admin_maintenance,
     data: admin_data,
+    oss: admin_oss,
     ai: admin_ai,
     swarm: admin_swarm,
     rpa: admin_rpa,
