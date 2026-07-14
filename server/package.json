@@ -12,6 +12,7 @@
     "worker:dev": "pnpm --filter @hodor/server worker:dev",
     "worker:types": "pnpm --filter @hodor/server worker:types",
     "db:init": "pnpm --filter @hodor/server db:init",
+    "db:generate": "npx tsx ./scripts/generate-ddl.ts",
     "sync:permissions": "pnpm --filter @hodor/server sync:permissions",
     "sync:schemas": "npx tsx -r dotenv/config ./scripts/sync-schemas.ts",
     "format": "prettier --write .",

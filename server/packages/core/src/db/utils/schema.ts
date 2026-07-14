@@ -19,15 +19,30 @@ export async function baseTableInit(tableName: string, sqlFileName?: string) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
-    // 定位 SQL 文件路径（当前文件在 src/db/utils/，SQL 在 src/db/sql/）
-    const sqlPath = path.resolve(
-      __dirname,
-      "../sql",
-      `${sqlFileName || tableName}.sql`
-    );
+    // 定位 SQL 目录（当前文件在 src/db/utils/，SQL 在 src/db/sql/）
+    const sqlDir = path.resolve(__dirname, "../sql");
 
-    if (!fs.existsSync(sqlPath)) {
-      console.warn(`⚠️ 未发现 SQL 文件: ${sqlPath}`);
+    // 递归寻找对应的 sql 文件
+    const findSqlFile = (dir: string, targetName: string): string | null => {
+      if (!fs.existsSync(dir)) return null;
+      const list = fs.readdirSync(dir);
+      for (const file of list) {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
+        if (stat && stat.isDirectory()) {
+          const found = findSqlFile(filePath, targetName);
+          if (found) return found;
+        } else if (file === `${targetName}.sql`) {
+          return filePath;
+        }
+      }
+      return null;
+    };
+
+    const sqlPath = findSqlFile(sqlDir, sqlFileName || tableName);
+
+    if (!sqlPath || !fs.existsSync(sqlPath)) {
+      console.warn(`⚠️ 未发现 SQL 文件 for table: ${tableName}`);
       return;
     }
 
