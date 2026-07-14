@@ -117,7 +117,12 @@ export type SchemaFormVOLike = SchemaFormPOLike;
 export type SchemaFormAddVOLike = Omit<SchemaFormAddPOLike, "creatorId">;
 export type SchemaFormUpdateVOLike = SchemaFormUpdatePOLike;
 export type SchemaFormDeleteVOLike = Pick<SchemaFormVOLike, IndexKeyLike>;
-export type SchemaFormGetVOLike = Pick<SchemaFormVOLike, IndexKeyLike>;
+export const SchemaFormGetVO = {
+  id: IndexVO.id,
+  code: SchemaFormBaseVO.code,
+} as const satisfies Record<keyof SchemaFormGetVOLike, JSONSchema>;
+
+export type SchemaFormGetVOLike = Pick<SchemaFormVOLike, IndexKeyLike | "code">;
 
 //----------------- Required Keys ----------------//
 export const SchemaFormAddKeys = [

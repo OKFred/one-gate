@@ -13,6 +13,7 @@ import {
   SchemaFormAddKeys,
   SchemaFormUpdateKeys,
   SchemaFormSortableKeys,
+  SchemaFormGetVO,
   type SchemaFormPOLike,
   type SchemaFormVOLike,
   type SchemaFormAddVOLike,
@@ -228,8 +229,7 @@ const deleteApi = {
 const getReq = {
   type: "object",
   properties: {
-    id: { type: "number" },
-    code: { type: "string" },
+    ...SchemaFormGetVO,
   },
   anyOf: [{ required: ["id"] }, { required: ["code"] }],
   additionalProperties: false,
