@@ -86,24 +86,12 @@ export const usePermission = () => {
 // 权限码常量
 `;
 
-permissionSeedsNode.properties.forEach((parentProp) => {
-  if (!ts.isPropertyAssignment(parentProp)) return;
-
-  let parentKey = "";
-  if (ts.isIdentifier(parentProp.name)) {
-    parentKey = parentProp.name.text;
-  } else if (ts.isStringLiteral(parentProp.name)) {
-    parentKey = parentProp.name.text;
-  }
-
-  if (!parentKey) return;
-
-  const parentConstName = formatKey(parentKey);
-  const parentDesc = getJSDocComment(parentProp) || parentKey;
-
-  content += `\n/** ${parentDesc} */\nexport const ${parentConstName} = {\n`;
-
-  const modulesObj = parentProp.initializer;
+function renderModuleBody(
+  modulesObj: ts.Expression,
+  parentKey: string,
+  indent: string
+): string {
+  let res = "{\n";
   if (ts.isObjectLiteralExpression(modulesObj)) {
     // 1. Output parent-level actions (module is "")
     const parentActionsProp = modulesObj.properties.find((p) => {
@@ -119,122 +107,118 @@ permissionSeedsNode.properties.forEach((parentProp) => {
           if (ts.isStringLiteral(el)) {
             const action = el.text;
             const actionKey = formatKey(action);
-            content += `  ${actionKey}: '${parentKey}:${action}',\n`;
+            res += `${indent}  ${actionKey}: '${parentKey}:${action}',\n`;
           }
         });
       }
     }
 
     // 2. Output modules (with recursion support for nested objects)
-    function renderProperty(
-      prop: ts.PropertyAssignment,
-      currentPrefix: string,
-      indent: string
-    ): string {
-      let keyName = "";
-      if (ts.isIdentifier(prop.name)) {
-        keyName = prop.name.text;
-      } else if (ts.isStringLiteral(prop.name)) {
-        keyName = prop.name.text;
-      }
-      if (keyName === "") return "";
+    modulesObj.properties.forEach((subProp) => {
+      if (!ts.isPropertyAssignment(subProp)) return;
+      const name = ts.isStringLiteral(subProp.name)
+        ? subProp.name.text
+        : ts.isIdentifier(subProp.name)
+          ? subProp.name.text
+          : "";
+      if (name === "") return;
 
-      const constName = formatKey(keyName);
-      const desc = getJSDocComment(prop) || keyName;
-      const init = prop.initializer;
+      const constName = formatKey(name);
+      const desc = getJSDocComment(subProp) || name;
+      const init = subProp.initializer;
 
-      let res = `${indent}/** ${desc} */\n`;
-      res += `${indent}${constName}: {\n`;
-
+      res += `${indent}  /** ${desc} */\n`;
       if (ts.isArrayLiteralExpression(init)) {
+        res += `${indent}  ${constName}: {\n`;
         init.elements.forEach((el) => {
           if (ts.isStringLiteral(el)) {
             const action = el.text;
             const actionKey = formatKey(action);
-            res += `${indent}  ${actionKey}: '${currentPrefix}.${keyName}:${action}',\n`;
+            res += `${indent}    ${actionKey}: '${parentKey}.${name}:${action}',\n`;
           }
         });
+        res += `${indent}  },\n`;
       } else if (ts.isObjectLiteralExpression(init)) {
-        // Output self actions first
-        const selfActionsProp = init.properties.find((p) => {
-          if (!ts.isPropertyAssignment(p)) return false;
-          const name = ts.isStringLiteral(p.name) ? p.name.text : "";
-          return name === "";
-        });
-
-        if (selfActionsProp && ts.isPropertyAssignment(selfActionsProp)) {
-          const arr = selfActionsProp.initializer;
-          if (ts.isArrayLiteralExpression(arr)) {
-            arr.elements.forEach((el) => {
-              if (ts.isStringLiteral(el)) {
-                const action = el.text;
-                const actionKey = formatKey(action);
-                res += `${indent}  ${actionKey}: '${currentPrefix}.${keyName}:${action}',\n`;
-              }
-            });
-          }
-        }
-
-        // Recursively output child properties
-        init.properties.forEach((subProp) => {
-          if (!ts.isPropertyAssignment(subProp)) return;
-          const name = ts.isStringLiteral(subProp.name)
-            ? subProp.name.text
-            : ts.isIdentifier(subProp.name)
-              ? subProp.name.text
-              : "";
-          if (name === "") return;
-          res += renderProperty(
-            subProp,
-            `${currentPrefix}.${keyName}`,
-            `${indent}  `
-          );
-        });
+        res += `${indent}  ${constName}: ${renderModuleBody(
+          init,
+          `${parentKey}.${name}`,
+          indent + "  "
+        )},\n`;
       }
-
-      res += `${indent}},\n`;
-      return res;
-    }
-
-    modulesObj.properties.forEach((moduleProp) => {
-      if (!ts.isPropertyAssignment(moduleProp)) return;
-      let moduleKey = "";
-      if (ts.isIdentifier(moduleProp.name)) {
-        moduleKey = moduleProp.name.text;
-      } else if (ts.isStringLiteral(moduleProp.name)) {
-        moduleKey = moduleProp.name.text;
-      }
-
-      if (moduleKey === "") return;
-      content += renderProperty(moduleProp, parentKey, "  ");
     });
   }
+  res += `${indent}}`;
+  return res;
+}
 
-  content += `} as const;\n`;
+const adminProperties: string[] = [];
+const enterpriseProperties: string[] = [];
+let personalBody = "";
+
+permissionSeedsNode.properties.forEach((parentProp) => {
+  if (!ts.isPropertyAssignment(parentProp)) return;
+
+  const parentKey =
+    ts.isIdentifier(parentProp.name) || ts.isStringLiteral(parentProp.name)
+      ? parentProp.name.text
+      : "";
+  if (!parentKey) return;
+
+  const desc = getJSDocComment(parentProp) || parentKey;
+  const init = parentProp.initializer;
+
+  if (parentKey === "personal") {
+    personalBody = renderModuleBody(init, "personal", "  ");
+    return;
+  }
+
+  // 统一处理 admin 和 enterprise 两个需要拆分/拼装的顶级组
+  const isEnterprise =
+    parentKey === "enterprise" ||
+    parentKey === "organization" ||
+    parentKey === "executive";
+  const targetList = isEnterprise ? enterpriseProperties : adminProperties;
+  const rootKey = isEnterprise ? "enterprise" : "admin";
+
+  if (parentKey === rootKey) {
+    // 自身级平铺 actions
+    if (ts.isObjectLiteralExpression(init)) {
+      const parentActionsProp = init.properties.find(
+        (p) =>
+          ts.isPropertyAssignment(p) &&
+          (ts.isStringLiteral(p.name) ? p.name.text : "") === ""
+      );
+      if (
+        parentActionsProp &&
+        ts.isPropertyAssignment(parentActionsProp) &&
+        ts.isArrayLiteralExpression(parentActionsProp.initializer)
+      ) {
+        parentActionsProp.initializer.elements.forEach((el) => {
+          if (ts.isStringLiteral(el)) {
+            const action = el.text;
+            const actionKey = formatKey(action);
+            targetList.push(`    ${actionKey}: '${rootKey}:${action}',`);
+          }
+        });
+      }
+    }
+  } else {
+    // 子模块嵌套
+    const subKey = parentKey.startsWith("admin.")
+      ? parentKey.slice(6)
+      : parentKey;
+    const subKeyConst = formatKey(subKey);
+    const bodyStr = renderModuleBody(init, parentKey, "    ");
+    targetList.push(`    /** ${desc} */\n    ${subKeyConst}: ${bodyStr},`);
+  }
 });
 
-// 输出全局树状嵌套 permissions 大对象
-content += `
-export const permissions = {
-  admin: {
-    ...admin,
-    system: admin_system,
-    mail: admin_mail,
-    i18n: admin_i18n,
-    maintenance: admin_maintenance,
-    data: admin_data,
-    ai: admin_ai,
-    swarm: admin_swarm,
-    rpa: admin_rpa,
-  },
-  enterprise: {
-    ...enterprise,
-    organization: organization,
-    executive: executive,
-  },
-  personal: personal,
-} as const;
-`;
+// Output main permissions structure
+content += `\nexport const permissions = {\n`;
+content += `  admin: {\n${adminProperties.join("\n")}\n  },\n`;
+content += `  enterprise: {\n${enterpriseProperties.join("\n")}\n  },\n`;
+content += `  personal: ${personalBody},\n`;
+content += `} as const;\n`;
 
 // Ensure the directory exists
 const dir = path.dirname(targetPath);

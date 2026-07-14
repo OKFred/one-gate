@@ -73,6 +73,7 @@ export const profileTable = sqliteTable("personal_profile", {
 在 `service.ts` 中描述并暴露 REST 端点：
 
 - 统一使用 `encapsulation` (封装好的高阶 Hono 控制器适配器) 挂载 API。
+- **禁止在 `service.ts` 中硬编码 API 请求或响应的字段定义 (Properties)**：为了保证类型与数据模型规范的集中管理，API 接口的 properties 字段属性必须定义在 `model.ts` 中（如封装为 `[Domain]VO`、`[Domain]AddVO`、`[Domain]GetVO`、`[Domain]SubmitVO` 等），而在 `service.ts` 的 JSON Schema 定义中，只需解构引用 `model.ts` 里的定义。
 - 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。
 - 领域服务在 `[module]/index.ts` 中导出，并在子包 `index.ts` 下挂载。
 

@@ -13,6 +13,20 @@ export default defineConfig({
     name: "workers",
     alias: [
       {
+        find: /^@hodor\/core\/db\/sql\/(system_|maintenance_|i18n_|mail_|oss_|swarm_|ai_|admin_)(.*)\.sql(\?raw)?$/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/core/src/db/sql/admin")
+            .replace(/\\/g, "/") + "/$1$2.sql$3",
+      },
+      {
+        find: /^@hodor\/core\/db\/sql\/(enterprise_)(.*)\.sql(\?raw)?$/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/core/src/db/sql/enterprise")
+            .replace(/\\/g, "/") + "/$1$2.sql$3",
+      },
+      {
         find: /^@\/(.*)\.js$/,
         replacement:
           path.resolve(__dirname, "./src").replace(/\\/g, "/") + "/$1",

@@ -103,16 +103,11 @@ async function main() {
         console.log(
           `🚀 [批次 ${i + 1}/${totalBatches}] 正在推送 ${batchSqls.length} 条 Schema 语句...`
         );
-        const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
         execSync(
-          `${npxCmd} wrangler d1 execute hodor_db ${targetFlag} --file=${tempSqlFile} --yes`,
+          `npx wrangler d1 execute hodor_db ${targetFlag} --file=${tempSqlFile} --yes`,
           {
             stdio: "inherit",
             cwd: path.resolve(process.cwd(), "apps/server"),
-            shell:
-              process.platform === "win32"
-                ? "C:\\Windows\\System32\\cmd.exe"
-                : "/bin/sh",
           }
         );
       } catch (error: unknown) {

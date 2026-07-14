@@ -90,7 +90,29 @@ export type SchemaFormDataDeleteVOLike = Pick<
   SchemaFormDataVOLike,
   IndexKeyLike
 >;
-export type SchemaFormDataGetVOLike = Pick<SchemaFormDataVOLike, IndexKeyLike>;
+export const SchemaFormDataGetVO = {
+  id: IndexVO.id,
+  formCode: SchemaFormDataBaseVO.formCode,
+  businessId: SchemaFormDataBaseVO.businessId,
+} as const satisfies Record<keyof SchemaFormDataGetVOLike, JSONSchema>;
+
+export type SchemaFormDataGetVOLike = Pick<
+  SchemaFormDataVOLike,
+  IndexKeyLike | "formCode" | "businessId"
+>;
+
+export const SchemaFormDataSubmitVO = {
+  formCode: {
+    ...SchemaFormDataBaseVO.formCode,
+    minLength: 1,
+  },
+  businessId: SchemaFormDataBaseVO.businessId,
+  data: {
+    type: "object",
+    description: "表单数据 (JSON 对象)",
+    additionalProperties: true,
+  },
+} as const satisfies Record<string, JSONSchema>;
 
 //----------------- Required Keys ----------------//
 export const SchemaFormDataAddKeys = [

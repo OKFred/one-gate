@@ -9,6 +9,8 @@ import {
   SchemaFormDataDeleteKeys,
   SchemaFormDataAddKeys,
   SchemaFormDataSortableKeys,
+  SchemaFormDataGetVO,
+  SchemaFormDataSubmitVO,
   type SchemaFormDataPOLike,
   type SchemaFormDataDeleteVOLike,
 } from "./model";
@@ -96,13 +98,7 @@ const listApi = {
 const submitReq = {
   type: "object",
   properties: {
-    formCode: { type: "string", minLength: 1 },
-    businessId: { type: "number" },
-    data: {
-      type: "object",
-      description: "表单数据 (JSON 对象)",
-      additionalProperties: true,
-    },
+    ...SchemaFormDataSubmitVO,
   },
   required: ["formCode", "businessId", "data"],
   additionalProperties: false,
@@ -229,9 +225,7 @@ const deleteApi = {
 const getReq = {
   type: "object",
   properties: {
-    id: { type: "number" },
-    formCode: { type: "string" },
-    businessId: { type: "number" },
+    ...SchemaFormDataGetVO,
   },
   anyOf: [{ required: ["id"] }, { required: ["formCode", "businessId"] }],
   additionalProperties: false,

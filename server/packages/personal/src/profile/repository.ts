@@ -27,7 +27,10 @@ function buildWhereCondition(condition?: {
   return exprs.length > 0 ? and(...exprs) : undefined;
 }
 
-export async function listAll(condition?: { keyword?: string; userId?: number }) {
+export async function listAll(condition?: {
+  keyword?: string;
+  userId?: number;
+}) {
   const where = buildWhereCondition(condition);
   return db.select().from(profileTable).where(where);
 }
@@ -51,7 +54,8 @@ export async function list(
     return { list: [], total };
   }
 
-  const orderField = (profileTable as any)[orderBy] || profileTable.createTimeUtc;
+  const orderField =
+    (profileTable as any)[orderBy] || profileTable.createTimeUtc;
   const offset = (pageNo - 1) * pageSize;
 
   const list = await db
@@ -66,12 +70,18 @@ export async function list(
 }
 
 export async function get(id: number) {
-  const res = await db.select().from(profileTable).where(eq(profileTable.id, id));
+  const res = await db
+    .select()
+    .from(profileTable)
+    .where(eq(profileTable.id, id));
   return res[0] || null;
 }
 
 export async function add(
-  data: Omit<InferInsertModel<typeof profileTable>, "createTimeUtc" | "updateTimeUtc">
+  data: Omit<
+    InferInsertModel<typeof profileTable>,
+    "createTimeUtc" | "updateTimeUtc"
+  >
 ) {
   const res = await db.insert(profileTable).values(data).returning();
   return res[0] || null;
@@ -79,7 +89,12 @@ export async function add(
 
 export async function update(
   id: number,
-  data: Partial<Omit<InferInsertModel<typeof profileTable>, "createTimeUtc" | "updateTimeUtc">>
+  data: Partial<
+    Omit<
+      InferInsertModel<typeof profileTable>,
+      "createTimeUtc" | "updateTimeUtc"
+    >
+  >
 ) {
   const res = await db
     .update(profileTable)
