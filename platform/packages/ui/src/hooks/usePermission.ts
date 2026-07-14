@@ -15,313 +15,278 @@ export const usePermission = () => {
 
 // 权限码常量
 
-/** 系统管理 */
-export const admin_system = {
-  read: 'admin.system:read',
-  /** 用户管理 */
-  user: {
-    read: 'admin.system.user:read',
-    add: 'admin.system.user:add',
-    edit: 'admin.system.user:edit',
-    delete: 'admin.system.user:delete',
-    export: 'admin.system.user:export',
-  },
-  /** 角色管理 */
-  role: {
-    read: 'admin.system.role:read',
-    add: 'admin.system.role:add',
-    edit: 'admin.system.role:edit',
-    delete: 'admin.system.role:delete',
-  },
-  /** 权限管理 */
-  permission: {
-    read: 'admin.system.permission:read',
-    add: 'admin.system.permission:add',
-    edit: 'admin.system.permission:edit',
-    delete: 'admin.system.permission:delete',
-  },
-  /** 部门管理 */
-  department: {
-    read: 'admin.system.department:read',
-    add: 'admin.system.department:add',
-    edit: 'admin.system.department:edit',
-    delete: 'admin.system.department:delete',
-  },
-  /** 菜单管理 */
-  menu: {
-    read: 'admin.system.menu:read',
-    add: 'admin.system.menu:add',
-    edit: 'admin.system.menu:edit',
-    delete: 'admin.system.menu:delete',
-  },
-  /** 角色权限管理 */
-  role_permission: {
-    read: 'admin.system.role_permission:read',
-    add: 'admin.system.role_permission:add',
-    edit: 'admin.system.role_permission:edit',
-    delete: 'admin.system.role_permission:delete',
-    batch_delete: 'admin.system.role_permission:batch-delete',
-  },
-  /** 个人信息 */
-  auth: {
-    read: 'admin.system.auth:read',
-    edit: 'admin.system.auth:edit',
-  },
-} as const;
-
-/** 邮件 */
-export const admin_mail = {
-  read: 'admin.mail:read',
-  /** 邮件账户 */
-  account: {
-    read: 'admin.mail.account:read',
-    add: 'admin.mail.account:add',
-    edit: 'admin.mail.account:edit',
-    delete: 'admin.mail.account:delete',
-  },
-  /** 邮件模板 */
-  template: {
-    read: 'admin.mail.template:read',
-    add: 'admin.mail.template:add',
-    edit: 'admin.mail.template:edit',
-    delete: 'admin.mail.template:delete',
-  },
-  /** 邮件日志 */
-  log: {
-    read: 'admin.mail.log:read',
-    view: 'admin.mail.log:view',
-  },
-  /** 邮件操作 */
-  action: {
-    read: 'admin.mail.action:read',
-    add: 'admin.mail.action:add',
-  },
-} as const;
-
-/** 国际化 */
-export const admin_i18n = {
-  read: 'admin.i18n:read',
-  /** 语言管理 */
-  language: {
-    read: 'admin.i18n.language:read',
-    add: 'admin.i18n.language:add',
-    edit: 'admin.i18n.language:edit',
-    delete: 'admin.i18n.language:delete',
-  },
-  /** 地区管理 */
-  region: {
-    read: 'admin.i18n.region:read',
-    add: 'admin.i18n.region:add',
-    edit: 'admin.i18n.region:edit',
-    delete: 'admin.i18n.region:delete',
-  },
-  /** 翻译管理 */
-  translation: {
-    read: 'admin.i18n.translation:read',
-    add: 'admin.i18n.translation:add',
-    edit: 'admin.i18n.translation:edit',
-    delete: 'admin.i18n.translation:delete',
-  },
-} as const;
-
-/** 运维 */
-export const admin_maintenance = {
-  read: 'admin.maintenance:read',
-  /** 缓存管理 */
-  cache: {
-    read: 'admin.maintenance.cache:read',
-    add: 'admin.maintenance.cache:add',
-    edit: 'admin.maintenance.cache:edit',
-    delete: 'admin.maintenance.cache:delete',
-    view: 'admin.maintenance.cache:view',
-  },
-  /** 登录日志 */
-  audit_login: {
-    read: 'admin.maintenance.audit_login:read',
-  },
-  /** 定时任务管理 */
-  cron: {
-    read: 'admin.maintenance.cron:read',
-    add: 'admin.maintenance.cron:add',
-    edit: 'admin.maintenance.cron:edit',
-    delete: 'admin.maintenance.cron:delete',
-  },
-  /** API 采集任务管理 */
-  api_task: {
-    read: 'admin.maintenance.api_task:read',
-    add: 'admin.maintenance.api_task:add',
-    edit: 'admin.maintenance.api_task:edit',
-    delete: 'admin.maintenance.api_task:delete',
-  },
-  /** API 文档管理 */
-  api_docs: {
-    read: 'admin.maintenance.api_docs:read',
-    add: 'admin.maintenance.api_docs:add',
-    edit: 'admin.maintenance.api_docs:edit',
-    delete: 'admin.maintenance.api_docs:delete',
-  },
-  /** 合规归档 */
-  compliance: {
-    read: 'admin.maintenance.compliance:read',
-  },
-  /** 初始化数据 */
-  init: {
-    read: 'admin.maintenance.init:read',
-  },
-} as const;
-
-/** 基础设施 */
-export const admin = {
-  read: 'admin:read',
-} as const;
-
-/** 数据库 */
-export const admin_data = {
-  read: 'admin.data:read',
-  /** 动态表单 */
-  schema_form: {
-    read: 'admin.data.schema_form:read',
-    add: 'admin.data.schema_form:add',
-    edit: 'admin.data.schema_form:edit',
-    delete: 'admin.data.schema_form:delete',
-  },
-  /** 表单数据 */
-  schema_form_data: {
-    read: 'admin.data.schema_form_data:read',
-    add: 'admin.data.schema_form_data:add',
-    edit: 'admin.data.schema_form_data:edit',
-    delete: 'admin.data.schema_form_data:delete',
-  },
-} as const;
-
-/** 对象存储 */
-export const admin_oss = {
-  read: 'admin.oss:read',
-  /** 存储配置 */
-  config: {
-    read: 'admin.oss.config:read',
-    add: 'admin.oss.config:add',
-    edit: 'admin.oss.config:edit',
-    delete: 'admin.oss.config:delete',
-  },
-  /** 文件管理 */
-  file: {
-    read: 'admin.oss.file:read',
-    add: 'admin.oss.file:add',
-    edit: 'admin.oss.file:edit',
-    delete: 'admin.oss.file:delete',
-  },
-} as const;
-
-/** 企业管理 */
-export const enterprise = {
-  read: 'enterprise:read',
-} as const;
-
-/** 组织管理 */
-export const organization = {
-  read: 'organization:read',
-  /** 考勤管理 */
-  attendance: {
-    read: 'organization.attendance:read',
-    add: 'organization.attendance:add',
-    edit: 'organization.attendance:edit',
-    delete: 'organization.attendance:delete',
-  },
-} as const;
-
-/** 事务管理 */
-export const executive = {
-  read: 'executive:read',
-  /** 工作流编排 */
-  workflow: {
-    read: 'executive.workflow:read',
-    add: 'executive.workflow:add',
-    edit: 'executive.workflow:edit',
-    delete: 'executive.workflow:delete',
-  },
-} as const;
-
-/** 个人中心 */
-export const personal = {
-  read: 'personal:read',
-  /** 个人信息 */
-  profile: {
-    read: 'personal.profile:read',
-    add: 'personal.profile:add',
-    edit: 'personal.profile:edit',
-    delete: 'personal.profile:delete',
-  },
-} as const;
-
-/** AI */
-export const admin_ai = {
-  read: 'admin.ai:read',
-  /** AI 配置 */
-  config: {
-    read: 'admin.ai.config:read',
-    add: 'admin.ai.config:add',
-    edit: 'admin.ai.config:edit',
-    delete: 'admin.ai.config:delete',
-  },
-  /** AI 对话 */
-  chat: {
-    read: 'admin.ai.chat:read',
-  },
-} as const;
-
-/** Swarm 集群 */
-export const admin_swarm = {
-  read: 'admin.swarm:read',
-  /** Swarm 集群 Docker 服务管理 */
-  docker: {
-    read: 'admin.swarm.docker:read',
-    add: 'admin.swarm.docker:add',
-    edit: 'admin.swarm.docker:edit',
-    delete: 'admin.swarm.docker:delete',
-  },
-  /** Swarm Docker配置管理 */
-  docker_config: {
-    read: 'admin.swarm.docker_config:read',
-    add: 'admin.swarm.docker_config:add',
-    edit: 'admin.swarm.docker_config:edit',
-    delete: 'admin.swarm.docker_config:delete',
-  },
-  /** Swarm 节点管理 */
-  nodes: {
-    read: 'admin.swarm.nodes:read',
-  },
-} as const;
-
-/** RPA */
-export const admin_rpa = {
-  read: 'admin.rpa:read',
-  /** 浏览器配置 */
-  browser: {
-    read: 'admin.rpa.browser:read',
-    add: 'admin.rpa.browser:add',
-    edit: 'admin.rpa.browser:edit',
-    delete: 'admin.rpa.browser:delete',
-  },
-} as const;
-
 export const permissions = {
   admin: {
-    ...admin,
-    system: admin_system,
-    mail: admin_mail,
-    i18n: admin_i18n,
-    maintenance: admin_maintenance,
-    data: admin_data,
-    oss: admin_oss,
-    ai: admin_ai,
-    swarm: admin_swarm,
-    rpa: admin_rpa,
+    /** 系统管理 */
+    system: {
+      read: 'admin.system:read',
+      /** 用户管理 */
+      user: {
+        read: 'admin.system.user:read',
+        add: 'admin.system.user:add',
+        edit: 'admin.system.user:edit',
+        delete: 'admin.system.user:delete',
+        export: 'admin.system.user:export',
+      },
+      /** 角色管理 */
+      role: {
+        read: 'admin.system.role:read',
+        add: 'admin.system.role:add',
+        edit: 'admin.system.role:edit',
+        delete: 'admin.system.role:delete',
+      },
+      /** 权限管理 */
+      permission: {
+        read: 'admin.system.permission:read',
+        add: 'admin.system.permission:add',
+        edit: 'admin.system.permission:edit',
+        delete: 'admin.system.permission:delete',
+      },
+      /** 部门管理 */
+      department: {
+        read: 'admin.system.department:read',
+        add: 'admin.system.department:add',
+        edit: 'admin.system.department:edit',
+        delete: 'admin.system.department:delete',
+      },
+      /** 菜单管理 */
+      menu: {
+        read: 'admin.system.menu:read',
+        add: 'admin.system.menu:add',
+        edit: 'admin.system.menu:edit',
+        delete: 'admin.system.menu:delete',
+      },
+      /** 角色权限管理 */
+      role_permission: {
+        read: 'admin.system.role_permission:read',
+        add: 'admin.system.role_permission:add',
+        edit: 'admin.system.role_permission:edit',
+        delete: 'admin.system.role_permission:delete',
+        batch_delete: 'admin.system.role_permission:batch-delete',
+      },
+      /** 个人信息 */
+      auth: {
+        read: 'admin.system.auth:read',
+        edit: 'admin.system.auth:edit',
+      },
+    },
+    /** 邮件 */
+    mail: {
+      read: 'admin.mail:read',
+      /** 邮件账户 */
+      account: {
+        read: 'admin.mail.account:read',
+        add: 'admin.mail.account:add',
+        edit: 'admin.mail.account:edit',
+        delete: 'admin.mail.account:delete',
+      },
+      /** 邮件模板 */
+      template: {
+        read: 'admin.mail.template:read',
+        add: 'admin.mail.template:add',
+        edit: 'admin.mail.template:edit',
+        delete: 'admin.mail.template:delete',
+      },
+      /** 邮件日志 */
+      log: {
+        read: 'admin.mail.log:read',
+        view: 'admin.mail.log:view',
+      },
+      /** 邮件操作 */
+      action: {
+        read: 'admin.mail.action:read',
+        add: 'admin.mail.action:add',
+      },
+    },
+    /** 国际化 */
+    i18n: {
+      read: 'admin.i18n:read',
+      /** 语言管理 */
+      language: {
+        read: 'admin.i18n.language:read',
+        add: 'admin.i18n.language:add',
+        edit: 'admin.i18n.language:edit',
+        delete: 'admin.i18n.language:delete',
+      },
+      /** 地区管理 */
+      region: {
+        read: 'admin.i18n.region:read',
+        add: 'admin.i18n.region:add',
+        edit: 'admin.i18n.region:edit',
+        delete: 'admin.i18n.region:delete',
+      },
+      /** 翻译管理 */
+      translation: {
+        read: 'admin.i18n.translation:read',
+        add: 'admin.i18n.translation:add',
+        edit: 'admin.i18n.translation:edit',
+        delete: 'admin.i18n.translation:delete',
+      },
+    },
+    /** 运维 */
+    maintenance: {
+      read: 'admin.maintenance:read',
+      /** 缓存管理 */
+      cache: {
+        read: 'admin.maintenance.cache:read',
+        add: 'admin.maintenance.cache:add',
+        edit: 'admin.maintenance.cache:edit',
+        delete: 'admin.maintenance.cache:delete',
+        view: 'admin.maintenance.cache:view',
+      },
+      /** 登录日志 */
+      audit_login: {
+        read: 'admin.maintenance.audit_login:read',
+      },
+      /** 定时任务管理 */
+      cron: {
+        read: 'admin.maintenance.cron:read',
+        add: 'admin.maintenance.cron:add',
+        edit: 'admin.maintenance.cron:edit',
+        delete: 'admin.maintenance.cron:delete',
+      },
+      /** API 采集任务管理 */
+      api_task: {
+        read: 'admin.maintenance.api_task:read',
+        add: 'admin.maintenance.api_task:add',
+        edit: 'admin.maintenance.api_task:edit',
+        delete: 'admin.maintenance.api_task:delete',
+      },
+      /** API 文档管理 */
+      api_docs: {
+        read: 'admin.maintenance.api_docs:read',
+        add: 'admin.maintenance.api_docs:add',
+        edit: 'admin.maintenance.api_docs:edit',
+        delete: 'admin.maintenance.api_docs:delete',
+      },
+      /** 合规归档 */
+      compliance: {
+        read: 'admin.maintenance.compliance:read',
+      },
+      /** 初始化数据 */
+      init: {
+        read: 'admin.maintenance.init:read',
+      },
+    },
+    read: 'admin:read',
+    /** 数据库 */
+    data: {
+      read: 'admin.data:read',
+      /** 动态表单 */
+      schema_form: {
+        read: 'admin.data.schema_form:read',
+        add: 'admin.data.schema_form:add',
+        edit: 'admin.data.schema_form:edit',
+        delete: 'admin.data.schema_form:delete',
+      },
+      /** 表单数据 */
+      schema_form_data: {
+        read: 'admin.data.schema_form_data:read',
+        add: 'admin.data.schema_form_data:add',
+        edit: 'admin.data.schema_form_data:edit',
+        delete: 'admin.data.schema_form_data:delete',
+      },
+    },
+    /** 对象存储 */
+    oss: {
+      read: 'admin.oss:read',
+      /** 存储配置 */
+      config: {
+        read: 'admin.oss.config:read',
+        add: 'admin.oss.config:add',
+        edit: 'admin.oss.config:edit',
+        delete: 'admin.oss.config:delete',
+      },
+      /** 文件管理 */
+      file: {
+        read: 'admin.oss.file:read',
+        add: 'admin.oss.file:add',
+        edit: 'admin.oss.file:edit',
+        delete: 'admin.oss.file:delete',
+      },
+    },
+    /** AI */
+    ai: {
+      read: 'admin.ai:read',
+      /** AI 配置 */
+      config: {
+        read: 'admin.ai.config:read',
+        add: 'admin.ai.config:add',
+        edit: 'admin.ai.config:edit',
+        delete: 'admin.ai.config:delete',
+      },
+      /** AI 对话 */
+      chat: {
+        read: 'admin.ai.chat:read',
+      },
+    },
+    /** Swarm 集群 */
+    swarm: {
+      read: 'admin.swarm:read',
+      /** Swarm 集群 Docker 服务管理 */
+      docker: {
+        read: 'admin.swarm.docker:read',
+        add: 'admin.swarm.docker:add',
+        edit: 'admin.swarm.docker:edit',
+        delete: 'admin.swarm.docker:delete',
+      },
+      /** Swarm Docker配置管理 */
+      docker_config: {
+        read: 'admin.swarm.docker_config:read',
+        add: 'admin.swarm.docker_config:add',
+        edit: 'admin.swarm.docker_config:edit',
+        delete: 'admin.swarm.docker_config:delete',
+      },
+      /** Swarm 节点管理 */
+      nodes: {
+        read: 'admin.swarm.nodes:read',
+      },
+    },
+    /** RPA */
+    rpa: {
+      read: 'admin.rpa:read',
+      /** 浏览器配置 */
+      browser: {
+        read: 'admin.rpa.browser:read',
+        add: 'admin.rpa.browser:add',
+        edit: 'admin.rpa.browser:edit',
+        delete: 'admin.rpa.browser:delete',
+      },
+    },
   },
   enterprise: {
-    ...enterprise,
-    organization: organization,
-    executive: executive,
+    read: 'enterprise:read',
+    /** 组织管理 */
+    organization: {
+      read: 'organization:read',
+      /** 考勤管理 */
+      attendance: {
+        read: 'organization.attendance:read',
+        add: 'organization.attendance:add',
+        edit: 'organization.attendance:edit',
+        delete: 'organization.attendance:delete',
+      },
+    },
+    /** 事务管理 */
+    executive: {
+      read: 'executive:read',
+      /** 工作流编排 */
+      workflow: {
+        read: 'executive.workflow:read',
+        add: 'executive.workflow:add',
+        edit: 'executive.workflow:edit',
+        delete: 'executive.workflow:delete',
+      },
+    },
   },
-  personal: personal,
+  personal: {
+    read: 'personal:read',
+    /** 个人信息 */
+    profile: {
+      read: 'personal.profile:read',
+      add: 'personal.profile:add',
+      edit: 'personal.profile:edit',
+      delete: 'personal.profile:delete',
+    },
+  },
 } as const;
