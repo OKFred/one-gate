@@ -14040,7 +14040,9 @@ export interface components {
             message: string;
         };
         "admin.data.schema_form_data.submit.req": {
+            /** @description 关联的表单 Code */
             formCode: string;
+            /** @description 关联的业务记录 ID */
             businessId: number;
             /** @description 表单数据 (JSON 对象) */
             data: {
@@ -14073,8 +14075,14 @@ export interface components {
             message: string;
         };
         "admin.data.schema_form_data.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
             id?: number;
+            /** @description 关联的表单 Code */
             formCode?: string;
+            /** @description 关联的业务记录 ID */
             businessId?: number;
         } | unknown | unknown;
         "admin.data.schema_form_data.get.res": {
@@ -14287,7 +14295,15 @@ export interface components {
             message: string;
         };
         "admin.data.schema_form.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
             id?: number;
+            /**
+             * @description 表单唯一标识
+             * @example survey_01
+             */
             code?: string;
         } | unknown | unknown;
         "admin.data.schema_form.get.res": {
@@ -18014,7 +18030,7 @@ export interface components {
                     id: number;
                     /** @description 配置名 */
                     name: string;
-                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
+                    /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
                     cdpUrl: string;
                     /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
                     authToken: ((string | null) | null) | null;
@@ -18045,7 +18061,7 @@ export interface components {
         "admin.rpa.browser.add.req": {
             /** @description 配置名 */
             name: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
             cdpUrl: string;
             /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
             authToken?: ((string | null) | null) | null;
@@ -18073,7 +18089,7 @@ export interface components {
             id: number;
             /** @description 配置名 */
             name?: string;
-            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://browser-run.cloudflare.com */
+            /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
             cdpUrl?: string;
             /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
             authToken?: ((string | null) | null) | null;

@@ -21,23 +21,7 @@
 
 ## 2. 后端开发规范 (以 Personal 模块为例)
 
-### Step 2.1: 定义数据库 DDL
-
-在 `server/packages/core/src/db/sql/` 目录下创建 `[table_name].sql`（例如 `personal_profile.sql`）。
-
-- 主键定义: `id INTEGER PRIMARY KEY AUTOINCREMENT`。
-- 必须包含标准审计字段：
-  ```sql
-  creator_id INTEGER NOT NULL,
-  updater_id INTEGER,
-  create_time_utc INTEGER DEFAULT (
-    CAST(strftime('%s', 'now') AS INTEGER) * 1000 +
-    CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)
-  ),
-  update_time_utc INTEGER
-  ```
-
-### Step 2.2: 声明数据表模型 (Model)
+### Step 2.1: 声明数据表模型 (Model)
 
 在对应的业务包内创建领域文件夹，并定义 Drizzle Schema。例如在 `packages/personal/src/profile/model.ts` 中：
 
@@ -60,6 +44,16 @@ export const profileTable = sqliteTable("personal_profile", {
   updateTimeUtc: integer("update_time_utc"),
 });
 ```
+
+### Step 2.2: 自动生成并归类 SQL DDL 文件
+
+在定义好 Drizzle Schema 后，**无需手动编写 SQL 建表脚本**。直接在 `server` 根目录下运行 DDL 自动生成与归类工具：
+
+```bash
+pnpm run db:generate
+```
+
+该命令内部会调用 `drizzle-kit` 读取对应的 `model.ts` 并把解析出来的 DDL 语句拆分并全自动保存到 `@hodor/core` 包中的相应物理目录下（例如：`packages/core/src/db/sql/personal/personal_profile.sql`）。
 
 ### Step 2.3: 实现业务持久层 (Repository)
 

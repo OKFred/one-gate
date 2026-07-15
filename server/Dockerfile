@@ -18,7 +18,6 @@ RUN pnpm install
 # 复制所有源代码
 COPY . .
 RUN pnpm run build
-RUN mkdir -p dist/db/sql && cp -r src/db/sql/. dist/db/sql/
 
 EXPOSE 8787
 

@@ -1,12 +1,11 @@
 # RBAC Dashboard
 
-A high-performance management dashboard for the RBAC system. Built with React 19, MUI v7, and UnoCSS for a sleek and responsive administration experience.
+A high-performance management dashboard for the RBAC system. Built with React 19 and MUI v7 for a sleek and responsive administration experience.
 
 ## 🚀 Key Technologies
 
 - **React 19**: Modern UI component library.
 - **MUI v7**: Professional-grade design system and components.
-- **UnoCSS**: Atomic CSS engine for fast styling.
 - **Vite 7**: Next-generation frontend tooling.
 - **Axios**: HTTP client for API communication.
 - **React Router 7**: Declarative routing for single-page applications.
