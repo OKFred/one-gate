@@ -195,8 +195,9 @@ async function main() {
       "exec",
       "-T",
       "backend",
-      "node",
-      "./dist/db/initTable.js",
+      "pnpm",
+      "run",
+      "db:init",
       "node",
     ]);
 
