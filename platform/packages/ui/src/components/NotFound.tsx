@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Typography, Button } from '@mui/material';
+import { Typography, Button, Box } from '@mui/material';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useFirstValidPath } from '@/hooks/useFirstValidPath';
 
@@ -9,7 +9,7 @@ const NotFound: React.FC = () => {
   const firstValidPath = useFirstValidPath();
 
   return (
-    <div className="flex flex-col items-center">
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <Typography variant="h1" color="primary" gutterBottom>
         404
       </Typography>
@@ -25,7 +25,7 @@ const NotFound: React.FC = () => {
       >
         {t('dialog.goBackHome')}
       </Button>
-    </div>
+    </Box>
   );
 };
 

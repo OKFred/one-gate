@@ -88,9 +88,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
       if (item.path.startsWith('http')) {
         window.open(item.path, '_blank');
       } else {
-        const currentScope = (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
+        const currentScope =
+          (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
         let targetScope = 'admin';
-        
+
         if (item.path.startsWith('/biz/') || item.path.startsWith('biz/')) {
           targetScope = 'enterprise';
         } else if (item.path.startsWith('/personal/') || item.path.startsWith('personal/')) {
@@ -164,7 +165,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const drawerContent = (
     <Box sx={{ paddingTop: { xs: 0, sm: '64px' } }}>
       {navItems && navItems.length > 0 ? (
-        <List className="pb-0! pt-0!">
+        <List sx={{ pb: 0, pt: 0 }}>
           {navItems.map((item) => renderSystemMenuTree(item, location.pathname))}
         </List>
       ) : null}

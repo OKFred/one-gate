@@ -2,9 +2,8 @@ import { defineConfig } from 'vite';
 import { loadEnv } from 'vite';
 import path from 'path';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
-import babel from '@rolldown/plugin-babel';
-import UnoCSS from 'unocss/vite';
 import childProcess from 'child_process';
+import babel from '@rolldown/plugin-babel';
 import { federation } from '@module-federation/vite';
 
 const pathUiSrc = path.resolve(__dirname, '../../packages/ui/src');
@@ -47,9 +46,6 @@ export default defineConfig(({ mode }) => {
       react(),
       babel({
         presets: [reactCompilerPreset()],
-      }),
-      UnoCSS({
-        configFile: '../../uno.config.ts',
       }),
       federation({
         name: 'admin',

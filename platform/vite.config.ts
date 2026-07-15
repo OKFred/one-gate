@@ -1,10 +1,9 @@
 import { defineConfig } from 'vite';
 import { loadEnv } from 'vite';
 import path from 'path';
+import childProcess from 'child_process';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import babel from '@rolldown/plugin-babel';
-import UnoCSS from 'unocss/vite';
-import childProcess from 'child_process';
 
 const pathSrc = path.resolve(__dirname, 'src');
 
@@ -45,7 +44,6 @@ export default defineConfig(({ command, mode }) => {
       babel({
         presets: [reactCompilerPreset()],
       }),
-      UnoCSS(),
     ],
     optimizeDeps: {
       include: [
