@@ -3,10 +3,9 @@
  * 基于 fetch() 标准 API，兼容 Node.js 18+ 和 Cloudflare Workers
  */
 
-import { AppDatabase } from "../db/index";
+import { type AppDatabase } from "@hodor/core/db/index";
 import { jobsRegistry } from "./registry";
-import { apiTaskTable } from "../../../admin/src/maintenance/api-task/model";
-import { eq, and } from "drizzle-orm";
+import { findEnabledByKey } from "../api-task/repository";
 
 export interface ApiTaskDef {
   baseUrl: string;
@@ -253,18 +252,7 @@ export class HttpJobExecutor implements JobExecutor {
     job: { jobKey: string; parameters?: string | null; name: string },
     db: AppDatabase
   ): Promise<JobExecutorResult> {
-    const apiTasks = await db
-      .select()
-      .from(apiTaskTable)
-      .where(
-        and(
-          eq(apiTaskTable.taskKey, job.jobKey),
-          eq(apiTaskTable.isEnabled, true)
-        )
-      )
-      .limit(1);
-
-    const apiTask = apiTasks[0];
+    const apiTask = await findEnabledByKey(job.jobKey);
     if (!apiTask) {
       return {
         status: false,

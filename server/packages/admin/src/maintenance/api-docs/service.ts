@@ -1,4 +1,3 @@
-import db from "@hodor/core/db/index";
 import {
   apiDocsTable,
   IndexVO,
@@ -20,10 +19,9 @@ import {
   type ApiDocsDeleteVOLike,
   type ApiDocsGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, and, like, or, type SQL } from "drizzle-orm";
+import * as repo from "./repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
-import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
   listReqBase,
   listResponseWrapper,
@@ -248,27 +246,6 @@ export function parseApiDoc(contentStr: string): {
   return { info, docType, apis, baseUrl };
 }
 
-// 辅助函数：根据条件构建查询 filter
-const buildWhereCondition = (condition?: { keyword?: string }) => {
-  const { keyword } = condition || {};
-  const conditions: SQL<unknown>[] = [];
-
-  if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(apiDocsTable.name, `%${keyword}%`),
-        like(apiDocsTable.description, `%${keyword}%`)
-      ) as SQL<unknown>
-    );
-  }
-
-  return conditions.length > 0
-    ? conditions.length === 1
-      ? conditions[0]
-      : and(...conditions)
-    : undefined;
-};
-
 //----------------- 1. 获取文档列表 ----------------//
 const listReq = {
   type: "object",
@@ -296,39 +273,21 @@ async function onList(
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const whereCondition = buildWhereCondition(params);
+  const result = await repo.findPage({
+    pageNo,
+    pageSize: finalPageSize,
+    orderBy,
+    descend,
+    keyword: params.keyword,
+  });
 
-  const countResult = await db
-    .select({ total: count(apiDocsTable.id) })
-    .from(apiDocsTable)
-    .where(whereCondition);
-  const total = countResult[0]?.total || 0;
-
-  if (total === 0) {
-    return {
-      total,
-      totalPage: 0,
-      currentPage: pageNo,
-      pageSize: finalPageSize,
-      list: [],
-    };
-  }
-
-  const rows = await db
-    .select()
-    .from(apiDocsTable)
-    .where(whereCondition)
-    .orderBy(descend ? desc(orderField) : asc(orderField))
-    .limit(finalPageSize)
-    .offset(offset);
-
-  const totalPage = Math.ceil(total / finalPageSize);
+  const totalPage = Math.ceil(result.total / finalPageSize);
   return {
-    total,
+    total: result.total,
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: rows,
+    list: result.list,
   };
 }
 
@@ -381,19 +340,16 @@ async function onAdd(
     preventParseFailed(err.message);
   }
 
-  const res = await db
-    .insert(apiDocsTable)
-    .values({
-      name,
-      version,
-      description,
-      docType: docType,
-      content,
-      creatorId,
-    })
-    .returning({ id: apiDocsTable.id });
+  const insertedId = await repo.onInsert({
+    name,
+    version,
+    description,
+    docType: docType,
+    content,
+    creatorId,
+  });
 
-  return res[0]?.id;
+  return insertedId;
 }
 
 const addApi = {
@@ -430,12 +386,7 @@ async function onUpdate(
   const { userId: updaterId } = userObj;
   let { id, name, version, description, docType, content } = params;
 
-  const existRows = await db
-    .select()
-    .from(apiDocsTable)
-    .where(eq(apiDocsTable.id, id))
-    .limit(1);
-  const row = existRows[0];
+  const row = await repo.findById(id);
   preventEmpty(row);
 
   if (content !== undefined) {
@@ -451,23 +402,17 @@ async function onUpdate(
     }
   }
 
-  const res = await db
-    .update(apiDocsTable)
-    .set({
-      name,
-      version,
-      description,
-      docType: docType,
-      content,
-      updaterId,
-      updateTimeUtc: getCurrentTimestampUtcSql(),
-    })
-    .where(eq(apiDocsTable.id, id))
-    .returning({ id: apiDocsTable.id });
+  const updatedId = await repo.onUpdate(id, {
+    name,
+    version,
+    description,
+    docType: docType,
+    content,
+    updaterId,
+  });
 
-  const updateRow = res[0];
-  preventEmpty(updateRow);
-  return updateRow.id;
+  preventEmpty(updatedId);
+  return updatedId;
 }
 
 const updateApi = {
@@ -502,20 +447,12 @@ async function onDelete(
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
   const { id } = params;
-  const existRows = await db
-    .select()
-    .from(apiDocsTable)
-    .where(eq(apiDocsTable.id, id))
-    .limit(1);
-  preventEmpty(existRows[0]);
+  const row = await repo.findById(id);
+  preventEmpty(row);
 
-  const result = await db
-    .delete(apiDocsTable)
-    .where(eq(apiDocsTable.id, id))
-    .returning({ id: apiDocsTable.id });
-  const deleteRow = result[0];
-  preventEmpty(deleteRow);
-  return deleteRow.id;
+  const deletedId = await repo.onDelete(id);
+  preventEmpty(deletedId);
+  return deletedId;
 }
 
 const deleteApi = {
@@ -555,12 +492,7 @@ async function onGet(
   userObj?: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(apiDocsTable)
-    .where(eq(apiDocsTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await repo.findById(id);
   preventEmpty(row);
   return row;
 }
@@ -639,12 +571,7 @@ async function onParse(
   userObj?: UserObj
 ): Promise<FromSchema<typeof parseRes>> {
   const { id } = params;
-  const rows = await db
-    .select()
-    .from(apiDocsTable)
-    .where(eq(apiDocsTable.id, id))
-    .limit(1);
-  const row = rows[0];
+  const row = await repo.findById(id);
   preventEmpty(row);
 
   return parseApiDoc(row.content);

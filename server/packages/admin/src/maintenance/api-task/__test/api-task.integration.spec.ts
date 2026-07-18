@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterEach, vi } from "vitest";
 import db from "@hodor/core/db/index";
 import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
 import apiTaskService from "../service";
-import { runPendingJobs } from "@hodor/core/jobs/scheduler";
+import { runPendingJobs } from "../../cron/scheduler";
 import { cronTable, cronLogTable } from "../../cron/model";
 import { eq } from "drizzle-orm";
 import type { UserObj } from "@hodor/core/types/app";

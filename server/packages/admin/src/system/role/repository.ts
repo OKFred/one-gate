@@ -120,6 +120,18 @@ export class RoleRepository {
     return rows;
   }
 
+  async getRoleDataScopes(roleIds: number[]) {
+    if (roleIds.length === 0) return [];
+    const rows = await db
+      .select({
+        dataScope: roleTable.dataScope,
+        customDeptIds: roleTable.customDeptIds,
+      })
+      .from(roleTable)
+      .where(inArray(roleTable.id, roleIds));
+    return rows;
+  }
+
   async verifyRoleExists(roleId: number): Promise<boolean> {
     const rows = await db
       .select({ id: roleTable.id })

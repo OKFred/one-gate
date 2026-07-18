@@ -109,3 +109,14 @@ export async function onDelete(id: number) {
     .returning({ id: apiTaskTable.id });
   return result[0] || null;
 }
+
+export async function findEnabledByKey(taskKey: string) {
+  const rows = await db
+    .select()
+    .from(apiTaskTable)
+    .where(
+      and(eq(apiTaskTable.taskKey, taskKey), eq(apiTaskTable.isEnabled, true))
+    )
+    .limit(1);
+  return rows[0] || null;
+}

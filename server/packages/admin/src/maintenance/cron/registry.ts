@@ -1,4 +1,4 @@
-import { AppDatabase } from "@hodor/core/db/index";
+import { type AppDatabase } from "@hodor/core/db/index";
 
 export interface JobContext {
   params: any;

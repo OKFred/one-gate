@@ -523,6 +523,10 @@ async function getUserNameById(
   return username;
 }
 
+async function getUser(id: number) {
+  return await onGet({ id });
+}
+
 export const utils = {
   countDepartmentUsers,
   convertPassword,
@@ -531,6 +535,7 @@ export const utils = {
   updateLangCode,
   updateUserInfo,
   getUserNameById,
+  getUser,
 };
 
 export default {

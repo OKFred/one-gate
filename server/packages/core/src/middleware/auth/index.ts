@@ -1,11 +1,8 @@
 import { tokenUtils } from "../../utils/token";
 import { Context } from "../../types/app";
-import userService, {
-  UserObj,
-} from "../../../../admin/src/system/user/service";
+import type { UserObj } from "../../../../admin/src/system/user/service";
 import { SUPER_ADMIN_ROLE_ID } from "../../db/init";
-import { utils as rolePermissionUtils } from "../../../../admin/src/system/role_permission/service";
-import { roleTable } from "../../../../admin/src/system/role/model";
+import { registry } from "../../../../admin/src/common/registry";
 import {
   DataScope,
   SCOPE_PRIORITY,
@@ -32,7 +29,7 @@ export const authMiddleware = async (c: Context) => {
   if (!payload) {
     throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   }
-  const user = await userService.get.service({ id: payload.userId });
+  const user = await registry.system.getUser(payload.userId);
   if (!user?.isEnabled) {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
@@ -89,7 +86,7 @@ export const authMiddleware = async (c: Context) => {
 
       // 2. 缓存未命中、报错或版本过旧，回退到数据库加载逻辑
       const [permissions, globalVersion] = await Promise.all([
-        rolePermissionUtils.getPermissionsByRoleIds(this.roleIds),
+        registry.system.getPermissionsByRoleIds(this.roleIds),
         kv.get(versionKey, "text").catch(() => "1"),
       ]);
 
@@ -99,13 +96,7 @@ export const authMiddleware = async (c: Context) => {
       const mergedCustomDeptIds: number[] = [];
 
       if (this.roleIds.length > 0) {
-        const roles = await db
-          .select({
-            dataScope: roleTable.dataScope,
-            customDeptIds: roleTable.customDeptIds,
-          })
-          .from(roleTable)
-          .where(inArray(roleTable.id, this.roleIds));
+        const roles = await registry.system.getRoleDataScopes(this.roleIds);
 
         for (const role of roles) {
           const scopeVal = (role.dataScope ??
