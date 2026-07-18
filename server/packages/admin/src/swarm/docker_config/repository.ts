@@ -1,6 +1,16 @@
 import db from "@hodor/core/db/index";
 import { swarmDockerConfigTable, type SwarmDockerConfigPOLike } from "./model";
-import { eq, and, or, like, not, count, asc, desc } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  not,
+  count,
+  asc,
+  desc,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -29,10 +39,12 @@ function buildWhereCondition(params: {
   keyword?: string;
   isEnabled?: boolean;
 }) {
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(params.keyword)) {
     conditions.push(
-      or(like(swarmDockerConfigTable.name, `%${params.keyword}%`))
+      or(
+        like(swarmDockerConfigTable.name, `%${params.keyword}%`)
+      ) as SQL<unknown>
     );
   }
   if (params.isEnabled !== undefined) {

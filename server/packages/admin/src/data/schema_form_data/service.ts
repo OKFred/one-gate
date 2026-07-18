@@ -244,9 +244,9 @@ const getRes = {
 
 async function onGet(
   params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+): Promise<FromSchema<typeof getRes>> {
   const { id, formCode, businessId } = params;
-  let row = null;
+  let row: Awaited<ReturnType<typeof schemaFormDataRepository.findById>> = null;
   if (id) {
     row = await schemaFormDataRepository.findById(id);
   } else if (formCode && businessId) {
@@ -256,7 +256,7 @@ async function onGet(
     );
   }
   preventEmpty(row);
-  return row;
+  return row as unknown as FromSchema<typeof getRes>;
 }
 
 const getApi = {

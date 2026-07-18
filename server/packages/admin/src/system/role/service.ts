@@ -338,8 +338,13 @@ async function verifyRoleExists(roleId: number) {
   return await roleRepository.verifyRoleExists(roleId);
 }
 
+async function getRoleDataScopes(roleIds: number[]) {
+  return await roleRepository.getRoleDataScopes(roleIds);
+}
+
 export const utils = {
   getRolesByIds,
+  getRoleDataScopes,
   verifyRoles,
   verifyRoleExists,
   updatePermissionCount,

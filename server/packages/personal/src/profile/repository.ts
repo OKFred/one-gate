@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { profileTable, type ProfilePOLike } from "./model";
-import { eq, and, or, like, asc, desc, count } from "drizzle-orm";
+import { eq, and, or, like, asc, desc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -8,10 +8,10 @@ function buildWhereCondition(condition?: {
   keyword?: string;
   userId?: number;
 }) {
-  const exprs = [];
+  const exprs: SQL<unknown>[] = [];
   if (condition) {
     if (hasValue(condition.userId)) {
-      exprs.push(eq(profileTable.userId, condition.userId));
+      exprs.push(eq(profileTable.userId, condition.userId as number));
     }
     if (hasValue(condition.keyword)) {
       exprs.push(
@@ -20,7 +20,7 @@ function buildWhereCondition(condition?: {
           like(profileTable.email, `%${condition.keyword}%`),
           like(profileTable.phone, `%${condition.keyword}%`),
           like(profileTable.remark, `%${condition.keyword}%`)
-        )
+        ) as SQL<unknown>
       );
     }
   }

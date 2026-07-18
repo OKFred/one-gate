@@ -5,7 +5,7 @@ import {
   type WorkflowPOLike,
   type WorkflowLogPOLike,
 } from "./model";
-import { eq, and, or, like, asc, desc, count } from "drizzle-orm";
+import { eq, and, or, like, asc, desc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -18,13 +18,13 @@ function buildWorkflowWhere(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(workflowTable.name, `%${keyword}%`),
         like(workflowTable.description, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (isEnabled !== undefined) {

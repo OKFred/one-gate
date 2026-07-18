@@ -44,7 +44,8 @@ const RegionUniquePO = {
 } as const satisfies Partial<Record<keyof RegionPOLike, JSONSchema>>;
 const RegionBasePO = {
   labels: {
-    type: "object",
+    type: ["object", "null"],
+    nullable: true,
     description: "语言对象",
     properties: {
       "zh-CN": {

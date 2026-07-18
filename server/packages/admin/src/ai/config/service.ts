@@ -255,11 +255,11 @@ const deleteApi = {
 async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
   const config = await onGet(obj);
   try {
-    const res = await fetch(`${config.baseUrl}/models`, {
-      headers: {
-        Authorization: config.apiKey ? `Bearer ${config.apiKey}` : undefined,
-      },
-    });
+    const headers: Record<string, string> = {};
+    if (config.apiKey) {
+      headers["Authorization"] = `Bearer ${config.apiKey}`;
+    }
+    const res = await fetch(`${config.baseUrl}/models`, { headers });
     const result = (await res.json()) as {
       object: string;
       data: {

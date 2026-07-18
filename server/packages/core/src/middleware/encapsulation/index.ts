@@ -103,7 +103,9 @@ function routeMaker({
       });
     }
     c.set("bodyObj", bodyObj);
-    const result = await adapter(service)(c);
+    const result = await (adapter as AdapterFn)(
+      service as Parameters<AdapterFn>[0]
+    )(c);
     if (getEnv("NODE_ENV") !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,
@@ -152,12 +154,22 @@ function routeMaker({
   return { pathObj: newPathObj, controller };
 }
 
+/**
+ * 适配器函数类型：接收一个 service 业务处理函数，
+ * 返回一个能从 Context 中提取所需参数并调用该函数的闭包。
+ */
+export type AdapterFn = (
+  service: (...args: unknown[]) => Promise<unknown>
+) => (c: Context) => Promise<unknown>;
+
 export interface API {
   req: JSONSchema;
   res: JSONSchema;
   pathInfo: Partial<RawRouteConfig> & Pick<RawRouteConfig, "path" | "method">;
-  adapter: Function;
-  service: (c: Context | any, ...args: any[]) => Promise<any>;
+  /** 适配器：负责从 Context 中提取参数并注入到 service 函数 */
+  adapter: AdapterFn;
+  /** 业务逻辑函数：接收适配器提取的参数，返回业务数据 */
+  service: (...args: unknown[]) => Promise<unknown>;
   /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
   permission?: { action: string } | false;
 }

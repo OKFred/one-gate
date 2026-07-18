@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { regionTable, type RegionPOLike } from "./model";
-import { eq, and, or, like, asc, desc, count, ne } from "drizzle-orm";
+import { eq, and, or, like, asc, desc, count, ne, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,18 +9,18 @@ function buildWhereCondition(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(regionTable.alpha2Code, `%${keyword}%`),
         like(regionTable.alpha3Code, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(regionTable.isEnabled, isEnabled));
+    conditions.push(eq(regionTable.isEnabled, isEnabled as boolean));
   }
   return conditions.length > 0
     ? conditions.length === 1
@@ -105,16 +105,16 @@ export async function findByCodes(params: {
   excludeId?: number;
 }) {
   const { alpha2Code, alpha3Code, numeric, excludeId } = params;
-  const matchConditions = [];
+  const matchConditions: SQL<unknown>[] = [];
 
   if (hasValue(alpha2Code)) {
-    matchConditions.push(eq(regionTable.alpha2Code, alpha2Code!));
+    matchConditions.push(eq(regionTable.alpha2Code, alpha2Code as string));
   }
   if (hasValue(alpha3Code)) {
-    matchConditions.push(eq(regionTable.alpha3Code, alpha3Code!));
+    matchConditions.push(eq(regionTable.alpha3Code, alpha3Code as string));
   }
   if (hasValue(numeric)) {
-    matchConditions.push(eq(regionTable.numeric, numeric!));
+    matchConditions.push(eq(regionTable.numeric, numeric as number));
   }
   if (matchConditions.length === 0) return null;
 

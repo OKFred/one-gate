@@ -1,6 +1,17 @@
 import db from "@hodor/core/db/index";
 import { ossConfigTable, type OssConfigPOLike } from "./model";
-import { eq, and, or, like, desc, asc, count, not, ne } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  desc,
+  asc,
+  count,
+  not,
+  ne,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,10 +20,12 @@ function buildWhereCondition(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
-    conditions.push(or(like(ossConfigTable.name, `%${keyword}%`)));
+    conditions.push(
+      or(like(ossConfigTable.name, `%${keyword}%`)) as SQL<unknown>
+    );
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(ossConfigTable.isEnabled, isEnabled));

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import apiTaskService from "./service";
 import * as apiTaskRepository from "./repository";
-import { executeApiTask } from "@hodor/core/jobs/executor";
+import { executeApiTask } from "../cron/executor";
 import type { UserObj } from "@hodor/core/types/app";
 
 vi.mock("./repository", () => {
@@ -15,7 +15,7 @@ vi.mock("./repository", () => {
   };
 });
 
-vi.mock("@hodor/core/jobs/executor", () => {
+vi.mock("../cron/executor", () => {
   return {
     executeApiTask: vi.fn(),
   };

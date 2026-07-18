@@ -33,7 +33,7 @@ import {
   BusinessErrorCode,
 } from "@hodor/core/middleware/errorHandler/businessError/index";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
-import { executeApiTask } from "@hodor/core/jobs/executor";
+import { executeApiTask } from "../cron/executor.js";
 import * as apiTaskRepository from "./repository";
 
 //----------------- 1. 获取任务列表 ----------------//

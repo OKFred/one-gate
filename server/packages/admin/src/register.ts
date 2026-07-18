@@ -1,10 +1,13 @@
 import { ServiceRegistry, setRegistry } from "./common/registry.js";
 import { utils as userUtils } from "./system/user/service.js";
+import { utils as rolePermissionUtils } from "./system/role_permission/service.js";
+import { utils as roleUtils } from "./system/role/service.js";
 import { utils as regionUtils } from "./i18n/region/service.js";
 import { utils as languageUtils } from "./i18n/language/service.js";
 import regionService from "./i18n/region/service.js";
 import { utils as auditUtils } from "./maintenance/audit_login/service.js";
 import { exportDeletionRecord } from "./maintenance/compliance/index.js";
+import { runPendingJobs } from "./maintenance/cron/scheduler.js";
 import { dockerClient } from "./swarm/docker/client.js";
 import { findDefaultActiveBrowser } from "./rpa/browser/repository.js";
 import { getActiveStorage } from "./oss/file/service.js";
@@ -12,6 +15,8 @@ import { getActiveStorage } from "./oss/file/service.js";
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
   ...userUtils,
+  ...rolePermissionUtils,
+  ...roleUtils,
 };
 
 export const i18nRegister = {
@@ -25,6 +30,7 @@ export const i18nRegister = {
 export const maintenanceRegister = {
   recordLogin: auditUtils.recordLogin,
   exportDeletionRecord,
+  runPendingJobs,
 };
 
 export const swarmRegister = dockerClient;

@@ -8,6 +8,7 @@ import {
   eq,
   and,
   inArray,
+  type SQL,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
@@ -17,7 +18,7 @@ export const buildWhereCondition = (condition?: {
   permissionId?: number;
 }) => {
   const { roleId, permissionId } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(roleId))
     conditions.push(eq(rolePermissionTable.roleId, roleId as number));
   if (hasValue(permissionId))
@@ -207,7 +208,7 @@ export class RolePermissionRepository {
     // 批量插入，分片处理以避免 D1 变量限制 (通常为 100)
     // 每行 3 个变量，取 25 行为一组 (75 变量)
     const chunkSize = 25;
-    const batches = [];
+    const batches: any[] = [];
     for (let i = 0; i < values.length; i += chunkSize) {
       const chunk = values.slice(i, i + chunkSize);
       const chunkValues = chunk.map((v) => ({
@@ -268,7 +269,7 @@ export class RolePermissionRepository {
     // 分片删除以避免 D1 变量限制 (通常为 100)
     // inArray 会产生 N 个变量，取 50 为一组
     const chunkSize = 50;
-    const batches = [];
+    const batches: any[] = [];
     for (let i = 0; i < permissionIds.length; i += chunkSize) {
       const chunk = permissionIds.slice(i, i + chunkSize);
       batches.push(

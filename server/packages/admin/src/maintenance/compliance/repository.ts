@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { complianceArchiveTable, type ComplianceArchivePOLike } from "./model";
-import { eq, and, like, count, desc, asc } from "drizzle-orm";
+import { eq, and, like, count, desc, asc, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -13,7 +13,7 @@ function buildWhereCondition(condition?: {
 }) {
   const { keyword, sourceTable, deleteReason, deleteType, restorable } =
     condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
@@ -21,16 +21,24 @@ function buildWhereCondition(condition?: {
     );
   }
   if (hasValue(sourceTable)) {
-    conditions.push(eq(complianceArchiveTable.sourceTable, sourceTable));
+    conditions.push(
+      eq(complianceArchiveTable.sourceTable, sourceTable as string)
+    );
   }
   if (hasValue(deleteReason)) {
-    conditions.push(eq(complianceArchiveTable.deleteReason, deleteReason));
+    conditions.push(
+      eq(complianceArchiveTable.deleteReason, deleteReason as string)
+    );
   }
   if (hasValue(deleteType)) {
-    conditions.push(eq(complianceArchiveTable.deleteType, deleteType));
+    conditions.push(
+      eq(complianceArchiveTable.deleteType, deleteType as string)
+    );
   }
   if (hasValue(restorable)) {
-    conditions.push(eq(complianceArchiveTable.restorable, restorable));
+    conditions.push(
+      eq(complianceArchiveTable.restorable, restorable as boolean)
+    );
   }
 
   return conditions.length > 0

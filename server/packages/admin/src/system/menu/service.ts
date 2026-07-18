@@ -166,7 +166,7 @@ async function onAdd(
   const insertedId = await menuRepository.onInsert({
     ...params,
     creatorId,
-  });
+  } as any);
 
   return insertedId;
 }
@@ -224,7 +224,7 @@ async function onUpdate(
     updaterId,
   };
 
-  const updatedId = await menuRepository.onUpdate(id, updateData);
+  const updatedId = await menuRepository.onUpdate(id, updateData as any);
   return updatedId;
 }
 const updateApi = {
@@ -372,7 +372,7 @@ async function onTree(
   userObj: UserObj
 ): Promise<FromSchema<typeof treeRes> | null> {
   const { roleArr, isSuperAdmin } = userObj;
-  const roleIds = roleArr.map((r) => r.value);
+  const roleIds = (roleArr || []).map((r) => r.value);
   // 获取所有菜单
   const { showAll } = params;
   const allMenus = await menuRepository.getTreeMenus(showAll);
@@ -475,7 +475,7 @@ async function getDescendantMenus(
   if (!thisMenu) return null;
   // 递归查找子孙菜单
   function findSubMenus(id: number): typeof allMenus {
-    const result = [];
+    const result: typeof allMenus = [];
     for (const m of allMenus) {
       if (m.parentId === id) {
         result.push(m);

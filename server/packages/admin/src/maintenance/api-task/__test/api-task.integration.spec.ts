@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterEach, vi } from "vitest";
 import db from "@hodor/core/db/index";
 import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
 import apiTaskService from "../service";
-import { runPendingJobs } from "@hodor/core/jobs/scheduler";
+import { runPendingJobs } from "../../cron/scheduler";
 import { cronTable, cronLogTable } from "../../cron/model";
 import { eq } from "drizzle-orm";
 import type { UserObj } from "@hodor/core/types/app";
@@ -209,8 +209,8 @@ describe("API Task 全链路集成测试", () => {
       expect(mockFetch).toHaveBeenCalled();
       expect(runRes.success).toBe(true);
       expect(runRes.statusCode).toBe(200);
-      expect(runRes.schemaValidation.hasSchema).toBe(true);
-      expect(runRes.schemaValidation.valid).toBe(true);
+      expect(runRes.schemaValidation?.hasSchema).toBe(true);
+      expect(runRes.schemaValidation?.valid).toBe(true);
 
       // Mock fetch 返回非法 JSON
       mockFetch.mockResolvedValue({
@@ -226,8 +226,8 @@ describe("API Task 全链路集成测试", () => {
         { id: taskId! },
         userObj
       );
-      expect(runResInvalidJson.schemaValidation.valid).toBe(false);
-      expect(runResInvalidJson.schemaValidation.errors[0]).toContain(
+      expect(runResInvalidJson.schemaValidation?.valid).toBe(false);
+      expect(runResInvalidJson.schemaValidation?.errors[0]).toContain(
         "not valid JSON"
       );
 
@@ -245,8 +245,10 @@ describe("API Task 全链路集成测试", () => {
         { id: taskId! },
         userObj
       );
-      expect(runResBadSchema.schemaValidation.valid).toBe(false);
-      expect(runResBadSchema.schemaValidation.errors.length).toBeGreaterThan(0);
+      expect(runResBadSchema.schemaValidation?.valid).toBe(false);
+      expect(runResBadSchema.schemaValidation?.errors.length).toBeGreaterThan(
+        0
+      );
     });
   });
 

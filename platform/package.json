@@ -12,6 +12,7 @@
     "build:enterprise": "pnpm --filter @hodor/enterprise build",
     "build:personal": "pnpm --filter @hodor/personal build",
     "build:all": "pnpm -r build",
+    "build": "pnpm run build:all",
     "i18n:scan": "node ./scripts/scan-i18n-enhanced.js",
     "i18n:scan:json": "node ./scripts/scan-i18n-enhanced.js --json",
     "format": "prettier --write .",

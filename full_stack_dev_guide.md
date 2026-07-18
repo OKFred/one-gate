@@ -55,7 +55,21 @@ pnpm run db:generate
 
 该命令内部会调用 `drizzle-kit` 读取对应的 `model.ts` 并把解析出来的 DDL 语句拆分并全自动保存到 `@hodor/core` 包中的相应物理目录下（例如：`packages/core/src/db/sql/personal/personal_profile.sql`）。
 
-### Step 2.3: 实现业务持久层 (Repository)
+### Step 2.3: 数据库增量迁移 (Migration)
+
+在生产环境中，仅靠 DDL 文件重建数据表是危险的，必须使用 Migration 流程来处理 Schema 变更：
+
+1. **生成 Migration 脚本**：修改 `model.ts` 后，运行以下命令生成增量迁移 SQL 脚本：
+   ```bash
+   npx drizzle-kit generate
+   ```
+2. **应用 Migration 变更**：在本地开发或部署时，执行推送到数据库：
+   ```bash
+   npx drizzle-kit push
+   ```
+或者使用 `drizzle-kit migrate` 通过 Node 脚本自动执行迁移逻辑以保证生产环境数据的完整性与安全。
+
+### Step 2.4: 实现业务持久层 (Repository)
 
 在 `repository.ts` 中完成低级别的数据库查询：
 

@@ -1,6 +1,7 @@
 import userService, { utils as userUtils } from "../user/service";
 import permissionService from "../permission/service";
 import { registry } from "../../common/registry.js";
+import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { tokenUtils } from "@hodor/core/utils/token";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj } from "@hodor/core/types/app";
@@ -259,9 +260,10 @@ const profileRes = {
 async function onProfile(
   _params: FromSchema<typeof profileReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof profileRes> | null> {
+): Promise<FromSchema<typeof profileRes>> {
   const { userId } = userObj;
   const userDataObj = await userService.get.service({ id: userId });
+  preventEmpty(userDataObj);
   return { userObj: userDataObj };
 }
 const profileApi = {
@@ -299,7 +301,7 @@ async function onUpdateProfile(
   const regionId = regionObj ? regionObj.value : null;
   if (regionId) await registry.i18n.verifyRegion(regionId);
   const res = await userUtils.updateUserInfo(
-    { id, regionObj, remark },
+    { id, regionObj, remark: remark ?? undefined },
     userObj
   );
   return res;

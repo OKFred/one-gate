@@ -1,11 +1,7 @@
-import { eq, and, or, isNull, lte, sql } from "drizzle-orm";
-import { db } from "../db/index";
-import {
-  cronTable,
-  cronLogTable,
-} from "../../../admin/src/maintenance/cron/model";
+import db from "@hodor/core/db/index";
 import { CronExpressionParser } from "cron-parser";
 import { jobExecutors } from "./executor";
+import * as repo from "./repository";
 
 /**
  * 扫描并运行所有待执行的定时任务 (两端通用核心调度方法)
@@ -14,15 +10,7 @@ export async function runPendingJobs() {
   const now = Date.now();
 
   // 1. 查询所有启用且已到达预定时间（或尚未初始化预定时间）的任务
-  const pendingJobs = await db
-    .select()
-    .from(cronTable)
-    .where(
-      and(
-        eq(cronTable.status, true),
-        or(isNull(cronTable.nextRunTimeUtc), lte(cronTable.nextRunTimeUtc, now))
-      )
-    );
+  const pendingJobs = await repo.findPendingJobs(now);
 
   if (pendingJobs.length === 0) {
     return;
@@ -37,26 +25,15 @@ export async function runPendingJobs() {
       const nextRunTime = interval.next().toDate().getTime();
 
       // 3. 乐观锁更新，防止在多实例并发时重复执行
-      const updateRes = await db
-        .update(cronTable)
-        .set({
-          lastRunTimeUtc: now,
-          nextRunTimeUtc: nextRunTime,
-          runCount: sql`${cronTable.runCount} + 1`,
-          updateTimeUtc: now,
-        })
-        .where(
-          and(
-            eq(cronTable.id, job.id),
-            job.nextRunTimeUtc !== null
-              ? eq(cronTable.nextRunTimeUtc, job.nextRunTimeUtc)
-              : isNull(cronTable.nextRunTimeUtc)
-          )
-        )
-        .returning({ id: cronTable.id });
+      const success = await repo.optimisticLockUpdateJob(
+        job.id,
+        now,
+        nextRunTime,
+        job.nextRunTimeUtc
+      );
 
       // 如果更新影响行数为 0，说明有其他实例并发抢占成功，本轮跳过
-      if (updateRes.length === 0) {
+      if (!success) {
         console.log(
           `[Scheduler] 任务 [${job.name}] 乐观锁争抢失败，已被其他节点执行。`
         );
@@ -106,7 +83,7 @@ export async function runPendingJobs() {
       const durationMs = endTime - startTime;
 
       // 5. 记录日志到数据库
-      await db.insert(cronLogTable).values({
+      await repo.addCronLog({
         jobId: job.id,
         status,
         errorMessage,

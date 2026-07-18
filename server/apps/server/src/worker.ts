@@ -2,7 +2,7 @@ import createApp from "./index.js";
 import { setD1Binding } from "@hodor/core/db/index.js";
 import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
-import { runPendingJobs } from "@hodor/core/jobs/scheduler.js";
+import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
 
 let app: ReturnType<typeof createApp> | null = null;
 

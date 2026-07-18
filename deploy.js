@@ -54,7 +54,13 @@ async function runCommand(command, args, cwd = ".") {
 async function main() {
   // 确保 server/.env 存在，以防 docker compose 因为缺少该文件而报错
   const serverEnvPath = path.resolve(__dirname, "server", ".env");
-  const serverEnvExample = path.resolve(__dirname, "server", ".env.example");
+  const serverEnvExample = path.resolve(
+    __dirname,
+    "server",
+    "apps",
+    "server",
+    ".env.example",
+  );
   if (!fs.existsSync(serverEnvPath)) {
     if (fs.existsSync(serverEnvExample)) {
       console.log(

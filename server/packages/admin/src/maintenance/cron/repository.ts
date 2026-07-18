@@ -1,6 +1,18 @@
 import db from "@hodor/core/db/index";
 import { cronTable, cronLogTable, type CronPOLike } from "./model";
-import { eq, and, or, like, desc, asc, count } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  desc,
+  asc,
+  count,
+  isNull,
+  lte,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,18 +21,18 @@ function buildWhereCondition(condition?: {
   status?: boolean;
 }) {
   const { keyword, status } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(cronTable.name, `%${keyword}%`),
         like(cronTable.jobKey, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (hasValue(status)) {
-    conditions.push(eq(cronTable.status, status));
+    conditions.push(eq(cronTable.status, status as boolean));
   }
 
   return conditions.length > 0
@@ -132,4 +144,46 @@ export async function findLogsPage(params: {
     .offset(offset);
 
   return { total, list };
+}
+
+export async function findPendingJobs(now: number) {
+  return await db
+    .select()
+    .from(cronTable)
+    .where(
+      and(
+        eq(cronTable.status, true),
+        or(isNull(cronTable.nextRunTimeUtc), lte(cronTable.nextRunTimeUtc, now))
+      )
+    );
+}
+
+export async function optimisticLockUpdateJob(
+  jobId: number,
+  now: number,
+  nextRunTime: number,
+  expectedNextRunTime: number | null
+) {
+  const updateRes = await db
+    .update(cronTable)
+    .set({
+      lastRunTimeUtc: now,
+      nextRunTimeUtc: nextRunTime,
+      runCount: sql`${cronTable.runCount} + 1`,
+      updateTimeUtc: now,
+    })
+    .where(
+      and(
+        eq(cronTable.id, jobId),
+        expectedNextRunTime !== null
+          ? eq(cronTable.nextRunTimeUtc, expectedNextRunTime)
+          : isNull(cronTable.nextRunTimeUtc)
+      )
+    )
+    .returning({ id: cronTable.id });
+  return updateRes.length > 0;
+}
+
+export async function addCronLog(data: InferInsertModel<typeof cronLogTable>) {
+  await db.insert(cronLogTable).values(data);
 }

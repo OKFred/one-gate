@@ -65,6 +65,8 @@ async function onList(
     ...params,
     pageNo,
     pageSize: finalPageSize,
+    deleteReason: params.deleteReason ?? undefined,
+    deleteType: params.deleteType ?? undefined,
   });
 
   const totalPage = Math.ceil(total / finalPageSize);

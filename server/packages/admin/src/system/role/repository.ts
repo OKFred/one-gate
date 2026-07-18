@@ -9,6 +9,7 @@ import {
   like,
   inArray,
   and,
+  type SQL,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
@@ -18,9 +19,9 @@ export const buildWhereCondition = (condition?: {
   isEnabled?: boolean;
 }) => {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
-    conditions.push(or(like(roleTable.name, `%${keyword}%`)));
+    conditions.push(or(like(roleTable.name, `%${keyword}%`)) as SQL<unknown>);
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(roleTable.isEnabled, isEnabled));
@@ -116,6 +117,18 @@ export class RoleRepository {
       .select({ value: roleTable.id, label: roleTable.name })
       .from(roleTable)
       .where(inArray(roleTable.id, ids));
+    return rows;
+  }
+
+  async getRoleDataScopes(roleIds: number[]) {
+    if (roleIds.length === 0) return [];
+    const rows = await db
+      .select({
+        dataScope: roleTable.dataScope,
+        customDeptIds: roleTable.customDeptIds,
+      })
+      .from(roleTable)
+      .where(inArray(roleTable.id, roleIds));
     return rows;
   }
 

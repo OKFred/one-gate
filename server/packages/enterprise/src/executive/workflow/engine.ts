@@ -368,18 +368,22 @@ export async function runWorkflow(
           sessionId = sessionRes.sessionId;
 
           // 激活 Page 域
-          await cdpClient.send("Page.enable", {}, sessionId);
+          await cdpClient.send("Page.enable", {}, sessionId as string);
         }
 
         if (action === "navigate") {
-          await cdpClient.send("Page.navigate", { url: value }, sessionId);
+          await cdpClient.send(
+            "Page.navigate",
+            { url: value },
+            sessionId as string
+          );
           // 等待页面完全加载
           let loaded = false;
           for (let i = 0; i < 30; i++) {
             const stateRes = await cdpClient.send(
               "Runtime.evaluate",
               { expression: "document.readyState" },
-              sessionId
+              sessionId as string
             );
             if (stateRes?.result?.value === "complete") {
               loaded = true;
@@ -405,7 +409,7 @@ export async function runWorkflow(
               return "OK";
             })()`,
             },
-            sessionId
+            sessionId as string
           );
           if (evalRes?.result?.value === "NOT_FOUND") {
             throw new Error(`点击目标未找到 Selector: ${selector}`);
@@ -434,7 +438,7 @@ export async function runWorkflow(
               return "OK";
             })()`,
             },
-            sessionId
+            sessionId as string
           );
           if (evalRes?.result?.value === "NOT_FOUND") {
             throw new Error(`输入目标未找到 Selector: ${selector}`);
@@ -450,7 +454,7 @@ export async function runWorkflow(
           const shotRes = await cdpClient.send(
             "Page.captureScreenshot",
             { format: "png" },
-            sessionId
+            sessionId as string
           );
           await appendStepLog({
             nodeId,
@@ -468,7 +472,7 @@ export async function runWorkflow(
                 ? `document.querySelector("${selector}")?.innerText || ""`
                 : `document.body.innerText`,
             },
-            sessionId
+            sessionId as string
           );
           const extractedText = evalRes?.result?.value || "";
           await appendStepLog({
@@ -499,7 +503,7 @@ ${expression}
               returnByValue: true,
               awaitPromise: true,
             },
-            sessionId
+            sessionId as string
           );
 
           if (evalRes?.exceptionDetails) {

@@ -9,6 +9,7 @@ import {
   like,
   and,
   inArray,
+  type SQL,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
@@ -18,9 +19,11 @@ export const buildWhereCondition = (condition?: {
   isEnabled?: boolean;
 }) => {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
-    conditions.push(or(like(userTable.username, `%${keyword}%`)));
+    conditions.push(
+      or(like(userTable.username, `%${keyword}%`)) as SQL<unknown>
+    );
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(userTable.isEnabled, isEnabled));

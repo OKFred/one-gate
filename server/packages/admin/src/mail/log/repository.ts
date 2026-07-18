@@ -1,6 +1,17 @@
 import db from "@hodor/core/db/index";
 import { mailLogTable, type MailLogPOLike } from "./model";
-import { eq, and, or, like, asc, desc, count, gte, lte } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  asc,
+  desc,
+  count,
+  gte,
+  lte,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -13,20 +24,20 @@ function buildWhereCondition(condition?: {
 }) {
   const { keyword, sendStatus, templateId, startTimeUtc, endTimeUtc } =
     condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(mailLogTable.mailTo, `%${keyword}%`),
         like(mailLogTable.mailFrom, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (sendStatus !== undefined) {
     conditions.push(eq(mailLogTable.sendStatus, sendStatus));
   }
   if (hasValue(templateId)) {
-    conditions.push(eq(mailLogTable.templateId, templateId));
+    conditions.push(eq(mailLogTable.templateId, templateId as string));
   }
   if (startTimeUtc !== undefined) {
     conditions.push(gte(mailLogTable.createTimeUtc, startTimeUtc));

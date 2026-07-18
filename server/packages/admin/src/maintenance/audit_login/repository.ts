@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { loginAuditTable, type LoginAuditPOLike } from "./model";
-import { eq, desc, asc, count, inArray, and } from "drizzle-orm";
+import { eq, desc, asc, count, inArray, and, type SQL } from "drizzle-orm";
 
 export async function recordLogin(
   userId: number,
@@ -47,7 +47,7 @@ export async function findPage(params: {
   const offset = (pageNo - 1) * pageSize;
   const orderField = loginAuditTable[orderBy] || loginAuditTable.id;
 
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (userId !== undefined) {
     conditions.push(eq(loginAuditTable.userId, userId));
   }

@@ -8,6 +8,7 @@ import {
   or,
   and,
   like,
+  type SQL,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
@@ -19,13 +20,13 @@ export const buildWhereCondition = (condition?: {
   isEnabled?: boolean;
 }) => {
   const { id, keyword, business, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(id)) {
     conditions.push(eq(menuTable.id, id!));
   }
   if (hasValue(keyword)) {
-    conditions.push(or(like(menuTable.name, `%${keyword}%`)));
+    conditions.push(or(like(menuTable.name, `%${keyword}%`)) as SQL<unknown>);
   }
   if (hasValue(business)) {
     conditions.push(eq(menuTable.business, business!));
@@ -131,7 +132,7 @@ export class MenuRepository {
   }
 
   async getTreeMenus(showAll?: boolean): Promise<MenuPOLike[]> {
-    const conditions = [];
+    const conditions: SQL<unknown>[] = [];
     if (showAll !== true) {
       conditions.push(eq(menuTable.isEnabled, true));
     }

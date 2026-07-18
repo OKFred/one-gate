@@ -248,16 +248,16 @@ const getRes = {
 
 async function onGet(
   params: FromSchema<typeof getReq>
-): Promise<FromSchema<typeof getRes> | null> {
+): Promise<FromSchema<typeof getRes>> {
   const { id, code } = params;
-  let row = null;
+  let row: Awaited<ReturnType<typeof schemaFormRepository.findById>> = null;
   if (id) {
     row = await schemaFormRepository.findById(id);
   } else if (code) {
     row = await schemaFormRepository.findByCode(code);
   }
   preventEmpty(row);
-  return row;
+  return row as unknown as FromSchema<typeof getRes>;
 }
 
 const getApi = {

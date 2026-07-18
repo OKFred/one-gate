@@ -2,7 +2,7 @@ import createApp from "./index.js";
 import { getEnv } from "@hodor/core/utils/env.js";
 import { serve } from "@hono/node-server";
 import cron from "node-cron";
-import { runPendingJobs } from "@hodor/core/jobs/scheduler.js";
+import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
 
 function main() {
   const app = createApp();

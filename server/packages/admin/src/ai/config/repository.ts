@@ -1,6 +1,16 @@
 import db from "@hodor/core/db/index";
 import { aiLlmConfigTable, type AiLlmConfigPOLike } from "./model";
-import { eq, and, or, like, asc, desc, count, not } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  asc,
+  desc,
+  count,
+  not,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,9 +19,11 @@ function buildWhereCondition(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
-    conditions.push(or(like(aiLlmConfigTable.name, `%${keyword}%`)));
+    conditions.push(
+      or(like(aiLlmConfigTable.name, `%${keyword}%`)) as SQL<unknown>
+    );
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(aiLlmConfigTable.isEnabled, isEnabled));
