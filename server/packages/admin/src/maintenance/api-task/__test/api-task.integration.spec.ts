@@ -209,8 +209,8 @@ describe("API Task 全链路集成测试", () => {
       expect(mockFetch).toHaveBeenCalled();
       expect(runRes.success).toBe(true);
       expect(runRes.statusCode).toBe(200);
-      expect(runRes.schemaValidation.hasSchema).toBe(true);
-      expect(runRes.schemaValidation.valid).toBe(true);
+      expect(runRes.schemaValidation?.hasSchema).toBe(true);
+      expect(runRes.schemaValidation?.valid).toBe(true);
 
       // Mock fetch 返回非法 JSON
       mockFetch.mockResolvedValue({
@@ -226,8 +226,8 @@ describe("API Task 全链路集成测试", () => {
         { id: taskId! },
         userObj
       );
-      expect(runResInvalidJson.schemaValidation.valid).toBe(false);
-      expect(runResInvalidJson.schemaValidation.errors[0]).toContain(
+      expect(runResInvalidJson.schemaValidation?.valid).toBe(false);
+      expect(runResInvalidJson.schemaValidation?.errors[0]).toContain(
         "not valid JSON"
       );
 
@@ -245,8 +245,10 @@ describe("API Task 全链路集成测试", () => {
         { id: taskId! },
         userObj
       );
-      expect(runResBadSchema.schemaValidation.valid).toBe(false);
-      expect(runResBadSchema.schemaValidation.errors.length).toBeGreaterThan(0);
+      expect(runResBadSchema.schemaValidation?.valid).toBe(false);
+      expect(runResBadSchema.schemaValidation?.errors.length).toBeGreaterThan(
+        0
+      );
     });
   });
 

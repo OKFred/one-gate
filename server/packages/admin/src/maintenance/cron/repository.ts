@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { cronTable, cronLogTable, type CronPOLike } from "./model";
-import { eq, and, or, like, desc, asc, count } from "drizzle-orm";
+import { eq, and, or, like, desc, asc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,18 +9,18 @@ function buildWhereCondition(condition?: {
   status?: boolean;
 }) {
   const { keyword, status } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(cronTable.name, `%${keyword}%`),
         like(cronTable.jobKey, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (hasValue(status)) {
-    conditions.push(eq(cronTable.status, status));
+    conditions.push(eq(cronTable.status, status as boolean));
   }
 
   return conditions.length > 0

@@ -288,7 +288,7 @@ async function onDelete(
         restoreUntilTimeUtc: new Date(
           Date.now() + 30 * 24 * 60 * 60 * 1000
         ).getTime(), // 30天后不可恢复
-        complianceNote: null,
+        complianceNote: undefined,
       },
       userObj.userId
     );
@@ -448,7 +448,7 @@ export async function getDescendantDepartments(
   if (!thisDepartment) return null;
   // 递归查找子女部门
   function findSubDepartments(id: number): typeof allDepartments {
-    const result = [];
+    const result: typeof allDepartments = [];
     for (const dept of allDepartments) {
       if (dept.parentId === id) {
         result.push(dept);

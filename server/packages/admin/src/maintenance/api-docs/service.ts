@@ -20,7 +20,7 @@ import {
   type ApiDocsDeleteVOLike,
   type ApiDocsGetVOLike,
 } from "./model";
-import { asc, count, desc, eq, and, like, or } from "drizzle-orm";
+import { asc, count, desc, eq, and, like, or, type SQL } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
@@ -251,14 +251,14 @@ export function parseApiDoc(contentStr: string): {
 // 辅助函数：根据条件构建查询 filter
 const buildWhereCondition = (condition?: { keyword?: string }) => {
   const { keyword } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(apiDocsTable.name, `%${keyword}%`),
         like(apiDocsTable.description, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
 

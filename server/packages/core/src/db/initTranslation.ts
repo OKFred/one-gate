@@ -59,7 +59,7 @@ export function mapTranslations(
  */
 export async function prepareTranslation(options?: { reset?: boolean }) {
   // 0. 数据扁平化处理
-  const flattenedData = [];
+  const flattenedData: any[] = [];
   for (const item of initialTranslationData) {
     for (const [langCode, tValue] of Object.entries(item.langCodes)) {
       flattenedData.push({

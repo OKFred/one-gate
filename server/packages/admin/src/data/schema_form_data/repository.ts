@@ -8,6 +8,7 @@ import {
   eq,
   and,
   or,
+  type SQL,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
@@ -18,16 +19,16 @@ export const buildWhereCondition = (condition?: {
   businessId?: number;
 }) => {
   const { id, formCode, businessId } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(id)) {
-    conditions.push(eq(schemaFormDataTable.id, id!));
+    conditions.push(eq(schemaFormDataTable.id, id as number));
   }
   if (hasValue(formCode)) {
-    conditions.push(eq(schemaFormDataTable.formCode, formCode!));
+    conditions.push(eq(schemaFormDataTable.formCode, formCode as string));
   }
   if (hasValue(businessId)) {
-    conditions.push(eq(schemaFormDataTable.businessId, businessId!));
+    conditions.push(eq(schemaFormDataTable.businessId, businessId as number));
   }
 
   return conditions.length > 0

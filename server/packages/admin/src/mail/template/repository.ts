@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { mailTemplateTable, type MailTemplatePOLike } from "./model";
-import { eq, and, or, like, asc, desc, count } from "drizzle-orm";
+import { eq, and, or, like, asc, desc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,14 +9,14 @@ function buildWhereCondition(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(mailTemplateTable.name, `%${keyword}%`),
         like(mailTemplateTable.title, `%${keyword}%`),
         like(mailTemplateTable.category, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (isEnabled !== undefined) {

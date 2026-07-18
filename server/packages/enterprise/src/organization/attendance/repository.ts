@@ -1,7 +1,7 @@
 import db from "@hodor/core/db/index";
 import { attendanceTable, type AttendancePOLike } from "./model";
 import { userTable } from "@hodor/admin/system/user/model";
-import { eq, and, or, like, asc, desc, count } from "drizzle-orm";
+import { eq, and, or, like, asc, desc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -12,9 +12,11 @@ function buildWhereCondition(condition?: {
   date?: string;
 }) {
   const { keyword, status, employeeId, date } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
-    conditions.push(or(like(attendanceTable.remark, `%${keyword}%`)));
+    conditions.push(
+      or(like(attendanceTable.remark, `%${keyword}%`)) as SQL<unknown>
+    );
   }
   if (status !== undefined) {
     conditions.push(eq(attendanceTable.status, status));
@@ -23,7 +25,7 @@ function buildWhereCondition(condition?: {
     conditions.push(eq(attendanceTable.employeeId, employeeId));
   }
   if (hasValue(date)) {
-    conditions.push(eq(attendanceTable.date, date));
+    conditions.push(eq(attendanceTable.date, date as string));
   }
   return conditions.length > 0
     ? conditions.length === 1

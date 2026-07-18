@@ -138,7 +138,9 @@ async function onPut(
 ): Promise<FromSchema<typeof putRes>> {
   const { key, value, expirationTtl } = params;
   // value 来自 JSON Schema 验证，类型安全
-  await kv.put(key, value as string | object, { expirationTtl });
+  await kv.put(key, value as string | object, {
+    expirationTtl: expirationTtl ?? undefined,
+  });
   return { success: true };
 }
 

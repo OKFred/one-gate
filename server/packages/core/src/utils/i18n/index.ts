@@ -28,6 +28,6 @@ const createTranslator = async (
   langCode?: string
 ): Promise<(key: string) => Promise<string>> => {
   return async (key: string): Promise<string> => {
-    return await getTranslation(langCode || getEnv("LOCALE"), key);
+    return await getTranslation((langCode || getEnv("LOCALE")) as string, key);
   };
 };

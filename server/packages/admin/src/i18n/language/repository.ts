@@ -16,11 +16,11 @@ function buildWhereCondition(condition?: {
       or(
         like(languageTable.langCode, `%${keyword}%`),
         like(languageTable.nativeName, `%${keyword}%`)
-      )!
+      ) as SQL<unknown>
     );
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(languageTable.isEnabled, isEnabled));
+    conditions.push(eq(languageTable.isEnabled, isEnabled as boolean));
   }
   return conditions.length > 0
     ? conditions.length === 1

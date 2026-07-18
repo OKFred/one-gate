@@ -67,7 +67,7 @@ export async function prepareSuperAdminUser(
         id: SUPER_ADMIN_ID,
         username: SUPER_ADMIN.username,
         password: hashedPassword,
-        langCode: SUPER_ADMIN.langCode,
+        langCode: SUPER_ADMIN.langCode as string,
         roleIdArr: [roleId],
         isEnabled: true,
         creatorId: SUPER_ADMIN_ID,
@@ -76,8 +76,8 @@ export async function prepareSuperAdminUser(
       .onConflictDoUpdate({
         target: userTable.username,
         set: {
-          langCode: SUPER_ADMIN.langCode,
-          roleIdArr: sql`excluded.role_id_arr`,
+          langCode: SUPER_ADMIN.langCode as string,
+          roleIdArr: sql<number[]>`excluded.role_id_arr`,
           isEnabled: true,
         },
       })

@@ -155,6 +155,7 @@ const adminProperties: string[] = [];
 const enterpriseProperties: string[] = [];
 let personalBody = "";
 
+// @ts-expect-error TS inference is poor here
 permissionSeedsNode.properties.forEach((parentProp) => {
   if (!ts.isPropertyAssignment(parentProp)) return;
 

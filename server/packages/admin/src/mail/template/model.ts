@@ -45,7 +45,8 @@ const MailTemplateBasePO = {
     description: "邮件内容",
   },
   category: {
-    type: "string",
+    type: ["string", "null"],
+    nullable: true,
     description: "邮件分类",
   },
   isEnabled: {

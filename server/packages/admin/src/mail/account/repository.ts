@@ -1,6 +1,16 @@
 import db from "@hodor/core/db/index";
 import { mailAccountTable, type MailAccountPOLike } from "./model";
-import { eq, and, or, like, asc, desc, count, inArray } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  asc,
+  desc,
+  count,
+  inArray,
+  type SQL,
+} from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
 function buildWhereCondition(condition?: {
@@ -8,9 +18,11 @@ function buildWhereCondition(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
   if (hasValue(keyword)) {
-    conditions.push(or(like(mailAccountTable.mailAddress, `%${keyword}%`)));
+    conditions.push(
+      or(like(mailAccountTable.mailAddress, `%${keyword}%`)) as SQL<unknown>
+    );
   }
   if (isEnabled !== undefined) {
     conditions.push(eq(mailAccountTable.isEnabled, isEnabled));

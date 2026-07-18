@@ -1,6 +1,17 @@
 import db from "@hodor/core/db/index";
 import { translationTable, type TranslationPOLike } from "./model";
-import { eq, and, or, like, asc, desc, count, ne, inArray } from "drizzle-orm";
+import {
+  eq,
+  and,
+  or,
+  like,
+  asc,
+  desc,
+  count,
+  ne,
+  inArray,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -13,27 +24,27 @@ function buildWhereCondition(condition?: {
 }) {
   const { keyword, application, business, langCode, isEnabled } =
     condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(translationTable.tKey, `%${keyword}%`),
         like(translationTable.tValue, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (hasValue(application)) {
-    conditions.push(eq(translationTable.application, application));
+    conditions.push(eq(translationTable.application, application as string));
   }
   if (hasValue(business)) {
-    conditions.push(eq(translationTable.business, business));
+    conditions.push(eq(translationTable.business, business as string));
   }
   if (hasValue(langCode)) {
-    conditions.push(eq(translationTable.langCode, langCode));
+    conditions.push(eq(translationTable.langCode, langCode as string));
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(translationTable.isEnabled, isEnabled));
+    conditions.push(eq(translationTable.isEnabled, isEnabled as boolean));
   }
   return conditions.length > 0
     ? conditions.length === 1

@@ -1,6 +1,6 @@
 import db from "@hodor/core/db/index";
 import { apiTaskTable, type ApiTaskPOLike } from "./model";
-import { eq, and, or, like, asc, desc, count } from "drizzle-orm";
+import { eq, and, or, like, asc, desc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
@@ -9,18 +9,18 @@ function buildWhereCondition(condition?: {
   isEnabled?: boolean;
 }) {
   const { keyword, isEnabled } = condition || {};
-  const conditions = [];
+  const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
     conditions.push(
       or(
         like(apiTaskTable.name, `%${keyword}%`),
         like(apiTaskTable.taskKey, `%${keyword}%`)
-      )
+      ) as SQL<unknown>
     );
   }
   if (hasValue(isEnabled)) {
-    conditions.push(eq(apiTaskTable.isEnabled, isEnabled));
+    conditions.push(eq(apiTaskTable.isEnabled, isEnabled as boolean));
   }
 
   return conditions.length > 0
