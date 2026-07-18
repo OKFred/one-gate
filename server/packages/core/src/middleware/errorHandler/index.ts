@@ -10,13 +10,22 @@ import { toHttpException } from "./businessError";
 import { convertSqlErrorToBusinessError } from "./sqlError";
 
 export default function errorHandler(app: App) {
+  // 移入函数内，避免模块加载副作用
+  if (getRuntimeKey() !== "workerd") {
+    process.on("uncaughtException", function (err) {
+      console.error("uncaughtException:", err);
+    });
+  }
+
+  console.log(`🚀 Server started in ${getEnv("NODE_ENV")} mode`);
+
   app.notFound(async (c: Context) => {
     const t = await getTranslator(c);
-    return c.json<ResJson<null>>(
+    return c.json<ResJson<Record<string, never>>>(
       {
         ok: false,
         message: await t("errorHandler.notFound"),
-        data: null,
+        data: {},
       },
       { status: StatusCodes.NOT_FOUND as ContentfulStatusCode }
     );
@@ -27,7 +36,7 @@ export default function errorHandler(app: App) {
     properties: {
       ok: { type: "boolean" },
       message: { type: "string" },
-      data: { type: "object", nullable: true },
+      data: { type: "object" },
     },
     required: ["ok", "message", "data"],
     additionalProperties: false,
@@ -53,28 +62,18 @@ export default function errorHandler(app: App) {
         {
           ok: false,
           message: await t(e.message),
-          data: (e.cause as { params?: unknown })?.params || null,
+          data: (e.cause as { params?: unknown })?.params || {},
         },
         { status: e.status as ContentfulStatusCode }
       );
     }
-    return c.json<ResJson<null>>(
+    return c.json<ResJson<Record<string, never>>>(
       {
         ok: false,
         message: await t("errorHandler.unknownError"),
-        data: null,
+        data: {},
       },
       { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
     );
   });
 }
-
-/**
- * @description: 未捕获异常处理
- */
-getRuntimeKey() !== "workerd" &&
-  process.on("uncaughtException", function (err) {
-    console.error("uncaughtException:", err);
-  });
-
-console.log(`🚀 Server started in ${getEnv("NODE_ENV")} mode`);
