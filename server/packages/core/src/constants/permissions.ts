@@ -20,6 +20,12 @@ export type CheckPermissionSeeds<T, Parent extends string = ""> = {
 };
 
 export const permissionSeeds = {
+  /** 底座 */
+  "admin.base": {
+    "": ["read"],
+    /** 配置项 */
+    config: ["read", "add", "edit", "delete"],
+  },
   /** 系统管理 */
   "admin.system": {
     "": ["read"],

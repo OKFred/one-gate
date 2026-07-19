@@ -16,6 +16,7 @@ import { workflowTranslations } from "../../../enterprise/src/executive/workflow
 import { profileTranslations } from "../../../personal/src/profile/translation";
 import { systemTranslations } from "../../../admin/src/system/translation";
 import { browserTranslations } from "../../../admin/src/rpa/browser/translation";
+import { baseTranslations } from "../../../admin/src/base/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "../types/business";
 import type { LanguageCode } from "./initLanguage";
@@ -138,4 +139,5 @@ export const initialTranslationData = mapTranslations({
   ...profileTranslations,
   ...systemTranslations,
   ...browserTranslations,
+  ...baseTranslations,
 }) satisfies BatchTranslationItem[];

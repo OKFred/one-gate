@@ -17,6 +17,17 @@ export const usePermission = () => {
 
 export const permissions = {
   admin: {
+    /** 底座 */
+    base: {
+      read: 'admin.base:read',
+      /** 配置项 */
+      config: {
+        read: 'admin.base.config:read',
+        add: 'admin.base.config:add',
+        edit: 'admin.base.config:edit',
+        delete: 'admin.base.config:delete',
+      },
+    },
     /** 系统管理 */
     system: {
       read: 'admin.system:read',

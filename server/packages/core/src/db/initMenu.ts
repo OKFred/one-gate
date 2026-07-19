@@ -415,6 +415,23 @@ export const initialMenuData = [
     sort: 1,
     business: "personal.profile",
   },
+  {
+    id: 49,
+    name: "sidebar.menu.admin.base",
+    icon: "material-symbols:settings-applications",
+    parentId: 42,
+    sort: 8,
+    business: "admin.base",
+  },
+  {
+    id: 50,
+    name: "sidebar.menu.admin.base.config",
+    icon: "material-symbols:tune",
+    path: "/base/config",
+    parentId: 49,
+    sort: 1,
+    business: "admin.base.config",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

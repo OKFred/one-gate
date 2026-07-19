@@ -80,6 +80,7 @@ pnpm run db:generate
 
 在 `service.ts` 中描述并暴露 REST 端点：
 
+- **所有业务接口设计必须且只能使用 POST 请求**：禁止使用 GET、PUT、DELETE 等其他方法，以保证高阶 `encapsulation` 中间件能正确且安全地从 JSON Body 中提取与校验数据。
 - 统一使用 `encapsulation` (封装好的高阶 Hono 控制器适配器) 挂载 API。
 - **禁止在 `service.ts` 中硬编码 API 请求或响应的字段定义 (Properties)**：为了保证类型与数据模型规范的集中管理，API 接口的 properties 字段属性必须定义在 `model.ts` 中（如封装为 `[Domain]VO`、`[Domain]AddVO`、`[Domain]GetVO`、`[Domain]SubmitVO` 等），而在 `service.ts` 的 JSON Schema 定义中，只需解构引用 `model.ts` 里的定义。
 - 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。

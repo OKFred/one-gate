@@ -11,12 +11,18 @@ import { runPendingJobs } from "./maintenance/cron/scheduler.js";
 import { dockerClient } from "./swarm/docker/client.js";
 import { findDefaultActiveBrowser } from "./rpa/browser/repository.js";
 import { getActiveStorage } from "./oss/file/service.js";
+import { OssConfigProvider } from "./oss/config/provider.js";
+import { utils as baseConfigUtils } from "./base/config/service.js";
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
   ...userUtils,
   ...rolePermissionUtils,
   ...roleUtils,
+};
+
+export const baseRegister = {
+  config: baseConfigUtils,
 };
 
 export const i18nRegister = {
@@ -41,6 +47,7 @@ export const rpaRegister = {
 
 export const ossRegister = {
   getActiveStorage,
+  configProvider: new OssConfigProvider(),
 };
 
 // 2. 初始化注册中心并绑定服务
@@ -53,6 +60,7 @@ export function initAdminRegistry() {
   reg.register("swarm", swarmRegister);
   reg.register("rpa", rpaRegister);
   reg.register("oss", ossRegister);
+  reg.register("base", baseRegister);
   console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);
 }

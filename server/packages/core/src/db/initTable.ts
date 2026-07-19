@@ -3,6 +3,7 @@ import { initDatabase } from "@hodor/core/db/init";
 import db from "@hodor/core/db/index";
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 import { execSync } from "node:child_process";
 
 import { fileURLToPath } from "node:url";
@@ -141,11 +142,35 @@ async function runWranglerInit(
   let successCount = 0;
   for (const file of files) {
     const filePath = file.absolutePath;
+    let tempFilePath: string | null = null;
     try {
       console.log(`📄 正在同步: ${file.relativePath}...`);
       const targetFlag = target === "remote" ? "--remote" : "--local";
+
+      // 动态注入 IF NOT EXISTS 以保证幂等性
+      const sqlContent = fs.readFileSync(filePath, "utf8");
+      const safeSqlContent = sqlContent
+        .replace(
+          /CREATE TABLE(?! IF NOT EXISTS) `/gi,
+          "CREATE TABLE IF NOT EXISTS `"
+        )
+        .replace(
+          /CREATE INDEX(?! IF NOT EXISTS) `/gi,
+          "CREATE INDEX IF NOT EXISTS `"
+        )
+        .replace(
+          /CREATE UNIQUE INDEX(?! IF NOT EXISTS) `/gi,
+          "CREATE UNIQUE INDEX IF NOT EXISTS `"
+        );
+
+      tempFilePath = path.join(
+        os.tmpdir(),
+        `temp_init_${Date.now()}_${path.basename(filePath)}`
+      );
+      fs.writeFileSync(tempFilePath, safeSqlContent, "utf8");
+
       execSync(
-        `npx wrangler d1 execute hodor_db ${targetFlag} --file=${filePath} --yes`,
+        `npx wrangler d1 execute hodor_db ${targetFlag} --file=${tempFilePath} --yes`,
         {
           stdio: "inherit",
         }
@@ -156,6 +181,10 @@ async function runWranglerInit(
         `\n❌ [Wrangler] ${file.relativePath} 同步失败:`,
         error.message
       );
+    } finally {
+      if (tempFilePath && fs.existsSync(tempFilePath)) {
+        fs.unlinkSync(tempFilePath);
+      }
     }
   }
 

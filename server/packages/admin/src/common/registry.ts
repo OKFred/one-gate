@@ -2,6 +2,7 @@
 // 引入装配常量的推导类型，构建唯一的类型安全层，杜绝在开发环境下 IDE 类型缺失的问题
 import type {
   systemRegister,
+  baseRegister,
   i18nRegister,
   maintenanceRegister,
   swarmRegister,
@@ -11,6 +12,7 @@ import type {
 
 export interface IAdminServices {
   system: typeof systemRegister;
+  base: typeof baseRegister;
   i18n: typeof i18nRegister;
   maintenance: typeof maintenanceRegister;
   swarm: typeof swarmRegister;

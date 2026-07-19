@@ -1,0 +1,139 @@
+import React, { useState } from 'react';
+import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
+import { ResponsiveButton } from '@/components/Responsive/index';
+import { useTranslation } from '@/hooks/useTranslation';
+import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Chip, Switch } from '@mui/material';
+
+import * as BaseConfigAPI from '@/api/admin/base/config';
+import type { ConfigRes, ListConfigReq } from '@/api/admin/base/type';
+import { BaseConfigFormDialog } from './components/BaseConfigFormDialog';
+
+// Extra context is useful if we need to trigger external state from inside config functions,
+// but here we can just capture component state in the config closure.
+// However, to keep config stable, we can pass them via extraContext.
+interface ExtraContext {
+  handleEdit: (row: ConfigRes) => void;
+  refreshList: () => void;
+}
+
+export default function BaseConfigPage() {
+  const t = useTranslation();
+
+  const [formOpen, setFormOpen] = useState(false);
+  const [editRow, setEditRow] = useState<ConfigRes | null>(null);
+
+  // We need a ref to call refreshTable on SchemaCrudPage if needed.
+  // Actually SchemaCrudPage handles its own refresh. We can trigger a re-render or just let SchemaCrudPage handle it.
+  // But wait, BaseConfigFormDialog saves data and we need to refresh SchemaCrudPage!
+  // How to refresh SchemaCrudPage from outside?
+  // It doesn't expose a ref. The easiest way is to add a refresh key.
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const extraContext: ExtraContext = {
+    handleEdit: (row) => {
+      setEditRow(row);
+      setFormOpen(true);
+    },
+    refreshList: () => {
+      setRefreshKey((prev) => prev + 1);
+    },
+  };
+
+  const config: SchemaCrudConfig<
+    ConfigRes,
+    Record<string, unknown>,
+    ListConfigReq,
+    ExtraContext
+  > = {
+    apiKeyName: 'id',
+    permissions: {
+      delete: [], // add permission codes if needed
+    },
+    api: {
+      list: BaseConfigAPI.listFn,
+      delete: BaseConfigAPI.deleteFn,
+      // Omit add and update so SchemaCrudPage doesn't render its own default buttons
+    },
+    filter: {
+      defaultFilters: {},
+      fields: () => [],
+      transformRequest: () => ({}) as ListConfigReq,
+    },
+    table: {
+      columns: () => [
+        { title: 'ID', width: 80, render: (row: ConfigRes) => row.id },
+        {
+          title: t('admin.base.namespace') || '命名空间',
+          render: (row: ConfigRes) => (
+            <Chip label={row.namespace} size="small" color="primary" variant="outlined" />
+          ),
+        },
+        {
+          title: t('admin.base.configKey') || '配置Key',
+          render: (row: ConfigRes) => row.configKey,
+        },
+        {
+          title: t('common.isEnabled') || '启用',
+          width: 100,
+          render: (row: ConfigRes) => <Switch size="small" checked={!!row.isEnabled} readOnly />,
+        },
+        {
+          title: t('admin.base.isPrimary') || '默认主配置',
+          width: 120,
+          render: (row: ConfigRes) =>
+            row.isPrimary ? <Chip label="Yes" size="small" color="success" /> : null,
+        },
+        {
+          title: t('common.createTime') || '创建时间',
+          width: 180,
+          render: (row: ConfigRes) => new Date(row.createTimeUtc as number).toLocaleString(),
+        },
+      ],
+      cardFields: () => [],
+      actions: (_t, ctx) => [
+        {
+          key: 'edit',
+          icon: <EditIcon />,
+          onClick: (row) => ctx?.handleEdit(row),
+        },
+      ],
+    },
+    form: {
+      schema: {}, // Dummy
+      defaultForm: {},
+    },
+  };
+
+  const customActions = (
+    <ResponsiveButton
+      startIcon={<AddIcon />}
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        setEditRow(null);
+        setFormOpen(true);
+      }}
+    >
+      {t('common.add') || '新建'}
+    </ResponsiveButton>
+  );
+
+  return (
+    <React.Fragment key={refreshKey}>
+      <SchemaCrudPage config={config} extraContext={extraContext} customActions={customActions} />
+
+      {formOpen && (
+        <BaseConfigFormDialog
+          open={formOpen}
+          editRow={editRow}
+          onClose={() => setFormOpen(false)}
+          onSuccess={() => {
+            setFormOpen(false);
+            extraContext.refreshList();
+          }}
+        />
+      )}
+    </React.Fragment>
+  );
+}

@@ -595,7 +595,6 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         open={deleteConfirmOpen}
         onClose={handleCloseDeleteConfirm}
         onConfirm={handleConfirmDelete}
-        t={t}
       />
     </PageLayout>
   );

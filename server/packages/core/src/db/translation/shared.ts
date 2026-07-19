@@ -993,6 +993,34 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "common.add",
+      langCodes: {
+        "zh-CN": "新增",
+        "en-US": "Add",
+      },
+    },
+    {
+      tKey: "common.createTime",
+      langCodes: {
+        "zh-CN": "创建时间",
+        "en-US": "Create Time",
+      },
+    },
+    {
+      tKey: "common.isEnabled",
+      langCodes: {
+        "zh-CN": "是否启用",
+        "en-US": "Is Enabled",
+      },
+    },
+    {
+      tKey: "common.remark",
+      langCodes: {
+        "zh-CN": "备注",
+        "en-US": "Remark",
+      },
+    },
+    {
       tKey: "columns.actions",
       langCodes: {
         "zh-CN": "操作",

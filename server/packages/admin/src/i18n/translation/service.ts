@@ -87,7 +87,6 @@ const listAllApi = {
   } as const,
   adapter: bodyAdapter,
   service: onListAll,
-  permission: { action: "read" },
 } satisfies API;
 
 const listReq = {
