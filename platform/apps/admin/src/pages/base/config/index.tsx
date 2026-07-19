@@ -85,7 +85,7 @@ export default function BaseConfigPage() {
             row.isPrimary ? <Chip label="Yes" size="small" color="success" /> : null,
         },
         {
-          title: t('common.createTime') || '创建时间',
+          title: t('columns.createTime') || '创建时间',
           width: 180,
           render: (row: ConfigRes) => new Date(row.createTimeUtc as number).toLocaleString(),
         },
@@ -115,7 +115,7 @@ export default function BaseConfigPage() {
         setFormOpen(true);
       }}
     >
-      {t('common.add') || '新建'}
+      {t('dialog.add') || '新建'}
     </ResponsiveButton>
   );
 

@@ -251,7 +251,7 @@ export function BaseConfigFormDialog({
               <Field
                 name="remark"
                 type="text"
-                label={t('common.remark') || '备注'}
+                label={t('column.remark') || '备注'}
                 value={form.remark}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setForm({ ...form, remark: e.target.value })
