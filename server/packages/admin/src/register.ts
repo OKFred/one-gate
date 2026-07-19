@@ -14,6 +14,8 @@ import { RpaConfigProvider } from "./rpa/config/provider.js";
 import { getActiveStorage } from "./oss/file/service.js";
 import { OssConfigProvider } from "./oss/config/provider.js";
 import { utils as baseConfigUtils } from "./base/config/service.js";
+import { getDefaultConfig as aiGetDefaultConfig } from "./ai/config/service.js";
+import { AiConfigProvider } from "./ai/config/provider.js";
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
@@ -52,6 +54,11 @@ export const ossRegister = {
   configProvider: new OssConfigProvider(),
 };
 
+export const aiRegister = {
+  getDefaultConfig: aiGetDefaultConfig,
+  configProvider: new AiConfigProvider(),
+};
+
 // 2. 初始化注册中心并绑定服务
 export function initAdminRegistry() {
   const reg = new ServiceRegistry();
@@ -62,6 +69,7 @@ export function initAdminRegistry() {
   reg.register("swarm", swarmRegister);
   reg.register("rpa", rpaRegister);
   reg.register("oss", ossRegister);
+  reg.register("ai", aiRegister);
   reg.register("base", baseRegister);
   console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);

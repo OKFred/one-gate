@@ -83,8 +83,8 @@ export const sharedTranslations = {
     {
       tKey: "sidebar.menu.ai.config",
       langCodes: {
-        "zh-CN": "LLM 配置",
-        "en-US": "LLM Configuration",
+        "zh-CN": "模型配置",
+        "en-US": "Model Configuration",
       },
     },
     {

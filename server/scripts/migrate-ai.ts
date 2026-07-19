@@ -1,12 +1,12 @@
 /**
- * RPA Config 数据迁移脚本
+ * AI Config 数据迁移脚本
  *
- * 将旧的 `admin_browser` 表中的数据迁移至 `base_config` 表中 (namespace = 'rpa')
+ * 将旧的 `ai_llm_config` 表中的数据迁移至 `base_config` 表中 (namespace = 'ai')
  * 采用覆盖模式：已存在的 config_key 会被更新，不存在的会被插入。
  *
  * 用法:
- *   pnpm run migrate:rpa           (默认写入本地 D1)
- *   pnpm run migrate:rpa --remote  (写入远程生产 D1)
+ *   pnpm run migrate:ai           (默认写入本地 D1)
+ *   pnpm run migrate:ai --remote  (写入远程生产 D1)
  */
 
 import fs from "node:fs";
@@ -24,16 +24,19 @@ async function main() {
     `-- 1. 更新已存在的记录`,
     `UPDATE base_config 
      SET 
-       is_enabled = (SELECT is_enabled FROM admin_browser WHERE name = base_config.config_key),
-       is_primary = (SELECT is_default FROM admin_browser WHERE name = base_config.config_key),
+       is_enabled = (SELECT is_enabled FROM ai_llm_config WHERE name = base_config.config_key),
+       is_primary = (SELECT is_default FROM ai_llm_config WHERE name = base_config.config_key),
        config_value = (SELECT json_object(
-         'cdpUrl', cdp_url,
-         'authToken', auth_token
-       ) FROM admin_browser WHERE name = base_config.config_key),
-       remark = (SELECT remark FROM admin_browser WHERE name = base_config.config_key),
-       updater_id = (SELECT updater_id FROM admin_browser WHERE name = base_config.config_key),
-       update_time_utc = (SELECT update_time_utc FROM admin_browser WHERE name = base_config.config_key)
-     WHERE namespace = 'rpa' AND config_key IN (SELECT name FROM admin_browser);`,
+         'provider', provider,
+         'baseUrl', base_url,
+         'apiKey', api_key,
+         'model', model,
+         'capabilities', capabilities
+       ) FROM ai_llm_config WHERE name = base_config.config_key),
+       remark = (SELECT remark FROM ai_llm_config WHERE name = base_config.config_key),
+       updater_id = (SELECT updater_id FROM ai_llm_config WHERE name = base_config.config_key),
+       update_time_utc = (SELECT update_time_utc FROM ai_llm_config WHERE name = base_config.config_key)
+     WHERE namespace = 'ai' AND config_key IN (SELECT name FROM ai_llm_config);`,
 
     `-- 2. 插入不存在的记录`,
     `INSERT INTO base_config (
@@ -41,17 +44,20 @@ async function main() {
        remark, creator_id, updater_id, create_time_utc, update_time_utc
      )
      SELECT 
-       'rpa', name, is_enabled, is_default,
+       'ai', name, is_enabled, is_default,
        json_object(
-         'cdpUrl', cdp_url,
-         'authToken', auth_token
+         'provider', provider,
+         'baseUrl', base_url,
+         'apiKey', api_key,
+         'model', model,
+         'capabilities', capabilities
        ),
        remark, creator_id, updater_id, create_time_utc, update_time_utc
-     FROM admin_browser
-     WHERE name NOT IN (SELECT config_key FROM base_config WHERE namespace = 'rpa');`,
+     FROM ai_llm_config
+     WHERE name NOT IN (SELECT config_key FROM base_config WHERE namespace = 'ai');`,
   ];
 
-  const tempSqlFile = path.resolve(process.cwd(), "temp_migrate_rpa.sql");
+  const tempSqlFile = path.resolve(process.cwd(), "temp_migrate_ai.sql");
   fs.writeFileSync(tempSqlFile, sqlStatements.join("\n\n"), "utf8");
 
   try {

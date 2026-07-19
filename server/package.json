@@ -18,6 +18,7 @@
     "sync:schemas": "npx tsx -r dotenv/config ./scripts/sync-schemas.ts",
     "migrate:oss": "npx tsx ./scripts/migrate-oss.ts",
     "migrate:rpa": "npx tsx ./scripts/migrate-rpa.ts",
+    "migrate:ai": "npx tsx ./scripts/migrate-ai.ts",
     "format": "prettier --write .",
     "lint": "eslint . --fix"
   },

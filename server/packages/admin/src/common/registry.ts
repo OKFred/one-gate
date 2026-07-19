@@ -8,6 +8,7 @@ import type {
   swarmRegister,
   rpaRegister,
   ossRegister,
+  aiRegister,
 } from "../register.js";
 
 export interface IAdminServices {
@@ -18,6 +19,7 @@ export interface IAdminServices {
   swarm: typeof swarmRegister;
   rpa: typeof rpaRegister;
   oss: typeof ossRegister;
+  ai: typeof aiRegister;
 }
 
 export class ServiceRegistry {

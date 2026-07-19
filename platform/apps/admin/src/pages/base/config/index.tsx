@@ -23,11 +23,7 @@ export default function BaseConfigPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editRow, setEditRow] = useState<ConfigRes | null>(null);
 
-  // We need a ref to call refreshTable on SchemaCrudPage if needed.
-  // Actually SchemaCrudPage handles its own refresh. We can trigger a re-render or just let SchemaCrudPage handle it.
-  // But wait, BaseConfigFormDialog saves data and we need to refresh SchemaCrudPage!
-  // How to refresh SchemaCrudPage from outside?
-  // It doesn't expose a ref. The easiest way is to add a refresh key.
+  // 用于触发 SchemaCrudPage 重新加载数据的 Key
   const [refreshKey, setRefreshKey] = useState(0);
 
   const extraContext: ExtraContext = {

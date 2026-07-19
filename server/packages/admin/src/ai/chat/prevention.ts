@@ -21,7 +21,7 @@ export const preventEmptyPrompt = (q?: string): void => {
 /**
  * 确保 AI 配置存在
  */
-export const preventMissingConfig = (config: any): void => {
+export const preventMissingConfig = (config: unknown): void => {
   if (!config) {
     throw new BusinessError(ErrorCodes.CONFIG_NOT_FOUND);
   }

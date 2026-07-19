@@ -85,7 +85,7 @@ describe("AI 模块全链路集成测试", () => {
     it("列表查询测试 (list & listAll)", async () => {
       await aiLlmConfigService.add.service(
         {
-          name: "LLM Config 1",
+          name: "Model Config 1",
           provider: "OpenAI",
           apiKey: "key-1",
           model: "gpt-4",
@@ -96,7 +96,7 @@ describe("AI 模块全链路集成测试", () => {
       );
       await aiLlmConfigService.add.service(
         {
-          name: "LLM Config 2",
+          name: "Model Config 2",
           provider: "Ollama",
           apiKey: "key-2",
           model: "llama3",
@@ -111,7 +111,7 @@ describe("AI 模块全链路集成测试", () => {
         isEnabled: true,
       });
       expect(allList.length).toBe(1);
-      expect(allList[0].name).toBe("LLM Config 1");
+      expect(allList[0].name).toBe("Model Config 1");
 
       // list (分页)
       const pageResult = await aiLlmConfigService.list.service({
@@ -271,7 +271,7 @@ describe("AI 模块全链路集成测试", () => {
       // 1. 添加默认配置
       await aiLlmConfigService.add.service(
         {
-          name: "Default LLM",
+          name: "Default Model",
           provider: "OpenAI",
           baseUrl: "https://api.openai.com/v1",
           apiKey: "sk-openai-key",
@@ -351,7 +351,7 @@ describe("AI 模块全链路集成测试", () => {
       // 1. 添加默认配置
       await aiLlmConfigService.add.service(
         {
-          name: "Default LLM",
+          name: "Default Model",
           provider: "OpenAI",
           baseUrl: "https://api.openai.com/v1",
           apiKey: "sk-openai-key",
