@@ -64,28 +64,28 @@ export default function BaseConfigPage() {
       columns: () => [
         { title: 'ID', width: 80, render: (row: ConfigRes) => row.id },
         {
-          title: t('admin.base.namespace') || '命名空间',
+          title: t('admin.base.namespace'),
           render: (row: ConfigRes) => (
             <Chip label={row.namespace} size="small" color="primary" variant="outlined" />
           ),
         },
         {
-          title: t('admin.base.configKey') || '配置Key',
+          title: t('admin.base.configKey'),
           render: (row: ConfigRes) => row.configKey,
         },
         {
-          title: t('common.isEnabled') || '启用',
+          title: t('common.isEnabled'),
           width: 100,
           render: (row: ConfigRes) => <Switch size="small" checked={!!row.isEnabled} readOnly />,
         },
         {
-          title: t('admin.base.isPrimary') || '默认主配置',
+          title: t('admin.base.isPrimary'),
           width: 120,
           render: (row: ConfigRes) =>
             row.isPrimary ? <Chip label="Yes" size="small" color="success" /> : null,
         },
         {
-          title: t('columns.createTime') || '创建时间',
+          title: t('columns.createTime'),
           width: 180,
           render: (row: ConfigRes) => new Date(row.createTimeUtc as number).toLocaleString(),
         },
@@ -115,7 +115,7 @@ export default function BaseConfigPage() {
         setFormOpen(true);
       }}
     >
-      {t('dialog.add') || '新建'}
+      {t('dialog.add')}
     </ResponsiveButton>
   );
 

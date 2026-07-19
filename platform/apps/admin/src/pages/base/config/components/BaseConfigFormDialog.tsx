@@ -208,7 +208,7 @@ export function BaseConfigFormDialog({
               <Field
                 name="namespace"
                 type="select"
-                label={t('admin.base.namespace') || '命名空间'}
+                label={t('admin.base.namespace')}
                 value={form.namespace || ''}
                 onChange={handleNamespaceChange}
                 disabled={!!editRow}
@@ -223,7 +223,7 @@ export function BaseConfigFormDialog({
               <Field
                 name="configKey"
                 type="text"
-                label={t('admin.base.configKey') || '配置Key'}
+                label={t('admin.base.configKey')}
                 value={form.configKey}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setForm({ ...form, configKey: e.target.value })
@@ -235,7 +235,7 @@ export function BaseConfigFormDialog({
               <Field
                 name="isEnabled"
                 type="switch"
-                label={t('common.isEnabled') || '是否启用'}
+                label={t('common.isEnabled')}
                 value={form.isEnabled}
                 onChange={(val: boolean) => setForm({ ...form, isEnabled: val })}
                 disabled={loading}
@@ -243,7 +243,7 @@ export function BaseConfigFormDialog({
               <Field
                 name="isPrimary"
                 type="switch"
-                label={t('admin.base.isPrimary') || '是否为主配置'}
+                label={t('admin.base.isPrimary')}
                 value={form.isPrimary}
                 onChange={(val: boolean) => setForm({ ...form, isPrimary: val })}
                 disabled={loading}
@@ -251,7 +251,7 @@ export function BaseConfigFormDialog({
               <Field
                 name="remark"
                 type="text"
-                label={t('column.remark') || '备注'}
+                label={t('column.remark')}
                 value={form.remark}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setForm({ ...form, remark: e.target.value })
@@ -275,9 +275,7 @@ export function BaseConfigFormDialog({
                     borderRadius: 1,
                   }}
                 >
-                  <Box sx={{ mb: 2, fontWeight: 'bold' }}>
-                    {t('admin.base.configValue') || '领域动态配置'}
-                  </Box>
+                  <Box sx={{ mb: 2, fontWeight: 'bold' }}>{t('admin.base.configValue')}</Box>
                   <DynamicForm
                     schema={dynamicSchema.schema}
                     value={(form.configValue as Record<string, unknown>) || {}}
