@@ -9,7 +9,8 @@ import { utils as auditUtils } from "./maintenance/audit_login/service.js";
 import { exportDeletionRecord } from "./maintenance/compliance/index.js";
 import { runPendingJobs } from "./maintenance/cron/scheduler.js";
 import { dockerClient } from "./swarm/docker/client.js";
-import { findDefaultActiveBrowser } from "./rpa/browser/repository.js";
+import { findDefaultActiveConfig } from "./rpa/config/service.js";
+import { RpaConfigProvider } from "./rpa/config/provider.js";
 import { getActiveStorage } from "./oss/file/service.js";
 import { OssConfigProvider } from "./oss/config/provider.js";
 import { utils as baseConfigUtils } from "./base/config/service.js";
@@ -42,7 +43,8 @@ export const maintenanceRegister = {
 export const swarmRegister = dockerClient;
 
 export const rpaRegister = {
-  findDefaultActiveBrowser,
+  findDefaultActiveConfig,
+  configProvider: new RpaConfigProvider(),
 };
 
 export const ossRegister = {

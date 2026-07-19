@@ -220,7 +220,7 @@ export async function runWorkflow(
     const visited = new Set<string>();
 
     // 获取激活的默认配置，用于 CDP 浏览器连接
-    const activeConfig = await registry.rpa.findDefaultActiveBrowser();
+    const activeConfig = await registry.rpa.findDefaultActiveConfig();
 
     while (currentNode && !visited.has(currentNode.id)) {
       visited.add(currentNode.id);
@@ -268,7 +268,7 @@ export async function runWorkflow(
 
         // 如果客户端未建立连接，则初始化连接
         if (!cdpClient) {
-          let wsUrl = activeConfig.cdpUrl;
+          let wsUrl = activeConfig.cdpUrl as string;
           // 如果填写的不是带有 /devtools/ 的完整 ws 调试地址，或者是以 http 开头，或者是 Cloudflare 模式，我们就需要获取真正的 webSocketDebuggerUrl
           const needFetchVersion =
             activeConfig.authToken ||
@@ -351,7 +351,10 @@ export async function runWorkflow(
             }
           }
 
-          cdpClient = new CDPClient(wsUrl, activeConfig.authToken);
+          cdpClient = new CDPClient(
+            wsUrl,
+            activeConfig.authToken as string | undefined
+          );
           await cdpClient.connect();
 
           // 创建新 Page 页面

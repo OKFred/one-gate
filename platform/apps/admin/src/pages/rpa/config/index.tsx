@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
-import * as BrowserConfigAPI from '@/api/admin/rpa/browser/config';
-import type { ListBrowserConfigReq, BrowserConfigObj } from '@/api/admin/rpa/browser/type';
+import * as RpaConfigAPI from '@/api/admin/rpa/config/config';
+import type { ListRpaConfigReq, RpaConfigObj } from '@/api/admin/rpa/config/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -19,7 +19,7 @@ interface TableExtraContext {
   handleVerify: (id: number) => Promise<void>;
 }
 
-const DEFAULT_FORM: Partial<BrowserConfigObj> = {
+const DEFAULT_FORM: Partial<RpaConfigObj> = {
   name: '',
   cdpUrl: '',
   authToken: '',
@@ -28,7 +28,7 @@ const DEFAULT_FORM: Partial<BrowserConfigObj> = {
   remark: '',
 };
 
-export default function BrowserConfigManagement() {
+export default function RpaConfigManagement() {
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
   const t = useTranslation();
 
@@ -36,20 +36,20 @@ export default function BrowserConfigManagement() {
   const handleVerify = async (id: number) => {
     try {
       setVerifyingId(id);
-      const res = await BrowserConfigAPI.verifyFn({ data: { id } });
+      const res = await RpaConfigAPI.verifyFn({ data: { id } });
       if (res.data.data) {
         showSnackbar({
-          message: t('admin.rpa.browser.verifySuccess'),
+          message: t('admin.rpa.config.verifySuccess'),
           type: 'success',
         });
       } else {
         showSnackbar({
-          message: t('admin.rpa.browser.verifyFailed'),
+          message: t('admin.rpa.config.verifyFailed'),
           type: 'error',
         });
       }
     } catch {
-      showSnackbar({ message: t('admin.rpa.browser.verifyError'), type: 'error' });
+      showSnackbar({ message: t('admin.rpa.config.verifyError'), type: 'error' });
     } finally {
       setVerifyingId(null);
     }
@@ -60,12 +60,7 @@ export default function BrowserConfigManagement() {
     handleVerify,
   };
 
-  const config: SchemaCrudConfig<
-    BrowserConfigObj,
-    FilterState,
-    ListBrowserConfigReq,
-    TableExtraContext
-  > = {
+  const config: SchemaCrudConfig<RpaConfigObj, FilterState, ListRpaConfigReq, TableExtraContext> = {
     apiKeyName: 'id',
     permissions: {
       add: [THIS_PERMISSION.add],
@@ -73,10 +68,10 @@ export default function BrowserConfigManagement() {
       delete: [THIS_PERMISSION.delete],
     },
     api: {
-      list: BrowserConfigAPI.listFn,
-      add: BrowserConfigAPI.addFn,
-      update: BrowserConfigAPI.updateFn,
-      delete: BrowserConfigAPI.deleteFn,
+      list: RpaConfigAPI.listFn,
+      add: RpaConfigAPI.addFn,
+      update: RpaConfigAPI.updateFn,
+      delete: RpaConfigAPI.deleteFn,
     },
     filter: {
       defaultFilters: { keyword: '' },
@@ -90,30 +85,28 @@ export default function BrowserConfigManagement() {
       transformRequest: (filters) =>
         ({
           keyword: filters.keyword || undefined,
-        }) as ListBrowserConfigReq,
+        }) as ListRpaConfigReq,
     },
     table: {
       columns: (t) => [
         { title: 'ID', render: (row) => row.id },
-        { title: t('admin.rpa.browser.name'), render: (row) => row.name },
-        { title: t('admin.rpa.browser.cdpUrlLabel'), render: (row) => row.cdpUrl },
+        { title: t('admin.rpa.config.name'), render: (row) => row.name },
+        { title: t('admin.rpa.config.cdpUrlLabel'), render: (row) => row.cdpUrl },
         {
-          title: t('admin.rpa.browser.defaultEnv'),
+          title: t('admin.rpa.config.defaultEnv'),
           render: (row) => (
             <Chip
-              label={row.isDefault ? t('admin.rpa.browser.yes') : t('admin.rpa.browser.no')}
+              label={row.isDefault ? t('admin.rpa.config.yes') : t('admin.rpa.config.no')}
               color={row.isDefault ? 'success' : 'default'}
               size="small"
             />
           ),
         },
         {
-          title: t('admin.rpa.browser.status'),
+          title: t('admin.rpa.config.status'),
           render: (row) => (
             <Chip
-              label={
-                row.isEnabled ? t('admin.rpa.browser.enabled') : t('admin.rpa.browser.disabled')
-              }
+              label={row.isEnabled ? t('admin.rpa.config.enabled') : t('admin.rpa.config.disabled')}
               color={row.isEnabled ? 'success' : 'error'}
               size="small"
               variant="outlined"
@@ -125,7 +118,7 @@ export default function BrowserConfigManagement() {
         { type: 'title', render: (row) => row.name },
         {
           type: 'subtitle',
-          label: t('admin.rpa.browser.cdpUrlCardLabel'),
+          label: t('admin.rpa.config.cdpUrlCardLabel'),
           render: (row) => row.cdpUrl,
         },
         {
@@ -134,13 +127,13 @@ export default function BrowserConfigManagement() {
             <Box sx={{ display: 'flex', gap: 0.5 }}>
               <Chip
                 label={
-                  row.isEnabled ? t('admin.rpa.browser.enabled') : t('admin.rpa.browser.disabled')
+                  row.isEnabled ? t('admin.rpa.config.enabled') : t('admin.rpa.config.disabled')
                 }
                 color={row.isEnabled ? 'success' : 'error'}
                 size="small"
               />
               {row.isDefault && (
-                <Chip label={t('admin.rpa.browser.default')} color="success" size="small" />
+                <Chip label={t('admin.rpa.config.default')} color="success" size="small" />
               )}
             </Box>
           ),
@@ -149,7 +142,7 @@ export default function BrowserConfigManagement() {
       actions: (t, extraContext) => [
         {
           key: 'verify',
-          label: t('admin.rpa.browser.testConnection'),
+          label: t('admin.rpa.config.testConnection'),
           color: 'success',
           permissionCodes: [THIS_PERMISSION.read],
           icon: (row) => {
@@ -173,26 +166,26 @@ export default function BrowserConfigManagement() {
       renderForm: (form, setForm, _isMobile, t) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
           <TextField
-            label={t('admin.rpa.browser.name')}
+            label={t('admin.rpa.config.name')}
             value={form.name || ''}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             fullWidth
             required
           />
           <TextField
-            label={t('admin.rpa.browser.cdpUrlFormLabel')}
+            label={t('admin.rpa.config.cdpUrlFormLabel')}
             value={form.cdpUrl || ''}
             onChange={(e) => setForm({ ...form, cdpUrl: e.target.value })}
             fullWidth
             required
-            helperText={t('admin.rpa.browser.cdpUrlHelper')}
+            helperText={t('admin.rpa.config.cdpUrlHelper')}
           />
           <TextField
-            label={t('admin.rpa.browser.authToken')}
+            label={t('admin.rpa.config.authToken')}
             value={form.authToken || ''}
             onChange={(e) => setForm({ ...form, authToken: e.target.value })}
             fullWidth
-            helperText={t('admin.rpa.browser.authTokenHelper')}
+            helperText={t('admin.rpa.config.authTokenHelper')}
           />
           <FormControlLabel
             control={
@@ -201,7 +194,7 @@ export default function BrowserConfigManagement() {
                 onChange={(e) => setForm({ ...form, isDefault: e.target.checked })}
               />
             }
-            label={t('admin.rpa.browser.setDefaultEnv')}
+            label={t('admin.rpa.config.setDefaultEnv')}
           />
           <FormControlLabel
             control={
@@ -210,10 +203,10 @@ export default function BrowserConfigManagement() {
                 onChange={(e) => setForm({ ...form, isEnabled: e.target.checked })}
               />
             }
-            label={t('admin.rpa.browser.enableEnv')}
+            label={t('admin.rpa.config.enableEnv')}
           />
           <TextField
-            label={t('admin.rpa.browser.remark')}
+            label={t('admin.rpa.config.remark')}
             value={form.remark || ''}
             onChange={(e) => setForm({ ...form, remark: e.target.value })}
             fullWidth

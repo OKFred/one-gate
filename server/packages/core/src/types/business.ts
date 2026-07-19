@@ -92,8 +92,8 @@ export const BUSINESS = {
   admin: "admin",
   /** RPA */
   "admin.rpa": "admin.rpa",
-  /** 浏览器环境调试配置 */
-  "admin.rpa.browser": "admin.rpa.browser",
+  /** RPA 配置 */
+  "admin.rpa.config": "admin.rpa.config",
   /** 基础配置 */
   "admin.base": "admin.base",
   /** 基础配置 - 具体配置 */

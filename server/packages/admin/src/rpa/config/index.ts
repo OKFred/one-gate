@@ -3,7 +3,7 @@ import service from "./service";
 import type { BusinessKey } from "@hodor/core/types/business";
 
 function createApp() {
-  return encapsulation(service, "admin.rpa.browser" satisfies BusinessKey);
+  return encapsulation(service, "admin.rpa.config" satisfies BusinessKey);
 }
 
 export default createApp;

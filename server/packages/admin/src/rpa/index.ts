@@ -1,10 +1,10 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { AppBindings } from "@hodor/core/types/app";
-import browser from "./browser/index.js";
+import config from "./config/index.js";
 
 const router = () => {
   const app = new OpenAPIHono<AppBindings>();
-  app.route("/browser", browser());
+  app.route("/config", config());
   return app;
 };
 

@@ -256,12 +256,12 @@ export const permissions = {
     /** RPA */
     rpa: {
       read: 'admin.rpa:read',
-      /** 浏览器配置 */
-      browser: {
-        read: 'admin.rpa.browser:read',
-        add: 'admin.rpa.browser:add',
-        edit: 'admin.rpa.browser:edit',
-        delete: 'admin.rpa.browser:delete',
+      /** RPA 配置 */
+      config: {
+        read: 'admin.rpa.config:read',
+        add: 'admin.rpa.config:add',
+        edit: 'admin.rpa.config:edit',
+        delete: 'admin.rpa.config:delete',
       },
     },
   },

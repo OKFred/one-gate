@@ -15,7 +15,7 @@ import { attendanceTranslations } from "../../../enterprise/src/organization/att
 import { workflowTranslations } from "../../../enterprise/src/executive/workflow/translation";
 import { profileTranslations } from "../../../personal/src/profile/translation";
 import { systemTranslations } from "../../../admin/src/system/translation";
-import { browserTranslations } from "../../../admin/src/rpa/browser/translation";
+import { configTranslations } from "../../../admin/src/rpa/config/translation";
 import { baseTranslations } from "../../../admin/src/base/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "../types/business";
@@ -138,6 +138,6 @@ export const initialTranslationData = mapTranslations({
   ...workflowTranslations,
   ...profileTranslations,
   ...systemTranslations,
-  ...browserTranslations,
+  ...configTranslations,
   ...baseTranslations,
 }) satisfies BatchTranslationItem[];

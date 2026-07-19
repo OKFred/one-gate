@@ -147,8 +147,8 @@ export const permissionSeeds = {
   /** RPA */
   "admin.rpa": {
     "": ["read"],
-    /** 浏览器配置 */
-    browser: ["read", "add", "edit", "delete"],
+    /** RPA 配置 */
+    config: ["read", "add", "edit", "delete"],
   },
 } as const;
 

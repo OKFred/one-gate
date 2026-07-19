@@ -392,12 +392,12 @@ export const initialMenuData = [
   },
   {
     id: 41,
-    name: "sidebar.menu.admin.rpa.browser",
+    name: "sidebar.menu.admin.rpa.config",
     icon: "material-symbols:settings-input-component",
-    path: "/rpa/browser",
+    path: "/rpa/config",
     parentId: 44,
     sort: 1,
-    business: "admin.rpa.browser",
+    business: "admin.rpa.config",
   },
   {
     id: 47,

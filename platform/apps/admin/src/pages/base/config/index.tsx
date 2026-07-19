@@ -65,9 +65,24 @@ export default function BaseConfigPage() {
         { title: 'ID', width: 80, render: (row: ConfigRes) => row.id },
         {
           title: t('admin.base.namespace'),
-          render: (row: ConfigRes) => (
-            <Chip label={row.namespace} size="small" color="primary" variant="outlined" />
-          ),
+          render: (row: ConfigRes) => {
+            const getColor = (str: string) => {
+              if (!str) return 'default';
+              const colors: Array<
+                'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'
+              > = ['primary', 'secondary', 'error', 'info', 'success', 'warning'];
+              const code = str.charCodeAt(0);
+              return colors[code % colors.length];
+            };
+            return (
+              <Chip
+                label={row.namespace}
+                size="small"
+                color={getColor(row.namespace)}
+                variant="outlined"
+              />
+            );
+          },
         },
         {
           title: t('admin.base.configKey'),

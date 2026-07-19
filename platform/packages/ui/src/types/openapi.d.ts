@@ -9461,7 +9461,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/list": {
+    "/api/v1/admin/rpa/config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -9470,7 +9470,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 分页获取浏览器环境配置 */
+        /** 分页获取RPA配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9480,7 +9480,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.list.req"];
+                    "application/json": components["schemas"]["admin.rpa.config.list.req"];
                 };
             };
             responses: {
@@ -9490,7 +9490,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.list.res"];
+                        "application/json": components["schemas"]["admin.rpa.config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9519,7 +9519,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/add": {
+    "/api/v1/admin/rpa/config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -9528,7 +9528,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 新建浏览器配置 */
+        /** 添加RPA配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9538,7 +9538,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.add.req"];
+                    "application/json": components["schemas"]["admin.rpa.config.add.req"];
                 };
             };
             responses: {
@@ -9548,7 +9548,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.add.res"];
+                        "application/json": components["schemas"]["admin.rpa.config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9577,7 +9577,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/update": {
+    "/api/v1/admin/rpa/config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -9586,7 +9586,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 更新浏览器配置 */
+        /** 更新RPA配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9596,7 +9596,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.update.req"];
+                    "application/json": components["schemas"]["admin.rpa.config.update.req"];
                 };
             };
             responses: {
@@ -9606,7 +9606,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.update.res"];
+                        "application/json": components["schemas"]["admin.rpa.config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9635,7 +9635,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/delete": {
+    "/api/v1/admin/rpa/config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -9644,7 +9644,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除浏览器配置 */
+        /** 获取RPA配置详情 */
         post: {
             parameters: {
                 query?: never;
@@ -9654,7 +9654,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.delete.req"];
+                    "application/json": components["schemas"]["admin.rpa.config.get.req"];
                 };
             };
             responses: {
@@ -9664,7 +9664,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.delete.res"];
+                        "application/json": components["schemas"]["admin.rpa.config.get.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9693,7 +9693,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/verify": {
+    "/api/v1/admin/rpa/config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -9702,7 +9702,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 验证 CDP 连接连通性 */
+        /** 删除RPA配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9712,7 +9712,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.verify.req"];
+                    "application/json": components["schemas"]["admin.rpa.config.delete.req"];
                 };
             };
             responses: {
@@ -9722,7 +9722,65 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.verify.res"];
+                        "application/json": components["schemas"]["admin.rpa.config.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证浏览器连接 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.verify.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.verify.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -18367,7 +18425,7 @@ export interface components {
             data: string;
             message: string;
         };
-        "admin.rpa.browser.list.req": {
+        "admin.rpa.config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18390,7 +18448,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
         };
-        "admin.rpa.browser.list.res": {
+        "admin.rpa.config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18413,7 +18471,7 @@ export interface components {
                     cdpUrl: string;
                     /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
                     authToken: ((string | null) | null) | null;
-                    /** @description 是否为默认环境 */
+                    /** @description 是否为主配置 */
                     isDefault: boolean;
                     /** @description 是否启用 */
                     isEnabled: boolean;
@@ -18437,21 +18495,21 @@ export interface components {
             };
             message: string;
         };
-        "admin.rpa.browser.add.req": {
+        "admin.rpa.config.add.req": {
             /** @description 配置名 */
             name: string;
             /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
             cdpUrl: string;
             /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
             authToken?: ((string | null) | null) | null;
-            /** @description 是否为默认环境 */
+            /** @description 是否为主配置 */
             isDefault: boolean;
             /** @description 是否启用 */
             isEnabled: boolean;
             /** @description 备注信息 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.rpa.browser.add.res": {
+        "admin.rpa.config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -18460,7 +18518,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.rpa.browser.update.req": {
+        "admin.rpa.config.update.req": {
             /**
              * @description id
              * @example 1
@@ -18472,14 +18530,14 @@ export interface components {
             cdpUrl?: string;
             /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
             authToken?: ((string | null) | null) | null;
-            /** @description 是否为默认环境 */
+            /** @description 是否为主配置 */
             isDefault?: boolean;
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @description 备注信息 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.rpa.browser.update.res": {
+        "admin.rpa.config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -18488,14 +18546,58 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.rpa.browser.delete.req": {
+        "admin.rpa.config.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.rpa.browser.delete.res": {
+        "admin.rpa.config.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 配置名 */
+                name: string;
+                /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
+                cdpUrl: string;
+                /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+                authToken: ((string | null) | null) | null;
+                /** @description 是否为主配置 */
+                isDefault: boolean;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 备注信息 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.rpa.config.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.rpa.config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -18504,16 +18606,19 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.rpa.browser.verify.req": {
+        "admin.rpa.config.verify.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.rpa.browser.verify.res": {
+        "admin.rpa.config.verify.res": {
             ok: boolean;
-            data: boolean;
+            data: {
+                ok: boolean;
+                message: string;
+            };
             message: string;
         };
         "admin.base.config.list.req": {
