@@ -181,3 +181,11 @@ node ./scripts/generate-constants.js
 
 所有前端 React 组件在渲染数据库返回的时间戳时，必须统一使用 `dayjs` 库进行格式化（如 `dayjs(timestamp).format("YYYY-MM-DD HH:mm:ss")`），严禁使用原生的 `new Date().toLocaleString()` 进行处理。
 > **注意**：如果后端的 `create_time_utc` 等字段在数据库层面是毫秒级存储的，则直接传入 `dayjs(timestamp)`，不需要在前端乘以 1000。
+
+### Step 4.7: 亮色/暗色模式主题适配规范
+
+在开发前端 UI 组件需要做明暗模式（Light/Dark Mode）适配时，**严禁硬编码 `rgba` 颜色**，也**避免使用 `theme.palette.mode === 'dark' ? A : B` 的三元条件判断逻辑**。
+请务必遵循 MUI 的最佳实践，使用预置的**语义化色板（Semantic Palette）**，这些色板已在底层绑定了明暗逻辑，能自动翻转颜色：
+- **背景/容器**：使用 `background.paper` 或 `background.default`。
+- **边框/分割线**：使用 `divider`，能自动在浅色与深色模式下呈现极佳的边界感，替代手写的 `boxShadow`。
+- **状态颜色（悬停/禁用等）**：使用 `action.active`、`action.hover`、`action.disabled` 等。例如自定义滚动条时，可使用 `action.disabled` 作为滑块基础色，`action.active` 作为悬停色。
