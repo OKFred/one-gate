@@ -1,11 +1,11 @@
-import { Suspense, useState } from "react";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Suspense, useState } from 'react';
+import { Tabs, Tab, Box } from '@mui/material';
 // Log Components
-import SysLogTable from "./components/SysLogTable";
-import AuditLogTable from "./components/AuditLogTable";
-import BizLogTable from "./components/BizLogTable";
-import GlobalTimeline from "./components/GlobalTimeline";
-import { useTranslation } from "@/hooks/useTranslation";
+import SysLogTable from './components/SysLogTable';
+import AuditLogTable from './components/AuditLogTable';
+import BizLogTable from './components/BizLogTable';
+import GlobalTimeline from './components/GlobalTimeline';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -23,12 +23,10 @@ function CustomTabPanel(props: TabPanelProps) {
       id={`base-log-tabpanel-${index}`}
       aria-labelledby={`base-log-tab-${index}`}
       {...other}
-      style={{ height: "100%" }}
+      style={{ height: '100%' }}
     >
       {value === index && (
-        <Box sx={{ height: "100%", p: 2 }}>
-          {children}
-        </Box>
+        <Box sx={{ height: '100%', p: 2, overflowY: 'auto', overflowX: 'hidden' }}>{children}</Box>
       )}
     </div>
   );
@@ -43,16 +41,23 @@ export default function BaseLogPage() {
   };
 
   return (
-    <Box sx={{ width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
-      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs value={value} onChange={handleChange} aria-label="base log tabs">
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          aria-label="base log tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+        >
           <Tab label={t('log.sysLog')} />
           <Tab label={t('log.auditLog')} />
           <Tab label={t('log.bizLog')} />
           <Tab label={t('log.globalTimeline')} />
         </Tabs>
       </Box>
-      <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
         <CustomTabPanel value={value} index={0}>
           <Suspense fallback={<div>{t('common.loading')}</div>}>
             <SysLogTable />

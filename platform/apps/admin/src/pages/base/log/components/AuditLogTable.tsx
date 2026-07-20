@@ -14,24 +14,45 @@ export default function AuditLogTable() {
     },
     filter: {
       defaultFilters: {},
-      fields: (t) => [
-        { name: 'namespace', label: t('log.namespace'), type: 'text' },
-      ],
-      transformRequest: (filters) => ({
-        namespace: filters.namespace || undefined,
-      } as AuditListReq),
+      fields: (t) => [{ name: 'namespace', label: t('log.namespace'), type: 'text' }],
+      transformRequest: (filters) =>
+        ({
+          namespace: filters.namespace || undefined,
+        }) as AuditListReq,
     },
     table: {
       columns: (t) => [
         { title: t('columns.id'), render: (row) => row.id },
         { title: t('log.namespace'), render: (row) => row.namespace },
         { title: t('table.actions'), render: (row) => row.action },
-        { title: t('columns.createTime'), render: (row) => row.createTimeUtc ? dayjs(row.createTimeUtc).format("YYYY-MM-DD HH:mm:ss") : '--' },
+        {
+          title: t('columns.createTime'),
+          render: (row) =>
+            row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
+        },
         { title: t('column.creatorName'), render: (row) => row.creatorName },
         { title: t('log.beforeData'), render: (row) => JSON.stringify(row.beforeData) },
         { title: t('log.afterData'), render: (row) => JSON.stringify(row.afterData) },
       ],
-      cardFields: () => [],
+      cardFields: (t) => [
+        { type: 'title', render: (row) => `[${row.action}] ${row.namespace}` },
+        {
+          type: 'subtitle',
+          label: t('columns.createTime'),
+          render: (row) =>
+            `${row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--'} · ${row.creatorName || 'System'}`,
+        },
+        {
+          type: 'content',
+          label: t('log.beforeData'),
+          render: (row) => JSON.stringify(row.beforeData),
+        },
+        {
+          type: 'content',
+          label: t('log.afterData'),
+          render: (row) => JSON.stringify(row.afterData),
+        },
+      ],
     },
     form: { fields: () => [] } as any,
   };
