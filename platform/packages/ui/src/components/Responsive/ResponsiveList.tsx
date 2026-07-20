@@ -29,6 +29,8 @@ export interface TableColumn<T> {
   width?: number | string;
   /** 对齐方式 */
   align?: 'left' | 'center' | 'right';
+  /** 是否固定列 */
+  fixed?: 'left' | 'right';
   /** 渲染单元格内容 */
   render: (item: T, index: number) => ReactNode;
 }
@@ -240,25 +242,76 @@ function ResponsiveListInner<T>({
 
   // PC端表格布局
   return (
-    <TableContainer component={Paper} sx={{ position: 'relative' }}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        position: 'relative',
+        '&::-webkit-scrollbar': { height: 8, width: 8 },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'action.disabled',
+          borderRadius: 4,
+          '&:hover': { backgroundColor: 'action.active' },
+        },
+        '&::-webkit-scrollbar-track': { backgroundColor: 'transparent' },
+      }}
+    >
       <Table>
         <TableHead>
           <TableRow>
-            {columns.map((col, index) => (
-              <TableCell key={index} align={col.align} width={col.width} sx={{ whiteSpace: 'nowrap' }}>
-                {col.title}
-              </TableCell>
-            ))}
+            {columns.map((col, index) => {
+              const isFixed = !!col.fixed;
+              const isFixedLeft = col.fixed === 'left';
+              const isFixedRight = col.fixed === 'right';
+              const fixedStyles = isFixed
+                ? {
+                    position: 'sticky',
+                    ...(isFixedLeft ? { left: 0 } : { right: 0 }),
+                    zIndex: 11,
+                    backgroundColor: 'background.paper',
+                    ...(isFixedLeft && { borderRight: '1px solid', borderColor: 'divider' }),
+                    ...(isFixedRight && { borderLeft: '1px solid', borderColor: 'divider' }),
+                  }
+                : {};
+              return (
+                <TableCell
+                  key={index}
+                  align={col.align}
+                  width={col.width}
+                  sx={{ whiteSpace: 'nowrap', ...fixedStyles }}
+                >
+                  {col.title}
+                </TableCell>
+              );
+            })}
           </TableRow>
         </TableHead>
         <TableBody>
           {data.map((item, rowIndex) => (
             <TableRow key={keyExtractor(item)} hover>
-              {columns.map((col, colIndex) => (
-                <TableCell key={colIndex} align={col.align} sx={{ minWidth: 100, whiteSpace: 'nowrap' }}>
-                  {col.render(item, rowIndex)}
-                </TableCell>
-              ))}
+              {columns.map((col, colIndex) => {
+                const isFixed = !!col.fixed;
+                const isFixedLeft = col.fixed === 'left';
+                const isFixedRight = col.fixed === 'right';
+                const fixedStyles = isFixed
+                  ? {
+                      position: 'sticky',
+                      ...(isFixedLeft ? { left: 0 } : { right: 0 }),
+                      zIndex: 10,
+                      backgroundColor: 'background.paper',
+                      ...(isFixedLeft && { borderRight: '1px solid', borderColor: 'divider' }),
+                      ...(isFixedRight && { borderLeft: '1px solid', borderColor: 'divider' }),
+                    }
+                  : {};
+                return (
+                  <TableCell
+                    key={colIndex}
+                    align={col.align}
+                    sx={{ minWidth: 100, whiteSpace: 'nowrap', ...fixedStyles }}
+                  >
+                    {col.render(item, rowIndex)}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))}
         </TableBody>

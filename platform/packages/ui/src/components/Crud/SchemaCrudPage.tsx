@@ -505,6 +505,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         {
           title: t('table.actions'),
           align: 'center' as const,
+          fixed: 'right' as const,
           render: (row: TRecord) => renderRowActions(row),
         },
       ];
