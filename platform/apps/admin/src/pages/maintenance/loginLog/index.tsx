@@ -1,6 +1,6 @@
 import { SchemaCrudPage } from '@/components/Crud';
 import dayjs from 'dayjs';
-import * as auditLoginAPI from '@/api/admin/maintenance/auditLogin';
+import * as loginLogAPI from '@/api/admin/maintenance/loginLog';
 import type { ListLoginAuditRes, ListLoginAuditReq } from '@/api/admin/maintenance/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
@@ -15,7 +15,7 @@ export default function AuditLoginPage() {
     apiKeyName: 'id',
     permissions: {},
     api: {
-      list: auditLoginAPI.listFn,
+      list: loginLogAPI.listFn,
     },
     filter: {
       defaultFilters: {
@@ -26,9 +26,9 @@ export default function AuditLoginPage() {
       fields: (t) => [
         {
           name: 'userId',
-          label: t('maintenance.auditLogin.column.userId'),
+          label: t('maintenance.loginLog.column.userId'),
           type: 'text',
-          placeholder: t('maintenance.auditLogin.column.userId'),
+          placeholder: t('maintenance.loginLog.column.userId'),
         },
         {
           name: 'orderBy',
@@ -36,8 +36,8 @@ export default function AuditLoginPage() {
           type: 'select',
           options: [
             { value: 'id', label: t('columns.id') },
-            { value: 'userId', label: t('maintenance.auditLogin.column.userId') },
-            { value: 'loginTimeUtc', label: t('maintenance.auditLogin.column.loginTime') },
+            { value: 'userId', label: t('maintenance.loginLog.column.userId') },
+            { value: 'loginTimeUtc', label: t('maintenance.loginLog.column.loginTime') },
             { value: 'createTimeUtc', label: t('columns.createTime') },
           ],
         },
@@ -61,15 +61,15 @@ export default function AuditLoginPage() {
     table: {
       columns: (t) => [
         { title: t('columns.id'), render: (row) => row.id },
-        { title: t('maintenance.auditLogin.column.userId'), render: (row) => row.userId },
+        { title: t('maintenance.loginLog.column.userId'), render: (row) => row.userId },
         {
-          title: t('maintenance.auditLogin.column.loginTime'),
+          title: t('maintenance.loginLog.column.loginTime'),
           render: (row) =>
             row.loginTimeUtc ? dayjs(row.loginTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '-',
         },
-        { title: t('maintenance.auditLogin.column.ip'), render: (row) => row.ip || '-' },
+        { title: t('maintenance.loginLog.column.ip'), render: (row) => row.ip || '-' },
         {
-          title: t('maintenance.auditLogin.column.userAgent'),
+          title: t('maintenance.loginLog.column.userAgent'),
           render: (row) => (
             <div
               style={{
@@ -95,18 +95,18 @@ export default function AuditLoginPage() {
         { type: 'subtitle', label: t('columns.id'), render: (row) => row.id },
         {
           type: 'content',
-          label: t('maintenance.auditLogin.column.loginTime'),
+          label: t('maintenance.loginLog.column.loginTime'),
           render: (row) =>
             row.loginTimeUtc ? dayjs(row.loginTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '-',
         },
         {
           type: 'content',
-          label: t('maintenance.auditLogin.column.ip'),
+          label: t('maintenance.loginLog.column.ip'),
           render: (row) => row.ip || '-',
         },
         {
           type: 'content',
-          label: t('maintenance.auditLogin.column.userAgent'),
+          label: t('maintenance.loginLog.column.userAgent'),
           render: (row) => row.userAgent || '-',
         },
       ],

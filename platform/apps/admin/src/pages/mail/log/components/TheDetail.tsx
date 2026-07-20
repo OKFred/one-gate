@@ -136,15 +136,6 @@ const TheDetail = memo(({ open, onClose, log }: TheDetailProps) => {
                 </Typography>
                 <Typography variant="body1">{formatDate(log.createTimeUtc)}</Typography>
               </Box>
-
-              {log.updateTimeUtc && (
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    {t('columns.updateTime')}
-                  </Typography>
-                  <Typography variant="body1">{formatDate(log.updateTimeUtc)}</Typography>
-                </Box>
-              )}
             </Stack>
           </Box>
 

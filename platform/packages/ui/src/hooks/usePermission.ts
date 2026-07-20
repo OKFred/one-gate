@@ -27,6 +27,10 @@ export const permissions = {
         edit: 'admin.base.config:edit',
         delete: 'admin.base.config:delete',
       },
+      /** 日志 */
+      log: {
+        read: 'admin.base.log:read',
+      },
     },
     /** 系统管理 */
     system: {
@@ -146,8 +150,8 @@ export const permissions = {
         view: 'admin.maintenance.cache:view',
       },
       /** 登录日志 */
-      audit_login: {
-        read: 'admin.maintenance.audit_login:read',
+      login_log: {
+        read: 'admin.maintenance.login_log:read',
       },
       /** 定时任务管理 */
       cron: {

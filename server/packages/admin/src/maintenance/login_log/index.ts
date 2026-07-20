@@ -5,7 +5,7 @@ import { BusinessKey } from "@hodor/core/types/business";
 function createApp() {
   return encapsulation(
     service,
-    "admin.maintenance.audit_login" satisfies BusinessKey
+    "admin.maintenance.login_log" satisfies BusinessKey
   );
 }
 

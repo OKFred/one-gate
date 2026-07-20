@@ -1570,7 +1570,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/mail/log/listAll": {
+    "/api/v1/admin/mail/log/list_all": {
         parameters: {
             query?: never;
             header?: never;
@@ -1579,7 +1579,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取所有邮件日志（不分页） */
+        /** 获取邮件日志全量列表 */
         post: {
             parameters: {
                 query?: never;
@@ -1589,7 +1589,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.mail.log.listall.req"];
+                    "application/json": components["schemas"]["admin.mail.log.list_all.req"];
                 };
             };
             responses: {
@@ -1599,7 +1599,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.mail.log.listall.res"];
+                        "application/json": components["schemas"]["admin.mail.log.list_all.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1716,122 +1716,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.mail.log.add.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/mail/log/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新邮件日志 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.mail.log.update.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.mail.log.update.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/mail/log/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除邮件日志 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.mail.log.delete.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.mail.log.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2266,7 +2150,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/maintenance/audit_login/list": {
+    "/api/v1/admin/maintenance/login_log/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2285,7 +2169,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.maintenance.audit_login.list.req"];
+                    "application/json": components["schemas"]["admin.maintenance.login_log.list.req"];
                 };
             };
             responses: {
@@ -2295,7 +2179,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.maintenance.audit_login.list.res"];
+                        "application/json": components["schemas"]["admin.maintenance.login_log.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10215,6 +10099,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/base/log/sys/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 系统日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.sys.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.sys.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/audit/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 审计日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.audit.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.audit.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/biz/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 业务日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.biz.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.biz.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 日志时间线 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.timeline.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.timeline.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -12857,7 +12973,7 @@ export interface components {
             data: boolean;
             message: string;
         };
-        "admin.mail.log.listall.req": {
+        "admin.mail.log.list_all.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 发送状态 */
@@ -12871,7 +12987,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
         };
-        "admin.mail.log.listall.res": {
+        "admin.mail.log.list_all.res": {
             ok: boolean;
             data: {
                 /**
@@ -12884,30 +13000,36 @@ export interface components {
                  * @description 收件人邮箱地址
                  * @example receiver@example.com
                  */
-                mailTo?: string;
+                mailTo: string;
                 /**
                  * Format: email
                  * @description 发件人邮箱地址
                  * @example sender@example.com
                  */
-                mailFrom?: string;
+                mailFrom: string;
                 /**
                  * @description 邮件标题
                  * @example Welcome to register on our platform!
                  */
-                title?: string;
+                title: string;
                 /** @description 邮件模板ID */
-                templateId?: ((string | null) | null) | null;
+                templateId: ((string | null) | null) | null;
                 /** @description 邮件模板参数 */
-                templateParams?: ((string | null) | null) | null;
+                templateParams: ((string | null) | null) | null;
                 /** @description 发送状态 */
-                sendStatus?: boolean;
+                sendStatus: boolean;
                 /** @description 异常代码 */
-                exceptionCode?: ((string | null) | null) | null;
+                exceptionCode: ((string | null) | null) | null;
                 /** @description 异常详情 */
-                exceptionDetails?: ((string | null) | null) | null;
+                exceptionDetails: ((string | null) | null) | null;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /** @description 创建人名称 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 创建时间(UTC) */
+                createTimeUtc: number;
             }[];
             message: string;
         };
@@ -12975,31 +13097,23 @@ export interface components {
                      */
                     title: string;
                     /** @description 邮件模板ID */
-                    templateId?: ((string | null) | null) | null;
+                    templateId: ((string | null) | null) | null;
                     /** @description 邮件模板参数 */
-                    templateParams?: ((string | null) | null) | null;
+                    templateParams: ((string | null) | null) | null;
                     /** @description 发送状态 */
                     sendStatus: boolean;
                     /** @description 异常代码 */
-                    exceptionCode?: ((string | null) | null) | null;
+                    exceptionCode: ((string | null) | null) | null;
                     /** @description 异常详情 */
-                    exceptionDetails?: ((string | null) | null) | null;
+                    exceptionDetails: ((string | null) | null) | null;
                     /** @description 备注 */
-                    remark?: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
+                    /** @description 创建人名称 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
                     createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -13044,67 +13158,6 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.mail.log.update.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-            /**
-             * Format: email
-             * @description 收件人邮箱地址
-             * @example receiver@example.com
-             */
-            mailTo?: string;
-            /**
-             * Format: email
-             * @description 发件人邮箱地址
-             * @example sender@example.com
-             */
-            mailFrom?: string;
-            /**
-             * @description 邮件标题
-             * @example Welcome to register on our platform!
-             */
-            title?: string;
-            /** @description 邮件模板ID */
-            templateId?: ((string | null) | null) | null;
-            /** @description 邮件模板参数 */
-            templateParams?: ((string | null) | null) | null;
-            /** @description 发送状态 */
-            sendStatus?: boolean;
-            /** @description 异常代码 */
-            exceptionCode?: ((string | null) | null) | null;
-            /** @description 异常详情 */
-            exceptionDetails?: ((string | null) | null) | null;
-            /** @description 备注 */
-            remark?: ((string | null) | null) | null;
-        };
-        "admin.mail.log.update.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "admin.mail.log.delete.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "admin.mail.log.delete.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
         "admin.mail.log.get.req": {
             /**
              * @description id
@@ -13138,31 +13191,23 @@ export interface components {
                  */
                 title: string;
                 /** @description 邮件模板ID */
-                templateId?: ((string | null) | null) | null;
+                templateId: ((string | null) | null) | null;
                 /** @description 邮件模板参数 */
-                templateParams?: ((string | null) | null) | null;
+                templateParams: ((string | null) | null) | null;
                 /** @description 发送状态 */
                 sendStatus: boolean;
                 /** @description 异常代码 */
-                exceptionCode?: ((string | null) | null) | null;
+                exceptionCode: ((string | null) | null) | null;
                 /** @description 异常详情 */
-                exceptionDetails?: ((string | null) | null) | null;
+                exceptionDetails: ((string | null) | null) | null;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
                 /** @description 创建人ID */
                 creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
+                /** @description 创建人名称 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 创建时间(UTC) */
                 createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -13448,7 +13493,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.maintenance.audit_login.list.req": {
+        "admin.maintenance.login_log.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13474,7 +13519,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "userId" | "loginTimeUtc" | "createTimeUtc";
         };
-        "admin.maintenance.audit_login.list.res": {
+        "admin.maintenance.login_log.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13505,28 +13550,20 @@ export interface components {
                      * @description 客户端IP地址
                      * @example 127.0.0.1
                      */
-                    ip?: ((string | null) | null) | null;
+                    ip: ((string | null) | null) | null;
                     /**
                      * @description 客户端User-Agent
                      * @example Mozilla/5.0...
                      */
-                    userAgent?: ((string | null) | null) | null;
+                    userAgent: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
+                    /** @description 创建人名称 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
                     createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -18195,7 +18232,7 @@ export interface components {
                      * @description API 基础地址
                      * @example https://api.deepseek.com/v1
                      */
-                    baseUrl?: ((string | null) | null) | null;
+                    baseUrl: ((string | null) | null) | null;
                     /** @description API 密钥 */
                     apiKey: string;
                     /**
@@ -18204,7 +18241,7 @@ export interface components {
                      */
                     model: string;
                     /** @description 模型支持的能力 (JSON 数组，如 ['text', 'image']) */
-                    capabilities?: ((string | null) | null) | null;
+                    capabilities: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 是否为默认配置 */
@@ -18336,7 +18373,7 @@ export interface components {
                  * @description API 基础地址
                  * @example https://api.deepseek.com/v1
                  */
-                baseUrl?: ((string | null) | null) | null;
+                baseUrl: ((string | null) | null) | null;
                 /** @description API 密钥 */
                 apiKey: string;
                 /**
@@ -18345,27 +18382,27 @@ export interface components {
                  */
                 model: string;
                 /** @description 模型支持的能力 (JSON 数组，如 ['text', 'image']) */
-                capabilities?: ((string | null) | null) | null;
+                capabilities: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 是否为默认配置 */
                 isDefault: boolean;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
                 /** @description 创建人ID */
-                creatorId: number;
+                creatorId?: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc: number;
+                createTimeUtc?: number;
                 /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
+                updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: ((number | null) | null) | null;
+                updateTimeUtc?: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -18843,6 +18880,259 @@ export interface components {
                 /** @description 命名空间 */
                 namespace: string;
             }[];
+            message: string;
+        };
+        "admin.base.log.sys.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            namespace?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "logLevel" | "createTimeUtc";
+        };
+        "admin.base.log.sys.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 日志级别 */
+                    logLevel?: string;
+                    /** @description 数据格式 */
+                    payloadType?: string;
+                    /** @description 明细内容 */
+                    logValue?: {
+                        [key: string]: unknown;
+                    };
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.audit.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            namespace?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "action" | "createTimeUtc";
+        };
+        "admin.base.log.audit.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 操作动作 */
+                    action?: string;
+                    /** @description 目标ID */
+                    targetId?: ((string | null) | null) | null;
+                    /** @description 数据格式 */
+                    payloadType?: string;
+                    /** @description 变更前数据 */
+                    beforeData?: (({
+                        [key: string]: unknown;
+                    } | null) | null) | null;
+                    /** @description 变更后数据 */
+                    afterData?: (({
+                        [key: string]: unknown;
+                    } | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.biz.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            namespace?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "status" | "createTimeUtc";
+        };
+        "admin.base.log.biz.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 状态 (1成功, 0失败) */
+                    status?: ((number | null) | null) | null;
+                    /** @description 数据格式 */
+                    payloadType?: string;
+                    /** @description 明细内容 */
+                    logValue?: {
+                        [key: string]: unknown;
+                    };
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.timeline.req": {
+            /** @description 要筛选的命名空间列表 */
+            namespaces?: string[];
+            /** @description 要查的日志类型 */
+            types?: ("sys" | "audit" | "biz")[];
+            /**
+             * @description 返回的最大条数
+             * @default 50
+             */
+            limit: number;
+            /** @description 上一页最后一条的 createTimeUtc，第一页留空 */
+            cursor?: number;
+        };
+        "admin.base.log.timeline.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @enum {string} */
+                    logType?: "sys" | "audit" | "biz";
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    action?: string | null;
+                    level?: string | null;
+                    status?: number | null;
+                    logValue?: {
+                        [key: string]: unknown;
+                    } | null;
+                    diffValue?: {
+                        [key: string]: unknown;
+                    } | null;
+                    beforeData?: {
+                        [key: string]: unknown;
+                    } | null;
+                    afterData?: {
+                        [key: string]: unknown;
+                    } | null;
+                }[];
+                /** @description 下一页的游标 */
+                nextCursor?: number | null;
+                hasMore: boolean;
+            };
             message: string;
         };
         "organization.attendance.listall.req": {

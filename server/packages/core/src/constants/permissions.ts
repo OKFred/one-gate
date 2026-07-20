@@ -25,6 +25,8 @@ export const permissionSeeds = {
     "": ["read"],
     /** 配置项 */
     config: ["read", "add", "edit", "delete"],
+    /** 日志 */
+    log: ["read"],
   },
   /** 系统管理 */
   "admin.system": {
@@ -72,7 +74,7 @@ export const permissionSeeds = {
     /** 缓存管理 */
     cache: ["read", "add", "edit", "delete", "view"],
     /** 登录日志 */
-    audit_login: ["read"],
+    login_log: ["read"],
     /** 定时任务管理 */
     cron: ["read", "add", "edit", "delete"],
     /** API 采集任务管理 */

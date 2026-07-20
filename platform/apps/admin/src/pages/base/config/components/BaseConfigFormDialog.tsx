@@ -236,7 +236,7 @@ export function BaseConfigFormDialog({
                 name="isEnabled"
                 type="switch"
                 label={t('common.isEnabled')}
-                value={form.isEnabled}
+                value={form.isEnabled ?? false}
                 onChange={(val: boolean) => setForm({ ...form, isEnabled: val })}
                 disabled={loading}
               />
@@ -244,7 +244,7 @@ export function BaseConfigFormDialog({
                 name="isPrimary"
                 type="switch"
                 label={t('admin.base.isPrimary')}
-                value={form.isPrimary}
+                value={form.isPrimary ?? false}
                 onChange={(val: boolean) => setForm({ ...form, isPrimary: val })}
                 disabled={loading}
               />

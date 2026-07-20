@@ -5,7 +5,7 @@ import { utils as roleUtils } from "./system/role/service.js";
 import { utils as regionUtils } from "./i18n/region/service.js";
 import { utils as languageUtils } from "./i18n/language/service.js";
 import regionService from "./i18n/region/service.js";
-import { utils as auditUtils } from "./maintenance/audit_login/service.js";
+import { utils as loginLogUtils } from "./maintenance/login_log/service.js";
 import { exportDeletionRecord } from "./maintenance/compliance/index.js";
 import { runPendingJobs } from "./maintenance/cron/scheduler.js";
 import { dockerClient } from "./swarm/docker/client.js";
@@ -14,6 +14,7 @@ import { RpaConfigProvider } from "./rpa/config/provider.js";
 import { getActiveStorage } from "./oss/file/service.js";
 import { OssConfigProvider } from "./oss/config/provider.js";
 import { utils as baseConfigUtils } from "./base/config/service.js";
+import baseLogService from "./base/log/service.js";
 import { getDefaultConfig as aiGetDefaultConfig } from "./ai/config/service.js";
 import { AiConfigProvider } from "./ai/config/provider.js";
 
@@ -26,6 +27,7 @@ export const systemRegister = {
 
 export const baseRegister = {
   config: baseConfigUtils,
+  log: baseLogService,
 };
 
 export const i18nRegister = {
@@ -37,7 +39,7 @@ export const i18nRegister = {
 };
 
 export const maintenanceRegister = {
-  recordLogin: auditUtils.recordLogin,
+  recordLogin: loginLogUtils.recordLogin,
   exportDeletionRecord,
   runPendingJobs,
 };

@@ -133,8 +133,15 @@ export const sharedTranslations = {
     {
       tKey: "sidebar.menu.me",
       langCodes: {
-        "zh-CN": "我的",
-        "en-US": "Profile",
+        "zh-CN": "个人资料",
+        "en-US": "My Profile",
+      },
+    },
+    {
+      tKey: "sidebar.menu.admin.base.log",
+      langCodes: {
+        "zh-CN": "日志",
+        "en-US": "Logs",
       },
     },
     {
@@ -979,6 +986,13 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "common.loadMore",
+      langCodes: {
+        "zh-CN": "加载更多",
+        "en-US": "Load More",
+      },
+    },
+    {
       tKey: "common.deleting",
       langCodes: {
         "zh-CN": "删除中...",
@@ -1036,6 +1050,76 @@ export const sharedTranslations = {
     },
   ],
   common: [
+    {
+      tKey: "log.namespace",
+      langCodes: {
+        "zh-CN": "命名空间",
+        "en-US": "Namespace",
+      },
+    },
+    {
+      tKey: "log.logLevel",
+      langCodes: {
+        "zh-CN": "日志级别",
+        "en-US": "Log Level",
+      },
+    },
+    {
+      tKey: "log.payloadType",
+      langCodes: {
+        "zh-CN": "数据格式",
+        "en-US": "Payload Type",
+      },
+    },
+    {
+      tKey: "log.beforeData",
+      langCodes: {
+        "zh-CN": "变更前数据",
+        "en-US": "Before Data",
+      },
+    },
+    {
+      tKey: "log.afterData",
+      langCodes: {
+        "zh-CN": "变更后数据",
+        "en-US": "After Data",
+      },
+    },
+    {
+      tKey: "log.content",
+      langCodes: {
+        "zh-CN": "内容",
+        "en-US": "Content",
+      },
+    },
+    {
+      tKey: "log.sysLog",
+      langCodes: {
+        "zh-CN": "系统日志 (Sys)",
+        "en-US": "System Logs",
+      },
+    },
+    {
+      tKey: "log.auditLog",
+      langCodes: {
+        "zh-CN": "审计日志 (Audit)",
+        "en-US": "Audit Logs",
+      },
+    },
+    {
+      tKey: "log.bizLog",
+      langCodes: {
+        "zh-CN": "业务日志 (Biz)",
+        "en-US": "Business Logs",
+      },
+    },
+    {
+      tKey: "log.globalTimeline",
+      langCodes: {
+        "zh-CN": "全局时间线 (Timeline)",
+        "en-US": "Global Timeline",
+      },
+    },
     {
       tKey: "common.fullScreen",
       langCodes: {

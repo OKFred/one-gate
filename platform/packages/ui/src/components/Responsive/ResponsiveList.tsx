@@ -245,7 +245,7 @@ function ResponsiveListInner<T>({
         <TableHead>
           <TableRow>
             {columns.map((col, index) => (
-              <TableCell key={index} align={col.align} width={col.width}>
+              <TableCell key={index} align={col.align} width={col.width} sx={{ whiteSpace: 'nowrap' }}>
                 {col.title}
               </TableCell>
             ))}
@@ -255,7 +255,7 @@ function ResponsiveListInner<T>({
           {data.map((item, rowIndex) => (
             <TableRow key={keyExtractor(item)} hover>
               {columns.map((col, colIndex) => (
-                <TableCell key={colIndex} align={col.align}>
+                <TableCell key={colIndex} align={col.align} sx={{ minWidth: 100, whiteSpace: 'nowrap' }}>
                   {col.render(item, rowIndex)}
                 </TableCell>
               ))}

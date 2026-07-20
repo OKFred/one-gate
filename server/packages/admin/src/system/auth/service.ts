@@ -90,7 +90,8 @@ async function onLogin(
   await registry.maintenance.recordLogin(
     id,
     clientInfo.ip,
-    clientInfo.userAgent
+    clientInfo.userAgent,
+    username
   );
 
   return {

@@ -471,47 +471,40 @@ export const maintenanceTranslations = {
       },
     },
   ],
-  "maintenance.audit_login": [
+  "maintenance.login_log": [
     {
-      tKey: "sidebar.menu.maintenance.auditLogin",
+      tKey: "sidebar.menu.maintenance.loginLog",
       langCodes: {
-        "zh-CN": "登录审计",
-        "en-US": "Login Audit",
+        "zh-CN": "登录日志",
+        "en-US": "Login Log",
       },
     },
     {
-      tKey: "maintenance.auditLogin.column.userId",
+      tKey: "maintenance.loginLog.column.userId",
       langCodes: {
         "zh-CN": "用户ID",
         "en-US": "User ID",
       },
     },
     {
-      tKey: "maintenance.auditLogin.column.loginTime",
+      tKey: "maintenance.loginLog.column.loginTime",
       langCodes: {
         "zh-CN": "登录时间",
         "en-US": "Login Time",
       },
     },
     {
-      tKey: "maintenance.auditLogin.column.ip",
+      tKey: "maintenance.loginLog.column.ip",
       langCodes: {
         "zh-CN": "IP地址",
         "en-US": "IP Address",
       },
     },
     {
-      tKey: "maintenance.auditLogin.column.userAgent",
+      tKey: "maintenance.loginLog.column.userAgent",
       langCodes: {
         "zh-CN": "浏览器/设备",
         "en-US": "User Agent",
-      },
-    },
-    {
-      tKey: "businessType.maintenance.audit_login",
-      langCodes: {
-        "zh-CN": "登录审计",
-        "en-US": "Login Audit",
       },
     },
   ],

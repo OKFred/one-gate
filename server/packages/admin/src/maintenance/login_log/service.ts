@@ -13,16 +13,36 @@ import {
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import type { RequiredKeys } from "@hodor/core/types/app";
-import * as auditLoginRepository from "./repository";
+import { registry } from "../../common/registry";
 
 /**
  * 记录用户登录审计
  * @param userId 用户ID
  * @param ip 客户端IP
  * @param userAgent 客户端User-Agent
+ * @param realName 真实姓名
  */
-async function recordLogin(userId: number, ip: string, userAgent: string) {
-  await auditLoginRepository.recordLogin(userId, ip, userAgent);
+async function recordLogin(
+  userId: number,
+  ip: string,
+  userAgent: string,
+  realName?: string | null
+) {
+  const creatorName = realName || String(userId);
+
+  await registry.base.log.sys.add({
+    namespace: "login",
+    logLevel: "INFO",
+    payloadType: "json",
+    logValue: {
+      userId,
+      loginTimeUtc: Date.now(),
+      ip,
+      userAgent,
+    },
+    creatorId: userId,
+    creatorName: creatorName,
+  });
 }
 
 // --- API ---
@@ -59,20 +79,49 @@ async function onList(
   } = params;
   const finalPageSize = Math.min(pageSize, 1000);
 
-  const { total, list } = await auditLoginRepository.findPage({
+  const filters = userId ? { userId } : undefined;
+
+  const { total, list } = await registry.base.log.sys.list({
+    namespace: "login",
     pageNo,
     pageSize: finalPageSize,
-    orderBy,
+    orderBy:
+      orderBy === "id" || orderBy === "createTimeUtc" ? orderBy : undefined,
     descend,
-    userId,
+    filters,
   });
+
+  // Map back to LoginAuditPOLike
+  const mappedList = list.map((item) => {
+    const val = item.logValue as any;
+    return {
+      id: item.id,
+      userId: val.userId,
+      loginTimeUtc: val.loginTimeUtc,
+      ip: val.ip,
+      userAgent: val.userAgent,
+      remark: item.remark,
+      creatorId: item.creatorId,
+      creatorName: item.creatorName,
+      createTimeUtc: item.createTimeUtc,
+    } as LoginAuditPOLike;
+  });
+
+  // For mapped sort where the sort wasn't handled natively by DB because it's a JSON field
+  if (orderBy === "userId" || orderBy === "loginTimeUtc") {
+    mappedList.sort((a, b) => {
+      const aVal = a[orderBy] as number;
+      const bVal = b[orderBy] as number;
+      return descend ? bVal - aVal : aVal - bVal;
+    });
+  }
 
   return {
     total,
     totalPage: Math.ceil(total / finalPageSize),
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: list as any,
+    list: mappedList as any,
   };
 }
 

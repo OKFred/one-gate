@@ -1,22 +1,19 @@
 import type { components, paths } from '../../../types/openapi';
 
-type ResWrapper<T> = {
-  ok: boolean;
-  message?: string;
-  data: T;
-};
+// Removed ResWrapper
 
 export type ListConfigReq =
-  paths['/api/v1/base/config/list']['post']['requestBody']['content']['application/json'];
-export type ConfigRes = components['schemas']['/api/v1/base/config/list']['list'][0];
+  paths['/api/v1/admin/base/config/list']['post']['requestBody']['content']['application/json'];
+export type ConfigRes = components['schemas']['admin.base.config.list.res']['data']['list'][0];
 
 export type AddConfigReq =
-  paths['/api/v1/base/config/add']['post']['requestBody']['content']['application/json'];
+  paths['/api/v1/admin/base/config/add']['post']['requestBody']['content']['application/json'];
 export type UpdateConfigReq =
-  paths['/api/v1/base/config/update']['post']['requestBody']['content']['application/json'];
+  paths['/api/v1/admin/base/config/update']['post']['requestBody']['content']['application/json'];
 export type DeleteConfigReq =
-  paths['/api/v1/base/config/delete']['post']['requestBody']['content']['application/json'];
-export type GetConfigSchemaReq = paths['/api/v1/base/config/schema']['get']['parameters']['query'];
+  paths['/api/v1/admin/base/config/delete']['post']['requestBody']['content']['application/json'];
+export type GetConfigSchemaReq =
+  paths['/api/v1/admin/base/config/schema']['post']['requestBody']['content']['application/json'];
 
-export type SchemaRes = components['schemas']['/api/v1/base/config/schema'];
-export type NamespacesRes = components['schemas']['/api/v1/base/config/namespaces'][0];
+export type SchemaRes = components['schemas']['admin.base.config.schema.res']['data'];
+export type NamespacesRes = components['schemas']['admin.base.config.namespaces.res']['data'][0];

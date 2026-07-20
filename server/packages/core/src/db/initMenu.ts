@@ -211,12 +211,12 @@ export const initialMenuData = [
   },
   {
     id: 22,
-    name: "sidebar.menu.maintenance.auditLogin",
+    name: "sidebar.menu.maintenance.loginLog",
     icon: "material-symbols:history-edu",
-    path: "/maintenance/auditLogin",
+    path: "/maintenance/loginLog",
     parentId: 19,
     sort: 3,
-    business: "admin.maintenance.audit_login",
+    business: "admin.maintenance.login_log",
   },
   {
     id: 35,
@@ -431,6 +431,15 @@ export const initialMenuData = [
     parentId: 49,
     sort: 1,
     business: "admin.base.config",
+  },
+  {
+    id: 51,
+    name: "sidebar.menu.admin.base.log",
+    icon: "material-symbols:history",
+    path: "/base/log",
+    parentId: 49,
+    sort: 2,
+    business: "admin.base.log",
   },
 ] satisfies menuLike[];
 

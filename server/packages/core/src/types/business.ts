@@ -30,7 +30,7 @@ export const BUSINESS = {
   /** 运维 API Task */
   "admin.maintenance.api_task": "admin.maintenance.api_task",
   /** 运维登录日志 */
-  "admin.maintenance.audit_login": "admin.maintenance.audit_login",
+  "admin.maintenance.login_log": "admin.maintenance.login_log",
   /** 运维初始化 */
   "admin.maintenance.init": "admin.maintenance.init",
   /** 系统 */
@@ -98,6 +98,8 @@ export const BUSINESS = {
   "admin.base": "admin.base",
   /** 基础配置 - 具体配置 */
   "admin.base.config": "admin.base.config",
+  /** 基础配置 - 日志 */
+  "admin.base.log": "admin.base.log",
   /** 数据库 */
   "admin.data": "admin.data",
   /** 表单数据 */

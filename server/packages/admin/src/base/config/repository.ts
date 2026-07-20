@@ -24,7 +24,7 @@ function buildWhereCondition(condition?: {
   const conditions: SQL<unknown>[] = [];
 
   if (hasValue(namespace)) {
-    conditions.push(eq(baseConfigTable.namespace, namespace));
+    conditions.push(eq(baseConfigTable.namespace, namespace!));
   }
   if (hasValue(keyword)) {
     conditions.push(
