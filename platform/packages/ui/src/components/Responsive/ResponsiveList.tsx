@@ -44,6 +44,8 @@ const ExpandableContent = ({ children }: { children: ReactNode }) => {
         textOverflow: 'ellipsis',
         whiteSpace: 'normal',
         wordBreak: 'break-word',
+        width: 'max-content',
+        maxWidth: '100%',
       }}
     >
       {children}
@@ -61,6 +63,8 @@ export interface TableColumn<T> {
   align?: 'left' | 'center' | 'right';
   /** 是否固定列 */
   fixed?: 'left' | 'right';
+  /** 是否为操作列（宽度自适应且不截断文本） */
+  isAction?: boolean;
   /** 渲染单元格内容 */
   render: (item: T, index: number) => ReactNode;
 }
@@ -292,6 +296,7 @@ function ResponsiveListInner<T>({
               const isFixed = !!col.fixed;
               const isFixedLeft = col.fixed === 'left';
               const isFixedRight = col.fixed === 'right';
+              const isActionCol = col.isAction || isFixedRight;
               const fixedStyles = isFixed
                 ? {
                     position: 'sticky',
@@ -308,12 +313,17 @@ function ResponsiveListInner<T>({
                   align={col.align}
                   width={col.width}
                   sx={{
-                    minWidth: 100,
-                    maxWidth: '50vw',
+                    ...(isActionCol
+                      ? {
+                          whiteSpace: 'nowrap',
+                          width: col.width || '1%',
+                          '& .MuiButtonBase-root': { minWidth: 50 },
+                        }
+                      : { minWidth: 100, maxWidth: '50vw' }),
                     ...fixedStyles,
                   }}
                 >
-                  <ExpandableContent>{col.title}</ExpandableContent>
+                  {isActionCol ? col.title : <ExpandableContent>{col.title}</ExpandableContent>}
                 </TableCell>
               );
             })}
@@ -326,6 +336,7 @@ function ResponsiveListInner<T>({
                 const isFixed = !!col.fixed;
                 const isFixedLeft = col.fixed === 'left';
                 const isFixedRight = col.fixed === 'right';
+                const isActionCol = col.isAction || isFixedRight;
                 const fixedStyles = isFixed
                   ? {
                       position: 'sticky',
@@ -341,12 +352,21 @@ function ResponsiveListInner<T>({
                     key={colIndex}
                     align={col.align}
                     sx={{
-                      minWidth: 100,
-                      maxWidth: '50vw',
+                      ...(isActionCol
+                        ? {
+                            whiteSpace: 'nowrap',
+                            width: col.width || '1%',
+                            '& .MuiButtonBase-root': { minWidth: 70 },
+                          }
+                        : { minWidth: 100, maxWidth: '50vw' }),
                       ...fixedStyles,
                     }}
                   >
-                    <ExpandableContent>{col.render(item, rowIndex)}</ExpandableContent>
+                    {isActionCol ? (
+                      col.render(item, rowIndex)
+                    ) : (
+                      <ExpandableContent>{col.render(item, rowIndex)}</ExpandableContent>
+                    )}
                   </TableCell>
                 );
               })}
