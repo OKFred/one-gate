@@ -11,9 +11,7 @@ import {
   SwarmDockerConfigAddKeys,
   SwarmDockerConfigUpdateKeys,
   SwarmDockerConfigSortableKeys,
-  type SwarmDockerConfigPOLike,
 } from "./model";
-import * as swarmDockerConfigRepository from "./repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
 import { dockerClient } from "../docker/client";
@@ -28,7 +26,7 @@ import {
   bodyUserAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
+import { registry } from "../../common/registry";
 
 // 列表 (全部)
 const listAllReq = {
@@ -36,11 +34,10 @@ const listAllReq = {
   properties: {
     ...listAllReqBase,
     isEnabled: SwarmDockerConfigVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof SwarmDockerConfigPOLike)[]>(
-      SwarmDockerConfigSortableKeys
-    ),
+    orderBy: orderByWrapper<(typeof SwarmDockerConfigSortableKeys)[number][]>([
+      ...SwarmDockerConfigSortableKeys,
+    ]),
   },
-  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -63,7 +60,37 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  return await swarmDockerConfigRepository.findAll(params);
+  const res = await registry.base.config.list({
+    namespace: "swarm_docker",
+    keyword: (params as { keyword?: string }).keyword,
+    isEnabled: params.isEnabled,
+    orderBy:
+      params.orderBy === "name"
+        ? "configKey"
+        : params.orderBy === "isDefault"
+          ? "isPrimary"
+          : (params.orderBy as
+              | "id"
+              | "isPrimary"
+              | "configKey"
+              | "isEnabled"
+              | "createTimeUtc"
+              | undefined),
+    descend: params.descend,
+    pageNo: 1,
+    pageSize: 1000,
+  });
+
+  return res.list.map((item) => {
+    const configValue = (item.configValue || {}) as Record<string, unknown>;
+    return {
+      id: item.id,
+      name: item.configKey,
+      host: configValue.host as string,
+      isEnabled: item.isEnabled,
+      isDefault: item.isPrimary,
+    } as unknown as FromSchema<typeof listAllRes>[number];
+  });
 }
 
 const listAllApi = {
@@ -85,41 +112,52 @@ const listReq = {
   properties: {
     ...listReqBase,
     isEnabled: SwarmDockerConfigVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof SwarmDockerConfigPOLike)[]>(
-      SwarmDockerConfigSortableKeys
-    ),
+    orderBy: orderByWrapper<(typeof SwarmDockerConfigSortableKeys)[number][]>([
+      ...SwarmDockerConfigSortableKeys,
+    ]),
   },
-  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<SwarmDockerConfigPOLike>[]>(
-    { ...SwarmDockerConfigListVO },
-    [...SwarmDockerConfigListKeys]
-  ),
+  ...listResponseWrapper(SwarmDockerConfigVO, [...SwarmDockerConfigListKeys]),
 } as const satisfies JSONSchema;
 
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-
-  const { list, total } = await swarmDockerConfigRepository.findPage({
-    keyword: params.keyword,
+  const res = await registry.base.config.list({
+    namespace: "swarm_docker",
+    keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
-    pageNo,
-    pageSize,
-    orderBy: orderBy as keyof SwarmDockerConfigPOLike,
-    descend,
+    orderBy:
+      params.orderBy === "name"
+        ? "configKey"
+        : params.orderBy === "isDefault"
+          ? "isPrimary"
+          : (params.orderBy as
+              | "id"
+              | "isPrimary"
+              | "configKey"
+              | "isEnabled"
+              | "createTimeUtc"
+              | undefined),
+    descend: params.descend,
+    pageNo: params.pageNo,
+    pageSize: params.pageSize,
   });
 
   return {
-    total,
-    totalPage: Math.ceil(total / pageSize),
-    currentPage: pageNo,
-    pageSize,
-    list,
+    ...res,
+    list: res.list.map((item) => {
+      const configValue = (item.configValue || {}) as Record<string, unknown>;
+      return {
+        ...item,
+        ...configValue,
+        name: item.configKey,
+        isDefault: item.isPrimary,
+      } as unknown as FromSchema<typeof listRes>["list"][number];
+    }),
   };
 }
 
@@ -145,23 +183,25 @@ const addRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
 async function onAdd(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
-  const { userId: creatorId } = userObj;
+): Promise<number | null> {
+  const { name, isEnabled, isDefault, remark, ...configValue } = obj;
 
-  // 如果设置为默认配置，则取消其他默认配置
-  if (obj.isDefault) {
-    await swarmDockerConfigRepository.clearAllDefaults();
-  }
-
-  const result = await swarmDockerConfigRepository.onInsert({
-    ...obj,
-    creatorId,
-  });
+  const resultId = await registry.base.config.add(
+    {
+      namespace: "swarm_docker",
+      configKey: name,
+      isEnabled,
+      isPrimary: isDefault,
+      configValue,
+      remark,
+    },
+    userObj
+  );
 
   // 配置变更，重置客户端的初始化状态
   dockerClient.reset();
 
-  return result?.id ?? null;
+  return resultId;
 }
 
 const addApi = {
@@ -185,26 +225,30 @@ async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<number | null> {
-  const { userId: updaterId } = userObj;
-  const { id, ...rest } = params;
-  await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
+  const { id, name, isEnabled, isDefault, remark, ...configValue } = params;
 
-  if (params.isDefault) {
-    await swarmDockerConfigRepository.clearAllDefaults(id);
-  }
+  const existing = await registry.base.config.detail({ id });
+  const mergedConfigValue = {
+    ...existing.configValue,
+    ...configValue,
+  };
 
-  const res = await swarmDockerConfigRepository.onUpdate(id, {
-    ...rest,
-    updaterId,
-    updateTimeUtc: Date.now(),
-  });
-
-  preventEmpty(res);
+  const res = await registry.base.config.update(
+    {
+      id,
+      configKey: name,
+      isEnabled,
+      isPrimary: isDefault,
+      configValue: mergedConfigValue,
+      remark,
+    },
+    userObj
+  );
 
   // 配置变更，重置客户端的初始化状态
   dockerClient.reset();
 
-  return res.id;
+  return res;
 }
 
 const updateApi = {
@@ -224,9 +268,13 @@ const getReq = {
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const row = await swarmDockerConfigRepository.findById(params.id);
-  preventEmpty(row);
-  return row;
+  const row = await registry.base.config.detail({ id: params.id as number });
+  return {
+    ...row,
+    ...row.configValue,
+    name: row.configKey,
+    isDefault: row.isPrimary,
+  };
 }
 
 const getApi = {
@@ -235,7 +283,7 @@ const getApi = {
     type: "object",
     properties: { ...SwarmDockerConfigVO },
     required: [...SwarmDockerConfigDetailKeys],
-  },
+  } as const,
   pathInfo: { path: "/get", method: "post", summary: "获取 Docker 配置详情" },
   adapter: bodyAdapter,
   service: onGet,
@@ -244,13 +292,12 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const row = await swarmDockerConfigRepository.onDelete(obj.id);
-  preventEmpty(row);
+  const res = await registry.base.config.delete({ id: obj.id as number });
 
   // 配置变更，重置客户端的初始化状态
   dockerClient.reset();
 
-  return row.id;
+  return res;
 }
 
 const deleteApi = {
@@ -265,15 +312,14 @@ const deleteApi = {
 // 验证连通性
 async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
   const config = await onGet(obj);
-  // testRawConnection 在连接失败时会抛出 BusinessError，由 errorHandler 统一处理
   return await dockerClient.testRawConnection({
-    host: config.host,
-    apiVersion: config.apiVersion || "",
-    tlsVerify: config.tlsVerify,
-    caCert: config.caCert ?? undefined,
-    clientCert: config.clientCert ?? undefined,
-    clientKey: config.clientKey ?? undefined,
-    cfMtlsBinding: config.cfMtlsBinding ?? undefined,
+    host: config.host as string,
+    apiVersion: (config.apiVersion as string) || "",
+    tlsVerify: config.tlsVerify as boolean,
+    caCert: (config.caCert as string) ?? undefined,
+    clientCert: (config.clientCert as string) ?? undefined,
+    clientKey: (config.clientKey as string) ?? undefined,
+    cfMtlsBinding: (config.cfMtlsBinding as string) ?? undefined,
   });
 }
 

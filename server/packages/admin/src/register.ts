@@ -17,6 +17,7 @@ import { utils as baseConfigUtils } from "./base/config/service.js";
 import baseLogService from "./base/log/service.js";
 import { getDefaultConfig as aiGetDefaultConfig } from "./ai/config/service.js";
 import { AiConfigProvider } from "./ai/config/provider.js";
+import { SwarmDockerConfigProvider } from "./swarm/docker_config/provider.js";
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
@@ -44,7 +45,9 @@ export const maintenanceRegister = {
   runPendingJobs,
 };
 
-export const swarmRegister = dockerClient;
+export const swarmRegister = Object.assign(dockerClient, {
+  configProvider: new SwarmDockerConfigProvider(),
+});
 
 export const rpaRegister = {
   findDefaultActiveConfig,

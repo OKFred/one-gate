@@ -31,14 +31,11 @@ export class DockerClient {
     if (this.isInitialized) return;
 
     try {
-      // 动态导入以解决可能在 `client -> repository -> client` 产生的循环依赖
-      const swarmDockerConfigRepository =
-        await import("@hodor/admin/swarm/docker_config/repository");
+      const { registry } = await import("../../common/registry");
+      const config = await registry.base.config.getMergedConfig("swarm_docker");
 
-      const config =
-        await swarmDockerConfigRepository.findDefaultActiveConfig();
-      if (config) {
-        let { host } = config;
+      if (config && config.host) {
+        let { host } = config as { host: string };
         if (host.startsWith("tcp://")) {
           host = host.replace(
             "tcp://",
@@ -49,8 +46,8 @@ export class DockerClient {
           host = host.slice(0, -1);
         }
         this.baseUrl = host;
-        this.apiVersion = config.apiVersion || "";
-        this.cfMtlsBinding = config.cfMtlsBinding || undefined;
+        this.apiVersion = (config.apiVersion as string) || "";
+        this.cfMtlsBinding = (config.cfMtlsBinding as string) || undefined;
 
         if (config.tlsVerify) {
           const isNode =
@@ -59,7 +56,9 @@ export class DockerClient {
             // Node.js 运行时：通过 undici.Agent 挂载数据库读取的证书文本
             // @ts-ignore
             const { Agent } = await import("undici");
-            const { caCert, clientCert, clientKey } = config;
+            const caCert = config.caCert as string | undefined;
+            const clientCert = config.clientCert as string | undefined;
+            const clientKey = config.clientKey as string | undefined;
 
             if (caCert && clientCert && clientKey) {
               this.dispatcher = new Agent({
