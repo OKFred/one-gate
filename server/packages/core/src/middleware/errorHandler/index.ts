@@ -43,12 +43,6 @@ export default function errorHandler(app: App) {
   });
 
   app.onError(async (err, c: Context) => {
-    if (c.var.logger) {
-      c.var.logger.error(err);
-    } else {
-      console.error(err);
-    }
-    const t = await getTranslator(c);
     let e = err;
     const sqlError = convertSqlErrorToBusinessError(e);
     if (sqlError) {
@@ -57,6 +51,26 @@ export default function errorHandler(app: App) {
     if (e instanceof BusinessError) {
       e = toHttpException(e);
     }
+
+    const isClientError = e instanceof HTTPException && e.status < 500;
+    if (isClientError) {
+      // 客户端错误或业务异常，仅打印简短日志，不输出完整堆栈以避免污染控制台
+      const msg = `[BusinessWarning] ${e.message}`;
+      if (c.var.logger && typeof c.var.logger.warn === "function") {
+        c.var.logger.warn(msg);
+      } else {
+        console.warn(msg);
+      }
+    } else {
+      // 服务端内部异常，保留完整堆栈
+      if (c.var.logger && typeof c.var.logger.error === "function") {
+        c.var.logger.error(err);
+      } else {
+        console.error(err);
+      }
+    }
+
+    const t = await getTranslator(c);
     if (e instanceof HTTPException) {
       return c.json<ResJson>(
         {
