@@ -356,7 +356,7 @@ function ResponsiveListInner<T>({
                         ? {
                             whiteSpace: 'nowrap',
                             width: col.width || '1%',
-                            '& .MuiButtonBase-root': { minWidth: 70 },
+                            '& .MuiButtonBase-root': { minWidth: 50 },
                           }
                         : { minWidth: 100, maxWidth: '50vw' }),
                       ...fixedStyles,
