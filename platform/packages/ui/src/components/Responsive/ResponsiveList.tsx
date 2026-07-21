@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from 'react';
+import { memo, useState, useCallback, useRef, type ReactNode } from 'react';
 import {
   Box,
   CircularProgress,
@@ -20,6 +20,36 @@ import {
 } from '@mui/material';
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
+
+const ExpandableContent = ({ children }: { children: ReactNode }) => {
+  const [expanded, setExpanded] = useState(false);
+  const lastTapRef = useRef(0);
+
+  const handleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      setExpanded((prev) => !prev);
+    }
+    lastTapRef.current = now;
+  }, []);
+
+  return (
+    <Box
+      onClick={handleTap}
+      sx={{
+        display: expanded ? 'block' : '-webkit-box',
+        WebkitLineClamp: expanded ? 'unset' : 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'normal',
+        wordBreak: 'break-word',
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
 
 /** 表格列配置 */
 export interface TableColumn<T> {
@@ -277,9 +307,13 @@ function ResponsiveListInner<T>({
                   key={index}
                   align={col.align}
                   width={col.width}
-                  sx={{ whiteSpace: 'nowrap', ...fixedStyles }}
+                  sx={{
+                    minWidth: 100,
+                    maxWidth: '50vw',
+                    ...fixedStyles,
+                  }}
                 >
-                  {col.title}
+                  <ExpandableContent>{col.title}</ExpandableContent>
                 </TableCell>
               );
             })}
@@ -306,9 +340,13 @@ function ResponsiveListInner<T>({
                   <TableCell
                     key={colIndex}
                     align={col.align}
-                    sx={{ minWidth: 100, whiteSpace: 'nowrap', ...fixedStyles }}
+                    sx={{
+                      minWidth: 100,
+                      maxWidth: '50vw',
+                      ...fixedStyles,
+                    }}
                   >
-                    {col.render(item, rowIndex)}
+                    <ExpandableContent>{col.render(item, rowIndex)}</ExpandableContent>
                   </TableCell>
                 );
               })}
