@@ -23,8 +23,7 @@ export const permissionSeeds = {
   /** 底座 */
   "admin.base": {
     "": ["read"],
-    /** 配置项 */
-    config: ["read", "add", "edit", "delete"],
+    sys_config: ["read", "add", "edit", "delete"],
     /** 日志 */
     log: ["read"],
   },
@@ -109,6 +108,10 @@ export const permissionSeeds = {
   /** 企业管理 */
   enterprise: {
     "": ["read"],
+    base: {
+      "": ["read"],
+      biz_config: ["read", "add", "edit", "delete"],
+    },
   },
   /** 组织管理 */
   organization: {

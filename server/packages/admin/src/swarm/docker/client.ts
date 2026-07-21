@@ -32,7 +32,8 @@ export class DockerClient {
 
     try {
       const { registry } = await import("../../common/registry");
-      const config = await registry.base.config.getMergedConfig("swarm");
+      const config =
+        await registry.base.sysConfig.getMergedConfig("swarm_docker");
 
       if (config && config.host) {
         let { host } = config as { host: string };

@@ -60,7 +60,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const res = await registry.base.config.list({
+  const res = await registry.base.sysConfig.list({
     namespace: "swarm",
     keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
@@ -126,7 +126,7 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const res = await registry.base.config.list({
+  const res = await registry.base.sysConfig.list({
     namespace: "swarm",
     keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
@@ -186,7 +186,7 @@ async function onAdd(
 ): Promise<number | null> {
   const { name, isEnabled, isDefault, remark, ...configValue } = obj;
 
-  const resultId = await registry.base.config.add(
+  const resultId = await registry.base.sysConfig.add(
     {
       namespace: "swarm",
       configKey: name,
@@ -227,13 +227,13 @@ async function onUpdate(
 ): Promise<number | null> {
   const { id, name, isEnabled, isDefault, remark, ...configValue } = params;
 
-  const existing = await registry.base.config.detail({ id });
+  const existing = await registry.base.sysConfig.detail({ id });
   const mergedConfigValue = {
     ...existing.configValue,
     ...configValue,
   };
 
-  const res = await registry.base.config.update(
+  const res = await registry.base.sysConfig.update(
     {
       id,
       configKey: name,
@@ -268,7 +268,7 @@ const getReq = {
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const row = await registry.base.config.detail({ id: params.id as number });
+  const row = await registry.base.sysConfig.detail({ id: params.id as number });
   return {
     ...row,
     ...row.configValue,
@@ -292,7 +292,7 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const res = await registry.base.config.delete({ id: obj.id as number });
+  const res = await registry.base.sysConfig.delete({ id: obj.id as number });
 
   // 配置变更，重置客户端的初始化状态
   dockerClient.reset();

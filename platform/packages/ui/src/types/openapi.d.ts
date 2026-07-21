@@ -9693,7 +9693,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/list": {
+    "/api/v1/admin/base/sys_config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -9702,7 +9702,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 分页获取系统配置 */
+        /** 鍒嗛〉鑾峰彇绯荤粺閰嶇疆 */
         post: {
             parameters: {
                 query?: never;
@@ -9712,7 +9712,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.list.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.list.req"];
                 };
             };
             responses: {
@@ -9722,7 +9722,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.list.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9751,7 +9751,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/detail": {
+    "/api/v1/admin/base/sys_config/detail": {
         parameters: {
             query?: never;
             header?: never;
@@ -9760,7 +9760,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取配置详情 */
+        /** 鑾峰彇閰嶇疆璇︽儏 */
         post: {
             parameters: {
                 query?: never;
@@ -9770,7 +9770,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.detail.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.detail.req"];
                 };
             };
             responses: {
@@ -9780,7 +9780,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.detail.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.detail.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9809,7 +9809,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/add": {
+    "/api/v1/admin/base/sys_config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -9818,7 +9818,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 添加配置 */
+        /** 娣诲姞閰嶇疆 */
         post: {
             parameters: {
                 query?: never;
@@ -9828,7 +9828,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.add.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.add.req"];
                 };
             };
             responses: {
@@ -9838,7 +9838,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.add.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9867,7 +9867,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/update": {
+    "/api/v1/admin/base/sys_config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -9876,7 +9876,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 更新配置 */
+        /** 鏇存柊閰嶇疆 */
         post: {
             parameters: {
                 query?: never;
@@ -9886,7 +9886,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.update.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.update.req"];
                 };
             };
             responses: {
@@ -9896,7 +9896,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.update.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9925,7 +9925,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/delete": {
+    "/api/v1/admin/base/sys_config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -9934,7 +9934,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除配置 */
+        /** 鍒犻櫎閰嶇疆 */
         post: {
             parameters: {
                 query?: never;
@@ -9944,7 +9944,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.delete.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.delete.req"];
                 };
             };
             responses: {
@@ -9954,7 +9954,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.delete.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9983,7 +9983,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/schema": {
+    "/api/v1/admin/base/sys_config/schema": {
         parameters: {
             query?: never;
             header?: never;
@@ -9992,7 +9992,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取领域配置Schema */
+        /** 鑾峰彇棰嗗煙閰嶇疆Schema */
         post: {
             parameters: {
                 query?: never;
@@ -10002,7 +10002,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.schema.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.schema.req"];
                 };
             };
             responses: {
@@ -10012,7 +10012,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.schema.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.schema.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10041,7 +10041,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/base/config/namespaces": {
+    "/api/v1/admin/base/sys_config/namespaces": {
         parameters: {
             query?: never;
             header?: never;
@@ -10050,7 +10050,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取已注册配置的命名空间 */
+        /** 鑾峰彇宸叉敞鍐岄厤缃殑鍛藉悕绌洪棿 */
         post: {
             parameters: {
                 query?: never;
@@ -10060,7 +10060,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.base.config.namespaces.req"];
+                    "application/json": components["schemas"]["admin.base.sys_config.namespaces.req"];
                 };
             };
             responses: {
@@ -10070,7 +10070,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.base.config.namespaces.res"];
+                        "application/json": components["schemas"]["admin.base.sys_config.namespaces.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -17959,12 +17959,12 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
+                    updaterId?: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: ((number | null) | null) | null;
+                    updateTimeUtc?: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -18112,12 +18112,12 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
+                updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: ((number | null) | null) | null;
+                updateTimeUtc?: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -18658,7 +18658,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.base.config.list.req": {
+        "admin.base.sys_config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18683,7 +18683,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "namespace" | "isEnabled" | "isPrimary" | "createTimeUtc";
         };
-        "admin.base.config.list.res": {
+        "admin.base.sys_config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18700,8 +18700,6 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /** @description 租户ID */
-                    tenantId?: ((number | null) | null) | null;
                     /** @description 命名空间 */
                     namespace: string;
                     /** @description 配置键 */
@@ -18734,14 +18732,14 @@ export interface components {
             };
             message: string;
         };
-        "admin.base.config.detail.req": {
+        "admin.base.sys_config.detail.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.base.config.detail.res": {
+        "admin.base.sys_config.detail.res": {
             ok: boolean;
             data: {
                 /**
@@ -18749,8 +18747,6 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /** @description 租户ID */
-                tenantId?: ((number | null) | null) | null;
                 /** @description 命名空间 */
                 namespace: string;
                 /** @description 配置键 */
@@ -18782,9 +18778,7 @@ export interface components {
             };
             message: string;
         };
-        "admin.base.config.add.req": {
-            /** @description 租户ID */
-            tenantId?: ((number | null) | null) | null;
+        "admin.base.sys_config.add.req": {
             /** @description 命名空间 */
             namespace: string;
             /** @description 配置键 */
@@ -18800,7 +18794,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.base.config.add.res": {
+        "admin.base.sys_config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -18809,14 +18803,12 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.base.config.update.req": {
+        "admin.base.sys_config.update.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
-            /** @description 租户ID */
-            tenantId?: ((number | null) | null) | null;
             /** @description 命名空间 */
             namespace?: string;
             /** @description 配置键 */
@@ -18832,7 +18824,7 @@ export interface components {
             /** @description 备注 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.base.config.update.res": {
+        "admin.base.sys_config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -18841,14 +18833,14 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.base.config.delete.req": {
+        "admin.base.sys_config.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.base.config.delete.res": {
+        "admin.base.sys_config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -18857,11 +18849,11 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.base.config.schema.req": {
+        "admin.base.sys_config.schema.req": {
             /** @description 命名空间 */
             namespace: string;
         };
-        "admin.base.config.schema.res": {
+        "admin.base.sys_config.schema.res": {
             ok: boolean;
             data: {
                 schema: {
@@ -18873,8 +18865,8 @@ export interface components {
             };
             message: string;
         };
-        "admin.base.config.namespaces.req": Record<string, never>;
-        "admin.base.config.namespaces.res": {
+        "admin.base.sys_config.namespaces.req": Record<string, never>;
+        "admin.base.sys_config.namespaces.res": {
             ok: boolean;
             data: {
                 /** @description 命名空间 */

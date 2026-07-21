@@ -1,6 +1,5 @@
-CREATE TABLE `base_config` (
+CREATE TABLE `base_sys_config` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`tenant_id` integer,
 	`namespace` text NOT NULL,
 	`config_key` text NOT NULL,
 	`is_enabled` integer DEFAULT true NOT NULL,
@@ -13,6 +12,4 @@ CREATE TABLE `base_config` (
 	`update_time_utc` integer
 );
 
-CREATE INDEX `idx_base_config_namespace` ON `base_config` (`namespace`);
-
-CREATE INDEX `idx_base_config_tenant` ON `base_config` (`tenant_id`);
+CREATE INDEX `idx_base_sys_config_namespace` ON `base_sys_config` (`namespace`);

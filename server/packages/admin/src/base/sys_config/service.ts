@@ -1,19 +1,19 @@
 import {
   IndexVO,
-  BaseConfigVO,
-  BaseConfigListVO,
-  BaseConfigAddVO,
-  BaseConfigUpdateVO,
-  BaseConfigListKeys,
-  BaseConfigDetailKeys,
-  BaseConfigGetKeys,
-  BaseConfigDeleteKeys,
-  BaseConfigAddKeys,
-  BaseConfigUpdateKeys,
-  BaseConfigSortableKeys,
+  BaseSysConfigVO,
+  BaseSysConfigListVO,
+  BaseSysConfigAddVO,
+  BaseSysConfigUpdateVO,
+  BaseSysConfigListKeys,
+  BaseSysConfigDetailKeys,
+  BaseSysConfigGetKeys,
+  BaseSysConfigDeleteKeys,
+  BaseSysConfigAddKeys,
+  BaseSysConfigUpdateKeys,
+  BaseSysConfigSortableKeys,
   NamespacesResVO,
   NamespacesResKeys,
-  type BaseConfigPOLike,
+  type BaseSysConfigPOLike,
   type IDomainConfigProvider,
 } from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -30,7 +30,7 @@ import {
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
-import * as baseConfigRepository from "./repository";
+import * as baseSysConfigRepository from "./repository";
 
 import { registry, type IAdminServices } from "../../common/registry";
 
@@ -61,7 +61,7 @@ export async function getMergedConfig(namespace: string) {
   }
   const defaultValues = provider.getDefaultValues();
   const dbConfig =
-    await baseConfigRepository.findPrimaryActiveConfig(namespace);
+    await baseSysConfigRepository.findPrimaryByNamespace(namespace);
 
   if (dbConfig) {
     let parsedValue = {};
@@ -83,18 +83,20 @@ const listReq = {
   type: "object",
   properties: {
     ...listReqBase,
-    namespace: BaseConfigVO["namespace"],
-    isEnabled: BaseConfigVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof BaseConfigPOLike)[]>(BaseConfigSortableKeys),
+    namespace: BaseSysConfigVO["namespace"],
+    isEnabled: BaseSysConfigVO["isEnabled"],
+    orderBy: orderByWrapper<(keyof BaseSysConfigPOLike)[]>(
+      BaseSysConfigSortableKeys
+    ),
   },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<BaseConfigPOLike>[]>(
-    { ...BaseConfigListVO },
-    [...BaseConfigListKeys]
+  ...listResponseWrapper<RequiredKeys<BaseSysConfigPOLike>[]>(
+    { ...BaseSysConfigListVO },
+    [...BaseSysConfigListKeys]
   ),
 } as const satisfies JSONSchema;
 
@@ -103,7 +105,7 @@ async function onList(params: FromSchema<typeof listReq>) {
   const maxPageSize = 1000;
   const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
 
-  const { total, list } = await baseConfigRepository.findPage({
+  const { total, list } = await baseSysConfigRepository.findPage({
     ...params,
     pageNo,
     pageSize: finalPageSize,
@@ -136,8 +138,8 @@ const listApi = {
 // ======================= API: ADD =======================
 const addReq = {
   type: "object",
-  properties: { ...BaseConfigAddVO },
-  required: [...BaseConfigAddKeys],
+  properties: { ...BaseSysConfigAddVO },
+  required: [...BaseSysConfigAddKeys],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -150,10 +152,10 @@ export async function onAdd(
   const { userId: creatorId } = userObj;
 
   if (obj.isPrimary) {
-    await baseConfigRepository.clearAllPrimary(obj.namespace);
+    await baseSysConfigRepository.resetPrimaryFlags(obj.namespace);
   }
 
-  const insertedId = await baseConfigRepository.onInsert({
+  const insertedId = await baseSysConfigRepository.onInsert({
     ...obj,
     configValue:
       typeof obj.configValue === "string"
@@ -177,8 +179,8 @@ const addApi = {
 // ======================= API: UPDATE =======================
 const updateReq = {
   type: "object",
-  properties: { ...BaseConfigUpdateVO },
-  required: [...BaseConfigUpdateKeys],
+  properties: { ...BaseSysConfigUpdateVO },
+  required: [...BaseSysConfigUpdateKeys],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -189,14 +191,14 @@ export async function onUpdate(
   const { userId: updaterId } = userObj;
   const { id, ...rest } = params;
 
-  const existing = await baseConfigRepository.findById(id);
+  const existing = await baseSysConfigRepository.findById(id);
   preventEmpty(existing);
 
   if (params.isPrimary) {
-    await baseConfigRepository.clearAllPrimary(existing.namespace, id);
+    await baseSysConfigRepository.resetPrimaryFlags(existing.namespace, id);
   }
 
-  const updateData: Partial<import("./model").BaseConfigInsertPOLike> = {
+  const updateData: Partial<import("./model").BaseSysConfigInsertPOLike> = {
     ...rest,
     updaterId,
     updateTimeUtc: Date.now(),
@@ -209,7 +211,7 @@ export async function onUpdate(
         : JSON.stringify(rest.configValue);
   }
 
-  const updateRow = await baseConfigRepository.onUpdate(id, updateData);
+  const updateRow = await baseSysConfigRepository.onUpdate(id, updateData);
   preventEmpty(updateRow);
   return updateRow.id;
 }
@@ -227,11 +229,11 @@ const updateApi = {
 const getReq = {
   type: "object",
   properties: { ...IndexVO },
-  required: [...BaseConfigGetKeys],
+  required: [...BaseSysConfigGetKeys],
 } as const satisfies JSONSchema;
 
 async function onDetail(params: FromSchema<typeof getReq>) {
-  const row = await baseConfigRepository.findById(params.id as number);
+  const row = await baseSysConfigRepository.findById(params.id as number);
   preventEmpty(row);
   return {
     ...row,
@@ -246,8 +248,8 @@ const detailApi = {
   req: getReq,
   res: {
     type: "object",
-    properties: { ...BaseConfigVO },
-    required: [...BaseConfigDetailKeys],
+    properties: { ...BaseSysConfigVO },
+    required: [...BaseSysConfigDetailKeys],
   },
   pathInfo: { path: "/detail", method: "post", summary: "获取配置详情" },
   adapter: bodyAdapter,
@@ -257,7 +259,7 @@ const detailApi = {
 
 // ======================= API: DELETE =======================
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const deletedRow = await baseConfigRepository.onDelete(obj.id as number);
+  const deletedRow = await baseSysConfigRepository.onDelete(obj.id as number);
   preventEmpty(deletedRow);
   return deletedRow.id;
 }
@@ -274,7 +276,7 @@ const deleteApi = {
 // ======================= API: SCHEMA =======================
 const schemaReq = {
   type: "object",
-  properties: { namespace: BaseConfigVO["namespace"] },
+  properties: { namespace: BaseSysConfigVO["namespace"] },
   required: ["namespace"],
   additionalProperties: false,
 } as const satisfies JSONSchema;

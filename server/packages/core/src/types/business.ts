@@ -97,7 +97,10 @@ export const BUSINESS = {
   /** 基础配置 */
   "admin.base": "admin.base",
   /** 基础配置 - 具体配置 */
-  "admin.base.config": "admin.base.config",
+  "admin.base.sys_config": "admin.base.sys_config",
+  "enterprise.base": "enterprise.base",
+  "enterprise.base.biz_config": "enterprise.base.biz_config",
+  "personal.base.user_config": "personal.base.user_config",
   /** 基础配置 - 日志 */
   "admin.base.log": "admin.base.log",
   /** 数据库 */

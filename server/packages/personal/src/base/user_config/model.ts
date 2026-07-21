@@ -24,11 +24,11 @@ export interface IDomainConfigProvider {
 }
 
 //----------------- Table ----------------//
-export const baseConfigTable = sqliteTable(
-  "base_config",
+export const baseUserConfigTable = sqliteTable(
+  "base_user_config",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
-    tenantId: integer("tenant_id"),
+    userId: integer("user_id").notNull(),
     namespace: text("namespace").notNull(),
     configKey: text("config_key").notNull(),
     isEnabled: integer("is_enabled", { mode: "boolean" })
@@ -47,20 +47,17 @@ export const baseConfigTable = sqliteTable(
     updateTimeUtc: integer("update_time_utc"),
   },
   (table) => ({
-    namespaceIdx: index("idx_base_config_namespace").on(table.namespace),
-    tenantIdx: index("idx_base_config_tenant").on(table.tenantId),
+    tenantNamespaceIdx: index("idx_base_user_config_tenant_namespace").on(
+      table.userId,
+      table.namespace
+    ),
   })
 );
 
-export default baseConfigTable;
+export default baseUserConfigTable;
 
 //----------------- PO / VO ----------------//
-const BaseConfigBasePO = {
-  tenantId: {
-    type: ["number", "null"],
-    nullable: true,
-    description: "租户ID",
-  },
+const BaseUserConfigBasePO = {
   namespace: {
     type: "string",
     description: "命名空间",
@@ -87,81 +84,101 @@ const BaseConfigBasePO = {
     nullable: true,
     description: "备注",
   },
-} as const satisfies Partial<Record<keyof BaseConfigPOLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof BaseUserConfigPOLike, JSONSchema>>;
 
-export const BaseConfigPO = {
+export const BaseUserConfigPO = {
   ...IndexPO,
-  ...BaseConfigBasePO,
+  userId: {
+    type: "integer",
+    description: "用户ID",
+  },
+  ...BaseUserConfigBasePO,
   ...AuditPO,
-} as const satisfies Record<keyof BaseConfigPOLike, JSONSchema>;
+} as const satisfies Record<keyof BaseUserConfigPOLike, JSONSchema>;
 
-export type BaseConfigPOLike = InferSelectModel<typeof baseConfigTable>;
-export type BaseConfigInsertPOLike = InferInsertModel<typeof baseConfigTable>;
-export type BaseConfigAddPOLike = Omit<
-  BaseConfigPOLike,
+export type BaseUserConfigPOLike = InferSelectModel<typeof baseUserConfigTable>;
+export type BaseUserConfigInsertPOLike = InferInsertModel<
+  typeof baseUserConfigTable
+>;
+export type BaseUserConfigAddPOLike = Omit<
+  BaseUserConfigPOLike,
   IndexKeyLike | AuditAddOmitKeyLike
 >;
-export type BaseConfigUpdatePOLike = Partial<
-  Omit<BaseConfigInsertPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
+export type BaseUserConfigUpdatePOLike = Partial<
+  Omit<BaseUserConfigInsertPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
 > &
-  Pick<BaseConfigPOLike, IndexKeyLike>;
+  Pick<BaseUserConfigPOLike, IndexKeyLike>;
 
 export { IndexVO };
-export const BaseConfigVO = {
+export const BaseUserConfigVO = {
   ...IndexVO,
-  ...BaseConfigBasePO,
+  userId: {
+    type: "integer",
+    description: "用户ID",
+  },
+  ...BaseUserConfigBasePO,
   ...AuditVO,
-} as const satisfies Partial<Record<keyof BaseConfigVOLike, JSONSchema>>;
+} as const satisfies Partial<Record<keyof BaseUserConfigVOLike, JSONSchema>>;
 
-export const BaseConfigListVO = BaseConfigVO;
-export const BaseConfigAddVO = BaseConfigBasePO;
-export const BaseConfigUpdateVO = {
+export const BaseUserConfigListVO = BaseUserConfigVO;
+export const BaseUserConfigAddVO = BaseUserConfigBasePO;
+export const BaseUserConfigUpdateVO = {
   ...IndexVO,
-  ...BaseConfigBasePO,
-} as const satisfies Partial<Record<keyof BaseConfigVOLike, JSONSchema>>;
+  userId: {
+    type: "integer",
+    description: "用户ID",
+  },
+  ...BaseUserConfigBasePO,
+} as const satisfies Partial<Record<keyof BaseUserConfigVOLike, JSONSchema>>;
 
-export type BaseConfigVOLike = BaseConfigPOLike;
-export type BaseConfigAddVOLike = Omit<BaseConfigAddPOLike, "creatorId">;
-export type BaseConfigUpdateVOLike = BaseConfigUpdatePOLike;
-export type BaseConfigDeleteVOLike = Pick<BaseConfigVOLike, IndexKeyLike>;
-export type BaseConfigGetVOLike = Pick<BaseConfigVOLike, IndexKeyLike>;
+export type BaseUserConfigVOLike = BaseUserConfigPOLike;
+export type BaseUserConfigAddVOLike = Omit<
+  BaseUserConfigAddPOLike,
+  "creatorId" | "userId"
+>;
+export type BaseUserConfigUpdateVOLike = BaseUserConfigUpdatePOLike;
+export type BaseUserConfigDeleteVOLike = Pick<
+  BaseUserConfigVOLike,
+  IndexKeyLike
+>;
+export type BaseUserConfigGetVOLike = Pick<BaseUserConfigVOLike, IndexKeyLike>;
 
-export const BaseConfigAddKeys = [
+export const BaseUserConfigAddKeys = [
   "namespace",
   "configKey",
   "isEnabled",
   "isPrimary",
   "configValue",
-] as const satisfies RequiredKeys<BaseConfigAddVOLike>[];
+] as const satisfies RequiredKeys<BaseUserConfigAddVOLike>[];
 
-export const BaseConfigUpdateKeys = [
+export const BaseUserConfigUpdateKeys = [
   ...IndexKey,
-] as const satisfies RequiredKeys<BaseConfigUpdateVOLike>[];
+] as const satisfies RequiredKeys<BaseUserConfigUpdateVOLike>[];
 
-export const BaseConfigDeleteKeys = [
+export const BaseUserConfigDeleteKeys = [
   ...IndexKey,
-] as const satisfies RequiredKeys<BaseConfigDeleteVOLike>[];
+] as const satisfies RequiredKeys<BaseUserConfigDeleteVOLike>[];
 
-export const BaseConfigGetKeys = [
+export const BaseUserConfigGetKeys = [
   ...IndexKey,
-] as const satisfies RequiredKeys<BaseConfigGetVOLike>[];
+] as const satisfies RequiredKeys<BaseUserConfigGetVOLike>[];
 
-const BaseConfigBaseKeys = [
+const BaseUserConfigBaseKeys = [
   ...IndexKey,
-  ...BaseConfigAddKeys,
+  ...BaseUserConfigAddKeys,
   ...AuditKeys,
-] as const satisfies RequiredKeys<BaseConfigPOLike>[];
+] as const satisfies RequiredKeys<BaseUserConfigPOLike>[];
 
-export const BaseConfigListKeys = BaseConfigBaseKeys;
-export const BaseConfigDetailKeys = BaseConfigBaseKeys;
+export const BaseUserConfigListKeys = BaseUserConfigBaseKeys;
+export const BaseUserConfigDetailKeys = BaseUserConfigBaseKeys;
 
-export const BaseConfigSortableKeys = [
+export const BaseUserConfigSortableKeys = [
   "id",
   "namespace",
   "isEnabled",
   "isPrimary",
   "createTimeUtc",
-] as const satisfies RequiredKeys<BaseConfigPOLike>[];
+] as const satisfies RequiredKeys<BaseUserConfigPOLike>[];
 
 export const NamespacesResVO = {
   namespace: { type: "string", description: "命名空间" },

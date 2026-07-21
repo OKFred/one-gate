@@ -13,7 +13,7 @@ import { findDefaultActiveConfig } from "./rpa/config/service.js";
 import { RpaConfigProvider } from "./rpa/config/provider.js";
 import { getActiveStorage } from "./oss/file/service.js";
 import { OssConfigProvider } from "./oss/config/provider.js";
-import { utils as baseConfigUtils } from "./base/config/service.js";
+import { utils as baseConfigUtils } from "./base/sys_config/service.js";
 import baseLogService from "./base/log/service.js";
 import { getDefaultConfig as aiGetDefaultConfig } from "./ai/config/service.js";
 import { AiConfigProvider } from "./ai/config/provider.js";
@@ -27,7 +27,7 @@ export const systemRegister = {
 };
 
 export const baseRegister = {
-  config: baseConfigUtils,
+  sysConfig: baseConfigUtils,
   log: baseLogService,
 };
 
@@ -71,7 +71,7 @@ export function initAdminRegistry() {
   reg.register("system", systemRegister);
   reg.register("i18n", i18nRegister);
   reg.register("maintenance", maintenanceRegister);
-  reg.register("swarm", swarmRegister);
+  reg.register("swarm_docker", swarmRegister);
   reg.register("rpa", rpaRegister);
   reg.register("oss", ossRegister);
   reg.register("ai", aiRegister);

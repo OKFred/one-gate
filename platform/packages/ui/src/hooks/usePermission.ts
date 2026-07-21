@@ -20,12 +20,12 @@ export const permissions = {
     /** 底座 */
     base: {
       read: 'admin.base:read',
-      /** 配置项 */
-      config: {
-        read: 'admin.base.config:read',
-        add: 'admin.base.config:add',
-        edit: 'admin.base.config:edit',
-        delete: 'admin.base.config:delete',
+      /** sys_config */
+      sys_config: {
+        read: 'admin.base.sys_config:read',
+        add: 'admin.base.sys_config:add',
+        edit: 'admin.base.sys_config:edit',
+        delete: 'admin.base.sys_config:delete',
       },
       /** 日志 */
       log: {

@@ -286,6 +286,20 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "sidebar.menu.base",
+      langCodes: {
+        "zh-CN": "底座",
+        "en-US": "Base",
+      },
+    },
+    {
+      tKey: "sidebar.menu.base.bizConfig",
+      langCodes: {
+        "zh-CN": "业务配置",
+        "en-US": "Business Config",
+      },
+    },
+    {
       tKey: "sidebar.menu.enterprise.attendance",
       langCodes: {
         "zh-CN": "考勤管理",
@@ -458,6 +472,14 @@ export const sharedTranslations = {
     {
       tKey: "businessType.enterprise",
       langCodes: { "zh-CN": "企业管理", "en-US": "Enterprise" },
+    },
+    {
+      tKey: "businessType.enterprise.base",
+      langCodes: { "zh-CN": "底座", "en-US": "Base" },
+    },
+    {
+      tKey: "businessType.enterprise.base.biz_config",
+      langCodes: { "zh-CN": "业务配置", "en-US": "Business Config" },
     },
     {
       tKey: "businessType.organization",

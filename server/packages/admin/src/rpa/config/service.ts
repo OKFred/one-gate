@@ -46,7 +46,7 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const res = await registry.base.config.list({
+  const res = await registry.base.sysConfig.list({
     namespace: "rpa",
     keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
@@ -105,7 +105,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<number | null> {
   const { name, isEnabled, isDefault, remark, ...configValue } = obj;
-  return await registry.base.config.add(
+  return await registry.base.sysConfig.add(
     {
       namespace: "rpa",
       configKey: name,
@@ -142,13 +142,13 @@ async function onUpdate(
   const { id, name, isEnabled, isDefault, remark, ...configValue } = params;
 
   // We need to merge configValue with existing
-  const existing = await registry.base.config.detail({ id: id as number });
+  const existing = await registry.base.sysConfig.detail({ id: id as number });
   const mergedConfigValue = {
     ...existing.configValue,
     ...configValue,
   };
 
-  return await registry.base.config.update(
+  return await registry.base.sysConfig.update(
     {
       id: id as number,
       configKey: name,
@@ -178,7 +178,7 @@ const getReq = {
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const row = await registry.base.config.detail({ id: params.id as number });
+  const row = await registry.base.sysConfig.detail({ id: params.id as number });
   return {
     ...row,
     ...row.configValue,
@@ -202,7 +202,7 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  return await registry.base.config.delete({ id: obj.id as number });
+  return await registry.base.sysConfig.delete({ id: obj.id as number });
 }
 
 const deleteApi = {
@@ -220,7 +220,7 @@ async function onVerify(
   userObj: UserObj,
   c: Context
 ) {
-  const row = await registry.base.config.detail({ id: obj.id as number });
+  const row = await registry.base.sysConfig.detail({ id: obj.id as number });
   preventEmpty(row);
   const configValue = (row.configValue || {}) as Record<string, string>;
   const cdpUrl = configValue.cdpUrl || "";
@@ -244,7 +244,7 @@ const verifyApi = {
 } satisfies API;
 
 export async function findDefaultActiveConfig() {
-  const merged = await registry.base.config.getMergedConfig("rpa");
+  const merged = await registry.base.sysConfig.getMergedConfig("rpa");
   return merged;
 }
 

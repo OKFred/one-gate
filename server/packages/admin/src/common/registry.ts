@@ -16,7 +16,7 @@ export interface IAdminServices {
   base: typeof baseRegister;
   i18n: typeof i18nRegister;
   maintenance: typeof maintenanceRegister;
-  swarm: typeof swarmRegister;
+  swarm_docker: typeof swarmRegister;
   rpa: typeof rpaRegister;
   oss: typeof ossRegister;
   ai: typeof aiRegister;

@@ -13,7 +13,7 @@ export const baseTranslations: Partial<
       },
     },
   ],
-  "admin.base.config": [
+  "admin.base.sys_config": [
     {
       tKey: "sidebar.menu.admin.base.config",
       langCodes: {

@@ -62,7 +62,7 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const res = await registry.base.config.list({
+  const res = await registry.base.sysConfig.list({
     namespace: "ai",
     isEnabled: params.isEnabled,
     orderBy:
@@ -129,7 +129,7 @@ const listRes = {
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const res = await registry.base.config.list({
+  const res = await registry.base.sysConfig.list({
     namespace: "ai",
     keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
@@ -187,7 +187,7 @@ async function onAdd(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const insertedId = await registry.base.config.add(
+  const insertedId = await registry.base.sysConfig.add(
     {
       namespace: "ai",
       configKey: obj.name,
@@ -248,7 +248,7 @@ async function onUpdate(
     };
   }
 
-  const updatedId = await registry.base.config.update(
+  const updatedId = await registry.base.sysConfig.update(
     {
       id,
       configKey: rest.name,
@@ -279,7 +279,7 @@ const getReq = {
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const row = await registry.base.config.detail({ id: params.id as number });
+  const row = await registry.base.sysConfig.detail({ id: params.id as number });
   preventEmpty(row);
   const configValue = (row.configValue || {}) as Record<string, unknown>;
   return {
@@ -305,7 +305,9 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const deletedId = await registry.base.config.delete({ id: obj.id as number });
+  const deletedId = await registry.base.sysConfig.delete({
+    id: obj.id as number,
+  });
   return deletedId;
 }
 
@@ -354,7 +356,7 @@ const verifyApi = {
 
 // Utils: 获取当前默认配置
 export async function getDefaultConfig() {
-  const res = await registry.base.config.list({
+  const res = await registry.base.sysConfig.list({
     namespace: "ai",
     isEnabled: true,
     pageNo: 1,

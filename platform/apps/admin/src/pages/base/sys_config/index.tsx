@@ -5,9 +5,9 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Chip, Switch } from '@mui/material';
 
-import * as BaseConfigAPI from '@/api/admin/base/config';
+import * as BaseSysConfigAPI from '@/api/admin/base/sys_config';
 import type { ConfigRes, ListConfigReq } from '@/api/admin/base/type';
-import { BaseConfigFormDialog } from './components/BaseConfigFormDialog';
+import { BaseSysConfigFormDialog } from './components/BaseSysConfigFormDialog';
 
 // Extra context is useful if we need to trigger external state from inside config functions,
 // but here we can just capture component state in the config closure.
@@ -17,7 +17,7 @@ interface ExtraContext {
   refreshList: () => void;
 }
 
-export default function BaseConfigPage() {
+export default function BaseSysConfigPage() {
   const t = useTranslation();
 
   const [formOpen, setFormOpen] = useState(false);
@@ -47,8 +47,8 @@ export default function BaseConfigPage() {
       delete: [], // add permission codes if needed
     },
     api: {
-      list: BaseConfigAPI.listFn,
-      delete: BaseConfigAPI.deleteFn,
+      list: BaseSysConfigAPI.listFn,
+      delete: BaseSysConfigAPI.deleteFn,
       // Omit add and update so SchemaCrudPage doesn't render its own default buttons
     },
     filter: {
@@ -135,7 +135,7 @@ export default function BaseConfigPage() {
       <SchemaCrudPage config={config} extraContext={extraContext} customActions={customActions} />
 
       {formOpen && (
-        <BaseConfigFormDialog
+        <BaseSysConfigFormDialog
           open={formOpen}
           editRow={editRow}
           onClose={() => setFormOpen(false)}

@@ -129,9 +129,16 @@ const IGNORED_BUSINESS_KEYS = new Set([
   'oss.config',
   'oss.file',
   'enterprise',
+  'enterprise.base',
+  'enterprise.base.biz_config',
   'enterprise.attendance',
   'enterprise.workflow',
   'enterprise.workflow_config',
+  'admin.base',
+  'admin.base.sys_config',
+  'admin.base.log',
+  'personal.base',
+  'personal.base.user_config',
   'ai',
   'ai.config',
   'ai.chat',
@@ -348,7 +355,7 @@ async function main() {
     join(baseDir, 'packages/ui/src'),
   ];
   console.log(`📁 扫描前端代码目录: \n${platformSrcDirs.map((d) => '  - ' + d).join('\n')}`);
-  
+
   const files = [];
   platformSrcDirs.forEach((dir) => {
     try {

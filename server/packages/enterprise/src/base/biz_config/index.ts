@@ -1,9 +1,12 @@
 import encapsulation from "@hodor/core/middleware/encapsulation";
-import service from "./service.js";
+import { apis as service } from "./service";
 import { BusinessKey } from "@hodor/core/types/business";
 
 function createApp() {
-  return encapsulation(service, "admin.base.config" satisfies BusinessKey);
+  return encapsulation(
+    service,
+    "enterprise.base.biz_config" satisfies BusinessKey
+  );
 }
 
 export default createApp;

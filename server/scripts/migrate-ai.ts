@@ -1,7 +1,7 @@
 /**
  * AI Config 数据迁移脚本
  *
- * 将旧的 `ai_llm_config` 表中的数据迁移至 `base_config` 表中 (namespace = 'ai')
+ * 将旧的 `ai_llm_config` 表中的数据迁移至 `base_sys_config` 表中 (namespace = 'ai')
  * 采用覆盖模式：已存在的 config_key 会被更新，不存在的会被插入。
  *
  * 用法:
@@ -22,24 +22,24 @@ async function main() {
 
   const sqlStatements = [
     `-- 1. 更新已存在的记录`,
-    `UPDATE base_config 
+    `UPDATE base_sys_config 
      SET 
-       is_enabled = (SELECT is_enabled FROM ai_llm_config WHERE name = base_config.config_key),
-       is_primary = (SELECT is_default FROM ai_llm_config WHERE name = base_config.config_key),
+       is_enabled = (SELECT is_enabled FROM ai_llm_config WHERE name = base_sys_config.config_key),
+       is_primary = (SELECT is_default FROM ai_llm_config WHERE name = base_sys_config.config_key),
        config_value = (SELECT json_object(
          'provider', provider,
          'baseUrl', base_url,
          'apiKey', api_key,
          'model', model,
          'capabilities', capabilities
-       ) FROM ai_llm_config WHERE name = base_config.config_key),
-       remark = (SELECT remark FROM ai_llm_config WHERE name = base_config.config_key),
-       updater_id = (SELECT updater_id FROM ai_llm_config WHERE name = base_config.config_key),
-       update_time_utc = (SELECT update_time_utc FROM ai_llm_config WHERE name = base_config.config_key)
+       ) FROM ai_llm_config WHERE name = base_sys_config.config_key),
+       remark = (SELECT remark FROM ai_llm_config WHERE name = base_sys_config.config_key),
+       updater_id = (SELECT updater_id FROM ai_llm_config WHERE name = base_sys_config.config_key),
+       update_time_utc = (SELECT update_time_utc FROM ai_llm_config WHERE name = base_sys_config.config_key)
      WHERE namespace = 'ai' AND config_key IN (SELECT name FROM ai_llm_config);`,
 
     `-- 2. 插入不存在的记录`,
-    `INSERT INTO base_config (
+    `INSERT INTO base_sys_config (
        namespace, config_key, is_enabled, is_primary, config_value, 
        remark, creator_id, updater_id, create_time_utc, update_time_utc
      )
@@ -54,7 +54,7 @@ async function main() {
        ),
        remark, creator_id, updater_id, create_time_utc, update_time_utc
      FROM ai_llm_config
-     WHERE name NOT IN (SELECT config_key FROM base_config WHERE namespace = 'ai');`,
+     WHERE name NOT IN (SELECT config_key FROM base_sys_config WHERE namespace = 'ai');`,
   ];
 
   const tempSqlFile = path.resolve(process.cwd(), "temp_migrate_ai.sql");

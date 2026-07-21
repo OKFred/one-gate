@@ -1,9 +1,9 @@
-import { type IDomainConfigProvider } from "../../base/config/model";
+import { type IDomainConfigProvider } from "../../base/sys_config/model";
 import { type JSONSchema } from "json-schema-to-ts";
 
 export class SwarmDockerConfigProvider implements IDomainConfigProvider {
   getNamespace(): string {
-    return "swarm";
+    return "swarm_docker";
   }
 
   getJsonSchema(): Record<string, JSONSchema> {

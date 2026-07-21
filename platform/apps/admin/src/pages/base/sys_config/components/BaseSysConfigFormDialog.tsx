@@ -16,13 +16,13 @@ import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Field } from '@/components/Form/Field';
 import { DynamicForm } from '@/components/Form/DynamicForm';
-import * as BaseConfigAPI from '@/api/admin/base/config';
+import * as BaseSysConfigAPI from '@/api/admin/base/sys_config';
 import type { ConfigRes, NamespacesRes, SchemaRes } from '@/api/admin/base/type';
 import { SchemaForm } from '@/components/Form';
 import { useValidator } from '@/utils/validator';
 import { useFormError } from '@/hooks/useFormError';
 
-interface BaseConfigFormDialogProps {
+interface BaseSysConfigFormDialogProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -41,12 +41,12 @@ const baseSchema = {
   required: ['namespace', 'configKey'],
 };
 
-export function BaseConfigFormDialog({
+export function BaseSysConfigFormDialog({
   open,
   onClose,
   onSuccess,
   editRow,
-}: BaseConfigFormDialogProps) {
+}: BaseSysConfigFormDialogProps) {
   const { isMobile } = useResponsive();
   const t = useTranslation();
   const theme = useTheme();
@@ -89,7 +89,7 @@ export function BaseConfigFormDialog({
 
   const fetchNamespaces = async () => {
     try {
-      const res = await BaseConfigAPI.namespacesFn({ data: {} });
+      const res = await BaseSysConfigAPI.namespacesFn({ data: {} });
       if (res.data) {
         setNamespaces(res.data.data);
       }
@@ -101,7 +101,7 @@ export function BaseConfigFormDialog({
   const fetchSchema = async (namespace: string) => {
     setSchemaLoading(true);
     try {
-      const res = await BaseConfigAPI.schemaFn({ data: { namespace } });
+      const res = await BaseSysConfigAPI.schemaFn({ data: { namespace } });
       if (res.data) {
         setDynamicSchema(res.data.data);
         if (!editRow) {
@@ -139,7 +139,7 @@ export function BaseConfigFormDialog({
     setLoading(true);
     try {
       if (editRow) {
-        await BaseConfigAPI.updateFn({
+        await BaseSysConfigAPI.updateFn({
           data: {
             id: editRow.id,
             configKey: form.configKey!,
@@ -150,7 +150,7 @@ export function BaseConfigFormDialog({
           },
         });
       } else {
-        await BaseConfigAPI.addFn({
+        await BaseSysConfigAPI.addFn({
           data: {
             namespace: form.namespace!,
             configKey: form.configKey!,
