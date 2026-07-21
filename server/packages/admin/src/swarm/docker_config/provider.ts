@@ -3,7 +3,7 @@ import { type JSONSchema } from "json-schema-to-ts";
 
 export class SwarmDockerConfigProvider implements IDomainConfigProvider {
   getNamespace(): string {
-    return "swarm_docker";
+    return "swarm";
   }
 
   getJsonSchema(): Record<string, JSONSchema> {

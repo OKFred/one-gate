@@ -61,7 +61,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
   const res = await registry.base.config.list({
-    namespace: "swarm_docker",
+    namespace: "swarm",
     keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
     orderBy:
@@ -127,7 +127,7 @@ async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
   const res = await registry.base.config.list({
-    namespace: "swarm_docker",
+    namespace: "swarm",
     keyword: (params as { keyword?: string }).keyword,
     isEnabled: params.isEnabled,
     orderBy:
@@ -188,7 +188,7 @@ async function onAdd(
 
   const resultId = await registry.base.config.add(
     {
-      namespace: "swarm_docker",
+      namespace: "swarm",
       configKey: name,
       isEnabled,
       isPrimary: isDefault,
