@@ -24,6 +24,7 @@ export async function insertSysLog(
 
 export async function findSysLogPage(params: {
   namespace?: string;
+  creatorId?: number;
   pageNo: number;
   pageSize: number;
   orderBy?: keyof SysLogPOLike;
@@ -32,6 +33,7 @@ export async function findSysLogPage(params: {
 }) {
   const {
     namespace,
+    creatorId,
     pageNo,
     pageSize,
     orderBy = "id",
@@ -44,6 +46,9 @@ export async function findSysLogPage(params: {
   const conditions: SQL[] = [];
   if (namespace !== undefined && namespace !== null) {
     conditions.push(eq(baseSysLogTable.namespace, namespace));
+  }
+  if (creatorId !== undefined && creatorId !== null) {
+    conditions.push(eq(baseSysLogTable.creatorId, creatorId));
   }
   if (filters) {
     for (const [k, v] of Object.entries(filters)) {

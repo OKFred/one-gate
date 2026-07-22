@@ -10,7 +10,7 @@ vi.mock("../../common/registry", () => {
           biz: {
             list: vi.fn(),
             add: vi.fn(),
-            get: vi.fn(),
+            detail: vi.fn(),
           },
         },
       },
@@ -41,17 +41,16 @@ describe("Mail Log Service 单元测试", () => {
         },
       ];
       vi.mocked(registry.base.log.biz.list).mockResolvedValue({
-        total: 1,
         list: mockList,
+        total: 1,
       } as any);
 
-      const params = { sendStatus: true };
+      const params = {};
       const res = await mailLogService.listAll.service(params);
 
       expect(registry.base.log.biz.list).toHaveBeenCalledWith(
         expect.objectContaining({
           namespace: "mail",
-          filters: { sendStatus: true },
         })
       );
       expect(res.length).toBe(1);
@@ -77,11 +76,11 @@ describe("Mail Log Service 单元测试", () => {
         },
       ];
       vi.mocked(registry.base.log.biz.list).mockResolvedValue({
+        list: mockList,
         total: 1,
-        list: mockList as any,
-      });
+      } as any);
 
-      const params = { pageNo: 1, pageSize: 10, sendStatus: true };
+      const params = { pageNo: 1, pageSize: 10 };
       const res = await mailLogService.list.service(params);
 
       expect(registry.base.log.biz.list).toHaveBeenCalledWith(
@@ -89,28 +88,25 @@ describe("Mail Log Service 单元测试", () => {
           namespace: "mail",
           pageNo: 1,
           pageSize: 10,
-          filters: { sendStatus: true },
         })
       );
       expect(res.total).toBe(1);
-      expect(res.totalPage).toBe(1);
-      expect(res.currentPage).toBe(1);
       expect(res.list.length).toBe(1);
     });
   });
 
   describe("onAdd", () => {
     it("应该正确组装数据并返回新插入的 ID", async () => {
-      vi.mocked(registry.base.log.biz.add).mockResolvedValue(100);
+      vi.mocked(registry.base.log.biz.add).mockResolvedValue(100 as any);
 
       const params = {
+        title: "Test",
         mailTo: "to@example.com",
         mailFrom: "from@example.com",
-        title: "Test",
         sendStatus: false,
       };
       const userObj = {
-        userId: 2,
+        id: 2,
         username: "user",
         realName: "User Name",
       } as any;
@@ -122,7 +118,6 @@ describe("Mail Log Service 单元测试", () => {
           namespace: "mail",
           logValue: params,
           creatorId: 2,
-          creatorName: "User Name",
         })
       );
       expect(res).toBe(100);

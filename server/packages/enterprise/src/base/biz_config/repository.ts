@@ -260,12 +260,15 @@ export async function resetPrimaryFlags(
 
 export async function insert(
   tenantId: string,
-  data: Omit<BaseBizConfigInsertPOLike, "creatorId" | "createTimeUtc">,
+  data: Omit<
+    BaseBizConfigInsertPOLike,
+    "tenantId" | "creatorId" | "createTimeUtc"
+  >,
   userObj: UserObj
 ): Promise<number> {
   const insertData = {
-    tenantId,
     ...data,
+    tenantId,
     creatorId: userObj.id,
     createTimeUtc: Date.now(),
   };

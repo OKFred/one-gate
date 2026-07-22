@@ -16,13 +16,31 @@ const sendReq = {
   properties: {
     accountId: {
       type: "number",
-      description: "邮箱账号ID",
+      description: "邮箱账号ID（可选，未指定时按作用域自动匹配或使用系统默认）",
       examples: [1],
     },
     templateId: {
       type: "number",
-      description: "邮件模板ID（可选，如果提供则使用模板内容）",
+      description: "邮件模板ID（可选）",
       examples: [1],
+    },
+    templateName: {
+      type: "string",
+      description: "邮件模板名称标识（可选，如 SYS_REMOTE_LOGIN_WARN）",
+      examples: ["SYS_REMOTE_LOGIN_WARN"],
+    },
+    scope: {
+      type: "string",
+      enum: ["sys", "biz", "user"],
+      description: "作用域（可选：sys/biz/user）",
+    },
+    tenantId: {
+      type: "number",
+      description: "租户ID（企业级可选）",
+    },
+    userId: {
+      type: "number",
+      description: "用户ID（个人级可选）",
     },
     receiverArr: {
       type: "array",
@@ -57,7 +75,7 @@ const sendReq = {
       additionalProperties: true,
     },
   },
-  required: ["accountId", "receiverArr"] as const,
+  required: ["receiverArr"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -66,7 +84,7 @@ const sendRes = {
   properties: {
     accepted: {
       type: "array",
-      description: "成功接收的邮箱地址列表",
+      description: "已接收的邮箱地址列表",
       items: {
         type: "object",
         properties: {
@@ -103,25 +121,61 @@ async function onSend(
   bodyObj: FromSchema<typeof sendReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof sendRes>> {
-  const { accountId, templateId, receiverArr, subject, html, templateParams } =
-    bodyObj;
+  const {
+    accountId,
+    templateId,
+    templateName,
+    scope,
+    tenantId,
+    receiverArr,
+    subject,
+    html,
+    templateParams,
+  } = bodyObj;
 
-  // 1. 获取邮件账户信息
-  const accountObj = await mailAccountService.get.service({ id: accountId });
+  // 1. 获取邮件账户信息（支持 ID 查寻找 或 级联级降级寻找）
+  let accountObj: any = null;
+  if (accountId) {
+    accountObj = await mailAccountService.get.service({ id: accountId });
+  } else {
+    const allAccounts = await mailAccountService.listAll.service({
+      isEnabled: true,
+    });
+    if (scope === "biz" && tenantId) {
+      accountObj = allAccounts.find(
+        (a: any) => a.scope === "biz" && a.tenantId === tenantId
+      );
+    }
+    if (!accountObj) {
+      accountObj = allAccounts.find((a: any) => a.scope === "sys");
+    }
+    if (!accountObj && allAccounts.length > 0) {
+      accountObj = allAccounts[0];
+    }
+  }
   preventEmpty(accountObj);
 
-  // 2. 如果提供了模板ID，获取模板内容
+  // 2. 如果提供了模板ID或模板名称，获取模板内容
   let finalSubject = subject || "";
   let finalHtml = html || "";
   let finalTemplateId: string | undefined = undefined;
   let finalTemplateParams: string | undefined = undefined;
 
+  let templateObj: any = null;
   if (templateId) {
-    const template = await mailTemplateService.get.service({ id: templateId });
-    preventEmpty(template);
-    finalSubject = template.title;
-    finalHtml = template.content;
-    finalTemplateId = String(templateId);
+    templateObj = await mailTemplateService.get.service({ id: templateId });
+  } else if (templateName) {
+    const allTemplates = await mailTemplateService.listAll.service({
+      isEnabled: true,
+    });
+    templateObj = allTemplates.find((t: any) => t.name === templateName);
+  }
+
+  if (templateObj) {
+    preventEmpty(templateObj);
+    finalSubject = templateObj.title;
+    finalHtml = templateObj.content;
+    finalTemplateId = String(templateObj.id);
 
     // 如果提供了模板参数，进行替换
     if (templateParams) {

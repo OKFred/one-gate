@@ -9,6 +9,7 @@ import type {
   rpaRegister,
   ossRegister,
   aiRegister,
+  mailRegister,
 } from "../register.js";
 
 export interface IAdminServices {
@@ -20,6 +21,7 @@ export interface IAdminServices {
   rpa: typeof rpaRegister;
   oss: typeof ossRegister;
   ai: typeof aiRegister;
+  mail: typeof mailRegister;
 }
 
 export class ServiceRegistry {

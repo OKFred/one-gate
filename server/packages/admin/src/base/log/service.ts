@@ -14,6 +14,7 @@ const sys = {
   },
   list: async (params: {
     namespace?: string;
+    creatorId?: number;
     pageNo: number;
     pageSize: number;
     orderBy?: keyof SysLogPOLike;

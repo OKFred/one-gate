@@ -86,6 +86,40 @@ async function onLogin(
     username,
   });
 
+  // 检查是否存在异地登录（判断近 30 条历史登录记录中是否有当前 IP）
+  try {
+    const recentLogsRes = await registry.base.log.sys.list({
+      namespace: "login",
+      creatorId: id,
+      pageSize: 30,
+      pageNo: 1,
+    });
+    const recentLogs = recentLogsRes?.list || [];
+    const pastIps = recentLogs.map((l: any) => l.logValue?.ip).filter(Boolean);
+    const isNewIp = pastIps.length > 0 && !pastIps.includes(clientInfo.ip);
+
+    if (isNewIp && (userObj as any).email) {
+      // 触发异地登录安全警告邮件（异步发送，无阻塞）
+      registry.mail
+        .send({
+          templateName: "SYS_REMOTE_LOGIN_WARN",
+          scope: "sys",
+          receiverArr: [{ name: username, address: (userObj as any).email }],
+          templateParams: {
+            username,
+            ip: clientInfo.ip,
+            time: new Date().toLocaleString(),
+            userAgent: clientInfo.userAgent,
+          },
+        })
+        .catch((err: any) => {
+          console.error("[Remote Login Mail Alert Error]", err);
+        });
+    }
+  } catch (err) {
+    console.error("[Remote IP Detection Failed]", err);
+  }
+
   // 记录登录审计
   await registry.maintenance.recordLogin(
     id,

@@ -1,4 +1,4 @@
-import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
+import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError/index.js";
 
 /**
  * 邮件操作模块错误码映射

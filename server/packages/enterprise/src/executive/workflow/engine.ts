@@ -557,7 +557,7 @@ ${expression}
         };
 
         // 创建服务
-        const createRes = await registry.swarm.createService(spec);
+        const createRes = await registry.swarm_docker.createService(spec);
         const serviceId = createRes.ID;
 
         // 轮询服务运行状态，最大等待 5 分钟
@@ -568,7 +568,7 @@ ${expression}
           await new Promise((r) => setTimeout(r, 2000));
           try {
             // 获取任务详情
-            const tasks = await registry.swarm.listTasks({
+            const tasks = await registry.swarm_docker.listTasks({
               service: [serviceName],
             });
             if (tasks.length > 0) {
@@ -592,18 +592,21 @@ ${expression}
 
         if (!isDone) {
           // 超时处理
-          await registry.swarm.removeService(serviceId);
+          await registry.swarm_docker.removeService(serviceId);
           throw new Error("Docker Swarm 任务运行超时(5分钟)。");
         }
 
         // 获取输出日志
         let taskLogs = "无日志输出。";
         try {
-          taskLogs = await registry.swarm.getServiceLogs(serviceName, 200);
+          taskLogs = await registry.swarm_docker.getServiceLogs(
+            serviceName,
+            200
+          );
         } catch (e) {}
 
         // 删除服务释放资源
-        await registry.swarm.removeService(serviceId);
+        await registry.swarm_docker.removeService(serviceId);
 
         if (finalStatus === "failed" || finalStatus === "rejected") {
           throw new Error(

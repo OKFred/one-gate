@@ -64,6 +64,26 @@ export const aiRegister = {
   configProvider: new AiConfigProvider(),
 };
 
+import mailActionService from "./mail/action/service.js";
+import mailAccountService from "./mail/account/service.js";
+import mailTemplateService from "./mail/template/service.js";
+import mailLogService from "./mail/log/service.js";
+
+export const mailRegister = {
+  send: async (
+    params: Parameters<typeof mailActionService.send.service>[0],
+    userObj?: any
+  ) => {
+    return await mailActionService.send.service(
+      params,
+      userObj || { id: 0, username: "system", langCode: "zh-CN", roleIdArr: [] }
+    );
+  },
+  account: mailAccountService,
+  template: mailTemplateService,
+  log: mailLogService,
+};
+
 // 2. 初始化注册中心并绑定服务
 export function initAdminRegistry() {
   const reg = new ServiceRegistry();
@@ -76,6 +96,7 @@ export function initAdminRegistry() {
   reg.register("oss", ossRegister);
   reg.register("ai", aiRegister);
   reg.register("base", baseRegister);
+  reg.register("mail", mailRegister);
   console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);
 }

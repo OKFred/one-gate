@@ -242,7 +242,8 @@ async function onAdd(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const { userId: creatorId, username } = userObj;
+  const creatorId = userObj.id || (userObj as any).userId;
+  const username = userObj.username;
   const { remark, ...logValue } = obj;
 
   const creatorName = username || String(creatorId);
