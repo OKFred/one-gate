@@ -68,6 +68,7 @@ import mailActionService from "./mail/action/service.js";
 import mailAccountService from "./mail/account/service.js";
 import mailTemplateService from "./mail/template/service.js";
 import mailLogService from "./mail/log/service.js";
+import mailRecipientService from "./mail/recipient/service.js";
 
 export const mailRegister = {
   send: async (
@@ -82,6 +83,61 @@ export const mailRegister = {
   account: mailAccountService,
   template: mailTemplateService,
   log: mailLogService,
+  recipient: {
+    list: async (
+      params: Parameters<typeof mailRecipientService.list.service>[0]
+    ) => await mailRecipientService.list.service(params),
+    add: async (
+      params: Parameters<typeof mailRecipientService.add.service>[0],
+      userObj?: import("@hodor/core/types/app").UserObj
+    ) =>
+      await mailRecipientService.add.service(
+        params,
+        userObj ||
+          ({
+            id: 0,
+            username: "system",
+            langCode: "zh-CN",
+            roleIds: [],
+            permissions: [],
+            dataScope: "all",
+            customDeptIds: [],
+            isSuperAdmin: true,
+            token: "",
+            userId: 0,
+            isEnabled: true,
+            ensureLoaded: async () => {},
+          } as unknown as import("@hodor/core/types/app").UserObj)
+      ),
+    update: async (
+      params: Parameters<typeof mailRecipientService.update.service>[0],
+      userObj?: import("@hodor/core/types/app").UserObj
+    ) =>
+      await mailRecipientService.update.service(
+        params,
+        userObj ||
+          ({
+            id: 0,
+            username: "system",
+            langCode: "zh-CN",
+            roleIds: [],
+            permissions: [],
+            dataScope: "all",
+            customDeptIds: [],
+            isSuperAdmin: true,
+            token: "",
+            userId: 0,
+            isEnabled: true,
+            ensureLoaded: async () => {},
+          } as unknown as import("@hodor/core/types/app").UserObj)
+      ),
+    delete: async (
+      params: Parameters<typeof mailRecipientService.delete.service>[0]
+    ) => await mailRecipientService.delete.service(params),
+    get: async (
+      params: Parameters<typeof mailRecipientService.get.service>[0]
+    ) => await mailRecipientService.get.service(params),
+  },
 };
 
 // 2. 初始化注册中心并绑定服务

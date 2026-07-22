@@ -57,8 +57,8 @@ const MailAccountBasePO = {
   },
   scope: {
     type: "string",
-    enum: ["sys", "biz", "user"],
-    description: "作用域：sys(系统级)/biz(企业级)/user(个人级)",
+    enum: ["sys", "biz"],
+    description: "作用域：sys(系统级)/biz(企业级)",
     default: "sys",
   },
   tenantId: {
@@ -176,10 +176,7 @@ export const mailAccountTable = sqliteTable(
     host: text("host").notNull(),
     port: integer("port").notNull(),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-    scope: text("scope")
-      .$type<"sys" | "biz" | "user">()
-      .notNull()
-      .default("sys"),
+    scope: text("scope").$type<"sys" | "biz">().notNull().default("sys"),
     tenantId: integer("tenant_id"),
     userId: integer("user_id"),
     remark: text("remark"),

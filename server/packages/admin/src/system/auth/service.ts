@@ -95,16 +95,30 @@ async function onLogin(
       pageNo: 1,
     });
     const recentLogs = recentLogsRes?.list || [];
-    const pastIps = recentLogs.map((l: any) => l.logValue?.ip).filter(Boolean);
+    const pastIps = recentLogs
+      .map((l) => (l.logValue as unknown as { ip?: string })?.ip)
+      .filter(Boolean);
     const isNewIp = pastIps.length > 0 && !pastIps.includes(clientInfo.ip);
 
-    if (isNewIp && (userObj as any).email) {
+    // 联查用户个人邮件接收偏好
+    const userPrefList = await registry.mail.recipient.list({
+      scope: "user",
+      userId: id,
+      pageNo: 1,
+      pageSize: 1,
+    });
+    const userPref = userPrefList?.list?.[0];
+    const isRemoteLoginWarnEnabled = userPref ? userPref.remoteLoginWarn : true;
+    const targetEmail =
+      userPref?.email || (userObj as unknown as { email?: string }).email;
+
+    if (isNewIp && isRemoteLoginWarnEnabled && targetEmail) {
       // 触发异地登录安全警告邮件（异步发送，无阻塞）
       registry.mail
         .send({
           templateName: "SYS_REMOTE_LOGIN_WARN",
           scope: "sys",
-          receiverArr: [{ name: username, address: (userObj as any).email }],
+          receiverArr: [{ name: username, address: targetEmail as string }],
           templateParams: {
             username,
             ip: clientInfo.ip,
@@ -112,7 +126,7 @@ async function onLogin(
             userAgent: clientInfo.userAgent,
           },
         })
-        .catch((err: any) => {
+        .catch((err: unknown) => {
           console.error("[Remote Login Mail Alert Error]", err);
         });
     }

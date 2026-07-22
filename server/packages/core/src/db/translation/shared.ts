@@ -46,6 +46,20 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "sidebar.menu.personal.mail",
+      langCodes: {
+        "zh-CN": "个人邮件",
+        "en-US": "Mail",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.mail.preference",
+      langCodes: {
+        "zh-CN": "邮件偏好",
+        "en-US": "Preference",
+      },
+    },
+    {
       tKey: "sidebar.menu.data",
       langCodes: {
         "zh-CN": "数据库",
@@ -286,17 +300,17 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "sidebar.menu.base",
+      tKey: "sidebar.menu.enterprise.mail",
       langCodes: {
-        "zh-CN": "底座",
-        "en-US": "Base",
+        "zh-CN": "企业邮件",
+        "en-US": "Mail",
       },
     },
     {
-      tKey: "sidebar.menu.base.bizConfig",
+      tKey: "sidebar.menu.enterprise.mail.edm",
       langCodes: {
-        "zh-CN": "业务配置",
-        "en-US": "Business Config",
+        "zh-CN": "EDM群发",
+        "en-US": "EDM",
       },
     },
     {
@@ -474,12 +488,12 @@ export const sharedTranslations = {
       langCodes: { "zh-CN": "企业管理", "en-US": "Enterprise" },
     },
     {
-      tKey: "businessType.enterprise.base",
-      langCodes: { "zh-CN": "底座", "en-US": "Base" },
+      tKey: "businessType.enterprise.mail",
+      langCodes: { "zh-CN": "企业邮件", "en-US": "Enterprise Mail" },
     },
     {
-      tKey: "businessType.enterprise.base.biz_config",
-      langCodes: { "zh-CN": "业务配置", "en-US": "Business Config" },
+      tKey: "businessType.enterprise.mail.edm",
+      langCodes: { "zh-CN": "EDM群发", "en-US": "EDM" },
     },
     {
       tKey: "businessType.organization",
@@ -504,6 +518,14 @@ export const sharedTranslations = {
     {
       tKey: "businessType.personal.profile",
       langCodes: { "zh-CN": "个人信息", "en-US": "Personal Profile" },
+    },
+    {
+      tKey: "businessType.personal.mail",
+      langCodes: { "zh-CN": "个人邮件", "en-US": "Personal Mail" },
+    },
+    {
+      tKey: "businessType.personal.mail.preference",
+      langCodes: { "zh-CN": "邮件偏好", "en-US": "Preference" },
     },
     {
       tKey: "businessType.admin.rpa",
@@ -1557,6 +1579,237 @@ export const sharedTranslations = {
       langCodes: {
         "zh-CN": "女",
         "en-US": "Female",
+      },
+    },
+    {
+      tKey: "mail.scope",
+      langCodes: {
+        "zh-CN": "作用域",
+        "en-US": "Scope",
+      },
+    },
+    {
+      tKey: "mail.scope.sys",
+      langCodes: {
+        "zh-CN": "系统级",
+        "en-US": "System",
+      },
+    },
+    {
+      tKey: "mail.scope.biz",
+      langCodes: {
+        "zh-CN": "企业级",
+        "en-US": "Enterprise",
+      },
+    },
+    {
+      tKey: "mail.scope.user",
+      langCodes: {
+        "zh-CN": "个人级",
+        "en-US": "Personal",
+      },
+    },
+    {
+      tKey: "mail.edm.error.invalidTemplateId",
+      langCodes: {
+        "zh-CN": "请填写有效的模板 ID",
+        "en-US": "Please enter a valid Template ID",
+      },
+    },
+    {
+      tKey: "mail.edm.error.sendFailed",
+      langCodes: {
+        "zh-CN": "发送失败，请稍后重试",
+        "en-US": "Send failed, please try again later",
+      },
+    },
+    {
+      tKey: "mail.edm.title",
+      langCodes: {
+        "zh-CN": "企业 EDM 营销邮件下发",
+        "en-US": "Enterprise EDM Marketing Email Delivery",
+      },
+    },
+    {
+      tKey: "mail.edm.description",
+      langCodes: {
+        "zh-CN":
+          "使用企业独立发信通道投递营销邮件，系统将自动过滤已退订营销邮件的客户。",
+        "en-US":
+          "Use the independent enterprise channel to deliver marketing emails. The system will automatically filter out customers who have unsubscribed.",
+      },
+    },
+    {
+      tKey: "mail.edm.success",
+      langCodes: {
+        "zh-CN": "营销 EDM 投递完成！",
+        "en-US": "EDM Delivery Completed!",
+      },
+    },
+    {
+      tKey: "mail.edm.totalSent",
+      langCodes: {
+        "zh-CN": "总计划数",
+        "en-US": "Total Planned",
+      },
+    },
+    {
+      tKey: "mail.edm.templateId",
+      langCodes: {
+        "zh-CN": "邮件模板 ID (Template ID)",
+        "en-US": "Email Template ID",
+      },
+    },
+    {
+      tKey: "mail.edm.templateId.placeholder",
+      langCodes: {
+        "zh-CN": "请输入企业级邮件模板ID",
+        "en-US": "Please enter enterprise email template ID",
+      },
+    },
+    {
+      tKey: "mail.edm.subject",
+      langCodes: {
+        "zh-CN": "自定义邮件主题 (选填)",
+        "en-US": "Custom Email Subject (Optional)",
+      },
+    },
+    {
+      tKey: "mail.edm.subject.placeholder",
+      langCodes: {
+        "zh-CN": "留空则默认使用模板主题",
+        "en-US": "Leave blank to use template subject",
+      },
+    },
+    {
+      tKey: "mail.edm.sending",
+      langCodes: {
+        "zh-CN": "正在批量投递中...",
+        "en-US": "Sending in batch...",
+      },
+    },
+    {
+      tKey: "mail.edm.send",
+      langCodes: {
+        "zh-CN": "开始营销群发",
+        "en-US": "Start Mass Marketing",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.saveSuccess",
+      langCodes: {
+        "zh-CN": "邮件通知偏好保存成功！",
+        "en-US": "Email notification preferences saved successfully!",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.saveFailed",
+      langCodes: {
+        "zh-CN": "保存失败，请稍后重试",
+        "en-US": "Save failed, please try again later",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.title",
+      langCodes: {
+        "zh-CN": "个人邮件通知偏好设置",
+        "en-US": "Personal Email Notification Preferences",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.desc",
+      langCodes: {
+        "zh-CN": "自主控制接收异地登录安全告警与企业营销邮件提醒",
+        "en-US":
+          "Control receiving security alerts for remote logins and enterprise marketing emails",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.emailLabel",
+      langCodes: {
+        "zh-CN": "绑定的接收邮箱地址",
+        "en-US": "Bound Email Address",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.emailHelper",
+      langCodes: {
+        "zh-CN": "用于接收系统告警与通知消息",
+        "en-US": "Used to receive system alerts and notifications",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.securityTitle",
+      langCodes: {
+        "zh-CN": "安全与告警通知",
+        "en-US": "Security & Alert Notifications",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.remoteLoginTitle",
+      langCodes: {
+        "zh-CN": "异地登录邮件安全告警",
+        "en-US": "Remote Login Email Security Alert",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.remoteLoginDesc",
+      langCodes: {
+        "zh-CN":
+          "当检测到您的账号在未常用 IP 登录时，自动向您发送防盗号安全提醒。",
+        "en-US":
+          "Automatically send you an anti-theft security alert when your account is logged in from an unusual IP.",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.marketingTitle",
+      langCodes: {
+        "zh-CN": "营销与资讯订阅",
+        "en-US": "Marketing & Newsletter Subscriptions",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.edmTitle",
+      langCodes: {
+        "zh-CN": "接收企业营销与推广 EDM 邮件",
+        "en-US": "Receive Enterprise Marketing and Promotion EDM Emails",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.edmDesc",
+      langCodes: {
+        "zh-CN":
+          "接收企业优惠活动、产品更新与营销推广邮件（关闭后企业营销群发将自动过滤您的邮箱）。",
+        "en-US":
+          "Receive enterprise promotional activities, product updates, and marketing emails (when turned off, enterprise mass marketing will automatically filter out your email).",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.saving",
+      langCodes: {
+        "zh-CN": "正在保存...",
+        "en-US": "Saving...",
+      },
+    },
+    {
+      application: "frontend",
+      tKey: "mail.pref.saveBtn",
+      langCodes: {
+        "zh-CN": "保存偏好设置",
+        "en-US": "Save Preferences",
       },
     },
   ],

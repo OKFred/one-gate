@@ -271,6 +271,17 @@ export const permissions = {
   },
   enterprise: {
     read: 'enterprise:read',
+    /** enterprise.mail */
+    mail: {
+      read: 'enterprise.mail:read',
+      /** edm */
+      edm: {
+        read: 'enterprise.mail.edm:read',
+        add: 'enterprise.mail.edm:add',
+        edit: 'enterprise.mail.edm:edit',
+        delete: 'enterprise.mail.edm:delete',
+      },
+    },
     /** 组织管理 */
     organization: {
       read: 'organization:read',
@@ -302,6 +313,17 @@ export const permissions = {
       add: 'personal.profile:add',
       edit: 'personal.profile:edit',
       delete: 'personal.profile:delete',
+    },
+    /** 个人邮件 */
+    mail: {
+      read: 'personal.mail:read',
+      /** preference */
+      preference: {
+        read: 'personal.mail.preference:read',
+        add: 'personal.mail.preference:add',
+        edit: 'personal.mail.preference:edit',
+        delete: 'personal.mail.preference:delete',
+      },
     },
   },
 } as const;

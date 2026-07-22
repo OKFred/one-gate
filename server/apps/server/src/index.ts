@@ -19,7 +19,6 @@ function createApp() {
   corsHandler(app);
   serverTiming(app);
   logHandler(app);
-  getEnv("NODE_ENV") !== "production" && docRegister(app);
 
   const apiApp = new OpenAPIHono<AppBindings>();
   apiApp.route("/admin", createAdminApp());
@@ -44,6 +43,7 @@ function createApp() {
       message: "Version OK!",
     });
   });
+  getEnv("NODE_ENV") !== "production" && docRegister(app);
   return app;
 }
 export default createApp;

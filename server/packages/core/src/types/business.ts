@@ -15,6 +15,10 @@ export const BUSINESS = {
   "admin.mail.template": "admin.mail.template",
   /** 邮件操作 */
   "admin.mail.action": "admin.mail.action",
+  /** 邮件收件人 */
+  "admin.mail.recipient": "admin.mail.recipient",
+  /** 企业邮件EDM */
+  "enterprise.mail.edm": "enterprise.mail.edm",
   /** 邮件日志 */
   "admin.mail.log": "admin.mail.log",
   /** 运维 */
@@ -65,6 +69,8 @@ export const BUSINESS = {
   personal: "personal",
   /** 个人中心-个人信息 */
   "personal.profile": "personal.profile",
+  /** 个人中心-邮件偏好 */
+  "personal.mail.preference": "personal.mail.preference",
   /** AI */
   "admin.ai": "admin.ai",
   /** AI 配置 */
@@ -98,8 +104,8 @@ export const BUSINESS = {
   "admin.base": "admin.base",
   /** 基础配置 - 具体配置 */
   "admin.base.sys_config": "admin.base.sys_config",
-  "enterprise.base": "enterprise.base",
-  "enterprise.base.biz_config": "enterprise.base.biz_config",
+  "enterprise.mail": "enterprise.mail",
+  "personal.mail": "personal.mail",
   "personal.base.user_config": "personal.base.user_config",
   /** 基础配置 - 日志 */
   "admin.base.log": "admin.base.log",

@@ -1,7 +1,7 @@
 import db from "./index";
 import { menuTable } from "../../../admin/src/system/menu/model";
 import { permissionTable } from "../../../admin/src/system/permission/model";
-import { sql } from "drizzle-orm";
+import { sql, inArray } from "drizzle-orm";
 import { SUPER_ADMIN_ID } from "./init";
 import { BusinessKey } from "../types/business";
 import { initialTranslationData } from "./initTranslation";
@@ -279,6 +279,23 @@ export const initialMenuData = [
     business: "enterprise",
   },
   {
+    id: 60,
+    name: "sidebar.menu.enterprise.mail",
+    icon: "material-symbols:mail",
+    parentId: 26,
+    sort: 8,
+    business: "enterprise.mail",
+  },
+  {
+    id: 61,
+    name: "sidebar.menu.enterprise.mail.edm",
+    icon: "material-symbols:mark-email-read",
+    path: "/mail/edm",
+    parentId: 60,
+    sort: 1,
+    business: "enterprise.mail.edm",
+  },
+  {
     id: 27,
     name: "sidebar.menu.organization",
     icon: "material-symbols:groups",
@@ -400,23 +417,6 @@ export const initialMenuData = [
     business: "admin.rpa.config",
   },
   {
-    id: 56,
-    name: "sidebar.menu.base",
-    icon: "material-symbols:settings",
-    parentId: 26,
-    sort: 9,
-    business: "enterprise.base.biz_config",
-  },
-  {
-    id: 57,
-    name: "sidebar.menu.base.bizConfig",
-    icon: "material-symbols:settings-applications",
-    path: "/base/biz_config",
-    parentId: 56,
-    sort: 1,
-    business: "enterprise.base.biz_config",
-  },
-  {
     id: 47,
     name: "sidebar.menu.personal",
     icon: "material-symbols:person",
@@ -431,6 +431,23 @@ export const initialMenuData = [
     parentId: 47,
     sort: 1,
     business: "personal.profile",
+  },
+  {
+    id: 62,
+    name: "sidebar.menu.personal.mail",
+    icon: "material-symbols:mail",
+    parentId: 47,
+    sort: 2,
+    business: "personal.mail",
+  },
+  {
+    id: 63,
+    name: "sidebar.menu.personal.mail.preference",
+    icon: "material-symbols:mark-email-unread",
+    path: "/mail/preference",
+    parentId: 62,
+    sort: 1,
+    business: "personal.mail.preference",
   },
   {
     id: 49,
@@ -499,6 +516,24 @@ export async function prepareMenu(options?: { reset?: boolean }) {
     isEnabled: true,
     creatorId,
   }));
+  // 获取所有合法的 ID
+  const validIds = initialMenuData.map((item) => item.id);
+
+  if (validIds.length > 0) {
+    // 获取当前所有菜单 ID
+    const existing = await db.select({ id: menuTable.id }).from(menuTable);
+    const idsToDelete = existing
+      .map((row) => row.id)
+      .filter((id) => !validIds.includes(id));
+
+    if (idsToDelete.length > 0) {
+      const DELETE_BATCH = 100;
+      for (let i = 0; i < idsToDelete.length; i += DELETE_BATCH) {
+        const chunk = idsToDelete.slice(i, i + DELETE_BATCH);
+        queries.push(db.delete(menuTable).where(inArray(menuTable.id, chunk)));
+      }
+    }
+  }
 
   // 基于 ID 执行 Upsert，使用 db.batch() 合并请求
   const BATCH_SIZE = 10;

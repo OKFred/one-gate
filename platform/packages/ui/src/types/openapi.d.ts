@@ -2150,6 +2150,296 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mail/recipient/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取邮件收件人/联系人列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取邮件收件人详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加邮件收件人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新邮件收件人信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除邮件收件人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/maintenance/login_log/list": {
         parameters: {
             query?: never;
@@ -9702,7 +9992,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 鍒嗛〉鑾峰彇绯荤粺閰嶇疆 */
+        /** 分页获取系统配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9760,7 +10050,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 鑾峰彇閰嶇疆璇︽儏 */
+        /** 获取配置详情 */
         post: {
             parameters: {
                 query?: never;
@@ -9818,7 +10108,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 娣诲姞閰嶇疆 */
+        /** 添加配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9876,7 +10166,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 鏇存柊閰嶇疆 */
+        /** 更新配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9934,7 +10224,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 鍒犻櫎閰嶇疆 */
+        /** 删除配置 */
         post: {
             parameters: {
                 query?: never;
@@ -9992,7 +10282,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 鑾峰彇棰嗗煙閰嶇疆Schema */
+        /** 获取领域配置Schema */
         post: {
             parameters: {
                 query?: never;
@@ -10050,7 +10340,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 鑾峰彇宸叉敞鍐岄厤缃殑鍛藉悕绌洪棿 */
+        /** 获取已注册配置的命名空间 */
         post: {
             parameters: {
                 query?: never;
@@ -11143,6 +11433,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enterprise/mail/edm/sendBatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 企业级 EDM 营销邮件批量下发 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.mail.edm.sendbatch.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.mail.edm.sendbatch.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personal/profile/listAll": {
         parameters: {
             query?: never;
@@ -11463,6 +11811,528 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["personal.profile.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取企业配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加企业配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新企业配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除企业配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取企业配置详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取配置Schema定义 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.schema.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.schema.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/namespaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取已有的命名空间列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.namespaces.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.namespaces.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/mail/preference/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取当前用户邮件通知偏好 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.mail.preference.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.mail.preference.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/mail/preference/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新当前用户邮件通知偏好 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.mail.preference.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.mail.preference.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -12627,6 +13497,16 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled?: boolean;
                 /**
+                 * @description 作用域：sys(系统级)/biz(企业级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
                  * @description 备注
                  * @example 这是一个测试邮箱账号
                  */
@@ -12710,6 +13590,16 @@ export interface components {
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /**
+                     * @description 作用域：sys(系统级)/biz(企业级)
+                     * @default sys
+                     * @enum {string}
+                     */
+                    scope: "sys" | "biz";
+                    /** @description 租户ID（企业级专用） */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 用户ID（个人级专用） */
+                    userId?: ((number | null) | null) | null;
+                    /**
                      * @description 备注
                      * @example 这是一个测试邮箱账号
                      */
@@ -12763,6 +13653,16 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
             /**
+             * @description 作用域：sys(系统级)/biz(企业级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
              * @description 备注
              * @example 这是一个测试邮箱账号
              */
@@ -12812,6 +13712,16 @@ export interface components {
             port?: number;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
             /**
              * @description 备注
              * @example 这是一个测试邮箱账号
@@ -12888,6 +13798,16 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /**
+                 * @description 作用域：sys(系统级)/biz(企业级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
                  * @description 备注
                  * @example 这是一个测试邮箱账号
                  */
@@ -12911,15 +13831,29 @@ export interface components {
         };
         "admin.mail.action.send.req": {
             /**
-             * @description 邮箱账号ID
+             * @description 邮箱账号ID（可选，未指定时按作用域自动匹配或使用系统默认）
              * @example 1
              */
-            accountId: number;
+            accountId?: number;
             /**
-             * @description 邮件模板ID（可选，如果提供则使用模板内容）
+             * @description 邮件模板ID（可选）
              * @example 1
              */
             templateId?: number;
+            /**
+             * @description 邮件模板名称标识（可选，如 SYS_REMOTE_LOGIN_WARN）
+             * @example SYS_REMOTE_LOGIN_WARN
+             */
+            templateName?: string;
+            /**
+             * @description 作用域（可选：sys/biz/user）
+             * @enum {string}
+             */
+            scope?: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级可选） */
+            tenantId?: number;
+            /** @description 用户ID（个人级可选） */
+            userId?: number;
             /** @description 收件人列表 */
             receiverArr: {
                 /** @description 收件人名称 */
@@ -12945,7 +13879,7 @@ export interface components {
         "admin.mail.action.send.res": {
             ok: boolean;
             data: {
-                /** @description 成功接收的邮箱地址列表 */
+                /** @description 已接收的邮箱地址列表 */
                 accepted: {
                     name: string;
                     address: string;
@@ -13244,6 +14178,16 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled?: boolean;
                 /**
+                 * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz" | "user";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
                  * @description 备注
                  * @example 这是一个测试邮箱模板
                  */
@@ -13318,6 +14262,16 @@ export interface components {
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /**
+                     * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                     * @default sys
+                     * @enum {string}
+                     */
+                    scope: "sys" | "biz" | "user";
+                    /** @description 租户ID（企业级专用） */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 用户ID（个人级专用） */
+                    userId?: ((number | null) | null) | null;
+                    /**
                      * @description 备注
                      * @example 这是一个测试邮箱模板
                      */
@@ -13363,6 +14317,16 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
             /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
              * @description 备注
              * @example 这是一个测试邮箱模板
              */
@@ -13404,6 +14368,16 @@ export interface components {
             category?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
             /**
              * @description 备注
              * @example 这是一个测试邮箱模板
@@ -13472,6 +14446,16 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /**
+                 * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz" | "user";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
                  * @description 备注
                  * @example 这是一个测试邮箱模板
                  */
@@ -13491,6 +14475,300 @@ export interface components {
                  */
                 updateTimeUtc: ((number | null) | null) | null;
             };
+            message: string;
+        };
+        "admin.mail.recipient.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 搜索关键词（邮箱/姓名/备注） */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default biz
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（系统/个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /** @description 是否开启异地登录告警邮件提醒 */
+            remoteLoginWarn?: boolean;
+            /** @description 是否订阅企业营销EDM邮件 */
+            marketingEdm?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "email" | "createTimeUtc";
+        };
+        "admin.mail.recipient.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * Format: email
+                     * @description 收件人邮箱地址
+                     * @example user@example.com
+                     */
+                    email: string;
+                    /**
+                     * @description 收件人姓名/称呼
+                     * @example 张三
+                     */
+                    name?: ((string | null) | null) | null;
+                    /**
+                     * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                     * @default biz
+                     * @enum {string}
+                     */
+                    scope: "sys" | "biz" | "user";
+                    /** @description 租户ID（企业级专用） */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 用户ID（系统/个人级专用） */
+                    userId?: ((number | null) | null) | null;
+                    /**
+                     * @description 是否开启异地登录告警邮件提醒
+                     * @default true
+                     */
+                    remoteLoginWarn: boolean;
+                    /**
+                     * @description 是否订阅企业营销EDM邮件
+                     * @default true
+                     */
+                    marketingEdm: boolean;
+                    /**
+                     * @description 联系人标签分类（JSON字符串）
+                     * @example ["VIP买家", "展会联系人"]
+                     */
+                    tags?: ((string | null) | null) | null;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mail.recipient.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mail.recipient.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * Format: email
+                 * @description 收件人邮箱地址
+                 * @example user@example.com
+                 */
+                email?: string;
+                /**
+                 * @description 收件人姓名/称呼
+                 * @example 张三
+                 */
+                name?: ((string | null) | null) | null;
+                /**
+                 * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                 * @default biz
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz" | "user";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（系统/个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
+                 * @description 是否开启异地登录告警邮件提醒
+                 * @default true
+                 */
+                remoteLoginWarn: boolean;
+                /**
+                 * @description 是否订阅企业营销EDM邮件
+                 * @default true
+                 */
+                marketingEdm: boolean;
+                /**
+                 * @description 联系人标签分类（JSON字符串）
+                 * @example ["VIP买家", "展会联系人"]
+                 */
+                tags?: ((string | null) | null) | null;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mail.recipient.add.req": {
+            /**
+             * Format: email
+             * @description 收件人邮箱地址
+             * @example user@example.com
+             */
+            email: string;
+            /**
+             * @description 收件人姓名/称呼
+             * @example 张三
+             */
+            name?: ((string | null) | null) | null;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default biz
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（系统/个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
+             * @description 是否开启异地登录告警邮件提醒
+             * @default true
+             */
+            remoteLoginWarn: boolean;
+            /**
+             * @description 是否订阅企业营销EDM邮件
+             * @default true
+             */
+            marketingEdm: boolean;
+            /**
+             * @description 联系人标签分类（JSON字符串）
+             * @example ["VIP买家", "展会联系人"]
+             */
+            tags?: ((string | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mail.recipient.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mail.recipient.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * Format: email
+             * @description 收件人邮箱地址
+             * @example user@example.com
+             */
+            email?: string;
+            /**
+             * @description 收件人姓名/称呼
+             * @example 张三
+             */
+            name?: ((string | null) | null) | null;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default biz
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（系统/个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
+             * @description 是否开启异地登录告警邮件提醒
+             * @default true
+             */
+            remoteLoginWarn: boolean;
+            /**
+             * @description 是否订阅企业营销EDM邮件
+             * @default true
+             */
+            marketingEdm: boolean;
+            /**
+             * @description 联系人标签分类（JSON字符串）
+             * @example ["VIP买家", "展会联系人"]
+             */
+            tags?: ((string | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mail.recipient.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mail.recipient.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mail.recipient.delete.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
             message: string;
         };
         "admin.maintenance.login_log.list.req": {
@@ -19774,6 +21052,25 @@ export interface components {
             };
             message: string;
         };
+        "enterprise.mail.edm.sendbatch.req": {
+            /** @description 邮件模板ID */
+            templateId: number;
+            /** @description 邮件主题（覆写） */
+            subject?: string;
+            /** @description 企业租户ID */
+            tenantId?: number;
+            /** @description 指定接收人ID列表（留空则发送给该租户所有订阅客户） */
+            recipientIds?: number[];
+        };
+        "enterprise.mail.edm.sendbatch.res": {
+            ok: boolean;
+            data: {
+                totalSent: number;
+                successCount: number;
+                failCount: number;
+            };
+            message: string;
+        };
         "personal.profile.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -20240,6 +21537,255 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "personal.base.user_config.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "isEnabled" | "isPrimary" | "createTimeUtc";
+        };
+        "personal.base.user_config.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 用户ID */
+                    userId?: number;
+                    /** @description 命名空间 */
+                    namespace: string;
+                    /** @description 配置键 */
+                    configKey: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 是否为主配置 */
+                    isPrimary: boolean;
+                    /** @description 配置值JSON */
+                    configValue: {
+                        [key: string]: unknown;
+                    };
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.base.user_config.add.req": {
+            /** @description 命名空间 */
+            namespace: string;
+            /** @description 配置键 */
+            configKey: string;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 是否为主配置 */
+            isPrimary: boolean;
+            /** @description 配置值JSON */
+            configValue: {
+                [key: string]: unknown;
+            };
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.base.user_config.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "personal.base.user_config.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 用户ID */
+            userId?: number;
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 配置键 */
+            configKey?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 是否为主配置 */
+            isPrimary?: boolean;
+            /** @description 配置值JSON */
+            configValue?: {
+                [key: string]: unknown;
+            };
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.base.user_config.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "personal.base.user_config.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.base.user_config.delete.res": {
+            ok: boolean;
+            data: {
+                count: number;
+            };
+            message: string;
+        };
+        "personal.base.user_config.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.base.user_config.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 用户ID */
+                userId?: number;
+                /** @description 命名空间 */
+                namespace: string;
+                /** @description 配置键 */
+                configKey: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 是否为主配置 */
+                isPrimary: boolean;
+                /** @description 配置值JSON */
+                configValue: {
+                    [key: string]: unknown;
+                };
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "personal.base.user_config.schema.req": {
+            namespace: string;
+        };
+        "personal.base.user_config.schema.res": {
+            ok: boolean;
+            data: {
+                [key: string]: unknown;
+            };
+            message: string;
+        };
+        "personal.base.user_config.namespaces.req": Record<string, never>;
+        "personal.base.user_config.namespaces.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /** @description 命名空间 */
+                    namespace: string;
+                }[];
+            };
+            message: string;
+        };
+        "personal.mail.preference.get.req": Record<string, never>;
+        "personal.mail.preference.get.res": {
+            ok: boolean;
+            data: {
+                email: string;
+                remoteLoginWarn: boolean;
+                marketingEdm: boolean;
+            };
+            message: string;
+        };
+        "personal.mail.preference.update.req": {
+            /** @description 关联的个人邮箱地址 */
+            email?: string;
+            /** @description 是否开启异地登录告警邮件提醒 */
+            remoteLoginWarn?: boolean;
+            /** @description 是否订阅企业营销EDM邮件 */
+            marketingEdm?: boolean;
+        };
+        "personal.mail.preference.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
             };
             message: string;
         };

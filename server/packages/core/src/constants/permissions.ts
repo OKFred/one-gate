@@ -108,10 +108,10 @@ export const permissionSeeds = {
   /** 企业管理 */
   enterprise: {
     "": ["read"],
-    base: {
-      "": ["read"],
-      biz_config: ["read", "add", "edit", "delete"],
-    },
+  },
+  "enterprise.mail": {
+    "": ["read"],
+    edm: ["read", "add", "edit", "delete"],
   },
   /** 组织管理 */
   organization: {
@@ -130,6 +130,11 @@ export const permissionSeeds = {
     "": ["read"],
     /** 个人信息 */
     profile: ["read", "add", "edit", "delete"],
+    /** 个人邮件 */
+    mail: {
+      "": ["read"],
+      preference: ["read", "add", "edit", "delete"],
+    },
   },
   /** AI */
   "admin.ai": {

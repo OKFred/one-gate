@@ -24,10 +24,15 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
     (location.pathname.startsWith('/organization/') ||
       location.pathname.startsWith('organization/') ||
       location.pathname.startsWith('/executive/') ||
-      location.pathname.startsWith('executive/'));
+      location.pathname.startsWith('executive/') ||
+      location.pathname.startsWith('/mail/edm') ||
+      location.pathname.startsWith('mail/edm'));
   const isPersonalActive =
     isHost &&
-    (location.pathname.startsWith('/personal/') || location.pathname.startsWith('personal/'));
+    (location.pathname.startsWith('/personal/') ||
+      location.pathname.startsWith('personal/') ||
+      location.pathname.startsWith('/mail/preference') ||
+      location.pathname.startsWith('mail/preference'));
   const isMicroAppActive = isEnterpriseActive || isPersonalActive;
 
   return (

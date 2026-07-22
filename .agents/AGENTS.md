@@ -19,7 +19,14 @@
 
 ---
 
-## 2. 后端开发规范 (以 Personal 模块为例)
+## 2. 全局 TypeScript 开发规范 (严格禁止 any)
+
+- **绝对禁止使用 `any`**：无论是在前端还是后端代码中，任何情况下都不允许使用 `any` 类型或 `as any` 强制类型转换。
+- **强制类型推导与校验**：所有变量、函数参数、返回值以及接口数据，都必须具有明确的类型定义或通过类型系统（如 Drizzle Schema、Zod 或 OpenAPI 生成的类型）进行安全的推导，确保类型链的完整性。
+
+---
+
+## 3. 后端开发规范 (以 Personal 模块为例)
 
 ### Step 2.1: 声明数据表模型 (Model)
 
@@ -67,7 +74,7 @@ pnpm run db:generate
    ```bash
    npx drizzle-kit push
    ```
-或者使用 `drizzle-kit migrate` 通过 Node 脚本自动执行迁移逻辑以保证生产环境数据的完整性与安全。
+   或者使用 `drizzle-kit migrate` 通过 Node 脚本自动执行迁移逻辑以保证生产环境数据的完整性与安全。
 
 ### Step 2.4: 实现业务持久层 (Repository)
 
@@ -76,15 +83,13 @@ pnpm run db:generate
 - 采用 Drizzle ORM 进行 DML 与单条/多条过滤。
 - 列表查询须支持动态 `orderBy` 列排序与降序。
 
-### Step 2.4: 业务控制层与 OpenAPI 描述 (Service & App)
-
 在 `service.ts` 中描述并暴露 REST 端点：
 
 - **所有业务接口设计必须且只能使用 POST 请求**：禁止使用 GET、PUT、DELETE 等其他方法，以保证高阶 `encapsulation` 中间件能正确且安全地从 JSON Body 中提取与校验数据。
-- 统一使用 `encapsulation` (封装好的高阶 Hono 控制器适配器) 挂载 API。
-- **禁止在 `service.ts` 中硬编码 API 请求或响应的字段定义 (Properties)**：为了保证类型与数据模型规范的集中管理，API 接口的 properties 字段属性必须定义在 `model.ts` 中（如封装为 `[Domain]VO`、`[Domain]AddVO`、`[Domain]GetVO`、`[Domain]SubmitVO` 等），而在 `service.ts` 的 JSON Schema 定义中，只需解构引用 `model.ts` 里的定义。
+- **禁止在 `service.ts` 中硬编码 API 请求或响应的字段定义 (Properties)**：为了保证类型与数据模型规范的集中管理，无论该业务是否有数据表对应，API 接口的 properties 字段属性必须定义在 `model.ts` 中（如封装为 `[Domain]ReqVO`、`[Domain]ResVO` 等），而在 `service.ts` 的 JSON Schema 定义中，只需解构引用 `model.ts` 里的定义。
 - 返回的列表及详情应严格遵守 JSON Schema 规范进行类型声明。
-- 领域服务在 `[module]/index.ts` 中导出，并在子包 `index.ts` 下挂载。
+- **严禁在 `service.ts` 中直接调用 `encapsulation` 挂载**：`service.ts` 的默认导出必须是包含各个 API 定义的纯对象（即强制推导为 `Record<string, API>` 类型，如 `export default { get: getApi, update: updateApi }`）。
+- **独立的路由挂载入口**：领域服务必须在同级目录新建的 `[module]/index.ts` 中调用 `encapsulation(service, "...")` 导出 `app`，并在子包的根 `index.ts` 下统一挂载路由，确保业务代码与挂载行为完全解耦。
 
 ### Step 2.5: 跨领域/模块解耦规范 (Service Registry)
 
@@ -122,12 +127,13 @@ pnpm run db:init node
 
 ## 4. 前端开发规范 (Vite + Module Federation)
 
-### Step 4.1: 新增 API 请求定义
+### Step 4.1: 新增与独立封装 API 请求定义
 
-在 `platform/packages/ui/src/api/` 的对应子目录下（例如 `personal/profile.ts`）编写封装函数：
-
-- 采用 `axiosPlus` 统一处理请求。
-- API 路径前缀必须契合后端，例如：`/api/v1/personal/profile/list`。
+- **前端所有 HTTP 接口调用必须保持独立解耦封装**：严禁在 React 页面组件（如 `pages/` 内的文件）中直接手写或调用内联 `axiosPlus`。
+- 所有接口请求必须统一在 `platform/packages/ui/src/api/[domain]/` 目录下按业务模块声明独立的 `.ts` 文件（例如 `admin/ai/config.ts`、`enterprise/mail/edm.ts`、`personal/mail/preference.ts`）。
+- 接口封装函数名统一按照规范命名（如 `listFn`、`listAllFn`、`getFn`、`addFn`、`updateFn`、`deleteFn`、`sendBatchFn` 等），内部采用 `axiosPlus` 适配请求，API 路径前缀必须契合后端（例如：`/api/v1/personal/profile/list`）。
+- **禁止使用 `any` 类型或 `as any` 强转**：接口请求与响应的数据类型必须直接从后端自动生成的 OpenAPI 类型文件 (`@/types/openapi.d.ts`) 或使用 `AxiosConfig<'/path', 'method'>` 泛型直接进行类型安全推导，严禁使用 `any` 绕过 TS 校验。
+- **禁止在业务组件中硬编码请求参数上下文**：发送 API 请求时（特别如 `tenantId: 1` 或特定 `userId` 等标识）严禁硬编码。这些参数必须通过全局状态、组件 Props 传入，或依赖后端 Token 隐式解析。
 
 ### Step 4.2: 前端路由挂载与扁平化设计
 
@@ -180,12 +186,14 @@ node ./scripts/generate-constants.js
 ### Step 4.6: 时间戳渲染规范
 
 所有前端 React 组件在渲染数据库返回的时间戳时，必须统一使用 `dayjs` 库进行格式化（如 `dayjs(timestamp).format("YYYY-MM-DD HH:mm:ss")`），严禁使用原生的 `new Date().toLocaleString()` 进行处理。
+
 > **注意**：如果后端的 `create_time_utc` 等字段在数据库层面是毫秒级存储的，则直接传入 `dayjs(timestamp)`，不需要在前端乘以 1000。
 
 ### Step 4.7: 亮色/暗色模式主题适配规范
 
 在开发前端 UI 组件需要做明暗模式（Light/Dark Mode）适配时，**严禁硬编码 `rgba` 颜色**，也**避免使用 `theme.palette.mode === 'dark' ? A : B` 的三元条件判断逻辑**。
 请务必遵循 MUI 的最佳实践，使用预置的**语义化色板（Semantic Palette）**，这些色板已在底层绑定了明暗逻辑，能自动翻转颜色：
+
 - **背景/容器**：使用 `background.paper` 或 `background.default`。
 - **边框/分割线**：使用 `divider`，能自动在浅色与深色模式下呈现极佳的边界感，替代手写的 `boxShadow`。
 - **状态颜色（悬停/禁用等）**：使用 `action.active`、`action.hover`、`action.disabled` 等。例如自定义滚动条时，可使用 `action.disabled` 作为滑块基础色，`action.active` 作为悬停色。

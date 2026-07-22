@@ -2,6 +2,7 @@ import * as AccountAPI from '@/api/admin/mail/account';
 import * as TemplateAPI from '@/api/admin/mail/template';
 import * as LogAPI from '@/api/admin/mail/log';
 import * as ActionAPI from '@/api/admin/mail/action';
+import * as RecipientAPI from '@/api/admin/mail/recipient';
 
 // 获取所有邮件账户
 export type ListAllMailAccountReq = NonNullable<Parameters<typeof AccountAPI.listAllFn>[0]['data']>;
@@ -68,3 +69,31 @@ export type SendMailRes = Awaited<ReturnType<typeof ActionAPI.sendFn>>['data']['
 // 验证邮件账户
 export type VerifyMailAccountReq = NonNullable<Parameters<typeof ActionAPI.verifyFn>[0]['data']>;
 export type VerifyMailAccountRes = Awaited<ReturnType<typeof ActionAPI.verifyFn>>['data']['data'];
+
+// 邮件收件人列表
+export type ListMailRecipientReq = NonNullable<Parameters<typeof RecipientAPI.listFn>[0]['data']>;
+export type ListMailRecipientRes = Awaited<ReturnType<typeof RecipientAPI.listFn>>['data']['data'];
+
+// 获取单个邮件收件人
+export type GetMailRecipientReq = NonNullable<Parameters<typeof RecipientAPI.getFn>[0]['data']>;
+export type GetMailRecipientRes = Awaited<ReturnType<typeof RecipientAPI.getFn>>['data']['data'];
+
+// 添加邮件收件人
+export type AddMailRecipientReq = NonNullable<Parameters<typeof RecipientAPI.addFn>[0]['data']>;
+export type AddMailRecipientRes = Awaited<ReturnType<typeof RecipientAPI.addFn>>['data']['data'];
+
+// 更新邮件收件人
+export type UpdateMailRecipientReq = NonNullable<
+  Parameters<typeof RecipientAPI.updateFn>[0]['data']
+>;
+export type UpdateMailRecipientRes = Awaited<
+  ReturnType<typeof RecipientAPI.updateFn>
+>['data']['data'];
+
+// 删除邮件收件人
+export type DeleteMailRecipientReq = NonNullable<
+  Parameters<typeof RecipientAPI.deleteFn>[0]['data']
+>;
+export type DeleteMailRecipientRes = Awaited<
+  ReturnType<typeof RecipientAPI.deleteFn>
+>['data']['data'];

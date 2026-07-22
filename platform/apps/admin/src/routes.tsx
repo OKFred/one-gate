@@ -61,6 +61,14 @@ const childrenRoutes = [
     path: 'personal/*',
     element: <div />,
   },
+  {
+    path: 'mail/edm/*',
+    element: <div />,
+  },
+  {
+    path: 'mail/preference/*',
+    element: <div />,
+  },
 ];
 
 const Layout = lazy(() => import('@/layout'));

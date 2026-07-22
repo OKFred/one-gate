@@ -12,6 +12,8 @@ import type { AccountRes } from './TheTable';
 import type { FilterState } from './TheFilter';
 import type { AddMailAccountReq, ListMailAccountReq } from '@/api/admin/mail/type';
 
+import { MenuItem } from '@mui/material';
+
 export interface AccountFormFieldsProps {
   form: Partial<AddMailAccountReq>;
   setForm: React.Dispatch<React.SetStateAction<Partial<AddMailAccountReq>>>;
@@ -28,6 +30,7 @@ export const formConfig: SchemaCrudConfig<AccountRes, FilterState, ListMailAccou
     host: '',
     port: 465,
     password: '',
+    scope: 'sys',
     isEnabled: true,
     remark: null,
   },
@@ -132,6 +135,20 @@ function AccountFormFields({ form, setForm, isMobile, t }: AccountFormFieldsProp
             },
           }}
         />
+        <TextField
+          name="scope"
+          label={t('mail.scope')}
+          select
+          value={form.scope || 'sys'}
+          onChange={(e) => handleFieldChange('scope', e.target.value)}
+          required
+          fullWidth
+          size="medium"
+        >
+          <MenuItem value="sys">{t('mail.scope.sys')}</MenuItem>
+          <MenuItem value="biz">{t('mail.scope.biz')}</MenuItem>
+          <MenuItem value="user">{t('mail.scope.user')}</MenuItem>
+        </TextField>
       </Stack>
 
       <TextField
