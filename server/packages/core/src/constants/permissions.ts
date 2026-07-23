@@ -142,6 +142,10 @@ export const permissionSeeds = {
     config: ["read", "add", "edit", "delete"],
     /** AI 对话 */
     chat: ["read"],
+    /** 全局 AI 搜索 */
+    search: ["read"],
+    /** OpenAI 兼容服务 */
+    openai: ["read"],
   },
   /** Swarm 集群 */
   "admin.swarm": {

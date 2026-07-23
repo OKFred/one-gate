@@ -17,6 +17,9 @@ import { utils as baseConfigUtils } from "./base/sys_config/service.js";
 import baseLogService from "./base/log/service.js";
 import { getDefaultConfig as aiGetDefaultConfig } from "./ai/config/service.js";
 import { AiConfigProvider } from "./ai/config/provider.js";
+import { runAiChat, runAiEmbedding } from "./ai/driver.js";
+import aiSearchService from "./ai/search/service.js";
+import aiChatService from "./ai/chat/service.js";
 import { SwarmDockerConfigProvider } from "./swarm/docker_config/provider.js";
 
 // 1. 组装各领域模块的具体服务实现
@@ -62,6 +65,10 @@ export const ossRegister = {
 export const aiRegister = {
   getDefaultConfig: aiGetDefaultConfig,
   configProvider: new AiConfigProvider(),
+  runAiChat,
+  runAiEmbedding,
+  ask: aiChatService.ask.service,
+  search: aiSearchService.search.service,
 };
 
 import mailActionService from "./mail/action/service.js";

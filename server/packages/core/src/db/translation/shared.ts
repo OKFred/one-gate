@@ -102,6 +102,20 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "sidebar.menu.ai.chat",
+      langCodes: {
+        "zh-CN": "AI 助手对话",
+        "en-US": "AI Playground Chat",
+      },
+    },
+    {
+      tKey: "sidebar.menu.ai.search",
+      langCodes: {
+        "zh-CN": "全局 AI 搜索",
+        "en-US": "Global AI Search",
+      },
+    },
+    {
       tKey: "sidebar.menu.swarm",
       langCodes: {
         "zh-CN": "Swarm集群",

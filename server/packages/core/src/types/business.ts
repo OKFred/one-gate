@@ -77,6 +77,10 @@ export const BUSINESS = {
   "admin.ai.config": "admin.ai.config",
   /** AI 对话 */
   "admin.ai.chat": "admin.ai.chat",
+  /** 全局 AI 搜索 */
+  "admin.ai.search": "admin.ai.search",
+  /** OpenAI 兼容服务 */
+  "admin.ai.openai": "admin.ai.openai",
   /** Swarm */
   "admin.swarm": "admin.swarm",
   /** Swarm Docker Service */

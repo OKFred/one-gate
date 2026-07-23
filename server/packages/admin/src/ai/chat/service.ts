@@ -1,15 +1,13 @@
 import { type FromSchema } from "json-schema-to-ts";
-import { getDefaultConfig } from "../config/service";
 import { AskReq, AskRes } from "./model";
 import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
-import {
-  preventEmptyPrompt,
-  preventMissingConfig,
-  ErrorCodes,
-} from "./prevention";
+import { preventEmptyPrompt } from "./prevention";
+import { runAiChat, type AiChatMessage } from "../driver";
 
+/**
+ * Handle AI chat completions using Workers AI driver with system configuration fallback.
+ */
 async function onAsk(
   params: FromSchema<typeof AskReq>
 ): Promise<FromSchema<typeof AskRes>> {
@@ -18,21 +16,10 @@ async function onAsk(
   // 预防提示词为空
   preventEmptyPrompt(q);
 
-  // 获取默认 AI 配置
-  const config = await getDefaultConfig();
-  // 预防配置缺失
-  preventMissingConfig(config);
-
-  const { baseUrl, apiKey, model } = config as unknown as Record<
-    string,
-    string
-  >;
-
   // 1. 构造系统指令消息
-  const systemMessage = {
+  const systemMessage: AiChatMessage = {
     role: "system",
-    content:
-      "Do not overthink. Keep reasoning short. Answer directly. Use tools quickly.",
+    content: "你是一个智能高效的 AI 助手，请准确、简洁、专业的回答用户的问题。",
   };
 
   // 2. 构造用户内容
@@ -43,40 +30,25 @@ async function onAsk(
       ]
     : q;
 
-  // 3. 组装最终消息流
-  const finalMessages = [
-    ...history,
+  // 3. 组装历史与当前消息
+  const formattedHistory: AiChatMessage[] = history.map((item) => ({
+    role: item.role as "user" | "assistant" | "system",
+    content: item.content as any,
+  }));
+
+  const finalMessages: AiChatMessage[] = [
     systemMessage,
+    ...formattedHistory,
     { role: "user", content: userContent },
   ];
 
-  const res = await fetch(`${baseUrl}/chat/completions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: finalMessages,
-      max_tokens: 4096,
-      reasoning_effort: "low",
-      temperature: 0.2,
-      tool_ids: ["server:chrome-devtools-mcp", "server:mcp-time"],
-    }),
+  const result = await runAiChat({
+    model: "@cf/meta/llama-3.2-3b-instruct",
+    messages: finalMessages,
+    temperature: 0.3,
   });
 
-  if (!res.ok) {
-    const errorBody = await res.text();
-    console.error(`AI API Error [${res.status}]:`, errorBody);
-    throw new Error(`AI API 响应错误 (${res.status})`);
-  }
-
-  const json = (await res.json()) as {
-    choices: { message: { content: string } }[];
-  };
-  console.log(json);
-  return json.choices[0].message.content;
+  return result.content;
 }
 
 const askApi = {

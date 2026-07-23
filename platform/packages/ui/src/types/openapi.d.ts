@@ -9635,6 +9635,296 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/ai/search/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 全局 AI 智能搜索 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.ai.config.search.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.ai.config.search.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/openai/chat/completions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** OpenAI 兼容对话补全 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.ai.config.chat.completions.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.ai.config.chat.completions.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/openai/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** OpenAI 兼容模型列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.ai.config.models.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.ai.config.models.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/v1/chat/completions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** OpenAI 兼容对话补全 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.ai.config.chat.completions.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.ai.config.chat.completions.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/v1/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** OpenAI 兼容模型列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.ai.config.models.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.ai.config.models.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/rpa/config/list": {
         parameters: {
             query?: never;
@@ -19390,6 +19680,146 @@ export interface components {
             ok: boolean;
             /** @description AI 返回的内容 */
             data: string;
+            message: string;
+        };
+        "admin.ai.config.search.req": {
+            /** @description 搜索关键词或语义提问 */
+            query: string;
+            /**
+             * @description 返回的最大结果数量
+             * @default 10
+             */
+            limit: number;
+        };
+        "admin.ai.config.search.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: string;
+                    title: string;
+                    /** @enum {string} */
+                    type: "menu" | "config" | "feature" | "system";
+                    path?: string;
+                    score: number;
+                    description?: string;
+                    snippet?: string;
+                }[];
+                total: number;
+            };
+            message: string;
+        };
+        "admin.ai.config.chat.completions.req": {
+            /**
+             * @description Cloudflare Workers AI 或 OpenAI 兼容模型名称
+             * @default @cf/meta/llama-3.2-3b-instruct
+             */
+            model: string;
+            /** @description 符合 OpenAI 规范的消息上下文列表 */
+            messages: {
+                /**
+                 * @description 消息发送者角色 (system | user | assistant)
+                 * @enum {string}
+                 */
+                role: "system" | "user" | "assistant";
+                content: string | {
+                    /** @description 内容类型 (text | image_url) */
+                    type?: string;
+                    /** @description 文本内容 */
+                    text?: string;
+                    /** @description 图片 URL 结构 */
+                    image_url?: {
+                        /** @description 图片地址或 Base64 编码 */
+                        url?: string;
+                    };
+                }[];
+            }[];
+            /**
+             * @description 生成随机性参数 (0.0 - 2.0)
+             * @default 0.7
+             */
+            temperature: number;
+            /**
+             * @description 最大生成 Token 数量限制
+             * @default 2048
+             */
+            max_tokens: number;
+            /**
+             * @description 是否开启流式传输 (暂保留)
+             * @default false
+             */
+            stream: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        "admin.ai.config.chat.completions.res": {
+            ok: boolean;
+            data: {
+                /** @description 单次对话生成唯一标识符 */
+                id: string;
+                /**
+                 * @description 响应对象类型
+                 * @constant
+                 */
+                object: "chat.completion";
+                /** @description 响应时间戳 */
+                created: number;
+                /** @description 调用的底层大语言模型名称 */
+                model: string;
+                /** @description 补全回答候选列表 */
+                choices: {
+                    /** @description 结果选项索引 */
+                    index: number;
+                    /** @description 生成的核心消息对象 */
+                    message: {
+                        /**
+                         * @description 固定为 assistant 角色
+                         * @constant
+                         */
+                        role: "assistant";
+                        /** @description AI 生成的回答文本 */
+                        content: string;
+                    };
+                    /** @description 结束标识 (如 stop | length) */
+                    finish_reason: string;
+                }[];
+                /** @description Token 消耗统计 */
+                usage?: {
+                    /** @description 提示词 Token 消耗数量 */
+                    prompt_tokens: number;
+                    /** @description 生成回答 Token 消耗数量 */
+                    completion_tokens: number;
+                    /** @description 总计 Token 消耗数量 */
+                    total_tokens: number;
+                };
+            };
+            message: string;
+        };
+        "admin.ai.config.models.req": {
+            [key: string]: unknown;
+        };
+        "admin.ai.config.models.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 固定为 list
+                 * @constant
+                 */
+                object: "list";
+                /** @description 支持的 AI 模型列表 */
+                data: {
+                    /** @description 模型 ID 名称 */
+                    id: string;
+                    /**
+                     * @description 固定为 model
+                     * @constant
+                     */
+                    object: "model";
+                    /** @description 模型创建时间戳 */
+                    created: number;
+                    /** @description 模型提供方标识 */
+                    owned_by: string;
+                }[];
+            };
             message: string;
         };
         "admin.rpa.config.list.req": {

@@ -234,6 +234,14 @@ export const permissions = {
       chat: {
         read: 'admin.ai.chat:read',
       },
+      /** 全局 AI 搜索 */
+      search: {
+        read: 'admin.ai.search:read',
+      },
+      /** OpenAI 兼容服务 */
+      openai: {
+        read: 'admin.ai.openai:read',
+      },
     },
     /** Swarm 集群 */
     swarm: {
