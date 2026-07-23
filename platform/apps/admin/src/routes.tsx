@@ -66,7 +66,7 @@ const childrenRoutes = [
     element: <div />,
   },
   {
-    path: 'mail/preference/*',
+    path: 'base/preference/*',
     element: <div />,
   },
 ];

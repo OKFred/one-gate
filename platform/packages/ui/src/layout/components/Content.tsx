@@ -31,8 +31,8 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
     isHost &&
     (location.pathname.startsWith('/personal/') ||
       location.pathname.startsWith('personal/') ||
-      location.pathname.startsWith('/mail/preference') ||
-      location.pathname.startsWith('mail/preference'));
+      location.pathname.startsWith('/base/preference') ||
+      location.pathname.startsWith('base/preference'));
   const isMicroAppActive = isEnterpriseActive || isPersonalActive;
 
   return (
