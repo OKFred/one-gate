@@ -20,19 +20,9 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
 
   // 识别当前路由属于哪一个子应用
   const isEnterpriseActive =
-    isHost &&
-    (location.pathname.startsWith('/organization/') ||
-      location.pathname.startsWith('organization/') ||
-      location.pathname.startsWith('/executive/') ||
-      location.pathname.startsWith('executive/') ||
-      location.pathname.startsWith('/mail/edm') ||
-      location.pathname.startsWith('mail/edm'));
+    isHost && (location.pathname.startsWith('/enterprise/') || location.pathname === '/enterprise');
   const isPersonalActive =
-    isHost &&
-    (location.pathname.startsWith('/personal/') ||
-      location.pathname.startsWith('personal/') ||
-      location.pathname.startsWith('/base/preference') ||
-      location.pathname.startsWith('base/preference'));
+    isHost && (location.pathname.startsWith('/personal/') || location.pathname === '/personal');
   const isMicroAppActive = isEnterpriseActive || isPersonalActive;
 
   return (

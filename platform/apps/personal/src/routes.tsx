@@ -27,13 +27,16 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       })),
     );
 
+    const element = (
+      <Suspense fallback={renderPageLoading()}>
+        <LazyComp />
+      </Suspense>
+    );
+
+    // 在微前端 Host 环境中以 /personal/xxx 访问
     routes.push({
-      path: routePath,
-      element: (
-        <Suspense fallback={renderPageLoading()}>
-          <LazyComp />
-        </Suspense>
-      ),
+      path: routePath.startsWith('personal/') ? routePath : `personal/${routePath}`,
+      element,
     });
   }
 

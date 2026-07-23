@@ -29,13 +29,23 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       })),
     );
 
+    const element = (
+      <Suspense fallback={<PageLoading />}>
+        <LazyComp />
+      </Suspense>
+    );
+
+    // /home 和 /me 作为根路径例外，其余统一在 Host 中以 /admin/xxx 前缀访问
+    const isRootException = routePath === 'home' || routePath === 'me';
+    const finalPath = isRootException
+      ? routePath
+      : routePath.startsWith('admin/')
+        ? routePath
+        : `admin/${routePath}`;
+
     routes.push({
-      path: routePath,
-      element: (
-        <Suspense fallback={<PageLoading />}>
-          <LazyComp />
-        </Suspense>
-      ),
+      path: finalPath,
+      element,
     });
   }
 
@@ -50,23 +60,11 @@ const childrenRoutes = [
     ),
   ),
   {
-    path: 'organization/*',
-    element: <div />,
-  },
-  {
-    path: 'executive/*',
+    path: 'enterprise/*',
     element: <div />,
   },
   {
     path: 'personal/*',
-    element: <div />,
-  },
-  {
-    path: 'mail/edm/*',
-    element: <div />,
-  },
-  {
-    path: 'base/preference/*',
     element: <div />,
   },
 ];
