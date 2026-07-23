@@ -2,7 +2,7 @@ import type { TranslationInputItem } from "@hodor/core/db/initTranslation";
 import type { BusinessKey } from "@hodor/core/types/business";
 
 export const preferenceTranslations = {
-  "personal.mail.preference": [
+  "personal.base.preference": [
     {
       application: "frontend",
       tKey: "mail.pref.saveSuccess",
@@ -122,6 +122,6 @@ export const preferenceTranslations = {
     },
   ],
 } satisfies Record<
-  Extract<BusinessKey, "personal.mail.preference">,
+  Extract<BusinessKey, "personal.base.preference">,
   TranslationInputItem[]
 >;

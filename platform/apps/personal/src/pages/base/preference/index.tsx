@@ -14,7 +14,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { MarkEmailRead as EmailIcon } from '@mui/icons-material';
-import { PersonalMailPreferenceAPI } from '@hodor/ui';
+import { PersonalBasePreferenceAPI } from '@hodor/ui';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function PersonalPreferencePage() {
@@ -33,7 +33,7 @@ export default function PersonalPreferencePage() {
   const fetchPreference = async () => {
     setLoading(true);
     try {
-      const res = await PersonalMailPreferenceAPI.getFn({ data: {} });
+      const res = await PersonalBasePreferenceAPI.getFn();
       if (res?.data?.data) {
         setEmail(res.data.data.email || '');
         setRemoteLoginWarn(res.data.data.remoteLoginWarn ?? true);
@@ -50,7 +50,7 @@ export default function PersonalPreferencePage() {
     setSaving(true);
     setMsg(null);
     try {
-      await PersonalMailPreferenceAPI.updateFn({
+      await PersonalBasePreferenceAPI.updateFn({
         data: {
           email,
           remoteLoginWarn,

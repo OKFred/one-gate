@@ -23,7 +23,10 @@ async function onAsk(
   // 预防配置缺失
   preventMissingConfig(config);
 
-  const { baseUrl, apiKey, model } = config!;
+  const { baseUrl, apiKey, model } = config as unknown as Record<
+    string,
+    string
+  >;
 
   // 1. 构造系统指令消息
   const systemMessage = {

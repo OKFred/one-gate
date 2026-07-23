@@ -67,11 +67,11 @@ export const BUSINESS = {
   "executive.workflow": "executive.workflow",
   /** 个人中心 */
   personal: "personal",
-  /** 个人中心-个人信息 */
-  "personal.profile": "personal.profile",
+
+  /** 个人中心-账号配置 */
+  "personal.base": "personal.base",
   /** 个人中心-邮件偏好 */
-  "personal.mail.preference": "personal.mail.preference",
-  /** AI */
+  "personal.base.preference": "personal.base.preference",
   "admin.ai": "admin.ai",
   /** AI 配置 */
   "admin.ai.config": "admin.ai.config",
@@ -105,8 +105,8 @@ export const BUSINESS = {
   /** 基础配置 - 具体配置 */
   "admin.base.sys_config": "admin.base.sys_config",
   "enterprise.mail": "enterprise.mail",
-  "personal.mail": "personal.mail",
   "personal.base.user_config": "personal.base.user_config",
+
   /** 基础配置 - 日志 */
   "admin.base.log": "admin.base.log",
   /** 数据库 */

@@ -307,22 +307,15 @@ export const permissions = {
   },
   personal: {
     read: 'personal:read',
-    /** 个人信息 */
-    profile: {
-      read: 'personal.profile:read',
-      add: 'personal.profile:add',
-      edit: 'personal.profile:edit',
-      delete: 'personal.profile:delete',
-    },
-    /** 个人邮件 */
-    mail: {
-      read: 'personal.mail:read',
+    /** 账号配置 */
+    base: {
+      read: 'personal.base:read',
       /** preference */
       preference: {
-        read: 'personal.mail.preference:read',
-        add: 'personal.mail.preference:add',
-        edit: 'personal.mail.preference:edit',
-        delete: 'personal.mail.preference:delete',
+        read: 'personal.base.preference:read',
+        add: 'personal.base.preference:add',
+        edit: 'personal.base.preference:edit',
+        delete: 'personal.base.preference:delete',
       },
     },
   },

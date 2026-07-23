@@ -128,10 +128,9 @@ export const permissionSeeds = {
   /** 个人中心 */
   personal: {
     "": ["read"],
-    /** 个人信息 */
-    profile: ["read", "add", "edit", "delete"],
-    /** 个人邮件 */
-    mail: {
+
+    /** 账号配置 */
+    base: {
       "": ["read"],
       preference: ["read", "add", "edit", "delete"],
     },

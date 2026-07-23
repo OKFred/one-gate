@@ -14,8 +14,8 @@ import { dataTranslations } from "../../../admin/src/data/translation";
 import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
 import { workflowTranslations } from "../../../enterprise/src/executive/workflow/translation";
 import { edmTranslations } from "../../../enterprise/src/mail/edm/translation";
-import { profileTranslations } from "../../../personal/src/profile/translation";
-import { preferenceTranslations } from "../../../personal/src/mail/preference/translation";
+
+import { preferenceTranslations } from "../../../personal/src/base/preference/translation";
 import { systemTranslations } from "../../../admin/src/system/translation";
 import { configTranslations } from "../../../admin/src/rpa/config/translation";
 import { baseTranslations } from "../../../admin/src/base/translation";
@@ -139,7 +139,7 @@ export const initialTranslationData = mapTranslations({
   ...attendanceTranslations,
   ...workflowTranslations,
   ...edmTranslations,
-  ...profileTranslations,
+
   ...preferenceTranslations,
   ...systemTranslations,
   ...configTranslations,

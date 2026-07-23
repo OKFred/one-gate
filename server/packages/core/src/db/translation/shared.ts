@@ -46,14 +46,14 @@ export const sharedTranslations = {
       },
     },
     {
-      tKey: "sidebar.menu.personal.mail",
+      tKey: "sidebar.menu.personal.base",
       langCodes: {
-        "zh-CN": "个人邮件",
-        "en-US": "Mail",
+        "zh-CN": "账号配置",
+        "en-US": "Account Config",
       },
     },
     {
-      tKey: "sidebar.menu.personal.mail.preference",
+      tKey: "sidebar.menu.personal.base.preference",
       langCodes: {
         "zh-CN": "邮件偏好",
         "en-US": "Preference",
