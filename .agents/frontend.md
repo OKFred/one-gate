@@ -24,9 +24,56 @@
 
 ## 3. 国际化多语言翻译机制
 
+### 基本原则
+
 - 严禁在页面组件中针对 `t()` 翻译函数使用备用文字（例如 `t('key') || '默认文本'`）。
 - 始终保持 `t('key')` 的干净输出，若缺少词条将直接展示键名，以防开发遗漏翻译，便于在运行时及时补全。
-- **新加的翻译文案，必须先检查是否有重复**：对于常见的通用词汇（如新增、编辑、删除、时间等），请全局搜索 `server/packages/core/src/db/translation/shared.ts`。如果有重复，则直接复用已有的键名，**不要新增重复词条**。
+
+### 文案存放位置（新规范）
+
+采用**双层文案加载机制**，前端本地 TS 文件为首选，数据库保留热修复能力：
+
+| 类型 | 存放位置 | 说明 |
+|------|---------|------|
+| 跨 App 公共文案（通用动词/状态/组件/侧边栏/认证） | `platform/packages/ui/src/locales/[lang]/` | 由 `useLoadTranslations` 启动时同步写入 |
+| App 专属页面文案 | `platform/apps/[app]/src/locales/[lang]/` | 由各 App.tsx 模块加载时同步 merge |
+| 后端报错文案、运营需动态修改的文案 | 数据库（通过后台「翻译管理」维护） | 接口 merge 覆盖本地，优先级最高 |
+
+> **严禁**将新功能的前端页面文案写入 `server/packages/core/src/db/translation/shared.ts` 或各模块 `translation.ts`。
+
+### 新增文案流程
+
+1. 在 `platform/packages/ui/src/locales/zh-CN/` 对应的 namespace 文件中添加（如 `common.ts`、`components.ts`）
+2. 若是 App 专属文案，在 `platform/apps/[app]/src/locales/zh-CN/` 下对应文件中添加
+3. 同步在 `en-US/` 对应文件添加英文翻译
+4. 无需重启后端，立即生效
+
+### 通用词汇复用（防止重复定义）
+
+**新增文案前，必须先检查以下位置是否已有可复用的 key：**
+
+- `platform/packages/ui/src/locales/zh-CN/common.ts`（通用动词：取消/确定/保存/删除…）
+- `platform/packages/ui/src/locales/zh-CN/components.ts`（表格/列名/弹窗/状态…）
+
+常见通用词对应 key：
+
+| 词汇 | key |
+|------|-----|
+| 取消/确定/保存/提交 | `common.cancel` / `common.confirm` / `common.save` / `common.submit` |
+| 编辑/删除/查看/新增 | `common.edit` / `common.delete` / `common.view` / `common.add` |
+| 操作（表格列） | `table.actions` |
+| 创建人/更新时间 | `column.creatorName` / `column.updateTime` |
+| 启用/禁用 | `status.enabled` / `status.disabled` |
+
+### 后端热修复
+
+若需要在**不发布前端**的情况下修改已上线的文案：
+
+1. 进入后台「翻译管理」
+2. 找到对应 `tKey`，修改 `tValue`，将 `application` 设为 `frontend`，`isEnabled` 设为 `true`
+3. 用户刷新页面后自动生效（接口数据优先级高于本地文案）
+
+
 
 ---
 
