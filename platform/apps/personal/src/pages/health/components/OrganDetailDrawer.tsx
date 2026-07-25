@@ -36,7 +36,7 @@ export const OrganDetailDrawer: React.FC<OrganDetailDrawerProps> = ({ organ, onC
         '& .MuiDrawer-paper': {
           width: { xs: '100%', sm: '420px' },
           p: 3,
-          background: theme.palette.mode === 'dark' ? theme.palette.background.paper : '#fafafa',
+          background: 'background.paper',
         },
       }}
     >

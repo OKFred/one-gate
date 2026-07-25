@@ -52,7 +52,21 @@ export const RelationGraph: React.FC = () => {
         const radius = 220;
         const angleStep = (2 * Math.PI) / (contacts.length || 1);
 
-        contacts.forEach((c: any, index: number) => {
+        interface ContactNodeItem {
+          id?: number;
+          realName?: string;
+          relationCircle?: string;
+          position?: string | null;
+        }
+
+        interface RelationEdgeItem {
+          id?: number;
+          sourceContactId?: number;
+          targetContactId?: number;
+          relationLabel?: string | null;
+        }
+
+        contacts.forEach((c: ContactNodeItem, index: number) => {
           const angle = index * angleStep;
           const x = 350 + radius * Math.cos(angle);
           const y = 250 + radius * Math.sin(angle);
@@ -62,10 +76,10 @@ export const RelationGraph: React.FC = () => {
             id: nodeId,
             position: { x, y },
             data: {
-              label: `${c.realName}\n(${c.position || getCircleLabel(c.relationCircle, t)})`,
+              label: `${c.realName || ''}\n(${c.position || getCircleLabel(c.relationCircle || '', t)})`,
             },
             style: {
-              background: getCircleBg(c.relationCircle),
+              background: getCircleBg(c.relationCircle || ''),
               color: '#fff',
               border: '1px solid rgba(255,255,255,0.3)',
               borderRadius: '10px',
@@ -82,14 +96,14 @@ export const RelationGraph: React.FC = () => {
             id: `edge-self-${c.id}`,
             source: 'self-node',
             target: nodeId,
-            label: getCircleLabel(c.relationCircle, t),
+            label: getCircleLabel(c.relationCircle || '', t),
             animated: true,
             style: { stroke: '#1677ff', strokeWidth: 2 },
           });
         });
 
         // Add interconnecting relations
-        relations.forEach((r: any) => {
+        relations.forEach((r: RelationEdgeItem) => {
           initialEdges.push({
             id: `edge-rel-${r.id}`,
             source: `contact-${r.sourceContactId}`,

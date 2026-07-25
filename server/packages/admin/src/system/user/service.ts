@@ -527,6 +527,10 @@ async function getUser(id: number) {
   return await onGet({ id });
 }
 
+async function getUserNameMapByIds(userIds: number[]) {
+  return await userRepository.getUserNameMapByIds(userIds);
+}
+
 export const utils = {
   countDepartmentUsers,
   convertPassword,
@@ -535,6 +539,7 @@ export const utils = {
   updateLangCode,
   updateUserInfo,
   getUserNameById,
+  getUserNameMapByIds,
   getUser,
 };
 

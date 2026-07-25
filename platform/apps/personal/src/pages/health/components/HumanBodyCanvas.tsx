@@ -66,16 +66,10 @@ export const HumanBodyCanvas: React.FC<HumanBodyCanvasProps> = ({
         justifyContent: 'space-between',
         position: 'relative',
         overflow: 'hidden',
-        background: (theme) =>
-          theme.palette.mode === 'dark'
-            ? 'radial-gradient(circle at 50% 30%, #0f172a 0%, #020617 100%)'
-            : 'radial-gradient(circle at 50% 30%, #f0f9ff 0%, #e0f2fe 100%)',
+        backgroundColor: 'background.paper',
         border: (theme) => `1px solid ${theme.palette.divider}`,
         borderRadius: 4,
-        boxShadow: (theme) =>
-          theme.palette.mode === 'dark'
-            ? '0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 2px rgba(56, 189, 248, 0.2)'
-            : '0 20px 40px rgba(14, 165, 233, 0.1), inset 0 0 2px rgba(14, 165, 233, 0.3)',
+        boxShadow: 4,
       }}
     >
       {/* Background Cybernetic Tech Grid & Medical Scanning Line */}

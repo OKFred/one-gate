@@ -59,13 +59,10 @@ export const Dashboard: React.FC = () => {
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card
-            elevation={2}
+            elevation={1}
             sx={{
               borderRadius: 3,
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%)'
-                  : 'linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%)',
+              backgroundColor: 'background.paper',
               border: (theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
@@ -88,13 +85,10 @@ export const Dashboard: React.FC = () => {
 
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card
-            elevation={2}
+            elevation={1}
             sx={{
               borderRadius: 3,
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #2b1d1d 0%, #1b0d0d 100%)'
-                  : 'linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%)',
+              backgroundColor: 'background.paper',
               border: (theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
@@ -117,13 +111,10 @@ export const Dashboard: React.FC = () => {
 
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card
-            elevation={2}
+            elevation={1}
             sx={{
               borderRadius: 3,
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #1d2b1d 0%, #0d1b0d 100%)'
-                  : 'linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%)',
+              backgroundColor: 'background.paper',
               border: (theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
@@ -146,13 +137,10 @@ export const Dashboard: React.FC = () => {
 
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card
-            elevation={2}
+            elevation={1}
             sx={{
               borderRadius: 3,
-              background: (theme) =>
-                theme.palette.mode === 'dark'
-                  ? 'linear-gradient(135deg, #2b2b1d 0%, #1b1b0d 100%)'
-                  : 'linear-gradient(135deg, #fffbe6 0%, #ffe58f 100%)',
+              backgroundColor: 'background.paper',
               border: (theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
