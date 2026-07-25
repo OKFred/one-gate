@@ -8,6 +8,7 @@ import {
   Paper,
   Chip,
   LinearProgress,
+  type LinearProgressProps,
   Stack,
   useTheme,
 } from '@mui/material';
@@ -130,7 +131,7 @@ export const OrganDetailDrawer: React.FC<OrganDetailDrawerProps> = ({ organ, onC
             <LinearProgress
               variant="determinate"
               value={m.percent}
-              color={m.color as any}
+              color={m.color as LinearProgressProps['color']}
               sx={{ height: 8, borderRadius: 4 }}
             />
           </Paper>

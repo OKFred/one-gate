@@ -200,7 +200,7 @@ export function UserFormFields({
             justifyContent: 'space-between',
             alignItems: 'center',
             minHeight: '56px',
-            borderColor: departmentObjError ? 'error.main' : 'rgba(0, 0, 0, 0.23)',
+            borderColor: departmentObjError ? 'error.main' : 'divider',
             '&:hover': {
               borderColor: departmentObjError ? 'error.main' : 'primary.main',
             },

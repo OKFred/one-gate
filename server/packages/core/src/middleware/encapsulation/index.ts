@@ -119,7 +119,7 @@ function routeMaker({
       }
     }
     return c.json<ResJson>(
-      { ok: true, message: "OK", data: result },
+      { ok: true, message: "OK", data: result ?? {} },
       StatusCodes.OK as ContentfulStatusCode
     );
   };

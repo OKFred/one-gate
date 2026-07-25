@@ -26,7 +26,7 @@ interface FormDialogProps<TRecord, TFilters, TApiData, TExtra = unknown> {
     clearFieldError: (path: string) => void;
     rootSchema?: Record<string, unknown>;
   };
-  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra>;
+  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra, never, never>;
   resolvedSchema: Record<string, unknown> | null;
   extraContext?: TExtra;
   onSubmit: (e: React.FormEvent) => void;

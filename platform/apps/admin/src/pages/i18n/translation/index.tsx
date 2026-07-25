@@ -6,6 +6,9 @@ import TranslationFormFields from './components/TheForm';
 import * as TranslationAPI from '@/api/admin/i18n/translation';
 import type { ListTranslationReq } from '@/api/admin/i18n/type';
 //
+type AddData = NonNullable<Parameters<typeof TranslationAPI.addFn>[0]['data']>;
+type UpdateData = NonNullable<Parameters<typeof TranslationAPI.updateFn>[0]['data']>;
+
 const calculateSHA256 = async (text: string): Promise<string> => {
   const encoder = new TextEncoder();
   const data = encoder.encode(text);
@@ -24,22 +27,22 @@ export default function TranslationPage() {
     },
     api: {
       list: TranslationAPI.listFn,
-      add: async (args) => {
-        const hash = await calculateSHA256(args.data.tValue || '');
+      add: async (args: { data: AddData }) => {
+        const hash = await calculateSHA256(args.data?.tValue || '');
         return TranslationAPI.addFn({
           data: {
             ...args.data,
             valueHash: hash,
-          },
+          } as AddData,
         });
       },
-      update: async (args) => {
-        const hash = await calculateSHA256(args.data.tValue || '');
+      update: async (args: { data: UpdateData }) => {
+        const hash = await calculateSHA256(args.data?.tValue || '');
         return TranslationAPI.updateFn({
           data: {
             ...args.data,
             valueHash: hash,
-          },
+          } as UpdateData,
         });
       },
       delete: TranslationAPI.deleteFn,

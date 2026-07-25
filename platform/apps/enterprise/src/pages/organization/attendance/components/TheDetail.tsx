@@ -10,6 +10,7 @@ import {
   Box,
   Divider,
   Chip,
+  type ChipProps,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -30,13 +31,12 @@ const TheDetail = memo(({ open, onClose, detail }: TheDetailProps) => {
   if (!detail) return null;
 
   const getStatusChip = (status: number) => {
-    const statusMap: Record<number, { label: string; color: Parameters<typeof Chip>[0]['color'] }> =
-      {
-        0: { label: t('organization.attendance.status.normal'), color: 'success' },
-        1: { label: t('organization.attendance.status.late'), color: 'warning' },
-        2: { label: t('organization.attendance.status.earlyLeave'), color: 'info' },
-        3: { label: t('organization.attendance.status.absent'), color: 'error' },
-      };
+    const statusMap: Record<number, { label: string; color: ChipProps['color'] }> = {
+      0: { label: t('organization.attendance.status.normal'), color: 'success' },
+      1: { label: t('organization.attendance.status.late'), color: 'warning' },
+      2: { label: t('organization.attendance.status.earlyLeave'), color: 'info' },
+      3: { label: t('organization.attendance.status.absent'), color: 'error' },
+    };
     const { label, color } = statusMap[status] || { label: t('column.noData'), color: 'default' };
     return <Chip label={label} color={color} size="small" />;
   };

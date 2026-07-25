@@ -135,7 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           onClick={() => handleMenuClick(item)}
           sx={{
             pl: 2 + level * 2,
-            backgroundColor: isActive ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
+            backgroundColor: isActive ? 'action.selected' : 'transparent',
           }}
         >
           <ListItemIcon sx={{ minWidth: 40 }}>

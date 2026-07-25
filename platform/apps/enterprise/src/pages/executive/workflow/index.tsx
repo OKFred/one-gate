@@ -25,6 +25,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  useTheme,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -130,6 +131,7 @@ function FlowEditorInner({
 }: FlowEditorInnerProps) {
   const { screenToFlowPosition } = useReactFlow();
   const t = useTranslation();
+  const theme = useTheme();
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -183,7 +185,7 @@ function FlowEditorInner({
       <Panel
         position="top-right"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: theme.palette.background.paper,
           padding: '8px',
           borderRadius: '4px',
           display: 'flex',
@@ -234,7 +236,7 @@ function FlowEditorInner({
       <Panel
         position="top-left"
         style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: theme.palette.background.paper,
           padding: '12px',
           borderRadius: '4px',
           zIndex: 10,

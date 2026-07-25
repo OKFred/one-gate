@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material';
+import { Chip, type ChipProps } from '@mui/material';
 import { Visibility as VisibilityIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
@@ -9,6 +9,16 @@ export interface AttendanceContext {
   onShowDetails: (row: AttendanceObj) => void;
 }
 
+const getStatusConfig = (status: number, t: (key: string) => string) => {
+  const statusMap: Record<number, { label: string; color: ChipProps['color'] }> = {
+    0: { label: t('organization.attendance.status.normal'), color: 'success' },
+    1: { label: t('organization.attendance.status.late'), color: 'warning' },
+    2: { label: t('organization.attendance.status.earlyLeave'), color: 'info' },
+    3: { label: t('organization.attendance.status.absent'), color: 'error' },
+  };
+  return statusMap[status] || { label: t('column.noData'), color: 'default' };
+};
+
 export const tableConfig: SchemaCrudConfig<
   AttendanceObj,
   FilterState,
@@ -17,7 +27,10 @@ export const tableConfig: SchemaCrudConfig<
 >['table'] = {
   columns: (t) => [
     { title: t('columns.id'), render: (row) => row.id },
-    { title: t('organization.attendance.employee'), render: (row) => row.employeeObj?.label || '-' },
+    {
+      title: t('organization.attendance.employee'),
+      render: (row) => row.employeeObj?.label || '-',
+    },
     { title: t('organization.attendance.date'), render: (row) => row.date },
     {
       title: t('organization.attendance.checkInTime'),
@@ -30,19 +43,7 @@ export const tableConfig: SchemaCrudConfig<
     {
       title: t('organization.attendance.status'),
       render: (row) => {
-        const statusMap: Record<
-          number,
-          { label: string; color: Parameters<typeof Chip>[0]['color'] }
-        > = {
-          0: { label: t('organization.attendance.status.normal'), color: 'success' },
-          1: { label: t('organization.attendance.status.late'), color: 'warning' },
-          2: { label: t('organization.attendance.status.earlyLeave'), color: 'info' },
-          3: { label: t('organization.attendance.status.absent'), color: 'error' },
-        };
-        const { label, color } = statusMap[row.status] || {
-          label: t('column.noData'),
-          color: 'default',
-        };
+        const { label, color } = getStatusConfig(row.status, t);
         return <Chip label={label} color={color} size="small" variant="outlined" />;
       },
     },
@@ -64,19 +65,7 @@ export const tableConfig: SchemaCrudConfig<
     {
       type: 'tags',
       render: (row) => {
-        const statusMap: Record<
-          number,
-          { label: string; color: Parameters<typeof Chip>[0]['color'] }
-        > = {
-          0: { label: t('organization.attendance.status.normal'), color: 'success' },
-          1: { label: t('organization.attendance.status.late'), color: 'warning' },
-          2: { label: t('organization.attendance.status.earlyLeave'), color: 'info' },
-          3: { label: t('organization.attendance.status.absent'), color: 'error' },
-        };
-        const { label, color } = statusMap[row.status] || {
-          label: t('column.noData'),
-          color: 'default',
-        };
+        const { label, color } = getStatusConfig(row.status, t);
         return <Chip label={label} color={color} size="small" />;
       },
     },

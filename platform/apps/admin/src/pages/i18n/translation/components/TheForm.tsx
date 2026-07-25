@@ -152,7 +152,7 @@ export default function TranslationFormFields({
                 )}
               </strong>
             </Box>
-            <List dense sx={{ bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, mb: 1 }}>
+            <List dense sx={{ bgcolor: 'action.hover', borderRadius: 1, mb: 1 }}>
               {duplicateInfo.duplicates.map((dup) => (
                 <ListItem key={dup.id} sx={{ py: 0.5 }}>
                   <ListItemIcon sx={{ minWidth: 32 }}>

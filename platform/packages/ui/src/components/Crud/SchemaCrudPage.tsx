@@ -35,17 +35,31 @@ export interface CrudState<TRecord, TFilters> {
   rowToDelete: TRecord | null;
 }
 
-interface SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra = unknown> {
-  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra>;
+interface SchemaCrudPageProps<
+  TRecord,
+  TFilters,
+  TApiData,
+  TExtra = unknown,
+  TAddData = Record<string, unknown>,
+  TUpdateData = Record<string, unknown>,
+> {
+  config: SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra, TAddData, TUpdateData>;
   extraContext?: TExtra;
   customActions?: React.ReactNode;
 }
 
-export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
+export function SchemaCrudPage<
+  TRecord,
+  TFilters,
+  TApiData,
+  TExtra = unknown,
+  TAddData = Record<string, unknown>,
+  TUpdateData = Record<string, unknown>,
+>({
   config,
   extraContext,
   customActions,
-}: SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra>) {
+}: SchemaCrudPageProps<TRecord, TFilters, TApiData, TExtra, TAddData, TUpdateData>) {
   const t = useTranslation();
   const { isMobile } = useResponsive();
 
@@ -373,13 +387,13 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
         const idKey = (configRef.current.apiKeyName || 'id') as keyof TRecord;
         if (configRef.current.api.update) {
           await configRef.current.api.update({
-            data: { ...submitForm, [idKey]: editId } as unknown as TRecord,
+            data: { ...submitForm, [idKey]: editId } as never,
           });
         }
       } else {
         if (configRef.current.api.add) {
           await configRef.current.api.add({
-            data: submitForm as unknown as Omit<TRecord, 'id'>,
+            data: submitForm as never,
           });
         }
       }
@@ -575,7 +589,7 @@ export function SchemaCrudPage<TRecord, TFilters, TApiData, TExtra = unknown>({
       />
 
       {/* 3. 新增/编辑表单对话框 */}
-      <FormDialog
+      <FormDialog<TRecord, TFilters, TApiData, TExtra>
         open={formOpen}
         onClose={handleCloseForm}
         editId={editId}
