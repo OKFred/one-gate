@@ -30,12 +30,8 @@ export const baseSysConfigTable = sqliteTable(
     id: integer("id").primaryKey({ autoIncrement: true }),
     namespace: text("namespace").notNull(),
     configKey: text("config_key").notNull(),
-    isEnabled: integer("is_enabled", { mode: "boolean" })
-      .notNull()
-      .default(true),
-    isPrimary: integer("is_primary", { mode: "boolean" })
-      .notNull()
-      .default(false),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+    isPrimary: integer("is_primary", { mode: "boolean" }).notNull(),
     configValue: text("config_value", { mode: "json" }).notNull(),
     remark: text("remark"),
     creatorId: integer("creator_id").notNull(),

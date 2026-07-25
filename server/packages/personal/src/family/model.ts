@@ -17,16 +17,16 @@ import { type RequiredKeys } from "@hodor/core/types/app";
 
 export const familyMembersTable = sqliteTable("personal_family_members", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  isSelf: integer("is_self", { mode: "boolean" }).notNull().default(false),
+  isSelf: integer("is_self", { mode: "boolean" }).notNull(),
   relationType: text("relation_type").notNull(), // self | spouse | parent | child | sibling | grandparent | other
   realName: text("real_name").notNull(),
   gender: text("gender"), // male | female | other
   avatar: text("avatar"),
   birthDateUtc: integer("birth_date_utc"),
   phone: text("phone"),
-  isEmergencyContact: integer("is_emergency_contact", { mode: "boolean" })
-    .notNull()
-    .default(false),
+  isEmergencyContact: integer("is_emergency_contact", {
+    mode: "boolean",
+  }).notNull(),
   healthNote: text("health_note"),
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),

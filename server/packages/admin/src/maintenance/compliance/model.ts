@@ -200,12 +200,8 @@ export const ComplianceArchiveSortableKeys = [
 
 export const complianceArchiveTable = sqliteTable("compliance_archives", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  sourceSystem: text("source_system", { length: 100 })
-    .notNull()
-    .default("self"),
-  sourceDatabase: text("source_database", { length: 100 })
-    .notNull()
-    .default("self"),
+  sourceSystem: text("source_system", { length: 100 }).notNull(),
+  sourceDatabase: text("source_database", { length: 100 }).notNull(),
   sourceTable: text("source_table", { length: 100 }).notNull(),
   sourcePrimaryKey: text("source_primary_key", { length: 100 }).notNull(),
   deleteReason: text("delete_reason", { length: 200 }),

@@ -106,15 +106,11 @@ export const mailRecipientTable = sqliteTable("mail_recipient", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   email: text("email").notNull(),
   name: text("name"),
-  scope: text("scope").$type<"sys" | "biz" | "user">().notNull().default("biz"),
+  scope: text("scope").$type<"sys" | "biz" | "user">().notNull(),
   tenantId: integer("tenant_id"),
   userId: integer("user_id"),
-  remoteLoginWarn: integer("remote_login_warn", { mode: "boolean" })
-    .notNull()
-    .default(true),
-  marketingEdm: integer("marketing_edm", { mode: "boolean" })
-    .notNull()
-    .default(true),
+  remoteLoginWarn: integer("remote_login_warn", { mode: "boolean" }).notNull(),
+  marketingEdm: integer("marketing_edm", { mode: "boolean" }).notNull(),
   tags: text("tags"),
   remark: text("remark"),
   creatorId: integer("creator_id"),

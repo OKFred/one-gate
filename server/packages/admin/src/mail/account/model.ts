@@ -176,7 +176,7 @@ export const mailAccountTable = sqliteTable(
     host: text("host").notNull(),
     port: integer("port").notNull(),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-    scope: text("scope").$type<"sys" | "biz">().notNull().default("sys"),
+    scope: text("scope").$type<"sys" | "biz">().notNull(),
     tenantId: integer("tenant_id"),
     userId: integer("user_id"),
     remark: text("remark"),

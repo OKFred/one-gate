@@ -172,10 +172,7 @@ export const mailTemplateTable = sqliteTable(
     content: text("content").notNull(),
     category: text("category"),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-    scope: text("scope")
-      .$type<"sys" | "biz" | "user">()
-      .notNull()
-      .default("sys"),
+    scope: text("scope").$type<"sys" | "biz" | "user">().notNull(),
     tenantId: integer("tenant_id"),
     userId: integer("user_id"),
     remark: text("remark"),

@@ -25,7 +25,7 @@ export const socialContactsTable = sqliteTable("personal_social_contacts", {
   phone: text("phone"),
   email: text("email"),
   avatar: text("avatar"),
-  intimacyLevel: integer("intimacy_level").default(3), // 1 ~ 5
+  intimacyLevel: integer("intimacy_level"), // 1 ~ 5
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),
   creatorName: text("creator_name"),
@@ -44,7 +44,7 @@ export const socialRelationsTable = sqliteTable("personal_social_relations", {
   targetContactId: integer("target_contact_id").notNull(),
   relationType: text("relation_type").notNull(),
   relationLabel: text("relation_label").notNull(), // e.g. "挚友", "同事", "项目合作"
-  intimacyScore: integer("intimacy_score").default(80),
+  intimacyScore: integer("intimacy_score"),
   creatorId: integer("creator_id").notNull(),
   creatorName: text("creator_name"),
   updaterId: integer("updater_id"),

@@ -26,7 +26,7 @@ export const medicalRecordsTable = sqliteTable("personal_medical_records", {
   diagnosis: text("diagnosis"),
   prescription: text("prescription"),
   reportUrl: text("report_url"),
-  cost: real("cost").default(0),
+  cost: real("cost"),
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),
   creatorName: text("creator_name"),

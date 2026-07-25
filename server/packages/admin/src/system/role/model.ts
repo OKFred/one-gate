@@ -135,11 +135,10 @@ export const roleTable = sqliteTable("system_role", {
   name: text("name").notNull().unique(),
   remark: text("remark"),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-  permissionCount: integer("permission_count").notNull().default(0),
+  permissionCount: integer("permission_count").notNull(),
   dataScope: text("data_scope")
     .$type<import("@hodor/core/types/dataScope").DataScopeValue>()
-    .notNull()
-    .default("self_only"),
+    .notNull(),
   customDeptIds: text("custom_dept_ids"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),

@@ -65,9 +65,7 @@ export const financialDataSourcesTable = sqliteTable(
     schemaFormCode: text("schema_form_code"),
     fieldMappingJson: text("field_mapping_json").notNull(),
     syncCron: text("sync_cron"),
-    isEnabled: integer("is_enabled", { mode: "boolean" })
-      .notNull()
-      .default(true),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
     lastSyncTimeUtc: integer("last_sync_time_utc"),
     creatorId: integer("creator_id").notNull(),
     creatorName: text("creator_name"),

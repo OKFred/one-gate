@@ -108,7 +108,7 @@ export const workflowTable = sqliteTable("enterprise_workflow", {
   name: text("name").notNull(),
   description: text("description"),
   flowData: text("flow_data").notNull(),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull().default(true),
+  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
