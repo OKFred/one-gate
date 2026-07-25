@@ -133,3 +133,16 @@ node ./scripts/generate-constants.js
 - **背景/容器**：使用 `background.paper` 或 `background.default`。
 - **边框/分割线**：使用 `divider`，能自动在浅色与深色模式下呈现极佳的边界感，替代手写的 `boxShadow`。
 - **状态颜色（悬停/禁用等）**：使用 `action.active`、`action.hover`、`action.disabled` 等。例如自定义滚动条时，可使用 `action.disabled` 作为滑块基础色，`action.active` 作为悬停色。
+
+---
+
+## 8. 前端 HTTP 接口异常处理 try-catch 规范
+
+由于项目在全局 HTTP 请求适配层（`platform/packages/ui/src/api/config.ts`）中已统一下发拦截与全局错误提示（自动弹出 `showSnackbar({ message, type: 'error' })`），页面与组件发起接口调用时必须遵循以下规范：
+
+- **`catch` 语法简化**：接口调用的 `try ... catch` 结构中，`catch` 统一简化为 `catch {}`。
+- **严禁控制台错误输出**：严禁在 `catch` 块中写入 `console.error(...)` / `console.log(...)` 调试打印。
+- **严禁重复错误弹框**：严禁在 `catch` 块中调用 `showSnackbar` 重复展示错误提示。
+- **孤立翻译清理**：若移除 `catch` 块的错误弹框导致某些失败提示文案不再被任何地方引用，必须同步清理相应的多语言词条。
+- **`finally` 作用域约束**：`finally` 块仅用于状态解构与变量恢复（如 `setLoading(false)` / `setVerifyingId(null)`）。若无需恢复操作，无需编写空 `finally` 块。
+
