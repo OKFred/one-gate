@@ -326,5 +326,33 @@ export const permissions = {
         delete: 'personal.base.preference:delete',
       },
     },
+    /** 健康与医疗 */
+    health: {
+      read: 'personal.health:read',
+      add: 'personal.health:add',
+      edit: 'personal.health:edit',
+      delete: 'personal.health:delete',
+    },
+    /** 收入状况 */
+    finance: {
+      read: 'personal.finance:read',
+      add: 'personal.finance:add',
+      edit: 'personal.finance:edit',
+      delete: 'personal.finance:delete',
+    },
+    /** 家庭 */
+    family: {
+      read: 'personal.family:read',
+      add: 'personal.family:add',
+      edit: 'personal.family:edit',
+      delete: 'personal.family:delete',
+    },
+    /** 社交 */
+    social: {
+      read: 'personal.social:read',
+      add: 'personal.social:add',
+      edit: 'personal.social:edit',
+      delete: 'personal.social:delete',
+    },
   },
 } as const;

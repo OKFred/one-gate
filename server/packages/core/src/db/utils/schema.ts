@@ -54,7 +54,16 @@ export async function baseTableInit(tableName: string, sqlFileName?: string) {
       .filter(Boolean);
 
     for (const statement of sqlStatements) {
-      await db.run(statement);
+      const safeStatement = statement
+        .replace(
+          /CREATE TABLE(?! IF NOT EXISTS) `/gi,
+          "CREATE TABLE IF NOT EXISTS `"
+        )
+        .replace(
+          /CREATE (UNIQUE\s+)?INDEX(?! IF NOT EXISTS) `/gi,
+          "CREATE $1INDEX IF NOT EXISTS `"
+        );
+      await db.run(safeStatement);
     }
     console.log(`💾 表 ${tableName} 已初始化`);
   } catch (err: any) {

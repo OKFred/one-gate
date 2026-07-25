@@ -60,6 +60,62 @@ export const sharedTranslations = {
       },
     },
     {
+      tKey: "sidebar.menu.personal.health",
+      langCodes: {
+        "zh-CN": "健康与医疗",
+        "en-US": "Health & Medical",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.finance",
+      langCodes: {
+        "zh-CN": "收入状况",
+        "en-US": "Income & Finances",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.family",
+      langCodes: {
+        "zh-CN": "家庭成员",
+        "en-US": "Family Members",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.social",
+      langCodes: {
+        "zh-CN": "社交网络",
+        "en-US": "Social Network",
+      },
+    },
+    {
+      tKey: "businessType.personal.health",
+      langCodes: {
+        "zh-CN": "个人中心-健康与医疗",
+        "en-US": "Personal-Health & Medical",
+      },
+    },
+    {
+      tKey: "businessType.personal.finance",
+      langCodes: {
+        "zh-CN": "个人中心-收入状况",
+        "en-US": "Personal-Income & Finances",
+      },
+    },
+    {
+      tKey: "businessType.personal.family",
+      langCodes: {
+        "zh-CN": "个人中心-家庭",
+        "en-US": "Personal-Family",
+      },
+    },
+    {
+      tKey: "businessType.personal.social",
+      langCodes: {
+        "zh-CN": "个人中心-社交网络",
+        "en-US": "Personal-Social Network",
+      },
+    },
+    {
       tKey: "sidebar.menu.data",
       langCodes: {
         "zh-CN": "数据库",
@@ -332,6 +388,34 @@ export const sharedTranslations = {
       langCodes: {
         "zh-CN": "考勤管理",
         "en-US": "Attendance",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.health",
+      langCodes: {
+        "zh-CN": "健康与医疗",
+        "en-US": "Health & Medical",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.finance",
+      langCodes: {
+        "zh-CN": "收入状况",
+        "en-US": "Income & Finance",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.family",
+      langCodes: {
+        "zh-CN": "家庭成员",
+        "en-US": "Family Members",
+      },
+    },
+    {
+      tKey: "sidebar.menu.personal.social",
+      langCodes: {
+        "zh-CN": "社交圈子",
+        "en-US": "Social Network",
       },
     },
     {

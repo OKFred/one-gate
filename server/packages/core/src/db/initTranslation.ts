@@ -16,6 +16,10 @@ import { workflowTranslations } from "../../../enterprise/src/executive/workflow
 import { edmTranslations } from "../../../enterprise/src/mail/edm/translation";
 
 import { preferenceTranslations } from "../../../personal/src/base/preference/translation";
+import { financialTranslations } from "../../../personal/src/financial/translation";
+import { familyTranslations } from "../../../personal/src/family/translation";
+import { healthTranslations } from "../../../personal/src/health/translation";
+import { socialTranslations } from "../../../personal/src/social/translation";
 import { systemTranslations } from "../../../admin/src/system/translation";
 import { configTranslations } from "../../../admin/src/rpa/config/translation";
 import { baseTranslations } from "../../../admin/src/base/translation";
@@ -141,6 +145,10 @@ export const initialTranslationData = mapTranslations({
   ...edmTranslations,
 
   ...preferenceTranslations,
+  ...financialTranslations,
+  ...familyTranslations,
+  ...healthTranslations,
+  ...socialTranslations,
   ...systemTranslations,
   ...configTranslations,
   ...baseTranslations,

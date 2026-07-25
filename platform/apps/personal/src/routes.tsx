@@ -33,7 +33,6 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       </Suspense>
     );
 
-    // 在微前端 Host 环境中以 /personal/xxx 访问
     routes.push({
       path: routePath.startsWith('personal/') ? routePath : `personal/${routePath}`,
       element,
@@ -43,12 +42,18 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   return routes;
 }
 
-export const childrenRoutes = buildRouteTree(
-  (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
-    ([filePath]) =>
-      !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/'),
+export const childrenRoutes: RouteObject[] = [
+  {
+    index: true,
+    element: <RootRedirect />,
+  },
+  ...buildRouteTree(
+    (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
+      ([filePath]) =>
+        !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/'),
+    ),
   ),
-);
+];
 
 const Layout = lazy(() => import('@/layout'));
 const NotFound = lazy(() => import('@/components/NotFound'));
@@ -56,11 +61,7 @@ const ProtectedRoute = lazy(() => import('@/components/ProtectedRoute'));
 
 export const routes: RouteObject[] = [
   {
-    path: '/',
-    element: <RootRedirect />,
-  },
-  {
-    path: '/',
+    path: '/*',
     element: (
       <ProtectedRoute>
         <Layout />

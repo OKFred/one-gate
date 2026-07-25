@@ -12303,6 +12303,1572 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/personal/health/medical_record/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取当前用户的医疗记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增医疗记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新医疗记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除医疗记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 财务总览仪表盘数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.dashboard.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.dashboard.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 收入记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增收入记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新收入记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除收入记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 支出记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增支出记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新支出记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除支出记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 数据源配置列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增数据源配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新数据源配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除数据源配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 手动立即触发数据源抓取与同步 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.sync.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.sync.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 家庭成员列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增家庭成员 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新家庭成员 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除家庭成员 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 联系人列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增联系人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新联系人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除联系人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取社交网络拓扑数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.graph.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.graph.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -21399,6 +22965,951 @@ export interface components {
             ok: boolean;
             data: {
                 success: boolean;
+            };
+            message: string;
+        };
+        "personal.health.medical_record.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 记录分类
+             * @enum {string}
+             */
+            category?: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+            /** @enum {string} */
+            orderBy?: "id" | "visitDateUtc" | "category" | "cost" | "createTimeUtc";
+        };
+        "personal.health.medical_record.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 记录分类
+                     * @enum {string}
+                     */
+                    category: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+                    /** @description 记录标题/诊断名称 */
+                    title: string;
+                    /** @description 医院名称 */
+                    hospitalName?: ((string | null) | null) | null;
+                    /** @description 医生姓名 */
+                    doctorName?: ((string | null) | null) | null;
+                    /** @description 就诊/检查时间(毫秒时间戳) */
+                    visitDateUtc: number;
+                    /** @description 诊断结论 */
+                    diagnosis?: ((string | null) | null) | null;
+                    /** @description 处方/用药医嘱 */
+                    prescription?: ((string | null) | null) | null;
+                    /** @description 报告或附件链接 */
+                    reportUrl?: ((string | null) | null) | null;
+                    /** @description 费用(元) */
+                    cost?: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.health.medical_record.add.req": {
+            /**
+             * @description 记录分类
+             * @enum {string}
+             */
+            category: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+            /** @description 记录标题/诊断名称 */
+            title: string;
+            /** @description 医院名称 */
+            hospitalName?: ((string | null) | null) | null;
+            /** @description 医生姓名 */
+            doctorName?: ((string | null) | null) | null;
+            /** @description 就诊/检查时间(毫秒时间戳) */
+            visitDateUtc: number;
+            /** @description 诊断结论 */
+            diagnosis?: ((string | null) | null) | null;
+            /** @description 处方/用药医嘱 */
+            prescription?: ((string | null) | null) | null;
+            /** @description 报告或附件链接 */
+            reportUrl?: ((string | null) | null) | null;
+            /** @description 费用(元) */
+            cost?: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.health.medical_record.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.health.medical_record.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 记录分类
+             * @enum {string}
+             */
+            category?: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+            /** @description 记录标题/诊断名称 */
+            title?: string;
+            /** @description 医院名称 */
+            hospitalName?: ((string | null) | null) | null;
+            /** @description 医生姓名 */
+            doctorName?: ((string | null) | null) | null;
+            /** @description 就诊/检查时间(毫秒时间戳) */
+            visitDateUtc?: number;
+            /** @description 诊断结论 */
+            diagnosis?: ((string | null) | null) | null;
+            /** @description 处方/用药医嘱 */
+            prescription?: ((string | null) | null) | null;
+            /** @description 报告或附件链接 */
+            reportUrl?: ((string | null) | null) | null;
+            /** @description 费用(元) */
+            cost?: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.health.medical_record.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.health.medical_record.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.health.medical_record.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.dashboard.req": Record<string, never>;
+        "personal.finance.dashboard.res": {
+            ok: boolean;
+            data: {
+                totalIncome: number;
+                totalExpense: number;
+                netBalance: number;
+                savingsRate: number;
+                incomeBreakdown: {
+                    category: string;
+                    amount: number;
+                }[];
+                expenseBreakdown: {
+                    category: string;
+                    amount: number;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.income.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            sourceCategory?: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+            /** @enum {string} */
+            orderBy?: "id" | "amount" | "incomeDateUtc";
+        };
+        "personal.finance.income.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @enum {string} */
+                    sourceCategory: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+                    amount: number;
+                    incomeDateUtc: number;
+                    payer?: ((string | null) | null) | null;
+                    remark?: ((string | null) | null) | null;
+                    dataTaskId?: ((number | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.income.add.req": {
+            /** @enum {string} */
+            sourceCategory: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+            amount: number;
+            incomeDateUtc: number;
+            payer?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.income.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.finance.income.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @enum {string} */
+            sourceCategory?: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+            amount?: number;
+            incomeDateUtc?: number;
+            payer?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.income.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.income.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.income.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.expense.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            expenseCategory?: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+            /** @enum {string} */
+            orderBy?: "id" | "amount" | "expenseDateUtc";
+        };
+        "personal.finance.expense.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @enum {string} */
+                    expenseCategory: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+                    amount: number;
+                    expenseDateUtc: number;
+                    payee?: ((string | null) | null) | null;
+                    paymentMethod?: ((string | null) | null) | null;
+                    remark?: ((string | null) | null) | null;
+                    dataTaskId?: ((number | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.expense.add.req": {
+            /** @enum {string} */
+            expenseCategory: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+            amount: number;
+            expenseDateUtc: number;
+            payee?: ((string | null) | null) | null;
+            paymentMethod?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.expense.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.finance.expense.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @enum {string} */
+            expenseCategory?: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+            amount?: number;
+            expenseDateUtc?: number;
+            payee?: ((string | null) | null) | null;
+            paymentMethod?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.expense.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.expense.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.expense.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+        };
+        "personal.finance.data_source.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    sourceName: string;
+                    /** @enum {string} */
+                    sourceType: "api_task" | "schema_form";
+                    apiTaskId?: ((number | null) | null) | null;
+                    schemaFormCode?: ((string | null) | null) | null;
+                    fieldMappingJson: string;
+                    syncCron?: ((string | null) | null) | null;
+                    isEnabled: boolean;
+                    lastSyncTimeUtc?: ((number | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.data_source.add.req": {
+            sourceName: string;
+            /** @enum {string} */
+            sourceType: "api_task" | "schema_form";
+            apiTaskId?: ((number | null) | null) | null;
+            schemaFormCode?: ((string | null) | null) | null;
+            fieldMappingJson: string;
+            syncCron?: ((string | null) | null) | null;
+            isEnabled?: boolean;
+        };
+        "personal.finance.data_source.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            sourceName?: string;
+            /** @enum {string} */
+            sourceType?: "api_task" | "schema_form";
+            apiTaskId?: ((number | null) | null) | null;
+            schemaFormCode?: ((string | null) | null) | null;
+            fieldMappingJson?: string;
+            syncCron?: ((string | null) | null) | null;
+            isEnabled?: boolean;
+        };
+        "personal.finance.data_source.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.data_source.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.sync.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.data_source.sync.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+                importedCount: number;
+                message: string;
+            };
+            message: string;
+        };
+        "personal.family.member.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 关系类型
+             * @enum {string}
+             */
+            relationType?: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+        };
+        "personal.family.member.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 是否本人节点 */
+                    isSelf: boolean;
+                    /**
+                     * @description 关系类型
+                     * @enum {string}
+                     */
+                    relationType: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+                    /** @description 姓名 */
+                    realName: string;
+                    /** @description 性别 */
+                    gender?: ((string | null) | null) | null;
+                    /** @description 头像URL */
+                    avatar?: ((string | null) | null) | null;
+                    /** @description 出生日期毫秒 */
+                    birthDateUtc?: ((number | null) | null) | null;
+                    /** @description 联系电话 */
+                    phone?: ((string | null) | null) | null;
+                    /** @description 是否紧急联系人 */
+                    isEmergencyContact?: boolean;
+                    /** @description 健康状况备注 */
+                    healthNote?: ((string | null) | null) | null;
+                    /** @description 其他备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.family.member.add.req": {
+            /** @description 是否本人节点 */
+            isSelf?: boolean;
+            /**
+             * @description 关系类型
+             * @enum {string}
+             */
+            relationType: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+            /** @description 姓名 */
+            realName: string;
+            /** @description 性别 */
+            gender?: ((string | null) | null) | null;
+            /** @description 头像URL */
+            avatar?: ((string | null) | null) | null;
+            /** @description 出生日期毫秒 */
+            birthDateUtc?: ((number | null) | null) | null;
+            /** @description 联系电话 */
+            phone?: ((string | null) | null) | null;
+            /** @description 是否紧急联系人 */
+            isEmergencyContact?: boolean;
+            /** @description 健康状况备注 */
+            healthNote?: ((string | null) | null) | null;
+            /** @description 其他备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.family.member.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.family.member.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 是否本人节点 */
+            isSelf?: boolean;
+            /**
+             * @description 关系类型
+             * @enum {string}
+             */
+            relationType?: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+            /** @description 姓名 */
+            realName?: string;
+            /** @description 性别 */
+            gender?: ((string | null) | null) | null;
+            /** @description 头像URL */
+            avatar?: ((string | null) | null) | null;
+            /** @description 出生日期毫秒 */
+            birthDateUtc?: ((number | null) | null) | null;
+            /** @description 联系电话 */
+            phone?: ((string | null) | null) | null;
+            /** @description 是否紧急联系人 */
+            isEmergencyContact?: boolean;
+            /** @description 健康状况备注 */
+            healthNote?: ((string | null) | null) | null;
+            /** @description 其他备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.family.member.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.family.member.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.family.member.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.social.contact.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            relationCircle?: "close_friend" | "colleague" | "classmate" | "business" | "other";
+        };
+        "personal.social.contact.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    realName: string;
+                    /** @enum {string} */
+                    relationCircle: "close_friend" | "colleague" | "classmate" | "business" | "other";
+                    company?: ((string | null) | null) | null;
+                    position?: ((string | null) | null) | null;
+                    phone?: ((string | null) | null) | null;
+                    email?: ((string | null) | null) | null;
+                    avatar?: ((string | null) | null) | null;
+                    intimacyLevel: number;
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.social.contact.add.req": {
+            realName: string;
+            /** @enum {string} */
+            relationCircle: "close_friend" | "colleague" | "classmate" | "business" | "other";
+            company?: ((string | null) | null) | null;
+            position?: ((string | null) | null) | null;
+            phone?: ((string | null) | null) | null;
+            email?: ((string | null) | null) | null;
+            avatar?: ((string | null) | null) | null;
+            intimacyLevel?: number;
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.social.contact.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.social.contact.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            realName?: string;
+            /** @enum {string} */
+            relationCircle?: "close_friend" | "colleague" | "classmate" | "business" | "other";
+            company?: ((string | null) | null) | null;
+            position?: ((string | null) | null) | null;
+            phone?: ((string | null) | null) | null;
+            email?: ((string | null) | null) | null;
+            avatar?: ((string | null) | null) | null;
+            intimacyLevel?: number;
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.social.contact.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.social.contact.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.social.contact.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.social.graph.req": Record<string, never>;
+        "personal.social.graph.res": {
+            ok: boolean;
+            data: {
+                contacts: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    realName?: string;
+                    /** @enum {string} */
+                    relationCircle?: "close_friend" | "colleague" | "classmate" | "business" | "other";
+                    company?: ((string | null) | null) | null;
+                    position?: ((string | null) | null) | null;
+                    phone?: ((string | null) | null) | null;
+                    email?: ((string | null) | null) | null;
+                    avatar?: ((string | null) | null) | null;
+                    intimacyLevel?: number;
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+                relations: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    sourceContactId?: number;
+                    targetContactId?: number;
+                    relationType?: string;
+                    relationLabel?: string;
+                    intimacyScore?: number;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
             };
             message: string;
         };

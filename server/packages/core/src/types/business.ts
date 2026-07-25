@@ -72,6 +72,14 @@ export const BUSINESS = {
   "personal.base": "personal.base",
   /** 个人中心-邮件偏好 */
   "personal.base.preference": "personal.base.preference",
+  /** 个人中心-健康与医疗 */
+  "personal.health": "personal.health",
+  /** 个人中心-收入状况 */
+  "personal.finance": "personal.finance",
+  /** 个人中心-家庭 */
+  "personal.family": "personal.family",
+  /** 个人中心-社交 */
+  "personal.social": "personal.social",
   "admin.ai": "admin.ai",
   /** AI 配置 */
   "admin.ai.config": "admin.ai.config",

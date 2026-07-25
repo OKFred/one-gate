@@ -134,6 +134,14 @@ export const permissionSeeds = {
       "": ["read"],
       preference: ["read", "add", "edit", "delete"],
     },
+    /** 健康与医疗 */
+    health: ["read", "add", "edit", "delete"],
+    /** 收入状况 */
+    finance: ["read", "add", "edit", "delete"],
+    /** 家庭 */
+    family: ["read", "add", "edit", "delete"],
+    /** 社交 */
+    social: ["read", "add", "edit", "delete"],
   },
   /** AI */
   "admin.ai": {

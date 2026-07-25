@@ -18,7 +18,6 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   const routes: RouteObject[] = [];
 
   for (const [filePath, loader] of paths) {
-    // ./pages/mail/template/index.tsx => mail/template
     const match = filePath.match(/\.\/pages\/(.*?)\/index\.tsx$/);
     if (!match) continue;
 
@@ -35,7 +34,6 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       </Suspense>
     );
 
-    // /home 和 /me 作为根路径例外，其余统一在 Host 中以 /admin/xxx 前缀访问
     const isRootException = routePath === 'home' || routePath === 'me';
     const finalPath = isRootException
       ? routePath
@@ -52,7 +50,7 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   return routes;
 }
 
-const childrenRoutes = [
+const childrenRoutes: RouteObject[] = [
   ...buildRouteTree(
     (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
       ([filePath]) =>
