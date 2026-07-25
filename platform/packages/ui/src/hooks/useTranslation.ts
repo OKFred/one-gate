@@ -23,7 +23,15 @@ const globalState = (globalThis as unknown as GlobalThisWithState)[globalKey] ||
 };
 (globalThis as unknown as GlobalThisWithState)[globalKey] = globalState;
 
-const fallbackLangCode = navigator.languages.some((str) => str.includes('zh')) ? 'zh-CN' : 'en-US';
+const fallbackLangCode = 'en-US';
+
+/**
+ * 获取当前用户的偏好语言代码（优先取 userInfo.langCode，兜底降级为 en-US 英语）
+ */
+export const getPreferredLangCode = (): LangCode => {
+  const userInfo = authUtils.getUserInfo();
+  return userInfo?.langCode || fallbackLangCode;
+};
 
 const notify = () => {
   globalState.version += 1;

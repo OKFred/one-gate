@@ -69,6 +69,13 @@ if ! node platform/scripts/scan-i18n-enhanced.js --fail-on-missing; then
 fi
 echo "  ✅ I18n compliance check passed"
 
+echo "🌐 Running Locale Parity check..."
+if ! node platform/scripts/check-locale-parity.js --fail-on-missing; then
+  echo "❌ Git Commit Aborted: Locale parity check failed! Some keys exist in one language but missing in another."
+  exit 1
+fi
+echo "  ✅ Locale parity check passed"
+
 # --- 6. Format changed files ---
 echo "🧹 Formatting changed files..."
 echo "  🔹 server..."

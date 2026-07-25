@@ -4,290 +4,25 @@ import type { BusinessKey } from "@hodor/core/types/business";
 export const systemTranslations = {
   "system.auth": [
     {
-      tKey: "form.missingCredentials",
+      application: "backend",
+      tKey: "errorHandler.wrongPassword",
       langCodes: {
-        "zh-CN": "请输入用户名和密码",
-        "en-US": "Please enter username and password",
+        "zh-CN": "密码错误",
+        "en-US": "Invalid password",
       },
     },
     {
-      tKey: "topbar.title",
+      application: "backend",
+      tKey: "errorHandler.loginFailed",
       langCodes: {
-        "zh-CN": "条条大道通罗马",
-        "en-US": "All roads lead to Rome",
-      },
-    },
-    {
-      tKey: "topbar.profile",
-      langCodes: {
-        "zh-CN": "个人设置",
-        "en-US": "Profile",
-      },
-    },
-    {
-      tKey: "topbar.logout",
-      langCodes: {
-        "zh-CN": "退出登录",
-        "en-US": "Log out",
-      },
-    },
-    {
-      tKey: "topbar.notLoggedIn",
-      langCodes: {
-        "zh-CN": "未登录",
-        "en-US": "Not signed in",
-      },
-    },
-    {
-      tKey: "login.username",
-      langCodes: {
-        "zh-CN": "用户名",
-        "en-US": "Username",
-      },
-    },
-    {
-      tKey: "login.password",
-      langCodes: {
-        "zh-CN": "密码",
-        "en-US": "Password",
-      },
-    },
-    {
-      tKey: "login.signIn",
-      langCodes: {
-        "zh-CN": "登录",
-        "en-US": "Sign in",
-      },
-    },
-    {
-      tKey: "login.wechatSignIn",
-      langCodes: {
-        "zh-CN": "微信登录",
-        "en-US": "WeChat Sign in",
-      },
-    },
-    {
-      tKey: "login.wechatWIP",
-      langCodes: {
-        "zh-CN": "微信登录功能正在开发中...",
-        "en-US": "WeChat sign-in is under development...",
-      },
-    },
-    {
-      tKey: "login.forgotPassword",
-      langCodes: {
-        "zh-CN": "忘记密码？",
-        "en-US": "Forgot password?",
-      },
-    },
-    {
-      tKey: "login.title",
-      langCodes: {
-        "zh-CN": "Open The Gate",
-        "en-US": "Open The Gate",
-      },
-    },
-    {
-      tKey: "login.subtitle",
-      langCodes: {
-        "zh-CN": "通用企业级权限管理后台",
-        "en-US": "General Enterprise Permission Management Platform",
-      },
-    },
-    {
-      tKey: "dialog.message",
-      langCodes: {
-        "zh-CN": "页面未找到",
-        "en-US": "Page Not Found",
-      },
-    },
-    {
-      tKey: "dialog.goBackHome",
-      langCodes: {
-        "zh-CN": "返回首页",
-        "en-US": "Go Back Home",
-      },
-    },
-    {
-      tKey: "home.title",
-      langCodes: {
-        "zh-CN": "欢迎使用",
-        "en-US": "Welcome",
-      },
-    },
-    {
-      tKey: "home.subtitle",
-      langCodes: {
-        "zh-CN": "一站式信息管理解决方案",
-        "en-US": "All-in-one information management solution",
-      },
-    },
-    {
-      tKey: "quickStart.accounts",
-      langCodes: {
-        "zh-CN": "邮件账户",
-        "en-US": "Mail Accounts",
-      },
-    },
-    {
-      tKey: "quickStart.templates",
-      langCodes: {
-        "zh-CN": "邮件模板",
-        "en-US": "Mail Templates",
-      },
-    },
-    {
-      tKey: "quickStart.todaySent",
-      langCodes: {
-        "zh-CN": "今日发送",
-        "en-US": "Sent Today",
-      },
-    },
-    {
-      tKey: "quickStart.title",
-      langCodes: {
-        "zh-CN": "快速开始",
-        "en-US": "Quick Start",
-      },
-    },
-    {
-      tKey: "quickStart.configureAccounts",
-      langCodes: {
-        "zh-CN": "🔧 配置邮件账户：在邮件账户管理中添加您的SMTP配置",
-        "en-US":
-          "🔧 Configure accounts: Add your SMTP settings in Mail Accounts",
-      },
-    },
-    {
-      tKey: "quickStart.createTemplate",
-      langCodes: {
-        "zh-CN": "📝 创建邮件模板：设计可重复使用的邮件模板",
-        "en-US": "📝 Create templates: Design reusable mail templates",
-      },
-    },
-    {
-      tKey: "quickStart.sendMail",
-      langCodes: {
-        "zh-CN": "📧 发送邮件：使用模板快速发送邮件",
-        "en-US": "📧 Send mail: Quickly send using templates",
-      },
-    },
-    {
-      tKey: "quickStart.viewLogs",
-      langCodes: {
-        "zh-CN": "📊 查看日志：监控邮件发送状态和历史记录",
-        "en-US": "📊 View logs: Monitor mail send status and history",
-      },
-    },
-    {
-      tKey: "me.title",
-      langCodes: {
-        "zh-CN": "我的",
-        "en-US": "My Profile",
-      },
-    },
-    {
-      tKey: "me.changePassword.title",
-      langCodes: {
-        "zh-CN": "修改密码",
-        "en-US": "Change Password",
-      },
-    },
-    {
-      tKey: "me.changePassword.confirmPasswordRequired",
-      langCodes: {
-        "zh-CN": "确认密码必填",
-        "en-US": "Confirm Password Required",
-      },
-    },
-    {
-      tKey: "me.table.currentPassword",
-      langCodes: {
-        "zh-CN": "当前密码",
-        "en-US": "Current Password",
-      },
-    },
-    {
-      tKey: "me.table.newPassword",
-      langCodes: {
-        "zh-CN": "新密码",
-        "en-US": "New Password",
-      },
-    },
-    {
-      tKey: "me.table.confirmPassword",
-      langCodes: {
-        "zh-CN": "确认新密码",
-        "en-US": "Confirm New Password",
-      },
-    },
-    {
-      tKey: "me.subtitle",
-      langCodes: {
-        "zh-CN": "个人信息",
-        "en-US": "Personal Information",
-      },
-    },
-    {
-      tKey: "me.region",
-      langCodes: {
-        "zh-CN": "国家/地区",
-        "en-US": "Country/Region",
-      },
-    },
-    {
-      tKey: "me.department",
-      langCodes: {
-        "zh-CN": "部门",
-        "en-US": "Department",
-      },
-    },
-    {
-      tKey: "me.role",
-      langCodes: {
-        "zh-CN": "角色",
-        "en-US": "Role",
-      },
-    },
-    {
-      tKey: "me.accountStatus",
-      langCodes: {
-        "zh-CN": "账户状态",
-        "en-US": "Account Status",
-      },
-    },
-    {
-      tKey: "me.changePassword.passwordFormatHint",
-      langCodes: {
-        "zh-CN": "密码长度7位~30位，至少包含一个字母和一个数字",
-        "en-US":
-          "Password length is from 7 to 30, and requires one word and one number at least",
-      },
-    },
-    {
-      tKey: "me.changePassword.sameAsOldPassword",
-      langCodes: {
-        "zh-CN": "新密码不能与当前密码相同",
-        "en-US": "New password cannot be the same as current password",
-      },
-    },
-    {
-      tKey: "me.changePassword.passwordMismatch",
-      langCodes: {
-        "zh-CN": "新密码与确认密码不匹配",
-        "en-US": "New password and confirm password do not match",
-      },
-    },
-    {
-      tKey: "me.changePassword.success",
-      langCodes: {
-        "zh-CN": "密码修改成功",
-        "en-US": "Password changed successfully",
+        "zh-CN": "登录失败，请检查用户名和密码",
+        "en-US": "Login failed, please check username and password",
       },
     },
   ],
   "system.role_permission": [
     {
+      application: "backend",
       tKey: "errorHandler.system.rolePermission.recordNotFound",
       langCodes: {
         "zh-CN": "角色权限记录不存在",
@@ -295,6 +30,7 @@ export const systemTranslations = {
       },
     },
     {
+      application: "backend",
       tKey: "errorHandler.system.rolePermission.roleNotFound",
       langCodes: {
         "zh-CN": "关联角色不存在",
@@ -302,474 +38,156 @@ export const systemTranslations = {
       },
     },
     {
+      application: "backend",
       tKey: "errorHandler.system.rolePermission.permissionNotFound",
       langCodes: {
         "zh-CN": "关联权限不存在",
         "en-US": "Associated permission not found",
       },
     },
-    {
-      tKey: "rolePermission.title",
-      langCodes: {
-        "zh-CN": "角色权限管理",
-        "en-US": "Role Permission Management",
-      },
-    },
-    {
-      tKey: "rolePermission.batchAdd",
-      langCodes: {
-        "zh-CN": "批量添加权限",
-        "en-US": "Batch Add Permissions",
-      },
-    },
-    {
-      tKey: "rolePermission.selectRole",
-      langCodes: {
-        "zh-CN": "选择角色",
-        "en-US": "Select Role",
-      },
-    },
-    {
-      tKey: "rolePermission.selectPermissions",
-      langCodes: {
-        "zh-CN": "选择权限",
-        "en-US": "Select Permissions",
-      },
-    },
-    {
-      tKey: "rolePermission.availablePermissions",
-      langCodes: {
-        "zh-CN": "可用权限",
-        "en-US": "Available Permissions",
-      },
-    },
-    {
-      tKey: "rolePermission.noAvailablePermissions",
-      langCodes: {
-        "zh-CN": "暂无可用权限",
-        "en-US": "No Available Permissions",
-      },
-    },
-    {
-      tKey: "rolePermission.currentPermissions",
-      langCodes: {
-        "zh-CN": "当前权限",
-        "en-US": "Current Permissions",
-      },
-    },
-    {
-      tKey: "rolePermission.assignedPermission",
-      langCodes: {
-        "zh-CN": "已分配权限",
-        "en-US": "Assigned Permission",
-      },
-    },
-    {
-      tKey: "rolePermission.noPermissions",
-      langCodes: {
-        "zh-CN": "暂无权限",
-        "en-US": "No Permissions",
-      },
-    },
-    {
-      tKey: "rolePermission.advancedSettings",
-      langCodes: {
-        "zh-CN": "高级设置",
-        "en-US": "Advanced Settings",
-      },
-    },
-    {
-      tKey: "rolePermission.categoryFirst",
-      langCodes: {
-        "zh-CN": "类别优先",
-        "en-US": "Category First",
-      },
-    },
-    {
-      tKey: "rolePermission.businessFirst",
-      langCodes: {
-        "zh-CN": "业务优先",
-        "en-US": "Business First",
-      },
-    },
-    {
-      tKey: "rolePermission.otherCategory",
-      langCodes: {
-        "zh-CN": "其他",
-        "en-US": "Other",
-      },
-    },
-    {
-      tKey: "rolePermission.keyword",
-      langCodes: {
-        "zh-CN": "关键词",
-        "en-US": "Keyword",
-      },
-    },
-    {
-      tKey: "rolePermission.keywordPlaceholder",
-      langCodes: {
-        "zh-CN": "搜索角色或权限名称",
-        "en-US": "Search role or permission name",
-      },
-    },
-    {
-      tKey: "rolePermission.filterByRole",
-      langCodes: {
-        "zh-CN": "按角色筛选",
-        "en-US": "Filter by Role",
-      },
-    },
-    {
-      tKey: "rolePermission.filterByPermission",
-      langCodes: {
-        "zh-CN": "按权限筛选",
-        "en-US": "Filter by Permission",
-      },
-    },
-    {
-      tKey: "rolePermission.batchDelete",
-      langCodes: {
-        "zh-CN": "批量删除",
-        "en-US": "Batch Delete",
-      },
-    },
-    {
-      tKey: "rolePermission.confirmBatchDelete",
-      langCodes: {
-        "zh-CN": "确定要删除选中的 {count} 个角色权限关联吗？",
-        "en-US":
-          "Are you sure you want to delete the selected {count} role-permission associations?",
-      },
-    },
-    {
-      tKey: "rolePermission.selectedItems",
-      langCodes: {
-        "zh-CN": "选中项目",
-        "en-US": "Selected Items",
-      },
-    },
-    {
-      tKey: "rolePermission.andMore",
-      langCodes: {
-        "zh-CN": "等 {count} 个",
-        "en-US": "and {count} more",
-      },
-    },
-    {
-      tKey: "rolePermission.hasFilter",
-      langCodes: {
-        "zh-CN": "有过滤条件",
-        "en-US": "Has Filter",
-      },
-    },
-    {
-      tKey: "rolePermission.hasConditions",
-      langCodes: {
-        "zh-CN": "有附加条件",
-        "en-US": "Has Conditions",
-      },
-    },
-    {
-      tKey: "system.rolePermission.tree.selectRole",
-      langCodes: {
-        "zh-CN": "请先选择角色",
-        "en-US": "Please select a role first",
-      },
-    },
   ],
   "system.user": [
     {
-      tKey: "user.table.password",
+      application: "backend",
+      tKey: "errorHandler.system.user.superAdminDeleteProhibited",
       langCodes: {
-        "zh-CN": "密码",
-        "en-US": "Password",
+        "zh-CN": "超级管理员用户禁止删除",
+        "en-US": "Super admin user cannot be deleted",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.system.user.superAdminDisableProhibited",
+      langCodes: {
+        "zh-CN": "超级管理员用户禁止禁用",
+        "en-US": "Super admin user cannot be disabled",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.system.user.assignSuperAdminRoleProhibited",
+      langCodes: {
+        "zh-CN": "禁止分配超级管理员角色",
+        "en-US": "Assigning super admin role is prohibited",
       },
     },
   ],
   "system.department": [
     {
-      tKey: "department.title",
+      application: "backend",
+      tKey: "errorHandler.departmentNotExist",
       langCodes: {
-        "zh-CN": "部门管理",
-        "en-US": "Department Management",
+        "zh-CN": "部门不存在或已被禁用",
+        "en-US": "Department does not exist or has been disabled",
       },
     },
     {
-      tKey: "department.table.name",
+      application: "backend",
+      tKey: "errorHandler.departmentHasEnabledUser",
       langCodes: {
-        "zh-CN": "名称",
-        "en-US": "Name",
+        "zh-CN": "当前部门或子部门下存在已启用的用户，无法禁用",
+        "en-US":
+          "Cannot disable department: active users exist in current or child departments",
       },
     },
     {
-      tKey: "department.table.managers",
+      application: "backend",
+      tKey: "errorHandler.departmentHasEnabledChildren",
       langCodes: {
-        "zh-CN": "部门管理员",
-        "en-US": "Department Managers",
+        "zh-CN": "当前部门下存在未禁用的子部门，请先禁用子部门",
+        "en-US":
+          "Cannot disable department: enabled child departments exist, please disable them first",
       },
     },
     {
-      tKey: "department.table.parentDepartment",
+      application: "backend",
+      tKey: "errorHandler.department.selfParent",
       langCodes: {
-        "zh-CN": "上级部门",
-        "en-US": "Parent Department",
+        "zh-CN": "不能将部门自身设为父部门",
+        "en-US": "A department cannot be its own parent",
       },
     },
     {
-      tKey: "department.table.topLevelDepartment",
+      application: "backend",
+      tKey: "errorHandler.department.descendantParent",
       langCodes: {
-        "zh-CN": "无（顶级部门）",
-        "en-US": "None (Top Level)",
-      },
-    },
-    {
-      tKey: "department.dialog.addChild",
-      langCodes: {
-        "zh-CN": "添加子部门",
-        "en-US": "Add Sub-Department",
+        "zh-CN": "不能将子孙部门设为父部门，会导致死循环",
+        "en-US":
+          "A descendant department cannot be set as a parent, it would cause a circular reference",
       },
     },
   ],
   "system.role": [
     {
-      tKey: "role.table.roleName",
+      application: "backend",
+      tKey: "errorHandler.roleNotExist",
       langCodes: {
-        "zh-CN": "角色名称",
-        "en-US": "Role Name",
+        "zh-CN": "角色不存在或已被禁用",
+        "en-US": "Role does not exist or has been disabled",
       },
     },
     {
-      tKey: "role.table.permissions",
+      application: "backend",
+      tKey: "errorHandler.system.role.superAdminDeleteProhibited",
       langCodes: {
-        "zh-CN": "权限列表",
-        "en-US": "Permissions",
+        "zh-CN": "超级管理员角色禁止删除",
+        "en-US": "Super admin role cannot be deleted",
       },
     },
     {
-      tKey: "role.table.permissionsHelper",
+      application: "backend",
+      tKey: "errorHandler.system.role.superAdminUpdateProhibited",
       langCodes: {
-        "zh-CN": "权限列表为JSON数组格式",
-        "en-US": "Permissions list in JSON array format",
-      },
-    },
-    {
-      tKey: "role.table.dataScope",
-      langCodes: {
-        "zh-CN": "数据范围",
-        "en-US": "Data Scope",
-      },
-    },
-    {
-      tKey: "role.dataScope.all",
-      langCodes: {
-        "zh-CN": "全部数据",
-        "en-US": "All Data",
-      },
-    },
-    {
-      tKey: "role.dataScope.dept_and_below",
-      langCodes: {
-        "zh-CN": "本部门及以下数据",
-        "en-US": "Dept & Below Data",
-      },
-    },
-    {
-      tKey: "role.dataScope.self_only",
-      langCodes: {
-        "zh-CN": "仅本人数据",
-        "en-US": "Self Only",
-      },
-    },
-    {
-      tKey: "role.dataScope.custom",
-      langCodes: {
-        "zh-CN": "自定义部门",
-        "en-US": "Custom Departments",
-      },
-    },
-    {
-      tKey: "role.dataScope.customDeptIds",
-      langCodes: {
-        "zh-CN": "自定义部门ID",
-        "en-US": "Custom Departments IDs",
+        "zh-CN": "超级管理员角色核心属性禁止修改",
+        "en-US": "Core attributes of super admin role cannot be modified",
       },
     },
   ],
   "system.menu": [
     {
-      tKey: "menu.dialog.addSubMenu",
+      application: "backend",
+      tKey: "errorHandler.menu.parentNotExist",
       langCodes: {
-        "zh-CN": "添加子菜单",
-        "en-US": "Add Sub-menu",
+        "zh-CN": "父菜单不存在或已被禁用",
+        "en-US": "Parent menu does not exist or has been disabled",
       },
     },
     {
-      tKey: "menu.table.menuName",
+      application: "backend",
+      tKey: "errorHandler.menu.selfParent",
       langCodes: {
-        "zh-CN": "菜单名称",
-        "en-US": "Menu Name",
+        "zh-CN": "父菜单不能是自己",
+        "en-US": "Parent menu cannot be itself",
       },
     },
     {
-      tKey: "menu.table.customIcon",
+      application: "backend",
+      tKey: "errorHandler.menu.circularParent",
       langCodes: {
-        "zh-CN": "自定义图标 (Iconify格式)",
-        "en-US": "Custom Icon (Iconify Format)",
+        "zh-CN": "不能将子孙菜单设为父菜单，会导致环路",
+        "en-US":
+          "Cannot set descendant menu as parent, it causes a circular loop",
       },
     },
     {
-      tKey: "menu.table.iconHelper",
+      application: "backend",
+      tKey: "errorHandler.menu.hasChildren",
       langCodes: {
-        "zh-CN": "例如: material-symbols:home",
-        "en-US": "e.g., material-symbols:home",
+        "zh-CN": "该菜单下存在子菜单，无法直接删除",
+        "en-US": "Sub-menus exist, cannot delete",
       },
     },
     {
-      tKey: "menu.table.routePath",
+      application: "backend",
+      tKey: "errorHandler.menu.hasEnabledChildren",
       langCodes: {
-        "zh-CN": "路由路径",
-        "en-US": "Route Path",
-      },
-    },
-    {
-      tKey: "menu.table.pathHelper",
-      langCodes: {
-        "zh-CN": "例如: /system/menu",
-        "en-US": "e.g., /system/menu",
-      },
-    },
-    {
-      tKey: "menu.table.parentMenu",
-      langCodes: {
-        "zh-CN": "父菜单",
-        "en-US": "Parent Menu",
-      },
-    },
-    {
-      tKey: "menu.table.topLevelMenu",
-      langCodes: {
-        "zh-CN": "无 (顶级菜单)",
-        "en-US": "None (Top Level)",
-      },
-    },
-    {
-      tKey: "menu.table.sort",
-      langCodes: {
-        "zh-CN": "排序",
-        "en-US": "Sort",
-      },
-    },
-    {
-      tKey: "menu.table.sortHelper",
-      langCodes: {
-        "zh-CN": "数字越小越靠前",
-        "en-US": "Smaller numbers come first",
-      },
-    },
-    {
-      tKey: "menu.table.menuNameRequired",
-      langCodes: {
-        "zh-CN": "菜单名称不能为空",
-        "en-US": "Menu name is required",
-      },
-    },
-    {
-      tKey: "menu.title",
-      langCodes: {
-        "zh-CN": "菜单管理",
-        "en-US": "Menu Management",
+        "zh-CN": "该菜单下存在已启用的子菜单，请先禁用子菜单",
+        "en-US": "Enabled sub-menus exist, please disable them first",
       },
     },
   ],
-  "system.permission": [
-    {
-      tKey: "permission.code",
-      langCodes: {
-        "zh-CN": "权限代码",
-        "en-US": "Permission Code",
-      },
-    },
-    {
-      tKey: "permission.name",
-      langCodes: {
-        "zh-CN": "权限名称",
-        "en-US": "Permission Name",
-      },
-    },
-    {
-      tKey: "permission.category",
-      langCodes: {
-        "zh-CN": "权限类别",
-        "en-US": "Permission Category",
-      },
-    },
-    {
-      tKey: "permission.category.menu",
-      langCodes: {
-        "zh-CN": "菜单",
-        "en-US": "Menu",
-      },
-    },
-    {
-      tKey: "permission.category.button",
-      langCodes: {
-        "zh-CN": "按钮",
-        "en-US": "Button",
-      },
-    },
-    {
-      tKey: "permission.category.api",
-      langCodes: {
-        "zh-CN": "接口",
-        "en-US": "API",
-      },
-    },
-    {
-      tKey: "permission.resource",
-      langCodes: {
-        "zh-CN": "资源路径",
-        "en-US": "Resource Path",
-      },
-    },
-    {
-      tKey: "permission.business",
-      langCodes: {
-        "zh-CN": "业务",
-        "en-US": "Business",
-      },
-    },
-    {
-      tKey: "permission.category.action",
-      langCodes: {
-        "zh-CN": "动作",
-        "en-US": "Action",
-      },
-    },
-  ],
-  system: [
-    {
-      tKey: "sidebar.menu.oss",
-      langCodes: {
-        "zh-CN": "对象存储",
-        "en-US": "Object Storage",
-      },
-    },
-    {
-      tKey: "sidebar.menu.oss.config",
-      langCodes: {
-        "zh-CN": "配置管理",
-        "en-US": "Config Management",
-      },
-    },
-    {
-      tKey: "sidebar.menu.oss.file",
-      langCodes: {
-        "zh-CN": "文件中心",
-        "en-US": "File Center",
-      },
-    },
-  ],
+  "system.permission": [],
+  system: [],
 } satisfies Record<
   Extract<
     BusinessKey,

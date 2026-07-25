@@ -1,0 +1,28 @@
+export const edm = {
+  'edm.invalidTemplateId': '请填写有效的模板 ID',
+  'edm.sendFailed': '发送失败，请稍后重试',
+  'edm.title': '企业 EDM 营销邮件下发',
+  'edm.description':
+    '通过企业邮件账户，批量向成员下发营销/通知邮件。支持模板变量替换，适用于节假日问候、会员活动、系统通知等场景。',
+  'edm.doneTitle': '营销 EDM 投递完成！',
+  'edm.totalCount': '总计划数',
+  'edm.templateIdLabel': '邮件模板 ID (Template ID)',
+  'edm.templateIdPlaceholder': '请输入企业级邮件模板ID',
+  'edm.subjectLabel': '自定义邮件主题 (选填)',
+  'edm.subjectPlaceholder': '留空则默认使用模板主题',
+  'edm.sending': '正在批量投递中...',
+  'edm.startSend': '开始营销群发',
+  'mail.edm.error.invalidTemplateId': '请填写有效的模板 ID',
+  'mail.edm.error.sendFailed': '发送失败，请稍后重试',
+  'mail.edm.title': '企业 EDM 营销邮件下发',
+  'mail.edm.description':
+    '通过企业邮件账户，批量向成员下发营销/通知邮件。支持模板变量替换，适用于节假日问候、会员活动、系统通知等场景。',
+  'mail.edm.success': '营销 EDM 投递完成！',
+  'mail.edm.totalSent': '总计划数',
+  'mail.edm.templateId': '邮件模板 ID (Template ID)',
+  'mail.edm.templateId.placeholder': '请输入企业级邮件模板ID',
+  'mail.edm.subject': '自定义邮件主题 (选填)',
+  'mail.edm.subject.placeholder': '留空则默认使用模板主题',
+  'mail.edm.sending': '正在批量投递中...',
+  'mail.edm.send': '开始营销群发',
+} as const satisfies Record<string, string>;

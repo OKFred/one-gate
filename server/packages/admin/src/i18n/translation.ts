@@ -4,106 +4,32 @@ import type { BusinessKey } from "@hodor/core/types/business";
 export const i18nTranslations = {
   "i18n.translation": [
     {
-      tKey: "translation.table.application",
+      application: "backend",
+      tKey: "errorHandler.i18n.translation.duplicateTKey",
       langCodes: {
-        "zh-CN": "应用",
-        "en-US": "Application",
-      },
-    },
-    {
-      tKey: "translation.table.business",
-      langCodes: {
-        "zh-CN": "业务",
-        "en-US": "Business",
-      },
-    },
-    {
-      tKey: "translation.table.langCode",
-      langCodes: {
-        "zh-CN": "语言代码",
-        "en-US": "Language Code",
-      },
-    },
-    {
-      tKey: "translation.table.tKey",
-      langCodes: {
-        "zh-CN": "翻译键",
-        "en-US": "Translation Key",
-      },
-    },
-    {
-      tKey: "translation.table.tValue",
-      langCodes: {
-        "zh-CN": "翻译值",
-        "en-US": "Translation Value",
-      },
-    },
-    {
-      tKey: "translation.dialog.duplicateWarning",
-      langCodes: {
-        "zh-CN": "发现{count}个相同的翻译文案：",
-        "en-US": "Found {count} duplicated translation(s):",
-      },
-    },
-    {
-      tKey: "translation.dialog.duplicateSuggestion",
-      langCodes: {
-        "zh-CN": "💡 建议：确认是否需要添加新的翻译文案，或复用现有翻译键",
-        "en-US":
-          "Tip: Consider reusing an existing key instead of adding a new translation.",
+        "zh-CN": "该翻译键在同一语言下已存在",
+        "en-US": "Translation key already exists for this language",
       },
     },
   ],
   "i18n.region": [
     {
-      tKey: "region.table.alpha2Code",
+      application: "backend",
+      tKey: "errorHandler.i18n.region.duplicateCode",
       langCodes: {
-        "zh-CN": "ISO两位代码",
-        "en-US": "ISO 3166-1 alpha-2",
-      },
-    },
-    {
-      tKey: "region.table.alpha3Code",
-      langCodes: {
-        "zh-CN": "ISO三位代码",
-        "en-US": "ISO 3166-1 alpha-3",
-      },
-    },
-    {
-      tKey: "region.table.numeric",
-      langCodes: {
-        "zh-CN": "数字代码",
-        "en-US": "Numeric Code",
-      },
-    },
-    {
-      tKey: "region.table.iso3166Independent",
-      langCodes: {
-        "zh-CN": "是否ISO3166独立主权国家",
-        "en-US": "Is Independent Country / Region in ISO3166",
-      },
-    },
-    {
-      tKey: "region.table.businessLanguages",
-      langCodes: {
-        "zh-CN": "业务语言",
-        "en-US": "Business Languages",
+        "zh-CN": "该国家/地区代码已存在（alpha2、alpha3 或 numeric 重复）",
+        "en-US":
+          "Region code already exists (duplicate alpha2, alpha3, or numeric)",
       },
     },
   ],
   "i18n.language": [
     {
-      tKey: "language.table.langCode",
+      application: "backend",
+      tKey: "errorHandler.i18n.language.duplicateLangCode",
       langCodes: {
-        "zh-CN": "语言代码",
-        "en-US": "Language Code",
-      },
-    },
-    {
-      tKey: "language.table.nativeName",
-      langCodes: {
-        "zh-CN": "本地名称",
-        "en-US": "Native Name",
+        "zh-CN": "该语言代码已存在",
+        "en-US": "Language code already exists",
       },
     },
   ],

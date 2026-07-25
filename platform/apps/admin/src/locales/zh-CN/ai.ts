@@ -1,0 +1,52 @@
+/**
+ * admin app — AI 功能页面文案（仅 frontend 条目）
+ * backend 条目（errorHandler.ai.*）保留在数据库
+ */
+export const ai = {
+  'ai.config.name': '配置名称',
+  'ai.config.provider': '提供商',
+  'ai.config.baseUrl': '接口地址',
+  'ai.config.apiKey': 'API 密钥',
+  'ai.config.model': '模型名称',
+  'ai.config.capabilities': '支持能力',
+  'ai.config.isDefault': '设为默认',
+  'ai.config.verify': '验证连通性',
+  'ai.config.verifySuccess': '连接验证成功',
+  'ai.config.verifyFailed': '连接验证失败',
+
+  'ai.chat.subtitle': 'Cloudflare Workers AI 交互工作台',
+  'ai.chat.modelSelect': 'AI 模型引擎',
+  'ai.chat.clearHistory': '清空对话历史',
+  'ai.chat.newChat': '新建对话',
+  'ai.chat.user': '您',
+  'ai.chat.assistant': 'Cloudflare AI',
+  'ai.chat.thinking': 'Cloudflare Workers AI 正在思考与生成...',
+  'ai.chat.cleared': '对话已清空。您可以开始新的问答交互！',
+  'ai.chat.welcome':
+    '你好！我是系统内置的 Cloudflare Workers AI 智能助手。请问今天有什么我可以帮您的？',
+  'ai.chat.inputPlaceholder': '输入您的提问内容... (Enter 发送，Shift + Enter 换行)',
+  'ai.chat.send': '发送',
+  'ai.chat.prompt1': '简短介绍管理后台的核心功能与应用模块',
+  'ai.chat.prompt2': '帮助我写一个基于 Drizzle ORM 的 SQLite 查询语句',
+  'ai.chat.prompt3': '如何配置 Cloudflare Workers AI 离线与生产运行环境？',
+  'ai.chat.prompt4': '请总结排查生产环境 JWT 认证失败问题的步骤',
+
+  'ai.search.subtitle': '基于 Cloudflare Workers AI 的全局语义重排序与意图检索工作台',
+  'ai.search.placeholder': "试着搜索: '查看系统日志' / 'AI 引擎配置' / '密码重置'...",
+  'ai.search.btn': 'AI 搜索',
+  'ai.search.popular': '热门推荐:',
+  'ai.search.tabAll': '全部类型',
+  'ai.search.tabMenu': '页面导航',
+  'ai.search.tabConfig': '系统配置',
+  'ai.search.tabFeature': '功能模块',
+  'ai.search.tabSystem': '运维日志',
+  'ai.search.searching': 'Workers AI 正在全盘索引与匹配意图...',
+  'ai.search.notFound': '未找到相关导航项或配置',
+  'ai.search.jump': '跳转直达',
+  'ai.search.pathLabel': '路径',
+  'ai.search.kwViewLogs': '查看日志',
+  'ai.search.kwAiEngine': 'AI 引擎',
+  'ai.search.kwCronTask': '定时任务',
+  'ai.search.kwRolePermission': '角色权限',
+  'ai.search.scoreLabel': '匹配度',
+} as const satisfies Record<string, string>;
