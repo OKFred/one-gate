@@ -55,8 +55,8 @@ export interface SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra = unknown>
         data?: { list?: TRecord[]; total?: number; hasMore?: boolean; cursor?: string };
       };
     }>;
-    add?: (args: { data: Omit<TRecord, 'id'> }) => Promise<unknown>;
-    update?: (args: { data: TRecord }) => Promise<unknown>;
+    add?: (args: any) => Promise<unknown>;
+    update?: (args: any) => Promise<unknown>;
     delete?: (args: { data: { id: number } }) => Promise<unknown>;
   };
 

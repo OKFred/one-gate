@@ -99,11 +99,7 @@ export default function AiConfigManagement() {
         return updated;
       },
       renderForm: (form, setForm, _isMobile, t) => (
-        <AiConfigFormFields
-          form={form}
-          setForm={setForm as unknown as Parameters<typeof AiConfigFormFields>[0]['setForm']}
-          t={t}
-        />
+        <AiConfigFormFields form={form} setForm={setForm} t={t} />
       ),
     },
   };

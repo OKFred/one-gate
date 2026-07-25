@@ -9,11 +9,7 @@ import {
 } from './components/TheTable';
 import { formConfig } from './components/TheForm';
 import * as DockerConfigAPI from '@/api/admin/swarm/docker_config';
-import type {
-  ListDockerConfigReq,
-  AddDockerConfigReq,
-  UpdateDockerConfigReq,
-} from '@/api/admin/swarm/type';
+import type { ListDockerConfigReq } from '@/api/admin/swarm/type';
 import { showSnackbar } from '@/components/Notification';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -51,26 +47,10 @@ export default function SwarmDockerConfigPage() {
       delete: [THIS_PERMISSION.delete],
     },
     api: {
-      list: DockerConfigAPI.listFn as unknown as SchemaCrudConfig<
-        SwarmDockerConfigRes,
-        FilterState,
-        ListDockerConfigReq
-      >['api']['list'],
-      add: DockerConfigAPI.addFn as unknown as SchemaCrudConfig<
-        SwarmDockerConfigRes,
-        FilterState,
-        AddDockerConfigReq
-      >['api']['add'],
-      update: DockerConfigAPI.updateFn as unknown as SchemaCrudConfig<
-        SwarmDockerConfigRes,
-        FilterState,
-        UpdateDockerConfigReq
-      >['api']['update'],
-      delete: DockerConfigAPI.deleteFn as unknown as SchemaCrudConfig<
-        SwarmDockerConfigRes,
-        FilterState,
-        unknown
-      >['api']['delete'],
+      list: DockerConfigAPI.listFn,
+      add: DockerConfigAPI.addFn,
+      update: DockerConfigAPI.updateFn,
+      delete: DockerConfigAPI.deleteFn,
     },
     filter: {
       defaultFilters,

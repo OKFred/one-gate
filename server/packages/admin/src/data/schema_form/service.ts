@@ -118,6 +118,7 @@ async function onAdd(
 
   const updateData = {
     ...params,
+    source: params.source ?? "user",
     creatorId,
     creatorName,
   };

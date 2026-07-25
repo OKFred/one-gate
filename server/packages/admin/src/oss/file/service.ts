@@ -116,9 +116,9 @@ export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
       provider: config.provider,
       endpoint: config.endpoint || undefined,
       region: config.region || undefined,
-      accessKeyId: config.accessKey,
-      secretAccessKey: config.secretKey,
-      bucket: config.bucket,
+      accessKeyId: config.accessKey || "",
+      secretAccessKey: config.secretKey || "",
+      bucket: config.bucket || "",
       accountId: config.accountId || undefined,
     },
     env

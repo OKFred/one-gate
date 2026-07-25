@@ -128,7 +128,7 @@ export default function UserManagement() {
     ],
   );
 
-  const config: SchemaCrudConfig<UserRecord, FilterState, ListUserReq, UserTableContext> = {
+  const config: SchemaCrudConfig<UserRes, FilterState, ListUserReq, UserTableContext> = {
     apiKeyName: 'id',
     permissions: {
       add: [THIS_PERMISSION.add],
@@ -136,21 +136,9 @@ export default function UserManagement() {
       delete: [THIS_PERMISSION.delete],
     },
     api: {
-      list: UserAPI.listFn as unknown as SchemaCrudConfig<
-        UserRecord,
-        FilterState,
-        ListUserReq
-      >['api']['list'],
-      add: UserAPI.addFn as unknown as SchemaCrudConfig<
-        UserRecord,
-        FilterState,
-        ListUserReq
-      >['api']['add'],
-      update: UserAPI.updateFn as unknown as SchemaCrudConfig<
-        UserRecord,
-        FilterState,
-        ListUserReq
-      >['api']['update'],
+      list: UserAPI.listFn,
+      add: UserAPI.addFn,
+      update: UserAPI.updateFn,
       delete: UserAPI.deleteFn,
     },
     filter: {
@@ -162,16 +150,8 @@ export default function UserManagement() {
         }) as ListUserReq,
     },
     table: {
-      columns: tableConfig.columns as unknown as SchemaCrudConfig<
-        UserRecord,
-        FilterState,
-        ListUserReq
-      >['table']['columns'],
-      cardFields: tableConfig.cardFields as unknown as SchemaCrudConfig<
-        UserRecord,
-        FilterState,
-        ListUserReq
-      >['table']['cardFields'],
+      columns: tableConfig.columns,
+      cardFields: tableConfig.cardFields,
     },
     form: formConfig,
   };

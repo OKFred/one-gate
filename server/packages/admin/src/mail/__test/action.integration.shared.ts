@@ -44,6 +44,7 @@ export function runMailActionIntegrationTests({
         nickname: "Mock Sender",
         host: "smtp.example.com",
         port: 465,
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -54,6 +55,7 @@ export function runMailActionIntegrationTests({
         title: "Hello {{name}}",
         langCode: "zh-CN",
         content: "Welcome, your code is {{code}}",
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -96,6 +98,7 @@ export function runMailActionIntegrationTests({
         nickname: "Verify Nick",
         host: "smtp.example.com",
         port: 587,
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -127,6 +130,7 @@ export function runMailActionIntegrationTests({
         nickname: "Real Sender Test",
         host: realHost,
         port: realPort,
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -167,6 +171,7 @@ export function runMailActionIntegrationTests({
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
+          scope: "biz",
           isEnabled: true,
           creatorId: 1,
         });
@@ -193,6 +198,7 @@ export function runMailActionIntegrationTests({
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
+          scope: "biz",
           isEnabled: true,
           creatorId: 1,
         });

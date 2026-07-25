@@ -7,7 +7,7 @@ import hasValue from "@hodor/core/utils/hasValue";
 
 function buildWhereCondition(condition?: {
   keyword?: string;
-  status?: number;
+  status?: 0 | 1 | 2 | 3;
   employeeId?: number;
   date?: string;
 }) {
@@ -38,7 +38,7 @@ export async function findPageAll(params: {
   orderBy?: keyof AttendancePOLike;
   descend?: boolean;
   keyword?: string;
-  status?: number;
+  status?: 0 | 1 | 2 | 3;
   employeeId?: number;
   date?: string;
 }) {
@@ -58,7 +58,7 @@ export async function findPage(params: {
   orderBy?: keyof AttendancePOLike;
   descend?: boolean;
   keyword?: string;
-  status?: number;
+  status?: 0 | 1 | 2 | 3;
   employeeId?: number;
   date?: string;
 }) {

@@ -87,11 +87,7 @@ export default function TranslationPage() {
         };
       },
       renderForm: (form, setForm, _errorContextValue, t) => (
-        <TranslationFormFields
-          form={form as unknown as Parameters<typeof TranslationFormFields>[0]['form']}
-          setForm={setForm as unknown as Parameters<typeof TranslationFormFields>[0]['setForm']}
-          t={t}
-        />
+        <TranslationFormFields form={form} setForm={setForm} t={t} />
       ),
     },
   };

@@ -8,7 +8,9 @@ import * as ApiTaskAPI from '@/api/admin/maintenance/api-task';
 
 export interface CronFormFieldsProps {
   form: Partial<CronObj>;
-  setForm: React.Dispatch<React.SetStateAction<Partial<CronObj>>>;
+  setForm:
+    | React.Dispatch<React.SetStateAction<Partial<CronObj>>>
+    | ((fn: (prev: Partial<CronObj>) => Partial<CronObj>) => void);
   t: (key: string) => string;
 }
 
