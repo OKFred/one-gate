@@ -27,18 +27,11 @@ import {
   TrendingUp as IncomeIcon,
 } from '@mui/icons-material';
 import * as FinancialAPI from '@/api/personal/financial';
+import type { ListIncomeRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface IncomeItem {
-  id: number;
-  sourceCategory: string;
-  amount: number;
-  incomeDateUtc: number;
-  payer?: string | null;
-  remark?: string | null;
-  dataTaskId?: number | null;
-}
+type IncomeItem = NonNullable<ListIncomeRes['list']>[0];
 
 export const IncomeList: React.FC = () => {
   const t = useTranslation();
@@ -50,9 +43,9 @@ export const IncomeList: React.FC = () => {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const res: any = await FinancialAPI.incomeListFn({ data: { pageNo: 1, pageSize: 50 } });
-      if (res?.list) {
-        setList(res.list);
+      const res = await FinancialAPI.incomeListFn({ data: { pageNo: 1, pageSize: 50 } });
+      if (res.data.data?.list) {
+        setList(res.data.data.list);
       }
     } catch (err) {
       console.error(err);
@@ -227,7 +220,12 @@ export const IncomeList: React.FC = () => {
               select
               label={t('personal.finance.income.formCategory')}
               value={editingItem?.sourceCategory || 'salary'}
-              onChange={(e) => setEditingItem({ ...editingItem, sourceCategory: e.target.value })}
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  sourceCategory: e.target.value as IncomeItem['sourceCategory'],
+                })
+              }
               fullWidth
             >
               <MenuItem value="salary">{t('personal.finance.cat.salary')}</MenuItem>

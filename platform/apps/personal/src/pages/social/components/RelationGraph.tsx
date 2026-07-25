@@ -22,10 +22,10 @@ export const RelationGraph: React.FC = () => {
   const fetchGraphData = async () => {
     setLoading(true);
     try {
-      const res: any = await SocialAPI.graphFn();
-      if (res?.contacts) {
-        const contacts = res.contacts;
-        const relations = res.relations || [];
+      const res = await SocialAPI.graphFn();
+      if (res.data.data?.contacts) {
+        const contacts = res.data.data.contacts;
+        const relations = res.data.data.relations || [];
 
         // Central Self Node
         const initialNodes: Node[] = [

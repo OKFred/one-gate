@@ -17,16 +17,10 @@ import {
   Savings as SavingsIcon,
 } from '@mui/icons-material';
 import * as FinancialAPI from '@/api/personal/financial';
+import type { FinanceDashboardRes } from '@/api/personal/type';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface DashboardStats {
-  totalIncome: number;
-  totalExpense: number;
-  netBalance: number;
-  savingsRate: number;
-  incomeBreakdown: { category: string; amount: number }[];
-  expenseBreakdown: { category: string; amount: number }[];
-}
+type DashboardStats = FinanceDashboardRes;
 
 export const Dashboard: React.FC = () => {
   const t = useTranslation();
@@ -36,9 +30,9 @@ export const Dashboard: React.FC = () => {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const res: any = await FinancialAPI.dashboardFn();
-      if (res) {
-        setStats(res);
+      const res = await FinancialAPI.dashboardFn();
+      if (res.data.data) {
+        setStats(res.data.data);
       }
     } catch (err) {
       console.error(err);

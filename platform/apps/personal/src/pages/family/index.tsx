@@ -32,26 +32,15 @@ import {
 } from '@mui/icons-material';
 import { PageLayout } from '@/components/Responsive/index';
 import * as FamilyAPI from '@/api/personal/family';
+import type { ListFamilyRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface FamilyMemberItem {
-  id: number;
-  isSelf: boolean;
-  relationType: string;
-  realName: string;
-  gender?: string | null;
-  avatar?: string | null;
-  birthDateUtc?: number | null;
-  phone?: string | null;
-  isEmergencyContact: boolean;
-  healthNote?: string | null;
-  remark?: string | null;
-}
+type FamilyMemberItem = NonNullable<ListFamilyRes['list']>[0];
 
 export default function FamilyPage() {
   const t = useTranslation();
-  const [list, setList] = useState<FamilyMemberItem[]>([]);
+  const [list, setList] = useState<NonNullable<ListFamilyRes['list']>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [editingItem, setEditingItem] = useState<Partial<FamilyMemberItem> | null>(null);
@@ -59,9 +48,9 @@ export default function FamilyPage() {
   const fetchMembers = async () => {
     setLoading(true);
     try {
-      const res: any = await FamilyAPI.listFn({ data: { pageNo: 1, pageSize: 50 } });
-      if (res?.list) {
-        setList(res.list);
+      const res = await FamilyAPI.listFn({ data: { pageNo: 1, pageSize: 50 } });
+      if (res.data.data?.list) {
+        setList(res.data.data.list);
       }
     } catch (err) {
       console.error(err);
@@ -294,7 +283,12 @@ export default function FamilyPage() {
                 select
                 label={t('personal.family.formRelationType')}
                 value={editingItem?.relationType || 'spouse'}
-                onChange={(e) => setEditingItem({ ...editingItem, relationType: e.target.value })}
+                onChange={(e) =>
+                  setEditingItem({
+                    ...editingItem,
+                    relationType: e.target.value as FamilyMemberItem['relationType'],
+                  })
+                }
                 fullWidth
                 disabled={editingItem?.isSelf}
               >

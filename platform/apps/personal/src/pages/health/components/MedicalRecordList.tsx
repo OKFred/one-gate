@@ -29,22 +29,11 @@ import {
   LocalHospital as HospitalIcon,
 } from '@mui/icons-material';
 import * as HealthAPI from '@/api/personal/health';
+import type { ListHealthRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface MedicalRecordItem {
-  id: number;
-  category: string;
-  title: string;
-  hospitalName?: string | null;
-  doctorName?: string | null;
-  visitDateUtc: number;
-  diagnosis?: string | null;
-  prescription?: string | null;
-  reportUrl?: string | null;
-  cost?: number | null;
-  remark?: string | null;
-}
+type MedicalRecordItem = NonNullable<ListHealthRes['list']>[0];
 
 export const MedicalRecordList: React.FC = () => {
   const t = useTranslation();
@@ -59,15 +48,15 @@ export const MedicalRecordList: React.FC = () => {
   const fetchRecords = async () => {
     setLoading(true);
     try {
-      const res: any = await HealthAPI.listFn({
+      const res = await HealthAPI.listFn({
         data: {
           pageNo: 1,
           category: categoryTab === 'all' ? undefined : (categoryTab as any),
           pageSize: 50,
         },
       });
-      if (res?.list) {
-        setList(res.list);
+      if (res.data.data?.list) {
+        setList(res.data.data.list);
       }
     } catch (err) {
       console.error(err);
@@ -268,7 +257,12 @@ export const MedicalRecordList: React.FC = () => {
               select
               label={t('personal.health.record.formCategory')}
               value={editingItem?.category || 'outpatient'}
-              onChange={(e) => setEditingItem({ ...editingItem, category: e.target.value })}
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  category: e.target.value as MedicalRecordItem['category'],
+                })
+              }
               fullWidth
             >
               <MenuItem value="outpatient">{t('personal.health.record.tabOutpatient')}</MenuItem>

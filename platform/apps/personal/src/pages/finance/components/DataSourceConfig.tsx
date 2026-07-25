@@ -29,20 +29,11 @@ import {
   CloudSync as CloudIcon,
 } from '@mui/icons-material';
 import * as FinancialAPI from '@/api/personal/financial';
+import type { ListDataSourceRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface DataSourceItem {
-  id: number;
-  sourceName: string;
-  sourceType: string;
-  apiTaskId?: number | null;
-  schemaFormCode?: string | null;
-  fieldMappingJson: string;
-  syncCron?: string | null;
-  isEnabled: boolean;
-  lastSyncTimeUtc?: number | null;
-}
+type DataSourceItem = NonNullable<ListDataSourceRes['list']>[0];
 
 export const DataSourceConfig: React.FC = () => {
   const t = useTranslation();
@@ -57,9 +48,9 @@ export const DataSourceConfig: React.FC = () => {
   const fetchList = async () => {
     setLoading(true);
     try {
-      const res: any = await FinancialAPI.dataSourceListFn({ data: { pageNo: 1, pageSize: 50 } });
-      if (res?.list) {
-        setList(res.list);
+      const res = await FinancialAPI.dataSourceListFn({ data: { pageNo: 1, pageSize: 50 } });
+      if (res.data.data?.list) {
+        setList(res.data.data.list);
       }
     } catch (err) {
       console.error(err);
@@ -75,9 +66,9 @@ export const DataSourceConfig: React.FC = () => {
   const handleSync = async (id: number) => {
     setSyncingId(id);
     try {
-      const res: any = await FinancialAPI.dataSourceSyncFn({ data: { id } });
-      if (res?.message) {
-        alert(res.message);
+      const res = await FinancialAPI.dataSourceSyncFn({ data: { id } });
+      if (res.data.data?.message) {
+        alert(res.data.data.message);
       }
       fetchList();
     } catch (err) {
@@ -315,7 +306,12 @@ export const DataSourceConfig: React.FC = () => {
               select
               label={t('personal.finance.dataSource.formSourceType')}
               value={editingItem?.sourceType || 'api_task'}
-              onChange={(e) => setEditingItem({ ...editingItem, sourceType: e.target.value })}
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  sourceType: e.target.value as DataSourceItem['sourceType'],
+                })
+              }
               fullWidth
             >
               <MenuItem value="api_task">{t('personal.finance.dataSource.optionApiTask')}</MenuItem>

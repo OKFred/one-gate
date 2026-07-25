@@ -30,20 +30,10 @@ import {
   Hub as HubIcon,
 } from '@mui/icons-material';
 import * as SocialAPI from '@/api/personal/social';
+import type { ListContactRes } from '@/api/personal/type';
 import { useTranslation } from '@/hooks/useTranslation';
 
-interface ContactItem {
-  id: number;
-  realName: string;
-  relationCircle: string;
-  company?: string | null;
-  position?: string | null;
-  phone?: string | null;
-  email?: string | null;
-  avatar?: string | null;
-  intimacyLevel?: number | null;
-  remark?: string | null;
-}
+type ContactItem = NonNullable<ListContactRes['list']>[0];
 
 export const ContactCards: React.FC = () => {
   const t = useTranslation();
@@ -55,9 +45,9 @@ export const ContactCards: React.FC = () => {
   const fetchContacts = async () => {
     setLoading(true);
     try {
-      const res: any = await SocialAPI.contactListFn({ data: { pageNo: 1, pageSize: 50 } });
-      if (res?.list) {
-        setList(res.list);
+      const res = await SocialAPI.contactListFn({ data: { pageNo: 1, pageSize: 50 } });
+      if (res.data.data?.list) {
+        setList(res.data.data.list);
       }
     } catch (err) {
       console.error(err);
@@ -279,7 +269,12 @@ export const ContactCards: React.FC = () => {
               select
               label={t('personal.social.cards.formRelationCircle')}
               value={editingItem?.relationCircle || 'close_friend'}
-              onChange={(e) => setEditingItem({ ...editingItem, relationCircle: e.target.value })}
+              onChange={(e) =>
+                setEditingItem({
+                  ...editingItem,
+                  relationCircle: e.target.value as ContactItem['relationCircle'],
+                })
+              }
               fullWidth
             >
               <MenuItem value="close_friend">{t('personal.social.circle.close_friend')}</MenuItem>
