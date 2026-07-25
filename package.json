@@ -1,0 +1,9 @@
+{
+  "name": "node-server-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "cr:status": "npx tsx scripts/cr-status.ts",
+    "cr:review": "npx tsx scripts/code-review.ts"
+  }
+}

@@ -6,7 +6,7 @@ import { execSync } from 'node:child_process';
 const rootDir = process.cwd();
 
 /**
- * 辅助函数：从根目录 .env 加载环境变量（若 process.env 中不存在）
+ * 辅助函数：从根目录 .env 加载环境变量
  */
 function loadEnv() {
   const envPath = path.join(rootDir, '.env');
@@ -29,23 +29,107 @@ function loadEnv() {
 
 loadEnv();
 
-// 1. 获取环境变量与配置参数
+// 环境变量与配置参数
 const baseURL = process.env.AI_BASE_URL;
 const apiKey = process.env.AI_KEY;
 const model = process.env.AI_MODEL || 'qwen3.5:27b';
-const maxDiffBytes = parseInt(process.env.AI_MAX_DIFF_BYTES || '200000', 10);
-const timeoutMs = parseInt(process.env.AI_TIMEOUT_MS || '120000', 10); // 默认 120 秒超时
+const maxChunkBytes = parseInt(process.env.AI_MAX_DIFF_BYTES || '150000', 10); // 单份 Diff 最大字符数
+const timeoutMs = parseInt(process.env.AI_TIMEOUT_MS || '180000', 10);
 const outputDirRel = process.env.AI_REVIEW_OUTPUT_DIR || path.join('docs', 'code-reviews');
+const reportDir = path.resolve(rootDir, outputDirRel);
+const tasksJsonPath = path.join(reportDir, 'tasks.json');
+const readmePath = path.join(reportDir, 'README.md');
 
 if (!baseURL || !apiKey) {
   console.log('⏭️  AI Review Skipped: AI_BASE_URL or AI_KEY not configured.');
   process.exit(0);
 }
 
-// 统计计时器
+// 确保输出目录存在
+if (!fs.existsSync(reportDir)) {
+  fs.mkdirSync(reportDir, { recursive: true });
+}
+
+// 接口定义
+interface TaskItem {
+  id: string;
+  commitHash: string;
+  commitSubject: string;
+  status: 'RUNNING' | 'COMPLETED' | 'FAILED';
+  model: string;
+  startTime: string;
+  endTime?: string;
+  durationSec?: number;
+  apiDurationSec?: number;
+  diffLines?: number;
+  diffChars?: number;
+  promptTokensEst?: number;
+  reports?: string[];
+  chunksCount?: number;
+  error?: string;
+}
+
+interface TasksData {
+  activeTasks: TaskItem[];
+  history: TaskItem[];
+}
+
+function loadTasksData(): TasksData {
+  if (fs.existsSync(tasksJsonPath)) {
+    try {
+      return JSON.parse(fs.readFileSync(tasksJsonPath, 'utf-8'));
+    } catch {
+      /* ignore */
+    }
+  }
+  return { activeTasks: [], history: [] };
+}
+
+function saveTasksData(data: TasksData) {
+  fs.writeFileSync(tasksJsonPath, JSON.stringify(data, null, 2), 'utf-8');
+  updateReadmeDashboard(data);
+}
+
+function updateReadmeDashboard(data: TasksData) {
+  let md = `# 🤖 AI Code Review 状态与历史看板\n\n`;
+
+  md += `## ⏳ 正在运行的任务 (${data.activeTasks.length})\n\n`;
+  if (data.activeTasks.length === 0) {
+    md += `*当前没有正在执行的审查任务。*\n\n`;
+  } else {
+    md += `| 提交 Hash | 提交说明 | 模型 | 开始时间 | 状态 |\n`;
+    md += `| :--- | :--- | :--- | :--- | :--- |\n`;
+    for (const t of data.activeTasks) {
+      md += `| \`${t.commitHash}\` | ${t.commitSubject} | \`${t.model}\` | ${t.startTime} | ⏳ **RUNNING** |\n`;
+    }
+    md += `\n`;
+  }
+
+  md += `## 📜 历史审查记录 (最新 20 条)\n\n`;
+  if (data.history.length === 0) {
+    md += `*暂无历史审查记录。*\n\n`;
+  } else {
+    md += `| 提交 Hash | 提交说明 | 状态 | 拆分份数 | API总耗时 | 审查报告 |\n`;
+    md += `| :--- | :--- | :--- | :--- | :--- | :--- |\n`;
+    for (const t of data.history.slice(0, 20)) {
+      const statusIcon = t.status === 'COMPLETED' ? '✅ COMPLETED' : '❌ FAILED';
+      let reportLinks = '-';
+      const rList = t.reports && t.reports.length > 0 ? t.reports : ((t as any).reportPath ? [(t as any).reportPath] : []);
+      if (rList.length > 0) {
+        reportLinks = rList
+          .map((rPath, idx) => `[${idx + 1}/${rList.length}](file:///${path.resolve(rootDir, rPath).replace(/\\/g, '/')})`)
+          .join(' | ');
+      }
+      md += `| \`${t.commitHash}\` | ${t.commitSubject} | ${statusIcon} | ${t.chunksCount || 1} 份 | ${t.apiDurationSec ?? '-'}s | ${reportLinks} |\n`;
+    }
+  }
+
+  fs.writeFileSync(readmePath, md, 'utf-8');
+}
+
 const startTime = Date.now();
 
-// 2. 获取当前 commit Hash 和 提交信息
+// 1. 获取当前 commit Hash 和 提交信息
 let commitHash = 'HEAD';
 let commitSubject = '';
 try {
@@ -56,7 +140,26 @@ try {
   process.exit(0);
 }
 
-// 3. 获取本次提交的 diff
+// 注册新任务
+const taskId = `${commitHash}_${Date.now()}`;
+const nowIso = new Date().toLocaleString();
+
+const tasksData = loadTasksData();
+const currentTask: TaskItem = {
+  id: taskId,
+  commitHash,
+  commitSubject,
+  status: 'RUNNING',
+  model,
+  startTime: nowIso,
+  reports: [],
+};
+
+tasksData.activeTasks = tasksData.activeTasks.filter((t) => t.id !== taskId);
+tasksData.activeTasks.push(currentTask);
+saveTasksData(tasksData);
+
+// 2. 获取本次提交的 diff
 const excludes = [
   ':(exclude)pnpm-lock.yaml',
   ':(exclude)package-lock.json',
@@ -67,49 +170,64 @@ const excludes = [
 ].join(' ');
 
 const gitDiffCmd = `git show ${commitHash} -- . ${excludes}`;
-let diffContent = '';
-const gitDiffStartTime = Date.now();
+let rawDiff = '';
 try {
-  diffContent = execSync(gitDiffCmd, {
+  rawDiff = execSync(gitDiffCmd, {
     encoding: 'utf-8',
     cwd: rootDir,
-    maxBuffer: 20 * 1024 * 1024,
+    maxBuffer: 30 * 1024 * 1024,
   });
 } catch (e: any) {
   console.error('⚠️ Failed to fetch git diff:', e.message);
+  currentTask.status = 'FAILED';
+  currentTask.error = e.message;
+  tasksData.activeTasks = tasksData.activeTasks.filter((t) => t.id !== taskId);
+  tasksData.history.unshift(currentTask);
+  saveTasksData(tasksData);
   process.exit(0);
 }
-const gitDiffDuration = Date.now() - gitDiffStartTime;
 
-if (!diffContent || diffContent.trim().length === 0) {
+if (!rawDiff || rawDiff.trim().length === 0) {
   console.log('ℹ️ No reviewable code changes found in this commit. Skipped.');
+  tasksData.activeTasks = tasksData.activeTasks.filter((t) => t.id !== taskId);
+  saveTasksData(tasksData);
   process.exit(0);
 }
 
-const diffCharCount = diffContent.length;
-const diffLineCount = diffContent.split('\n').length;
+currentTask.diffLines = rawDiff.split('\n').length;
+currentTask.diffChars = rawDiff.length;
 
-// 4. 上下文防过长截断处理
-let isTruncated = false;
-if (diffContent.length > maxDiffBytes) {
-  isTruncated = true;
-  let diffStat = '';
-  try {
-    diffStat = execSync(`git show --stat ${commitHash}`, { encoding: 'utf-8', cwd: rootDir });
-  } catch (e) {
-    /* ignore */
+// 3. 智能按文件分块 (Diff Chunks)
+function splitDiffIntoChunks(diff: string, maxBytes: number): string[] {
+  const fileDiffs = diff.split('\ndiff --git ');
+  const chunks: string[] = [];
+  let currentChunk = '';
+
+  for (let i = 0; i < fileDiffs.length; i++) {
+    let fileDiff = fileDiffs[i];
+    if (i > 0) fileDiff = 'diff --git ' + fileDiff;
+
+    if ((currentChunk + fileDiff).length > maxBytes && currentChunk.length > 0) {
+      chunks.push(currentChunk);
+      currentChunk = fileDiff;
+    } else {
+      currentChunk += fileDiff;
+    }
   }
-  diffContent =
-    `[NOTE: Diff content exceeded limit of ${maxDiffBytes} characters. Truncated summary below]\n\n` +
-    `--- CHANGED FILES SUMMARY ---\n${diffStat}\n\n` +
-    `--- TRUNCATED DIFF (FIRST ${maxDiffBytes} CHARS) ---\n` +
-    diffContent.slice(0, maxDiffBytes);
+
+  if (currentChunk.trim().length > 0) {
+    chunks.push(currentChunk);
+  }
+
+  return chunks.length > 0 ? chunks : [diff];
 }
 
-// 5. 动态装载 .agents 规约
-const agentsDir = path.join(rootDir, '.agents');
-let projectRules = '';
+const diffChunks = splitDiffIntoChunks(rawDiff, maxChunkBytes);
+const totalChunks = diffChunks.length;
+currentTask.chunksCount = totalChunks;
 
+// 4. 动态装载 .agents 规约
+const agentsDir = path.join(rootDir, '.agents');
 function readAgentFile(filename: string): string {
   const filePath = path.join(agentsDir, filename);
   if (fs.existsSync(filePath)) {
@@ -118,21 +236,50 @@ function readAgentFile(filename: string): string {
   return '';
 }
 
-projectRules += readAgentFile('AGENTS.md');
-projectRules += readAgentFile('global.md');
-projectRules += readAgentFile('workflow.md');
+let baseRules = readAgentFile('AGENTS.md') + readAgentFile('global.md') + readAgentFile('workflow.md');
 
-if (diffContent.includes('server/')) {
-  projectRules += readAgentFile('backend.md');
+// 5. 生成极简日期与递增序号文件名 (<commitHash>_<YYYYMM>_<HHmm>_<001|002>.md)
+function getNextReportFilename(hash: string): string {
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const yyyymm = `${now.getFullYear()}${pad(now.getMonth() + 1)}`;
+  const hhmm = `${pad(now.getHours())}${pad(now.getMinutes())}`;
+
+  const files = fs.readdirSync(reportDir);
+  const prefix = `${hash}_`;
+  let maxSeq = 0;
+
+  for (const file of files) {
+    if (file.startsWith(prefix) && file.endsWith('.md') && file !== 'README.md') {
+      const match = file.match(/_(\d{3})\.md$/);
+      if (match) {
+        const seq = parseInt(match[1], 10);
+        if (seq > maxSeq) maxSeq = seq;
+      }
+    }
+  }
+
+  const nextSeq = String(maxSeq + 1).padStart(3, '0');
+  return `${hash}_${yyyymm}_${hhmm}_${nextSeq}.md`;
 }
-if (diffContent.includes('platform/')) {
-  projectRules += readAgentFile('frontend.md');
-}
 
-const rulesCharCount = projectRules.length;
+// 6. 依次处理并生成份数报告
+async function main() {
+  console.log(`🤖 Starting AI Code Review for commit [${commitHash}] (${commitSubject})...`);
+  console.log(`📦 Diff split into ${totalChunks} chunk(s).`);
 
-// 6. 构造 AI Prompt 与 长度/Token 估算
-const systemPrompt = `你是一位严谨资深的全栈架构师与代码审查专家。
+  let totalApiDuration = 0;
+
+  for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+    const chunkIndexDisplay = `${chunkIdx + 1}/${totalChunks}`; // 编号标示: 1/5, 2/5...
+    const chunkDiff = diffChunks[chunkIdx];
+
+    // 针对本 Chunk 内容匹配专有规约
+    let chunkRules = baseRules;
+    if (chunkDiff.includes('server/')) chunkRules += readAgentFile('backend.md');
+    if (chunkDiff.includes('platform/')) chunkRules += readAgentFile('frontend.md');
+
+    const systemPrompt = `你是一位严谨资深的全栈架构师与代码审查专家。
 你的任务是根据项目设定的【团队开发规范】，对最新的 Git 代码提交做深入、全面且有针对性的审查。
 
 审查要求与重点：
@@ -142,114 +289,97 @@ const systemPrompt = `你是一位严谨资深的全栈架构师与代码审查�
 4. **输出格式**：请使用结构清晰的 Markdown 格式输出代码审查报告。对于发现的问题，务必指明具体文件、可能引发的问题，并提供改进后的代码示例。
 
 项目规范参考如下：
-${projectRules}`;
+${chunkRules}`;
 
-const userPrompt = `本次 Commit 信息：
+    const userPrompt = `本次 Commit 信息：
 - Commit Hash: ${commitHash}
 - Commit Message: ${commitSubject}
-${isTruncated ? '⚠️ 提示：由于本次提交文件变更较多，系统已对超长 Diff 进行了截断处理。' : ''}
+- 报告分份标记: [${chunkIndexDisplay}] (第 ${chunkIdx + 1} 份 / 共 ${totalChunks} 份)
 
-本次提交的具体代码变更 (Git Diff)：
+本份提交的具体代码变更片段 (Git Diff Part ${chunkIndexDisplay})：
 \`\`\`diff
-${diffContent}
+${chunkDiff}
 \`\`\`
 
-请根据团队开发规范，输出本次代码提交的详细 AI 审查报告。`;
+请根据团队开发规范，输出本份代码变更的详细 AI 审查报告。`;
 
-const totalPromptChars = systemPrompt.length + userPrompt.length;
-// 粗略估算 Token 数量（中英混合按 ~3 字符/Token 计算）
-const estimatedTokens = Math.round(totalPromptChars / 3);
+    const totalPromptChars = systemPrompt.length + userPrompt.length;
+    const estimatedTokens = Math.round(totalPromptChars / 3);
 
-// 7. 发送带超时控制的 API 请求
-async function main() {
-  console.log(`🤖 Starting AI Code Review for commit [${commitHash}] (${commitSubject})...`);
-  console.log(`📡 Model: ${model} | BaseURL: ${baseURL}`);
-  console.log(`📊 Input Stats: DiffChars=${diffCharCount} (Lines=${diffLineCount}), RulesChars=${rulesCharCount}`);
-  console.log(`🧮 Prompt Total: ${totalPromptChars} chars (~${estimatedTokens} tokens)`);
-  console.log(`⏱️ Timeout limit: ${timeoutMs / 1000}s`);
+    console.log(`\n⏳ Processing part [${chunkIndexDisplay}] (~${estimatedTokens} tokens)...`);
 
-  const endpoint = `${baseURL.replace(/\/+$/, '')}/chat/completions`;
+    const endpoint = `${baseURL.replace(/\/+$/, '')}/chat/completions`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  // 超时控制器
-  const controller = new AbortController();
-  const timer = setTimeout(() => {
-    controller.abort();
-  }, timeoutMs);
+    const apiStartTime = Date.now();
+    let reviewMarkdown = '';
+    let apiDuration = 0;
 
-  const apiStartTime = Date.now();
-  let apiDuration = 0;
-  let reviewMarkdown = '';
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.2,
+        }),
+        signal: controller.signal,
+      });
 
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.2,
-      }),
-      signal: controller.signal,
-    });
+      clearTimeout(timer);
+      apiDuration = Date.now() - apiStartTime;
+      totalApiDuration += apiDuration;
 
-    clearTimeout(timer);
-    apiDuration = Date.now() - apiStartTime;
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP Error ${response.status}: ${errorText}`);
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`HTTP Error ${response.status}: ${errorText}`);
-    }
+      const data = (await response.json()) as any;
+      reviewMarkdown = data.choices?.[0]?.message?.content || 'AI 未生成任何回复内容。';
 
-    const data = (await response.json()) as any;
-    reviewMarkdown = data.choices?.[0]?.message?.content || 'AI 未生成任何回复内容。';
+    } catch (error: any) {
+      clearTimeout(timer);
+      apiDuration = Date.now() - apiStartTime;
+      totalApiDuration += apiDuration;
 
-  } catch (error: any) {
-    clearTimeout(timer);
-    apiDuration = Date.now() - apiStartTime;
-    if (error.name === 'AbortError') {
-      console.error(`❌ AI Code Review Timed Out after ${timeoutMs / 1000} seconds!`);
-      process.exit(1);
-    } else {
-      console.error('❌ AI Code Review Request Failed:', error.message);
+      currentTask.status = 'FAILED';
+      currentTask.endTime = new Date().toLocaleString();
+      currentTask.error = error.name === 'AbortError' ? `Part ${chunkIndexDisplay} Timed out` : error.message;
+
+      tasksData.activeTasks = tasksData.activeTasks.filter((t) => t.id !== taskId);
+      tasksData.history.unshift(currentTask);
+      saveTasksData(tasksData);
+
+      console.error(`❌ Part [${chunkIndexDisplay}] Failed:`, error.message);
       process.exit(1);
     }
-  }
 
-  const totalDuration = Date.now() - startTime;
-  const outputChars = reviewMarkdown.length;
+    const reportFileName = getNextReportFilename(commitHash);
+    const reportPath = path.join(reportDir, reportFileName);
 
-  // 8. 写入包含统计信息的 Markdown 报告
-  const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-
-  const reportDir = path.resolve(rootDir, outputDirRel);
-  if (!fs.existsSync(reportDir)) {
-    fs.mkdirSync(reportDir, { recursive: true });
-  }
-
-  const reportFileName = `${commitHash}_${timestamp}.md`;
-  const reportPath = path.join(reportDir, reportFileName);
-
-  const statsSection = `
+    const statsSection = `
 > [!NOTE]
-> **📊 审核性能与消耗统计**
+> **📊 审核性能与消耗统计 [${chunkIndexDisplay}]**
 > - **提交 Hash**: \`${commitHash}\` (${commitSubject})
+> - **分份进度**: **${chunkIndexDisplay}** (第 ${chunkIdx + 1} 份 / 共 ${totalChunks} 份)
 > - **审核模型**: \`${model}\`
-> - **Diff 修改行数 / 字符**: ${diffLineCount} 行 / ${diffCharCount} 字符 (${isTruncated ? '已截断' : '全量'})
-> - **加载规约字符数**: ${rulesCharCount} 字符
+> - **本份 Diff 字符**: ${chunkDiff.length} 字符 (修改行数 ~${chunkDiff.split('\n').length} 行)
 > - **Prompt 输入长度**: ${totalPromptChars} 字符 (约 ~${estimatedTokens} tokens)
-> - **AI 响应长度**: ${outputChars} 字符
-> - **耗时统计**: API 请求 ${ (apiDuration / 1000).toFixed(2) }s | 总耗时 ${ (totalDuration / 1000).toFixed(2) }s
+> - **AI 响应长度**: ${reviewMarkdown.length} 字符
+> - **本份 API 耗时**: ${(apiDuration / 1000).toFixed(2)}s
 `;
 
-  const fullReportContent = `# 代码提交 AI 审核报告 (${commitHash})
+    // 标题中显式加上 [1/5]、[2/5] 等编号
+    const fullReportContent = `# 代码提交 AI 审核报告 (${commitHash}) [${chunkIndexDisplay}]
 
 ${statsSection}
 
@@ -258,13 +388,28 @@ ${statsSection}
 ${reviewMarkdown}
 `;
 
-  fs.writeFileSync(reportPath, fullReportContent, 'utf-8');
+    fs.writeFileSync(reportPath, fullReportContent, 'utf-8');
+
+    const relPath = path.relative(rootDir, reportPath);
+    currentTask.reports!.push(relPath);
+    saveTasksData(tasksData);
+
+    console.log(`✅ Part [${chunkIndexDisplay}] Review Completed! Report saved to: ${relPath}`);
+  }
+
+  const totalDuration = Date.now() - startTime;
+  currentTask.status = 'COMPLETED';
+  currentTask.endTime = new Date().toLocaleString();
+  currentTask.durationSec = parseFloat((totalDuration / 1000).toFixed(1));
+  currentTask.apiDurationSec = parseFloat((totalApiDuration / 1000).toFixed(1));
+
+  tasksData.activeTasks = tasksData.activeTasks.filter((t) => t.id !== taskId);
+  tasksData.history.unshift(currentTask);
+  saveTasksData(tasksData);
 
   console.log(`\n==================================================`);
-  console.log(`✅ AI Code Review Completed!`);
-  console.log(`⏱️  Stats: API=${(apiDuration / 1000).toFixed(2)}s | Total=${(totalDuration / 1000).toFixed(2)}s`);
-  console.log(`📝 Output: ${outputChars} chars`);
-  console.log(`📄 Report saved to: ${path.relative(rootDir, reportPath)}`);
+  console.log(`🎉 All ${totalChunks} part(s) of AI Code Review completed!`);
+  console.log(`⏱️  Total API Time: ${(totalApiDuration / 1000).toFixed(2)}s | Total Time: ${(totalDuration / 1000).toFixed(2)}s`);
   console.log(`==================================================\n`);
 }
 
