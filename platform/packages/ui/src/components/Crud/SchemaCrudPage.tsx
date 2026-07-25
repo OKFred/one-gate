@@ -431,8 +431,7 @@ export function SchemaCrudPage<
         const newQuery = { ...query, page: 1 };
         updateState({ query: newQuery });
         fetchList(newQuery);
-      } catch (err: unknown) {
-        console.error('Delete failed:', err);
+      } catch {
       } finally {
         handleCloseDeleteConfirm();
       }

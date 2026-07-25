@@ -34,8 +34,7 @@ export const Dashboard: React.FC = () => {
       if (res.data.data) {
         setStats(res.data.data);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }

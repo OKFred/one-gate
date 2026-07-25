@@ -52,8 +52,7 @@ export default function FamilyPage() {
       if (res.data.data?.list) {
         setList(res.data.data.list);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -100,9 +99,7 @@ export default function FamilyPage() {
       }
       setOpenModal(false);
       fetchMembers();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id: number) => {
@@ -110,9 +107,7 @@ export default function FamilyPage() {
     try {
       await FamilyAPI.deleteFn({ data: { id } });
       fetchMembers();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   return (

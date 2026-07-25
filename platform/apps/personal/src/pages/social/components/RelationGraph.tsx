@@ -116,8 +116,7 @@ export const RelationGraph: React.FC = () => {
         setNodes(initialNodes);
         setEdges(initialEdges);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }

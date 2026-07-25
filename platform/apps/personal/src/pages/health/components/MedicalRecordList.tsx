@@ -59,8 +59,7 @@ export const MedicalRecordList: React.FC = () => {
       if (res.data.data?.list) {
         setList(res.data.data.list);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -105,9 +104,7 @@ export const MedicalRecordList: React.FC = () => {
       }
       setOpenModal(false);
       fetchRecords();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id: number) => {
@@ -115,9 +112,7 @@ export const MedicalRecordList: React.FC = () => {
     try {
       await HealthAPI.deleteFn({ data: { id } });
       fetchRecords();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   return (

@@ -52,8 +52,7 @@ export const DataSourceConfig: React.FC = () => {
       if (res.data.data?.list) {
         setList(res.data.data.list);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -71,8 +70,7 @@ export const DataSourceConfig: React.FC = () => {
         alert(res.data.data.message);
       }
       fetchList();
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setSyncingId(null);
     }
@@ -110,9 +108,7 @@ export const DataSourceConfig: React.FC = () => {
       }
       setOpenModal(false);
       fetchList();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id: number) => {
@@ -120,9 +116,7 @@ export const DataSourceConfig: React.FC = () => {
     try {
       await FinancialAPI.dataSourceDeleteFn({ data: { id } });
       fetchList();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   return (

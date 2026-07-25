@@ -4,6 +4,7 @@ export const mail = {
   'mail.scope.biz': 'Enterprise',
   'mail.scope.user': 'Personal',
 
+  'account.verifySuccess': 'Verification successful',
   'account.table.nickname': 'Nickname',
   'account.table.email': 'Email',
   'account.table.host': 'Host',

@@ -11,6 +11,7 @@ export const mail = {
   'mail.scope.user': '个人级',
 
   // 邮件账户
+  'account.verifySuccess': '验证成功',
   'account.table.nickname': '昵称',
   'account.table.email': '邮箱',
   'account.table.host': '主机',

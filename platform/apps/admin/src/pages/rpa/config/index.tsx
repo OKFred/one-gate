@@ -49,7 +49,6 @@ export default function RpaConfigManagement() {
         });
       }
     } catch {
-      showSnackbar({ message: t('admin.rpa.config.verifyError'), type: 'error' });
     } finally {
       setVerifyingId(null);
     }

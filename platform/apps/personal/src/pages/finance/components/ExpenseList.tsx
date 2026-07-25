@@ -47,8 +47,7 @@ export const ExpenseList: React.FC = () => {
       if (res.data.data?.list) {
         setList(res.data.data.list);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -87,9 +86,7 @@ export const ExpenseList: React.FC = () => {
       }
       setOpenModal(false);
       fetchList();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id: number) => {
@@ -97,9 +94,7 @@ export const ExpenseList: React.FC = () => {
     try {
       await FinancialAPI.expenseDeleteFn({ data: { id } });
       fetchList();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   return (

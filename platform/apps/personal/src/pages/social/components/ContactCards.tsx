@@ -49,8 +49,7 @@ export const ContactCards: React.FC = () => {
       if (res.data.data?.list) {
         setList(res.data.data.list);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -95,9 +94,7 @@ export const ContactCards: React.FC = () => {
       }
       setOpenModal(false);
       fetchContacts();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id: number) => {
@@ -105,9 +102,7 @@ export const ContactCards: React.FC = () => {
     try {
       await SocialAPI.contactDeleteFn({ data: { id } });
       fetchContacts();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   return (

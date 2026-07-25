@@ -47,8 +47,7 @@ export const IncomeList: React.FC = () => {
       if (res.data.data?.list) {
         setList(res.data.data.list);
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -85,9 +84,7 @@ export const IncomeList: React.FC = () => {
       }
       setOpenModal(false);
       fetchList();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   const handleDelete = async (id: number) => {
@@ -95,9 +92,7 @@ export const IncomeList: React.FC = () => {
     try {
       await FinancialAPI.incomeDeleteFn({ data: { id } });
       fetchList();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch {}
   };
 
   return (

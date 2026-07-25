@@ -7,20 +7,21 @@ import { formConfig } from './components/TheForm';
 import * as AccountAPI from '@/api/admin/mail/account';
 import * as ActionAPI from '@/api/admin/mail/action';
 import { showSnackbar } from '@/components/Notification';
+import { useTranslation } from '@/hooks/useTranslation';
 import type { ListMailAccountReq } from '@/api/admin/mail/type';
 import type { SchemaCrudConfig } from '@/components/Crud';
 
 export default function MailAccountPage() {
   const [verifyingId, setVerifyingId] = useState<number | null>(null);
+  const t = useTranslation();
 
   // 处理发信连接测试
   const handleVerify = async (accountId: number) => {
     try {
       setVerifyingId(accountId);
       await ActionAPI.verifyFn({ data: { accountId } });
-      showSnackbar({ message: '验证成功', type: 'success' });
-    } catch (error) {
-      console.error('Connection test failed:', error);
+      showSnackbar({ message: t('account.verifySuccess'), type: 'success' });
+    } catch {
     } finally {
       setVerifyingId(null);
     }

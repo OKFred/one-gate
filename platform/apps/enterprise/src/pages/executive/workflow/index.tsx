@@ -389,11 +389,10 @@ export default function WorkflowManagement() {
       const res = await WorkflowAPI.listFn({ data: { pageNo: 1, pageSize: 100 } });
       setWorkflows(res.data.data.list as WorkflowObj[]);
     } catch {
-      showSnackbar({ message: t('workflow.listFailed'), type: 'error' });
     } finally {
       setLoading(false);
     }
-  }, [t]);
+  }, []);
 
   useEffect(() => {
     fetchWorkflows();
@@ -435,9 +434,7 @@ export default function WorkflowManagement() {
       setNewWorkflowName('');
       setNewWorkflowDesc('');
       fetchWorkflows();
-    } catch {
-      showSnackbar({ message: t('workflow.createFailed'), type: 'error' });
-    }
+    } catch {}
   };
 
   // 3. 进入编辑器
@@ -476,9 +473,7 @@ export default function WorkflowManagement() {
       setWorkflows((prev) =>
         prev.map((w) => (w.id === editingWorkflow.id ? { ...w, flowData: flowDataStr } : w)),
       );
-    } catch {
-      showSnackbar({ message: t('workflow.saveFailed'), type: 'error' });
-    }
+    } catch {}
   };
 
   // 5. 退出编辑器
@@ -492,9 +487,7 @@ export default function WorkflowManagement() {
     try {
       await WorkflowAPI.runFn({ data: { id } });
       showSnackbar({ message: t('workflow.runSuccess'), type: 'success' });
-    } catch {
-      showSnackbar({ message: t('workflow.runFailed'), type: 'error' });
-    }
+    } catch {}
   };
 
   // 7. 删除工作流（打开确认弹窗）
@@ -510,7 +503,6 @@ export default function WorkflowManagement() {
       showSnackbar({ message: t('workflow.deleteSuccess'), type: 'success' });
       fetchWorkflows();
     } catch {
-      showSnackbar({ message: t('workflow.deleteFailed'), type: 'error' });
     } finally {
       setDeleteTargetId(null);
     }
@@ -527,7 +519,6 @@ export default function WorkflowManagement() {
       });
       setLogsList(res.data.data.list as LogObj[]);
     } catch {
-      showSnackbar({ message: t('workflow.getLogsFailed'), type: 'error' });
     } finally {
       setLogsLoading(false);
     }
