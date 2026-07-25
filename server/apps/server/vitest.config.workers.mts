@@ -27,6 +27,13 @@ export default defineConfig({
             .replace(/\\/g, "/") + "/$1$2.sql$3",
       },
       {
+        find: /^@hodor\/core\/db\/sql\/(personal_|base_user_config)(.*)\.sql(\?raw)?$/,
+        replacement:
+          path
+            .resolve(__dirname, "../../packages/core/src/db/sql/personal")
+            .replace(/\\/g, "/") + "/$1$2.sql$3",
+      },
+      {
         find: /^@\/(.*)\.js$/,
         replacement:
           path.resolve(__dirname, "./src").replace(/\\/g, "/") + "/$1",
@@ -102,12 +109,12 @@ export default defineConfig({
     include: [
       "src/**/*.spec.ts",
       "src/**/*.workers.spec.ts",
-      "../../packages/*/src/**/*.spec.ts",
-      "../../packages/*/src/**/*.workers.spec.ts",
+      "../../packages/**/src/**/*.spec.ts",
+      "../../packages/**/src/**/*.workers.spec.ts",
       "test/index.spec.ts",
     ],
     setupFiles: ["./test/setup.workers.ts"],
-    exclude: ["**/*.node.spec.ts", "../../packages/*/src/**/*.node.spec.ts"],
+    exclude: ["**/node_modules/**", "**/*.node.spec.ts", "../../packages/*/src/**/*.node.spec.ts"],
   },
   ssr: {
     noExternal: true,
