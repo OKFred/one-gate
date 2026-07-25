@@ -68,7 +68,7 @@ export const ContactCards: React.FC = () => {
           data: {
             id: editingItem.id,
             realName: editingItem.realName,
-            relationCircle: editingItem.relationCircle as any,
+            relationCircle: editingItem.relationCircle,
             company: editingItem.company || null,
             position: editingItem.position || null,
             phone: editingItem.phone || null,
@@ -82,7 +82,7 @@ export const ContactCards: React.FC = () => {
         await SocialAPI.contactAddFn({
           data: {
             realName: editingItem.realName,
-            relationCircle: editingItem.relationCircle as any,
+            relationCircle: editingItem.relationCircle,
             company: editingItem.company || null,
             position: editingItem.position || null,
             phone: editingItem.phone || null,
@@ -181,7 +181,7 @@ export const ContactCards: React.FC = () => {
                     </Box>
                     <Chip
                       label={getCircleName(c.relationCircle, t)}
-                      color={getCircleColor(c.relationCircle) as any}
+                      color={getCircleColor(c.relationCircle)}
                       size="small"
                       sx={{ fontWeight: 600 }}
                     />
@@ -352,7 +352,9 @@ function getCircleName(circle: string, t: (key: string) => string) {
   }
 }
 
-function getCircleColor(circle: string) {
+function getCircleColor(
+  circle: string,
+): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' {
   switch (circle) {
     case 'close_friend':
       return 'primary';

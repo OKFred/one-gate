@@ -29,15 +29,16 @@ import {
   LocalHospital as HospitalIcon,
 } from '@mui/icons-material';
 import * as HealthAPI from '@/api/personal/health';
-import type { ListHealthRes } from '@/api/personal/type';
+import type { ListHealthReq, ListHealthRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
 import { useTranslation } from '@/hooks/useTranslation';
 
+type MedicalCategory = NonNullable<ListHealthReq['category']>;
 type MedicalRecordItem = NonNullable<ListHealthRes['list']>[0];
 
 export const MedicalRecordList: React.FC = () => {
   const t = useTranslation();
-  const [categoryTab, setCategoryTab] = useState<string>('all');
+  const [categoryTab, setCategoryTab] = useState<'all' | MedicalCategory>('all');
   const [list, setList] = useState<MedicalRecordItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -51,7 +52,7 @@ export const MedicalRecordList: React.FC = () => {
       const res = await HealthAPI.listFn({
         data: {
           pageNo: 1,
-          category: categoryTab === 'all' ? undefined : (categoryTab as any),
+          category: categoryTab === 'all' ? undefined : categoryTab,
           pageSize: 50,
         },
       });
@@ -76,7 +77,7 @@ export const MedicalRecordList: React.FC = () => {
         await HealthAPI.updateFn({
           data: {
             id: editingItem.id,
-            category: editingItem.category as any,
+            category: editingItem.category,
             title: editingItem.title,
             hospitalName: editingItem.hospitalName || null,
             doctorName: editingItem.doctorName || null,
@@ -90,7 +91,7 @@ export const MedicalRecordList: React.FC = () => {
       } else {
         await HealthAPI.addFn({
           data: {
-            category: editingItem.category as any,
+            category: editingItem.category,
             title: editingItem.title,
             hospitalName: editingItem.hospitalName || null,
             doctorName: editingItem.doctorName || null,
@@ -210,7 +211,7 @@ export const MedicalRecordList: React.FC = () => {
                     <TableCell>
                       <Chip
                         label={getCategoryName(row.category, t)}
-                        color={getCategoryColor(row.category) as any}
+                        color={getCategoryColor(row.category)}
                         size="small"
                       />
                     </TableCell>

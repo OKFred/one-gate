@@ -45,7 +45,7 @@ export default function BizLogTable() {
         { type: 'content', label: t('log.content'), render: (row) => JSON.stringify(row.logValue) },
       ],
     },
-    form: { fields: () => [] } as any,
+    form: { schema: {}, defaultForm: {} },
   };
 
   return <SchemaCrudPage config={config} />;

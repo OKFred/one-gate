@@ -86,7 +86,7 @@ export const DataSourceConfig: React.FC = () => {
           data: {
             id: editingItem.id,
             sourceName: editingItem.sourceName,
-            sourceType: editingItem.sourceType as any,
+            sourceType: editingItem.sourceType,
             apiTaskId: editingItem.apiTaskId ? Number(editingItem.apiTaskId) : null,
             schemaFormCode: editingItem.schemaFormCode || null,
             fieldMappingJson: editingItem.fieldMappingJson || '{}',
@@ -98,7 +98,7 @@ export const DataSourceConfig: React.FC = () => {
         await FinancialAPI.dataSourceAddFn({
           data: {
             sourceName: editingItem.sourceName,
-            sourceType: editingItem.sourceType as any,
+            sourceType: editingItem.sourceType,
             apiTaskId: editingItem.apiTaskId ? Number(editingItem.apiTaskId) : null,
             schemaFormCode: editingItem.schemaFormCode || null,
             fieldMappingJson:

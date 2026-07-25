@@ -152,7 +152,7 @@ export const attendanceTable = sqliteTable("enterprise_attendance", {
   date: text("date").notNull(),
   checkInTime: integer("check_in_time"),
   checkOutTime: integer("check_out_time"),
-  status: integer("status").notNull(),
+  status: integer("status").$type<0 | 1 | 2 | 3>().notNull(),
   remark: text("remark"),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),

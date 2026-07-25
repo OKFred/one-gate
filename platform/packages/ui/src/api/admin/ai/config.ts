@@ -1,64 +1,78 @@
-import { axiosPlus } from '@/api/config';
+import { axiosPlus, type AxiosConfig } from '@/api/config';
 
 /** 获取所有 AI 配置 */
-export const listAllFn = (axiosConfig?: any) => {
+export const listAllFn = (
+  axiosConfig?: Omit<AxiosConfig<'/api/v1/admin/ai/config/listAll', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/listAll' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/listAll',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };
 
 /** 分页获取 AI 配置 */
-export const listFn = (axiosConfig: any) => {
+export const listFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/ai/config/list', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/list' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/list',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };
 
 /** 获取 AI 配置详情 */
-export const getFn = (axiosConfig: any) => {
+export const getFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/ai/config/get', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/get' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/get',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };
 
 /** 添加 AI 配置 */
-export const addFn = (axiosConfig: any) => {
+export const addFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/ai/config/add', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/add' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/add',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };
 
 /** 更新 AI 配置 */
-export const updateFn = (axiosConfig: any) => {
+export const updateFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/ai/config/update', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/update' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/update',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };
 
 /** 删除 AI 配置 */
-export const deleteFn = (axiosConfig: any) => {
+export const deleteFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/ai/config/delete', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/delete' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/delete',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };
 
 /** 验证 AI 配置连通性 */
-export const verifyFn = (axiosConfig: any) => {
+export const verifyFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/ai/config/verify', 'post'>, 'url' | 'method'>,
+) => {
   return axiosPlus({
-    url: '/api/v1/admin/ai/config/verify' as any,
-    method: 'post' as any,
+    url: '/api/v1/admin/ai/config/verify',
+    method: 'post',
     ...axiosConfig,
-  } as any);
+  });
 };

@@ -71,7 +71,7 @@ export default function FamilyPage() {
           data: {
             id: editingItem.id,
             isSelf: editingItem.isSelf ?? false,
-            relationType: editingItem.relationType as any,
+            relationType: editingItem.relationType,
             realName: editingItem.realName,
             gender: editingItem.gender || null,
             avatar: editingItem.avatar || null,
@@ -86,7 +86,7 @@ export default function FamilyPage() {
         await FamilyAPI.addFn({
           data: {
             isSelf: editingItem.isSelf ?? false,
-            relationType: editingItem.relationType as any,
+            relationType: editingItem.relationType,
             realName: editingItem.realName,
             gender: editingItem.gender || null,
             avatar: editingItem.avatar || null,

@@ -65,7 +65,7 @@ export const IncomeList: React.FC = () => {
         await FinancialAPI.incomeUpdateFn({
           data: {
             id: editingItem.id,
-            sourceCategory: editingItem.sourceCategory as any,
+            sourceCategory: editingItem.sourceCategory,
             amount: Number(editingItem.amount),
             incomeDateUtc: editingItem.incomeDateUtc || Date.now(),
             payer: editingItem.payer || null,
@@ -75,7 +75,7 @@ export const IncomeList: React.FC = () => {
       } else {
         await FinancialAPI.incomeAddFn({
           data: {
-            sourceCategory: editingItem.sourceCategory as any,
+            sourceCategory: editingItem.sourceCategory,
             amount: Number(editingItem.amount),
             incomeDateUtc: editingItem.incomeDateUtc || Date.now(),
             payer: editingItem.payer || null,

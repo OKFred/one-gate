@@ -5,6 +5,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
 import { Chip, Switch } from '@mui/material';
 
+import dayjs from 'dayjs';
 import * as BaseSysConfigAPI from '@/api/admin/base/sys_config';
 import type { ConfigRes, ListConfigReq } from '@/api/admin/base/type';
 import { BaseSysConfigFormDialog } from './components/BaseSysConfigFormDialog';
@@ -98,7 +99,8 @@ export default function BaseSysConfigPage() {
         {
           title: t('columns.createTime'),
           width: 180,
-          render: (row: ConfigRes) => new Date(row.createTimeUtc as number).toLocaleString(),
+          render: (row: ConfigRes) =>
+            row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
         },
       ],
       cardFields: () => [],

@@ -33,7 +33,7 @@ async function onAsk(
   // 3. 组装历史与当前消息
   const formattedHistory: AiChatMessage[] = history.map((item) => ({
     role: item.role as "user" | "assistant" | "system",
-    content: item.content as any,
+    content: item.content as AiChatMessage["content"],
   }));
 
   const finalMessages: AiChatMessage[] = [

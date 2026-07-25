@@ -54,7 +54,7 @@ export default function AuditLogTable() {
         },
       ],
     },
-    form: { fields: () => [] } as any,
+    form: { schema: {}, defaultForm: {} },
   };
 
   return <SchemaCrudPage config={config} />;

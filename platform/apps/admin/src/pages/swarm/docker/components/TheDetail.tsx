@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
@@ -144,11 +145,11 @@ export default function TheDetail({ open, onClose, service }: TheDetailProps) {
                 </Typography>
                 <Typography variant="body2">
                   <strong>{t('swarm.docker.createdAt')}:</strong>{' '}
-                  {service.CreatedAt ? new Date(service.CreatedAt).toLocaleString() : '-'}
+                  {service.CreatedAt ? dayjs(service.CreatedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
                 </Typography>
                 <Typography variant="body2">
                   <strong>{t('swarm.docker.updatedAt')}:</strong>{' '}
-                  {service.UpdatedAt ? new Date(service.UpdatedAt).toLocaleString() : '-'}
+                  {service.UpdatedAt ? dayjs(service.UpdatedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
                 </Typography>
               </Box>
             </Box>

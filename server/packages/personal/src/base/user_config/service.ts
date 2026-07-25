@@ -101,7 +101,7 @@ const listRes = {
 } as const satisfies JSONSchema;
 
 async function onList(params: FromSchema<typeof listReq>, userObj: UserObj) {
-  const userId = (userObj as any).userId as number;
+  const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
   const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
@@ -153,7 +153,7 @@ export async function onAdd(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
-  const userId = (userObj as any).userId as number;
+  const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
   preventEmpty(obj.configKey, "配置键不能空");
@@ -212,7 +212,7 @@ export async function onUpdate(
   obj: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof updateRes> | null> {
-  const userId = (userObj as any).userId as number;
+  const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
   const dbObj = await baseUserConfigRepository.findById(userId, obj.id);
@@ -287,7 +287,7 @@ export async function onDelete(
   obj: FromSchema<typeof deleteReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof deleteRes> | null> {
-  const userId = (userObj as any).userId as number;
+  const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
   const count = await baseUserConfigRepository.deleteByIds(
@@ -331,7 +331,7 @@ export async function onGet(
   obj: FromSchema<typeof getReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof getRes> | null> {
-  const userId = (userObj as any).userId as number;
+  const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
   const dbObj = await baseUserConfigRepository.findById(userId, obj.id[0]);
@@ -404,7 +404,7 @@ async function onNamespaces(
   params: FromSchema<typeof namespacesReq>,
   userObj: UserObj
 ) {
-  const userId = (userObj as any).userId as number;
+  const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
   const namespaces = await baseUserConfigRepository.findNamespaces(userId);

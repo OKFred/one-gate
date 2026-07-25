@@ -1,21 +1,11 @@
+import type { AiLlmConfigObj as AiConfigRes, ListAiConfigReq } from '@/api/admin/ai/type';
 import { THIS_PERMISSION } from '../constant';
 import { Chip, Box, CircularProgress } from '@mui/material';
 import { QuestionMark as VerifyIcon } from '@mui/icons-material';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
 
-export interface AiConfigRes {
-  id: number;
-  name: string;
-  provider: string;
-  model: string;
-  baseUrl?: string;
-  apiKey?: string;
-  capabilities?: string | null;
-  isDefault?: boolean;
-  isEnabled?: boolean;
-  remark?: string | null;
-}
+export type { AiConfigRes };
 
 export interface TableExtraContext {
   verifyingId: number | null;
@@ -25,7 +15,7 @@ export interface TableExtraContext {
 export const tableConfig: SchemaCrudConfig<
   AiConfigRes,
   FilterState,
-  any,
+  ListAiConfigReq,
   TableExtraContext
 >['table'] = {
   columns: (t) => [

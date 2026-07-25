@@ -25,7 +25,7 @@ export default function CronFormFields({ form, setForm, t }: CronFormFieldsProps
       .then((res) => {
         const list = res?.data?.data?.list || [];
         const opts = list.map((item: ApiTaskObj) => ({
-          label: `${item.name} (${item.taskKey})${!item.isEnabled ? ` - [${t('status.disabled') || '已禁用'}]` : ''}`,
+          label: `${item.name} (${item.taskKey})${!item.isEnabled ? ` - [${t('status.disabled')}]` : ''}`,
           value: item.taskKey,
         }));
         setDynamicOptions(opts);

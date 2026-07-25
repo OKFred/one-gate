@@ -93,25 +93,25 @@ async function onList(
 
   // Map back to LoginAuditPOLike
   const mappedList = list.map((item) => {
-    const val = item.logValue as any;
+    const val = (item.logValue || {}) as Record<string, unknown>;
     return {
       id: item.id,
-      userId: val.userId,
-      loginTimeUtc: val.loginTimeUtc,
-      ip: val.ip,
-      userAgent: val.userAgent,
+      userId: Number(val.userId || 0),
+      loginTimeUtc: Number(val.loginTimeUtc || item.createTimeUtc),
+      ip: String(val.ip || ""),
+      userAgent: String(val.userAgent || ""),
       remark: item.remark,
       creatorId: item.creatorId,
       creatorName: item.creatorName,
       createTimeUtc: item.createTimeUtc,
-    } as LoginAuditPOLike;
+    } satisfies LoginAuditPOLike;
   });
 
   // For mapped sort where the sort wasn't handled natively by DB because it's a JSON field
   if (orderBy === "userId" || orderBy === "loginTimeUtc") {
     mappedList.sort((a, b) => {
-      const aVal = a[orderBy] as number;
-      const bVal = b[orderBy] as number;
+      const aVal = (a[orderBy] as number) || 0;
+      const bVal = (b[orderBy] as number) || 0;
       return descend ? bVal - aVal : aVal - bVal;
     });
   }
@@ -121,7 +121,7 @@ async function onList(
     totalPage: Math.ceil(total / finalPageSize),
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: mappedList as any,
+    list: mappedList,
   };
 }
 

@@ -48,7 +48,16 @@ export const OrganDetailDrawer: React.FC<OrganDetailDrawerProps> = ({ organ, onC
           </Typography>
           <Chip
             label={data.statusText}
-            color={data.statusColor as any}
+            color={
+              data.statusColor as
+                | 'default'
+                | 'primary'
+                | 'secondary'
+                | 'error'
+                | 'info'
+                | 'success'
+                | 'warning'
+            }
             size="small"
             sx={{ fontWeight: 600 }}
           />
