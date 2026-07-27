@@ -66,7 +66,6 @@ export const mqtt = {
   'admin.mqtt.sub.stop': 'Stop Listening',
   'admin.mqtt.sub.listening': 'Live Listening...',
   'admin.mqtt.sub.stopped': 'Not Listening',
-  'admin.mqtt.sub.presets': 'Mobile Presets',
   'admin.mqtt.sub.clear': 'Clear Stream',
   'admin.mqtt.sub.receivedCount': 'Live Received',
 } as const satisfies Record<string, string>;

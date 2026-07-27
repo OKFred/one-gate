@@ -65,7 +65,6 @@ export const mqtt = {
   'admin.mqtt.sub.stop': '停止监听',
   'admin.mqtt.sub.listening': '实时监听中...',
   'admin.mqtt.sub.stopped': '未建立监听',
-  'admin.mqtt.sub.presets': '移动端核心 Topic 预设',
   'admin.mqtt.sub.clear': '清空列表',
   'admin.mqtt.sub.receivedCount': '实时接收',
 } as const satisfies Record<string, string>;

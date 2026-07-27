@@ -36,8 +36,6 @@ import {
   PlayArrow as StartIcon,
   Stop as StopIcon,
   ClearAll as ClearIcon,
-  PhoneIphone as MobileIcon,
-  Dns as TopicIcon,
 } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import mqtt, { type MqttClient } from 'mqtt';
@@ -72,13 +70,13 @@ export default function MqttConsolePage() {
   const t = useTranslation();
 
   // ---------- 发布表单 State ----------
-  const [topic, setTopic] = useState('autojs6/tasks');
+  const [topic, setTopic] = useState('');
   const [payload, setPayload] = useState(
-    '{\n  "action": "run_script",\n  "script": "console.log(\'Hello from PC Admin Console!\');"\n}',
+    '{\n  "action": "run_script",\n  "script": "console.log(\'Hello MQTT!\');"\n}',
   );
   const [qos, setQos] = useState<number>(1);
   const [retain, setRetain] = useState(false);
-  const [remark, setRemark] = useState('下发移动端指令测试');
+  const [remark, setRemark] = useState('');
   const [publishing, setPublishing] = useState(false);
 
   // ---------- 实时监听 (Subscriber) State ----------
@@ -111,7 +109,7 @@ export default function MqttConsolePage() {
         setLogs(res.data.data.list as unknown as MqttLogRow[]);
       }
     } catch {
-      // 客户端全局响应拦截器自动提示
+      // 全局拦截器处理错误
     } finally {
       setLoadingLogs(false);
     }
@@ -140,41 +138,6 @@ export default function MqttConsolePage() {
       showSnackbar({ message: t('admin.mqtt.msg.formatSuccess'), type: 'success' });
     } catch {
       showSnackbar({ message: t('admin.mqtt.msg.formatInvalid'), type: 'error' });
-    }
-  };
-
-  // 快捷发送预设设置
-  const applyPreset = (presetType: 'tasks' | 'results' | 'status') => {
-    if (presetType === 'tasks') {
-      setTopic('autojs6/tasks');
-      setPayload(
-        JSON.stringify(
-          { action: 'run_script', scriptName: 'demo.js', timestamp: Date.now() },
-          null,
-          2,
-        ),
-      );
-      setRemark('下发 autojs6/tasks 任务指令');
-    } else if (presetType === 'results') {
-      setTopic('autojs6/results');
-      setSubTopic('autojs6/results');
-      setPayload(
-        JSON.stringify(
-          { taskId: 'task_001', success: true, result: 'Script executed successfully' },
-          null,
-          2,
-        ),
-      );
-    } else if (presetType === 'status') {
-      setTopic('autojs6/status');
-      setSubTopic('autojs6/status');
-      setPayload(
-        JSON.stringify(
-          { deviceId: 'mobile_35249311637582', status: 'online', battery: 95 },
-          null,
-          2,
-        ),
-      );
     }
   };
 
@@ -310,43 +273,6 @@ export default function MqttConsolePage() {
         </Box>
       </Box>
 
-      {/* 快捷预设 Topic 栏 */}
-      <Card elevation={0} sx={{ mb: 3, p: 2, border: 1, borderColor: 'divider', borderRadius: 2 }}>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center' }}
-          >
-            <MobileIcon sx={{ fontSize: 18, mr: 0.5 }} />
-            {t('admin.mqtt.sub.presets')}:
-          </Typography>
-          <Chip
-            icon={<TopicIcon />}
-            label="autojs6/tasks (下发移动端指令)"
-            color="primary"
-            variant="outlined"
-            clickable
-            onClick={() => applyPreset('tasks')}
-          />
-          <Chip
-            icon={<TopicIcon />}
-            label="autojs6/results (接收移动端结果)"
-            color="success"
-            variant="outlined"
-            clickable
-            onClick={() => applyPreset('results')}
-          />
-          <Chip
-            icon={<TopicIcon />}
-            label="autojs6/status (接收移动端心跳)"
-            color="info"
-            variant="outlined"
-            clickable
-            onClick={() => applyPreset('status')}
-          />
-        </Stack>
-      </Card>
-
       <Grid container spacing={3}>
         {/* 左侧：发布测试面板 */}
         <Grid size={{ xs: 12, md: 6 }}>
@@ -365,6 +291,7 @@ export default function MqttConsolePage() {
                 {t('admin.mqtt.publish.title')}
               </Typography>
 
+              {/* Topic 输入 */}
               <TextField
                 fullWidth
                 label={t('admin.mqtt.publish.topic')}
@@ -498,10 +425,10 @@ export default function MqttConsolePage() {
                 <TextField
                   fullWidth
                   size="small"
+                  disabled={isListening}
                   label={t('admin.mqtt.sub.topic')}
                   value={subTopic}
                   onChange={(e) => setSubTopic(e.target.value)}
-                  disabled={isListening}
                 />
                 <Button
                   variant={isListening ? 'outlined' : 'contained'}
@@ -517,7 +444,7 @@ export default function MqttConsolePage() {
                   }
                   onClick={toggleListening}
                   disabled={connectingSub}
-                  sx={{ minWidth: 130 }}
+                  sx={{ minWidth: 148, whiteSpace: 'nowrap', flexShrink: 0 }}
                 >
                   {isListening ? t('admin.mqtt.sub.stop') : t('admin.mqtt.sub.start')}
                 </Button>
@@ -544,7 +471,7 @@ export default function MqttConsolePage() {
               {/* 消息瀑布流面板 */}
               <Box
                 sx={{
-                  height: 320,
+                  height: 340,
                   overflowY: 'auto',
                   border: 1,
                   borderColor: 'divider',
@@ -564,7 +491,7 @@ export default function MqttConsolePage() {
                   >
                     <Typography variant="body2">
                       {isListening
-                        ? '⚡ 正在监听 MQTT Broker 消息流，等待移动端 (AutoJS6) 或云端数据推送到站...'
+                        ? '⚡ 正在监听 MQTT Broker 消息流，等待来自云端/设备数据推送到站...'
                         : '点击“启动实时监听”按钮开启动态调试'}
                     </Typography>
                   </Box>
