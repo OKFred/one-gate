@@ -151,6 +151,16 @@ async function onListLogs(params: FromSchema<typeof MqttLogQueryReqSchema>) {
   const pageNo = params.pageNo || 1;
   const pageSize = params.pageSize || 20;
 
+  const filters: Record<string, unknown> = {};
+  if (params.direction) {
+    filters.direction = params.direction;
+  }
+
+  const likeFilters: Record<string, string> = {};
+  if (params.topic) {
+    likeFilters.topic = params.topic;
+  }
+
   const result = await baseLogService.biz.list({
     namespace: "mqtt",
     pageNo,
@@ -158,27 +168,13 @@ async function onListLogs(params: FromSchema<typeof MqttLogQueryReqSchema>) {
     descend: true,
     startTime: params.startTimeUtc || undefined,
     endTime: params.endTimeUtc || undefined,
+    status: params.status ?? undefined,
+    filters: Object.keys(filters).length > 0 ? filters : undefined,
+    likeFilters: Object.keys(likeFilters).length > 0 ? likeFilters : undefined,
   });
 
-  // 内存二次过滤 topic 和 direction (若入参提供)
-  let filteredList = result.list as MqttBizLogItem[];
-  if (params.topic) {
-    const keyword = params.topic;
-    filteredList = filteredList.filter((item) => {
-      const val = item.logValue;
-      return typeof val?.topic === "string" && val.topic.includes(keyword);
-    });
-  }
-  if (params.direction) {
-    const dir = params.direction;
-    filteredList = filteredList.filter((item) => {
-      const val = item.logValue;
-      return val?.direction === dir;
-    });
-  }
-
   return {
-    list: filteredList,
+    list: result.list as MqttBizLogItem[],
     total: result.total,
     pageNo,
     pageSize,

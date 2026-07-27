@@ -157,6 +157,8 @@ export async function findBizLogPage(params: {
   orderBy?: keyof BizLogPOLike;
   descend?: boolean;
   filters?: Record<string, unknown>;
+  likeFilters?: Record<string, string>;
+  status?: boolean;
   startTime?: number;
   endTime?: number;
 }) {
@@ -167,6 +169,8 @@ export async function findBizLogPage(params: {
     orderBy = "id",
     descend = true,
     filters,
+    likeFilters,
+    status,
     startTime,
     endTime,
   } = params;
@@ -176,6 +180,9 @@ export async function findBizLogPage(params: {
   const conditions: SQL[] = [];
   if (namespace !== undefined && namespace !== null) {
     conditions.push(eq(baseBizLogTable.namespace, namespace));
+  }
+  if (status !== undefined && status !== null) {
+    conditions.push(eq(baseBizLogTable.status, status));
   }
   if (startTime !== undefined) {
     conditions.push(sql`${baseBizLogTable.createTimeUtc} >= ${startTime}`);
@@ -188,6 +195,16 @@ export async function findBizLogPage(params: {
       if (v !== undefined && v !== null) {
         conditions.push(
           sql`json_extract(${baseBizLogTable.logValue}, '$.' || ${k}) = ${v}`
+        );
+      }
+    }
+  }
+  if (likeFilters) {
+    for (const [k, v] of Object.entries(likeFilters)) {
+      if (v !== undefined && v !== null && v !== "") {
+        const pattern = `%${v}%`;
+        conditions.push(
+          sql`json_extract(${baseBizLogTable.logValue}, '$.' || ${k}) LIKE ${pattern}`
         );
       }
     }

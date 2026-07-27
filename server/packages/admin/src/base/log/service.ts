@@ -57,6 +57,8 @@ const biz = {
     orderBy?: keyof BizLogPOLike;
     descend?: boolean;
     filters?: Record<string, unknown>;
+    likeFilters?: Record<string, string>;
+    status?: boolean;
     startTime?: number;
     endTime?: number;
   }) => {
