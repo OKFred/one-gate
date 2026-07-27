@@ -30,11 +30,10 @@ const ThePreviewDialog = memo(({ open, onClose, formCode, schemaJson }: ThePrevi
   const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [businessId, setBusinessId] = useState<number>(1001);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   // 表单验证错误映射上下文
-  const { fieldErrors, handleFormError, clearErrors, clearFieldError, rootSchema } = useFormError(
+  const { fieldErrors, clearErrors, clearFieldError, rootSchema } = useFormError(
     schema || undefined,
   );
 
@@ -46,7 +45,6 @@ const ThePreviewDialog = memo(({ open, onClose, formCode, schemaJson }: ThePrevi
   useEffect(() => {
     if (open) {
       setSubmitSuccess(false);
-      setErrorMessage('');
       setBusinessId(Math.floor(Math.random() * 9000) + 1000);
       clearErrors();
       try {
@@ -67,7 +65,6 @@ const ThePreviewDialog = memo(({ open, onClose, formCode, schemaJson }: ThePrevi
         setFormData(defaults);
       } catch {
         setSchema(null);
-        setErrorMessage(t('schemaForm.errors.parseSchemaFailed'));
       }
     }
   }, [open, schemaJson, clearErrors, t]);
@@ -77,7 +74,6 @@ const ThePreviewDialog = memo(({ open, onClose, formCode, schemaJson }: ThePrevi
     if (!schema) return;
 
     setLoading(true);
-    setErrorMessage('');
     setSubmitSuccess(false);
     clearErrors();
 
@@ -90,19 +86,7 @@ const ThePreviewDialog = memo(({ open, onClose, formCode, schemaJson }: ThePrevi
         },
       });
       setSubmitSuccess(true);
-    } catch (err: unknown) {
-      handleFormError(err);
-      const error = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      if (error?.response?.data?.message) {
-        setErrorMessage(error.response.data.message);
-      } else if (error?.message) {
-        setErrorMessage(error.message);
-      } else {
-        setErrorMessage(t('schemaForm.errors.submitValidationFailed'));
-      }
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -115,7 +99,6 @@ const ThePreviewDialog = memo(({ open, onClose, formCode, schemaJson }: ThePrevi
       </DialogTitle>
       <DialogContent dividers>
         <Stack spacing={3}>
-          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
           {submitSuccess && <Alert severity="success">{t('schemaForm.testSubmitSuccess')}</Alert>}
 
           <Box sx={{ bgcolor: 'action.hover', p: 2, borderRadius: 1 }}>

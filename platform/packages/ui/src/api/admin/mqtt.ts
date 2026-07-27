@@ -39,3 +39,16 @@ export const credentialsFn = (
     ...axiosConfig,
   });
 };
+
+/**
+ * 测试 MQTT 服务连通性 API
+ */
+export const testConnectionFn = (
+  axiosConfig?: Omit<AxiosConfig<'/api/v1/admin/mqtt/testConnection', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/mqtt/testConnection',
+    method: 'post',
+    ...axiosConfig,
+  });
+};

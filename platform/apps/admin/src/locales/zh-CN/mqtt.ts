@@ -44,6 +44,12 @@ export const mqtt = {
   'admin.mqtt.config.providerAliyun': '阿里云 MQTT',
   'admin.mqtt.config.providerEmqx': 'EMQX',
   'admin.mqtt.config.edit': '编辑配置',
+  'admin.mqtt.config.provider': '提供商',
+  'admin.mqtt.config.hostPort': '服务地址',
+  'admin.mqtt.config.clientId': '客户端 ID',
+  'admin.mqtt.config.testConnection': '测试连通性',
+  'admin.mqtt.config.testing': '测试中...',
+  'admin.mqtt.config.testSuccess': '连接测试成功',
 
   'admin.mqtt.msg.topicRequired': '请输入 Topic 主题',
   'admin.mqtt.msg.payloadRequired': '请输入 Payload 消息内容',

@@ -84,12 +84,12 @@ export const RunTestDialog: React.FC<RunTestDialogProps> = ({ open, onClose, sel
           setRunResult(response.data.data);
         }
       } catch (err: unknown) {
-        const error = err as { response?: { data?: { message?: string } }; message?: string };
+        const errorMessage = err instanceof Error ? err.message : String(err);
         setRunResult({
           success: false,
           statusCode: 0,
           durationMs: 0,
-          errorMessage: error.response?.data?.message || error.message || String(err),
+          errorMessage,
         });
       }
     });

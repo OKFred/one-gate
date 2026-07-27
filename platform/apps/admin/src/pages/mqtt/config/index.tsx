@@ -1,211 +1,236 @@
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Grid,
-  Button,
-  Chip,
-  CircularProgress,
-  Divider,
-} from '@mui/material';
-import { Add as AddIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
+import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
+import { showSnackbar } from '@/components/Notification';
+import { Add as AddIcon, Edit as EditIcon, Sensors as SensorsIcon } from '@mui/icons-material';
+import { Chip, Switch, Box, Typography, CircularProgress } from '@mui/material';
+
+import dayjs from 'dayjs';
 import * as BaseSysConfigAPI from '@/api/admin/base/sys_config';
-import type { ConfigRes } from '@/api/admin/base/type';
+import * as MqttAPI from '@/api/admin/mqtt';
+import type { ConfigRes, ListConfigReq } from '@/api/admin/base/type';
 import { BaseSysConfigFormDialog } from '../../base/sys_config/components/BaseSysConfigFormDialog';
+
+interface ExtraContext {
+  handleEdit: (row: ConfigRes) => void;
+  handleTestConnection: (row: ConfigRes) => void;
+  refreshList: () => void;
+  testingId: number | null;
+}
 
 export default function MqttConfigPage() {
   const t = useTranslation();
 
-  // ---------- 配置列表 State ----------
-  const [configList, setConfigList] = useState<ConfigRes[]>([]);
-  const [loadingConfigs, setLoadingConfigs] = useState(false);
-  const [configDialogOpen, setConfigDialogOpen] = useState(false);
-  const [editConfigRow, setEditConfigRow] = useState<ConfigRes | null>(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editRow, setEditRow] = useState<ConfigRes | null>(null);
+  const [testingId, setTestingId] = useState<number | null>(null);
 
-  // 获取 MQTT 配置列表 (namespace = 'mqtt')
-  const fetchConfigs = useCallback(async () => {
-    setLoadingConfigs(true);
+  const handleTestConnection = async (row: ConfigRes) => {
+    setTestingId(row.id);
     try {
-      const res = await BaseSysConfigAPI.listFn({
-        data: {
-          pageNo: 1,
-          pageSize: 100,
-          namespace: 'mqtt',
-        },
+      const res = await MqttAPI.testConnectionFn({
+        data: { id: row.id },
       });
-      if (res?.data?.data?.list) {
-        setConfigList(res.data.data.list);
-      }
-    } catch {
-      // 全局拦截器提示
-    } finally {
-      setLoadingConfigs(false);
-    }
-  }, []);
 
-  useEffect(() => {
-    fetchConfigs();
-  }, [fetchConfigs]);
+      showSnackbar({
+        message: res.data.message || t('admin.mqtt.config.testSuccess'),
+        type: 'success',
+      });
+    } catch {
+    } finally {
+      setTestingId(null);
+    }
+  };
+
+  const extraContext: ExtraContext = {
+    handleEdit: (row) => {
+      setEditRow(row);
+      setFormOpen(true);
+    },
+    handleTestConnection,
+    refreshList: () => {},
+    testingId,
+  };
+
+  const config: SchemaCrudConfig<
+    ConfigRes,
+    Record<string, unknown>,
+    ListConfigReq,
+    ExtraContext
+  > = {
+    apiKeyName: 'id',
+    permissions: {
+      delete: [],
+    },
+    api: {
+      list: (req) =>
+        BaseSysConfigAPI.listFn({
+          ...req,
+          data: {
+            ...req?.data,
+            namespace: 'mqtt',
+          },
+        }),
+      delete: BaseSysConfigAPI.deleteFn,
+    },
+    filter: {
+      defaultFilters: {
+        namespace: 'mqtt',
+      },
+      fields: () => [],
+      transformRequest: (req: any) => ({
+        pageNo: 1,
+        pageSize: 20,
+        ...req,
+        namespace: 'mqtt',
+      }),
+    },
+    table: {
+      columns: () => [
+        { title: 'ID', width: 70, render: (row: ConfigRes) => row.id },
+        {
+          title: t('admin.base.configKey'),
+          width: 180,
+          render: (row: ConfigRes) => (
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+              {row.configKey}
+            </Typography>
+          ),
+        },
+        {
+          title: t('admin.mqtt.config.provider'),
+          width: 130,
+          render: (row: ConfigRes) => {
+            const val = (row.configValue || {}) as Record<string, unknown>;
+            const isAliyun = val.provider === 'Aliyun';
+            return (
+              <Chip
+                label={
+                  isAliyun
+                    ? t('admin.mqtt.config.providerAliyun')
+                    : t('admin.mqtt.config.providerEmqx')
+                }
+                size="small"
+                color={isAliyun ? 'warning' : 'info'}
+                variant="outlined"
+              />
+            );
+          },
+        },
+        {
+          title: t('admin.mqtt.config.hostPort'),
+          width: 220,
+          render: (row: ConfigRes) => {
+            const val = (row.configValue || {}) as Record<string, unknown>;
+            const host = String(val.host || '127.0.0.1');
+            const port = String(val.port || 1883);
+            const proto = String(val.protocol || 'mqtt');
+            return (
+              <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{ color: 'primary.main', fontWeight: 'medium' }}
+                >
+                  {proto}://
+                </Typography>
+                {host}:{port}
+              </Box>
+            );
+          },
+        },
+        {
+          title: t('admin.mqtt.config.clientId'),
+          width: 180,
+          render: (row: ConfigRes) => {
+            const val = (row.configValue || {}) as Record<string, unknown>;
+            return (
+              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
+                {String(val.clientId || '-')}
+              </Typography>
+            );
+          },
+        },
+        {
+          title: t('common.isEnabled'),
+          width: 90,
+          render: (row: ConfigRes) => <Switch size="small" checked={!!row.isEnabled} readOnly />,
+        },
+        {
+          title: t('admin.base.isPrimary'),
+          width: 100,
+          render: (row: ConfigRes) =>
+            row.isPrimary ? (
+              <Chip label={t('admin.mqtt.config.primary')} size="small" color="primary" />
+            ) : null,
+        },
+        {
+          title: t('columns.createTime'),
+          width: 170,
+          render: (row: ConfigRes) =>
+            row.createTimeUtc ? dayjs(row.createTimeUtc).format('YYYY-MM-DD HH:mm:ss') : '--',
+        },
+      ],
+      cardFields: () => [],
+      actions: (_t, ctx) => [
+        {
+          key: 'test',
+          icon: (row: ConfigRes) =>
+            ctx?.testingId === row.id ? (
+              <CircularProgress size={16} color="inherit" />
+            ) : (
+              <SensorsIcon />
+            ),
+          label: ctx?.testingId
+            ? t('admin.mqtt.config.testing')
+            : t('admin.mqtt.config.testConnection'),
+          disabled: (row: ConfigRes) => ctx?.testingId === row.id,
+          onClick: (row) => ctx?.handleTestConnection(row),
+        },
+        {
+          key: 'edit',
+          icon: <EditIcon />,
+          label: t('admin.mqtt.config.edit'),
+          onClick: (row) => ctx?.handleEdit(row),
+        },
+      ],
+    },
+    form: {
+      schema: {},
+      defaultForm: {},
+    },
+  };
+
+  const customActions = (
+    <ResponsiveButton
+      startIcon={<AddIcon />}
+      variant="contained"
+      color="primary"
+      onClick={() => {
+        setEditRow(null);
+        setFormOpen(true);
+      }}
+    >
+      {t('admin.mqtt.config.create')}
+    </ResponsiveButton>
+  );
 
   return (
-    <Box sx={{ p: 3, maxWidth: 1400, margin: '0 auto' }}>
-      {/* 头部 Title */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <SettingsIcon sx={{ fontSize: 36, color: 'primary.main', mr: 1.5 }} />
-        <Box>
-          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-            {t('sidebar.menu.mqtt.config')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('admin.mqtt.config.desc')}
-          </Typography>
-        </Box>
-      </Box>
+    <React.Fragment>
+      <SchemaCrudPage config={config} extraContext={extraContext} customActions={customActions} />
 
-      <Card
-        elevation={0}
-        sx={{ borderRadius: 2, border: 1, borderColor: 'divider', bgcolor: 'background.paper' }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}
-          >
-            <Box>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                {t('admin.mqtt.config.title')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t('admin.mqtt.config.desc')}
-              </Typography>
-            </Box>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => {
-                setEditConfigRow(null);
-                setConfigDialogOpen(true);
-              }}
-            >
-              {t('admin.mqtt.config.create')}
-            </Button>
-          </Box>
-
-          {loadingConfigs ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-              <CircularProgress />
-            </Box>
-          ) : configList.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 6, color: 'text.secondary' }}>
-              <Typography variant="body1">{t('admin.mqtt.config.empty')}</Typography>
-              <Button
-                variant="outlined"
-                sx={{ mt: 2 }}
-                onClick={() => {
-                  setEditConfigRow(null);
-                  setConfigDialogOpen(true);
-                }}
-              >
-                {t('admin.mqtt.config.createDefault')}
-              </Button>
-            </Box>
-          ) : (
-            <Grid container spacing={2}>
-              {configList.map((cfg) => {
-                const val = (cfg.configValue || {}) as Record<string, unknown>;
-                const isAliyun = val.provider === 'Aliyun';
-                const hostStr = String(val.host || '127.0.0.1');
-                const portStr = String(val.port || 1883);
-                const protoStr = String(val.protocol || 'mqtt');
-                const clientStr = String(val.clientId || '-');
-                const instanceStr = String(val.instanceId || '-');
-
-                return (
-                  <Grid size={{ xs: 12, sm: 6, md: 4 }} key={cfg.id}>
-                    <Card variant="outlined" sx={{ borderRadius: 2, position: 'relative', p: 1 }}>
-                      <CardContent>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                            {cfg.configKey}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 0.5 }}>
-                            {cfg.isPrimary && (
-                              <Chip
-                                label={t('admin.mqtt.config.primary')}
-                                size="small"
-                                color="primary"
-                              />
-                            )}
-                            <Chip
-                              label={
-                                isAliyun
-                                  ? t('admin.mqtt.config.providerAliyun')
-                                  : t('admin.mqtt.config.providerEmqx')
-                              }
-                              size="small"
-                              color={isAliyun ? 'warning' : 'info'}
-                              variant="outlined"
-                            />
-                          </Box>
-                        </Box>
-                        <Divider sx={{ my: 1 }} />
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ fontFamily: 'monospace' }}
-                        >
-                          Host: {hostStr}:{portStr}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{ fontFamily: 'monospace' }}
-                        >
-                          Protocol: {protoStr} | ClientId: {clientStr}
-                        </Typography>
-
-                        {isAliyun && (
-                          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                            InstanceId: {instanceStr}
-                          </Typography>
-                        )}
-
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            onClick={() => {
-                              setEditConfigRow(cfg);
-                              setConfigDialogOpen(true);
-                            }}
-                          >
-                            {t('admin.mqtt.config.edit')}
-                          </Button>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* SysConfig 配置编辑对话框 */}
-      {configDialogOpen && (
+      {formOpen && (
         <BaseSysConfigFormDialog
-          open={configDialogOpen}
-          editRow={editConfigRow}
-          onClose={() => setConfigDialogOpen(false)}
+          open={formOpen}
+          editRow={editRow}
+          onClose={() => setFormOpen(false)}
           onSuccess={() => {
-            setConfigDialogOpen(false);
-            fetchConfigs();
+            setFormOpen(false);
+            extraContext.refreshList();
           }}
         />
       )}
-    </Box>
+    </React.Fragment>
   );
 }

@@ -1,3 +1,4 @@
+import mqtt from "mqtt";
 import type { FromSchema } from "json-schema-to-ts";
 import {
   bodyAdapter,
@@ -5,6 +6,10 @@ import {
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import type { UserObj } from "@hodor/core/types/app";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@hodor/core/middleware/errorHandler/businessError/index";
 import baseLogService from "../base/log/service.js";
 import * as baseSysConfigRepository from "../base/sys_config/repository.js";
 import {
@@ -13,6 +18,8 @@ import {
   MqttLogQueryReqSchema,
   MqttLogListResSchema,
   MqttCredentialsResSchema,
+  MqttTestConnectionReqSchema,
+  MqttTestConnectionResSchema,
   type MqttBizLogItem,
   type MqttLogValueLike,
 } from "./model.js";
@@ -47,55 +54,148 @@ export async function getActiveCredentials(): Promise<MqttConnectionCredentials>
 }
 
 /**
+ * 建立高可用 MQTT 连接（支持在 Worker 环境自动回退 WSS 协议）
+ */
+async function connectMqttWithFallback(
+  credentials: MqttConnectionCredentials,
+  opts: { connectTimeout?: number; timeoutMs?: number; clientIdPrefix?: string }
+): Promise<mqtt.MqttClient> {
+  const { connectTimeout = 3000, timeoutMs = 4000, clientIdPrefix = "" } = opts;
+  const clientId = `${credentials.clientId}_${clientIdPrefix}${Date.now().toString(36)}`;
+
+  const urlsToTry: string[] = [credentials.brokerUrl];
+  if (
+    credentials.brokerUrl.startsWith("mqtts://") ||
+    credentials.brokerUrl.startsWith("mqtt://")
+  ) {
+    try {
+      const parsed = new URL(
+        credentials.brokerUrl
+          .replace("mqtts://", "https://")
+          .replace("mqtt://", "http://")
+      );
+      urlsToTry.push(
+        `wss://${parsed.hostname}:8084/mqtt`,
+        `wss://${parsed.hostname}:443/mqtt`
+      );
+    } catch {}
+  }
+
+  let lastError: unknown;
+  for (const brokerUrl of urlsToTry) {
+    let client: mqtt.MqttClient | null = null;
+    try {
+      await Promise.race([
+        new Promise((_, reject) =>
+          setTimeout(
+            () =>
+              reject(new Error(`MQTT 连接或发布超时(${timeoutMs / 1000}s)`)),
+            timeoutMs
+          )
+        ),
+        (async () => {
+          client = await mqtt.connectAsync(brokerUrl, {
+            clientId,
+            username: credentials.username || undefined,
+            password: credentials.password || undefined,
+            keepalive: credentials.keepalive,
+            clean: credentials.cleanSession,
+            connectTimeout,
+            reconnectPeriod: 0,
+          });
+        })(),
+      ]);
+      if (client) {
+        return client;
+      }
+    } catch (err) {
+      if (client) {
+        try {
+          (client as mqtt.MqttClient).end(true);
+        } catch {}
+      }
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error("MQTT 连接失败");
+}
+
+/**
  * 执行 MQTT 消息发布服务
  *
  * @param params 包含 topic, payload, qos, retain 的发布参数
  * @param userObj 当前登录用户信息
- * @returns 包含成功状态、提示信息与 traceId 的结果
+ * @returns 包含 traceId 的结果
  */
 async function onPublish(
   params: FromSchema<typeof MqttPublishReqSchema>,
   userObj?: UserObj
 ) {
-  const qos = params.qos ?? 0;
+  const qos = (params.qos ?? 0) as 0 | 1 | 2;
   const retain = params.retain ?? false;
   const traceId = `mqtt_${Date.now()}_${crypto.randomUUID().substring(0, 8)}`;
 
   // 获取计算好的多提供商 (EMQX / Aliyun) 动态签名凭证
   const credentials = await getActiveCredentials();
 
-  const logValue: MqttLogValueLike & {
-    provider?: string;
-    brokerUrl?: string;
-  } = {
-    traceId,
-    topic: params.topic,
-    payload: params.payload,
-    qos,
-    retain,
-    direction: "OUT",
-    provider: credentials.provider,
-    brokerUrl: credentials.brokerUrl,
-  };
+  let publishSuccess = false;
+  let errorMsg = "";
+  let client: mqtt.MqttClient | null = null;
 
-  // 记录业务日志到 base_biz_log
-  const logData = {
-    namespace: "mqtt",
-    status: true,
-    payloadType: "json",
-    logValue,
-    remark:
-      params.remark ||
-      `[${credentials.provider}] 向主题 ${params.topic} 发布消息`,
-    creatorId: userObj?.id || 0,
-    creatorName: userObj?.username || "system",
-  };
+  try {
+    client = await connectMqttWithFallback(credentials, {
+      connectTimeout: 3000,
+      timeoutMs: 4000,
+      clientIdPrefix: "pub_",
+    });
 
-  await baseLogService.biz.add(logData);
+    await client.publishAsync(params.topic, params.payload, {
+      qos,
+      retain,
+    });
+    publishSuccess = true;
+  } catch (err: unknown) {
+    errorMsg = err instanceof Error ? err.message : String(err);
+  } finally {
+    if (client) {
+      try {
+        (client as mqtt.MqttClient).end(true);
+      } catch {}
+    }
+  }
+
+  // 记录审计与业务日志
+  try {
+    await baseLogService.biz.add({
+      namespace: "mqtt",
+      status: publishSuccess,
+      payloadType: "json",
+      remark: publishSuccess
+        ? `MQTT 消息发布成功: ${params.topic}`
+        : `MQTT 消息发布失败: ${errorMsg}`,
+      creatorId: userObj?.userId || 0,
+      creatorName: userObj?.username || "System",
+      logValue: {
+        traceId,
+        topic: params.topic,
+        payload: params.payload,
+        qos,
+        retain,
+        direction: "OUT",
+        remark: params.remark ?? null,
+        error: publishSuccess ? null : errorMsg,
+      },
+    });
+  } catch (logErr) {
+    console.error("[MQTT Publish] Failed to record log:", logErr);
+  }
+
+  if (!publishSuccess) {
+    throw new BusinessError(`消息发布失败: ${errorMsg}`);
+  }
 
   return {
-    success: true,
-    message: `消息已成功通过 [${credentials.provider}] 发布至主题 [${params.topic}]`,
     traceId,
   };
 }
@@ -114,6 +214,70 @@ export const publishApi = {
   adapter: bodyAdapter,
   service: onPublish,
   permission: { action: "write" },
+} satisfies API;
+
+/**
+ * 执行 MQTT 连通性测试服务
+ *
+ * @param params MQTT 配置选项
+ * @returns 包含成功状态与提示信息的结果
+ */
+async function onTestConnection(
+  params: FromSchema<typeof MqttTestConnectionReqSchema>
+) {
+  let credentials: MqttConnectionCredentials;
+  if (params.host) {
+    credentials = getMqttConnectionInfo(params as MqttConfigOptions);
+  } else if (params.id) {
+    const sysCfg = await baseSysConfigRepository.findById(params.id as number);
+    if (!sysCfg || !sysCfg.configValue) {
+      throw new BusinessError("未找到指定的 MQTT 配置");
+    }
+    credentials = getMqttConnectionInfo(
+      sysCfg.configValue as MqttConfigOptions
+    );
+  } else {
+    credentials = await getActiveCredentials();
+  }
+
+  let client: mqtt.MqttClient | null = null;
+  try {
+    client = await connectMqttWithFallback(credentials, {
+      connectTimeout: 2500,
+      timeoutMs: 3000,
+      clientIdPrefix: "test_",
+    });
+
+    return {
+      success: true,
+      message: `已成功连通 [${credentials.provider}] Broker (${credentials.brokerUrl})`,
+    };
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    throw new BusinessError(`MQTT 连通性测试失败: ${errorMsg}`);
+  } finally {
+    if (client) {
+      try {
+        (client as mqtt.MqttClient).end(true);
+      } catch {}
+    }
+  }
+}
+
+/**
+ * MQTT 连通性测试 API
+ */
+export const testConnectionApi = {
+  req: MqttTestConnectionReqSchema,
+  res: MqttTestConnectionResSchema,
+  pathInfo: {
+    path: "/testConnection",
+    method: "post",
+    summary: "测试 MQTT 连通性",
+  },
+  adapter: bodyAdapter,
+  service: onTestConnection,
+  permission: { action: "read" },
 } satisfies API;
 
 /**
@@ -199,6 +363,7 @@ export const listLogsApi = {
 
 const service = {
   publish: publishApi,
+  testConnection: testConnectionApi,
   credentials: getCredentialsApi,
   logs: listLogsApi,
 };

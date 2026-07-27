@@ -65,10 +65,7 @@ export const DataSourceConfig: React.FC = () => {
   const handleSync = async (id: number) => {
     setSyncingId(id);
     try {
-      const res = await FinancialAPI.dataSourceSyncFn({ data: { id } });
-      if (res.data.data?.message) {
-        alert(res.data.data.message);
-      }
+      await FinancialAPI.dataSourceSyncFn({ data: { id } });
       fetchList();
     } catch {
     } finally {

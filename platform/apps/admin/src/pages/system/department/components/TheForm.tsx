@@ -248,12 +248,7 @@ const TheForm = memo(
         setEditingDepartment(null);
         setFormValues(DEFAULT_FORM);
         setError('');
-      } catch (err) {
-        console.error(err);
-        const errLike = err as { response?: { data?: { message?: string } } };
-        const errMsg =
-          errLike.response?.data?.message || (err as Error).message || t('error.requestFailed');
-        setError(errMsg);
+      } catch {
       } finally {
         setLoading(false);
       }

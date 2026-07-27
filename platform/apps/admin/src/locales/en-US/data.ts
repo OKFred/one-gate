@@ -48,11 +48,4 @@ export const data = {
   'schemaForm.fields.testBusinessIdPlaceholder': 'Please enter Business ID',
   'schemaForm.submitTestData': 'Submit Test Data',
   'schemaForm.errors.noValidSchema': 'No valid JSON Schema configured',
-  'admin.base': 'Base',
-  'sidebar.menu.admin.base.config': 'Configurations',
-  'admin.base.config': 'Base Config',
-  'admin.base.namespace': 'Namespace',
-  'admin.base.configKey': 'Config Key',
-  'admin.base.isPrimary': 'Primary',
-  'admin.base.configValue': 'Configuration Value',
 } as const satisfies Record<string, string>;

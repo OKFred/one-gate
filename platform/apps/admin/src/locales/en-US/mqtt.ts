@@ -45,6 +45,12 @@ export const mqtt = {
   'admin.mqtt.config.providerAliyun': 'Aliyun MQTT',
   'admin.mqtt.config.providerEmqx': 'EMQX',
   'admin.mqtt.config.edit': 'Edit Config',
+  'admin.mqtt.config.provider': 'Provider',
+  'admin.mqtt.config.hostPort': 'Host & Port',
+  'admin.mqtt.config.clientId': 'Client ID',
+  'admin.mqtt.config.testConnection': 'Test Connection',
+  'admin.mqtt.config.testing': 'Testing...',
+  'admin.mqtt.config.testSuccess': 'Connection Successful',
 
   'admin.mqtt.msg.topicRequired': 'Please enter Topic',
   'admin.mqtt.msg.payloadRequired': 'Please enter Payload',

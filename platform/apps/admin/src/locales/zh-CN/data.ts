@@ -48,11 +48,4 @@ export const data = {
   'schemaForm.fields.testBusinessIdPlaceholder': '请输入用于归属的业务主键 ID',
   'schemaForm.submitTestData': '提交测试数据',
   'schemaForm.errors.noValidSchema': '未配置有效的 JSON Schema',
-  'admin.base': '底座',
-  'sidebar.menu.admin.base.config': '配置项',
-  'admin.base.config': '配置项',
-  'admin.base.namespace': '命名空间',
-  'admin.base.configKey': '配置标识',
-  'admin.base.isPrimary': '是否主配置',
-  'admin.base.configValue': '配置内容',
 } as const satisfies Record<string, string>;

@@ -1,5 +1,5 @@
 import { kv } from "../../middleware/cache/index.js";
-import translationService from "../../../../admin/src/i18n/translation/service";
+import { findByKeyAndLang } from "../../../../admin/src/i18n/translation/repository";
 
 /**
  * 获取翻译文案 (懒加载模式)
@@ -15,24 +15,17 @@ export async function getTranslation(
     // 1. 尝试从 KV 缓存获取
     const cachedValue = await kv.get<string>(cacheKey);
     if (cachedValue !== null) {
-      // console.log("cache hit", cacheKey);
       return cachedValue;
     }
 
-    // 2. 缓存未命中，从数据库获取
-    // 由于 list 使用 keyword 进行模糊匹配，我们需要手动过滤出精确匹配项
-    const translations = await translationService.list.service({
+    // 2. 缓存未命中，从数据库精确获取
+    const match = await findByKeyAndLang({
       application: "backend",
-      keyword: key,
+      tKey: key,
       langCode: langCode,
-      pageNo: 1,
-      pageSize: 10,
     });
 
-    const match = translations.list.find((item) => item.tKey === key);
-
-    if (match) {
-      // console.log("cache miss", cacheKey);
+    if (match && match.tValue) {
       // 3. 查到结果，回填缓存并返回
       await kv.put(cacheKey, match.tValue as string);
       return match.tValue as string;

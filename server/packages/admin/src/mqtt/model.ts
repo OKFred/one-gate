@@ -57,9 +57,7 @@ export const MqttPublishKeys = ["topic", "payload"] as const;
  * MQTT 消息发布响应属性定义
  */
 export const MqttPublishResVO = {
-  success: { type: "boolean", description: "是否成功" },
-  message: { type: "string", description: "提示信息" },
-  traceId: { type: "string", description: "追踪ID" },
+  traceId: { type: "string", description: "消息追踪ID" },
 } as const satisfies Record<string, JSONSchema>;
 
 /**
@@ -78,7 +76,45 @@ export const MqttPublishReqSchema = {
 export const MqttPublishResSchema = {
   type: "object",
   properties: MqttPublishResVO,
-  required: ["success", "message", "traceId"],
+  required: ["traceId"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+/**
+ * MQTT 连通性测试 API 请求定义
+ */
+export const MqttTestConnectionReqSchema = {
+  type: "object",
+  properties: {
+    id: { type: ["number", "null"], nullable: true },
+    provider: { type: ["string", "null"], nullable: true },
+    protocol: { type: ["string", "null"], nullable: true },
+    host: { type: ["string", "null"], nullable: true },
+    port: { type: ["number", "null"], nullable: true },
+    clientId: { type: ["string", "null"], nullable: true },
+    username: { type: ["string", "null"], nullable: true },
+    password: { type: ["string", "null"], nullable: true },
+    instanceId: { type: ["string", "null"], nullable: true },
+    accessKey: { type: ["string", "null"], nullable: true },
+    secretKey: { type: ["string", "null"], nullable: true },
+    productKey: { type: ["string", "null"], nullable: true },
+    deviceName: { type: ["string", "null"], nullable: true },
+    keepalive: { type: ["number", "null"], nullable: true },
+    cleanSession: { type: ["boolean", "null"], nullable: true },
+  },
+  additionalProperties: true,
+} as const satisfies JSONSchema;
+
+/**
+ * MQTT 连通性测试 API 响应定义
+ */
+export const MqttTestConnectionResSchema = {
+  type: "object",
+  properties: {
+    success: { type: "boolean", description: "测试连通性是否成功" },
+    message: { type: "string", description: "测试结果消息" },
+  },
+  required: ["success", "message"],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 

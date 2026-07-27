@@ -136,7 +136,7 @@ export default function MqttConsolePage() {
 
     setPublishing(true);
     try {
-      const res = await MqttAPI.publishFn({
+      await MqttAPI.publishFn({
         data: {
           topic,
           payload,
@@ -145,8 +145,7 @@ export default function MqttConsolePage() {
           remark,
         },
       });
-      const resData = res?.data?.data;
-      showToast(resData?.message || t('common.submit'), 'success');
+      showToast(t('common.submitSuccess') || t('common.submit'), 'success');
       fetchLogs();
     } catch {
       // 全局拦截器处理

@@ -10969,6 +10969,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mqtt/testConnection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 测试 MQTT 连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.testconnection.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.testconnection.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/mqtt/credentials": {
         parameters: {
             query?: never;
@@ -22249,12 +22307,37 @@ export interface components {
         "admin.mqtt.publish.res": {
             ok: boolean;
             data: {
-                /** @description 是否成功 */
-                success: boolean;
-                /** @description 提示信息 */
-                message: string;
-                /** @description 追踪ID */
+                /** @description 消息追踪ID */
                 traceId: string;
+            };
+            message: string;
+        };
+        "admin.mqtt.testconnection.req": {
+            id?: ((number | null) | null) | null;
+            provider?: ((string | null) | null) | null;
+            protocol?: ((string | null) | null) | null;
+            host?: ((string | null) | null) | null;
+            port?: ((number | null) | null) | null;
+            clientId?: ((string | null) | null) | null;
+            username?: ((string | null) | null) | null;
+            password?: ((string | null) | null) | null;
+            instanceId?: ((string | null) | null) | null;
+            accessKey?: ((string | null) | null) | null;
+            secretKey?: ((string | null) | null) | null;
+            productKey?: ((string | null) | null) | null;
+            deviceName?: ((string | null) | null) | null;
+            keepalive?: ((number | null) | null) | null;
+            cleanSession?: ((boolean | null) | null) | null;
+        } & {
+            [key: string]: unknown;
+        };
+        "admin.mqtt.testconnection.res": {
+            ok: boolean;
+            data: {
+                /** @description 测试连通性是否成功 */
+                success: boolean;
+                /** @description 测试结果消息 */
+                message: string;
             };
             message: string;
         };

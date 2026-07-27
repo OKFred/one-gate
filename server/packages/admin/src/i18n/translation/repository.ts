@@ -27,12 +27,15 @@ function buildWhereCondition(condition?: {
   const conditions: SQL<unknown>[] = [];
 
   if (hasValue(keyword)) {
-    conditions.push(
-      or(
-        like(translationTable.tKey, `%${keyword}%`),
-        like(translationTable.tValue, `%${keyword}%`)
-      ) as SQL<unknown>
-    );
+    const cleanKeyword = String(keyword).replace(/[()%_\\]/g, "");
+    if (cleanKeyword) {
+      conditions.push(
+        or(
+          like(translationTable.tKey, `%${cleanKeyword}%`),
+          like(translationTable.tValue, `%${cleanKeyword}%`)
+        ) as SQL<unknown>
+      );
+    }
   }
   if (hasValue(application)) {
     conditions.push(eq(translationTable.application, application as string));
@@ -166,16 +169,22 @@ export async function findDuplicates(params: {
 export async function findByKeyAndLang(params: {
   tKey: string;
   langCode: string;
+  application?: string;
   excludeId?: number;
 }) {
-  const { tKey, langCode, excludeId } = params;
+  const { tKey, langCode, application, excludeId } = params;
   const rows = await db
-    .select({ id: translationTable.id })
+    .select({
+      id: translationTable.id,
+      tKey: translationTable.tKey,
+      tValue: translationTable.tValue,
+    })
     .from(translationTable)
     .where(
       and(
         eq(translationTable.tKey, tKey),
         eq(translationTable.langCode, langCode),
+        application ? eq(translationTable.application, application) : undefined,
         excludeId !== undefined ? ne(translationTable.id, excludeId) : undefined
       )
     )
