@@ -56,4 +56,16 @@ export const mqtt = {
   'admin.mqtt.msg.formatSuccess': 'JSON 格式化成功',
   'admin.mqtt.msg.formatInvalid': '当前 Payload 不是有效的 JSON 格式',
   'admin.mqtt.msg.copied': '内容已复制到剪贴板',
+
+  'admin.mqtt.sub.title': '在线实时监听 / 接收调试',
+  'admin.mqtt.sub.desc':
+    '建立 WebSockets 实时监听，测试接收来自移动端 (AutoJS6) 或云端的推送到站消息',
+  'admin.mqtt.sub.topic': '订阅 Topic',
+  'admin.mqtt.sub.start': '启动实时监听',
+  'admin.mqtt.sub.stop': '停止监听',
+  'admin.mqtt.sub.listening': '实时监听中...',
+  'admin.mqtt.sub.stopped': '未建立监听',
+  'admin.mqtt.sub.presets': '移动端核心 Topic 预设',
+  'admin.mqtt.sub.clear': '清空列表',
+  'admin.mqtt.sub.receivedCount': '实时接收',
 } as const satisfies Record<string, string>;

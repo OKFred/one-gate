@@ -31,11 +31,11 @@ export const logsFn = (
  * 获取 MQTT 计算后的动态签名与连接凭证 API
  */
 export const credentialsFn = (
-  axiosConfig?: Omit<AxiosConfig<'/api/v1/admin/mqtt/credentials', 'get'>, 'url' | 'method'>,
+  axiosConfig?: Omit<AxiosConfig<'/api/v1/admin/mqtt/credentials', 'post'>, 'url' | 'method'>,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/mqtt/credentials',
-    method: 'get',
+    method: 'post',
     ...axiosConfig,
   });
 };

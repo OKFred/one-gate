@@ -11034,8 +11034,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        get?: never;
+        put?: never;
         /** 获取 MQTT 计算后的动态签名与连接凭证 */
-        get: {
+        post: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -11077,8 +11079,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;

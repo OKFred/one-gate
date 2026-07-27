@@ -17,6 +17,7 @@ import {
   MqttPublishResSchema,
   MqttLogQueryReqSchema,
   MqttLogListResSchema,
+  MqttCredentialsReqSchema,
   MqttCredentialsResSchema,
   MqttTestConnectionReqSchema,
   MqttTestConnectionResSchema,
@@ -293,14 +294,14 @@ async function onGetCredentials() {
  * 获取 MQTT 动态连接与签名凭证 API
  */
 export const getCredentialsApi = {
-  req: { type: "object", properties: {}, additionalProperties: false },
+  req: MqttCredentialsReqSchema,
   res: MqttCredentialsResSchema,
   pathInfo: {
     path: "/credentials",
-    method: "get",
+    method: "post",
     summary: "获取 MQTT 计算后的动态签名与连接凭证",
   },
-  adapter: queryAdapter,
+  adapter: bodyAdapter,
   service: onGetCredentials,
   permission: { action: "read" },
 } satisfies API;

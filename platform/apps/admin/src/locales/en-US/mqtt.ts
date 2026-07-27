@@ -57,4 +57,16 @@ export const mqtt = {
   'admin.mqtt.msg.formatSuccess': 'JSON formatting succeeded',
   'admin.mqtt.msg.formatInvalid': 'Current payload is not a valid JSON format',
   'admin.mqtt.msg.copied': 'Copied to clipboard',
+
+  'admin.mqtt.sub.title': 'Realtime Live Message Subscriber & Receiver',
+  'admin.mqtt.sub.desc':
+    'Establish WebSockets subscription to debug live incoming messages from mobile / cloud',
+  'admin.mqtt.sub.topic': 'Subscription Topic',
+  'admin.mqtt.sub.start': 'Start Listening',
+  'admin.mqtt.sub.stop': 'Stop Listening',
+  'admin.mqtt.sub.listening': 'Live Listening...',
+  'admin.mqtt.sub.stopped': 'Not Listening',
+  'admin.mqtt.sub.presets': 'Mobile Presets',
+  'admin.mqtt.sub.clear': 'Clear Stream',
+  'admin.mqtt.sub.receivedCount': 'Live Received',
 } as const satisfies Record<string, string>;

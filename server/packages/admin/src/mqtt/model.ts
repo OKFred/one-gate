@@ -202,6 +202,15 @@ export const MqttCredentialsResVO = {
 } as const satisfies Record<string, JSONSchema>;
 
 /**
+ * MQTT 动态连接凭证查询请求 Schema
+ */
+export const MqttCredentialsReqSchema = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+/**
  * MQTT 动态连接凭证查询响应 Schema
  */
 export const MqttCredentialsResSchema = {

@@ -26,6 +26,7 @@
     "dayjs": "^1.11.21",
     "font-awesome": "^4.7.0",
     "jodit-react": "^5.3.21",
+    "mqtt": "^5.15.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
