@@ -7,8 +7,29 @@ import {
   type AuditLogPOLike,
   type BizLogPOLike,
 } from "./model";
-import { eq, asc, desc, count, and, sql, type SQL } from "drizzle-orm";
+import {
+  eq,
+  asc,
+  desc,
+  count,
+  and,
+  gte,
+  lte,
+  inArray,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
+
+/**
+ * 校验 JSON 动态键名是否合法（防止路径注入）。
+ * 仅允许字母、数字、下划线、连字符，最大长度 64。
+ * @param key - 待校验的 JSON 字段名
+ * @returns 合法时返回 true，否则返回 false
+ */
+function isValidJsonKey(key: string): boolean {
+  return /^[a-zA-Z0-9_-]{1,64}$/.test(key);
+}
 
 // ----------------- Sys Log -----------------
 
@@ -52,9 +73,15 @@ export async function findSysLogPage(params: {
   }
   if (filters) {
     for (const [k, v] of Object.entries(filters)) {
+      if (!isValidJsonKey(k)) {
+        console.warn(`[findSysLogPage] 非法 JSON 键名已跳过: "${k}"`);
+        continue;
+      }
       if (v !== undefined && v !== null) {
+        // 键名已通过白名单校验，使用字符串拼接构建静态路径，值仍由参数绑定保护
+        const path = `$.${k}`;
         conditions.push(
-          sql`json_extract(${baseSysLogTable.logValue}, '$.' || ${k}) = ${v}`
+          sql`json_extract(${baseSysLogTable.logValue}, ${path}) = ${v}`
         );
       }
     }
@@ -185,26 +212,38 @@ export async function findBizLogPage(params: {
     conditions.push(eq(baseBizLogTable.status, status));
   }
   if (startTime !== undefined) {
-    conditions.push(sql`${baseBizLogTable.createTimeUtc} >= ${startTime}`);
+    conditions.push(gte(baseBizLogTable.createTimeUtc, startTime));
   }
   if (endTime !== undefined) {
-    conditions.push(sql`${baseBizLogTable.createTimeUtc} <= ${endTime}`);
+    conditions.push(lte(baseBizLogTable.createTimeUtc, endTime));
   }
   if (filters) {
     for (const [k, v] of Object.entries(filters)) {
+      if (!isValidJsonKey(k)) {
+        console.warn(`[findBizLogPage] 非法 JSON 键名已跳过: "${k}"`);
+        continue;
+      }
       if (v !== undefined && v !== null) {
+        // 键名已通过白名单校验，使用字符串拼接构建静态路径，值仍由参数绑定保护
+        const path = `$.${k}`;
         conditions.push(
-          sql`json_extract(${baseBizLogTable.logValue}, '$.' || ${k}) = ${v}`
+          sql`json_extract(${baseBizLogTable.logValue}, ${path}) = ${v}`
         );
       }
     }
   }
   if (likeFilters) {
     for (const [k, v] of Object.entries(likeFilters)) {
+      if (!isValidJsonKey(k)) {
+        console.warn(`[findBizLogPage] 非法 JSON 键名已跳过: "${k}"`);
+        continue;
+      }
       if (v !== undefined && v !== null && v !== "") {
+        // 键名已通过白名单校验，使用字符串拼接构建静态路径，值仍由参数绑定保护
+        const path = `$.${k}`;
         const pattern = `%${v}%`;
         conditions.push(
-          sql`json_extract(${baseBizLogTable.logValue}, '$.' || ${k}) LIKE ${pattern}`
+          sql`json_extract(${baseBizLogTable.logValue}, ${path}) LIKE ${pattern}`
         );
       }
     }
@@ -261,7 +300,6 @@ export async function findBizLogById(id: number) {
 }
 
 // ----------------- Timeline Cursor Utilities -----------------
-import { inArray, lte } from "drizzle-orm";
 
 export async function findTimelineChunkSys(params: {
   cursor?: number;
