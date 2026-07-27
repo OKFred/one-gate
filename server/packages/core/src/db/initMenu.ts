@@ -272,6 +272,32 @@ export const initialMenuData = [
     business: "admin.oss.file",
   },
   {
+    id: 74,
+    name: "sidebar.menu.mqtt",
+    icon: "material-symbols:cell-tower",
+    parentId: 42,
+    sort: 7,
+    business: "admin.mqtt",
+  },
+  {
+    id: 75,
+    name: "sidebar.menu.mqtt.console",
+    icon: "material-symbols:terminal",
+    path: "/admin/mqtt/console",
+    parentId: 74,
+    sort: 1,
+    business: "admin.mqtt.console",
+  },
+  {
+    id: 76,
+    name: "sidebar.menu.mqtt.config",
+    icon: "material-symbols:settings",
+    path: "/admin/mqtt/config",
+    parentId: 74,
+    sort: 2,
+    business: "admin.mqtt",
+  },
+  {
     id: 26,
     name: "sidebar.menu.enterprise",
     icon: "material-symbols:enterprise",
@@ -536,6 +562,17 @@ type menuLike = {
  * 准备菜单数据同步语句
  */
 export async function prepareMenu(options?: { reset?: boolean }) {
+  // 校验 ID 唯一性，检测到重复 ID 时立刻抛出错误断言
+  const seenIds = new Map<number, string>();
+  for (const item of initialMenuData) {
+    if (seenIds.has(item.id)) {
+      throw new Error(
+        `❌ [initMenu] 检测到重复的菜单 ID: ${item.id} ! 菜单 "${item.name}" 与已存在的 "${seenIds.get(item.id)}" 冲突，请修改配置！`
+      );
+    }
+    seenIds.set(item.id, item.name);
+  }
+
   const stats = {
     total: initialMenuData.length,
     created: 0,

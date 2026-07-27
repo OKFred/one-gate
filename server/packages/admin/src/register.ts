@@ -147,6 +147,15 @@ export const mailRegister = {
   },
 };
 
+import { MqttConfigProvider } from "./mqtt/config/provider.js";
+import mqttService from "./mqtt/service.js";
+
+export const mqttRegister = {
+  publish: mqttService.publish.service,
+  logs: mqttService.logs.service,
+  configProvider: new MqttConfigProvider(),
+};
+
 // 2. 初始化注册中心并绑定服务
 export function initAdminRegistry() {
   const reg = new ServiceRegistry();
@@ -160,6 +169,7 @@ export function initAdminRegistry() {
   reg.register("ai", aiRegister);
   reg.register("base", baseRegister);
   reg.register("mail", mailRegister);
+  reg.register("mqtt", mqttRegister);
   console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);
 }

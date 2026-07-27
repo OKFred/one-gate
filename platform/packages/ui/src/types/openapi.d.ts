@@ -10911,6 +10911,180 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mqtt/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 发布 MQTT 消息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.publish.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.publish.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mqtt/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 获取 MQTT 计算后的动态签名与连接凭证 */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.credentials.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.credentials.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mqtt/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询 MQTT 历史消息日志 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.logs.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.logs.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -21983,8 +22157,8 @@ export interface components {
                     creatorName?: ((string | null) | null) | null;
                     /** @description 创建时间(UTC) */
                     createTimeUtc?: number;
-                    /** @description 状态 (1成功, 0失败) */
-                    status?: ((number | null) | null) | null;
+                    /** @description 状态 (true成功, false失败) */
+                    status?: ((boolean | null) | null) | null;
                     /** @description 数据格式 */
                     payloadType?: string;
                     /** @description 明细内容 */
@@ -22050,6 +22224,99 @@ export interface components {
                 /** @description 下一页的游标 */
                 nextCursor?: number | null;
                 hasMore: boolean;
+            };
+            message: string;
+        };
+        "admin.mqtt.publish.req": {
+            /** @description 目标 Topic 主题 */
+            topic: string;
+            /** @description 消息载荷 (支持 JSON 字符串或纯文本) */
+            payload: string;
+            /**
+             * @description 服务质量等级 QoS (0, 1, 2)
+             * @default 0
+             * @enum {number}
+             */
+            qos: 0 | 1 | 2;
+            /**
+             * @description 是否为保留消息 Retain
+             * @default false
+             */
+            retain: boolean;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mqtt.publish.res": {
+            ok: boolean;
+            data: {
+                /** @description 是否成功 */
+                success: boolean;
+                /** @description 提示信息 */
+                message: string;
+                /** @description 追踪ID */
+                traceId: string;
+            };
+            message: string;
+        };
+        "admin.mqtt.credentials.req": Record<string, never>;
+        "admin.mqtt.credentials.res": {
+            ok: boolean;
+            data: {
+                /** @description 提供商类型: EMQX / Aliyun */
+                provider: string;
+                /** @description Broker 服务地址 */
+                brokerUrl: string;
+                /** @description 客户端 ClientId */
+                clientId: string;
+                /** @description 计算/配置的 Username */
+                username: string;
+                /** @description 计算/配置的 Password (已签名) */
+                password: string;
+                /** @description 心跳保持时间(秒) */
+                keepalive: number;
+                /** @description Clean Session 标志 */
+                cleanSession: boolean;
+            };
+            message: string;
+        };
+        "admin.mqtt.logs.req": {
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页数量
+             * @default 20
+             */
+            pageSize: number;
+            /** @description 主题关键字 */
+            topic?: ((string | null) | null) | null;
+            /**
+             * @description 消息流向: IN (接收), OUT (发送)
+             * @enum {string|null|null}
+             */
+            direction?: "IN" | "OUT" | null;
+            /** @description 发送状态 (true成功, false失败) */
+            status?: ((boolean | null) | null) | null;
+            /** @description 起始时间 UTC 时间戳 */
+            startTimeUtc?: ((number | null) | null) | null;
+            /** @description 截止时间 UTC 时间戳 */
+            endTimeUtc?: ((number | null) | null) | null;
+        };
+        "admin.mqtt.logs.res": {
+            ok: boolean;
+            data: {
+                /** @description 日志记录列表 */
+                list: {
+                    [key: string]: unknown;
+                }[];
+                /** @description 总条数 */
+                total: number;
+                /** @description 页码 */
+                pageNo: number;
+                /** @description 每页数量 */
+                pageSize: number;
             };
             message: string;
         };

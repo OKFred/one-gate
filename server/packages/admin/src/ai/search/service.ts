@@ -112,7 +112,7 @@ async function onSearch(
   });
 
   // 排序筛选候选
-  let results = scoredItems
+  const results = scoredItems
     .filter((entry) => entry.score > 0)
     .sort((a, b) => b.score - a.score);
 

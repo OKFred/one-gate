@@ -2,6 +2,7 @@ import { common } from './common';
 import { components } from './components';
 import { sidebar } from './sidebar';
 import { auth } from './auth';
+import { cron } from './cron';
 
 /**
  * zh-CN 共享翻译聚合入口
@@ -12,4 +13,5 @@ export default {
   ...components,
   ...sidebar,
   ...auth,
+  ...cron,
 } as const satisfies Record<string, string>;

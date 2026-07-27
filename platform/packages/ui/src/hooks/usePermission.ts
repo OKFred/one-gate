@@ -276,6 +276,20 @@ export const permissions = {
         delete: 'admin.rpa.config:delete',
       },
     },
+    /** MQTT 消息管理 */
+    mqtt: {
+      read: 'admin.mqtt:read',
+      add: 'admin.mqtt:add',
+      edit: 'admin.mqtt:edit',
+      delete: 'admin.mqtt:delete',
+      /** MQTT 配置 */
+      config: {
+        read: 'admin.mqtt.config:read',
+        add: 'admin.mqtt.config:add',
+        edit: 'admin.mqtt.config:edit',
+        delete: 'admin.mqtt.config:delete',
+      },
+    },
   },
   enterprise: {
     read: 'enterprise:read',

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { listAllFn } from '@/api/admin/i18n/translation';
-import { setTranslations, mergeTranslations } from './useTranslation';
+import { mergeTranslations } from './useTranslation';
 import zhCN from '../locales/zh-CN';
 import enUS from '../locales/en-US';
 
@@ -17,9 +17,9 @@ export function useLoadTranslations(): boolean {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // ① 同步写入本地共享文案（兜底，立即可用）
-    setTranslations('zh-CN', zhCN);
-    setTranslations('en-US', enUS);
+    // ① 同步写入本地共享文案（使用 merge 模式，避免覆盖各 App 注入的专属文案）
+    mergeTranslations('zh-CN', zhCN);
+    mergeTranslations('en-US', enUS);
 
     // 本地文案写入后立即标记为已加载，避免白屏
     setIsLoaded(true);

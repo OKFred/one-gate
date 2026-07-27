@@ -171,6 +171,14 @@ export const permissionSeeds = {
     /** RPA 配置 */
     config: ["read", "add", "edit", "delete"],
   },
+  /** MQTT 消息管理 */
+  "admin.mqtt": {
+    "": ["read"],
+    /** MQTT 控制台 */
+    console: ["read", "add", "edit", "delete"],
+    /** MQTT 配置 */
+    config: ["read", "add", "edit", "delete"],
+  },
 } as const;
 
 // Ensure type safety of permissionSeeds against BusinessKey mapping

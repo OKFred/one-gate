@@ -114,7 +114,11 @@ export default defineConfig({
       "test/index.spec.ts",
     ],
     setupFiles: ["./test/setup.workers.ts"],
-    exclude: ["**/node_modules/**", "**/*.node.spec.ts", "../../packages/*/src/**/*.node.spec.ts"],
+    exclude: [
+      "**/node_modules/**",
+      "**/*.node.spec.ts",
+      "../../packages/*/src/**/*.node.spec.ts",
+    ],
   },
   ssr: {
     noExternal: true,

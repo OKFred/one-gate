@@ -62,7 +62,7 @@ export const baseBizLogTable = sqliteTable(
   "base_biz_log",
   {
     ...baseLogFields,
-    status: integer("status"),
+    status: integer("status", { mode: "boolean" }),
     payloadType: text("payload_type").notNull(),
     logValue: text("log_value", { mode: "json" }).notNull(),
   },
@@ -158,9 +158,9 @@ export const AuditLogBasePO = {
 export const BizLogBasePO = {
   ...BaseLogBasePO,
   status: {
-    type: ["number", "null"],
+    type: ["boolean", "null"],
     nullable: true,
-    description: "状态 (1成功, 0失败)",
+    description: "状态 (true成功, false失败)",
   },
   payloadType: {
     type: "string",

@@ -32,12 +32,19 @@ export async function preparePermissions(options?: { reset?: boolean }) {
 
   // 1. 递归生成打平后的权限数据
   const mappedData: any[] = [];
+  const seenCodes = new Set<string>();
 
   function traverse(node: any, pathParts: string[]) {
     if (Array.isArray(node)) {
       const business = pathParts.filter(Boolean).join(".");
       for (const action of node) {
         const code = `${business}:${action}`;
+        if (seenCodes.has(code)) {
+          throw new Error(
+            `❌ [initPermissions] 检测到重复的权限 Code: ${code}，请检查 permissionSeeds 配置！`
+          );
+        }
+        seenCodes.add(code);
 
         // 获取显示名称
         const getActionName = () => {

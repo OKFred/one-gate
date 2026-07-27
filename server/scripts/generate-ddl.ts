@@ -44,6 +44,19 @@ function parseSqlStatements(sqlContent: string): Record<string, string[]> {
       stmt += ";";
     }
 
+    // 自动为 CREATE TABLE 和 CREATE [UNIQUE] INDEX 添加 IF NOT EXISTS
+    stmt = stmt.replace(
+      /^create\s+table\s+(?!if\s+not\s+exists\s+)/i,
+      "CREATE TABLE IF NOT EXISTS "
+    );
+    stmt = stmt.replace(
+      /^create\s+(unique\s+)?index\s+(?!if\s+not\s+exists\s+)/i,
+      (_, isUnique) =>
+        isUnique
+          ? "CREATE UNIQUE INDEX IF NOT EXISTS "
+          : "CREATE INDEX IF NOT EXISTS "
+    );
+
     let tableName: string | null = null;
 
     const createTableMatch = stmt.match(

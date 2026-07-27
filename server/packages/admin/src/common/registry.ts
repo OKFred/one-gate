@@ -10,6 +10,7 @@ import type {
   ossRegister,
   aiRegister,
   mailRegister,
+  mqttRegister,
 } from "../register.js";
 
 export interface IAdminServices {
@@ -22,6 +23,7 @@ export interface IAdminServices {
   oss: typeof ossRegister;
   ai: typeof aiRegister;
   mail: typeof mailRegister;
+  mqtt: typeof mqttRegister;
 }
 
 export class ServiceRegistry {

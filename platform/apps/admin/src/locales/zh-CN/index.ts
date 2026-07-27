@@ -8,6 +8,8 @@ import { i18n } from './i18n';
 import { oss } from './oss';
 import { rpa } from './rpa';
 import { data } from './data';
+import { mqtt } from './mqtt';
+import { base } from './base';
 
 /**
  * admin app zh-CN 翻译聚合入口
@@ -24,4 +26,6 @@ export default {
   ...oss,
   ...rpa,
   ...data,
+  ...mqtt,
+  ...base,
 } as const satisfies Record<string, string>;

@@ -131,6 +131,12 @@ export const BUSINESS = {
   "admin.oss.config": "admin.oss.config",
   /** 对象存储文件 */
   "admin.oss.file": "admin.oss.file",
+  /** MQTT 消息管理 */
+  "admin.mqtt": "admin.mqtt",
+  /** MQTT 控制台 */
+  "admin.mqtt.console": "admin.mqtt.console",
+  /** MQTT 配置 */
+  "admin.mqtt.config": "admin.mqtt.config",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;
