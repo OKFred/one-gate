@@ -9,3 +9,6 @@ CREATE TABLE IF NOT EXISTS `admin_voice_session_log` (
 	`update_time_utc` integer,
 	`end_time_utc` integer
 );
+
+CREATE INDEX IF NOT EXISTS `idx_voice_meeting_id` ON `admin_voice_session_log` (`meeting_id`);
+CREATE INDEX IF NOT EXISTS `idx_voice_creator_status` ON `admin_voice_session_log` (`creator_id`, `status`);

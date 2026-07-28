@@ -1,24 +1,31 @@
 import type { JSONSchema } from "json-schema-to-ts";
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 
 /**
  * 通话会话日志表
  * 记录每次 App-to-App 实时通话会话的生命周期
  */
-export const voiceSessionLogTable = sqliteTable("admin_voice_session_log", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  meetingId: text("meeting_id").notNull(),
-  meetingTitle: text("meeting_title"),
-  status: text("status").notNull(),
-  taskId: text("task_id").notNull(),
-  creatorId: integer("creator_id").notNull(),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-  endTimeUtc: integer("end_time_utc"),
-});
+export const voiceSessionLogTable = sqliteTable(
+  "admin_voice_session_log",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    meetingId: text("meeting_id").notNull(),
+    meetingTitle: text("meeting_title"),
+    status: text("status").notNull(),
+    taskId: text("task_id").notNull(),
+    creatorId: integer("creator_id").notNull(),
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+    endTimeUtc: integer("end_time_utc"),
+  },
+  (table) => [
+    index("idx_voice_meeting_id").on(table.meetingId),
+    index("idx_voice_creator_status").on(table.creatorId, table.status),
+  ]
+);
 
 // ─── Config Types & Schemas ──────────────────────────────────────────────────
 
@@ -66,7 +73,7 @@ export const VoiceJoinVO = {
     description: "会话 ID（由创建会话接口返回）",
   },
   displayName: {
-    type: ["string", "null"],
+    type: "string",
     nullable: true,
     description: "显示名称（可选，默认取当前登录用户名）",
   },
@@ -89,9 +96,9 @@ export const VoiceSessionListVO = {
   page: { type: "number", description: "页码，从 1 开始" },
   pageSize: { type: "number", description: "每页条数" },
   status: {
-    type: ["string", "null"],
+    type: "string",
     nullable: true,
-    enum: ["active", "ended", null],
+    enum: ["active", "ended"],
     description: "会话状态过滤",
   },
 } as const satisfies Record<string, JSONSchema>;

@@ -190,7 +190,7 @@ export default function MqttConsolePage() {
       const credRes = await MqttAPI.credentialsFn();
       const creds = credRes?.data?.data;
       if (!creds || !creds.brokerUrl) {
-        showSnackbar({ message: '获取 MQTT 连接凭证失败', type: 'error' });
+        showSnackbar({ message: t('admin.mqtt.sub.credFailed'), type: 'error' });
         return;
       }
 
@@ -221,7 +221,7 @@ export default function MqttConsolePage() {
         client.subscribe(targetTopic, (err: Error | null) => {
           if (!err) {
             showSnackbar({
-              message: `已成功建立 WebSockets 监听: [${targetTopic}]`,
+              message: `${t('admin.mqtt.sub.connected')}: [${targetTopic}]`,
               type: 'success',
             });
           }

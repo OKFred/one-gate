@@ -67,4 +67,6 @@ export const mqtt = {
   'admin.mqtt.sub.stopped': '未建立监听',
   'admin.mqtt.sub.clear': '清空列表',
   'admin.mqtt.sub.receivedCount': '实时接收',
+  'admin.mqtt.sub.credFailed': '获取 MQTT 连接凭证失败',
+  'admin.mqtt.sub.connected': '已成功建立 WebSockets 监听',
 } as const satisfies Record<string, string>;

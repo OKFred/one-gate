@@ -80,7 +80,7 @@ export default function MqttConfigPage() {
         namespace: 'mqtt',
       },
       fields: () => [],
-      transformRequest: (req: any) => ({
+      transformRequest: (req: Record<string, unknown>) => ({
         pageNo: 1,
         pageSize: 20,
         ...req,

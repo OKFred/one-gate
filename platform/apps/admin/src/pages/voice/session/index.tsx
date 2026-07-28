@@ -108,7 +108,7 @@ export default function VoiceSessionPage() {
             {t('voice.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            基于 Cloudflare RealtimeKit 的浏览器端实时音视频通话
+            {t('voice.subtitle')}
           </Typography>
         </Box>
       </Box>
@@ -162,7 +162,7 @@ export default function VoiceSessionPage() {
                 onClick={() => setPanelOpen(true)}
                 size="small"
               >
-                参会人
+                {t('voice.participant.title')}
               </Button>
               <Button
                 variant="contained"
@@ -201,10 +201,10 @@ export default function VoiceSessionPage() {
           <CardContent sx={{ p: 4, textAlign: 'center' }}>
             <CallIcon sx={{ fontSize: 56, color: 'primary.main', mb: 2, opacity: 0.8 }} />
             <Typography variant="h6" sx={{ mb: 1, fontWeight: 'bold' }}>
-              发起新通话
+              {t('voice.startCall')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              点击下方按钮创建通话会话，分享会话 ID 给对方加入
+              {t('voice.newCallDesc')}
             </Typography>
             <Button
               variant="contained"
@@ -285,7 +285,7 @@ export default function VoiceSessionPage() {
                   <TableCell width={100}>{t('voice.session.colStatus')}</TableCell>
                   <TableCell width={180}>{t('voice.session.colTime')}</TableCell>
                   <TableCell width={100} align="center">
-                    操作
+                    {t('table.actions')}
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -347,7 +347,7 @@ export default function VoiceSessionPage() {
                             onClick={() => joinCall(row.meetingId)}
                             disabled={joining || !!activeSession}
                           >
-                            加入
+                            {t('voice.join')}
                           </Button>
                         )}
                       </TableCell>
@@ -367,7 +367,7 @@ export default function VoiceSessionPage() {
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>发起新通话</DialogTitle>
+        <DialogTitle>{t('voice.startCall')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth

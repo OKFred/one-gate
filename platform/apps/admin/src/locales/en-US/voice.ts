@@ -31,4 +31,16 @@ export const voice = {
   'voice.config.primary': 'Primary',
   'voice.config.edit': 'Edit Config',
   'voice.config.create': 'Create Config',
+  'voice.participant.title': 'Participants',
+  'voice.participant.waiting': 'Waiting Room',
+  'voice.participant.joined': 'Joined',
+  'voice.participant.admit': 'Admit',
+  'voice.participant.self': '(Me)',
+  'voice.participant.host': 'Host',
+  'voice.participant.guest': 'Guest',
+  'voice.subtitle':
+    'Browser-based real-time audio and video call powered by Cloudflare RealtimeKit',
+  'voice.newCallDesc':
+    'Click the button below to start a new call session and share the meeting ID with others',
+  'voice.join': 'Join',
 } as const satisfies Record<string, string>;

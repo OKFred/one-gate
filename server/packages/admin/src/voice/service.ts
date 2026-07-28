@@ -24,7 +24,6 @@ interface RtkConfig {
   accountId: string;
   apiToken: string;
   appId: string;
-  preset: string;
 }
 
 import { voiceConfigProvider } from "./driver.js";
@@ -44,7 +43,6 @@ async function getRtkConfig(): Promise<RtkConfig> {
   const accountId = config.cfAccountId;
   const apiToken = config.rtkApiToken;
   const appId = config.rtkAppId;
-  const preset = "group_call_host";
 
   if (!accountId || !apiToken || !appId) {
     throw new BusinessError(
@@ -52,13 +50,14 @@ async function getRtkConfig(): Promise<RtkConfig> {
     );
   }
 
-  return { accountId, apiToken, appId, preset };
+  return { accountId, apiToken, appId };
 }
 
 /**
  * 构造 Cloudflare Realtime Kit API 请求 Headers
  *
- * @param apiToken CF API Token
+ * @param apiToken CF API Token 凭证
+ * @returns 包含 Content-Type 与 Bearer Token 的 HTTP 请求头对象
  */
 function rtkHeaders(apiToken: string): Record<string, string> {
   return {
@@ -97,7 +96,6 @@ async function onCreateMeeting(
   }
 
   const jsonText = await res.text();
-  console.log("RealtimeKit Response:", jsonText);
   const json = JSON.parse(jsonText);
 
   // Try to extract meetingId from different possible structures
@@ -195,7 +193,6 @@ async function onJoinMeeting(
   }
 
   const jsonText = await res.text();
-  console.log("RealtimeKit Join Response:", jsonText);
   const json = JSON.parse(jsonText);
 
   // Extract token from possible structures
@@ -248,6 +245,18 @@ async function onEndMeeting(
   if (!session) {
     throw new BusinessError(`通话会话不存在: ${params.meetingId}`);
   }
+
+  // 尝试通知 Cloudflare RealtimeKit 释放/销毁会议资源
+  try {
+    const { accountId, apiToken, appId } = await getRtkConfig();
+    await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/realtime/kit/${appId}/meetings/${params.meetingId}`,
+      {
+        method: "DELETE",
+        headers: rtkHeaders(apiToken),
+      }
+    );
+  } catch {}
 
   const nowUtc = Date.now();
   await voiceRepository.updateSessionLog(params.meetingId, {

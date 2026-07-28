@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRealtimeKitClient } from '@cloudflare/realtimekit-react';
 import * as VoiceAPI from '@/api/admin/voice';
-import { showSnackbar } from '@/components/Notification';
 
 /**
  * 活跃通话会话的状态接口
@@ -62,7 +61,6 @@ export function useVoiceSession(): UseVoiceSessionReturn {
       await initMeeting({ authToken });
       setActiveSession({ meetingId, taskId });
     } catch {
-      showSnackbar({ message: '创建通话会话失败，请重试', type: 'error' });
     } finally {
       setJoining(false);
     }
@@ -78,7 +76,6 @@ export function useVoiceSession(): UseVoiceSessionReturn {
       await initMeeting({ authToken });
       setActiveSession({ meetingId, taskId: '' });
     } catch {
-      showSnackbar({ message: '加入通话会话失败，请重试', type: 'error' });
     } finally {
       setJoining(false);
     }

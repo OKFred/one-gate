@@ -68,4 +68,6 @@ export const mqtt = {
   'admin.mqtt.sub.stopped': 'Not Listening',
   'admin.mqtt.sub.clear': 'Clear Stream',
   'admin.mqtt.sub.receivedCount': 'Live Received',
+  'admin.mqtt.sub.credFailed': 'Failed to fetch MQTT credentials',
+  'admin.mqtt.sub.connected': 'Successfully established WebSocket listening',
 } as const satisfies Record<string, string>;
