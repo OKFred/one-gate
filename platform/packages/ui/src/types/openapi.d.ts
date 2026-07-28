@@ -11143,6 +11143,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/voice/meeting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 创建 RealtimeKit 通话会话 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.meeting.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.meeting.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 加入通话会话，获取参与者 authToken */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.join.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.join.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/meeting/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 结束通话会话（更新本地日志状态为 ended） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.meeting.end.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.meeting.end.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/meeting/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页查询通话会话历史记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.meeting.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.meeting.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -22399,6 +22631,74 @@ export interface components {
                 /** @description 页码 */
                 pageNo: number;
                 /** @description 每页数量 */
+                pageSize: number;
+            };
+            message: string;
+        };
+        "admin.voice.meeting.req": {
+            /** @description 会话标题（可选） */
+            title?: string | null;
+        };
+        "admin.voice.meeting.res": {
+            ok: boolean;
+            data: {
+                /** @description RealtimeKit 会话 ID */
+                meetingId: string;
+                /** @description 内部异步任务 ID */
+                taskId: string;
+                /** @description 任务状态 */
+                status: string;
+            };
+            message: string;
+        };
+        "admin.voice.join.req": {
+            /** @description 会话 ID（由创建会话接口返回） */
+            meetingId: string;
+            /** @description 显示名称（可选，默认取当前登录用户名） */
+            displayName?: ((string | null) | null) | null;
+        };
+        "admin.voice.join.res": {
+            ok: boolean;
+            data: {
+                /** @description RealtimeKit 参与者 authToken，用于前端 SDK 初始化 */
+                authToken: string;
+                /** @description 会话 ID */
+                meetingId: string;
+            };
+            message: string;
+        };
+        "admin.voice.meeting.end.req": {
+            /** @description 会话 ID */
+            meetingId: string;
+        };
+        "admin.voice.meeting.end.res": {
+            ok: boolean;
+            data: Record<string, never>;
+            message: string;
+        };
+        "admin.voice.meeting.list.req": {
+            /** @description 页码，从 1 开始 */
+            page: number;
+            /** @description 每页条数 */
+            pageSize: number;
+            /**
+             * @description 会话状态过滤
+             * @enum {string|null|null}
+             */
+            status?: "active" | "ended" | null;
+        };
+        "admin.voice.meeting.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 会话日志列表 */
+                list: {
+                    [key: string]: unknown;
+                }[];
+                /** @description 总条数 */
+                total: number;
+                /** @description 当前页码 */
+                page: number;
+                /** @description 每页条数 */
                 pageSize: number;
             };
             message: string;

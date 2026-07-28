@@ -10,6 +10,7 @@ import { rpa } from './rpa';
 import { data } from './data';
 import { mqtt } from './mqtt';
 import { base } from './base';
+import { voice } from './voice';
 
 export default {
   ...system,
@@ -24,4 +25,5 @@ export default {
   ...data,
   ...mqtt,
   ...base,
+  ...voice,
 } as const satisfies Record<string, string>;

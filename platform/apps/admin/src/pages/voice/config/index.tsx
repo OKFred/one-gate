@@ -2,56 +2,32 @@ import React, { useState } from 'react';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import { showSnackbar } from '@/components/Notification';
-import { Add as AddIcon, Edit as EditIcon, Sensors as SensorsIcon } from '@mui/icons-material';
-import { Chip, Switch, Box, Typography, CircularProgress } from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Chip, Switch, Box, Typography } from '@mui/material';
 
 import dayjs from 'dayjs';
 import * as BaseSysConfigAPI from '@/api/admin/base/sys_config';
-import * as MqttAPI from '@/api/admin/mqtt';
 import type { ConfigRes, ListConfigReq } from '@/api/admin/base/type';
 import { BaseSysConfigFormDialog } from '../../base/sys_config/components/BaseSysConfigFormDialog';
 
 interface ExtraContext {
   handleEdit: (row: ConfigRes) => void;
-  handleTestConnection: (row: ConfigRes) => void;
   refreshList: () => void;
-  testingId: number | null;
 }
 
-export default function MqttConfigPage() {
+export default function VoiceConfigPage() {
   const t = useTranslation();
 
   const [formOpen, setFormOpen] = useState(false);
   const [editRow, setEditRow] = useState<ConfigRes | null>(null);
-  const [testingId, setTestingId] = useState<number | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
-
-  const handleTestConnection = async (row: ConfigRes) => {
-    setTestingId(row.id);
-    try {
-      const res = await MqttAPI.testConnectionFn({
-        data: { id: row.id },
-      });
-
-      showSnackbar({
-        message: res.data.message || t('admin.mqtt.config.testSuccess'),
-        type: 'success',
-      });
-    } catch {
-    } finally {
-      setTestingId(null);
-    }
-  };
 
   const extraContext: ExtraContext = {
     handleEdit: (row) => {
       setEditRow(row);
       setFormOpen(true);
     },
-    handleTestConnection,
     refreshList: () => {},
-    testingId,
   };
 
   const config: SchemaCrudConfig<
@@ -70,21 +46,21 @@ export default function MqttConfigPage() {
           ...req,
           data: {
             ...req?.data,
-            namespace: 'mqtt',
+            namespace: 'voice',
           },
         }),
       delete: BaseSysConfigAPI.deleteFn,
     },
     filter: {
       defaultFilters: {
-        namespace: 'mqtt',
+        namespace: 'voice',
       },
       fields: () => [],
       transformRequest: (req: any) => ({
         pageNo: 1,
         pageSize: 20,
         ...req,
-        namespace: 'mqtt',
+        namespace: 'voice',
       }),
     },
     table: {
@@ -100,56 +76,26 @@ export default function MqttConfigPage() {
           ),
         },
         {
-          title: t('admin.mqtt.config.provider'),
-          width: 130,
+          title: t('voice.config.cfAccountId'),
+          width: 250,
           render: (row: ConfigRes) => {
             const val = (row.configValue || {}) as Record<string, unknown>;
-            const isAliyun = val.provider === 'Aliyun';
-            return (
-              <Chip
-                label={
-                  isAliyun
-                    ? t('admin.mqtt.config.providerAliyun')
-                    : t('admin.mqtt.config.providerEmqx')
-                }
-                size="small"
-                color={isAliyun ? 'warning' : 'info'}
-                variant="outlined"
-              />
-            );
-          },
-        },
-        {
-          title: t('admin.mqtt.config.hostPort'),
-          width: 220,
-          render: (row: ConfigRes) => {
-            const val = (row.configValue || {}) as Record<string, unknown>;
-            const host = String(val.host || '127.0.0.1');
-            const port = String(val.port || 1883);
-            const proto = String(val.protocol || 'mqtt');
             return (
               <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                <Typography
-                  variant="body2"
-                  component="span"
-                  sx={{ color: 'primary.main', fontWeight: 'medium' }}
-                >
-                  {proto}://
-                </Typography>
-                {host}:{port}
+                {String(val.cfAccountId || '-')}
               </Box>
             );
           },
         },
         {
-          title: t('admin.mqtt.config.clientId'),
-          width: 180,
+          title: t('voice.config.rtkAppId'),
+          width: 250,
           render: (row: ConfigRes) => {
             const val = (row.configValue || {}) as Record<string, unknown>;
             return (
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', color: 'text.secondary' }}>
-                {String(val.clientId || '-')}
-              </Typography>
+              <Box sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
+                {String(val.rtkAppId || '-')}
+              </Box>
             );
           },
         },
@@ -163,7 +109,7 @@ export default function MqttConfigPage() {
           width: 100,
           render: (row: ConfigRes) =>
             row.isPrimary ? (
-              <Chip label={t('admin.mqtt.config.primary')} size="small" color="primary" />
+              <Chip label={t('voice.config.primary')} size="small" color="primary" />
             ) : null,
         },
         {
@@ -176,23 +122,9 @@ export default function MqttConfigPage() {
       cardFields: () => [],
       actions: (_t, ctx) => [
         {
-          key: 'test',
-          icon: (row: ConfigRes) =>
-            ctx?.testingId === row.id ? (
-              <CircularProgress size={16} color="inherit" />
-            ) : (
-              <SensorsIcon />
-            ),
-          label: ctx?.testingId
-            ? t('admin.mqtt.config.testing')
-            : t('admin.mqtt.config.testConnection'),
-          disabled: (row: ConfigRes) => ctx?.testingId === row.id,
-          onClick: (row) => ctx?.handleTestConnection(row),
-        },
-        {
           key: 'edit',
           icon: <EditIcon />,
-          label: t('admin.mqtt.config.edit'),
+          label: t('voice.config.edit'),
           onClick: (row) => ctx?.handleEdit(row),
         },
       ],
@@ -213,7 +145,7 @@ export default function MqttConfigPage() {
         setFormOpen(true);
       }}
     >
-      {t('admin.mqtt.config.create')}
+      {t('voice.config.create')}
     </ResponsiveButton>
   );
 
@@ -230,7 +162,7 @@ export default function MqttConfigPage() {
         <BaseSysConfigFormDialog
           open={formOpen}
           editRow={editRow}
-          defaultNamespace="mqtt"
+          defaultNamespace="voice"
           onClose={() => setFormOpen(false)}
           onSuccess={() => {
             setFormOpen(false);

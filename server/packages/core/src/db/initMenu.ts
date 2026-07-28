@@ -546,6 +546,32 @@ export const initialMenuData = [
     sort: 2,
     business: "admin.base.log",
   },
+  {
+    id: 77,
+    name: "sidebar.menu.voice",
+    icon: "material-symbols:call",
+    parentId: 42,
+    sort: 9,
+    business: "admin.voice",
+  },
+  {
+    id: 78,
+    name: "sidebar.menu.voice.session",
+    icon: "material-symbols:video-call",
+    path: "/admin/voice/session",
+    parentId: 77,
+    sort: 1,
+    business: "admin.voice.session",
+  },
+  {
+    id: 79,
+    name: "sidebar.menu.voice.config",
+    icon: "material-symbols:settings-input-component",
+    path: "/admin/voice/config",
+    parentId: 77,
+    sort: 2,
+    business: "admin.voice.config",
+  },
 ] satisfies menuLike[];
 
 type menuLike = {

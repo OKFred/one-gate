@@ -4,11 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode=development",
+    "dev": "vite --mode=development --host",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cloudflare/realtimekit-react": "^2.0.1",
+    "@cloudflare/realtimekit-react-ui": "^2.0.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hodor/ui": "workspace:*",

@@ -24,11 +24,19 @@ export const DynamicForm = ({
   onChange,
   disabled = false,
 }: DynamicFormProps) => {
-  if (!schema || !schema.properties) {
+  if (!schema) {
     return null;
   }
 
-  const properties = schema.properties;
+  let properties = schema.properties;
+  if (!properties && schema.type !== 'object') {
+    properties = schema as Record<string, SchemaProperty>;
+  }
+
+  if (!schema || !properties) {
+    return null;
+  }
+
   const keys = Object.keys(properties);
 
   const handleFieldChange = (key: string, fieldValue: unknown) => {

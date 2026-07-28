@@ -11,6 +11,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { useFormError } from '@/hooks/useFormError';
 import { useValidator } from '@/utils/validator';
 import { useSchema } from '@/hooks/useSchema';
+import { showSnackbar } from '@/components/Notification';
 
 import type { SchemaCrudConfig, CrudHelpers, QueryState } from './types';
 import { Filter } from './components/Filter';
@@ -428,9 +429,10 @@ export function SchemaCrudPage<
       const recordId = rowToDelete[idKey] as unknown as number;
       try {
         await configRef.current.api.delete({ data: { id: recordId } });
+        showSnackbar({ message: t('common.deleteSuccess'), type: 'success' });
         const newQuery = { ...query, page: 1 };
         updateState({ query: newQuery });
-        fetchList(newQuery);
+        await fetchList(newQuery);
       } catch {
       } finally {
         handleCloseDeleteConfirm();

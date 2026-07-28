@@ -156,6 +156,12 @@ export const mqttRegister = {
   configProvider: new MqttConfigProvider(),
 };
 
+import { voiceConfigProvider } from "./voice/driver.js";
+
+export const voiceRegister = {
+  configProvider: voiceConfigProvider,
+};
+
 // 2. 初始化注册中心并绑定服务
 export function initAdminRegistry() {
   const reg = new ServiceRegistry();
@@ -170,6 +176,7 @@ export function initAdminRegistry() {
   reg.register("base", baseRegister);
   reg.register("mail", mailRegister);
   reg.register("mqtt", mqttRegister);
+  reg.register("voice", voiceRegister);
   console.log(`[ADMIN] registered domains`, reg.domains);
   setRegistry(reg);
 }

@@ -24,6 +24,7 @@ import { systemTranslations } from "../../../admin/src/system/translation";
 import { configTranslations } from "../../../admin/src/rpa/config/translation";
 import { baseTranslations } from "../../../admin/src/base/translation";
 import { mqttTranslations } from "../../../admin/src/mqtt/translation";
+import { voiceTranslations } from "../../../admin/src/voice/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "../types/business";
 import type { LanguageCode } from "./initLanguage";
@@ -161,4 +162,5 @@ export const initialTranslationData = mapTranslations({
   ...configTranslations,
   ...baseTranslations,
   ...mqttTranslations,
+  ...voiceTranslations,
 }) satisfies BatchTranslationItem[];

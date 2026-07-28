@@ -179,6 +179,14 @@ export const permissionSeeds = {
     /** MQTT 配置 */
     config: ["read", "add", "edit", "delete"],
   },
+  /** 实时通话 */
+  "admin.voice": {
+    "": ["read"],
+    /** 通话会话 */
+    session: ["read", "add", "edit"],
+    /** 服务配置 */
+    config: ["read", "add", "edit", "delete"],
+  },
 } as const;
 
 // Ensure type safety of permissionSeeds against BusinessKey mapping

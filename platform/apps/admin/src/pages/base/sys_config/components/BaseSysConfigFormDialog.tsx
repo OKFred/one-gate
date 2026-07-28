@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useResponsive } from '@/hooks/useResponsive';
+import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 import { Field } from '@/components/Form/Field';
 import { DynamicForm } from '@/components/Form/DynamicForm';
@@ -27,6 +28,7 @@ interface BaseSysConfigFormDialogProps {
   onClose: () => void;
   onSuccess: () => void;
   editRow: ConfigRes | null;
+  defaultNamespace?: string;
 }
 
 const baseSchema = {
@@ -46,6 +48,7 @@ export function BaseSysConfigFormDialog({
   onClose,
   onSuccess,
   editRow,
+  defaultNamespace,
 }: BaseSysConfigFormDialogProps) {
   const { isMobile } = useResponsive();
   const t = useTranslation();
@@ -63,7 +66,7 @@ export function BaseSysConfigFormDialog({
 
   // Validation hook
   const { validate } = useValidator(baseSchema);
-  const { fieldErrors, handleFormError, clearErrors, clearFieldError, rootSchema } =
+  const { fieldErrors, setFieldErrors, handleFormError, clearErrors, clearFieldError, rootSchema } =
     useFormError(baseSchema);
   const errorContextValue = { fieldErrors, clearFieldError, rootSchema };
 
@@ -77,15 +80,20 @@ export function BaseSysConfigFormDialog({
           fetchSchema(editRow.namespace);
         }
       } else {
+        const initialNamespace = defaultNamespace || '';
         setForm({
+          namespace: initialNamespace,
           isEnabled: true,
           isPrimary: false,
           configValue: {},
         });
         setDynamicSchema(null);
+        if (initialNamespace) {
+          fetchSchema(initialNamespace);
+        }
       }
     }
-  }, [open, editRow]);
+  }, [open, editRow, defaultNamespace]);
 
   const fetchNamespaces = async () => {
     try {
@@ -132,7 +140,7 @@ export function BaseSysConfigFormDialog({
     const errors = validate(form);
     const isValid = Object.keys(errors).length === 0;
     if (!isValid) {
-      handleFormError(errors);
+      setFieldErrors(errors);
       return;
     }
 
@@ -161,6 +169,7 @@ export function BaseSysConfigFormDialog({
           },
         });
       }
+      showSnackbar({ message: t('common.saveSuccess'), type: 'success' });
       onSuccess();
     } catch (e: unknown) {
       handleFormError(e);

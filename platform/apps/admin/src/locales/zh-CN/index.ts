@@ -10,6 +10,7 @@ import { rpa } from './rpa';
 import { data } from './data';
 import { mqtt } from './mqtt';
 import { base } from './base';
+import { voice } from './voice';
 
 /**
  * admin app zh-CN 翻译聚合入口
@@ -28,4 +29,5 @@ export default {
   ...data,
   ...mqtt,
   ...base,
+  ...voice,
 } as const satisfies Record<string, string>;

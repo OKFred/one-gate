@@ -11,6 +11,7 @@ import type {
   aiRegister,
   mailRegister,
   mqttRegister,
+  voiceRegister,
 } from "../register.js";
 
 export interface IAdminServices {
@@ -24,6 +25,7 @@ export interface IAdminServices {
   ai: typeof aiRegister;
   mail: typeof mailRegister;
   mqtt: typeof mqttRegister;
+  voice: typeof voiceRegister;
 }
 
 export class ServiceRegistry {
@@ -57,10 +59,21 @@ export const registry = new Proxy(
   {},
   {
     get: (target, prop) => {
+      if (prop === "__getDomains")
+        return Object.keys(getActiveRegistry()["services"]);
       return getActiveRegistry().domains[prop as keyof IAdminServices];
     },
+    ownKeys: () => {
+      return Object.keys(getActiveRegistry()["services"]);
+    },
+    getOwnPropertyDescriptor: (target, prop) => {
+      return {
+        enumerable: true,
+        configurable: true,
+      };
+    },
   }
-) as unknown as IAdminServices;
+) as unknown as IAdminServices & { __getDomains: () => string[] };
 
 function getActiveRegistry(): ServiceRegistry {
   if (!currentRegistry) {

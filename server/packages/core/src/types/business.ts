@@ -137,6 +137,12 @@ export const BUSINESS = {
   "admin.mqtt.console": "admin.mqtt.console",
   /** MQTT 配置 */
   "admin.mqtt.config": "admin.mqtt.config",
+  /** 实时通话 */
+  "admin.voice": "admin.voice",
+  /** 实时通话会话 */
+  "admin.voice.session": "admin.voice.session",
+  /** 实时通话配置 */
+  "admin.voice.config": "admin.voice.config",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

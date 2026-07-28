@@ -9,6 +9,7 @@ import ai from "./ai/index.js";
 import rpa from "./rpa/index.js";
 import base from "./base/index.js";
 import mqtt from "./mqtt/index.js";
+import voice from "./voice/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { initAdminRegistry } from "./register.js";
@@ -27,6 +28,7 @@ function createAdminApp(): App {
   app.route("/rpa", rpa());
   app.route("/base", base());
   app.route("/mqtt", mqtt());
+  app.route("/voice", voice());
   return app;
 }
 export default createAdminApp;
