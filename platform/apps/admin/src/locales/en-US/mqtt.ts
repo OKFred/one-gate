@@ -1,6 +1,6 @@
 /** admin app — MQTT Messages & Config page text */
 export const mqtt = {
-  'sidebar.menu.mqtt': 'MQTT Messages & Config',
+  'sidebar.menu.mqtt': 'MQTT',
   'sidebar.menu.mqtt.console': 'Message Console',
   'sidebar.menu.mqtt.config': 'Service Config',
   'admin.mqtt.title': 'MQTT Messages & Configuration',
