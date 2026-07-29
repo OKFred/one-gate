@@ -1,7 +1,7 @@
 import db from "./index";
 import { menuTable } from "../../../admin/src/system/menu/model";
 import { permissionTable } from "../../../admin/src/system/permission/model";
-import { sql } from "drizzle-orm";
+import { sql, inArray } from "drizzle-orm";
 import { SUPER_ADMIN_ID } from "./init";
 import { BusinessKey } from "../types/business";
 import { initialTranslationData } from "./initTranslation";
@@ -54,7 +54,7 @@ export const initialMenuData = [
     id: 4,
     name: "sidebar.menu.mail.template",
     icon: "material-symbols:description",
-    path: "/mail/template",
+    path: "/admin/mail/template",
     parentId: 3,
     sort: 1,
     business: "admin.mail.template",
@@ -63,7 +63,7 @@ export const initialMenuData = [
     id: 5,
     name: "sidebar.menu.mail.log",
     icon: "material-symbols:history",
-    path: "/mail/log",
+    path: "/admin/mail/log",
     parentId: 3,
     sort: 2,
     business: "admin.mail.log",
@@ -72,7 +72,7 @@ export const initialMenuData = [
     id: 6,
     name: "sidebar.menu.mail.send",
     icon: "material-symbols:send",
-    path: "/mail/send",
+    path: "/admin/mail/send",
     parentId: 3,
     sort: 3,
     business: "admin.mail.action",
@@ -81,7 +81,7 @@ export const initialMenuData = [
     id: 7,
     name: "sidebar.menu.mail.account",
     icon: "material-symbols:manage-accounts",
-    path: "/mail/account",
+    path: "/admin/mail/account",
     parentId: 3,
     sort: 4,
     business: "admin.mail.account",
@@ -98,7 +98,7 @@ export const initialMenuData = [
     id: 9,
     name: "sidebar.menu.system.role",
     icon: "material-symbols:supervisor-account",
-    path: "/system/role",
+    path: "/admin/system/role",
     parentId: 8,
     sort: 1,
     business: "admin.system.role",
@@ -107,7 +107,7 @@ export const initialMenuData = [
     id: 10,
     name: "sidebar.menu.user",
     icon: "material-symbols:group",
-    path: "/system/user",
+    path: "/admin/system/user",
     parentId: 8,
     sort: 2,
     business: "admin.system.user",
@@ -116,7 +116,7 @@ export const initialMenuData = [
     id: 11,
     name: "sidebar.menu.system.department",
     icon: "material-symbols:groups",
-    path: "/system/department",
+    path: "/admin/system/department",
     parentId: 8,
     sort: 3,
     business: "admin.system.department",
@@ -125,7 +125,7 @@ export const initialMenuData = [
     id: 12,
     name: "sidebar.menu.menu",
     icon: "material-symbols:menu",
-    path: "/system/menu",
+    path: "/admin/system/menu",
     parentId: 8,
     sort: 4,
     business: "admin.system.menu",
@@ -142,7 +142,7 @@ export const initialMenuData = [
     id: 14,
     name: "sidebar.menu.language",
     icon: "material-symbols:language-international",
-    path: "/i18n/language",
+    path: "/admin/i18n/language",
     parentId: 13,
     sort: 1,
     business: "admin.i18n.language",
@@ -151,7 +151,7 @@ export const initialMenuData = [
     id: 15,
     name: "sidebar.menu.translation",
     icon: "material-symbols:translate",
-    path: "/i18n/translation",
+    path: "/admin/i18n/translation",
     parentId: 13,
     sort: 2,
     business: "admin.i18n.translation",
@@ -160,7 +160,7 @@ export const initialMenuData = [
     id: 16,
     name: "sidebar.menu.i18n.region",
     icon: "material-symbols:public",
-    path: "/i18n/region",
+    path: "/admin/i18n/region",
     parentId: 13,
     sort: 3,
     business: "admin.i18n.region",
@@ -169,7 +169,7 @@ export const initialMenuData = [
     id: 17,
     name: "sidebar.menu.system.permission",
     icon: "material-symbols:lock",
-    path: "/system/permission",
+    path: "/admin/system/permission",
     parentId: 8,
     sort: 5,
     business: "admin.system.permission",
@@ -178,7 +178,7 @@ export const initialMenuData = [
     id: 18,
     name: "sidebar.menu.system.rolePermission",
     icon: "material-symbols:admin-panel-settings",
-    path: "/system/role_permission",
+    path: "/admin/system/role_permission",
     parentId: 8,
     sort: 6,
     business: "admin.system.role_permission",
@@ -195,7 +195,7 @@ export const initialMenuData = [
     id: 20,
     name: "sidebar.menu.maintenance.cache",
     icon: "material-symbols:database",
-    path: "/maintenance/cache",
+    path: "/admin/maintenance/cache",
     parentId: 19,
     sort: 1,
     business: "admin.maintenance.cache",
@@ -204,25 +204,25 @@ export const initialMenuData = [
     id: 21,
     name: "sidebar.menu.maintenance.openapi",
     icon: "material-symbols:api",
-    path: "/maintenance/openapi",
+    path: "/admin/maintenance/openapi",
     parentId: 19,
     sort: 2,
     business: "admin.maintenance",
   },
   {
     id: 22,
-    name: "sidebar.menu.maintenance.auditLogin",
+    name: "sidebar.menu.maintenance.loginLog",
     icon: "material-symbols:history-edu",
-    path: "/maintenance/auditLogin",
+    path: "/admin/maintenance/loginLog",
     parentId: 19,
     sort: 3,
-    business: "admin.maintenance.audit_login",
+    business: "admin.maintenance.login_log",
   },
   {
     id: 35,
     name: "sidebar.menu.maintenance.cron",
     icon: "material-symbols:alarm",
-    path: "/maintenance/cron",
+    path: "/admin/maintenance/cron",
     parentId: 19,
     sort: 4,
     business: "admin.maintenance.cron",
@@ -231,7 +231,7 @@ export const initialMenuData = [
     id: 37,
     name: "sidebar.menu.maintenance.apiTask",
     icon: "material-symbols:http",
-    path: "/maintenance/api-task",
+    path: "/admin/maintenance/api-task",
     parentId: 19,
     sort: 5,
     business: "admin.maintenance.api_task",
@@ -240,7 +240,7 @@ export const initialMenuData = [
     id: 38,
     name: "sidebar.menu.maintenance.apiDocs",
     icon: "material-symbols:api",
-    path: "/maintenance/api-docs",
+    path: "/admin/maintenance/api-docs",
     parentId: 19,
     sort: 6,
     business: "admin.maintenance.api_docs",
@@ -257,7 +257,7 @@ export const initialMenuData = [
     id: 24,
     name: "sidebar.menu.oss.config",
     icon: "material-symbols:settings-suggest",
-    path: "/oss/config",
+    path: "/admin/oss/config",
     parentId: 23,
     sort: 1,
     business: "admin.oss.config",
@@ -266,10 +266,36 @@ export const initialMenuData = [
     id: 25,
     name: "sidebar.menu.oss.file",
     icon: "material-symbols:folder-shared",
-    path: "/oss/file",
+    path: "/admin/oss/file",
     parentId: 23,
     sort: 2,
     business: "admin.oss.file",
+  },
+  {
+    id: 74,
+    name: "sidebar.menu.mqtt",
+    icon: "material-symbols:cell-tower",
+    parentId: 42,
+    sort: 7,
+    business: "admin.mqtt",
+  },
+  {
+    id: 75,
+    name: "sidebar.menu.mqtt.console",
+    icon: "material-symbols:terminal",
+    path: "/admin/mqtt/console",
+    parentId: 74,
+    sort: 1,
+    business: "admin.mqtt.console",
+  },
+  {
+    id: 76,
+    name: "sidebar.menu.mqtt.config",
+    icon: "material-symbols:settings",
+    path: "/admin/mqtt/config",
+    parentId: 74,
+    sort: 2,
+    business: "admin.mqtt",
   },
   {
     id: 26,
@@ -277,6 +303,23 @@ export const initialMenuData = [
     icon: "material-symbols:enterprise",
     sort: 4,
     business: "enterprise",
+  },
+  {
+    id: 60,
+    name: "sidebar.menu.enterprise.mail",
+    icon: "material-symbols:mail",
+    parentId: 26,
+    sort: 8,
+    business: "enterprise.mail",
+  },
+  {
+    id: 61,
+    name: "sidebar.menu.enterprise.mail.edm",
+    icon: "material-symbols:mark-email-read",
+    path: "/enterprise/mail/edm",
+    parentId: 60,
+    sort: 1,
+    business: "enterprise.mail.edm",
   },
   {
     id: 27,
@@ -290,7 +333,7 @@ export const initialMenuData = [
     id: 45,
     name: "sidebar.menu.organization.attendance",
     icon: "material-symbols:calendar-month",
-    path: "/organization/attendance",
+    path: "/enterprise/organization/attendance",
     parentId: 27,
     sort: 1,
     business: "organization.attendance",
@@ -307,16 +350,34 @@ export const initialMenuData = [
     id: 29,
     name: "sidebar.menu.ai.config",
     icon: "material-symbols:settings-input-component",
-    path: "/ai/config",
+    path: "/admin/ai/config",
     parentId: 28,
     sort: 1,
     business: "admin.ai.config",
   },
   {
+    id: 64,
+    name: "sidebar.menu.ai.chat",
+    icon: "material-symbols:forum",
+    path: "/admin/ai/chat",
+    parentId: 28,
+    sort: 2,
+    business: "admin.ai.chat",
+  },
+  {
+    id: 65,
+    name: "sidebar.menu.ai.search",
+    icon: "material-symbols:travel-explore",
+    path: "/admin/ai/search",
+    parentId: 28,
+    sort: 3,
+    business: "admin.ai.search",
+  },
+  {
     id: 30,
     name: "sidebar.menu.data.schemaForm",
     icon: "material-symbols:edit-document",
-    path: "/data/schema_form",
+    path: "/admin/data/schema_form",
     parentId: 43,
     sort: 7,
     business: "admin.data.schema_form",
@@ -325,7 +386,7 @@ export const initialMenuData = [
     id: 31,
     name: "sidebar.menu.data.schemaFormData",
     icon: "material-symbols:table-view",
-    path: "/data/schema_form_data",
+    path: "/admin/data/schema_form_data",
     parentId: 43,
     sort: 1,
     business: "admin.data.schema_form_data",
@@ -342,7 +403,7 @@ export const initialMenuData = [
     id: 33,
     name: "sidebar.menu.swarm.docker",
     icon: "material-symbols:layers",
-    path: "/swarm/docker",
+    path: "/admin/swarm/docker",
     parentId: 32,
     sort: 1,
     business: "admin.swarm.docker",
@@ -351,7 +412,7 @@ export const initialMenuData = [
     id: 34,
     name: "sidebar.menu.swarm.nodes",
     icon: "material-symbols:lan",
-    path: "/swarm/nodes",
+    path: "/admin/swarm/nodes",
     parentId: 32,
     sort: 2,
     business: "admin.swarm.nodes",
@@ -360,7 +421,7 @@ export const initialMenuData = [
     id: 36,
     name: "sidebar.menu.swarm.dockerConfig",
     icon: "material-symbols:settings-ethernet",
-    path: "/swarm/docker_config",
+    path: "/admin/swarm/docker_config",
     parentId: 32,
     sort: 3,
     business: "admin.swarm.docker_config",
@@ -377,7 +438,7 @@ export const initialMenuData = [
     id: 40,
     name: "sidebar.menu.executive.workflow",
     icon: "material-symbols:schema",
-    path: "/executive/workflow",
+    path: "/enterprise/executive/workflow",
     parentId: 39,
     sort: 1,
     business: "executive.workflow",
@@ -392,12 +453,12 @@ export const initialMenuData = [
   },
   {
     id: 41,
-    name: "sidebar.menu.admin.rpa.browser",
+    name: "sidebar.menu.admin.rpa.config",
     icon: "material-symbols:settings-input-component",
-    path: "/rpa/browser",
+    path: "/admin/rpa/config",
     parentId: 44,
     sort: 1,
-    business: "admin.rpa.browser",
+    business: "admin.rpa.config",
   },
   {
     id: 47,
@@ -407,13 +468,109 @@ export const initialMenuData = [
     business: "personal",
   },
   {
-    id: 48,
-    name: "sidebar.menu.personal.profile",
-    icon: "material-symbols:account-box",
-    path: "/personal/profile",
+    id: 62,
+    name: "sidebar.menu.personal.base",
+    icon: "material-symbols:settings-account-box",
+    parentId: 47,
+    sort: 2,
+    business: "personal.base",
+  },
+  {
+    id: 63,
+    name: "sidebar.menu.personal.base.preference",
+    icon: "material-symbols:mark-email-unread",
+    path: "/personal/base/preference",
+    parentId: 62,
+    sort: 1,
+    business: "personal.base.preference",
+  },
+  {
+    id: 70,
+    name: "sidebar.menu.personal.health",
+    icon: "material-symbols:monitor-heart",
+    path: "/personal/health",
     parentId: 47,
     sort: 1,
-    business: "personal.profile",
+    business: "personal.health",
+  },
+  {
+    id: 71,
+    name: "sidebar.menu.personal.finance",
+    icon: "material-symbols:account-balance-wallet",
+    path: "/personal/finance",
+    parentId: 47,
+    sort: 2,
+    business: "personal.finance",
+  },
+  {
+    id: 72,
+    name: "sidebar.menu.personal.family",
+    icon: "material-symbols:family-restroom",
+    path: "/personal/family",
+    parentId: 47,
+    sort: 3,
+    business: "personal.family",
+  },
+  {
+    id: 73,
+    name: "sidebar.menu.personal.social",
+    icon: "material-symbols:hub",
+    path: "/personal/social",
+    parentId: 47,
+    sort: 4,
+    business: "personal.social",
+  },
+  {
+    id: 49,
+    name: "sidebar.menu.admin.base",
+    icon: "material-symbols:settings-applications",
+    parentId: 42,
+    sort: 8,
+    business: "admin.base",
+  },
+  {
+    id: 50,
+    name: "sidebar.menu.admin.base.config",
+    icon: "material-symbols:tune",
+    path: "/admin/base/sys_config",
+    parentId: 49,
+    sort: 1,
+    business: "admin.base.sys_config",
+  },
+  {
+    id: 51,
+    name: "sidebar.menu.admin.base.log",
+    icon: "material-symbols:history",
+    path: "/admin/base/log",
+    parentId: 49,
+    sort: 2,
+    business: "admin.base.log",
+  },
+  {
+    id: 77,
+    name: "sidebar.menu.voice",
+    icon: "material-symbols:call",
+    parentId: 42,
+    sort: 9,
+    business: "admin.voice",
+  },
+  {
+    id: 78,
+    name: "sidebar.menu.voice.session",
+    icon: "material-symbols:video-call",
+    path: "/admin/voice/session",
+    parentId: 77,
+    sort: 1,
+    business: "admin.voice.session",
+  },
+  {
+    id: 79,
+    name: "sidebar.menu.voice.config",
+    icon: "material-symbols:settings-input-component",
+    path: "/admin/voice/config",
+    parentId: 77,
+    sort: 2,
+    business: "admin.voice.config",
   },
 ] satisfies menuLike[];
 
@@ -431,6 +588,17 @@ type menuLike = {
  * 准备菜单数据同步语句
  */
 export async function prepareMenu(options?: { reset?: boolean }) {
+  // 校验 ID 唯一性，检测到重复 ID 时立刻抛出错误断言
+  const seenIds = new Map<number, string>();
+  for (const item of initialMenuData) {
+    if (seenIds.has(item.id)) {
+      throw new Error(
+        `❌ [initMenu] 检测到重复的菜单 ID: ${item.id} ! 菜单 "${item.name}" 与已存在的 "${seenIds.get(item.id)}" 冲突，请修改配置！`
+      );
+    }
+    seenIds.set(item.id, item.name);
+  }
+
   const stats = {
     total: initialMenuData.length,
     created: 0,
@@ -456,6 +624,24 @@ export async function prepareMenu(options?: { reset?: boolean }) {
     isEnabled: true,
     creatorId,
   }));
+  // 获取所有合法的 ID
+  const validIds = initialMenuData.map((item) => item.id);
+
+  if (validIds.length > 0) {
+    // 获取当前所有菜单 ID
+    const existing = await db.select({ id: menuTable.id }).from(menuTable);
+    const idsToDelete = existing
+      .map((row) => row.id)
+      .filter((id) => !validIds.includes(id));
+
+    if (idsToDelete.length > 0) {
+      const DELETE_BATCH = 100;
+      for (let i = 0; i < idsToDelete.length; i += DELETE_BATCH) {
+        const chunk = idsToDelete.slice(i, i + DELETE_BATCH);
+        queries.push(db.delete(menuTable).where(inArray(menuTable.id, chunk)));
+      }
+    }
+  }
 
   // 基于 ID 执行 Upsert，使用 db.batch() 合并请求
   const BATCH_SIZE = 10;

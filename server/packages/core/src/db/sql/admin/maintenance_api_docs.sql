@@ -1,4 +1,4 @@
-CREATE TABLE `maintenance_api_docs` (
+CREATE TABLE IF NOT EXISTS `maintenance_api_docs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`version` text,

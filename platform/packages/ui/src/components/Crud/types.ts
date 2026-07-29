@@ -44,7 +44,14 @@ export interface FilterFieldConfig<TFilters> {
 /**
  * 全局低代码 CRUD 页面核心配置接口
  */
-export interface SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra = unknown> {
+export interface SchemaCrudConfig<
+  TRecord,
+  TFilters,
+  TApiData,
+  TExtra = unknown,
+  TAddData = never,
+  TUpdateData = never,
+> {
   /** 启用游标分页模式：total 与翻页解耦，由 hasMore/cursor 驱动翻页 */
   cursorPagination?: boolean;
 
@@ -55,8 +62,8 @@ export interface SchemaCrudConfig<TRecord, TFilters, TApiData, TExtra = unknown>
         data?: { list?: TRecord[]; total?: number; hasMore?: boolean; cursor?: string };
       };
     }>;
-    add?: (args: { data: Omit<TRecord, 'id'> }) => Promise<unknown>;
-    update?: (args: { data: TRecord }) => Promise<unknown>;
+    add?: (args: { data: TAddData }) => Promise<unknown>;
+    update?: (args: { data: TUpdateData }) => Promise<unknown>;
     delete?: (args: { data: { id: number } }) => Promise<unknown>;
   };
 

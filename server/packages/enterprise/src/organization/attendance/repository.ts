@@ -1,13 +1,13 @@
 import db from "@hodor/core/db/index";
 import { attendanceTable, type AttendancePOLike } from "./model";
-import { userTable } from "@hodor/admin/system/user/model";
+import { registry } from "@hodor/admin/common/registry.js";
 import { eq, and, or, like, asc, desc, count, type SQL } from "drizzle-orm";
 import type { InferInsertModel } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 
 function buildWhereCondition(condition?: {
   keyword?: string;
-  status?: number;
+  status?: 0 | 1 | 2 | 3;
   employeeId?: number;
   date?: string;
 }) {
@@ -38,7 +38,7 @@ export async function findPageAll(params: {
   orderBy?: keyof AttendancePOLike;
   descend?: boolean;
   keyword?: string;
-  status?: number;
+  status?: 0 | 1 | 2 | 3;
   employeeId?: number;
   date?: string;
 }) {
@@ -58,7 +58,7 @@ export async function findPage(params: {
   orderBy?: keyof AttendancePOLike;
   descend?: boolean;
   keyword?: string;
-  status?: number;
+  status?: 0 | 1 | 2 | 3;
   employeeId?: number;
   date?: string;
 }) {
@@ -79,19 +79,29 @@ export async function findPage(params: {
   }
 
   const rows = await db
-    .select({
-      attendance: attendanceTable,
-      employeeName: userTable.username,
-    })
+    .select()
     .from(attendanceTable)
-    .leftJoin(userTable, eq(attendanceTable.employeeId, userTable.id))
     .where(where)
     .orderBy(!descend ? asc(orderField) : desc(orderField))
     .limit(pageSize)
     .offset(offset);
 
-  const list = rows.map(({ attendance, employeeName }) => {
+  const employeeIds = Array.from(
+    new Set(
+      rows
+        .map((r) => r.employeeId)
+        .filter((id): id is number => id !== undefined && id !== null)
+    )
+  );
+
+  const userMap =
+    employeeIds.length > 0
+      ? await registry.system.getUserNameMapByIds(employeeIds)
+      : {};
+
+  const list = rows.map((attendance) => {
     const { employeeId, ...rest } = attendance;
+    const employeeName = employeeId ? userMap[employeeId] : undefined;
     return {
       ...rest,
       employeeObj: {
@@ -106,20 +116,19 @@ export async function findPage(params: {
 
 export async function findById(id: number) {
   const rows = await db
-    .select({
-      attendance: attendanceTable,
-      employeeName: userTable.username,
-    })
+    .select()
     .from(attendanceTable)
-    .leftJoin(userTable, eq(attendanceTable.employeeId, userTable.id))
     .where(eq(attendanceTable.id, id))
     .limit(1);
 
   const row = rows[0];
   if (!row) return null;
 
-  const { attendance, employeeName } = row;
-  const { employeeId, ...rest } = attendance;
+  const { employeeId, ...rest } = row;
+  const employeeName =
+    employeeId !== undefined && employeeId !== null
+      ? await registry.system.getUserNameById(employeeId)
+      : undefined;
 
   return {
     ...rest,

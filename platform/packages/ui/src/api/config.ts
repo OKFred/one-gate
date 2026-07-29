@@ -84,10 +84,17 @@ function setupInterceptors(service: AxiosInstance) {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      if (config.method !== 'get' && config.method !== 'head' && !config.headers['Content-Type']) {
+        config.headers['Content-Type'] = 'application/json';
+      }
 
       let _url = config.url;
       if (!_url) {
         throw new Error('url is required');
+      }
+      // 自动添加post请求中的data，避免请求报错
+      if (config.method === 'post' && !config?.data) {
+        config.data = {};
       }
       const path = config.path;
       if (typeof path === 'object' && path) {

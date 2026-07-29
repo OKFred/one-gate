@@ -1,10 +1,10 @@
-CREATE TABLE `enterprise_attendance` (
+CREATE TABLE IF NOT EXISTS `enterprise_attendance` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`employee_id` integer NOT NULL,
 	`date` text NOT NULL,
 	`check_in_time` integer,
 	`check_out_time` integer,
-	`status` integer DEFAULT 0 NOT NULL,
+	`status` integer NOT NULL,
 	`remark` text,
 	`creator_id` integer NOT NULL,
 	`updater_id` integer,

@@ -123,7 +123,7 @@ async function onAdd(
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
   const { userId: creatorId } = userObj;
-  const { jobKey, name, cronExpression, status, parameters } = params;
+  const { jobKey, name, cronExpression, status = true, parameters } = params;
 
   // 验证 Cron 表达式是否合法，并计算初始下次运行时间
   let nextRunTimeUtc: number | null = null;
@@ -143,6 +143,7 @@ async function onAdd(
     name,
     cronExpression,
     status,
+    runCount: 0,
     parameters,
     nextRunTimeUtc,
     creatorId,

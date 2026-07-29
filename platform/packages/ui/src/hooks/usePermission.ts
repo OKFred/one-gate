@@ -17,6 +17,21 @@ export const usePermission = () => {
 
 export const permissions = {
   admin: {
+    /** 底座 */
+    base: {
+      read: 'admin.base:read',
+      /** sys_config */
+      sys_config: {
+        read: 'admin.base.sys_config:read',
+        add: 'admin.base.sys_config:add',
+        edit: 'admin.base.sys_config:edit',
+        delete: 'admin.base.sys_config:delete',
+      },
+      /** 日志 */
+      log: {
+        read: 'admin.base.log:read',
+      },
+    },
     /** 系统管理 */
     system: {
       read: 'admin.system:read',
@@ -135,8 +150,8 @@ export const permissions = {
         view: 'admin.maintenance.cache:view',
       },
       /** 登录日志 */
-      audit_login: {
-        read: 'admin.maintenance.audit_login:read',
+      login_log: {
+        read: 'admin.maintenance.login_log:read',
       },
       /** 定时任务管理 */
       cron: {
@@ -219,6 +234,14 @@ export const permissions = {
       chat: {
         read: 'admin.ai.chat:read',
       },
+      /** 全局 AI 搜索 */
+      search: {
+        read: 'admin.ai.search:read',
+      },
+      /** OpenAI 兼容服务 */
+      openai: {
+        read: 'admin.ai.openai:read',
+      },
     },
     /** Swarm 集群 */
     swarm: {
@@ -245,17 +268,42 @@ export const permissions = {
     /** RPA */
     rpa: {
       read: 'admin.rpa:read',
-      /** 浏览器配置 */
-      browser: {
-        read: 'admin.rpa.browser:read',
-        add: 'admin.rpa.browser:add',
-        edit: 'admin.rpa.browser:edit',
-        delete: 'admin.rpa.browser:delete',
+      /** RPA 配置 */
+      config: {
+        read: 'admin.rpa.config:read',
+        add: 'admin.rpa.config:add',
+        edit: 'admin.rpa.config:edit',
+        delete: 'admin.rpa.config:delete',
+      },
+    },
+    /** MQTT 消息管理 */
+    mqtt: {
+      read: 'admin.mqtt:read',
+      add: 'admin.mqtt:add',
+      edit: 'admin.mqtt:edit',
+      delete: 'admin.mqtt:delete',
+      /** MQTT 配置 */
+      config: {
+        read: 'admin.mqtt.config:read',
+        add: 'admin.mqtt.config:add',
+        edit: 'admin.mqtt.config:edit',
+        delete: 'admin.mqtt.config:delete',
       },
     },
   },
   enterprise: {
     read: 'enterprise:read',
+    /** enterprise.mail */
+    mail: {
+      read: 'enterprise.mail:read',
+      /** edm */
+      edm: {
+        read: 'enterprise.mail.edm:read',
+        add: 'enterprise.mail.edm:add',
+        edit: 'enterprise.mail.edm:edit',
+        delete: 'enterprise.mail.edm:delete',
+      },
+    },
     /** 组织管理 */
     organization: {
       read: 'organization:read',
@@ -281,12 +329,44 @@ export const permissions = {
   },
   personal: {
     read: 'personal:read',
-    /** 个人信息 */
-    profile: {
-      read: 'personal.profile:read',
-      add: 'personal.profile:add',
-      edit: 'personal.profile:edit',
-      delete: 'personal.profile:delete',
+    /** 账号配置 */
+    base: {
+      read: 'personal.base:read',
+      /** preference */
+      preference: {
+        read: 'personal.base.preference:read',
+        add: 'personal.base.preference:add',
+        edit: 'personal.base.preference:edit',
+        delete: 'personal.base.preference:delete',
+      },
+    },
+    /** 健康与医疗 */
+    health: {
+      read: 'personal.health:read',
+      add: 'personal.health:add',
+      edit: 'personal.health:edit',
+      delete: 'personal.health:delete',
+    },
+    /** 收入状况 */
+    finance: {
+      read: 'personal.finance:read',
+      add: 'personal.finance:add',
+      edit: 'personal.finance:edit',
+      delete: 'personal.finance:delete',
+    },
+    /** 家庭 */
+    family: {
+      read: 'personal.family:read',
+      add: 'personal.family:add',
+      edit: 'personal.family:edit',
+      delete: 'personal.family:delete',
+    },
+    /** 社交 */
+    social: {
+      read: 'personal.social:read',
+      add: 'personal.social:add',
+      edit: 'personal.social:edit',
+      delete: 'personal.social:delete',
     },
   },
 } as const;

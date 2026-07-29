@@ -1,9 +1,9 @@
-CREATE TABLE `enterprise_workflow` (
+CREATE TABLE IF NOT EXISTS `enterprise_workflow` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`description` text,
 	`flow_data` text NOT NULL,
-	`is_enabled` integer DEFAULT true NOT NULL,
+	`is_enabled` integer NOT NULL,
 	`remark` text,
 	`creator_id` integer NOT NULL,
 	`updater_id` integer,

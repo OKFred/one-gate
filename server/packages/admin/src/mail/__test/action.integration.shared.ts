@@ -4,12 +4,12 @@ import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
 import mailActionService from "../action/service";
 import * as mailAccountRepository from "../account/repository";
 import * as mailTemplateRepository from "../template/repository";
-import * as mailLogRepository from "../log/repository";
+import { registry } from "../../common/registry";
 
 // 静态导入 SQL 文件文本（Vite 支持 ?raw 后缀直接读取文本）
 import accountSql from "@hodor/core/db/sql/mail_account.sql?raw";
 import templateSql from "@hodor/core/db/sql/mail_template.sql?raw";
-import logSql from "@hodor/core/db/sql/mail_log.sql?raw";
+import logSql from "@hodor/core/db/sql/base_biz_log.sql?raw";
 
 export function runMailActionIntegrationTests({
   runtime,
@@ -44,6 +44,7 @@ export function runMailActionIntegrationTests({
         nickname: "Mock Sender",
         host: "smtp.example.com",
         port: 465,
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -54,6 +55,7 @@ export function runMailActionIntegrationTests({
         title: "Hello {{name}}",
         langCode: "zh-CN",
         content: "Welcome, your code is {{code}}",
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -79,13 +81,14 @@ export function runMailActionIntegrationTests({
       expect(sendRes.logId).toBeGreaterThan(0);
 
       // 5. 验证数据库中的邮件日志
-      const log = await mailLogRepository.findById(sendRes.logId);
+      const log = await registry.base.log.biz.detail(sendRes.logId);
       expect(log).not.toBeNull();
-      expect(log!.sendStatus).toBe(true);
-      expect(log!.mailFrom).toBe("mock-sender@example.com");
-      expect(log!.mailTo).toBe("mock-receiver@example.com");
-      expect(log!.title).toBe("Hello Antigravity");
-      expect(log!.templateId).toBe(String(templateId));
+      expect(log!.status).toBe(1);
+      const logValue = log!.logValue as any;
+      expect(logValue.mailFrom).toBe("mock-sender@example.com");
+      expect(logValue.mailTo).toBe("mock-receiver@example.com");
+      expect(logValue.title).toBe("Hello Antigravity");
+      expect(logValue.templateId).toBe(String(templateId));
     });
 
     it("Mock 模式下验证邮箱连接，应该返回 true", async () => {
@@ -95,6 +98,7 @@ export function runMailActionIntegrationTests({
         nickname: "Verify Nick",
         host: "smtp.example.com",
         port: 587,
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -126,6 +130,7 @@ export function runMailActionIntegrationTests({
         nickname: "Real Sender Test",
         host: realHost,
         port: realPort,
+        scope: "biz",
         isEnabled: true,
         creatorId: 1,
       });
@@ -145,10 +150,11 @@ export function runMailActionIntegrationTests({
       expect(sendRes.logId).toBeGreaterThan(0);
 
       // 3. 验证日志
-      const log = await mailLogRepository.findById(sendRes.logId);
+      const log = await registry.base.log.biz.detail(sendRes.logId);
       expect(log).not.toBeNull();
-      expect(log!.sendStatus).toBe(true);
-      expect(log!.mailFrom).toBe(realAddress);
+      expect(log!.status).toBe(1);
+      const logValue = log!.logValue as any;
+      expect(logValue.mailFrom).toBe(realAddress);
     });
 
     it.runIf(shouldRun)(
@@ -165,6 +171,7 @@ export function runMailActionIntegrationTests({
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
+          scope: "biz",
           isEnabled: true,
           creatorId: 1,
         });
@@ -191,6 +198,7 @@ export function runMailActionIntegrationTests({
           nickname: "Real Sender Test",
           host: realHost,
           port: realPort,
+          scope: "biz",
           isEnabled: true,
           creatorId: 1,
         });

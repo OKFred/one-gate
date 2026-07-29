@@ -13,9 +13,18 @@ import { ossTranslations } from "../../../admin/src/oss/translation";
 import { dataTranslations } from "../../../admin/src/data/translation";
 import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
 import { workflowTranslations } from "../../../enterprise/src/executive/workflow/translation";
-import { profileTranslations } from "../../../personal/src/profile/translation";
+import { edmTranslations } from "../../../enterprise/src/mail/edm/translation";
+
+import { preferenceTranslations } from "../../../personal/src/base/preference/translation";
+import { financialTranslations } from "../../../personal/src/financial/translation";
+import { familyTranslations } from "../../../personal/src/family/translation";
+import { healthTranslations } from "../../../personal/src/health/translation";
+import { socialTranslations } from "../../../personal/src/social/translation";
 import { systemTranslations } from "../../../admin/src/system/translation";
-import { browserTranslations } from "../../../admin/src/rpa/browser/translation";
+import { configTranslations } from "../../../admin/src/rpa/config/translation";
+import { baseTranslations } from "../../../admin/src/base/translation";
+import { mqttTranslations } from "../../../admin/src/mqtt/translation";
+import { voiceTranslations } from "../../../admin/src/voice/translation";
 import { sharedTranslations } from "./translation/shared";
 import type { BusinessKey } from "../types/business";
 import type { LanguageCode } from "./initLanguage";
@@ -55,11 +64,18 @@ export function mapTranslations(
 }
 
 /**
- * 准备多语言数据同步语句
+ * 准备多语言翻译数据同步语句
  */
 export async function prepareTranslation(options?: { reset?: boolean }) {
-  // 0. 数据扁平化处理
-  const flattenedData: any[] = [];
+  const flattenedData: Array<{
+    application: "frontend" | "backend";
+    business: BusinessKey;
+    tKey: string;
+    langCode: string;
+    tValue: string;
+    isEnabled: boolean;
+  }> = [];
+
   for (const item of initialTranslationData) {
     for (const [langCode, tValue] of Object.entries(item.langCodes)) {
       flattenedData.push({
@@ -135,7 +151,16 @@ export const initialTranslationData = mapTranslations({
   ...ossTranslations,
   ...attendanceTranslations,
   ...workflowTranslations,
-  ...profileTranslations,
+  ...edmTranslations,
+
+  ...preferenceTranslations,
+  ...financialTranslations,
+  ...familyTranslations,
+  ...healthTranslations,
+  ...socialTranslations,
   ...systemTranslations,
-  ...browserTranslations,
+  ...configTranslations,
+  ...baseTranslations,
+  ...mqttTranslations,
+  ...voiceTranslations,
 }) satisfies BatchTranslationItem[];

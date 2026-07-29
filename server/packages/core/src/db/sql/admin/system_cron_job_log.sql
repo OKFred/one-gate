@@ -1,4 +1,4 @@
-CREATE TABLE `system_cron_job_log` (
+CREATE TABLE IF NOT EXISTS `system_cron_job_log` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`job_id` integer NOT NULL,
 	`status` integer NOT NULL,

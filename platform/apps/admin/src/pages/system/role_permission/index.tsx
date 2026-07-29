@@ -50,9 +50,7 @@ export default function RolePermissionManagement() {
       try {
         const res = await RoleAPI.listAllFn({ data: {} });
         setAllRoles(res.data.data || []);
-      } catch (error) {
-        console.error('Failed to fetch roles:', error);
-      }
+      } catch {}
     };
     fetchRoles();
   }, []);

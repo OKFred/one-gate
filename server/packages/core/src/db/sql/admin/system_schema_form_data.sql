@@ -1,4 +1,4 @@
-CREATE TABLE `system_schema_form_data` (
+CREATE TABLE IF NOT EXISTS `system_schema_form_data` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`form_code` text NOT NULL,
 	`business_id` integer NOT NULL,

@@ -1,4 +1,4 @@
-CREATE TABLE `system_department` (
+CREATE TABLE IF NOT EXISTS `system_department` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`parent_id` integer,
@@ -10,4 +10,4 @@ CREATE TABLE `system_department` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `system_department_name_unique` ON `system_department` (`name`);
+CREATE UNIQUE INDEX IF NOT EXISTS `system_department_name_unique` ON `system_department` (`name`);

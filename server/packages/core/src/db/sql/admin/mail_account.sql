@@ -1,4 +1,4 @@
-CREATE TABLE `mail_account` (
+CREATE TABLE IF NOT EXISTS `mail_account` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`mail_address` text NOT NULL,
 	`password` text NOT NULL,
@@ -6,6 +6,9 @@ CREATE TABLE `mail_account` (
 	`host` text NOT NULL,
 	`port` integer NOT NULL,
 	`is_enabled` integer NOT NULL,
+	`scope` text NOT NULL,
+	`tenant_id` integer,
+	`user_id` integer,
 	`remark` text,
 	`creator_id` integer NOT NULL,
 	`updater_id` integer,
@@ -13,6 +16,6 @@ CREATE TABLE `mail_account` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `mail_account_mail_address_unique` ON `mail_account` (`mail_address`);
+CREATE UNIQUE INDEX IF NOT EXISTS `mail_account_mail_address_unique` ON `mail_account` (`mail_address`);
 
-CREATE UNIQUE INDEX `idx_mail_address` ON `mail_account` (`mail_address`);
+CREATE UNIQUE INDEX IF NOT EXISTS `idx_mail_address` ON `mail_account` (`mail_address`);

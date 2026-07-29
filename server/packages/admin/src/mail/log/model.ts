@@ -1,24 +1,13 @@
-import { sqliteTable, integer, text, index } from "drizzle-orm/sqlite-core";
-import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { JSONSchema } from "json-schema-to-ts";
-import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
   IndexPO,
   IndexVO,
-  AuditPO,
-  AuditVO,
   IndexKey,
-  AuditKeys,
   type IndexKeyLike,
-  type AuditAddOmitKeyLike,
-  type AuditUpdateOmitKeyLike,
 } from "@hodor/core/db/common/schema";
 import { type RequiredKeys } from "@hodor/core/types/app";
 
-//----------------- PO ----------------//
-const MailLogUniquePO = {} as const satisfies Partial<
-  Record<keyof MailLogPOLike, JSONSchema>
->;
+//----------------- Base PO ----------------//
 
 const MailLogBasePO = {
   mailTo: {
@@ -68,47 +57,67 @@ const MailLogBasePO = {
     description: "备注",
     maxLength: 500,
   },
-} as const satisfies Partial<Record<keyof MailLogPOLike, JSONSchema>>;
+} as const satisfies Record<string, JSONSchema>;
 
-const MailLogPO = {
+export const MailLogPO = {
   ...IndexPO,
-  ...MailLogUniquePO,
   ...MailLogBasePO,
-  ...AuditPO,
-} as const satisfies Record<keyof MailLogPOLike, JSONSchema>;
+  creatorId: { type: "number", description: "创建人ID" },
+  creatorName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "创建人名称",
+  },
+  createTimeUtc: { type: "number", description: "创建时间(UTC)" },
+} as const satisfies Record<string, JSONSchema>;
 
-export type MailLogPOLike = InferSelectModel<typeof mailLogTable>;
-type MailLogSelectPOLike = InferInsertModel<typeof mailLogTable>;
-type MailLogAddPOLike = Omit<MailLogPOLike, IndexKeyLike | AuditAddOmitKeyLike>;
-type MailLogUpdatePOLike = Partial<
-  Omit<MailLogSelectPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
-> &
-  Pick<MailLogPOLike, IndexKeyLike>;
+export type MailLogPOLike = {
+  id: number;
+  mailTo: string;
+  mailFrom: string;
+  title: string;
+  templateId: string | null;
+  templateParams: string | null;
+  sendStatus: boolean;
+  exceptionCode: string | null;
+  exceptionDetails: string | null;
+  remark: string | null;
+  creatorId: number;
+  creatorName: string | null;
+  createTimeUtc: number;
+};
 
 //----------------- VO ----------------//
 export { IndexVO };
-export const MailLogUniqueVO = MailLogUniquePO;
 export const MailLogBaseVO = MailLogBasePO;
 export const MailLogVO = {
   ...IndexVO,
-  ...MailLogUniqueVO,
   ...MailLogBaseVO,
-  ...AuditVO,
+  creatorId: { type: "number", description: "创建人ID" },
+  creatorName: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "创建人名称",
+  },
+  createTimeUtc: { type: "number", description: "创建时间(UTC)" },
 } as const satisfies Partial<Record<keyof MailLogVOLike, JSONSchema>>;
+
 export const MailLogListVO = MailLogVO;
 export const MailLogAddVO = {
-  ...MailLogUniqueVO,
   ...MailLogBaseVO,
 } as const satisfies Partial<Record<keyof MailLogVOLike, JSONSchema>>;
 export const MailLogUpdateVO = {
   ...IndexVO,
-  ...MailLogUniqueVO,
   ...MailLogBaseVO,
 } as const satisfies Partial<Record<keyof MailLogVOLike, JSONSchema>>;
 
 export type MailLogVOLike = MailLogPOLike;
-export type MailLogAddVOLike = Omit<MailLogAddPOLike, "creatorId">;
-export type MailLogUpdateVOLike = MailLogUpdatePOLike;
+export type MailLogAddVOLike = Omit<
+  MailLogPOLike,
+  "id" | "creatorId" | "creatorName" | "createTimeUtc"
+>;
+export type MailLogUpdateVOLike = Partial<MailLogAddVOLike> &
+  Pick<MailLogPOLike, IndexKeyLike>;
 export type MailLogDeleteVOLike = Pick<MailLogVOLike, IndexKeyLike>;
 export type MailLogGetVOLike = Pick<MailLogVOLike, IndexKeyLike>;
 
@@ -135,7 +144,14 @@ export const MailLogGetKeys = [
 const MailLogBaseKeys = [
   ...IndexKey,
   ...MailLogAddKeys,
-  ...AuditKeys,
+  "templateId",
+  "templateParams",
+  "exceptionCode",
+  "exceptionDetails",
+  "remark",
+  "creatorId",
+  "creatorName",
+  "createTimeUtc",
 ] as const satisfies RequiredKeys<MailLogPOLike>[];
 
 export const MailLogListKeys = MailLogBaseKeys;
@@ -150,33 +166,3 @@ export const MailLogSortableKeys = [
   "sendStatus",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<MailLogPOLike>[];
-
-export const mailLogTable = sqliteTable(
-  "mail_log",
-  {
-    id: integer("id").primaryKey({ autoIncrement: true }),
-    mailTo: text("mail_to").notNull(),
-    mailFrom: text("mail_from").notNull(),
-    title: text("title").notNull(),
-    templateId: text("template_id"),
-    templateParams: text("template_params"),
-    sendStatus: integer("send_status", { mode: "boolean" }).notNull(),
-    exceptionCode: text("exception_code"),
-    exceptionDetails: text("exception_details"),
-    remark: text("remark"),
-    creatorId: integer("creator_id").notNull(),
-    updaterId: integer("updater_id"),
-    createTimeUtc: integer("create_time_utc")
-      .notNull()
-      .default(getCurrentTimestampUtcSql()),
-    updateTimeUtc: integer("update_time_utc"),
-  },
-  (table) => [
-    index("idx_mail_to_time").on(table.mailTo, table.createTimeUtc),
-    index("idx_send_status").on(table.sendStatus),
-    index("idx_template_id").on(table.templateId),
-    index("idx_create_time").on(table.createTimeUtc),
-  ]
-);
-
-export default mailLogTable;

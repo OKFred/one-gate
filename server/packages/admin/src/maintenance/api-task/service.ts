@@ -117,11 +117,11 @@ async function onAdd(
     description,
     baseUrl,
     path,
-    method,
+    method = "GET",
     headers,
     requestSchema,
     responseSchema,
-    timeoutMs,
+    timeoutMs = 30000,
     isEnabled,
   } = params;
 
@@ -554,7 +554,7 @@ async function onBulkAdd(
         description: task.description || null,
         baseUrl: task.baseUrl,
         path: task.path,
-        method: task.method as any,
+        method: (task.method || "GET") as any,
         headers: task.headers || null,
         requestSchema: task.requestSchema || null,
         responseSchema: task.responseSchema || null,

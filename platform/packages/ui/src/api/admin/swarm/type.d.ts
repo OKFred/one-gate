@@ -18,6 +18,7 @@ export type AddDockerConfigReq = NonNullable<Parameters<typeof DockerConfigAPI.a
 export type UpdateDockerConfigReq = NonNullable<
   Parameters<typeof DockerConfigAPI.updateFn>[0]
 >['data'];
+export type DockerConfigObj = NonNullable<ListDockerConfigRes['list']>[number];
 
 /** 业务对象类型 */
 export interface DockerServiceObj {

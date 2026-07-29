@@ -51,6 +51,9 @@ export async function findPageAll(params: {
       host: mailAccountTable.host,
       port: mailAccountTable.port,
       isEnabled: mailAccountTable.isEnabled,
+      scope: mailAccountTable.scope,
+      tenantId: mailAccountTable.tenantId,
+      userId: mailAccountTable.userId,
     })
     .from(mailAccountTable)
     .where(buildWhereCondition(params))

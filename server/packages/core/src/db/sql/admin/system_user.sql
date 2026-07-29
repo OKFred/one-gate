@@ -1,4 +1,4 @@
-CREATE TABLE `system_user` (
+CREATE TABLE IF NOT EXISTS `system_user` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`username` text NOT NULL,
 	`password` text NOT NULL,
@@ -14,4 +14,4 @@ CREATE TABLE `system_user` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `system_user_username_unique` ON `system_user` (`username`);
+CREATE UNIQUE INDEX IF NOT EXISTS `system_user_username_unique` ON `system_user` (`username`);

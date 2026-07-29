@@ -20,6 +20,13 @@ export type CheckPermissionSeeds<T, Parent extends string = ""> = {
 };
 
 export const permissionSeeds = {
+  /** 底座 */
+  "admin.base": {
+    "": ["read"],
+    sys_config: ["read", "add", "edit", "delete"],
+    /** 日志 */
+    log: ["read"],
+  },
   /** 系统管理 */
   "admin.system": {
     "": ["read"],
@@ -66,7 +73,7 @@ export const permissionSeeds = {
     /** 缓存管理 */
     cache: ["read", "add", "edit", "delete", "view"],
     /** 登录日志 */
-    audit_login: ["read"],
+    login_log: ["read"],
     /** 定时任务管理 */
     cron: ["read", "add", "edit", "delete"],
     /** API 采集任务管理 */
@@ -102,6 +109,10 @@ export const permissionSeeds = {
   enterprise: {
     "": ["read"],
   },
+  "enterprise.mail": {
+    "": ["read"],
+    edm: ["read", "add", "edit", "delete"],
+  },
   /** 组织管理 */
   organization: {
     "": ["read"],
@@ -117,8 +128,20 @@ export const permissionSeeds = {
   /** 个人中心 */
   personal: {
     "": ["read"],
-    /** 个人信息 */
-    profile: ["read", "add", "edit", "delete"],
+
+    /** 账号配置 */
+    base: {
+      "": ["read"],
+      preference: ["read", "add", "edit", "delete"],
+    },
+    /** 健康与医疗 */
+    health: ["read", "add", "edit", "delete"],
+    /** 收入状况 */
+    finance: ["read", "add", "edit", "delete"],
+    /** 家庭 */
+    family: ["read", "add", "edit", "delete"],
+    /** 社交 */
+    social: ["read", "add", "edit", "delete"],
   },
   /** AI */
   "admin.ai": {
@@ -127,6 +150,10 @@ export const permissionSeeds = {
     config: ["read", "add", "edit", "delete"],
     /** AI 对话 */
     chat: ["read"],
+    /** 全局 AI 搜索 */
+    search: ["read"],
+    /** OpenAI 兼容服务 */
+    openai: ["read"],
   },
   /** Swarm 集群 */
   "admin.swarm": {
@@ -141,8 +168,24 @@ export const permissionSeeds = {
   /** RPA */
   "admin.rpa": {
     "": ["read"],
-    /** 浏览器配置 */
-    browser: ["read", "add", "edit", "delete"],
+    /** RPA 配置 */
+    config: ["read", "add", "edit", "delete"],
+  },
+  /** MQTT 消息管理 */
+  "admin.mqtt": {
+    "": ["read"],
+    /** MQTT 控制台 */
+    console: ["read", "add", "edit", "delete"],
+    /** MQTT 配置 */
+    config: ["read", "add", "edit", "delete"],
+  },
+  /** 实时通话 */
+  "admin.voice": {
+    "": ["read"],
+    /** 通话会话 */
+    session: ["read", "add", "edit"],
+    /** 服务配置 */
+    config: ["read", "add", "edit", "delete"],
   },
 } as const;
 

@@ -53,6 +53,22 @@ const MailTemplateBasePO = {
     type: "boolean",
     description: "是否启用",
   },
+  scope: {
+    type: "string",
+    enum: ["sys", "biz", "user"],
+    description: "作用域：sys(系统级)/biz(企业级)/user(个人级)",
+    default: "sys",
+  },
+  tenantId: {
+    type: ["number", "null"],
+    description: "租户ID（企业级专用）",
+    nullable: true,
+  },
+  userId: {
+    type: ["number", "null"],
+    description: "用户ID（个人级专用）",
+    nullable: true,
+  },
   remark: {
     type: ["string", "null"],
     nullable: true,
@@ -156,6 +172,9 @@ export const mailTemplateTable = sqliteTable(
     content: text("content").notNull(),
     category: text("category"),
     isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+    scope: text("scope").$type<"sys" | "biz" | "user">().notNull(),
+    tenantId: integer("tenant_id"),
+    userId: integer("user_id"),
     remark: text("remark"),
     creatorId: integer("creator_id").notNull(),
     updaterId: integer("updater_id"),

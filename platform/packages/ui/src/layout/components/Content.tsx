@@ -14,19 +14,15 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
   const { isMobile } = useResponsive();
   const location = useLocation();
 
-  const currentScope = (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
+  const currentScope =
+    (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
   const isHost = currentScope === 'admin';
 
   // 识别当前路由属于哪一个子应用
   const isEnterpriseActive =
-    isHost &&
-    (location.pathname.startsWith('/organization/') ||
-      location.pathname.startsWith('organization/') ||
-      location.pathname.startsWith('/executive/') ||
-      location.pathname.startsWith('executive/'));
+    isHost && (location.pathname.startsWith('/enterprise/') || location.pathname === '/enterprise');
   const isPersonalActive =
-    isHost &&
-    (location.pathname.startsWith('/personal/') || location.pathname.startsWith('personal/'));
+    isHost && (location.pathname.startsWith('/personal/') || location.pathname === '/personal');
   const isMicroAppActive = isEnterpriseActive || isPersonalActive;
 
   return (
@@ -35,8 +31,12 @@ const Content: React.FC<ContentProps> = ({ sidebarOpen }) => {
       className={isMobile ? 'content-mobile-padding' : ''}
       sx={{
         flexGrow: 1,
+        minWidth: 0,
         p: { xs: 2, md: 3 },
-        width: { sm: sidebarOpen ? `calc(100vw - ${drawerWidth}px)` : `calc(100vw - 56px)` },
+        width: {
+          xs: '100%',
+          sm: sidebarOpen ? `calc(100vw - ${drawerWidth}px)` : `calc(100vw - 56px)`,
+        },
         minHeight: 'calc(100vh - 64px)',
         pb: isMobile ? 'calc(72px + env(safe-area-inset-bottom, 16px))' : { xs: 2, md: 3 },
         transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',

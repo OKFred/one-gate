@@ -220,7 +220,7 @@ export async function runWorkflow(
     const visited = new Set<string>();
 
     // 获取激活的默认配置，用于 CDP 浏览器连接
-    const activeConfig = await registry.rpa.findDefaultActiveBrowser();
+    const activeConfig = await registry.rpa.findDefaultActiveConfig();
 
     while (currentNode && !visited.has(currentNode.id)) {
       visited.add(currentNode.id);
@@ -268,7 +268,7 @@ export async function runWorkflow(
 
         // 如果客户端未建立连接，则初始化连接
         if (!cdpClient) {
-          let wsUrl = activeConfig.cdpUrl;
+          let wsUrl = activeConfig.cdpUrl as string;
           // 如果填写的不是带有 /devtools/ 的完整 ws 调试地址，或者是以 http 开头，或者是 Cloudflare 模式，我们就需要获取真正的 webSocketDebuggerUrl
           const needFetchVersion =
             activeConfig.authToken ||
@@ -351,7 +351,10 @@ export async function runWorkflow(
             }
           }
 
-          cdpClient = new CDPClient(wsUrl, activeConfig.authToken);
+          cdpClient = new CDPClient(
+            wsUrl,
+            activeConfig.authToken as string | undefined
+          );
           await cdpClient.connect();
 
           // 创建新 Page 页面
@@ -554,7 +557,7 @@ ${expression}
         };
 
         // 创建服务
-        const createRes = await registry.swarm.createService(spec);
+        const createRes = await registry.swarm_docker.createService(spec);
         const serviceId = createRes.ID;
 
         // 轮询服务运行状态，最大等待 5 分钟
@@ -565,7 +568,7 @@ ${expression}
           await new Promise((r) => setTimeout(r, 2000));
           try {
             // 获取任务详情
-            const tasks = await registry.swarm.listTasks({
+            const tasks = await registry.swarm_docker.listTasks({
               service: [serviceName],
             });
             if (tasks.length > 0) {
@@ -589,18 +592,21 @@ ${expression}
 
         if (!isDone) {
           // 超时处理
-          await registry.swarm.removeService(serviceId);
+          await registry.swarm_docker.removeService(serviceId);
           throw new Error("Docker Swarm 任务运行超时(5分钟)。");
         }
 
         // 获取输出日志
         let taskLogs = "无日志输出。";
         try {
-          taskLogs = await registry.swarm.getServiceLogs(serviceName, 200);
+          taskLogs = await registry.swarm_docker.getServiceLogs(
+            serviceName,
+            200
+          );
         } catch (e) {}
 
         // 删除服务释放资源
-        await registry.swarm.removeService(serviceId);
+        await registry.swarm_docker.removeService(serviceId);
 
         if (finalStatus === "failed" || finalStatus === "rejected") {
           throw new Error(

@@ -15,3 +15,6 @@ node_modules/
 package-lock.json
 midscene_run/
 *.db
+
+code-reviews/
+tsconfig.tsbuildinfo

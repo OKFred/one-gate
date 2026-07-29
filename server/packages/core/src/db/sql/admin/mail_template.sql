@@ -1,4 +1,4 @@
-CREATE TABLE `mail_template` (
+CREATE TABLE IF NOT EXISTS `mail_template` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`title` text NOT NULL,
@@ -6,6 +6,9 @@ CREATE TABLE `mail_template` (
 	`content` text NOT NULL,
 	`category` text,
 	`is_enabled` integer NOT NULL,
+	`scope` text NOT NULL,
+	`tenant_id` integer,
+	`user_id` integer,
 	`remark` text,
 	`creator_id` integer NOT NULL,
 	`updater_id` integer,
@@ -13,6 +16,6 @@ CREATE TABLE `mail_template` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `mail_template_name_unique` ON `mail_template` (`name`);
+CREATE UNIQUE INDEX IF NOT EXISTS `mail_template_name_unique` ON `mail_template` (`name`);
 
-CREATE UNIQUE INDEX `idx_template_name` ON `mail_template` (`name`);
+CREATE UNIQUE INDEX IF NOT EXISTS `idx_template_name` ON `mail_template` (`name`);

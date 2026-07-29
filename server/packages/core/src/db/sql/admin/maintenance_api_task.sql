@@ -1,15 +1,15 @@
-CREATE TABLE `maintenance_api_task` (
+CREATE TABLE IF NOT EXISTS `maintenance_api_task` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`task_key` text NOT NULL,
 	`name` text NOT NULL,
 	`description` text,
 	`base_url` text NOT NULL,
 	`path` text NOT NULL,
-	`method` text DEFAULT 'GET' NOT NULL,
+	`method` text NOT NULL,
 	`headers` text,
 	`request_schema` text,
 	`response_schema` text,
-	`timeout_ms` integer DEFAULT 30000 NOT NULL,
+	`timeout_ms` integer NOT NULL,
 	`is_enabled` integer NOT NULL,
 	`creator_id` integer NOT NULL,
 	`updater_id` integer,

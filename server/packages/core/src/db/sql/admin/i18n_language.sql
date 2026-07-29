@@ -1,4 +1,4 @@
-CREATE TABLE `i18n_language` (
+CREATE TABLE IF NOT EXISTS `i18n_language` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`lang_code` text(10) NOT NULL,
 	`native_name` text(50) NOT NULL,
@@ -11,4 +11,4 @@ CREATE TABLE `i18n_language` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `idx_language_code` ON `i18n_language` (`lang_code`);
+CREATE UNIQUE INDEX IF NOT EXISTS `idx_language_code` ON `i18n_language` (`lang_code`);

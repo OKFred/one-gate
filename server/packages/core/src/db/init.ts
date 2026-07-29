@@ -26,6 +26,7 @@ export const SUPER_ADMIN = {
 export const SUPER_ADMIN_ROLE = {
   name: "超级管理员",
   isEnabled: true,
+  permissionCount: 0,
   creatorId: SUPER_ADMIN_ID,
   remark: "系统初始化创建的超级管理员角色，拥有所有权限",
   dataScope: "all" as const,

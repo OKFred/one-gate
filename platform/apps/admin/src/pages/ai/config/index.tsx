@@ -30,7 +30,7 @@ export default function AiConfigManagement() {
   const handleVerify = async (id: number) => {
     try {
       setVerifyingId(id);
-      const res = (await AiConfigAPI.verifyFn({ data: { id } })) as any;
+      const res = await AiConfigAPI.verifyFn({ data: { id } });
       if (res.data.data) {
         showSnackbar({ message: t('ai.config.verifySuccess'), type: 'success' });
       } else {
@@ -99,11 +99,7 @@ export default function AiConfigManagement() {
         return updated;
       },
       renderForm: (form, setForm, _isMobile, t) => (
-        <AiConfigFormFields
-          form={form}
-          setForm={setForm as unknown as Parameters<typeof AiConfigFormFields>[0]['setForm']}
-          t={t}
-        />
+        <AiConfigFormFields form={form} setForm={setForm} t={t} />
       ),
     },
   };

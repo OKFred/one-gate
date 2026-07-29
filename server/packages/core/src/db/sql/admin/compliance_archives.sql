@@ -1,7 +1,7 @@
-CREATE TABLE `compliance_archives` (
+CREATE TABLE IF NOT EXISTS `compliance_archives` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`source_system` text(100) DEFAULT 'self' NOT NULL,
-	`source_database` text(100) DEFAULT 'self' NOT NULL,
+	`source_system` text(100) NOT NULL,
+	`source_database` text(100) NOT NULL,
 	`source_table` text(100) NOT NULL,
 	`source_primary_key` text(100) NOT NULL,
 	`delete_reason` text(200),

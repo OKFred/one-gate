@@ -55,12 +55,7 @@ async function onListAll(
   params: FromSchema<typeof listAllReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof listAllRes>> {
-  const rows = await attendanceRepository.findPageAll(params);
-
-  return rows.map((row) => ({
-    ...row,
-    employeeObj: null, // Simplified for listAll or handle it if needed
-  })) as any;
+  return await attendanceRepository.findPageAll(params);
 }
 
 const listAllApi = {
@@ -117,7 +112,7 @@ async function onList(
     totalPage: Math.ceil(total / finalPageSize),
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: list as any,
+    list,
   };
 }
 

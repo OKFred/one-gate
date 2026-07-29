@@ -1,4 +1,4 @@
-CREATE TABLE `system_permission` (
+CREATE TABLE IF NOT EXISTS `system_permission` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text NOT NULL,
 	`name` text NOT NULL,
@@ -13,4 +13,4 @@ CREATE TABLE `system_permission` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `system_permission_code_unique` ON `system_permission` (`code`);
+CREATE UNIQUE INDEX IF NOT EXISTS `system_permission_code_unique` ON `system_permission` (`code`);

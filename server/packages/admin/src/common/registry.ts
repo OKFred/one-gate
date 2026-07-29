@@ -2,20 +2,30 @@
 // 引入装配常量的推导类型，构建唯一的类型安全层，杜绝在开发环境下 IDE 类型缺失的问题
 import type {
   systemRegister,
+  baseRegister,
   i18nRegister,
   maintenanceRegister,
   swarmRegister,
   rpaRegister,
   ossRegister,
+  aiRegister,
+  mailRegister,
+  mqttRegister,
+  voiceRegister,
 } from "../register.js";
 
 export interface IAdminServices {
   system: typeof systemRegister;
+  base: typeof baseRegister;
   i18n: typeof i18nRegister;
   maintenance: typeof maintenanceRegister;
-  swarm: typeof swarmRegister;
+  swarm_docker: typeof swarmRegister;
   rpa: typeof rpaRegister;
   oss: typeof ossRegister;
+  ai: typeof aiRegister;
+  mail: typeof mailRegister;
+  mqtt: typeof mqttRegister;
+  voice: typeof voiceRegister;
 }
 
 export class ServiceRegistry {
@@ -49,10 +59,21 @@ export const registry = new Proxy(
   {},
   {
     get: (target, prop) => {
+      if (prop === "__getDomains")
+        return Object.keys(getActiveRegistry()["services"]);
       return getActiveRegistry().domains[prop as keyof IAdminServices];
     },
+    ownKeys: () => {
+      return Object.keys(getActiveRegistry()["services"]);
+    },
+    getOwnPropertyDescriptor: (target, prop) => {
+      return {
+        enumerable: true,
+        configurable: true,
+      };
+    },
   }
-) as unknown as IAdminServices;
+) as unknown as IAdminServices & { __getDomains: () => string[] };
 
 function getActiveRegistry(): ServiceRegistry {
   if (!currentRegistry) {

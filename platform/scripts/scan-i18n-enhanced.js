@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { readdirSync, statSync, readFileSync, writeFileSync } from 'fs';
-import { join, relative } from 'path';
+import { readdirSync, statSync, readFileSync, writeFileSync, existsSync } from 'fs';
+import { join, relative, resolve } from 'path';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -132,6 +132,17 @@ const IGNORED_BUSINESS_KEYS = new Set([
   'enterprise.attendance',
   'enterprise.workflow',
   'enterprise.workflow_config',
+  'enterprise.mail',
+  'enterprise.mail.edm',
+  'personal',
+  'personal.profile',
+  'personal.mail',
+  'personal.mail.preference',
+  'admin.base',
+  'admin.base.sys_config',
+  'admin.base.log',
+  'personal.base',
+  'personal.base.user_config',
   'ai',
   'ai.config',
   'ai.chat',
@@ -185,60 +196,99 @@ function extractBackendTranslationKeys(filePath) {
 }
 
 /**
- * 从 initTranslation.ts 文件中提取所有多语言键，支持解析并加载其 import 导入的所有子翻译文件
+ * 从前端 locales 目录与 initTranslation.ts 文件中提取所有已定义的多语言键
  */
 function extractInitI18nKeys(filePath) {
   const keys = new Set();
+
+  // 1. 扫描前端 packages/ui/src/locales 与 apps/*/src/locales 下定义的静态 TS 字典
   try {
-    const content = readFileSync(filePath, 'utf-8');
-    const importRegex = /import\s+{[^}]+}\s+from\s+['"`]([^'"`]+)['"`]/g;
-    let match;
-    const serverSrcDir = path.dirname(path.dirname(filePath)); // server/src
-    const dbDir = path.dirname(filePath); // server/src/db
-
-    // 1. 提取 initTranslation.ts 中直接定义的所有 tKey
-    const directKeyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
-    let directMatch;
-    while ((directMatch = directKeyRegex.exec(content)) !== null) {
-      keys.add(directMatch[1].trim());
-    }
-
-    // 2. 解析所有 import 的多语言配置文件并提取 tKey
-    while ((match = importRegex.exec(content)) !== null) {
-      const importPath = match[1];
-      let resolvedPath;
-      if (importPath.startsWith('@/')) {
-        resolvedPath = join(serverSrcDir, importPath.slice(2));
-      } else if (importPath.startsWith('.') || importPath.startsWith('..')) {
-        resolvedPath = join(dbDir, importPath);
-      } else {
-        continue;
+    const findLocaleTsFiles = (dir, list = []) => {
+      if (!existsSync(dir)) return list;
+      const items = readdirSync(dir);
+      for (const item of items) {
+        const fullPath = join(dir, item);
+        const stat = statSync(fullPath);
+        if (stat.isDirectory()) {
+          if (!item.includes('node_modules') && !item.startsWith('.')) {
+            findLocaleTsFiles(fullPath, list);
+          }
+        } else if (fullPath.includes('locales') && fullPath.endsWith('.ts')) {
+          list.push(fullPath);
+        }
       }
+      return list;
+    };
 
-      // 自动拼接扩展名
-      if (!resolvedPath.endsWith('.ts')) {
-        resolvedPath += '.ts';
-      }
+    const platformSrcDir = resolve(__dirname, '..');
+    const localeTsFiles = findLocaleTsFiles(platformSrcDir);
 
+    for (const tsFile of localeTsFiles) {
       try {
-        const fileContent = readFileSync(resolvedPath, 'utf-8');
-        const keyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
-        let keyMatch;
-        while ((keyMatch = keyRegex.exec(fileContent)) !== null) {
-          keys.add(keyMatch[1].trim());
+        const fileContent = readFileSync(tsFile, 'utf-8');
+        // 匹配 'key.name': 或 "key.name": 形式的键
+        const localeKeyRegex = /['"]([a-zA-Z0-9_.\-]+)['"]\s*:/g;
+        let localeMatch;
+        while ((localeMatch = localeKeyRegex.exec(fileContent)) !== null) {
+          keys.add(localeMatch[1].trim());
         }
       } catch (err) {
-        console.error(
-          `Warning: Failed to read imported translation file ${resolvedPath}:`,
-          err.message,
-        );
+        /* ignore */
+      }
+    }
+  } catch (err) {
+    console.error('Warning: Error scanning frontend locales:', err.message);
+  }
+
+  // 2. 提取后端的 initTranslation.ts 及其 import 文件中定义的所有 tKey
+  try {
+    if (existsSync(filePath)) {
+      const content = readFileSync(filePath, 'utf-8');
+      const importRegex = /import\s+{[^}]+}\s+from\s+['"`]([^'"`]+)['"`]/g;
+      let match;
+      const serverSrcDir = path.dirname(path.dirname(filePath)); // server/src
+      const dbDir = path.dirname(filePath); // server/src/db
+
+      // 提取 initTranslation.ts 中直接定义的 tKey
+      const directKeyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
+      let directMatch;
+      while ((directMatch = directKeyRegex.exec(content)) !== null) {
+        keys.add(directMatch[1].trim());
+      }
+
+      // 解析 import 的文件并提取 tKey
+      while ((match = importRegex.exec(content)) !== null) {
+        const importPath = match[1];
+        let resolvedPath;
+        if (importPath.startsWith('@/')) {
+          resolvedPath = join(serverSrcDir, importPath.slice(2));
+        } else if (importPath.startsWith('.') || importPath.startsWith('..')) {
+          resolvedPath = join(dbDir, importPath);
+        } else {
+          continue;
+        }
+
+        if (!resolvedPath.endsWith('.ts')) {
+          resolvedPath += '.ts';
+        }
+
+        try {
+          const fileContent = readFileSync(resolvedPath, 'utf-8');
+          const keyRegex = /tKey:\s*['"`]([^'"`]+)['"`]/g;
+          let keyMatch;
+          while ((keyMatch = keyRegex.exec(fileContent)) !== null) {
+            keys.add(keyMatch[1].trim());
+          }
+        } catch (err) {
+          /* ignore */
+        }
       }
     }
 
     return keys;
   } catch (error) {
     console.error(`Error reading file ${filePath}:`, error.message);
-    return new Set();
+    return keys;
   }
 }
 
@@ -348,7 +398,7 @@ async function main() {
     join(baseDir, 'packages/ui/src'),
   ];
   console.log(`📁 扫描前端代码目录: \n${platformSrcDirs.map((d) => '  - ' + d).join('\n')}`);
-  
+
   const files = [];
   platformSrcDirs.forEach((dir) => {
     try {
@@ -465,7 +515,7 @@ async function main() {
   const failOnMissing = args.includes('--fail-on-missing') || args.includes('--ci');
   if (failOnMissing && missingKeys.length > 0) {
     console.error(
-      `❌ 错误: 发现 ${missingKeys.length} 个缺失的多语言翻译键，请在后端相应的 translation.ts 中补充定义：`,
+      `❌ 错误: 发现 ${missingKeys.length} 个缺失的多语言翻译键，请在前端 platform/packages/ui/src/locales/ 或相应 app/src/locales/ 的 TS 字典中显式补充定义：`,
     );
     missingKeys.forEach((key) => {
       const locations = keyLocations[key] || [];

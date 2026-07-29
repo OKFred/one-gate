@@ -176,6 +176,7 @@ permissionSeedsNode.properties.forEach((parentProp) => {
   // 统一处理 admin 和 enterprise 两个需要拆分/拼装的顶级组
   const isEnterprise =
     parentKey === "enterprise" ||
+    parentKey.startsWith("enterprise.") ||
     parentKey === "organization" ||
     parentKey === "executive";
   const targetList = isEnterprise ? enterpriseProperties : adminProperties;
@@ -205,9 +206,12 @@ permissionSeedsNode.properties.forEach((parentProp) => {
     }
   } else {
     // 子模块嵌套
-    const subKey = parentKey.startsWith("admin.")
-      ? parentKey.slice(6)
-      : parentKey;
+    let subKey = parentKey;
+    if (parentKey.startsWith("admin.")) {
+      subKey = parentKey.slice(6);
+    } else if (parentKey.startsWith("enterprise.")) {
+      subKey = parentKey.slice(11);
+    }
     const subKeyConst = formatKey(subKey);
     const bodyStr = renderModuleBody(init, parentKey, "    ");
     targetList.push(`    /** ${desc} */\n    ${subKeyConst}: ${bodyStr},`);

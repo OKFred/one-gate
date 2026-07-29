@@ -27,25 +27,33 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       })),
     );
 
+    const element = (
+      <Suspense fallback={renderPageLoading()}>
+        <LazyComp />
+      </Suspense>
+    );
+
     routes.push({
-      path: routePath,
-      element: (
-        <Suspense fallback={renderPageLoading()}>
-          <LazyComp />
-        </Suspense>
-      ),
+      path: routePath.startsWith('personal/') ? routePath : `personal/${routePath}`,
+      element,
     });
   }
 
   return routes;
 }
 
-export const childrenRoutes = buildRouteTree(
-  (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
-    ([filePath]) =>
-      !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/'),
+export const childrenRoutes: RouteObject[] = [
+  {
+    index: true,
+    element: <RootRedirect />,
+  },
+  ...buildRouteTree(
+    (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
+      ([filePath]) =>
+        !filePath.startsWith('./pages/error/') && !filePath.startsWith('./pages/login/'),
+    ),
   ),
-);
+];
 
 const Layout = lazy(() => import('@/layout'));
 const NotFound = lazy(() => import('@/components/NotFound'));
@@ -53,11 +61,7 @@ const ProtectedRoute = lazy(() => import('@/components/ProtectedRoute'));
 
 export const routes: RouteObject[] = [
   {
-    path: '/',
-    element: <RootRedirect />,
-  },
-  {
-    path: '/',
+    path: '/*',
     element: (
       <ProtectedRoute>
         <Layout />

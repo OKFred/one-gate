@@ -47,6 +47,9 @@ export async function findPageAll(params: {
       content: mailTemplateTable.content,
       category: mailTemplateTable.category,
       isEnabled: mailTemplateTable.isEnabled,
+      scope: mailTemplateTable.scope,
+      tenantId: mailTemplateTable.tenantId,
+      userId: mailTemplateTable.userId,
     })
     .from(mailTemplateTable)
     .where(buildWhereCondition(params))

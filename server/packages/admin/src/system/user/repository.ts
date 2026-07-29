@@ -150,6 +150,21 @@ export class UserRepository {
     return rows[0]?.username || null;
   }
 
+  async getUserNameMapByIds(
+    userIds: number[]
+  ): Promise<Record<number, string>> {
+    if (!userIds || userIds.length === 0) return {};
+    const rows = await db
+      .select({ id: userTable.id, username: userTable.username })
+      .from(userTable)
+      .where(inArray(userTable.id, userIds));
+    const map: Record<number, string> = {};
+    rows.forEach((r) => {
+      map[r.id] = r.username;
+    });
+    return map;
+  }
+
   async onInsert(
     data: Omit<
       InferInsertModel<typeof userTable>,

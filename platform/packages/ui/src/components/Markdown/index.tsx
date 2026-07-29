@@ -16,7 +16,7 @@ const Markdown = ({ content }: MarkdownProps) => {
         '& ul, & ol': { mb: 1, pl: 2 },
         '& code': {
           fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-          bgcolor: 'rgba(0, 0, 0, 0.04)',
+          bgcolor: 'action.hover',
           p: '2px 4px',
           borderRadius: 1,
           fontSize: '0.9em',

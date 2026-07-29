@@ -98,11 +98,7 @@ export default function CronManagement() {
         };
       },
       renderForm: (form, setForm, _errorContextValue, t) => (
-        <CronFormFields
-          form={form}
-          setForm={setForm as unknown as Parameters<typeof CronFormFields>[0]['setForm']}
-          t={t}
-        />
+        <CronFormFields form={form} setForm={setForm} t={t} />
       ),
     },
   };

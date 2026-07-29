@@ -1,4 +1,4 @@
-CREATE TABLE `i18n_region` (
+CREATE TABLE IF NOT EXISTS `i18n_region` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`labels` text,
 	`alpha2_code` text(2) NOT NULL,
@@ -14,8 +14,8 @@ CREATE TABLE `i18n_region` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `idx_region_numeric` ON `i18n_region` (`numeric`);
+CREATE UNIQUE INDEX IF NOT EXISTS `idx_region_numeric` ON `i18n_region` (`numeric`);
 
-CREATE UNIQUE INDEX `idx_region_alpha2` ON `i18n_region` (`alpha2_code`);
+CREATE UNIQUE INDEX IF NOT EXISTS `idx_region_alpha2` ON `i18n_region` (`alpha2_code`);
 
-CREATE UNIQUE INDEX `idx_region_alpha3` ON `i18n_region` (`alpha3_code`);
+CREATE UNIQUE INDEX IF NOT EXISTS `idx_region_alpha3` ON `i18n_region` (`alpha3_code`);

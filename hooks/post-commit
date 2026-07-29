@@ -1,0 +1,15 @@
+#!/bin/sh
+# =============================================================================
+# post-commit hook: Trigger AI Code Review asynchronously in background
+# =============================================================================
+
+# 读取根目录 .env 中的环境变量（若有）
+if [ -f ".env" ]; then
+  export $(grep -v '^#' .env | xargs 2>/dev/null) 2>/dev/null
+fi
+
+if [ -n "$AI_BASE_URL" ] && [ -n "$AI_KEY" ]; then
+  echo "🚀 Git commit succeeded! AI Code Review started in background..."
+  # 重定向 stdout 和 stderr 并丢到后台运行，确保 git commit 秒级完成不卡顿
+  (nohup npx tsx scripts/code-review.ts > /dev/null 2>&1 &)
+fi

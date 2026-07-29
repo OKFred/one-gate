@@ -1,23 +1,3 @@
-import {
-  IndexVO,
-  OssConfigVO,
-  OssConfigListVO,
-  OssConfigAddVO,
-  OssConfigUpdateVO,
-  OssConfigListKeys,
-  OssConfigDetailKeys,
-  OssConfigGetKeys,
-  OssConfigDeleteKeys,
-  OssConfigAddKeys,
-  OssConfigUpdateKeys,
-  OssConfigSortableKeys,
-  type OssConfigPOLike,
-  type OssConfigVOLike,
-  type OssConfigAddVOLike,
-  type OssConfigUpdateVOLike,
-  type OssConfigDeleteVOLike,
-  type OssConfigGetVOLike,
-} from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
 import {
@@ -32,10 +12,22 @@ import {
   bodyUserContextAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
+import type { Context } from "@hodor/core/types/app";
 import { preventStorageInitFailure } from "./prevention";
 import { getStorage } from "@hodor/core/utils/storage";
-import * as ossConfigRepository from "./repository";
+import { registry } from "../../common/registry";
+import {
+  IndexVO,
+  OssConfigVO,
+  OssConfigAddVO,
+  OssConfigUpdateVO,
+  OssConfigAddKeys,
+  OssConfigUpdateKeys,
+  OssConfigGetKeys,
+  OssConfigDetailKeys,
+  OssConfigListKeys,
+  OssConfigSortableKeys,
+} from "./model";
 
 // 列表 (全部)
 const listAllReq = {
@@ -43,9 +35,10 @@ const listAllReq = {
   properties: {
     ...listAllReqBase,
     isEnabled: OssConfigVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof OssConfigPOLike)[]>(OssConfigSortableKeys),
+    orderBy: orderByWrapper<(typeof OssConfigSortableKeys)[number][]>([
+      ...OssConfigSortableKeys,
+    ]),
   },
-  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
@@ -54,7 +47,7 @@ const listAllRes = {
   items: {
     type: "object",
     properties: {
-      ...IndexVO,
+      id: IndexVO.id,
       name: OssConfigVO["name"],
       provider: OssConfigVO["provider"],
       isEnabled: OssConfigVO["isEnabled"],
@@ -68,18 +61,45 @@ const listAllRes = {
 async function onListAll(
   params: FromSchema<typeof listAllReq>
 ): Promise<FromSchema<typeof listAllRes>> {
-  const list = await ossConfigRepository.findAll(params);
-  return list as any;
+  // Use the new generic list
+  const res = await registry.base.sysConfig.list({
+    namespace: "oss",
+    keyword: (params as { keyword?: string }).keyword,
+    isEnabled: params.isEnabled,
+    // Map order by name to configKey
+    orderBy:
+      params.orderBy === "name"
+        ? "configKey"
+        : params.orderBy === "isDefault"
+          ? "isPrimary"
+          : (params.orderBy as
+              | "id"
+              | "isPrimary"
+              | "configKey"
+              | "isEnabled"
+              | "createTimeUtc"
+              | undefined),
+    descend: params.descend,
+    pageNo: 1,
+    pageSize: 1000,
+  });
+
+  return res.list.map((item) => {
+    const configValue = item.configValue as Record<string, unknown> | undefined;
+    return {
+      id: item.id,
+      name: item.configKey,
+      provider: configValue?.provider as string | undefined,
+      isEnabled: item.isEnabled,
+      isDefault: item.isPrimary,
+    } as unknown as FromSchema<typeof listAllRes>[number];
+  });
 }
 
 const listAllApi = {
   req: listAllReq,
   res: listAllRes,
-  pathInfo: {
-    path: "/listAll",
-    method: "post",
-    summary: "获取所有存储配置",
-  },
+  pathInfo: { path: "/listAll", method: "post", summary: "获取所有存储配置" },
   adapter: bodyAdapter,
   service: onListAll,
   permission: { action: "read" },
@@ -91,38 +111,52 @@ const listReq = {
   properties: {
     ...listReqBase,
     isEnabled: OssConfigVO["isEnabled"],
-    orderBy: orderByWrapper<(keyof OssConfigPOLike)[]>(OssConfigSortableKeys),
+    orderBy: orderByWrapper<(typeof OssConfigSortableKeys)[number][]>([
+      ...OssConfigSortableKeys,
+    ]),
   },
-  required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
 const listRes = {
-  ...listResponseWrapper<RequiredKeys<OssConfigPOLike>[]>(
-    { ...OssConfigListVO },
-    [...OssConfigListKeys]
-  ),
+  ...listResponseWrapper(OssConfigVO, [...OssConfigListKeys]),
 } as const satisfies JSONSchema;
 
 async function onList(
   params: FromSchema<typeof listReq>
 ): Promise<FromSchema<typeof listRes>> {
-  const { orderBy = "id", descend = true, pageNo = 1, pageSize = 10 } = params;
-  const maxPageSize = 1000;
-  const finalPageSize = pageSize > maxPageSize ? maxPageSize : pageSize;
-
-  const { total, list } = await ossConfigRepository.findPage({
-    ...params,
-    pageNo,
-    pageSize: finalPageSize,
+  const res = await registry.base.sysConfig.list({
+    namespace: "oss",
+    keyword: (params as { keyword?: string }).keyword,
+    isEnabled: params.isEnabled,
+    orderBy:
+      params.orderBy === "name"
+        ? "configKey"
+        : params.orderBy === "isDefault"
+          ? "isPrimary"
+          : (params.orderBy as
+              | "id"
+              | "isPrimary"
+              | "configKey"
+              | "isEnabled"
+              | "createTimeUtc"
+              | undefined),
+    descend: params.descend,
+    pageNo: params.pageNo,
+    pageSize: params.pageSize,
   });
 
   return {
-    total,
-    totalPage: Math.ceil(total / finalPageSize),
-    currentPage: pageNo,
-    pageSize: finalPageSize,
-    list: list as any,
+    ...res,
+    list: res.list.map((item) => {
+      const configValue = (item.configValue || {}) as Record<string, unknown>;
+      return {
+        ...item,
+        ...configValue,
+        name: item.configKey,
+        isDefault: item.isPrimary,
+      } as unknown as FromSchema<typeof listRes>["list"][number];
+    }),
   };
 }
 
@@ -148,20 +182,19 @@ const addRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
 async function onAdd(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof addRes> | null> {
-  const { userId: creatorId } = userObj;
-
-  // 如果设置为默认建议，则取消其他默认建议
-  if (obj.isDefault) {
-    await ossConfigRepository.clearAllDefaults();
-  }
-
-  const insertedId = await ossConfigRepository.onInsert({
-    ...obj,
-    creatorId,
-  });
-
-  return insertedId;
+): Promise<number | null> {
+  const { name, isEnabled, isDefault, remark, ...configValue } = obj;
+  return await registry.base.sysConfig.add(
+    {
+      namespace: "oss",
+      configKey: name,
+      isEnabled,
+      isPrimary: isDefault,
+      configValue,
+      remark,
+    },
+    userObj
+  );
 }
 
 const addApi = {
@@ -185,22 +218,26 @@ async function onUpdate(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<number | null> {
-  const { userId: updaterId } = userObj;
-  const { id, ...rest } = params;
-  await onGet({ id }); // 若记录不存在则由 preventEmpty 抛出
+  const { id, name, isEnabled, isDefault, remark, ...configValue } = params;
 
-  if (params.isDefault) {
-    await ossConfigRepository.clearAllDefaults(id);
-  }
+  // We need to merge configValue with existing
+  const existing = await registry.base.sysConfig.detail({ id });
+  const mergedConfigValue = {
+    ...existing.configValue,
+    ...configValue,
+  };
 
-  const updateRow = await ossConfigRepository.onUpdate(id, {
-    ...rest,
-    updaterId,
-    updateTimeUtc: Date.now(),
-  });
-
-  preventEmpty(updateRow);
-  return updateRow.id;
+  return await registry.base.sysConfig.update(
+    {
+      id,
+      configKey: name,
+      isEnabled,
+      isPrimary: isDefault,
+      configValue: mergedConfigValue,
+      remark,
+    },
+    userObj
+  );
 }
 
 const updateApi = {
@@ -216,13 +253,17 @@ const updateApi = {
 const getReq = {
   type: "object",
   properties: { ...IndexVO },
-  required: [...OssConfigGetKeys],
+  required: ["id"],
 } as const satisfies JSONSchema;
 
 async function onGet(params: FromSchema<typeof getReq>) {
-  const row = await ossConfigRepository.findById(params.id);
-  preventEmpty(row);
-  return row;
+  const row = await registry.base.sysConfig.detail({ id: params.id as number });
+  return {
+    ...row,
+    ...row.configValue,
+    name: row.configKey,
+    isDefault: row.isPrimary,
+  };
 }
 
 const getApi = {
@@ -231,7 +272,7 @@ const getApi = {
     type: "object",
     properties: { ...OssConfigVO },
     required: [...OssConfigDetailKeys],
-  },
+  } as const,
   pathInfo: { path: "/get", method: "post", summary: "获取配置详情" },
   adapter: bodyAdapter,
   service: onGet,
@@ -240,9 +281,7 @@ const getApi = {
 
 // 删除
 async function onDelete(obj: FromSchema<typeof getReq>) {
-  const deletedRow = await ossConfigRepository.onDelete(obj.id);
-  preventEmpty(deletedRow);
-  return deletedRow.id;
+  return await registry.base.sysConfig.delete({ id: obj.id as number });
 }
 
 const deleteApi = {
@@ -257,8 +296,8 @@ const deleteApi = {
 // 验证连通性
 async function onVerify(
   obj: FromSchema<typeof getReq>,
-  userObj: any,
-  c: any
+  userObj: UserObj,
+  c: Context
 ): Promise<boolean> {
   const config = await onGet(obj);
   const storage = getStorage(
@@ -275,37 +314,25 @@ async function onVerify(
   );
 
   preventStorageInitFailure(storage);
-
-  // 通过列出对象来测试连通性
   await storage.list();
   return true;
 }
 
 const verifyApi = {
   req: getReq,
-  res: { type: "boolean" },
+  res: { type: "boolean" } as const,
   pathInfo: { path: "/verify", method: "post", summary: "验证存储连通性" },
   adapter: bodyUserContextAdapter,
   service: onVerify,
   permission: { action: "read" },
 } satisfies API;
 
-// Utils: 获取当前默认配置
 export async function getDefaultConfig() {
-  return await ossConfigRepository.findDefaultActiveConfig();
-}
-
-/**
- * 校验名称是否唯一
- */
-async function verifyNameUnique(name: string, excludeId?: number) {
-  const records = await ossConfigRepository.findByName(name, excludeId);
-  return records.length === 0;
+  return await registry.base.sysConfig.getMergedConfig("oss");
 }
 
 export const utils = {
   getDefaultConfig,
-  verifyNameUnique,
 };
 
 export default {

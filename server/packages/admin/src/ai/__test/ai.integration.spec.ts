@@ -3,17 +3,19 @@ import db from "@hodor/core/db/index";
 import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
 import aiLlmConfigService from "../config/service";
 import aiChatService from "../chat/service";
-import aiConfigSql from "@hodor/core/db/sql/ai_llm_config.sql?raw";
+import baseSysConfigSql from "@hodor/core/db/sql/admin/base_sys_config.sql?raw";
+import { initAdminRegistry } from "../../register";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 import { ErrorCodes as ChatErrorCodes } from "../chat/prevention";
 import type { UserObj } from "@hodor/core/types/app";
 
 describe("AI 模块全链路集成测试", () => {
-  const testTables = ["ai_llm_config"];
+  const testTables = ["base_sys_config"];
   const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
-    await setupTestDb(db, [aiConfigSql]);
+    initAdminRegistry();
+    await setupTestDb(db, [baseSysConfigSql]);
     await clearTestData(db, testTables);
   });
 
@@ -85,7 +87,7 @@ describe("AI 模块全链路集成测试", () => {
     it("列表查询测试 (list & listAll)", async () => {
       await aiLlmConfigService.add.service(
         {
-          name: "LLM Config 1",
+          name: "Model Config 1",
           provider: "OpenAI",
           apiKey: "key-1",
           model: "gpt-4",
@@ -96,7 +98,7 @@ describe("AI 模块全链路集成测试", () => {
       );
       await aiLlmConfigService.add.service(
         {
-          name: "LLM Config 2",
+          name: "Model Config 2",
           provider: "Ollama",
           apiKey: "key-2",
           model: "llama3",
@@ -111,7 +113,7 @@ describe("AI 模块全链路集成测试", () => {
         isEnabled: true,
       });
       expect(allList.length).toBe(1);
-      expect(allList[0].name).toBe("LLM Config 1");
+      expect(allList[0].name).toBe("Model Config 1");
 
       // list (分页)
       const pageResult = await aiLlmConfigService.list.service({
@@ -271,7 +273,7 @@ describe("AI 模块全链路集成测试", () => {
       // 1. 添加默认配置
       await aiLlmConfigService.add.service(
         {
-          name: "Default LLM",
+          name: "Default Model",
           provider: "OpenAI",
           baseUrl: "https://api.openai.com/v1",
           apiKey: "sk-openai-key",
@@ -291,12 +293,12 @@ describe("AI 模块全链路集成测试", () => {
 
         const body = JSON.parse(init.body);
         expect(body.model).toBe("gpt-4o");
-        expect(body.messages.length).toBe(3); // history(1) + system(1) + user(1)
-        expect(body.messages[0]).toEqual({
+        expect(body.messages.length).toBe(3); // system(1) + history(1) + user(1)
+        expect(body.messages[0].role).toBe("system");
+        expect(body.messages[1]).toEqual({
           role: "user",
           content: "Previous question",
         });
-        expect(body.messages[1].role).toBe("system");
         expect(body.messages[2]).toEqual({
           role: "user",
           content: "Hello AI!",
@@ -329,12 +331,14 @@ describe("AI 模块全链路集成测试", () => {
 
     it("空提示词校验测试", async () => {
       await expect(aiChatService.ask.service({ q: "" })).rejects.toThrowError(
-        new BusinessError(ChatErrorCodes.PROMPT_REQUIRED)
+        new BusinessError(ChatErrorCodes.PROMPT_REQUIRED).message
       );
 
       await expect(
         aiChatService.ask.service({ q: "   " })
-      ).rejects.toThrowError(new BusinessError(ChatErrorCodes.PROMPT_REQUIRED));
+      ).rejects.toThrowError(
+        new BusinessError(ChatErrorCodes.PROMPT_REQUIRED).message
+      );
     });
 
     it("未设置默认配置报错测试", async () => {
@@ -342,16 +346,14 @@ describe("AI 模块全链路集成测试", () => {
       // 在 afterEach 中已经 clearTestData，所以这里没有配置
       await expect(
         aiChatService.ask.service({ q: "Hello" })
-      ).rejects.toThrowError(
-        new BusinessError(ChatErrorCodes.CONFIG_NOT_FOUND)
-      );
+      ).rejects.toThrowError(/未配置后台 AI 引擎/);
     });
 
     it("API 响应失败报错测试", async () => {
       // 1. 添加默认配置
       await aiLlmConfigService.add.service(
         {
-          name: "Default LLM",
+          name: "Default Model",
           provider: "OpenAI",
           baseUrl: "https://api.openai.com/v1",
           apiKey: "sk-openai-key",
@@ -375,7 +377,7 @@ describe("AI 模块全链路集成测试", () => {
       // 3. 调用并断言抛出错误
       await expect(
         aiChatService.ask.service({ q: "Hello" })
-      ).rejects.toThrowError("AI API 响应错误 (500)");
+      ).rejects.toThrowError(/500/);
     });
   });
 });

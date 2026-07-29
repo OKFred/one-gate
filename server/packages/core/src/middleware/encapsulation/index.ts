@@ -48,7 +48,10 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = ["/system/auth/login", "/i18n/translation/listAll"];
+const routeWhitelist = [
+  "/admin/system/auth/login",
+  "/admin/i18n/translation/listAll",
+];
 
 function routeMaker({
   pathInfo,
@@ -75,7 +78,7 @@ function routeMaker({
       });
     }
     const ignoreError = routeWhitelist.some((path) =>
-      c.req.path.includes(path)
+      c.req.path?.replace(getEnv("BASE_API_PATH") ?? "", "").startsWith(path)
     );
     try {
       await authMiddleware(c);
@@ -119,7 +122,7 @@ function routeMaker({
       }
     }
     return c.json<ResJson>(
-      { ok: true, message: "OK", data: result },
+      { ok: true, message: "OK", data: result ?? {} },
       StatusCodes.OK as ContentfulStatusCode
     );
   };

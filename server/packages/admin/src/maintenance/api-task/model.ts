@@ -183,12 +183,11 @@ export const apiTaskTable = sqliteTable("maintenance_api_task", {
   path: text("path").notNull(),
   method: text("method")
     .$type<"GET" | "POST" | "PUT" | "PATCH" | "DELETE">()
-    .notNull()
-    .default("GET"),
+    .notNull(),
   headers: text("headers"),
   requestSchema: text("request_schema"),
   responseSchema: text("response_schema"),
-  timeoutMs: integer("timeout_ms").notNull().default(30000),
+  timeoutMs: integer("timeout_ms").notNull(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),

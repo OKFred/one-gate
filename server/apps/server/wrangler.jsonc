@@ -5,6 +5,7 @@
 {
   "$schema": "https://cdn.jsdelivr.net/npm/wrangler/config-schema.json",
   "name": "hodor",
+  "account_id": "00000000000000000000000000000000",
   "main": "src/worker.ts",
   "compatibility_date": "2026-03-17",
   "workers_dev": false,
@@ -40,6 +41,7 @@
     "BASE_API_PATH": "/api/v1",
     "LOCALE": "en-US",
     "VERSION": "20260705010933-926da5fb",
+    "CLOUDFLARE_ACCOUNT_ID": "00000000000000000000000000000000",
   },
 
   /**
@@ -71,4 +73,11 @@
       "binding": "BUCKET",
     },
   ],
+  /**
+   * Workers AI Binding
+   * https://developers.cloudflare.com/workers-ai/
+   */
+  "ai": {
+    "binding": "AI",
+  },
 }

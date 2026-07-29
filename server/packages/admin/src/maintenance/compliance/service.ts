@@ -75,7 +75,7 @@ async function onList(
     totalPage,
     currentPage: pageNo,
     pageSize: finalPageSize,
-    list: list as any,
+    list,
   };
 }
 

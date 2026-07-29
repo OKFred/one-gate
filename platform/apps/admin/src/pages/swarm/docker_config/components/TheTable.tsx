@@ -4,24 +4,12 @@ import { QuestionMark as VerifyIcon } from '@mui/icons-material';
 import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
-import type { ListDockerConfigReq } from '@/api/admin/swarm/type';
+import type {
+  ListDockerConfigReq,
+  DockerConfigObj as SwarmDockerConfigRes,
+} from '@/api/admin/swarm/type';
 
-export interface SwarmDockerConfigRes {
-  id: number;
-  name: string;
-  host: string;
-  apiVersion?: string | null;
-  tlsVerify: boolean;
-  caCert?: string | null;
-  clientCert?: string | null;
-  clientKey?: string | null;
-  cfMtlsBinding?: string | null;
-  isEnabled: boolean;
-  isDefault: boolean;
-  createTimeUtc?: number | null;
-  updateTimeUtc?: number | null;
-  remark?: string | null;
-}
+export type { SwarmDockerConfigRes };
 
 export interface TableExtraContext {
   verifyingId: number | null;

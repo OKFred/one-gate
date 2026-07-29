@@ -169,6 +169,7 @@ async function onAdd(
   const { userId: creatorId } = userObj;
 
   const insertedId = await roleRepository.onInsert({
+    permissionCount: 0,
     ...obj,
     creatorId,
   });

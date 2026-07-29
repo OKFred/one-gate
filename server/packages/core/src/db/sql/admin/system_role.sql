@@ -1,10 +1,10 @@
-CREATE TABLE `system_role` (
+CREATE TABLE IF NOT EXISTS `system_role` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`remark` text,
 	`is_enabled` integer NOT NULL,
-	`permission_count` integer DEFAULT 0 NOT NULL,
-	`data_scope` text DEFAULT 'self_only' NOT NULL,
+	`permission_count` integer NOT NULL,
+	`data_scope` text NOT NULL,
 	`custom_dept_ids` text,
 	`creator_id` integer NOT NULL,
 	`updater_id` integer,
@@ -12,4 +12,4 @@ CREATE TABLE `system_role` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `system_role_name_unique` ON `system_role` (`name`);
+CREATE UNIQUE INDEX IF NOT EXISTS `system_role_name_unique` ON `system_role` (`name`);

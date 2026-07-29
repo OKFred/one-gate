@@ -157,11 +157,11 @@ export const cronTable = sqliteTable("system_cron_job", {
   jobKey: text("job_key").notNull(),
   name: text("name").notNull(),
   cronExpression: text("cron_expression").notNull(),
-  status: integer("status", { mode: "boolean" }).notNull().default(true),
+  status: integer("status", { mode: "boolean" }).notNull(),
   parameters: text("parameters"),
   lastRunTimeUtc: integer("last_run_time_utc"),
   nextRunTimeUtc: integer("next_run_time_utc"),
-  runCount: integer("run_count").notNull().default(0),
+  runCount: integer("run_count").notNull(),
   creatorId: integer("creator_id").notNull(),
   updaterId: integer("updater_id"),
   createTimeUtc: integer("create_time_utc")

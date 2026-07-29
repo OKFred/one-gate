@@ -84,7 +84,7 @@ export async function onUpdate(
     .update(apiDocsTable)
     .set({
       ...data,
-      updateTimeUtc: getCurrentTimestampUtcSql() as any,
+      updateTimeUtc: getCurrentTimestampUtcSql(),
     })
     .where(eq(apiDocsTable.id, id))
     .returning({ id: apiDocsTable.id });

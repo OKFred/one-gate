@@ -1,4 +1,4 @@
-CREATE TABLE `system_menu` (
+CREATE TABLE IF NOT EXISTS `system_menu` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`icon` text NOT NULL,

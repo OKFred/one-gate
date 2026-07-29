@@ -60,6 +60,25 @@ export const tableConfig: SchemaCrudConfig<
       render: (row) => truncateText(stripHtml(row.content), 40),
     },
     {
+      title: t('mail.scope'),
+      render: (row) => {
+        const scope = row.scope || 'sys';
+        const colorMap = { sys: 'primary', biz: 'secondary', user: 'info' } as const;
+        const labelMap: Record<string, string> = {
+          sys: t('mail.scope.sys'),
+          biz: t('mail.scope.biz'),
+          user: t('mail.scope.user'),
+        };
+        return (
+          <Chip
+            label={labelMap[scope] || scope}
+            color={colorMap[scope as keyof typeof colorMap] || 'default'}
+            size="small"
+          />
+        );
+      },
+    },
+    {
       title: t('columns.createTime'),
       render: (row) => formatDate(row.createTimeUtc),
     },

@@ -1,26 +1,23 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
-import { type InferSelectModel, type InferInsertModel } from "drizzle-orm";
-import { type JSONSchema } from "json-schema-to-ts";
-import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
+import type { JSONSchema } from "json-schema-to-ts";
 import {
-  IndexPO,
   IndexVO,
-  AuditPO,
   AuditVO,
   IndexKey,
   AuditKeys,
-  type IndexKeyLike,
-  type AuditAddOmitKeyLike,
-  type AuditUpdateOmitKeyLike,
 } from "@hodor/core/db/common/schema";
-import { type RequiredKeys } from "@hodor/core/types/app";
 
-//----------------- PO ----------------//
-const AiLlmConfigBasePO = {
+export { IndexVO };
+
+//====================================================================
+// AiLlmConfig PO, VO
+//====================================================================
+
+export const AiLlmConfigBasePO = {
   name: {
     type: "string",
     description: "配置名称",
     examples: ["My DeepSeek"],
+    maxLength: 100,
   },
   provider: {
     type: "string",
@@ -60,47 +57,25 @@ const AiLlmConfigBasePO = {
     description: "备注",
     maxLength: 500,
   },
-} as const satisfies Partial<Record<keyof AiLlmConfigPOLike, JSONSchema>>;
+} as const satisfies Record<string, JSONSchema>;
 
-export const AiLlmConfigPO = {
-  ...IndexPO,
-  ...AiLlmConfigBasePO,
-  ...AuditPO,
-} as const satisfies Record<keyof AiLlmConfigPOLike, JSONSchema>;
-
-export type AiLlmConfigPOLike = InferSelectModel<typeof aiLlmConfigTable>;
-type AiLlmConfigInsertPOLike = InferInsertModel<typeof aiLlmConfigTable>;
-type AiLlmConfigAddPOLike = Omit<
-  AiLlmConfigPOLike,
-  IndexKeyLike | AuditAddOmitKeyLike
->;
-type AiLlmConfigUpdatePOLike = Partial<
-  Omit<AiLlmConfigInsertPOLike, IndexKeyLike | AuditUpdateOmitKeyLike>
-> &
-  Pick<AiLlmConfigPOLike, IndexKeyLike>;
-
-//----------------- VO ----------------//
-export { IndexVO };
 export const AiLlmConfigVO = {
   ...IndexVO,
   ...AiLlmConfigBasePO,
   ...AuditVO,
-} as const satisfies Partial<Record<keyof AiLlmConfigVOLike, JSONSchema>>;
+} as const satisfies Record<string, JSONSchema>;
 
 export const AiLlmConfigListVO = AiLlmConfigVO;
-export const AiLlmConfigAddVO = AiLlmConfigBasePO;
+
+export const AiLlmConfigAddVO = {
+  ...AiLlmConfigBasePO,
+} as const satisfies Record<string, JSONSchema>;
+
 export const AiLlmConfigUpdateVO = {
   ...IndexVO,
   ...AiLlmConfigBasePO,
-} as const satisfies Partial<Record<keyof AiLlmConfigVOLike, JSONSchema>>;
+} as const satisfies Record<string, JSONSchema>;
 
-export type AiLlmConfigVOLike = AiLlmConfigPOLike;
-export type AiLlmConfigAddVOLike = Omit<AiLlmConfigAddPOLike, "creatorId">;
-export type AiLlmConfigUpdateVOLike = AiLlmConfigUpdatePOLike;
-export type AiLlmConfigDeleteVOLike = Pick<AiLlmConfigVOLike, IndexKeyLike>;
-export type AiLlmConfigGetVOLike = Pick<AiLlmConfigVOLike, IndexKeyLike>;
-
-//----------------- Required Keys ----------------//
 export const AiLlmConfigAddKeys = [
   "name",
   "provider",
@@ -108,56 +83,44 @@ export const AiLlmConfigAddKeys = [
   "model",
   "isEnabled",
   "isDefault",
-] as const satisfies RequiredKeys<AiLlmConfigAddVOLike>[];
+] as const;
 
-export const AiLlmConfigUpdateKeys = [
-  ...IndexKey,
-] as const satisfies RequiredKeys<AiLlmConfigUpdateVOLike>[];
+export const AiLlmConfigUpdateKeys = [...IndexKey] as const;
 
-export const AiLlmConfigDeleteKeys = [
-  ...IndexKey,
-] as const satisfies RequiredKeys<AiLlmConfigDeleteVOLike>[];
+export const AiLlmConfigDeleteKeys = [...IndexKey] as const;
 
-export const AiLlmConfigGetKeys = [
-  ...IndexKey,
-] as const satisfies RequiredKeys<AiLlmConfigGetVOLike>[];
+export const AiLlmConfigGetKeys = [...IndexKey] as const;
 
-const AiLlmConfigBaseKeys = [
+export const AiLlmConfigListKeys = [
   ...IndexKey,
-  ...AiLlmConfigAddKeys,
+  "name",
+  "provider",
+  "baseUrl",
+  "apiKey",
+  "model",
+  "capabilities",
+  "isEnabled",
+  "isDefault",
   ...AuditKeys,
-] as const satisfies RequiredKeys<AiLlmConfigPOLike>[];
+] as const;
 
-export const AiLlmConfigListKeys = AiLlmConfigBaseKeys;
-export const AiLlmConfigDetailKeys = AiLlmConfigBaseKeys;
+export const AiLlmConfigDetailKeys = [
+  ...IndexKey,
+  "name",
+  "provider",
+  "baseUrl",
+  "apiKey",
+  "model",
+  "capabilities",
+  "isEnabled",
+  "isDefault",
+  "remark",
+] as const;
 
-// 可排序字段
 export const AiLlmConfigSortableKeys = [
   "id",
   "name",
   "isEnabled",
   "isDefault",
   "createTimeUtc",
-] as const satisfies RequiredKeys<AiLlmConfigPOLike>[];
-
-//----------------- Table ----------------//
-export const aiLlmConfigTable = sqliteTable("ai_llm_config", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull(),
-  provider: text("provider").notNull(),
-  baseUrl: text("base_url"),
-  apiKey: text("api_key").notNull(),
-  model: text("model").notNull(),
-  capabilities: text("capabilities"),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-  isDefault: integer("is_default", { mode: "boolean" }).notNull(),
-  remark: text("remark"),
-  creatorId: integer("creator_id").notNull(),
-  updaterId: integer("updater_id"),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-});
-
-export default aiLlmConfigTable;
+] as const;

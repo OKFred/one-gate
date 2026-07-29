@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from 'react';
+import { memo, useState, useCallback, useRef, type ReactNode } from 'react';
 import {
   Box,
   CircularProgress,
@@ -21,6 +21,38 @@ import {
 import { useResponsive } from '@/hooks/useResponsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
+const ExpandableContent = ({ children }: { children: ReactNode }) => {
+  const [expanded, setExpanded] = useState(false);
+  const lastTapRef = useRef(0);
+
+  const handleTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      setExpanded((prev) => !prev);
+    }
+    lastTapRef.current = now;
+  }, []);
+
+  return (
+    <Box
+      onClick={handleTap}
+      sx={{
+        display: expanded ? 'block' : '-webkit-box',
+        WebkitLineClamp: expanded ? 'unset' : 2,
+        WebkitBoxOrient: 'vertical',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'normal',
+        wordBreak: 'break-word',
+        width: 'max-content',
+        maxWidth: '100%',
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
+
 /** 表格列配置 */
 export interface TableColumn<T> {
   /** 列标题 */
@@ -29,6 +61,10 @@ export interface TableColumn<T> {
   width?: number | string;
   /** 对齐方式 */
   align?: 'left' | 'center' | 'right';
+  /** 是否固定列 */
+  fixed?: 'left' | 'right';
+  /** 是否为操作列（宽度自适应且不截断文本） */
+  isAction?: boolean;
   /** 渲染单元格内容 */
   render: (item: T, index: number) => ReactNode;
 }
@@ -240,25 +276,100 @@ function ResponsiveListInner<T>({
 
   // PC端表格布局
   return (
-    <TableContainer component={Paper} sx={{ position: 'relative' }}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        position: 'relative',
+        '&::-webkit-scrollbar': { height: 8, width: 8 },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: 'action.disabled',
+          borderRadius: 4,
+          '&:hover': { backgroundColor: 'action.active' },
+        },
+        '&::-webkit-scrollbar-track': { backgroundColor: 'transparent' },
+      }}
+    >
       <Table>
         <TableHead>
           <TableRow>
-            {columns.map((col, index) => (
-              <TableCell key={index} align={col.align} width={col.width}>
-                {col.title}
-              </TableCell>
-            ))}
+            {columns.map((col, index) => {
+              const isFixed = !!col.fixed;
+              const isFixedLeft = col.fixed === 'left';
+              const isFixedRight = col.fixed === 'right';
+              const isActionCol = col.isAction || isFixedRight;
+              const fixedStyles = isFixed
+                ? {
+                    position: 'sticky',
+                    ...(isFixedLeft ? { left: 0 } : { right: 0 }),
+                    zIndex: 11,
+                    backgroundColor: 'background.paper',
+                    ...(isFixedLeft && { borderRight: '1px solid', borderColor: 'divider' }),
+                    ...(isFixedRight && { borderLeft: '1px solid', borderColor: 'divider' }),
+                  }
+                : {};
+              return (
+                <TableCell
+                  key={index}
+                  align={col.align}
+                  width={col.width}
+                  sx={{
+                    ...(isActionCol
+                      ? {
+                          whiteSpace: 'nowrap',
+                          width: col.width || '1%',
+                          '& .MuiButtonBase-root': { minWidth: 50 },
+                        }
+                      : { minWidth: 100, maxWidth: '50vw' }),
+                    ...fixedStyles,
+                  }}
+                >
+                  {isActionCol ? col.title : <ExpandableContent>{col.title}</ExpandableContent>}
+                </TableCell>
+              );
+            })}
           </TableRow>
         </TableHead>
         <TableBody>
           {data.map((item, rowIndex) => (
             <TableRow key={keyExtractor(item)} hover>
-              {columns.map((col, colIndex) => (
-                <TableCell key={colIndex} align={col.align}>
-                  {col.render(item, rowIndex)}
-                </TableCell>
-              ))}
+              {columns.map((col, colIndex) => {
+                const isFixed = !!col.fixed;
+                const isFixedLeft = col.fixed === 'left';
+                const isFixedRight = col.fixed === 'right';
+                const isActionCol = col.isAction || isFixedRight;
+                const fixedStyles = isFixed
+                  ? {
+                      position: 'sticky',
+                      ...(isFixedLeft ? { left: 0 } : { right: 0 }),
+                      zIndex: 10,
+                      backgroundColor: 'background.paper',
+                      ...(isFixedLeft && { borderRight: '1px solid', borderColor: 'divider' }),
+                      ...(isFixedRight && { borderLeft: '1px solid', borderColor: 'divider' }),
+                    }
+                  : {};
+                return (
+                  <TableCell
+                    key={colIndex}
+                    align={col.align}
+                    sx={{
+                      ...(isActionCol
+                        ? {
+                            whiteSpace: 'nowrap',
+                            width: col.width || '1%',
+                            '& .MuiButtonBase-root': { minWidth: 50 },
+                          }
+                        : { minWidth: 100, maxWidth: '50vw' }),
+                      ...fixedStyles,
+                    }}
+                  >
+                    {isActionCol ? (
+                      col.render(item, rowIndex)
+                    ) : (
+                      <ExpandableContent>{col.render(item, rowIndex)}</ExpandableContent>
+                    )}
+                  </TableCell>
+                );
+              })}
             </TableRow>
           ))}
         </TableBody>

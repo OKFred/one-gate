@@ -16,25 +16,17 @@ import type { CheckDuplicateTranslationRes } from '@/api/admin/i18n/type';
 import * as TranslationAPI from '@/api/admin/i18n/translation';
 import hasValue from '@/utils/hasValue';
 
-interface FormState {
-  id?: number;
-  application: string;
-  business: string;
-  langCode: string;
-  tKey: string;
-  tValue: string;
-  valueHash: string;
-  isEnabled: boolean;
-  remark: string | null;
-}
+import type { TranslationRes } from './TheTable';
 
 export default function TranslationFormFields({
   form,
   setForm,
   t,
 }: {
-  form: Partial<FormState>;
-  setForm: (form: Partial<FormState>) => void;
+  form: Partial<TranslationRes>;
+  setForm:
+    | React.Dispatch<React.SetStateAction<Partial<TranslationRes>>>
+    | ((form: Partial<TranslationRes>) => void);
   t: (key: string) => string;
 }) {
   const [duplicateInfo, setDuplicateInfo] = useState<CheckDuplicateTranslationRes | null>(null);
@@ -160,7 +152,7 @@ export default function TranslationFormFields({
                 )}
               </strong>
             </Box>
-            <List dense sx={{ bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 1, mb: 1 }}>
+            <List dense sx={{ bgcolor: 'action.hover', borderRadius: 1, mb: 1 }}>
               {duplicateInfo.duplicates.map((dup) => (
                 <ListItem key={dup.id} sx={{ py: 0.5 }}>
                   <ListItemIcon sx={{ minWidth: 32 }}>

@@ -1,4 +1,4 @@
-CREATE TABLE `system_role_permission` (
+CREATE TABLE IF NOT EXISTS `system_role_permission` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`role_id` integer NOT NULL,
 	`permission_id` integer NOT NULL,

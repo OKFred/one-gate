@@ -15,6 +15,10 @@ export const BUSINESS = {
   "admin.mail.template": "admin.mail.template",
   /** 邮件操作 */
   "admin.mail.action": "admin.mail.action",
+  /** 邮件收件人 */
+  "admin.mail.recipient": "admin.mail.recipient",
+  /** 企业邮件EDM */
+  "enterprise.mail.edm": "enterprise.mail.edm",
   /** 邮件日志 */
   "admin.mail.log": "admin.mail.log",
   /** 运维 */
@@ -30,7 +34,7 @@ export const BUSINESS = {
   /** 运维 API Task */
   "admin.maintenance.api_task": "admin.maintenance.api_task",
   /** 运维登录日志 */
-  "admin.maintenance.audit_login": "admin.maintenance.audit_login",
+  "admin.maintenance.login_log": "admin.maintenance.login_log",
   /** 运维初始化 */
   "admin.maintenance.init": "admin.maintenance.init",
   /** 系统 */
@@ -63,14 +67,28 @@ export const BUSINESS = {
   "executive.workflow": "executive.workflow",
   /** 个人中心 */
   personal: "personal",
-  /** 个人中心-个人信息 */
-  "personal.profile": "personal.profile",
-  /** AI */
+
+  /** 个人中心-账号配置 */
+  "personal.base": "personal.base",
+  /** 个人中心-邮件偏好 */
+  "personal.base.preference": "personal.base.preference",
+  /** 个人中心-健康与医疗 */
+  "personal.health": "personal.health",
+  /** 个人中心-收入状况 */
+  "personal.finance": "personal.finance",
+  /** 个人中心-家庭 */
+  "personal.family": "personal.family",
+  /** 个人中心-社交 */
+  "personal.social": "personal.social",
   "admin.ai": "admin.ai",
   /** AI 配置 */
   "admin.ai.config": "admin.ai.config",
   /** AI 对话 */
   "admin.ai.chat": "admin.ai.chat",
+  /** 全局 AI 搜索 */
+  "admin.ai.search": "admin.ai.search",
+  /** OpenAI 兼容服务 */
+  "admin.ai.openai": "admin.ai.openai",
   /** Swarm */
   "admin.swarm": "admin.swarm",
   /** Swarm Docker Service */
@@ -92,8 +110,17 @@ export const BUSINESS = {
   admin: "admin",
   /** RPA */
   "admin.rpa": "admin.rpa",
-  /** 浏览器环境调试配置 */
-  "admin.rpa.browser": "admin.rpa.browser",
+  /** RPA 配置 */
+  "admin.rpa.config": "admin.rpa.config",
+  /** 基础配置 */
+  "admin.base": "admin.base",
+  /** 基础配置 - 具体配置 */
+  "admin.base.sys_config": "admin.base.sys_config",
+  "enterprise.mail": "enterprise.mail",
+  "personal.base.user_config": "personal.base.user_config",
+
+  /** 基础配置 - 日志 */
+  "admin.base.log": "admin.base.log",
   /** 数据库 */
   "admin.data": "admin.data",
   /** 表单数据 */
@@ -104,6 +131,18 @@ export const BUSINESS = {
   "admin.oss.config": "admin.oss.config",
   /** 对象存储文件 */
   "admin.oss.file": "admin.oss.file",
+  /** MQTT 消息管理 */
+  "admin.mqtt": "admin.mqtt",
+  /** MQTT 控制台 */
+  "admin.mqtt.console": "admin.mqtt.console",
+  /** MQTT 配置 */
+  "admin.mqtt.config": "admin.mqtt.config",
+  /** 实时通话 */
+  "admin.voice": "admin.voice",
+  /** 实时通话会话 */
+  "admin.voice.session": "admin.voice.session",
+  /** 实时通话配置 */
+  "admin.voice.config": "admin.voice.config",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

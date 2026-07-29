@@ -1,7 +1,7 @@
 import * as AiConfigAPI from '@/api/admin/ai/config';
 import * as AiChatAPI from '@/api/admin/ai/chat';
 
-// ==================== AI LLM Configuration ====================
+// ==================== AI Model Configuration ====================
 
 /** 获取所有 AI 配置请求 */
 export type ListAllAiConfigReq = NonNullable<Parameters<typeof AiConfigAPI.listAllFn>[0]['data']>;

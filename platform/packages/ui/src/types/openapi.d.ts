@@ -1570,7 +1570,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/mail/log/listAll": {
+    "/api/v1/admin/mail/log/list_all": {
         parameters: {
             query?: never;
             header?: never;
@@ -1579,7 +1579,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取所有邮件日志（不分页） */
+        /** 获取邮件日志全量列表 */
         post: {
             parameters: {
                 query?: never;
@@ -1589,7 +1589,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.mail.log.listall.req"];
+                    "application/json": components["schemas"]["admin.mail.log.list_all.req"];
                 };
             };
             responses: {
@@ -1599,7 +1599,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.mail.log.listall.res"];
+                        "application/json": components["schemas"]["admin.mail.log.list_all.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -1716,122 +1716,6 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.mail.log.add.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/mail/log/update": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 更新邮件日志 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.mail.log.update.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.mail.log.update.res"];
-                    };
-                };
-                /** @description 校验失败 */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-                /** @description 未知异常 */
-                500: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ErrorInvalidRequest"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/mail/log/delete": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** 删除邮件日志 */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["admin.mail.log.delete.req"];
-                };
-            };
-            responses: {
-                /** @description 成功 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["admin.mail.log.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -2266,7 +2150,297 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/maintenance/audit_login/list": {
+    "/api/v1/admin/mail/recipient/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取邮件收件人/联系人列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取邮件收件人详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加邮件收件人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新邮件收件人信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mail/recipient/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除邮件收件人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mail.recipient.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mail.recipient.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/maintenance/login_log/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -2285,7 +2459,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.maintenance.audit_login.list.req"];
+                    "application/json": components["schemas"]["admin.maintenance.login_log.list.req"];
                 };
             };
             responses: {
@@ -2295,7 +2469,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.maintenance.audit_login.list.res"];
+                        "application/json": components["schemas"]["admin.maintenance.login_log.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9461,7 +9635,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/list": {
+    "/api/v1/admin/ai/search/search": {
         parameters: {
             query?: never;
             header?: never;
@@ -9470,7 +9644,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 分页获取浏览器环境配置 */
+        /** 全局 AI 智能搜索 */
         post: {
             parameters: {
                 query?: never;
@@ -9480,7 +9654,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.list.req"];
+                    "application/json": components["schemas"]["admin.ai.config.search.req"];
                 };
             };
             responses: {
@@ -9490,7 +9664,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.list.res"];
+                        "application/json": components["schemas"]["admin.ai.config.search.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9519,7 +9693,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/add": {
+    "/api/v1/admin/ai/openai/chat/completions": {
         parameters: {
             query?: never;
             header?: never;
@@ -9528,7 +9702,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 新建浏览器配置 */
+        /** OpenAI 兼容对话补全 */
         post: {
             parameters: {
                 query?: never;
@@ -9538,7 +9712,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.add.req"];
+                    "application/json": components["schemas"]["admin.ai.config.chat.completions.req"];
                 };
             };
             responses: {
@@ -9548,7 +9722,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.add.res"];
+                        "application/json": components["schemas"]["admin.ai.config.chat.completions.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9577,7 +9751,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/update": {
+    "/api/v1/admin/ai/openai/models": {
         parameters: {
             query?: never;
             header?: never;
@@ -9586,7 +9760,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 更新浏览器配置 */
+        /** OpenAI 兼容模型列表 */
         post: {
             parameters: {
                 query?: never;
@@ -9596,7 +9770,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.update.req"];
+                    "application/json": components["schemas"]["admin.ai.config.models.req"];
                 };
             };
             responses: {
@@ -9606,7 +9780,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.update.res"];
+                        "application/json": components["schemas"]["admin.ai.config.models.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9635,7 +9809,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/delete": {
+    "/api/v1/admin/ai/v1/chat/completions": {
         parameters: {
             query?: never;
             header?: never;
@@ -9644,7 +9818,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除浏览器配置 */
+        /** OpenAI 兼容对话补全 */
         post: {
             parameters: {
                 query?: never;
@@ -9654,7 +9828,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.delete.req"];
+                    "application/json": components["schemas"]["admin.ai.config.chat.completions.req"];
                 };
             };
             responses: {
@@ -9664,7 +9838,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.delete.res"];
+                        "application/json": components["schemas"]["admin.ai.config.chat.completions.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -9693,7 +9867,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/rpa/browser/verify": {
+    "/api/v1/admin/ai/v1/models": {
         parameters: {
             query?: never;
             header?: never;
@@ -9702,7 +9876,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 验证 CDP 连接连通性 */
+        /** OpenAI 兼容模型列表 */
         post: {
             parameters: {
                 query?: never;
@@ -9712,7 +9886,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.rpa.browser.verify.req"];
+                    "application/json": components["schemas"]["admin.ai.config.models.req"];
                 };
             };
             responses: {
@@ -9722,7 +9896,1457 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.rpa.browser.verify.res"];
+                        "application/json": components["schemas"]["admin.ai.config.models.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取RPA配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加RPA配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新RPA配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取RPA配置详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除RPA配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/rpa/config/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证浏览器连接 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.rpa.config.verify.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.rpa.config.verify.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取系统配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取配置详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.detail.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.detail.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取领域配置Schema */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.schema.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.schema.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/sys_config/namespaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取已注册配置的命名空间 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.sys_config.namespaces.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.sys_config.namespaces.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/sys/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 系统日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.sys.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.sys.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/audit/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 审计日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.audit.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.audit.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/biz/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 业务日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.biz.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.biz.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/log/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 日志时间线 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.timeline.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.timeline.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mqtt/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 发布 MQTT 消息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.publish.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.publish.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mqtt/testConnection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 测试 MQTT 连通性 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.testconnection.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.testconnection.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mqtt/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 MQTT 计算后的动态签名与连接凭证 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.credentials.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.credentials.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mqtt/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询 MQTT 历史消息日志 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mqtt.logs.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mqtt.logs.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/meeting": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 创建 RealtimeKit 通话会话 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.meeting.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.meeting.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 加入通话会话，获取参与者 authToken */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.join.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.join.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/meeting/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 结束通话会话（更新本地日志状态为 ended） */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.meeting.end.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.meeting.end.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/voice/meeting/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页查询通话会话历史记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.voice.meeting.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.voice.meeting.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10563,7 +12187,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/personal/profile/listAll": {
+    "/api/v1/enterprise/mail/edm/sendBatch": {
         parameters: {
             query?: never;
             header?: never;
@@ -10572,7 +12196,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取所有个人信息记录 */
+        /** 企业级 EDM 营销邮件批量下发 */
         post: {
             parameters: {
                 query?: never;
@@ -10582,7 +12206,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["personal.profile.listall.req"];
+                    "application/json": components["schemas"]["enterprise.mail.edm.sendbatch.req"];
                 };
             };
             responses: {
@@ -10592,7 +12216,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["personal.profile.listall.res"];
+                        "application/json": components["schemas"]["enterprise.mail.edm.sendbatch.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10621,7 +12245,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/personal/profile/list": {
+    "/api/v1/personal/base/user_config/list": {
         parameters: {
             query?: never;
             header?: never;
@@ -10630,7 +12254,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 分页获取个人信息列表 */
+        /** 分页获取企业配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10640,7 +12264,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["personal.profile.list.req"];
+                    "application/json": components["schemas"]["personal.base.user_config.list.req"];
                 };
             };
             responses: {
@@ -10650,7 +12274,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["personal.profile.list.res"];
+                        "application/json": components["schemas"]["personal.base.user_config.list.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10679,7 +12303,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/personal/profile/add": {
+    "/api/v1/personal/base/user_config/add": {
         parameters: {
             query?: never;
             header?: never;
@@ -10688,7 +12312,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 新增个人信息 */
+        /** 添加企业配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10698,7 +12322,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["personal.profile.add.req"];
+                    "application/json": components["schemas"]["personal.base.user_config.add.req"];
                 };
             };
             responses: {
@@ -10708,7 +12332,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["personal.profile.add.res"];
+                        "application/json": components["schemas"]["personal.base.user_config.add.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10737,7 +12361,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/personal/profile/update": {
+    "/api/v1/personal/base/user_config/update": {
         parameters: {
             query?: never;
             header?: never;
@@ -10746,7 +12370,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 修改个人信息 */
+        /** 更新企业配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10756,7 +12380,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["personal.profile.update.req"];
+                    "application/json": components["schemas"]["personal.base.user_config.update.req"];
                 };
             };
             responses: {
@@ -10766,7 +12390,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["personal.profile.update.res"];
+                        "application/json": components["schemas"]["personal.base.user_config.update.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10795,7 +12419,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/personal/profile/delete": {
+    "/api/v1/personal/base/user_config/delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -10804,7 +12428,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 删除个人信息记录 */
+        /** 删除企业配置 */
         post: {
             parameters: {
                 query?: never;
@@ -10814,7 +12438,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["personal.profile.delete.req"];
+                    "application/json": components["schemas"]["personal.base.user_config.delete.req"];
                 };
             };
             responses: {
@@ -10824,7 +12448,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["personal.profile.delete.res"];
+                        "application/json": components["schemas"]["personal.base.user_config.delete.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10853,7 +12477,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/personal/profile/get": {
+    "/api/v1/personal/base/user_config/get": {
         parameters: {
             query?: never;
             header?: never;
@@ -10862,7 +12486,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取个人信息详情 */
+        /** 获取企业配置详情 */
         post: {
             parameters: {
                 query?: never;
@@ -10872,7 +12496,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["personal.profile.get.req"];
+                    "application/json": components["schemas"]["personal.base.user_config.get.req"];
                 };
             };
             responses: {
@@ -10882,7 +12506,1805 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["personal.profile.get.res"];
+                        "application/json": components["schemas"]["personal.base.user_config.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/schema": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取配置Schema定义 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.schema.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.schema.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/user_config/namespaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取已有的命名空间列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.user_config.namespaces.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.user_config.namespaces.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/preference/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取当前用户邮件通知偏好 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.preference.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.preference.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/base/preference/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新当前用户邮件通知偏好 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.base.preference.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.base.preference.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取当前用户的医疗记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增医疗记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新医疗记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/health/medical_record/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除医疗记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.health.medical_record.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.health.medical_record.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 财务总览仪表盘数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.dashboard.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.dashboard.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 收入记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增收入记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新收入记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/income/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除收入记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.income.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.income.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 支出记录列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增支出记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新支出记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/expense/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除支出记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.expense.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.expense.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 数据源配置列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增数据源配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新数据源配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除数据源配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/finance/data_source/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 手动立即触发数据源抓取与同步 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.finance.data_source.sync.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.finance.data_source.sync.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 家庭成员列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增家庭成员 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新家庭成员 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/family/member/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除家庭成员 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.family.member.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.family.member.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 联系人列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新增联系人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新联系人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/contact/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除联系人 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.contact.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.contact.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/personal/social/graph": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取社交网络拓扑数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["personal.social.graph.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["personal.social.graph.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -10918,7 +14340,7 @@ export interface components {
         ErrorInvalidRequest: {
             ok: boolean;
             message: string;
-            data: Record<string, never> | null;
+            data: Record<string, never>;
         };
         "admin.i18n.language.listall.req": {
             /** @description 是否降序 */
@@ -11234,14 +14656,14 @@ export interface components {
                  */
                 id: number;
                 /** @description 语言对象 */
-                labels?: {
+                labels?: ((({
                     /** @description 中文（中国） */
                     "zh-CN"?: string;
                     /** @description 英语（美国） */
                     "en-US"?: string;
                 } & {
                     [key: string]: unknown;
-                };
+                }) | null) | null) | null;
                 /** @description ISO 3166-1 alpha-2 */
                 alpha2Code?: string;
                 /** @description ISO 3166-1 alpha-3 */
@@ -11318,14 +14740,14 @@ export interface components {
                      */
                     numeric: number;
                     /** @description 语言对象 */
-                    labels: {
+                    labels: ((({
                         /** @description 中文（中国） */
                         "zh-CN"?: string;
                         /** @description 英语（美国） */
                         "en-US"?: string;
                     } & {
                         [key: string]: unknown;
-                    };
+                    }) | null) | null) | null;
                     /** @description 是否ISO3166独立主权国家 */
                     iso3166Independent: boolean;
                     /** @description 语言代码列表 */
@@ -11367,14 +14789,14 @@ export interface components {
              */
             numeric: number;
             /** @description 语言对象 */
-            labels: {
+            labels: ((({
                 /** @description 中文（中国） */
                 "zh-CN"?: string;
                 /** @description 英语（美国） */
                 "en-US"?: string;
             } & {
                 [key: string]: unknown;
-            };
+            }) | null) | null) | null;
             /** @description 是否ISO3166独立主权国家 */
             iso3166Independent: boolean;
             /** @description 语言代码列表 */
@@ -11413,14 +14835,14 @@ export interface components {
              */
             numeric?: number;
             /** @description 语言对象 */
-            labels?: {
+            labels?: ((({
                 /** @description 中文（中国） */
                 "zh-CN"?: string;
                 /** @description 英语（美国） */
                 "en-US"?: string;
             } & {
                 [key: string]: unknown;
-            };
+            }) | null) | null) | null;
             /** @description 是否ISO3166独立主权国家 */
             iso3166Independent?: boolean;
             /** @description 语言代码列表 */
@@ -11484,14 +14906,14 @@ export interface components {
                  */
                 numeric: number;
                 /** @description 语言对象 */
-                labels: {
+                labels: ((({
                     /** @description 中文（中国） */
                     "zh-CN"?: string;
                     /** @description 英语（美国） */
                     "en-US"?: string;
                 } & {
                     [key: string]: unknown;
-                };
+                }) | null) | null) | null;
                 /** @description 是否ISO3166独立主权国家 */
                 iso3166Independent: boolean;
                 /** @description 语言代码列表 */
@@ -12047,6 +15469,16 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled?: boolean;
                 /**
+                 * @description 作用域：sys(系统级)/biz(企业级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
                  * @description 备注
                  * @example 这是一个测试邮箱账号
                  */
@@ -12130,6 +15562,16 @@ export interface components {
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /**
+                     * @description 作用域：sys(系统级)/biz(企业级)
+                     * @default sys
+                     * @enum {string}
+                     */
+                    scope: "sys" | "biz";
+                    /** @description 租户ID（企业级专用） */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 用户ID（个人级专用） */
+                    userId?: ((number | null) | null) | null;
+                    /**
                      * @description 备注
                      * @example 这是一个测试邮箱账号
                      */
@@ -12183,6 +15625,16 @@ export interface components {
             /** @description 是否启用 */
             isEnabled: boolean;
             /**
+             * @description 作用域：sys(系统级)/biz(企业级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
              * @description 备注
              * @example 这是一个测试邮箱账号
              */
@@ -12232,6 +15684,16 @@ export interface components {
             port?: number;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
             /**
              * @description 备注
              * @example 这是一个测试邮箱账号
@@ -12308,6 +15770,16 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /**
+                 * @description 作用域：sys(系统级)/biz(企业级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
                  * @description 备注
                  * @example 这是一个测试邮箱账号
                  */
@@ -12331,15 +15803,29 @@ export interface components {
         };
         "admin.mail.action.send.req": {
             /**
-             * @description 邮箱账号ID
+             * @description 邮箱账号ID（可选，未指定时按作用域自动匹配或使用系统默认）
              * @example 1
              */
-            accountId: number;
+            accountId?: number;
             /**
-             * @description 邮件模板ID（可选，如果提供则使用模板内容）
+             * @description 邮件模板ID（可选）
              * @example 1
              */
             templateId?: number;
+            /**
+             * @description 邮件模板名称标识（可选，如 SYS_REMOTE_LOGIN_WARN）
+             * @example SYS_REMOTE_LOGIN_WARN
+             */
+            templateName?: string;
+            /**
+             * @description 作用域（可选：sys/biz/user）
+             * @enum {string}
+             */
+            scope?: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级可选） */
+            tenantId?: number;
+            /** @description 用户ID（个人级可选） */
+            userId?: number;
             /** @description 收件人列表 */
             receiverArr: {
                 /** @description 收件人名称 */
@@ -12365,7 +15851,7 @@ export interface components {
         "admin.mail.action.send.res": {
             ok: boolean;
             data: {
-                /** @description 成功接收的邮箱地址列表 */
+                /** @description 已接收的邮箱地址列表 */
                 accepted: {
                     name: string;
                     address: string;
@@ -12393,7 +15879,7 @@ export interface components {
             data: boolean;
             message: string;
         };
-        "admin.mail.log.listall.req": {
+        "admin.mail.log.list_all.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /** @description 发送状态 */
@@ -12407,7 +15893,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "mailTo" | "mailFrom" | "sendStatus" | "createTimeUtc";
         };
-        "admin.mail.log.listall.res": {
+        "admin.mail.log.list_all.res": {
             ok: boolean;
             data: {
                 /**
@@ -12420,30 +15906,36 @@ export interface components {
                  * @description 收件人邮箱地址
                  * @example receiver@example.com
                  */
-                mailTo?: string;
+                mailTo: string;
                 /**
                  * Format: email
                  * @description 发件人邮箱地址
                  * @example sender@example.com
                  */
-                mailFrom?: string;
+                mailFrom: string;
                 /**
                  * @description 邮件标题
                  * @example Welcome to register on our platform!
                  */
-                title?: string;
+                title: string;
                 /** @description 邮件模板ID */
-                templateId?: ((string | null) | null) | null;
+                templateId: ((string | null) | null) | null;
                 /** @description 邮件模板参数 */
-                templateParams?: ((string | null) | null) | null;
+                templateParams: ((string | null) | null) | null;
                 /** @description 发送状态 */
-                sendStatus?: boolean;
+                sendStatus: boolean;
                 /** @description 异常代码 */
-                exceptionCode?: ((string | null) | null) | null;
+                exceptionCode: ((string | null) | null) | null;
                 /** @description 异常详情 */
-                exceptionDetails?: ((string | null) | null) | null;
+                exceptionDetails: ((string | null) | null) | null;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /** @description 创建人名称 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 创建时间(UTC) */
+                createTimeUtc: number;
             }[];
             message: string;
         };
@@ -12511,31 +16003,23 @@ export interface components {
                      */
                     title: string;
                     /** @description 邮件模板ID */
-                    templateId?: ((string | null) | null) | null;
+                    templateId: ((string | null) | null) | null;
                     /** @description 邮件模板参数 */
-                    templateParams?: ((string | null) | null) | null;
+                    templateParams: ((string | null) | null) | null;
                     /** @description 发送状态 */
                     sendStatus: boolean;
                     /** @description 异常代码 */
-                    exceptionCode?: ((string | null) | null) | null;
+                    exceptionCode: ((string | null) | null) | null;
                     /** @description 异常详情 */
-                    exceptionDetails?: ((string | null) | null) | null;
+                    exceptionDetails: ((string | null) | null) | null;
                     /** @description 备注 */
-                    remark?: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
+                    /** @description 创建人名称 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
                     createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -12580,67 +16064,6 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.mail.log.update.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-            /**
-             * Format: email
-             * @description 收件人邮箱地址
-             * @example receiver@example.com
-             */
-            mailTo?: string;
-            /**
-             * Format: email
-             * @description 发件人邮箱地址
-             * @example sender@example.com
-             */
-            mailFrom?: string;
-            /**
-             * @description 邮件标题
-             * @example Welcome to register on our platform!
-             */
-            title?: string;
-            /** @description 邮件模板ID */
-            templateId?: ((string | null) | null) | null;
-            /** @description 邮件模板参数 */
-            templateParams?: ((string | null) | null) | null;
-            /** @description 发送状态 */
-            sendStatus?: boolean;
-            /** @description 异常代码 */
-            exceptionCode?: ((string | null) | null) | null;
-            /** @description 异常详情 */
-            exceptionDetails?: ((string | null) | null) | null;
-            /** @description 备注 */
-            remark?: ((string | null) | null) | null;
-        };
-        "admin.mail.log.update.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
-        "admin.mail.log.delete.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "admin.mail.log.delete.res": {
-            ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
-            message: string;
-        };
         "admin.mail.log.get.req": {
             /**
              * @description id
@@ -12674,31 +16097,23 @@ export interface components {
                  */
                 title: string;
                 /** @description 邮件模板ID */
-                templateId?: ((string | null) | null) | null;
+                templateId: ((string | null) | null) | null;
                 /** @description 邮件模板参数 */
-                templateParams?: ((string | null) | null) | null;
+                templateParams: ((string | null) | null) | null;
                 /** @description 发送状态 */
                 sendStatus: boolean;
                 /** @description 异常代码 */
-                exceptionCode?: ((string | null) | null) | null;
+                exceptionCode: ((string | null) | null) | null;
                 /** @description 异常详情 */
-                exceptionDetails?: ((string | null) | null) | null;
+                exceptionDetails: ((string | null) | null) | null;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
                 /** @description 创建人ID */
                 creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
+                /** @description 创建人名称 */
+                creatorName: ((string | null) | null) | null;
+                /** @description 创建时间(UTC) */
                 createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -12731,9 +16146,19 @@ export interface components {
                 /** @description 邮件内容 */
                 content?: string;
                 /** @description 邮件分类 */
-                category?: string;
+                category?: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled?: boolean;
+                /**
+                 * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz" | "user";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
                 /**
                  * @description 备注
                  * @example 这是一个测试邮箱模板
@@ -12805,9 +16230,19 @@ export interface components {
                     /** @description 邮件内容 */
                     content: string;
                     /** @description 邮件分类 */
-                    category?: string;
+                    category?: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
+                    /**
+                     * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                     * @default sys
+                     * @enum {string}
+                     */
+                    scope: "sys" | "biz" | "user";
+                    /** @description 租户ID（企业级专用） */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 用户ID（个人级专用） */
+                    userId?: ((number | null) | null) | null;
                     /**
                      * @description 备注
                      * @example 这是一个测试邮箱模板
@@ -12850,9 +16285,19 @@ export interface components {
             /** @description 邮件内容 */
             content: string;
             /** @description 邮件分类 */
-            category?: string;
+            category?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled: boolean;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
             /**
              * @description 备注
              * @example 这是一个测试邮箱模板
@@ -12892,9 +16337,19 @@ export interface components {
             /** @description 邮件内容 */
             content?: string;
             /** @description 邮件分类 */
-            category?: string;
+            category?: ((string | null) | null) | null;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default sys
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（个人级专用） */
+            userId?: ((number | null) | null) | null;
             /**
              * @description 备注
              * @example 这是一个测试邮箱模板
@@ -12959,9 +16414,19 @@ export interface components {
                 /** @description 邮件内容 */
                 content: string;
                 /** @description 邮件分类 */
-                category?: string;
+                category?: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
+                /**
+                 * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                 * @default sys
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz" | "user";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（个人级专用） */
+                userId?: ((number | null) | null) | null;
                 /**
                  * @description 备注
                  * @example 这是一个测试邮箱模板
@@ -12984,7 +16449,301 @@ export interface components {
             };
             message: string;
         };
-        "admin.maintenance.audit_login.list.req": {
+        "admin.mail.recipient.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 搜索关键词（邮箱/姓名/备注） */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default biz
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（系统/个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /** @description 是否开启异地登录告警邮件提醒 */
+            remoteLoginWarn?: boolean;
+            /** @description 是否订阅企业营销EDM邮件 */
+            marketingEdm?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "email" | "createTimeUtc";
+        };
+        "admin.mail.recipient.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * Format: email
+                     * @description 收件人邮箱地址
+                     * @example user@example.com
+                     */
+                    email: string;
+                    /**
+                     * @description 收件人姓名/称呼
+                     * @example 张三
+                     */
+                    name?: ((string | null) | null) | null;
+                    /**
+                     * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                     * @default biz
+                     * @enum {string}
+                     */
+                    scope: "sys" | "biz" | "user";
+                    /** @description 租户ID（企业级专用） */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 用户ID（系统/个人级专用） */
+                    userId?: ((number | null) | null) | null;
+                    /**
+                     * @description 是否开启异地登录告警邮件提醒
+                     * @default true
+                     */
+                    remoteLoginWarn: boolean;
+                    /**
+                     * @description 是否订阅企业营销EDM邮件
+                     * @default true
+                     */
+                    marketingEdm: boolean;
+                    /**
+                     * @description 联系人标签分类（JSON字符串）
+                     * @example ["VIP买家", "展会联系人"]
+                     */
+                    tags?: ((string | null) | null) | null;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mail.recipient.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mail.recipient.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id?: number;
+                /**
+                 * Format: email
+                 * @description 收件人邮箱地址
+                 * @example user@example.com
+                 */
+                email?: string;
+                /**
+                 * @description 收件人姓名/称呼
+                 * @example 张三
+                 */
+                name?: ((string | null) | null) | null;
+                /**
+                 * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+                 * @default biz
+                 * @enum {string}
+                 */
+                scope: "sys" | "biz" | "user";
+                /** @description 租户ID（企业级专用） */
+                tenantId?: ((number | null) | null) | null;
+                /** @description 用户ID（系统/个人级专用） */
+                userId?: ((number | null) | null) | null;
+                /**
+                 * @description 是否开启异地登录告警邮件提醒
+                 * @default true
+                 */
+                remoteLoginWarn: boolean;
+                /**
+                 * @description 是否订阅企业营销EDM邮件
+                 * @default true
+                 */
+                marketingEdm: boolean;
+                /**
+                 * @description 联系人标签分类（JSON字符串）
+                 * @example ["VIP买家", "展会联系人"]
+                 */
+                tags?: ((string | null) | null) | null;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mail.recipient.add.req": {
+            /**
+             * Format: email
+             * @description 收件人邮箱地址
+             * @example user@example.com
+             */
+            email: string;
+            /**
+             * @description 收件人姓名/称呼
+             * @example 张三
+             */
+            name?: ((string | null) | null) | null;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default biz
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（系统/个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
+             * @description 是否开启异地登录告警邮件提醒
+             * @default true
+             */
+            remoteLoginWarn: boolean;
+            /**
+             * @description 是否订阅企业营销EDM邮件
+             * @default true
+             */
+            marketingEdm: boolean;
+            /**
+             * @description 联系人标签分类（JSON字符串）
+             * @example ["VIP买家", "展会联系人"]
+             */
+            tags?: ((string | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mail.recipient.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mail.recipient.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * Format: email
+             * @description 收件人邮箱地址
+             * @example user@example.com
+             */
+            email?: string;
+            /**
+             * @description 收件人姓名/称呼
+             * @example 张三
+             */
+            name?: ((string | null) | null) | null;
+            /**
+             * @description 作用域：sys(系统级)/biz(企业级)/user(个人级)
+             * @default biz
+             * @enum {string}
+             */
+            scope: "sys" | "biz" | "user";
+            /** @description 租户ID（企业级专用） */
+            tenantId?: ((number | null) | null) | null;
+            /** @description 用户ID（系统/个人级专用） */
+            userId?: ((number | null) | null) | null;
+            /**
+             * @description 是否开启异地登录告警邮件提醒
+             * @default true
+             */
+            remoteLoginWarn: boolean;
+            /**
+             * @description 是否订阅企业营销EDM邮件
+             * @default true
+             */
+            marketingEdm: boolean;
+            /**
+             * @description 联系人标签分类（JSON字符串）
+             * @example ["VIP买家", "展会联系人"]
+             */
+            tags?: ((string | null) | null) | null;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mail.recipient.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mail.recipient.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mail.recipient.delete.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.maintenance.login_log.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -13010,7 +16769,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "userId" | "loginTimeUtc" | "createTimeUtc";
         };
-        "admin.maintenance.audit_login.list.res": {
+        "admin.maintenance.login_log.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -13041,28 +16800,20 @@ export interface components {
                      * @description 客户端IP地址
                      * @example 127.0.0.1
                      */
-                    ip?: ((string | null) | null) | null;
+                    ip: ((string | null) | null) | null;
                     /**
                      * @description 客户端User-Agent
                      * @example Mozilla/5.0...
                      */
-                    userAgent?: ((string | null) | null) | null;
+                    userAgent: ((string | null) | null) | null;
                     /** @description 备注说明 */
                     remark?: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
-                    /**
-                     * @description 创建时间
-                     * @example 1672531199000
-                     */
+                    /** @description 创建人名称 */
+                    creatorName: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
                     createTimeUtc: number;
-                    /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
-                    /**
-                     * @description 更新时间
-                     * @example 1672531199000
-                     */
-                    updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -14394,13 +18145,10 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /**
-                 * @description 配置名称
-                 * @example My S3 Storage
-                 */
+                /** @description 配置名称 */
                 name: string;
                 /**
-                 * @description 存储提供商类型
+                 * @description 存储提供商
                  * @enum {string}
                  */
                 provider: "S3" | "R2";
@@ -14451,20 +18199,14 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /**
-                     * @description 配置名称
-                     * @example My S3 Storage
-                     */
+                    /** @description 配置名称 */
                     name: string;
                     /**
-                     * @description 存储提供商类型
+                     * @description 存储提供商
                      * @enum {string}
                      */
                     provider: "S3" | "R2";
-                    /**
-                     * @description 服务地址 (R2 不需要)
-                     * @example http://localhost:9000
-                     */
+                    /** @description 服务地址 */
                     endpoint?: ((string | null) | null) | null;
                     /** @description 账户 ID (仅 R2 需要) */
                     accountId?: ((string | null) | null) | null;
@@ -14493,31 +18235,25 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
+                    updaterId?: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: ((number | null) | null) | null;
+                    updateTimeUtc?: ((number | null) | null) | null;
                 }[];
             };
             message: string;
         };
         "admin.oss.config.add.req": {
-            /**
-             * @description 配置名称
-             * @example My S3 Storage
-             */
+            /** @description 配置名称 */
             name: string;
             /**
-             * @description 存储提供商类型
+             * @description 存储提供商
              * @enum {string}
              */
             provider: "S3" | "R2";
-            /**
-             * @description 服务地址 (R2 不需要)
-             * @example http://localhost:9000
-             */
+            /** @description 服务地址 */
             endpoint?: ((string | null) | null) | null;
             /** @description 账户 ID (仅 R2 需要) */
             accountId?: ((string | null) | null) | null;
@@ -14554,20 +18290,14 @@ export interface components {
              * @example 1
              */
             id: number;
-            /**
-             * @description 配置名称
-             * @example My S3 Storage
-             */
+            /** @description 配置名称 */
             name?: string;
             /**
-             * @description 存储提供商类型
+             * @description 存储提供商
              * @enum {string}
              */
             provider?: "S3" | "R2";
-            /**
-             * @description 服务地址 (R2 不需要)
-             * @example http://localhost:9000
-             */
+            /** @description 服务地址 */
             endpoint?: ((string | null) | null) | null;
             /** @description 账户 ID (仅 R2 需要) */
             accountId?: ((string | null) | null) | null;
@@ -14613,20 +18343,14 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /**
-                 * @description 配置名称
-                 * @example My S3 Storage
-                 */
+                /** @description 配置名称 */
                 name: string;
                 /**
-                 * @description 存储提供商类型
+                 * @description 存储提供商
                  * @enum {string}
                  */
                 provider: "S3" | "R2";
-                /**
-                 * @description 服务地址 (R2 不需要)
-                 * @example http://localhost:9000
-                 */
+                /** @description 服务地址 */
                 endpoint?: ((string | null) | null) | null;
                 /** @description 账户 ID (仅 R2 需要) */
                 accountId?: ((string | null) | null) | null;
@@ -14648,19 +18372,19 @@ export interface components {
                 /** @description 备注 */
                 remark?: ((string | null) | null) | null;
                 /** @description 创建人ID */
-                creatorId: number;
+                creatorId?: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc: number;
+                createTimeUtc?: number;
                 /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
+                updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: ((number | null) | null) | null;
+                updateTimeUtc?: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -17485,12 +21209,12 @@ export interface components {
                      */
                     createTimeUtc: number;
                     /** @description 更新人ID */
-                    updaterId: ((number | null) | null) | null;
+                    updaterId?: ((number | null) | null) | null;
                     /**
                      * @description 更新时间
                      * @example 1672531199000
                      */
-                    updateTimeUtc: ((number | null) | null) | null;
+                    updateTimeUtc?: ((number | null) | null) | null;
                 }[];
             };
             message: string;
@@ -17638,12 +21362,12 @@ export interface components {
                  */
                 createTimeUtc: number;
                 /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
+                updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: ((number | null) | null) | null;
+                updateTimeUtc?: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -17758,7 +21482,7 @@ export interface components {
                      * @description API 基础地址
                      * @example https://api.deepseek.com/v1
                      */
-                    baseUrl?: ((string | null) | null) | null;
+                    baseUrl: ((string | null) | null) | null;
                     /** @description API 密钥 */
                     apiKey: string;
                     /**
@@ -17767,7 +21491,7 @@ export interface components {
                      */
                     model: string;
                     /** @description 模型支持的能力 (JSON 数组，如 ['text', 'image']) */
-                    capabilities?: ((string | null) | null) | null;
+                    capabilities: ((string | null) | null) | null;
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 是否为默认配置 */
@@ -17899,7 +21623,7 @@ export interface components {
                  * @description API 基础地址
                  * @example https://api.deepseek.com/v1
                  */
-                baseUrl?: ((string | null) | null) | null;
+                baseUrl: ((string | null) | null) | null;
                 /** @description API 密钥 */
                 apiKey: string;
                 /**
@@ -17908,27 +21632,27 @@ export interface components {
                  */
                 model: string;
                 /** @description 模型支持的能力 (JSON 数组，如 ['text', 'image']) */
-                capabilities?: ((string | null) | null) | null;
+                capabilities: ((string | null) | null) | null;
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 是否为默认配置 */
                 isDefault: boolean;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
                 /** @description 创建人ID */
-                creatorId: number;
+                creatorId?: number;
                 /**
                  * @description 创建时间
                  * @example 1672531199000
                  */
-                createTimeUtc: number;
+                createTimeUtc?: number;
                 /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
+                updaterId?: ((number | null) | null) | null;
                 /**
                  * @description 更新时间
                  * @example 1672531199000
                  */
-                updateTimeUtc: ((number | null) | null) | null;
+                updateTimeUtc?: ((number | null) | null) | null;
             };
             message: string;
         };
@@ -17988,7 +21712,147 @@ export interface components {
             data: string;
             message: string;
         };
-        "admin.rpa.browser.list.req": {
+        "admin.ai.config.search.req": {
+            /** @description 搜索关键词或语义提问 */
+            query: string;
+            /**
+             * @description 返回的最大结果数量
+             * @default 10
+             */
+            limit: number;
+        };
+        "admin.ai.config.search.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: string;
+                    title: string;
+                    /** @enum {string} */
+                    type: "menu" | "config" | "feature" | "system";
+                    path?: string;
+                    score: number;
+                    description?: string;
+                    snippet?: string;
+                }[];
+                total: number;
+            };
+            message: string;
+        };
+        "admin.ai.config.chat.completions.req": {
+            /**
+             * @description Cloudflare Workers AI 或 OpenAI 兼容模型名称
+             * @default @cf/meta/llama-3.2-3b-instruct
+             */
+            model: string;
+            /** @description 符合 OpenAI 规范的消息上下文列表 */
+            messages: {
+                /**
+                 * @description 消息发送者角色 (system | user | assistant)
+                 * @enum {string}
+                 */
+                role: "system" | "user" | "assistant";
+                content: string | {
+                    /** @description 内容类型 (text | image_url) */
+                    type?: string;
+                    /** @description 文本内容 */
+                    text?: string;
+                    /** @description 图片 URL 结构 */
+                    image_url?: {
+                        /** @description 图片地址或 Base64 编码 */
+                        url?: string;
+                    };
+                }[];
+            }[];
+            /**
+             * @description 生成随机性参数 (0.0 - 2.0)
+             * @default 0.7
+             */
+            temperature: number;
+            /**
+             * @description 最大生成 Token 数量限制
+             * @default 2048
+             */
+            max_tokens: number;
+            /**
+             * @description 是否开启流式传输 (暂保留)
+             * @default false
+             */
+            stream: boolean;
+        } & {
+            [key: string]: unknown;
+        };
+        "admin.ai.config.chat.completions.res": {
+            ok: boolean;
+            data: {
+                /** @description 单次对话生成唯一标识符 */
+                id: string;
+                /**
+                 * @description 响应对象类型
+                 * @constant
+                 */
+                object: "chat.completion";
+                /** @description 响应时间戳 */
+                created: number;
+                /** @description 调用的底层大语言模型名称 */
+                model: string;
+                /** @description 补全回答候选列表 */
+                choices: {
+                    /** @description 结果选项索引 */
+                    index: number;
+                    /** @description 生成的核心消息对象 */
+                    message: {
+                        /**
+                         * @description 固定为 assistant 角色
+                         * @constant
+                         */
+                        role: "assistant";
+                        /** @description AI 生成的回答文本 */
+                        content: string;
+                    };
+                    /** @description 结束标识 (如 stop | length) */
+                    finish_reason: string;
+                }[];
+                /** @description Token 消耗统计 */
+                usage?: {
+                    /** @description 提示词 Token 消耗数量 */
+                    prompt_tokens: number;
+                    /** @description 生成回答 Token 消耗数量 */
+                    completion_tokens: number;
+                    /** @description 总计 Token 消耗数量 */
+                    total_tokens: number;
+                };
+            };
+            message: string;
+        };
+        "admin.ai.config.models.req": {
+            [key: string]: unknown;
+        };
+        "admin.ai.config.models.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description 固定为 list
+                 * @constant
+                 */
+                object: "list";
+                /** @description 支持的 AI 模型列表 */
+                data: {
+                    /** @description 模型 ID 名称 */
+                    id: string;
+                    /**
+                     * @description 固定为 model
+                     * @constant
+                     */
+                    object: "model";
+                    /** @description 模型创建时间戳 */
+                    created: number;
+                    /** @description 模型提供方标识 */
+                    owned_by: string;
+                }[];
+            };
+            message: string;
+        };
+        "admin.rpa.config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18011,7 +21875,7 @@ export interface components {
             /** @enum {string} */
             orderBy?: "id" | "name" | "isDefault" | "isEnabled" | "createTimeUtc";
         };
-        "admin.rpa.browser.list.res": {
+        "admin.rpa.config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18034,7 +21898,7 @@ export interface components {
                     cdpUrl: string;
                     /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
                     authToken: ((string | null) | null) | null;
-                    /** @description 是否为默认环境 */
+                    /** @description 是否为主配置 */
                     isDefault: boolean;
                     /** @description 是否启用 */
                     isEnabled: boolean;
@@ -18058,21 +21922,21 @@ export interface components {
             };
             message: string;
         };
-        "admin.rpa.browser.add.req": {
+        "admin.rpa.config.add.req": {
             /** @description 配置名 */
             name: string;
             /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
             cdpUrl: string;
             /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
             authToken?: ((string | null) | null) | null;
-            /** @description 是否为默认环境 */
+            /** @description 是否为主配置 */
             isDefault: boolean;
             /** @description 是否启用 */
             isEnabled: boolean;
             /** @description 备注信息 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.rpa.browser.add.res": {
+        "admin.rpa.config.add.res": {
             ok: boolean;
             /**
              * @description id
@@ -18081,7 +21945,7 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.rpa.browser.update.req": {
+        "admin.rpa.config.update.req": {
             /**
              * @description id
              * @example 1
@@ -18093,14 +21957,14 @@ export interface components {
             cdpUrl?: string;
             /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
             authToken?: ((string | null) | null) | null;
-            /** @description 是否为默认环境 */
+            /** @description 是否为主配置 */
             isDefault?: boolean;
             /** @description 是否启用 */
             isEnabled?: boolean;
             /** @description 备注信息 */
             remark?: ((string | null) | null) | null;
         };
-        "admin.rpa.browser.update.res": {
+        "admin.rpa.config.update.res": {
             ok: boolean;
             /**
              * @description id
@@ -18109,14 +21973,58 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.rpa.browser.delete.req": {
+        "admin.rpa.config.get.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.rpa.browser.delete.res": {
+        "admin.rpa.config.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 配置名 */
+                name: string;
+                /** @description CDP 协议调试连接地址 (e.g. ws://127.0.0.1:9222/devtools/browser/... 或调试主机:端口)。使用 Cloudflare Browser Run 时填写 https://api.cloudflare.com/client/v4/accounts/<您的ACCOUNT_ID>/browser-rendering */
+                cdpUrl: string;
+                /** @description 认证 Token（可选）。填写后自动切换为 Cloudflare Browser Run 模式，使用 Bearer Token 进行身份验证 */
+                authToken: ((string | null) | null) | null;
+                /** @description 是否为主配置 */
+                isDefault: boolean;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 备注信息 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId?: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc?: number;
+                /** @description 更新人ID */
+                updaterId?: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc?: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.rpa.config.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.rpa.config.delete.res": {
             ok: boolean;
             /**
              * @description id
@@ -18125,16 +22033,674 @@ export interface components {
             data: number;
             message: string;
         };
-        "admin.rpa.browser.verify.req": {
+        "admin.rpa.config.verify.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "admin.rpa.browser.verify.res": {
+        "admin.rpa.config.verify.res": {
             ok: boolean;
-            data: boolean;
+            data: {
+                ok: boolean;
+                message: string;
+            };
+            message: string;
+        };
+        "admin.base.sys_config.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "isEnabled" | "isPrimary" | "createTimeUtc";
+        };
+        "admin.base.sys_config.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 命名空间 */
+                    namespace: string;
+                    /** @description 配置键 */
+                    configKey: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 是否为主配置 */
+                    isPrimary: boolean;
+                    /** @description 配置值JSON */
+                    configValue: {
+                        [key: string]: unknown;
+                    };
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.sys_config.detail.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.base.sys_config.detail.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 命名空间 */
+                namespace: string;
+                /** @description 配置键 */
+                configKey: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 是否为主配置 */
+                isPrimary: boolean;
+                /** @description 配置值JSON */
+                configValue: {
+                    [key: string]: unknown;
+                };
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.base.sys_config.add.req": {
+            /** @description 命名空间 */
+            namespace: string;
+            /** @description 配置键 */
+            configKey: string;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 是否为主配置 */
+            isPrimary: boolean;
+            /** @description 配置值JSON */
+            configValue: {
+                [key: string]: unknown;
+            };
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.base.sys_config.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.base.sys_config.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 配置键 */
+            configKey?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 是否为主配置 */
+            isPrimary?: boolean;
+            /** @description 配置值JSON */
+            configValue?: {
+                [key: string]: unknown;
+            };
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.base.sys_config.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.base.sys_config.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.base.sys_config.delete.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.base.sys_config.schema.req": {
+            /** @description 命名空间 */
+            namespace: string;
+        };
+        "admin.base.sys_config.schema.res": {
+            ok: boolean;
+            data: {
+                schema: {
+                    [key: string]: unknown;
+                };
+                defaultValues: {
+                    [key: string]: unknown;
+                };
+            };
+            message: string;
+        };
+        "admin.base.sys_config.namespaces.req": Record<string, never>;
+        "admin.base.sys_config.namespaces.res": {
+            ok: boolean;
+            data: {
+                /** @description 命名空间 */
+                namespace: string;
+            }[];
+            message: string;
+        };
+        "admin.base.log.sys.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            namespace?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "logLevel" | "createTimeUtc";
+        };
+        "admin.base.log.sys.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 日志级别 */
+                    logLevel?: string;
+                    /** @description 数据格式 */
+                    payloadType?: string;
+                    /** @description 明细内容 */
+                    logValue?: {
+                        [key: string]: unknown;
+                    };
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.audit.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            namespace?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "action" | "createTimeUtc";
+        };
+        "admin.base.log.audit.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 操作动作 */
+                    action?: string;
+                    /** @description 目标ID */
+                    targetId?: ((string | null) | null) | null;
+                    /** @description 数据格式 */
+                    payloadType?: string;
+                    /** @description 变更前数据 */
+                    beforeData?: (({
+                        [key: string]: unknown;
+                    } | null) | null) | null;
+                    /** @description 变更后数据 */
+                    afterData?: (({
+                        [key: string]: unknown;
+                    } | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.biz.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            namespace?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "status" | "createTimeUtc";
+        };
+        "admin.base.log.biz.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 状态 (true成功, false失败) */
+                    status?: ((boolean | null) | null) | null;
+                    /** @description 数据格式 */
+                    payloadType?: string;
+                    /** @description 明细内容 */
+                    logValue?: {
+                        [key: string]: unknown;
+                    };
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.timeline.req": {
+            /** @description 要筛选的命名空间列表 */
+            namespaces?: string[];
+            /** @description 要查的日志类型 */
+            types?: ("sys" | "audit" | "biz")[];
+            /**
+             * @description 返回的最大条数
+             * @default 50
+             */
+            limit: number;
+            /** @description 上一页最后一条的 createTimeUtc，第一页留空 */
+            cursor?: number;
+        };
+        "admin.base.log.timeline.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @enum {string} */
+                    logType?: "sys" | "audit" | "biz";
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    action?: string | null;
+                    level?: string | null;
+                    status?: number | null;
+                    logValue?: {
+                        [key: string]: unknown;
+                    } | null;
+                    diffValue?: {
+                        [key: string]: unknown;
+                    } | null;
+                    beforeData?: {
+                        [key: string]: unknown;
+                    } | null;
+                    afterData?: {
+                        [key: string]: unknown;
+                    } | null;
+                }[];
+                /** @description 下一页的游标 */
+                nextCursor?: number | null;
+                hasMore: boolean;
+            };
+            message: string;
+        };
+        "admin.mqtt.publish.req": {
+            /** @description 目标 Topic 主题 */
+            topic: string;
+            /** @description 消息载荷 (支持 JSON 字符串或纯文本) */
+            payload: string;
+            /**
+             * @description 服务质量等级 QoS (0, 1, 2)
+             * @default 0
+             * @enum {number}
+             */
+            qos: 0 | 1 | 2;
+            /**
+             * @description 是否为保留消息 Retain
+             * @default false
+             */
+            retain: boolean;
+            /** @description 备注说明 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mqtt.publish.res": {
+            ok: boolean;
+            data: {
+                /** @description 消息追踪ID */
+                traceId: string;
+            };
+            message: string;
+        };
+        "admin.mqtt.testconnection.req": {
+            id?: ((number | null) | null) | null;
+            provider?: ((string | null) | null) | null;
+            protocol?: ((string | null) | null) | null;
+            host?: ((string | null) | null) | null;
+            port?: ((number | null) | null) | null;
+            clientId?: ((string | null) | null) | null;
+            username?: ((string | null) | null) | null;
+            password?: ((string | null) | null) | null;
+            instanceId?: ((string | null) | null) | null;
+            accessKey?: ((string | null) | null) | null;
+            secretKey?: ((string | null) | null) | null;
+            productKey?: ((string | null) | null) | null;
+            deviceName?: ((string | null) | null) | null;
+            keepalive?: ((number | null) | null) | null;
+            cleanSession?: ((boolean | null) | null) | null;
+        } & {
+            [key: string]: unknown;
+        };
+        "admin.mqtt.testconnection.res": {
+            ok: boolean;
+            data: {
+                /** @description 测试连通性是否成功 */
+                success: boolean;
+                /** @description 测试结果消息 */
+                message: string;
+            };
+            message: string;
+        };
+        "admin.mqtt.credentials.req": Record<string, never>;
+        "admin.mqtt.credentials.res": {
+            ok: boolean;
+            data: {
+                /** @description 提供商类型: EMQX / Aliyun */
+                provider: string;
+                /** @description Broker 服务地址 */
+                brokerUrl: string;
+                /** @description 客户端 ClientId */
+                clientId: string;
+                /** @description 计算/配置的 Username */
+                username: string;
+                /** @description 计算/配置的 Password (已签名) */
+                password: string;
+                /** @description 心跳保持时间(秒) */
+                keepalive: number;
+                /** @description Clean Session 标志 */
+                cleanSession: boolean;
+            };
+            message: string;
+        };
+        "admin.mqtt.logs.req": {
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页数量
+             * @default 20
+             */
+            pageSize: number;
+            /** @description 主题关键字 */
+            topic?: ((string | null) | null) | null;
+            /**
+             * @description 消息流向: IN (接收), OUT (发送)
+             * @enum {string|null|null}
+             */
+            direction?: "IN" | "OUT" | null;
+            /** @description 发送状态 (true成功, false失败) */
+            status?: ((boolean | null) | null) | null;
+            /** @description 起始时间 UTC 时间戳 */
+            startTimeUtc?: ((number | null) | null) | null;
+            /** @description 截止时间 UTC 时间戳 */
+            endTimeUtc?: ((number | null) | null) | null;
+        };
+        "admin.mqtt.logs.res": {
+            ok: boolean;
+            data: {
+                /** @description 日志记录列表 */
+                list: {
+                    [key: string]: unknown;
+                }[];
+                /** @description 总条数 */
+                total: number;
+                /** @description 页码 */
+                pageNo: number;
+                /** @description 每页数量 */
+                pageSize: number;
+            };
+            message: string;
+        };
+        "admin.voice.meeting.req": {
+            /** @description 会话标题（可选） */
+            title?: string | null;
+        };
+        "admin.voice.meeting.res": {
+            ok: boolean;
+            data: {
+                /** @description RealtimeKit 会话 ID */
+                meetingId: string;
+                /** @description 内部异步任务 ID */
+                taskId: string;
+                /** @description 任务状态 */
+                status: string;
+            };
+            message: string;
+        };
+        "admin.voice.join.req": {
+            /** @description 会话 ID（由创建会话接口返回） */
+            meetingId: string;
+            /** @description 显示名称（可选，默认取当前登录用户名） */
+            displayName?: ((string | null) | null) | null;
+        };
+        "admin.voice.join.res": {
+            ok: boolean;
+            data: {
+                /** @description RealtimeKit 参与者 authToken，用于前端 SDK 初始化 */
+                authToken: string;
+                /** @description 会话 ID */
+                meetingId: string;
+            };
+            message: string;
+        };
+        "admin.voice.meeting.end.req": {
+            /** @description 会话 ID */
+            meetingId: string;
+        };
+        "admin.voice.meeting.end.res": {
+            ok: boolean;
+            data: Record<string, never>;
+            message: string;
+        };
+        "admin.voice.meeting.list.req": {
+            /** @description 页码，从 1 开始 */
+            page: number;
+            /** @description 每页条数 */
+            pageSize: number;
+            /**
+             * @description 会话状态过滤
+             * @enum {string|null|null}
+             */
+            status?: "active" | "ended" | null;
+        };
+        "admin.voice.meeting.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 会话日志列表 */
+                list: {
+                    [key: string]: unknown;
+                }[];
+                /** @description 总条数 */
+                total: number;
+                /** @description 当前页码 */
+                page: number;
+                /** @description 每页条数 */
+                pageSize: number;
+            };
             message: string;
         };
         "organization.attendance.listall.req": {
@@ -18784,70 +23350,26 @@ export interface components {
             };
             message: string;
         };
-        "personal.profile.listall.req": {
-            /** @description 是否降序 */
-            descend?: boolean;
-            /**
-             * @description 关联用户ID
-             * @example 1
-             */
-            userId?: number;
-            /** @enum {string} */
-            orderBy?: "id" | "userId" | "realName" | "createTimeUtc";
+        "enterprise.mail.edm.sendbatch.req": {
+            /** @description 邮件模板ID */
+            templateId: number;
+            /** @description 邮件主题（覆写） */
+            subject?: string;
+            /** @description 企业租户ID */
+            tenantId?: number;
+            /** @description 指定接收人ID列表（留空则发送给该租户所有订阅客户） */
+            recipientIds?: number[];
         };
-        "personal.profile.listall.res": {
+        "enterprise.mail.edm.sendbatch.res": {
             ok: boolean;
             data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 关联用户ID
-                 * @example 1
-                 */
-                userId: number;
-                /**
-                 * @description 姓名
-                 * @example 张三
-                 */
-                realName: string;
-                /**
-                 * @description 性别 (male/female/other)
-                 * @example male
-                 */
-                gender?: ((string | null) | null) | null;
-                /**
-                 * @description 电子邮箱
-                 * @example zhangsan@example.com
-                 */
-                email?: ((string | null) | null) | null;
-                /**
-                 * @description 手机号码
-                 * @example 13800138000
-                 */
-                phone?: ((string | null) | null) | null;
-                /** @description 备注信息 */
-                remark?: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc?: ((number | null) | null) | null;
-            }[];
+                totalSent: number;
+                successCount: number;
+                failCount: number;
+            };
             message: string;
         };
-        "personal.profile.list.req": {
+        "personal.base.user_config.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
             /**
@@ -18865,15 +23387,14 @@ export interface components {
              * @default 10
              */
             pageSize: number;
-            /**
-             * @description 关联用户ID
-             * @example 1
-             */
-            userId?: number;
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
             /** @enum {string} */
-            orderBy?: "id" | "userId" | "realName" | "createTimeUtc";
+            orderBy?: "id" | "namespace" | "isEnabled" | "isPrimary" | "createTimeUtc";
         };
-        "personal.profile.list.res": {
+        "personal.base.user_config.list.res": {
             ok: boolean;
             data: {
                 /** @description 总记录数 */
@@ -18890,32 +23411,21 @@ export interface components {
                      * @example 1
                      */
                     id: number;
-                    /**
-                     * @description 关联用户ID
-                     * @example 1
-                     */
-                    userId: number;
-                    /**
-                     * @description 姓名
-                     * @example 张三
-                     */
-                    realName: string;
-                    /**
-                     * @description 性别 (male/female/other)
-                     * @example male
-                     */
-                    gender?: ((string | null) | null) | null;
-                    /**
-                     * @description 电子邮箱
-                     * @example zhangsan@example.com
-                     */
-                    email?: ((string | null) | null) | null;
-                    /**
-                     * @description 手机号码
-                     * @example 13800138000
-                     */
-                    phone?: ((string | null) | null) | null;
-                    /** @description 备注信息 */
+                    /** @description 用户ID */
+                    userId?: number;
+                    /** @description 命名空间 */
+                    namespace: string;
+                    /** @description 配置键 */
+                    configKey: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 是否为主配置 */
+                    isPrimary: boolean;
+                    /** @description 配置值JSON */
+                    configValue: {
+                        [key: string]: unknown;
+                    };
+                    /** @description 备注 */
                     remark?: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
@@ -18935,214 +23445,85 @@ export interface components {
             };
             message: string;
         };
-        "personal.profile.add.req": {
+        "personal.base.user_config.add.req": {
+            /** @description 命名空间 */
+            namespace: string;
+            /** @description 配置键 */
+            configKey: string;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 是否为主配置 */
+            isPrimary: boolean;
+            /** @description 配置值JSON */
+            configValue: {
+                [key: string]: unknown;
+            };
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.base.user_config.add.res": {
+            ok: boolean;
             /**
              * @description id
              * @example 1
              */
-            id?: number;
-            /**
-             * @description 关联用户ID
-             * @example 1
-             */
-            userId: number;
-            /**
-             * @description 姓名
-             * @example 张三
-             */
-            realName: string;
-            /**
-             * @description 性别 (male/female/other)
-             * @example male
-             */
-            gender?: ((string | null) | null) | null;
-            /**
-             * @description 电子邮箱
-             * @example zhangsan@example.com
-             */
-            email?: ((string | null) | null) | null;
-            /**
-             * @description 手机号码
-             * @example 13800138000
-             */
-            phone?: ((string | null) | null) | null;
-            /** @description 备注信息 */
-            remark?: ((string | null) | null) | null;
-            /** @description 创建人ID */
-            creatorId?: number;
-            /**
-             * @description 创建时间
-             * @example 1672531199000
-             */
-            createTimeUtc?: number;
-            /** @description 更新人ID */
-            updaterId?: ((number | null) | null) | null;
-            /**
-             * @description 更新时间
-             * @example 1672531199000
-             */
-            updateTimeUtc?: ((number | null) | null) | null;
-        };
-        "personal.profile.add.res": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 关联用户ID
-                 * @example 1
-                 */
-                userId: number;
-                /**
-                 * @description 姓名
-                 * @example 张三
-                 */
-                realName: string;
-                /**
-                 * @description 性别 (male/female/other)
-                 * @example male
-                 */
-                gender?: ((string | null) | null) | null;
-                /**
-                 * @description 电子邮箱
-                 * @example zhangsan@example.com
-                 */
-                email?: ((string | null) | null) | null;
-                /**
-                 * @description 手机号码
-                 * @example 13800138000
-                 */
-                phone?: ((string | null) | null) | null;
-                /** @description 备注信息 */
-                remark?: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
-            };
+            data: number;
             message: string;
         };
-        "personal.profile.update.req": {
+        "personal.base.user_config.update.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
-            /**
-             * @description 关联用户ID
-             * @example 1
-             */
+            /** @description 用户ID */
             userId?: number;
-            /**
-             * @description 姓名
-             * @example 张三
-             */
-            realName?: string;
-            /**
-             * @description 性别 (male/female/other)
-             * @example male
-             */
-            gender?: ((string | null) | null) | null;
-            /**
-             * @description 电子邮箱
-             * @example zhangsan@example.com
-             */
-            email?: ((string | null) | null) | null;
-            /**
-             * @description 手机号码
-             * @example 13800138000
-             */
-            phone?: ((string | null) | null) | null;
-            /** @description 备注信息 */
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 配置键 */
+            configKey?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 是否为主配置 */
+            isPrimary?: boolean;
+            /** @description 配置值JSON */
+            configValue?: {
+                [key: string]: unknown;
+            };
+            /** @description 备注 */
             remark?: ((string | null) | null) | null;
-            /** @description 创建人ID */
-            creatorId?: number;
-            /**
-             * @description 创建时间
-             * @example 1672531199000
-             */
-            createTimeUtc?: number;
-            /** @description 更新人ID */
-            updaterId?: ((number | null) | null) | null;
-            /**
-             * @description 更新时间
-             * @example 1672531199000
-             */
-            updateTimeUtc?: ((number | null) | null) | null;
         };
-        "personal.profile.update.res": {
+        "personal.base.user_config.update.res": {
             ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 关联用户ID
-                 * @example 1
-                 */
-                userId: number;
-                /**
-                 * @description 姓名
-                 * @example 张三
-                 */
-                realName: string;
-                /**
-                 * @description 性别 (male/female/other)
-                 * @example male
-                 */
-                gender?: ((string | null) | null) | null;
-                /**
-                 * @description 电子邮箱
-                 * @example zhangsan@example.com
-                 */
-                email?: ((string | null) | null) | null;
-                /**
-                 * @description 手机号码
-                 * @example 13800138000
-                 */
-                phone?: ((string | null) | null) | null;
-                /** @description 备注信息 */
-                remark?: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc: number;
-                /** @description 更新人ID */
-                updaterId: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc: ((number | null) | null) | null;
-            };
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
             message: string;
         };
-        "personal.profile.delete.req": {
+        "personal.base.user_config.delete.req": {
             /**
              * @description id
              * @example 1
              */
             id: number;
         };
-        "personal.profile.delete.res": {
+        "personal.base.user_config.delete.res": {
+            ok: boolean;
+            data: {
+                count: number;
+            };
+            message: string;
+        };
+        "personal.base.user_config.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.base.user_config.get.res": {
             ok: boolean;
             data: {
                 /**
@@ -19150,91 +23531,21 @@ export interface components {
                  * @example 1
                  */
                 id: number;
-                /**
-                 * @description 关联用户ID
-                 * @example 1
-                 */
+                /** @description 用户ID */
                 userId?: number;
-                /**
-                 * @description 姓名
-                 * @example 张三
-                 */
-                realName?: string;
-                /**
-                 * @description 性别 (male/female/other)
-                 * @example male
-                 */
-                gender?: ((string | null) | null) | null;
-                /**
-                 * @description 电子邮箱
-                 * @example zhangsan@example.com
-                 */
-                email?: ((string | null) | null) | null;
-                /**
-                 * @description 手机号码
-                 * @example 13800138000
-                 */
-                phone?: ((string | null) | null) | null;
-                /** @description 备注信息 */
-                remark?: ((string | null) | null) | null;
-                /** @description 创建人ID */
-                creatorId?: number;
-                /**
-                 * @description 创建时间
-                 * @example 1672531199000
-                 */
-                createTimeUtc?: number;
-                /** @description 更新人ID */
-                updaterId?: ((number | null) | null) | null;
-                /**
-                 * @description 更新时间
-                 * @example 1672531199000
-                 */
-                updateTimeUtc?: ((number | null) | null) | null;
-            };
-            message: string;
-        };
-        "personal.profile.get.req": {
-            /**
-             * @description id
-             * @example 1
-             */
-            id: number;
-        };
-        "personal.profile.get.res": {
-            ok: boolean;
-            data: {
-                /**
-                 * @description id
-                 * @example 1
-                 */
-                id: number;
-                /**
-                 * @description 关联用户ID
-                 * @example 1
-                 */
-                userId: number;
-                /**
-                 * @description 姓名
-                 * @example 张三
-                 */
-                realName: string;
-                /**
-                 * @description 性别 (male/female/other)
-                 * @example male
-                 */
-                gender?: ((string | null) | null) | null;
-                /**
-                 * @description 电子邮箱
-                 * @example zhangsan@example.com
-                 */
-                email?: ((string | null) | null) | null;
-                /**
-                 * @description 手机号码
-                 * @example 13800138000
-                 */
-                phone?: ((string | null) | null) | null;
-                /** @description 备注信息 */
+                /** @description 命名空间 */
+                namespace: string;
+                /** @description 配置键 */
+                configKey: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 是否为主配置 */
+                isPrimary: boolean;
+                /** @description 配置值JSON */
+                configValue: {
+                    [key: string]: unknown;
+                };
+                /** @description 备注 */
                 remark?: ((string | null) | null) | null;
                 /** @description 创建人ID */
                 creatorId: number;
@@ -19250,6 +23561,1005 @@ export interface components {
                  * @example 1672531199000
                  */
                 updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "personal.base.user_config.schema.req": {
+            namespace: string;
+        };
+        "personal.base.user_config.schema.res": {
+            ok: boolean;
+            data: {
+                [key: string]: unknown;
+            };
+            message: string;
+        };
+        "personal.base.user_config.namespaces.req": Record<string, never>;
+        "personal.base.user_config.namespaces.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /** @description 命名空间 */
+                    namespace: string;
+                }[];
+            };
+            message: string;
+        };
+        "personal.base.preference.get.req": Record<string, never>;
+        "personal.base.preference.get.res": {
+            ok: boolean;
+            data: {
+                email: string;
+                remoteLoginWarn: boolean;
+                marketingEdm: boolean;
+            };
+            message: string;
+        };
+        "personal.base.preference.update.req": {
+            /** @description 关联的个人邮箱地址 */
+            email?: string;
+            /** @description 是否开启异地登录告警邮件提醒 */
+            remoteLoginWarn?: boolean;
+            /** @description 是否订阅企业营销EDM邮件 */
+            marketingEdm?: boolean;
+        };
+        "personal.base.preference.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.health.medical_record.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 记录分类
+             * @enum {string}
+             */
+            category?: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+            /** @enum {string} */
+            orderBy?: "id" | "visitDateUtc" | "category" | "cost" | "createTimeUtc";
+        };
+        "personal.health.medical_record.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 记录分类
+                     * @enum {string}
+                     */
+                    category: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+                    /** @description 记录标题/诊断名称 */
+                    title: string;
+                    /** @description 医院名称 */
+                    hospitalName?: ((string | null) | null) | null;
+                    /** @description 医生姓名 */
+                    doctorName?: ((string | null) | null) | null;
+                    /** @description 就诊/检查时间(毫秒时间戳) */
+                    visitDateUtc: number;
+                    /** @description 诊断结论 */
+                    diagnosis?: ((string | null) | null) | null;
+                    /** @description 处方/用药医嘱 */
+                    prescription?: ((string | null) | null) | null;
+                    /** @description 报告或附件链接 */
+                    reportUrl?: ((string | null) | null) | null;
+                    /** @description 费用(元) */
+                    cost?: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.health.medical_record.add.req": {
+            /**
+             * @description 记录分类
+             * @enum {string}
+             */
+            category: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+            /** @description 记录标题/诊断名称 */
+            title: string;
+            /** @description 医院名称 */
+            hospitalName?: ((string | null) | null) | null;
+            /** @description 医生姓名 */
+            doctorName?: ((string | null) | null) | null;
+            /** @description 就诊/检查时间(毫秒时间戳) */
+            visitDateUtc: number;
+            /** @description 诊断结论 */
+            diagnosis?: ((string | null) | null) | null;
+            /** @description 处方/用药医嘱 */
+            prescription?: ((string | null) | null) | null;
+            /** @description 报告或附件链接 */
+            reportUrl?: ((string | null) | null) | null;
+            /** @description 费用(元) */
+            cost?: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.health.medical_record.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.health.medical_record.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description 记录分类
+             * @enum {string}
+             */
+            category?: "outpatient" | "hospitalization" | "exam" | "prescription" | "vaccination";
+            /** @description 记录标题/诊断名称 */
+            title?: string;
+            /** @description 医院名称 */
+            hospitalName?: ((string | null) | null) | null;
+            /** @description 医生姓名 */
+            doctorName?: ((string | null) | null) | null;
+            /** @description 就诊/检查时间(毫秒时间戳) */
+            visitDateUtc?: number;
+            /** @description 诊断结论 */
+            diagnosis?: ((string | null) | null) | null;
+            /** @description 处方/用药医嘱 */
+            prescription?: ((string | null) | null) | null;
+            /** @description 报告或附件链接 */
+            reportUrl?: ((string | null) | null) | null;
+            /** @description 费用(元) */
+            cost?: number;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.health.medical_record.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.health.medical_record.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.health.medical_record.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.dashboard.req": Record<string, never>;
+        "personal.finance.dashboard.res": {
+            ok: boolean;
+            data: {
+                totalIncome: number;
+                totalExpense: number;
+                netBalance: number;
+                savingsRate: number;
+                incomeBreakdown: {
+                    category: string;
+                    amount: number;
+                }[];
+                expenseBreakdown: {
+                    category: string;
+                    amount: number;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.income.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            sourceCategory?: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+            /** @enum {string} */
+            orderBy?: "id" | "amount" | "incomeDateUtc";
+        };
+        "personal.finance.income.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @enum {string} */
+                    sourceCategory: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+                    amount: number;
+                    incomeDateUtc: number;
+                    payer?: ((string | null) | null) | null;
+                    remark?: ((string | null) | null) | null;
+                    dataTaskId?: ((number | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.income.add.req": {
+            /** @enum {string} */
+            sourceCategory: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+            amount: number;
+            incomeDateUtc: number;
+            payer?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.income.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.finance.income.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @enum {string} */
+            sourceCategory?: "salary" | "investment" | "bonus" | "side_hustle" | "other";
+            amount?: number;
+            incomeDateUtc?: number;
+            payer?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.income.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.income.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.income.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.expense.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            expenseCategory?: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+            /** @enum {string} */
+            orderBy?: "id" | "amount" | "expenseDateUtc";
+        };
+        "personal.finance.expense.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @enum {string} */
+                    expenseCategory: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+                    amount: number;
+                    expenseDateUtc: number;
+                    payee?: ((string | null) | null) | null;
+                    paymentMethod?: ((string | null) | null) | null;
+                    remark?: ((string | null) | null) | null;
+                    dataTaskId?: ((number | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.expense.add.req": {
+            /** @enum {string} */
+            expenseCategory: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+            amount: number;
+            expenseDateUtc: number;
+            payee?: ((string | null) | null) | null;
+            paymentMethod?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.expense.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.finance.expense.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @enum {string} */
+            expenseCategory?: "housing" | "daily" | "medical" | "entertainment" | "education" | "transport" | "other";
+            amount?: number;
+            expenseDateUtc?: number;
+            payee?: ((string | null) | null) | null;
+            paymentMethod?: ((string | null) | null) | null;
+            remark?: ((string | null) | null) | null;
+            dataTaskId?: ((number | null) | null) | null;
+        };
+        "personal.finance.expense.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.expense.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.expense.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+        };
+        "personal.finance.data_source.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    sourceName: string;
+                    /** @enum {string} */
+                    sourceType: "api_task" | "schema_form";
+                    apiTaskId?: ((number | null) | null) | null;
+                    schemaFormCode?: ((string | null) | null) | null;
+                    fieldMappingJson: string;
+                    syncCron?: ((string | null) | null) | null;
+                    isEnabled: boolean;
+                    lastSyncTimeUtc?: ((number | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.finance.data_source.add.req": {
+            sourceName: string;
+            /** @enum {string} */
+            sourceType: "api_task" | "schema_form";
+            apiTaskId?: ((number | null) | null) | null;
+            schemaFormCode?: ((string | null) | null) | null;
+            fieldMappingJson: string;
+            syncCron?: ((string | null) | null) | null;
+            isEnabled?: boolean;
+        };
+        "personal.finance.data_source.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            sourceName?: string;
+            /** @enum {string} */
+            sourceType?: "api_task" | "schema_form";
+            apiTaskId?: ((number | null) | null) | null;
+            schemaFormCode?: ((string | null) | null) | null;
+            fieldMappingJson?: string;
+            syncCron?: ((string | null) | null) | null;
+            isEnabled?: boolean;
+        };
+        "personal.finance.data_source.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.data_source.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.finance.data_source.sync.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.finance.data_source.sync.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+                importedCount: number;
+                message: string;
+            };
+            message: string;
+        };
+        "personal.family.member.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description 关系类型
+             * @enum {string}
+             */
+            relationType?: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+        };
+        "personal.family.member.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 是否本人节点 */
+                    isSelf: boolean;
+                    /**
+                     * @description 关系类型
+                     * @enum {string}
+                     */
+                    relationType: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+                    /** @description 姓名 */
+                    realName: string;
+                    /** @description 性别 */
+                    gender?: ((string | null) | null) | null;
+                    /** @description 头像URL */
+                    avatar?: ((string | null) | null) | null;
+                    /** @description 出生日期毫秒 */
+                    birthDateUtc?: ((number | null) | null) | null;
+                    /** @description 联系电话 */
+                    phone?: ((string | null) | null) | null;
+                    /** @description 是否紧急联系人 */
+                    isEmergencyContact?: boolean;
+                    /** @description 健康状况备注 */
+                    healthNote?: ((string | null) | null) | null;
+                    /** @description 其他备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.family.member.add.req": {
+            /** @description 是否本人节点 */
+            isSelf?: boolean;
+            /**
+             * @description 关系类型
+             * @enum {string}
+             */
+            relationType: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+            /** @description 姓名 */
+            realName: string;
+            /** @description 性别 */
+            gender?: ((string | null) | null) | null;
+            /** @description 头像URL */
+            avatar?: ((string | null) | null) | null;
+            /** @description 出生日期毫秒 */
+            birthDateUtc?: ((number | null) | null) | null;
+            /** @description 联系电话 */
+            phone?: ((string | null) | null) | null;
+            /** @description 是否紧急联系人 */
+            isEmergencyContact?: boolean;
+            /** @description 健康状况备注 */
+            healthNote?: ((string | null) | null) | null;
+            /** @description 其他备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.family.member.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.family.member.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 是否本人节点 */
+            isSelf?: boolean;
+            /**
+             * @description 关系类型
+             * @enum {string}
+             */
+            relationType?: "self" | "spouse" | "parent" | "child" | "sibling" | "grandparent" | "other";
+            /** @description 姓名 */
+            realName?: string;
+            /** @description 性别 */
+            gender?: ((string | null) | null) | null;
+            /** @description 头像URL */
+            avatar?: ((string | null) | null) | null;
+            /** @description 出生日期毫秒 */
+            birthDateUtc?: ((number | null) | null) | null;
+            /** @description 联系电话 */
+            phone?: ((string | null) | null) | null;
+            /** @description 是否紧急联系人 */
+            isEmergencyContact?: boolean;
+            /** @description 健康状况备注 */
+            healthNote?: ((string | null) | null) | null;
+            /** @description 其他备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.family.member.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.family.member.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.family.member.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.social.contact.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @enum {string} */
+            relationCircle?: "close_friend" | "colleague" | "classmate" | "business" | "other";
+        };
+        "personal.social.contact.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    realName: string;
+                    /** @enum {string} */
+                    relationCircle: "close_friend" | "colleague" | "classmate" | "business" | "other";
+                    company?: ((string | null) | null) | null;
+                    position?: ((string | null) | null) | null;
+                    phone?: ((string | null) | null) | null;
+                    email?: ((string | null) | null) | null;
+                    avatar?: ((string | null) | null) | null;
+                    intimacyLevel: number;
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "personal.social.contact.add.req": {
+            realName: string;
+            /** @enum {string} */
+            relationCircle: "close_friend" | "colleague" | "classmate" | "business" | "other";
+            company?: ((string | null) | null) | null;
+            position?: ((string | null) | null) | null;
+            phone?: ((string | null) | null) | null;
+            email?: ((string | null) | null) | null;
+            avatar?: ((string | null) | null) | null;
+            intimacyLevel?: number;
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.social.contact.add.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+            };
+            message: string;
+        };
+        "personal.social.contact.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            realName?: string;
+            /** @enum {string} */
+            relationCircle?: "close_friend" | "colleague" | "classmate" | "business" | "other";
+            company?: ((string | null) | null) | null;
+            position?: ((string | null) | null) | null;
+            phone?: ((string | null) | null) | null;
+            email?: ((string | null) | null) | null;
+            avatar?: ((string | null) | null) | null;
+            intimacyLevel?: number;
+            remark?: ((string | null) | null) | null;
+        };
+        "personal.social.contact.update.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.social.contact.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "personal.social.contact.delete.res": {
+            ok: boolean;
+            data: {
+                success: boolean;
+            };
+            message: string;
+        };
+        "personal.social.graph.req": Record<string, never>;
+        "personal.social.graph.res": {
+            ok: boolean;
+            data: {
+                contacts: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    realName?: string;
+                    /** @enum {string} */
+                    relationCircle?: "close_friend" | "colleague" | "classmate" | "business" | "other";
+                    company?: ((string | null) | null) | null;
+                    position?: ((string | null) | null) | null;
+                    phone?: ((string | null) | null) | null;
+                    email?: ((string | null) | null) | null;
+                    avatar?: ((string | null) | null) | null;
+                    intimacyLevel?: number;
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
+                relations: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    sourceContactId?: number;
+                    targetContactId?: number;
+                    relationType?: string;
+                    relationLabel?: string;
+                    intimacyScore?: number;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc?: number;
+                    /** @description 更新人ID */
+                    updaterId?: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc?: ((number | null) | null) | null;
+                    creatorName?: ((string | null) | null) | null;
+                    updaterName?: ((string | null) | null) | null;
+                }[];
             };
             message: string;
         };

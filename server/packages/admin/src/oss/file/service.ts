@@ -96,8 +96,19 @@ function toFileVO(item: StorageObjectMetadata) {
   };
 }
 
+interface OssConfig {
+  provider: "s3" | "oss" | "r2" | "cos" | "minio" | "local";
+  endpoint?: string;
+  region?: string;
+  accessKey?: string;
+  secretKey?: string;
+  bucket?: string;
+  acl?: string;
+  accountId?: string;
+}
+
 export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
-  const config = await getDefaultConfig();
+  const config = (await getDefaultConfig()) as unknown as OssConfig;
   preventEmpty(config);
 
   const storage = getStorage(
@@ -105,9 +116,9 @@ export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
       provider: config.provider,
       endpoint: config.endpoint || undefined,
       region: config.region || undefined,
-      accessKeyId: config.accessKey,
-      secretAccessKey: config.secretKey,
-      bucket: config.bucket,
+      accessKeyId: config.accessKey || "",
+      secretAccessKey: config.secretKey || "",
+      bucket: config.bucket || "",
       accountId: config.accountId || undefined,
     },
     env

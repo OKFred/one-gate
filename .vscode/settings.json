@@ -1,4 +1,5 @@
 {
+    "files.eol": "\n",
     "editor.formatOnSave": true,
     "workbench.startupEditor": "none",
     "[typescript]": {

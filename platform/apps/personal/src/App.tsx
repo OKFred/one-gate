@@ -5,6 +5,15 @@ import { ThemeProvider } from '@/theme';
 import { MenuProvider } from '@/contexts/MenuContext';
 import { PermissionProvider } from '@/contexts/PermissionContext';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
+import { mergeTranslations, getPreferredLangCode } from '@/hooks/useTranslation';
+import appLocales from './locales';
+
+// 根据用户偏好语言同步注入 personal 专属文案（优先英语 en-US，偏好语言同步合并）
+const userLang = getPreferredLangCode();
+if (appLocales['en-US']) mergeTranslations('en-US', appLocales['en-US']);
+if (appLocales[userLang]) {
+  mergeTranslations(userLang, appLocales[userLang]);
+}
 
 import keySvg from '@/assets/imgs/key.svg?raw';
 import { useState, useEffect } from 'react';

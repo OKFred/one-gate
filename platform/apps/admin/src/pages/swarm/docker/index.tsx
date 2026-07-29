@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { THIS_PERMISSION } from './constant';
 import { useState, useMemo } from 'react';
 import { SchemaCrudPage } from '@/components/Crud';
@@ -181,7 +182,8 @@ export default function DockerSwarmManagement() {
         },
         {
           title: t('swarm.docker.createdAt'),
-          render: (row) => (row.CreatedAt ? new Date(row.CreatedAt).toLocaleString() : '-'),
+          render: (row) =>
+            row.CreatedAt ? dayjs(row.CreatedAt).format('YYYY-MM-DD HH:mm:ss') : '-',
         },
       ],
       cardFields: (t) => [

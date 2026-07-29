@@ -1,4 +1,4 @@
-CREATE TABLE `enterprise_workflow_log` (
+CREATE TABLE IF NOT EXISTS `enterprise_workflow_log` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`workflow_id` integer NOT NULL,
 	`status` text NOT NULL,

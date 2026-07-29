@@ -1,12 +1,12 @@
-CREATE TABLE `system_schema_form` (
+CREATE TABLE IF NOT EXISTS `system_schema_form` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`code` text NOT NULL,
 	`name` text NOT NULL,
 	`schema_data` text NOT NULL,
 	`ui_schema_data` text,
 	`remark` text,
-	`is_enabled` integer DEFAULT true NOT NULL,
-	`source` text DEFAULT 'user' NOT NULL,
+	`is_enabled` integer NOT NULL,
+	`source` text NOT NULL,
 	`creator_id` integer NOT NULL,
 	`creator_name` text,
 	`updater_id` integer,
@@ -15,4 +15,4 @@ CREATE TABLE `system_schema_form` (
 	`update_time_utc` integer
 );
 
-CREATE UNIQUE INDEX `system_schema_form_code_unique` ON `system_schema_form` (`code`);
+CREATE UNIQUE INDEX IF NOT EXISTS `system_schema_form_code_unique` ON `system_schema_form` (`code`);

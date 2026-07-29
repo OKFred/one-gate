@@ -7,9 +7,9 @@ import db from "./index";
 import { permissionTable } from "../../../admin/src/system/permission/model";
 import { rolePermissionTable } from "../../../admin/src/system/role_permission/model";
 import { initialTranslationData } from "./initTranslation";
-import { SUPER_ADMIN_ID } from "./init";
+import { SUPER_ADMIN_ID, SUPER_ADMIN_ROLE_ID } from "./init";
 import { getEnv } from "../utils/env";
-import { sql, notInArray, inArray } from "drizzle-orm";
+import { sql, notInArray, inArray, eq } from "drizzle-orm";
 import { permissionSeeds } from "../constants/permissions";
 import { actionTranslations } from "./translation/shared";
 
@@ -32,12 +32,19 @@ export async function preparePermissions(options?: { reset?: boolean }) {
 
   // 1. 递归生成打平后的权限数据
   const mappedData: any[] = [];
+  const seenCodes = new Set<string>();
 
   function traverse(node: any, pathParts: string[]) {
     if (Array.isArray(node)) {
       const business = pathParts.filter(Boolean).join(".");
       for (const action of node) {
         const code = `${business}:${action}`;
+        if (seenCodes.has(code)) {
+          throw new Error(
+            `❌ [initPermissions] 检测到重复的权限 Code: ${code}，请检查 permissionSeeds 配置！`
+          );
+        }
+        seenCodes.add(code);
 
         // 获取显示名称
         const getActionName = () => {
@@ -135,6 +142,13 @@ export async function preparePermissions(options?: { reset?: boolean }) {
         })
     );
   }
+
+  // 自动将所有权限分配给超级管理员角色 (role_id = 1)
+  queries.push(
+    db.run(
+      sql`INSERT OR IGNORE INTO system_role_permission (role_id, permission_id) SELECT 1, id FROM system_permission`
+    )
+  );
 
   stats.created = mappedData.length;
   return { queries, stats };

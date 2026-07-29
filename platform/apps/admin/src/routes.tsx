@@ -18,7 +18,6 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
   const routes: RouteObject[] = [];
 
   for (const [filePath, loader] of paths) {
-    // ./pages/mail/template/index.tsx => mail/template
     const match = filePath.match(/\.\/pages\/(.*?)\/index\.tsx$/);
     if (!match) continue;
 
@@ -29,20 +28,29 @@ function buildRouteTree(paths: [string, () => Promise<unknown>][]): RouteObject[
       })),
     );
 
+    const element = (
+      <Suspense fallback={<PageLoading />}>
+        <LazyComp />
+      </Suspense>
+    );
+
+    const isRootException = routePath === 'home' || routePath === 'me';
+    const finalPath = isRootException
+      ? routePath
+      : routePath.startsWith('admin/')
+        ? routePath
+        : `admin/${routePath}`;
+
     routes.push({
-      path: routePath,
-      element: (
-        <Suspense fallback={<PageLoading />}>
-          <LazyComp />
-        </Suspense>
-      ),
+      path: finalPath,
+      element,
     });
   }
 
   return routes;
 }
 
-const childrenRoutes = [
+const childrenRoutes: RouteObject[] = [
   ...buildRouteTree(
     (Object.entries(modules) as [string, () => Promise<unknown>][]).filter(
       ([filePath]) =>
@@ -50,11 +58,7 @@ const childrenRoutes = [
     ),
   ),
   {
-    path: 'organization/*',
-    element: <div />,
-  },
-  {
-    path: 'executive/*',
+    path: 'enterprise/*',
     element: <div />,
   },
   {

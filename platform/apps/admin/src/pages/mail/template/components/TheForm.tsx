@@ -10,6 +10,8 @@ import type { AddMailTemplateReq, ListMailTemplateReq } from '@/api/admin/mail/t
 // 动态导入 JoditEditor 实现代码分割
 const JoditEditor = lazy(() => import('@/components/JoditEditor/index'));
 
+import { MenuItem } from '@mui/material';
+
 export interface TemplateFormFieldsProps {
   form: Partial<AddMailTemplateReq>;
   setForm: React.Dispatch<React.SetStateAction<Partial<AddMailTemplateReq>>>;
@@ -26,6 +28,7 @@ export const formConfig: SchemaCrudConfig<TemplateRes, FilterState, ListMailTemp
     langCode: '',
     content: '',
     category: '',
+    scope: 'sys',
     isEnabled: true,
     remark: null,
   },
@@ -81,6 +84,20 @@ function TemplateFormFields({ form, setForm, isMobile, t }: TemplateFormFieldsPr
       </Stack>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+        <TextField
+          name="scope"
+          label={t('mail.scope')}
+          select
+          value={form.scope || 'sys'}
+          onChange={(e) => handleFieldChange('scope', e.target.value)}
+          required
+          fullWidth
+          size="medium"
+        >
+          <MenuItem value="sys">{t('mail.scope.sys')} (sys)</MenuItem>
+          <MenuItem value="biz">{t('mail.scope.biz')} (biz)</MenuItem>
+          <MenuItem value="user">{t('mail.scope.user')} (user)</MenuItem>
+        </TextField>
         <TextField
           name="langCode"
           label={t('translation.table.langCode')}
