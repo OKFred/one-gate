@@ -90,8 +90,17 @@ export function calculateAliyunMqttSign(config: MqttConfigOptions): {
  * @returns 标准的连接凭证与 URL
  */
 export function getMqttConnectionInfo(
-  config: MqttConfigOptions
+  rawConfig: MqttConfigOptions | string | unknown
 ): MqttConnectionCredentials {
+  let config: MqttConfigOptions = {};
+  if (typeof rawConfig === "string") {
+    try {
+      config = JSON.parse(rawConfig);
+    } catch {}
+  } else if (rawConfig && typeof rawConfig === "object") {
+    config = rawConfig as MqttConfigOptions;
+  }
+
   const provider: MqttProvider =
     config.provider === "Aliyun" ? "Aliyun" : "EMQX";
   const protocol = config.protocol || "mqtt";

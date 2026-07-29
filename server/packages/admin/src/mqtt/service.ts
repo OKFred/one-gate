@@ -39,14 +39,14 @@ export async function getActiveCredentials(): Promise<MqttConnectionCredentials>
   const primaryConfig =
     await baseSysConfigRepository.findPrimaryByNamespace("mqtt");
 
-  let rawConfig: MqttConfigOptions = {};
+  let rawConfig: unknown = {};
   if (primaryConfig && primaryConfig.configValue) {
-    rawConfig = primaryConfig.configValue as MqttConfigOptions;
+    rawConfig = primaryConfig.configValue;
   } else {
     // 降级使用第一个存在的配置，或者默认 EMQX 配置
     const configs = await baseSysConfigRepository.findByNamespace("mqtt");
     if (configs.length > 0 && configs[0].configValue) {
-      rawConfig = configs[0].configValue as MqttConfigOptions;
+      rawConfig = configs[0].configValue;
     }
   }
 
@@ -61,10 +61,10 @@ async function connectMqttWithFallback(
   credentials: MqttConnectionCredentials,
   opts: { connectTimeout?: number; timeoutMs?: number; clientIdPrefix?: string }
 ): Promise<mqtt.MqttClient> {
-  const { connectTimeout = 3000, timeoutMs = 4000, clientIdPrefix = "" } = opts;
+  const { connectTimeout = 4000, timeoutMs = 5000, clientIdPrefix = "" } = opts;
   const clientId = `${credentials.clientId}_${clientIdPrefix}${Date.now().toString(36)}`;
 
-  const urlsToTry: string[] = [credentials.brokerUrl];
+  const urlsToTry: string[] = [];
   if (
     credentials.brokerUrl.startsWith("mqtts://") ||
     credentials.brokerUrl.startsWith("mqtt://")
@@ -75,46 +75,50 @@ async function connectMqttWithFallback(
           .replace("mqtts://", "https://")
           .replace("mqtt://", "http://")
       );
+      // 在 Worker/Edge 环境下优先尝试 WSS (8084 / 443)，最后回退到原生 TCP mqtts (8883)
       urlsToTry.push(
         `wss://${parsed.hostname}:8084/mqtt`,
-        `wss://${parsed.hostname}:443/mqtt`
+        `wss://${parsed.hostname}:443/mqtt`,
+        credentials.brokerUrl
       );
-    } catch {}
+    } catch {
+      urlsToTry.push(credentials.brokerUrl);
+    }
+  } else {
+    urlsToTry.push(credentials.brokerUrl);
   }
 
   let lastError: unknown;
   for (const brokerUrl of urlsToTry) {
-    let client: mqtt.MqttClient | null = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
     try {
-      await Promise.race([
-        new Promise((_, reject) =>
-          setTimeout(
-            () =>
-              reject(new Error(`MQTT 连接或发布超时(${timeoutMs / 1000}s)`)),
-            timeoutMs
-          )
-        ),
-        (async () => {
-          client = await mqtt.connectAsync(brokerUrl, {
-            clientId,
-            username: credentials.username || undefined,
-            password: credentials.password || undefined,
-            keepalive: credentials.keepalive,
-            clean: credentials.cleanSession,
-            connectTimeout,
-            reconnectPeriod: 0,
-          });
-        })(),
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timer = setTimeout(
+          () => reject(new Error(`MQTT 连接超时(${timeoutMs / 1000}s)`)),
+          timeoutMs
+        );
+      });
+
+      const client = await Promise.race([
+        mqtt.connectAsync(brokerUrl, {
+          clientId,
+          username: credentials.username || undefined,
+          password: credentials.password || undefined,
+          keepalive: credentials.keepalive,
+          clean: credentials.cleanSession,
+          connectTimeout,
+          reconnectPeriod: 0,
+          rejectUnauthorized: false,
+        }),
+        timeoutPromise,
       ]);
+
+      if (timer) clearTimeout(timer);
       if (client) {
         return client;
       }
     } catch (err) {
-      if (client) {
-        try {
-          (client as mqtt.MqttClient).end(true);
-        } catch {}
-      }
+      if (timer) clearTimeout(timer);
       lastError = err;
     }
   }
@@ -146,8 +150,8 @@ async function onPublish(
 
   try {
     client = await connectMqttWithFallback(credentials, {
-      connectTimeout: 3000,
-      timeoutMs: 4000,
+      connectTimeout: 7000,
+      timeoutMs: 8000,
       clientIdPrefix: "pub_",
     });
 
@@ -228,15 +232,13 @@ async function onTestConnection(
 ) {
   let credentials: MqttConnectionCredentials;
   if (params.host) {
-    credentials = getMqttConnectionInfo(params as MqttConfigOptions);
+    credentials = getMqttConnectionInfo(params);
   } else if (params.id) {
     const sysCfg = await baseSysConfigRepository.findById(params.id as number);
     if (!sysCfg || !sysCfg.configValue) {
       throw new BusinessError("未找到指定的 MQTT 配置");
     }
-    credentials = getMqttConnectionInfo(
-      sysCfg.configValue as MqttConfigOptions
-    );
+    credentials = getMqttConnectionInfo(sysCfg.configValue);
   } else {
     credentials = await getActiveCredentials();
   }
@@ -244,8 +246,8 @@ async function onTestConnection(
   let client: mqtt.MqttClient | null = null;
   try {
     client = await connectMqttWithFallback(credentials, {
-      connectTimeout: 2500,
-      timeoutMs: 3000,
+      connectTimeout: 7000,
+      timeoutMs: 8000,
       clientIdPrefix: "test_",
     });
 

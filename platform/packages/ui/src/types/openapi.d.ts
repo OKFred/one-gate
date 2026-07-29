@@ -22655,7 +22655,7 @@ export interface components {
             /** @description 会话 ID（由创建会话接口返回） */
             meetingId: string;
             /** @description 显示名称（可选，默认取当前登录用户名） */
-            displayName?: ((string | null) | null) | null;
+            displayName?: string | null;
         };
         "admin.voice.join.res": {
             ok: boolean;
@@ -22683,7 +22683,7 @@ export interface components {
             pageSize: number;
             /**
              * @description 会话状态过滤
-             * @enum {string|null|null}
+             * @enum {string|null}
              */
             status?: "active" | "ended" | null;
         };
