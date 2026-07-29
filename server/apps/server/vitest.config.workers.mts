@@ -13,6 +13,21 @@ export default defineConfig({
     name: "workers",
     alias: [
       {
+        find: /^@hodor\/core\/db\/sql\/(admin\/)?(maintenance_audit_login|mail_log)\.sql(\?raw)?$/,
+        replacement:
+          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/base_sys_log.sql").replace(/\\/g, "/") + "$3",
+      },
+      {
+        find: /^@hodor\/core\/db\/sql\/(admin\/)?maintenance_compliance\.sql(\?raw)?$/,
+        replacement:
+          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/compliance_archives.sql").replace(/\\/g, "/") + "$3",
+      },
+      {
+        find: /^@hodor\/core\/db\/sql\/(admin\/)?(oss_config|swarm_docker_config|rpa_config)\.sql(\?raw)?$/,
+        replacement:
+          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/base_sys_config.sql").replace(/\\/g, "/") + "$3",
+      },
+      {
         find: /^@hodor\/core\/db\/sql\/(system_|maintenance_|i18n_|mail_|oss_|swarm_|ai_|admin_)(.*)\.sql(\?raw)?$/,
         replacement:
           path

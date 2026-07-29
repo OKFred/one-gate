@@ -250,6 +250,7 @@ async function onAdd(
 
   const insertedId = await registry.base.log.biz.add({
     namespace: "mail",
+    status: !obj.exceptionCode && Boolean(obj.sendStatus),
     payloadType: "json",
     logValue: logValue,
     remark: remark,

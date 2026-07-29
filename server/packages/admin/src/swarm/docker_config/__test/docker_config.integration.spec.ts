@@ -5,7 +5,7 @@ import swarmDockerConfigService from "../service";
 import type { UserObj } from "@hodor/core/types/app";
 
 // 静态导入 SQL 文件
-import swarmDockerConfigSql from "@hodor/core/db/sql/swarm_docker_config.sql?raw";
+import swarmDockerConfigSql from "@hodor/core/db/sql/admin/base_sys_config.sql?raw";
 
 // 模拟 dockerClient 以防止网络调用与真实连接
 vi.mock("../../docker/client", () => {
@@ -17,11 +17,14 @@ vi.mock("../../docker/client", () => {
   };
 });
 
+import { initAdminRegistry } from "../../../register";
+
 describe("Swarm Docker Config 模块集成测试", () => {
-  const testTables = ["swarm_docker_config"];
+  const testTables = ["base_sys_config"];
   const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
+    initAdminRegistry();
     await setupTestDb(db, [swarmDockerConfigSql]);
     await clearTestData(db, testTables);
   });

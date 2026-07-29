@@ -11,4 +11,5 @@ CREATE TABLE IF NOT EXISTS `admin_voice_session_log` (
 );
 
 CREATE INDEX IF NOT EXISTS `idx_voice_meeting_id` ON `admin_voice_session_log` (`meeting_id`);
-CREATE INDEX IF NOT EXISTS `idx_voice_creator_status` ON `admin_voice_session_log` (`creator_id`, `status`);
+
+CREATE INDEX IF NOT EXISTS `idx_voice_creator_status` ON `admin_voice_session_log` (`creator_id`,`status`);

@@ -7,10 +7,13 @@ import * as complianceRepository from "../repository";
 // 静态导入 SQL 文件
 import complianceSql from "@hodor/core/db/sql/maintenance_compliance.sql?raw";
 
+import { initAdminRegistry } from "../../../register";
+
 describe("Compliance 全链路集成测试", () => {
   const testTables = ["compliance_archives"];
 
   beforeAll(async () => {
+    initAdminRegistry();
     await setupTestDb(db, [complianceSql]);
     await clearTestData(db, testTables);
   });

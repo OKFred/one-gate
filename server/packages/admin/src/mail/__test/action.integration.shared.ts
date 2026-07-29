@@ -9,7 +9,10 @@ import { registry } from "../../common/registry";
 // 静态导入 SQL 文件文本（Vite 支持 ?raw 后缀直接读取文本）
 import accountSql from "@hodor/core/db/sql/mail_account.sql?raw";
 import templateSql from "@hodor/core/db/sql/mail_template.sql?raw";
+import recipientSql from "@hodor/core/db/sql/mail_recipient.sql?raw";
 import logSql from "@hodor/core/db/sql/base_biz_log.sql?raw";
+
+import { initAdminRegistry } from "../../register";
 
 export function runMailActionIntegrationTests({
   runtime,
@@ -20,13 +23,19 @@ export function runMailActionIntegrationTests({
   getEnv: () => any;
   beforeAllHook?: () => Promise<void> | void;
 }) {
-  const testTables = ["mail_account", "mail_template", "mail_log"];
+  const testTables = [
+    "mail_account",
+    "mail_template",
+    "mail_recipient",
+    "base_biz_log",
+  ];
 
   beforeAll(async () => {
+    initAdminRegistry();
     if (beforeAllHook) {
       await beforeAllHook();
     }
-    await setupTestDb(db, [accountSql, templateSql, logSql]);
+    await setupTestDb(db, [accountSql, templateSql, recipientSql, logSql]);
   });
 
   afterEach(async () => {
@@ -83,7 +92,7 @@ export function runMailActionIntegrationTests({
       // 5. 验证数据库中的邮件日志
       const log = await registry.base.log.biz.detail(sendRes.logId);
       expect(log).not.toBeNull();
-      expect(log!.status).toBe(1);
+      expect(log!.status).toBeTruthy();
       const logValue = log!.logValue as any;
       expect(logValue.mailFrom).toBe("mock-sender@example.com");
       expect(logValue.mailTo).toBe("mock-receiver@example.com");
@@ -114,8 +123,13 @@ export function runMailActionIntegrationTests({
   describe("真实发送模式全链路测试", () => {
     const environment = getEnv();
 
-    // 动态判断是否跳过真实测试
-    const shouldRun = !!environment.TEST_MAIL_ADDRESS;
+    // 动态判断是否跳过真实测试（只有显式开启 RUN_REAL_MAIL_TESTS 且配置有效凭证时才进行真实 SMTP 通信）
+    const shouldRun =
+      process.env.RUN_REAL_MAIL_TESTS === "true" &&
+      !!environment.TEST_MAIL_ADDRESS &&
+      !!environment.TEST_MAIL_PASSWORD &&
+      !environment.TEST_MAIL_ADDRESS.includes("example.com") &&
+      !environment.TEST_MAIL_PASSWORD.includes("your_");
 
     it.runIf(shouldRun)("应该成功发送真实邮件并录入日志", async () => {
       const realAddress = environment.TEST_MAIL_ADDRESS as string;

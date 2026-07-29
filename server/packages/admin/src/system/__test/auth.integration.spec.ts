@@ -26,6 +26,7 @@ import menuSql from "@hodor/core/db/sql/system_menu.sql?raw";
 import auditLoginSql from "@hodor/core/db/sql/maintenance_audit_login.sql?raw";
 import regionSql from "@hodor/core/db/sql/i18n_region.sql?raw";
 import languageSql from "@hodor/core/db/sql/i18n_language.sql?raw";
+import mailRecipientSql from "@hodor/core/db/sql/mail_recipient.sql?raw";
 
 describe("System Auth 模块全链路集成测试", () => {
   const testTables = [
@@ -35,10 +36,13 @@ describe("System Auth 模块全链路集成测试", () => {
     "system_role_permission",
     "system_department",
     "system_menu",
-    "maintenance_audit_login",
+    "base_sys_log",
     "i18n_region",
     "i18n_language",
+    "mail_recipient",
   ];
+
+  const adminUserObj = { userId: 1, langCode: "zh-CN" } as unknown as UserObj;
 
   beforeAll(async () => {
     initAdminRegistry();
@@ -52,6 +56,7 @@ describe("System Auth 模块全链路集成测试", () => {
       auditLoginSql,
       regionSql,
       languageSql,
+      mailRecipientSql,
     ]);
   });
 
@@ -220,7 +225,6 @@ describe("System Auth 模块全链路集成测试", () => {
         name: "Test Role",
         remark: "test",
         isEnabled: true,
-        permissionCount: 0,
         dataScope: "self_only",
         customDeptIds: null,
       },

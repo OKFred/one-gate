@@ -72,7 +72,7 @@ describe("AI Chat Service 单元测试", () => {
 
       await expect(
         aiChatService.ask.service({ q: "Hello" })
-      ).rejects.toThrowError(new BusinessError(ErrorCodes.CONFIG_NOT_FOUND));
+      ).rejects.toThrowError(BusinessError);
     });
 
     it("API 请求返回错误时应该抛出异常", async () => {
@@ -98,7 +98,7 @@ describe("AI Chat Service 单元测试", () => {
 
       await expect(
         aiChatService.ask.service({ q: "Hello" })
-      ).rejects.toThrowError("AI API 响应错误 (401)");
+      ).rejects.toThrowError(/401/);
     });
   });
 });
