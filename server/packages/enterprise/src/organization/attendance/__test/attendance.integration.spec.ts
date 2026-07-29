@@ -3,18 +3,29 @@ import db from "@hodor/core/db/index";
 import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
 import attendanceService from "../service";
 import type { UserObj } from "@hodor/core/types/app";
+import { initAdminRegistry } from "@hodor/admin/register";
 
 // 静态导入 SQL 文件
 import attendanceSql from "@hodor/core/db/sql/enterprise_attendance.sql?raw";
 import systemUserSql from "@hodor/core/db/sql/system_user.sql?raw";
+
+import { sql } from "drizzle-orm";
 
 describe("Attendance 考勤模块全链路集成测试", () => {
   const testTables = ["enterprise_attendance", "system_user"];
   const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
+    initAdminRegistry();
     await setupTestDb(db, [attendanceSql, systemUserSql]);
     await clearTestData(db, testTables);
+  });
+
+  beforeEach(async () => {
+    await clearTestData(db, testTables);
+    await db.run(
+      sql`INSERT INTO system_user (id, username, password, lang_code, is_enabled, creator_id, role_id_arr) VALUES (101, 'employee_101', 'password', 'zh-CN', 1, 1, '[]')`
+    );
   });
 
   afterEach(async () => {

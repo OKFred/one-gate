@@ -5,7 +5,7 @@ import ossConfigService from "../service";
 import type { UserObj } from "@hodor/core/types/app";
 
 // 静态导入 SQL 文件
-import ossConfigSql from "@hodor/core/db/sql/oss_config.sql?raw";
+import ossConfigSql from "@hodor/core/db/sql/admin/base_sys_config.sql?raw";
 
 // 模拟 storage 模块以防止调用真实的 S3
 vi.mock("@hodor/core/utils/storage", () => {
@@ -20,11 +20,14 @@ vi.mock("@hodor/core/utils/storage", () => {
   };
 });
 
+import { initAdminRegistry } from "../../../register";
+
 describe("OSS Config 模块集成测试", () => {
-  const testTables = ["oss_config"];
+  const testTables = ["base_sys_config"];
   const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
+    initAdminRegistry();
     await setupTestDb(db, [ossConfigSql]);
     await clearTestData(db, testTables);
   });
