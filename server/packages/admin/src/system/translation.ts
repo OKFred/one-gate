@@ -2,7 +2,7 @@ import type { TranslationInputItem } from "@hodor/core/db/initTranslation";
 import type { BusinessKey } from "@hodor/core/types/business";
 
 export const systemTranslations = {
-  "system.auth": [
+  "admin.system.auth": [
     {
       application: "backend",
       tKey: "errorHandler.wrongPassword",
@@ -20,7 +20,7 @@ export const systemTranslations = {
       },
     },
   ],
-  "system.role_permission": [
+  "admin.system.role_permission": [
     {
       application: "backend",
       tKey: "errorHandler.system.rolePermission.recordNotFound",
@@ -46,7 +46,7 @@ export const systemTranslations = {
       },
     },
   ],
-  "system.user": [
+  "admin.system.user": [
     {
       application: "backend",
       tKey: "errorHandler.system.user.superAdminDeleteProhibited",
@@ -72,7 +72,7 @@ export const systemTranslations = {
       },
     },
   ],
-  "system.department": [
+  "admin.system.department": [
     {
       application: "backend",
       tKey: "errorHandler.departmentNotExist",
@@ -117,7 +117,7 @@ export const systemTranslations = {
       },
     },
   ],
-  "system.role": [
+  "admin.system.role": [
     {
       application: "backend",
       tKey: "errorHandler.roleNotExist",
@@ -143,7 +143,7 @@ export const systemTranslations = {
       },
     },
   ],
-  "system.menu": [
+  "admin.system.menu": [
     {
       application: "backend",
       tKey: "errorHandler.menu.parentNotExist",
@@ -186,19 +186,21 @@ export const systemTranslations = {
       },
     },
   ],
-  "system.permission": [],
-  system: [],
+  "admin.system.permission": [],
+  "admin.system": [],
+  "admin.system.api_token": [],
 } satisfies Record<
   Extract<
     BusinessKey,
-    | "system.auth"
-    | "system.role_permission"
-    | "system.user"
-    | "system.department"
-    | "system.role"
-    | "system.menu"
-    | "system.permission"
-    | "system"
+    | "admin.system.auth"
+    | "admin.system.role_permission"
+    | "admin.system.user"
+    | "admin.system.department"
+    | "admin.system.role"
+    | "admin.system.menu"
+    | "admin.system.permission"
+    | "admin.system"
+    | "admin.system.api_token"
   >,
   TranslationInputItem[]
 >;

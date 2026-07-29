@@ -5,6 +5,7 @@ import * as MenuAPI from '@/api/admin/system/menu';
 import * as AuthAPI from '@/api/admin/system/auth';
 import * as PermissionAPI from '@/api/admin/system/permission';
 import * as RolePermissionAPI from '@/api/admin/system/role_permission';
+import * as ApiTokenAPI from '@/api/admin/system/api-token';
 // ==================== User ====================
 
 // 获取所有用户列表
@@ -274,3 +275,28 @@ export type GetPermissionsByRoleReq = NonNullable<
 export type GetPermissionsByRoleRes = Awaited<
   ReturnType<typeof RolePermissionAPI.getPermissionsByRoleFn>
 >['data']['data'];
+
+// ==================== Api Token ====================
+// 获取 API Token 列表
+export type ListApiTokenReq = NonNullable<Parameters<typeof ApiTokenAPI.listFn>[0]['data']>;
+export type ListApiTokenRes = Awaited<ReturnType<typeof ApiTokenAPI.listFn>>['data']['data'];
+
+// 获取单个 API Token
+export type GetApiTokenReq = NonNullable<Parameters<typeof ApiTokenAPI.getFn>[0]['data']>;
+export type GetApiTokenRes = Awaited<ReturnType<typeof ApiTokenAPI.getFn>>['data']['data'];
+
+// 添加 API Token
+export type AddApiTokenReq = NonNullable<Parameters<typeof ApiTokenAPI.addFn>[0]['data']>;
+export type AddApiTokenRes = Awaited<ReturnType<typeof ApiTokenAPI.addFn>>['data']['data'];
+
+// 更新 API Token
+export type UpdateApiTokenReq = NonNullable<Parameters<typeof ApiTokenAPI.updateFn>[0]['data']>;
+export type UpdateApiTokenRes = Awaited<ReturnType<typeof ApiTokenAPI.updateFn>>['data']['data'];
+
+// 删除 API Token
+export type DeleteApiTokenReq = NonNullable<Parameters<typeof ApiTokenAPI.deleteFn>[0]['data']>;
+export type DeleteApiTokenRes = Awaited<ReturnType<typeof ApiTokenAPI.deleteFn>>['data']['data'];
+
+// 吊销 API Token
+export type RevokeApiTokenReq = NonNullable<Parameters<typeof ApiTokenAPI.revokeFn>[0]['data']>;
+export type RevokeApiTokenRes = Awaited<ReturnType<typeof ApiTokenAPI.revokeFn>>['data']['data'];

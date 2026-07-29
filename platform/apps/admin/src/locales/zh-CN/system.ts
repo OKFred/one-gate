@@ -76,4 +76,24 @@ export const system = {
   'permission.resource': '资源路径',
   'permission.business': '业务',
   'permission.category.action': '动作',
+
+  // API 令牌管理
+  'apiToken.name': '令牌名称',
+  'apiToken.namePlaceholder': '为您的 API 令牌指定描述性名称',
+  'apiToken.tokenPrefix': '令牌前缀',
+  'apiToken.permissions': '权限',
+  'apiToken.selectPermissions': '选择要分配给此令牌的权限',
+  'apiToken.ipWhitelist': '客户端 IP 地址筛选',
+  'apiToken.ipWhitelistHint':
+    '选择要筛选的 IP 地址或 IP 地址范围。如果不添加，此令牌适用于所有地址。',
+  'apiToken.startTime': '生效时间',
+  'apiToken.expireTime': '过期时间',
+  'apiToken.never': '永不过期',
+  'apiToken.lastUsed': '上次使用',
+  'apiToken.status': '状态',
+  'apiToken.searchPlaceholder': '搜索令牌名称',
+  'apiToken.tokenCreated': 'API 令牌创建成功',
+  'apiToken.tokenOnceWarning':
+    '这是此令牌唯一一次显示。请务必将它复制到安全的地方妥善保存。一旦关闭此窗口，您将无法再次查看该令牌的完整内容。',
+  'apiToken.copied': '令牌已复制到剪贴板',
 } as const satisfies Record<string, string>;
