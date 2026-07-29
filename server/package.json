@@ -19,6 +19,7 @@
     "migrate:oss": "npx tsx ./scripts/migrate-oss.ts",
     "migrate:rpa": "npx tsx ./scripts/migrate-rpa.ts",
     "migrate:ai": "npx tsx ./scripts/migrate-ai.ts",
+    "migrate:log": "npx tsx ./scripts/migrate-log.ts",
     "format": "prettier --write .",
     "lint": "eslint . --fix"
   },
