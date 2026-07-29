@@ -67,4 +67,24 @@ export const system = {
   'permission.resource': 'Resource Path',
   'permission.business': 'Business',
   'permission.category.action': 'Action',
+
+  // API Token Management
+  'apiToken.name': 'Token Name',
+  'apiToken.namePlaceholder': 'Provide a descriptive name for your API token',
+  'apiToken.tokenPrefix': 'Token Prefix',
+  'apiToken.permissions': 'Permissions',
+  'apiToken.selectPermissions': 'Select permissions for this token',
+  'apiToken.ipWhitelist': 'Client IP Address Filter',
+  'apiToken.ipWhitelistHint':
+    'Select IP addresses or IP ranges to filter. If none added, this token can be used from any IP.',
+  'apiToken.startTime': 'Start Time',
+  'apiToken.expireTime': 'Expire Time',
+  'apiToken.never': 'Never expires',
+  'apiToken.lastUsed': 'Last Used',
+  'apiToken.status': 'Status',
+  'apiToken.searchPlaceholder': 'Search token name',
+  'apiToken.tokenCreated': 'API Token Created',
+  'apiToken.tokenOnceWarning':
+    'This is the ONLY time this token will be displayed. Please copy it to a secure location. Once this window is closed, you will not be able to view the full token again.',
+  'apiToken.copied': 'Token copied to clipboard',
 } as const satisfies Record<string, string>;

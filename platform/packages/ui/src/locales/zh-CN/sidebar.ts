@@ -45,6 +45,7 @@ export const sidebar = {
   'sidebar.menu.menu': '菜单',
   'sidebar.menu.system.permission': '权限',
   'sidebar.menu.system.rolePermission': '角色权限',
+  'sidebar.menu.system.apiToken': 'API 令牌',
   'sidebar.menu.system.permission.emptyPrompt': '权限列表为空，请联系管理员分配权限',
   'sidebar.menu.mail': '邮件管理',
   'sidebar.menu.mail.template': '模板',

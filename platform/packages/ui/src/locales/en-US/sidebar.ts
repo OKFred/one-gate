@@ -41,6 +41,7 @@ export const sidebar = {
   'sidebar.menu.menu': 'Menus',
   'sidebar.menu.system.permission': 'Permissions',
   'sidebar.menu.system.rolePermission': 'Role Permission',
+  'sidebar.menu.system.apiToken': 'API Tokens',
   'sidebar.menu.system.permission.emptyPrompt':
     'The permission list is empty. Please contact the administrator to assign it.',
   'sidebar.menu.mail': 'Mail Management',

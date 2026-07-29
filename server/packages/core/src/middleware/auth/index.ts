@@ -15,6 +15,8 @@ import {
   BusinessErrorCode,
 } from "../errorHandler/businessError";
 import { kv } from "../cache";
+import crypto from "crypto";
+import { apiTokenRepository } from "../../../../admin/src/system/api-token/repository";
 
 export const authMiddleware = async (c: Context) => {
   // 从Authorization header中获取token
@@ -24,6 +26,91 @@ export const authMiddleware = async (c: Context) => {
   }
 
   const token = authHeader.substring(7); // 移除 "Bearer " 前缀
+
+  // ====== API Token 鉴权分支（hdr_ 前缀） ======
+  if (token.startsWith("hdr_")) {
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+    const apiToken = await apiTokenRepository.findByTokenHash(tokenHash);
+
+    if (!apiToken || apiToken.status !== "active") {
+      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+    }
+
+    // 过期校验
+    const now = Date.now();
+    if (apiToken.startTimeUtc && now < apiToken.startTimeUtc) {
+      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+    }
+    if (apiToken.expireTimeUtc && now > apiToken.expireTimeUtc) {
+      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+    }
+
+    // IP 白名单校验
+    if (apiToken.ipWhitelist) {
+      const allowedIps: string[] = JSON.parse(apiToken.ipWhitelist);
+      if (allowedIps.length > 0) {
+        const clientIp =
+          c.req.header("x-forwarded-for") ||
+          c.req.header("x-real-ip") ||
+          "unknown";
+        if (!allowedIps.includes(clientIp)) {
+          throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+        }
+      }
+    }
+
+    // 将令牌权限 code 列表转换为 PermissionInfo 格式
+    const permissionCodes: string[] = JSON.parse(apiToken.permissions);
+    const tokenPermissions = permissionCodes.map((code) => ({
+      id: 0,
+      code,
+      name: code,
+      category: "action" as const,
+      resource: null,
+      business: code.split(":")[0] || null,
+      remark: null,
+      isEnabled: true,
+      creatorId: apiToken.creatorId,
+      updaterId: null,
+      createTimeUtc: apiToken.createTimeUtc,
+      updateTimeUtc: null,
+    }));
+
+    // 构建受限 userObj（不关联用户身份，权限来自令牌自身）
+    const apiTokenUserObj: UserObj = {
+      token,
+      userId: apiToken.creatorId,
+      id: apiToken.creatorId,
+      isSuperAdmin: false,
+      roleIds: [],
+      username: `api-token:${apiToken.name}`,
+      langCode: "zh-CN",
+      isEnabled: true,
+      _isLoaded: true,
+      permissions: tokenPermissions,
+      dataScope: DataScope.SELF_ONLY,
+      customDeptIds: [],
+      async ensureLoaded() {
+        /* API Token 权限在构建时已经加载完毕，无需懒加载 */
+      },
+    };
+
+    c.set("userObj", apiTokenUserObj);
+
+    // 异步更新最后使用时间
+    const updateTask = apiTokenRepository
+      .updateLastUsedTime(apiToken.id)
+      .catch(() => {});
+    try {
+      c.executionCtx.waitUntil(updateTask);
+    } catch {
+      // 本地 Node.js 开发环境不支持 executionCtx
+    }
+
+    return;
+  }
+
+  // ====== 用户 JWT 鉴权（原有逻辑） ======
   const payload = tokenUtils.verifyToken(token);
 
   if (!payload) {

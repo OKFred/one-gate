@@ -17,6 +17,17 @@ export const usePermission = () => {
 
 export const permissions = {
   admin: {
+    /** 自动生成: personal.base */
+    personal_base: {
+      read: 'personal.base:read',
+      /** 自动生成: user_config */
+      user_config: {
+        read: 'personal.base.user_config:read',
+        add: 'personal.base.user_config:add',
+        edit: 'personal.base.user_config:edit',
+        delete: 'personal.base.user_config:delete',
+      },
+    },
     /** 底座 */
     base: {
       read: 'admin.base:read',
@@ -84,10 +95,27 @@ export const permissions = {
         read: 'admin.system.auth:read',
         edit: 'admin.system.auth:edit',
       },
+      /** API 令牌管理 */
+      api_token: {
+        read: 'admin.system.api_token:read',
+        add: 'admin.system.api_token:add',
+        edit: 'admin.system.api_token:edit',
+        delete: 'admin.system.api_token:delete',
+      },
     },
     /** 邮件 */
     mail: {
       read: 'admin.mail:read',
+      add: 'admin.mail:add',
+      edit: 'admin.mail:edit',
+      delete: 'admin.mail:delete',
+      /** 自动生成: recipient */
+      recipient: {
+        read: 'admin.mail.recipient:read',
+        add: 'admin.mail.recipient:add',
+        edit: 'admin.mail.recipient:edit',
+        delete: 'admin.mail.recipient:delete',
+      },
       /** 邮件账户 */
       account: {
         read: 'admin.mail.account:read',
@@ -279,15 +307,36 @@ export const permissions = {
     /** MQTT 消息管理 */
     mqtt: {
       read: 'admin.mqtt:read',
-      add: 'admin.mqtt:add',
-      edit: 'admin.mqtt:edit',
-      delete: 'admin.mqtt:delete',
+      /** MQTT 控制台 */
+      console: {
+        read: 'admin.mqtt.console:read',
+        add: 'admin.mqtt.console:add',
+        edit: 'admin.mqtt.console:edit',
+        delete: 'admin.mqtt.console:delete',
+      },
       /** MQTT 配置 */
       config: {
         read: 'admin.mqtt.config:read',
         add: 'admin.mqtt.config:add',
         edit: 'admin.mqtt.config:edit',
         delete: 'admin.mqtt.config:delete',
+      },
+    },
+    /** 实时通话 */
+    voice: {
+      read: 'admin.voice:read',
+      /** 通话会话 */
+      session: {
+        read: 'admin.voice.session:read',
+        add: 'admin.voice.session:add',
+        edit: 'admin.voice.session:edit',
+      },
+      /** 服务配置 */
+      config: {
+        read: 'admin.voice.config:read',
+        add: 'admin.voice.config:add',
+        edit: 'admin.voice.config:edit',
+        delete: 'admin.voice.config:delete',
       },
     },
   },

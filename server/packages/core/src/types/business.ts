@@ -53,6 +53,8 @@ export const BUSINESS = {
   "admin.system.role_permission": "admin.system.role_permission",
   /** 系统用户 */
   "admin.system.user": "admin.system.user",
+  /** API 令牌管理 */
+  "admin.system.api_token": "admin.system.api_token",
   /** 动态表单 */
   "admin.data.schema_form": "admin.data.schema_form",
   /** 企业 */

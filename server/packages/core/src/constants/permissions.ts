@@ -44,9 +44,13 @@ export const permissionSeeds = {
     role_permission: ["read", "add", "edit", "delete", "batch-delete"],
     /** 个人信息 */
     auth: ["read", "edit"],
+    /** API 令牌管理 */
+    api_token: ["read", "add", "edit", "delete"],
   },
   /** 邮件 */
   "admin.mail": {
+    /** 自动生成: recipient */
+    recipient: ["read", "add", "edit", "delete"],
     "": ["read"],
     /** 邮件账户 */
     account: ["read", "add", "edit", "delete"],
@@ -133,6 +137,7 @@ export const permissionSeeds = {
     base: {
       "": ["read"],
       preference: ["read", "add", "edit", "delete"],
+      user_config: ["read", "add", "edit", "delete"],
     },
     /** 健康与医疗 */
     health: ["read", "add", "edit", "delete"],

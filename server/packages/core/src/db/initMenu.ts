@@ -184,6 +184,15 @@ export const initialMenuData = [
     business: "admin.system.role_permission",
   },
   {
+    id: 80,
+    name: "sidebar.menu.system.apiToken",
+    icon: "material-symbols:key",
+    path: "/admin/system/api-token",
+    parentId: 8,
+    sort: 7,
+    business: "admin.system.api_token",
+  },
+  {
     id: 19,
     name: "sidebar.menu.maintenance",
     icon: "material-symbols:build",
