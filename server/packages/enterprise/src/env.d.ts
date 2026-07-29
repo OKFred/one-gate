@@ -9,6 +9,6 @@ declare module "*.sql" {
 }
 
 declare module "cloudflare:workers" {
-  const content: any;
+  const content: Record<string, unknown>;
   export default content;
 }

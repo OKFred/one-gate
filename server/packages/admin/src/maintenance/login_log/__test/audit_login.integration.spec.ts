@@ -37,6 +37,14 @@ describe("Login Audit 全链路集成测试", () => {
       expect(listAll.total).toBe(3);
       expect(listAll.list.length).toBe(3);
 
+      // 按照 ID 降序排列，最新添加的记录应该在最上方
+      expect(listAll.list[0].userId).toBe(102);
+      expect(listAll.list[0].ip).toBe("10.0.0.1");
+      expect(listAll.list[1].userId).toBe(101);
+      expect(listAll.list[1].ip).toBe("192.168.1.2");
+      expect(listAll.list[2].userId).toBe(101);
+      expect(listAll.list[2].ip).toBe("192.168.1.1");
+
       // 3. 按 userId = 101 过滤检索
       const listFiltered = await auditLoginService.list.service({
         pageNo: 1,
@@ -45,6 +53,8 @@ describe("Login Audit 全链路集成测试", () => {
       });
       expect(listFiltered.total).toBe(2);
       expect(listFiltered.list.every((item) => item.userId === 101)).toBe(true);
+      expect(listFiltered.list[0].ip).toBe("192.168.1.2");
+      expect(listFiltered.list[1].ip).toBe("192.168.1.1");
     });
 
     it("最大保留数（Log Rotation）限制测试", async () => {

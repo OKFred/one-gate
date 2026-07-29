@@ -93,7 +93,7 @@ export function runMailActionIntegrationTests({
       const log = await registry.base.log.biz.detail(sendRes.logId);
       expect(log).not.toBeNull();
       expect(log!.status).toBeTruthy();
-      const logValue = log!.logValue as any;
+      const logValue = log!.logValue as Record<string, unknown>;
       expect(logValue.mailFrom).toBe("mock-sender@example.com");
       expect(logValue.mailTo).toBe("mock-receiver@example.com");
       expect(logValue.title).toBe("Hello Antigravity");
