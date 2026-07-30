@@ -2,23 +2,9 @@ import { Chip, Tooltip } from '@mui/material';
 import dayjs from 'dayjs';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { FilterState } from './TheFilter';
+import type { ListApiTokenRes } from '@/api/admin/system/type';
 
-export interface ApiTokenRes {
-  id: number;
-  name: string;
-  tokenPrefix: string;
-  permissions: string;
-  ipWhitelist: string | null;
-  startTimeUtc: number | null;
-  expireTimeUtc: number | null;
-  lastUsedTimeUtc: number | null;
-  status: 'active' | 'revoked';
-  remark: string | null;
-  creatorId: number;
-  updaterId: number | null;
-  createTimeUtc: number;
-  updateTimeUtc: number | null;
-}
+export type ApiTokenRes = NonNullable<ListApiTokenRes['list']>[0];
 
 /**
  * 解析 permissions JSON 字符串并格式化为权限摘要

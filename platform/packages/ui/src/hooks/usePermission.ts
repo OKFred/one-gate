@@ -106,9 +106,6 @@ export const permissions = {
     /** 邮件 */
     mail: {
       read: 'admin.mail:read',
-      add: 'admin.mail:add',
-      edit: 'admin.mail:edit',
-      delete: 'admin.mail:delete',
       /** 自动生成: recipient */
       recipient: {
         read: 'admin.mail.recipient:read',
