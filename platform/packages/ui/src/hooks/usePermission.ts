@@ -17,17 +17,6 @@ export const usePermission = () => {
 
 export const permissions = {
   admin: {
-    /** 自动生成: personal.base */
-    personal_base: {
-      read: 'personal.base:read',
-      /** 自动生成: user_config */
-      user_config: {
-        read: 'personal.base.user_config:read',
-        add: 'personal.base.user_config:add',
-        edit: 'personal.base.user_config:edit',
-        delete: 'personal.base.user_config:delete',
-      },
-    },
     /** 底座 */
     base: {
       read: 'admin.base:read',
@@ -106,6 +95,9 @@ export const permissions = {
     /** 邮件 */
     mail: {
       read: 'admin.mail:read',
+      add: 'admin.mail:add',
+      edit: 'admin.mail:edit',
+      delete: 'admin.mail:delete',
       /** 自动生成: recipient */
       recipient: {
         read: 'admin.mail.recipient:read',
@@ -336,6 +328,42 @@ export const permissions = {
         delete: 'admin.voice.config:delete',
       },
     },
+    /** 移动端管理 */
+    mobile: {
+      read: 'admin.mobile:read',
+      /** device */
+      device: {
+        read: 'admin.mobile.device:read',
+        add: 'admin.mobile.device:add',
+        edit: 'admin.mobile.device:edit',
+        delete: 'admin.mobile.device:delete',
+        sync: 'admin.mobile.device:sync',
+      },
+      /** app */
+      app: {
+        read: 'admin.mobile.app:read',
+        add: 'admin.mobile.app:add',
+        edit: 'admin.mobile.app:edit',
+        delete: 'admin.mobile.app:delete',
+      },
+      /** app_version */
+      app_version: {
+        read: 'admin.mobile.app_version:read',
+        add: 'admin.mobile.app_version:add',
+        edit: 'admin.mobile.app_version:edit',
+        delete: 'admin.mobile.app_version:delete',
+      },
+      /** device_app */
+      device_app: {
+        read: 'admin.mobile.device_app:read',
+        sync: 'admin.mobile.device_app:sync',
+        install: 'admin.mobile.device_app:install',
+      },
+      /** async_task */
+      async_task: {
+        read: 'admin.mobile.async_task:read',
+      },
+    },
   },
   enterprise: {
     read: 'enterprise:read',
@@ -384,6 +412,13 @@ export const permissions = {
         add: 'personal.base.preference:add',
         edit: 'personal.base.preference:edit',
         delete: 'personal.base.preference:delete',
+      },
+      /** user_config */
+      user_config: {
+        read: 'personal.base.user_config:read',
+        add: 'personal.base.user_config:add',
+        edit: 'personal.base.user_config:edit',
+        delete: 'personal.base.user_config:delete',
       },
     },
     /** 健康与医疗 */

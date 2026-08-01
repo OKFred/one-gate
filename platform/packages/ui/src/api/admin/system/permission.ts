@@ -2,7 +2,10 @@ import { axiosPlus } from '../../config';
 import type { AxiosConfig } from '../../config';
 
 export const listAllFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/permission/listAll', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/permission/listAll', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/permission/listAll',
@@ -42,7 +45,10 @@ export const addFn = (
 };
 
 export const updateFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/permission/update', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/permission/update', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/permission/update',
@@ -52,7 +58,10 @@ export const updateFn = (
 };
 
 export const deleteFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/permission/delete', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/permission/delete', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/permission/delete',

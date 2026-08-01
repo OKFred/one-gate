@@ -52,7 +52,10 @@ export const getProfileFn = (
 };
 
 export const updateProfileFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/updateProfile', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/updateProfile', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/auth/updateProfile',
@@ -62,7 +65,10 @@ export const updateProfileFn = (
 };
 
 export const updatePasswordFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/updatePassword', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/updatePassword', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/auth/updatePassword',
@@ -72,7 +78,10 @@ export const updatePasswordFn = (
 };
 
 export const updateLangCodeFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/updateLangCode', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/updateLangCode', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/auth/updateLangCode',

@@ -28,7 +28,12 @@ export default function HomePage() {
               background: 'background.paper',
             }}
           >
-            <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+            <Typography
+              variant="h3"
+              component="h1"
+              gutterBottom
+              sx={{ fontWeight: 'bold', color: 'primary.main' }}
+            >
               {t('common.welcome')}
             </Typography>
             <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>

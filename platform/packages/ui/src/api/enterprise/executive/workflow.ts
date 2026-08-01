@@ -19,7 +19,10 @@ export const listAllFn = (
 };
 
 export const listFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/executive/workflow/list', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/executive/workflow/list', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/executive/workflow/list',
@@ -29,7 +32,10 @@ export const listFn = (
 };
 
 export const getFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/executive/workflow/get', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/executive/workflow/get', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/executive/workflow/get',
@@ -39,7 +45,10 @@ export const getFn = (
 };
 
 export const addFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/executive/workflow/add', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/executive/workflow/add', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/executive/workflow/add',
@@ -75,7 +84,10 @@ export const deleteFn = (
 };
 
 export const runFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/executive/workflow/run', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/executive/workflow/run', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/executive/workflow/run',

@@ -145,6 +145,20 @@ export const BUSINESS = {
   "admin.voice.session": "admin.voice.session",
   /** 实时通话配置 */
   "admin.voice.config": "admin.voice.config",
+
+  /** 移动端管理 */
+  "admin.mobile": "admin.mobile",
+  "admin.mobile.device": "admin.mobile.device",
+  "admin.mobile.app": "admin.mobile.app",
+  "admin.mobile.app-version": "admin.mobile.app-version",
+  "admin.mobile.device-app": "admin.mobile.device-app",
+  "admin.mobile.async-task": "admin.mobile.async-task",
+  /** 自动生成: admin.mobile.app_version */
+  "admin.mobile.app_version": "admin.mobile.app_version",
+  /** 自动生成: admin.mobile.async_task */
+  "admin.mobile.async_task": "admin.mobile.async_task",
+  /** 自动生成: admin.mobile.device_app */
+  "admin.mobile.device_app": "admin.mobile.device_app",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

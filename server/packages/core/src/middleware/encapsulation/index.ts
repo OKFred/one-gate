@@ -51,6 +51,7 @@ function componentMaker(
 const routeWhitelist = [
   "/admin/system/auth/login",
   "/admin/i18n/translation/listAll",
+  "/admin/mobile/device-app/callback",
 ];
 
 function routeMaker({

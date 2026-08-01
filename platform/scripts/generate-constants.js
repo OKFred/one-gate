@@ -14,10 +14,7 @@ const TARGET_DIRS = [
 // Pages that have no corresponding permission entries and should be excluded entirely
 const EXCLUDED_DIRS = ['home', 'login', 'me'];
 
-const USE_PERMISSION_PATH = path.resolve(
-  __dirname,
-  '../packages/ui/src/hooks/usePermission.ts',
-);
+const USE_PERMISSION_PATH = path.resolve(__dirname, '../packages/ui/src/hooks/usePermission.ts');
 
 function toSnakeCase(str) {
   return str

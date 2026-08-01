@@ -11723,6 +11723,1166 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/device/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取移动设备 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加移动设备 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新移动设备 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取设备详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除移动设备 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取移动应用 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加移动应用 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新移动应用 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取应用详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除移动应用 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app-version/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取应用版本列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app_version.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app_version.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app-version/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 登记新版本 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app_version.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app_version.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app-version/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新应用版本 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app_version.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app_version.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app-version/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取版本详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app_version.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app_version.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/app-version/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除应用版本 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.app_version.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.app_version.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device-app/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取设备应用关联列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device_app.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device_app.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device-app/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 下发应用列表同步任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device_app.sync.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device_app.sync.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device-app/install": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 下发应用安装任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device_app.install.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device_app.install.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device-app/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 接收移动端任务执行结果 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device_app.callback.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device_app.callback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取异步任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -23340,6 +24500,746 @@ export interface components {
                 page: number;
                 /** @description 每页条数 */
                 pageSize: number;
+            };
+            message: string;
+        };
+        "admin.mobile.device.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "clientId" | "deviceName" | "isEnabled" | "createTimeUtc";
+        };
+        "admin.mobile.device.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+                    clientId: string;
+                    /** @description 设备名称/别名 */
+                    deviceName: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mobile.device.add.req": {
+            /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+            clientId: string;
+            /** @description 设备名称/别名 */
+            deviceName?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.device.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mobile.device.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+            clientId?: string;
+            /** @description 设备名称/别名 */
+            deviceName?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.device.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mobile.device.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.device.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+                clientId: string;
+                /** @description 设备名称/别名 */
+                deviceName: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.device.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.device.delete.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "admin.mobile.app.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "packageName" | "name" | "isEnabled" | "createTimeUtc";
+        };
+        "admin.mobile.app.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 包名 (唯一, 如 org.autojs.autojs6) */
+                    packageName: string;
+                    /** @description 应用名称 */
+                    name: string;
+                    /** @description 图标 (支持 Base64 与普通 URL 链接) */
+                    iconUrl: ((string | null) | null) | null;
+                    /** @description 描述 */
+                    description: ((string | null) | null) | null;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mobile.app.add.req": {
+            /** @description 包名 (唯一, 如 org.autojs.autojs6) */
+            packageName: string;
+            /** @description 应用名称 */
+            name: string;
+            /** @description 图标 (支持 Base64 与普通 URL 链接) */
+            iconUrl?: ((string | null) | null) | null;
+            /** @description 描述 */
+            description?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.app.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mobile.app.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 包名 (唯一, 如 org.autojs.autojs6) */
+            packageName?: string;
+            /** @description 应用名称 */
+            name?: string;
+            /** @description 图标 (支持 Base64 与普通 URL 链接) */
+            iconUrl?: ((string | null) | null) | null;
+            /** @description 描述 */
+            description?: ((string | null) | null) | null;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.app.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mobile.app.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.app.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 包名 (唯一, 如 org.autojs.autojs6) */
+                packageName: string;
+                /** @description 应用名称 */
+                name: string;
+                /** @description 图标 (支持 Base64 与普通 URL 链接) */
+                iconUrl: ((string | null) | null) | null;
+                /** @description 描述 */
+                description: ((string | null) | null) | null;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.app.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.app.delete.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "admin.mobile.app_version.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            appId?: number;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "appId" | "versionName" | "versionCode" | "isForced" | "isEnabled" | "createTimeUtc";
+        };
+        "admin.mobile.app_version.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 关联 mobile_app.id (无数据库外键) */
+                    appId: number;
+                    /** @description 版本名 (如 1.0.0) */
+                    versionName: string;
+                    /** @description 版本号 (整型) */
+                    versionCode: number;
+                    /** @description 安装包地址 */
+                    apkUrl: string;
+                    /** @description 更新说明 */
+                    releaseNotes: ((string | null) | null) | null;
+                    /** @description 是否强制更新 */
+                    isForced: boolean;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mobile.app_version.add.req": {
+            /** @description 关联 mobile_app.id (无数据库外键) */
+            appId: number;
+            /** @description 版本名 (如 1.0.0) */
+            versionName: string;
+            /** @description 版本号 (整型) */
+            versionCode: number;
+            /** @description 安装包地址 */
+            apkUrl: string;
+            /** @description 更新说明 */
+            releaseNotes?: ((string | null) | null) | null;
+            /** @description 是否强制更新 */
+            isForced: boolean;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.app_version.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mobile.app_version.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description 关联 mobile_app.id (无数据库外键) */
+            appId?: number;
+            /** @description 版本名 (如 1.0.0) */
+            versionName?: string;
+            /** @description 版本号 (整型) */
+            versionCode?: number;
+            /** @description 安装包地址 */
+            apkUrl?: string;
+            /** @description 更新说明 */
+            releaseNotes?: ((string | null) | null) | null;
+            /** @description 是否强制更新 */
+            isForced?: boolean;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.app_version.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.mobile.app_version.get.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.app_version.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 关联 mobile_app.id (无数据库外键) */
+                appId: number;
+                /** @description 版本名 (如 1.0.0) */
+                versionName: string;
+                /** @description 版本号 (整型) */
+                versionCode: number;
+                /** @description 安装包地址 */
+                apkUrl: string;
+                /** @description 更新说明 */
+                releaseNotes: ((string | null) | null) | null;
+                /** @description 是否强制更新 */
+                isForced: boolean;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 备注 */
+                remark?: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.app_version.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.app_version.delete.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "admin.mobile.device_app.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            clientId?: string;
+            appId?: number;
+            /**
+             * @description 状态 (INSTALLED, INSTALLING, FAILED, UNINSTALLED)
+             * @enum {string}
+             */
+            installStatus?: "INSTALLED" | "INSTALLING" | "FAILED" | "UNINSTALLED";
+            /** @enum {string} */
+            orderBy?: "id" | "clientId" | "appId" | "installedVersionCode" | "installStatus" | "lastSyncTimeUtc" | "createTimeUtc";
+        };
+        "admin.mobile.device_app.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 设备标识 */
+                    clientId: string;
+                    /** @description 关联 mobile_app.id */
+                    appId: number;
+                    /** @description 已安装的版本号 */
+                    installedVersionCode: number;
+                    /** @description 已安装的版本名 */
+                    installedVersionName: string;
+                    /**
+                     * @description 状态 (INSTALLED, INSTALLING, FAILED, UNINSTALLED)
+                     * @enum {string}
+                     */
+                    installStatus: "INSTALLED" | "INSTALLING" | "FAILED" | "UNINSTALLED";
+                    /** @description 最后一次同步时间 */
+                    lastSyncTimeUtc: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mobile.device_app.sync.req": {
+            /** @description 目标设备标识 */
+            clientId: string;
+            /** @description 目标应用 (仅安装或更新时需要) */
+            appId?: number;
+            /** @description 目标版本 (仅安装时需要) */
+            versionId?: number;
+            /** @description 移动端回调地址 (例如 http://xxxx/api/admin/mobile/device-app/callback) */
+            callbackUrl: string;
+        };
+        "admin.mobile.device_app.sync.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+            };
+            message: string;
+        };
+        "admin.mobile.device_app.install.req": {
+            /** @description 目标设备标识 */
+            clientId: string;
+            /** @description 目标应用 (仅安装或更新时需要) */
+            appId?: number;
+            /** @description 目标版本 (仅安装时需要) */
+            versionId?: number;
+            /** @description 移动端回调地址 (例如 http://xxxx/api/admin/mobile/device-app/callback) */
+            callbackUrl: string;
+        };
+        "admin.mobile.device_app.install.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+            };
+            message: string;
+        };
+        "admin.mobile.device_app.callback.req": {
+            taskId: string;
+            /** @enum {string} */
+            status: "SUCCESS" | "FAILURE" | "PROGRESS";
+            message?: string;
+            data?: string;
+        };
+        "admin.mobile.device_app.callback.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "admin.mobile.async_task.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 设备标识 */
+            clientId?: string;
+            /**
+             * @description 任务状态
+             * @enum {string}
+             */
+            status?: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+            /** @enum {string} */
+            orderBy?: "id" | "taskId" | "clientId" | "status" | "expiresAtUtc" | "createTimeUtc";
+        };
+        "admin.mobile.async_task.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description 任务唯一标识 (UUID) */
+                    taskId: string;
+                    /** @description 设备标识 */
+                    clientId: string;
+                    /** @description 任务分类 (shell, autojs6 等) */
+                    cat: string;
+                    /** @description 原始下发的脚本指令 */
+                    script: string;
+                    /**
+                     * @description 任务状态
+                     * @enum {string}
+                     */
+                    status: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+                    /** @description 执行结果或失败原因 */
+                    resultMessage: ((string | null) | null) | null;
+                    /** @description 任务预期过期时间 */
+                    expiresAtUtc: number;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };

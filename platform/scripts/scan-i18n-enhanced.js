@@ -150,6 +150,12 @@ const IGNORED_BUSINESS_KEYS = new Set([
   'swarm.docker',
   'swarm.nodes',
   'swarm.docker_config',
+  'admin.mobile',
+  'admin.mobile.device',
+  'admin.mobile.app',
+  'admin.mobile.app_version',
+  'admin.mobile.device_app',
+  'admin.mobile.async_task',
 ]);
 
 /**

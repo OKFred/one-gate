@@ -15,7 +15,10 @@ export const listAllFn = (
 };
 
 export const listFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/role_permission/list', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/role_permission/list', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/role_permission/list',
@@ -25,7 +28,10 @@ export const listFn = (
 };
 
 export const addFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/role_permission/add', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/role_permission/add', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/role_permission/add',
@@ -48,7 +54,10 @@ export const batchAddFn = (
 };
 
 export const updateFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/role_permission/update', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/role_permission/update', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/role_permission/update',
@@ -58,7 +67,10 @@ export const updateFn = (
 };
 
 export const deleteFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/role_permission/delete', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/role_permission/delete', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/role_permission/delete',
@@ -81,7 +93,10 @@ export const batchDeleteFn = (
 };
 
 export const getFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/role_permission/get', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/role_permission/get', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/role_permission/get',

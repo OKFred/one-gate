@@ -81,7 +81,8 @@ export const MicroAppContainer: React.FC<MicroAppContainerProps> = ({ scope, vis
         ]);
 
         const module = await loadRemote(`${scope}/App`);
-        const Component = (module as { default: React.ComponentType<Record<string, unknown>> }).default;
+        const Component = (module as { default: React.ComponentType<Record<string, unknown>> })
+          .default;
         componentCache[scope] = Component;
         setFederatedComponent(() => Component);
       } catch (err) {

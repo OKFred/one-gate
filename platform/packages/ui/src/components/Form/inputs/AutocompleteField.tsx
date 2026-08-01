@@ -8,9 +8,9 @@ export interface AutocompleteFieldProps<
   DisableClearable extends boolean | undefined = undefined,
   FreeSolo extends boolean | undefined = undefined,
 > extends Omit<
-    AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>,
-    'renderInput' | 'onChange' | 'value'
-  > {
+  AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>,
+  'renderInput' | 'onChange' | 'value'
+> {
   name: string;
   label?: string;
   value: unknown;
