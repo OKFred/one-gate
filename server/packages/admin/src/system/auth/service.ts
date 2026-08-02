@@ -24,6 +24,7 @@ import {
   BusinessErrorCode,
 } from "@hodor/core/middleware/errorHandler/businessError/index";
 import { preventLoginFailure, preventWrongPassword } from "./prevention";
+import { GithubOrg, GithubUser, GithubTokenResponse } from "./type";
 
 // 普通登录
 const loginReq = {
@@ -219,6 +220,387 @@ const wechatLoginApi = {
   permission: false,
 } satisfies API;
 
+// GitHub SSO
+const githubUrlReq = {
+  type: "object",
+  properties: {
+    state: {
+      type: "string",
+      description: "OAuth state",
+    },
+  },
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const githubUrlRes = {
+  type: "object",
+  properties: {
+    url: {
+      type: "string",
+      description: "GitHub OAuth URL",
+    },
+  },
+  required: ["url"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onGithubUrl(
+  params: FromSchema<typeof githubUrlReq>
+): Promise<FromSchema<typeof githubUrlRes>> {
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  if (!clientId) {
+    throw new BusinessError(BusinessErrorCode.UNKNOWN_ERROR, {
+      message: "Missing GITHUB_CLIENT_ID",
+    });
+  }
+  const stateQuery = params.state
+    ? `&state=${encodeURIComponent(params.state)}`
+    : "";
+  const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email%20read:org${stateQuery}`;
+  return { url };
+}
+
+const githubUrlApi = {
+  req: githubUrlReq,
+  res: githubUrlRes,
+  pathInfo: {
+    path: "/github/url",
+    method: "post",
+    summary: "获取GitHub登录授权链接",
+  } as const,
+  adapter: bodyAdapter,
+  service: onGithubUrl,
+  permission: false,
+} satisfies API;
+
+const githubLoginReq = {
+  type: "object",
+  properties: {
+    code: {
+      type: "string",
+      description: "GitHub OAuth Code",
+    },
+  },
+  required: ["code"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const githubLoginRes = {
+  ...loginRes,
+} as const satisfies JSONSchema;
+
+async function onGithubLogin(
+  params: FromSchema<typeof githubLoginReq>,
+  clientInfo: { ip: string; userAgent: string }
+): Promise<FromSchema<typeof githubLoginRes>> {
+  const { code } = params;
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new BusinessError(BusinessErrorCode.UNKNOWN_ERROR, {
+      message: "Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET",
+    });
+  }
+
+  // 1. 获取 Access Token
+  const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      client_secret: clientSecret,
+      code,
+    }),
+  });
+
+  const tokenData = (await tokenRes.json()) as GithubTokenResponse;
+  if (tokenData.error) {
+    throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
+      message: `GitHub Auth Error: ${tokenData.error_description}`,
+    });
+  }
+  const accessToken = tokenData.access_token;
+
+  // 2. 获取 GitHub 用户信息
+  const userRes = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json",
+      "User-Agent": "OkFred-Node-Server",
+    },
+  });
+  let githubUserStr = await userRes.text();
+  const githubUser = JSON.parse(githubUserStr) as GithubUser;
+  if (!githubUser.id) {
+    throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
+      message: "获取 GitHub 用户信息失败",
+    });
+  }
+
+  const githubIdStr = String(githubUser.id);
+  const githubLogin = githubUser.login;
+
+  let finalUserId: number;
+  let finalUsername: string;
+  let finalLangCode: string = "zh-CN";
+
+  // 3. 查找是否已绑定本地用户
+  const existingOauth = await userUtils.findOauthByProviderId(
+    "github",
+    githubIdStr
+  );
+
+  if (existingOauth) {
+    // 已经绑定，允许直接登录
+    finalUserId = existingOauth.userId;
+    const localUser = await userUtils.getUser(finalUserId);
+    if (!localUser) {
+      throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED, {
+        message: "关联的本地用户不存在",
+      });
+    }
+    finalUsername = localUser.username;
+    finalLangCode = localUser.langCode;
+  } else {
+    // 未绑定过，必须在指定组织内才可以自动注册
+    const orgsRes = await fetch("https://api.github.com/user/orgs", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+        "User-Agent": "OkFred-Node-Server",
+      },
+    });
+    const orgsText = await orgsRes.text();
+    const orgs = JSON.parse(orgsText) as Array<GithubOrg>;
+    const targetOrgName = process.env.GITHUB_ORG_NAME;
+    const isMember = orgs.some((org) => org.login === targetOrgName);
+
+    if (!isMember) {
+      throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED, {
+        message: `对不起，仅限 ${targetOrgName} 组织下的成员登录！(或请先绑定账号)`,
+      });
+    }
+
+    try {
+      const tempPassword = await userUtils.convertPassword(
+        Buffer.from(Math.random().toString()).toString("base64")
+      );
+      finalUserId = await userUtils.onInsert({
+        username: githubLogin,
+        password: tempPassword,
+        langCode: "zh-CN",
+        remark: "GitHub OAuth Auto Create",
+        departmentId: null,
+        regionId: null,
+        roleIdArr: [],
+        isEnabled: true,
+        creatorId: 1,
+      });
+
+      finalUsername = githubLogin;
+
+      await userUtils.onInsertOauth({
+        userId: finalUserId,
+        provider: "github",
+        providerId: githubIdStr,
+        providerUsername: githubLogin,
+      });
+    } catch (e: unknown) {
+      const err = e as { message?: string };
+      if (err.message && err.message.includes("UNIQUE constraint failed")) {
+        throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA, {
+          message: `用户名 ${githubLogin} 冲突，拒绝登录`,
+        });
+      }
+      throw e;
+    }
+  }
+
+  // 生成token
+  const token = tokenUtils.generateToken({
+    userId: finalUserId,
+    username: finalUsername,
+  });
+
+  return {
+    userObj: {
+      id: finalUserId,
+      username: finalUsername,
+      langCode: finalLangCode,
+      token,
+    },
+  };
+}
+
+const githubLoginApi = {
+  req: githubLoginReq,
+  res: githubLoginRes,
+  pathInfo: {
+    path: "/github/login",
+    method: "post",
+    summary: "GitHub 登录回调",
+    description:
+      "使用 GitHub 的授权 code 进行登录，如果之前未绑定过但属于指定组织，则自动创建账号",
+    tags: ["auth", "Admin Auth"],
+  },
+  adapter: bodyAdapter,
+  service: onGithubLogin,
+  permission: false,
+} satisfies API;
+
+// 绑定 GitHub
+const githubBindReq = githubLoginReq;
+const githubBindRes = {
+  type: "object",
+  properties: {
+    message: { type: "string" },
+  },
+  required: ["message"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onGithubBind(
+  params: FromSchema<typeof githubBindReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof githubBindRes>> {
+  const { code } = params;
+  const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    throw new BusinessError(BusinessErrorCode.UNKNOWN_ERROR, {
+      message: "Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET",
+    });
+  }
+
+  const currentUserId = userObj.userId;
+
+  // 1. 获取 Access Token
+  const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      client_id: clientId,
+      client_secret: clientSecret,
+      code,
+    }),
+  });
+
+  const tokenData = (await tokenRes.json()) as GithubTokenResponse;
+  if (tokenData.error) {
+    throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
+      message: `GitHub Auth Error: ${tokenData.error_description}`,
+    });
+  }
+  const accessToken = tokenData.access_token;
+
+  // 2. 获取 GitHub 用户信息
+  const userRes = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: "application/json",
+      "User-Agent": "OkFred-Node-Server",
+    },
+  });
+  const githubUserStr = await userRes.text();
+  const githubUser = JSON.parse(githubUserStr) as GithubUser;
+  if (!githubUser.id) {
+    throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
+      message: "获取 GitHub 用户信息失败",
+    });
+  }
+
+  const githubIdStr = String(githubUser.id);
+  const githubLogin = githubUser.login;
+
+  // 3. 检查是否已经被绑定
+  const existingOauth = await userUtils.findOauthByProviderId(
+    "github",
+    githubIdStr
+  );
+
+  if (existingOauth) {
+    if (existingOauth.userId === currentUserId) {
+      return { message: "你已经绑定过此 GitHub 账号了" };
+    }
+    throw new BusinessError(BusinessErrorCode.DUPLICATE_DATA, {
+      message: "此 GitHub 账号已被系统内的其他用户绑定",
+    });
+  }
+
+  // 4. 执行绑定
+  await userUtils.onInsertOauth({
+    userId: currentUserId,
+    provider: "github",
+    providerId: githubIdStr,
+    providerUsername: githubLogin,
+  });
+
+  return { message: "绑定成功" };
+}
+
+const githubBindApi = {
+  req: githubBindReq,
+  res: githubBindRes,
+  pathInfo: {
+    path: "/github/bind",
+    method: "post",
+    summary: "当前登录用户绑定 GitHub",
+    description: "当前登录用户通过 GitHub code 绑定其账号",
+    tags: ["auth", "Admin Auth"],
+  },
+  adapter: bodyUserAdapter,
+  service: onGithubBind,
+  permission: false,
+} satisfies API;
+
+// 解绑 GitHub
+const githubUnbindReq = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+const githubUnbindRes = {
+  type: "object",
+  properties: {
+    message: { type: "string" },
+  },
+  required: ["message"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+async function onGithubUnbind(
+  _params: FromSchema<typeof githubUnbindReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof githubUnbindRes>> {
+  const { userId } = userObj;
+  await userUtils.deleteOauthByUserAndProvider(userId, "github");
+  return { message: "解绑成功" };
+}
+
+const githubUnbindApi = {
+  req: githubUnbindReq,
+  res: githubUnbindRes,
+  pathInfo: {
+    path: "/github/unbind",
+    method: "post",
+    summary: "当前登录用户解绑 GitHub",
+    description: "删除当前登录用户绑定的 GitHub OAuth 记录",
+    tags: ["auth", "Admin Auth"],
+  },
+  adapter: bodyUserAdapter,
+  service: onGithubUnbind,
+  permission: false,
+} satisfies API;
+
 // 刷新token
 const refreshTokenReq = {
   type: "object",
@@ -298,6 +680,10 @@ const profileRes = {
       type: "object",
       properties: {
         ...UserVO,
+        githubUsername: {
+          type: ["string", "null"],
+          description: "绑定的 GitHub 用户名",
+        },
       },
       required: [...UserDetailKeys] as const,
       additionalProperties: false,
@@ -306,6 +692,7 @@ const profileRes = {
   required: ["userObj"] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
 async function onProfile(
   _params: FromSchema<typeof profileReq>,
   userObj: UserObj
@@ -313,7 +700,19 @@ async function onProfile(
   const { userId } = userObj;
   const userDataObj = await userService.get.service({ id: userId });
   preventEmpty(userDataObj);
-  return { userObj: userDataObj };
+
+  const githubOauth = await userUtils.findOauthByUserAndProvider(
+    userId,
+    "github"
+  );
+  const githubUsername = githubOauth?.providerUsername || null;
+
+  return {
+    userObj: {
+      ...userDataObj,
+      githubUsername,
+    },
+  };
 }
 const profileApi = {
   req: profileReq,
@@ -507,4 +906,8 @@ export default {
   updateLangCode: updateLangCodeApi,
   updatePassword: updatePasswordApi,
   getButtonPermission: getButtonPermissionApi,
+  githubUrl: githubUrlApi,
+  githubLogin: githubLoginApi,
+  githubBind: githubBindApi,
+  githubUnbind: githubUnbindApi,
 };

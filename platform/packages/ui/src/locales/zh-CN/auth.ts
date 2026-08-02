@@ -18,6 +18,23 @@ export const auth = {
   'login.title': 'Open The Gate',
   'login.subtitle': '通用企业级权限管理后台',
 
+  // GitHub 相关
+  'github.signIn': '使用 GITHUB 登录',
+  'github.bind': '绑定 GitHub',
+  'github.bound': '已绑定: {{username}}',
+  'github.unbind': '解绑 GitHub',
+  'github.unbindTitle': '确认解绑 GitHub 账号？',
+  'github.unbindConfirm': '当前已绑定 GitHub 账号 {{username}}。解绑后，你将无法使用该 GitHub 账号直接登录本系统。确定解绑吗？',
+  'github.unbindSuccess': 'GitHub 账号解绑成功！',
+  'github.bindSuccess': 'GitHub 账号绑定成功！',
+  'github.loginSuccess': '登录成功',
+  'github.authFailed': '授权失败',
+  'github.authFailedRetry': '授权失败，请重试',
+  'github.noCode': '未找到授权码 (code)，请返回重试。',
+  'github.verifying': '正在验证 GitHub 授权，请稍候...',
+  'github.back': '返回',
+  'github.confirmUnbind': '确定解绑',
+
   // 个人中心 / 我的
   'me.title': '我的',
   'me.subtitle': '个人信息',

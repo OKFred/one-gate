@@ -5923,6 +5923,247 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/system/auth/github/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取GitHub登录授权链接 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.github.url.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.github.url.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/github/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * GitHub 登录回调
+         * @description 使用 GitHub 的授权 code 进行登录，如果之前未绑定过但属于指定组织，则自动创建账号
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.github.login.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.github.login.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/github/bind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 当前登录用户绑定 GitHub
+         * @description 当前登录用户通过 GitHub code 绑定其账号
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.github.bind.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.github.bind.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/github/unbind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * 当前登录用户解绑 GitHub
+         * @description 删除当前登录用户绑定的 GitHub OAuth 记录
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.github.unbind.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.github.unbind.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/system/department/listAll": {
         parameters: {
             query?: never;
@@ -20275,6 +20516,8 @@ export interface components {
                      * @example 1672531199000
                      */
                     updateTimeUtc: ((number | null) | null) | null;
+                    /** @description 绑定的 GitHub 用户名 */
+                    githubUsername?: string | null;
                 };
             };
             message: string;
@@ -20397,6 +20640,70 @@ export interface components {
                      */
                     updateTimeUtc: ((number | null) | null) | null;
                 }[];
+            };
+            message: string;
+        };
+        "admin.system.auth.github.url.req": {
+            /** @description OAuth state */
+            state?: string;
+        };
+        "admin.system.auth.github.url.res": {
+            ok: boolean;
+            data: {
+                /** @description GitHub OAuth URL */
+                url: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.github.login.req": {
+            /** @description GitHub OAuth Code */
+            code: string;
+        };
+        "admin.system.auth.github.login.res": {
+            ok: boolean;
+            data: {
+                userObj: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 用户名
+                     * @example user
+                     */
+                    username: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode: string;
+                    /**
+                     * @description 用户的token
+                     * @example example-session-token
+                     */
+                    token: string;
+                };
+            };
+            message: string;
+        };
+        "admin.system.auth.github.bind.req": {
+            /** @description GitHub OAuth Code */
+            code: string;
+        };
+        "admin.system.auth.github.bind.res": {
+            ok: boolean;
+            data: {
+                message: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.github.unbind.req": Record<string, never>;
+        "admin.system.auth.github.unbind.res": {
+            ok: boolean;
+            data: {
+                message: string;
             };
             message: string;
         };

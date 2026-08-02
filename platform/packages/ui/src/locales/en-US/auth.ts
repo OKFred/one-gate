@@ -13,6 +13,23 @@ export const auth = {
   'login.title': 'Open The Gate',
   'login.subtitle': 'General Enterprise Permission Management Platform',
 
+  // GitHub Relative
+  'github.signIn': 'Sign in with GITHUB',
+  'github.bind': 'Bind GitHub',
+  'github.bound': 'Bound: {{username}}',
+  'github.unbind': 'Unbind GitHub',
+  'github.unbindTitle': 'Confirm Unbinding GitHub Account?',
+  'github.unbindConfirm': 'Currently bound to GitHub account {{username}}. After unbinding, you will not be able to log in directly with this GitHub account. Are you sure?',
+  'github.unbindSuccess': 'GitHub account unbound successfully!',
+  'github.bindSuccess': 'GitHub account bound successfully!',
+  'github.loginSuccess': 'Login successful',
+  'github.authFailed': 'Authorization Failed',
+  'github.authFailedRetry': 'Authorization failed, please try again',
+  'github.noCode': 'Authorization code (code) not found, please try again.',
+  'github.verifying': 'Verifying GitHub authorization, please wait...',
+  'github.back': 'Back',
+  'github.confirmUnbind': 'Confirm Unbind',
+
   'me.title': 'My Profile',
   'me.subtitle': 'Personal Information',
   'me.region': 'Country/Region',

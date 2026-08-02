@@ -5,7 +5,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginFn } from '@/api/admin/system/auth';
+import { loginFn, githubUrlFn } from '@/api/admin/system/auth';
 import type { LoginReq } from '@/api/admin/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -90,6 +90,23 @@ export default function TheForm() {
     showSnackbar({ message: t('login.wechatWIP'), type: 'info' });
   };
 
+  // 处理 GitHub 登录
+  const handleGithubLogin = async () => {
+    try {
+      setLoading(true);
+      const res = await githubUrlFn({ data: {} });
+      const responseData = res.data.data as any;
+      if (responseData.url) {
+        window.location.href = responseData.url;
+      }
+    } catch (err) {
+      console.log(err);
+      showSnackbar({ message: '获取 GitHub 登录链接失败', type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 处理回车键登录
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
@@ -167,6 +184,18 @@ export default function TheForm() {
           disabled={loading}
         >
           {t('login.wechatSignIn')}
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="secondary"
+          fullWidth
+          size={isMobile ? 'large' : 'medium'}
+          sx={{ py: isMobile ? 1.5 : 1 }}
+          onClick={handleGithubLogin}
+          disabled={loading}
+        >
+          {t('github.signIn')}
         </Button>
       </Stack>
     </Box>
