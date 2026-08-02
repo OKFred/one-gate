@@ -73,6 +73,31 @@ export const baseBizLogTable = sqliteTable(
   })
 );
 
+export const baseHttpRequestLogTable = sqliteTable(
+  "base_http_request_log",
+  {
+    ...baseLogFields,
+    method: text("method").notNull(),
+    url: text("url").notNull(),
+    protocol: text("protocol"),
+    host: text("host"),
+    path: text("path"),
+    query: text("query"),
+    requestHeaders: text("request_headers", { mode: "json" }),
+    requestBody: text("request_body", { mode: "json" }),
+    responseStatus: integer("response_status"),
+    responseHeaders: text("response_headers", { mode: "json" }),
+    responseBody: text("response_body", { mode: "json" }),
+    durationMs: integer("duration_ms"),
+    errorMessage: text("error_message"),
+  },
+  (table) => [
+    index("idx_http_req_log_namespace").on(table.namespace),
+    index("idx_http_req_log_tenant").on(table.tenantId),
+    index("idx_http_req_log_time").on(table.createTimeUtc),
+  ]
+);
+
 //----------------- PO / VO ----------------//
 
 export const BaseLogBasePO = {
@@ -178,6 +203,24 @@ export const BizLogBasePO = {
 export type SysLogPOLike = InferSelectModel<typeof baseSysLogTable>;
 export type AuditLogPOLike = InferSelectModel<typeof baseAuditLogTable>;
 export type BizLogPOLike = InferSelectModel<typeof baseBizLogTable>;
+export type HttpRequestLogPOLike = InferSelectModel<typeof baseHttpRequestLogTable>;
+
+export const HttpRequestLogBasePO = {
+  ...BaseLogBasePO,
+  method: { type: "string", description: "请求方式" },
+  url: { type: "string", description: "完整URL" },
+  protocol: { type: ["string", "null"], nullable: true, description: "协议" },
+  host: { type: ["string", "null"], nullable: true, description: "主机" },
+  path: { type: ["string", "null"], nullable: true, description: "路径" },
+  query: { type: ["string", "null"], nullable: true, description: "查询参数" },
+  requestHeaders: { type: ["object", "null"], nullable: true, additionalProperties: true, description: "请求头" },
+  requestBody: { type: ["object", "string", "null"], nullable: true, description: "请求体" },
+  responseStatus: { type: ["number", "null"], nullable: true, description: "响应状态码" },
+  responseHeaders: { type: ["object", "null"], nullable: true, additionalProperties: true, description: "响应头" },
+  responseBody: { type: ["object", "string", "null"], nullable: true, description: "响应体" },
+  durationMs: { type: ["number", "null"], nullable: true, description: "耗时(ms)" },
+  errorMessage: { type: ["string", "null"], nullable: true, description: "错误信息" },
+} as const satisfies Partial<Record<keyof HttpRequestLogPOLike, JSONSchema>>;
 
 export { IndexVO };
 export const SysLogVO = {
@@ -194,6 +237,11 @@ export const BizLogVO = {
   ...IndexVO,
   ...BizLogBasePO,
 } as const satisfies Partial<Record<keyof BizLogPOLike, JSONSchema>>;
+
+export const HttpRequestLogVO = {
+  ...IndexVO,
+  ...HttpRequestLogBasePO,
+} as const satisfies Partial<Record<keyof HttpRequestLogPOLike, JSONSchema>>;
 
 export const SysLogSortableKeys = [
   "id",
@@ -215,6 +263,13 @@ export const BizLogSortableKeys = [
   "status",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<BizLogPOLike>[];
+
+export const HttpRequestLogSortableKeys = [
+  "id",
+  "namespace",
+  "method",
+  "createTimeUtc",
+] as const satisfies RequiredKeys<HttpRequestLogPOLike>[];
 
 import {
   listReqBase,
@@ -260,6 +315,23 @@ export const LogBizListReq = {
 } as const satisfies JSONSchema;
 
 export const LogBizListRes = listResponseWrapper(BizLogVO);
+
+export const LogHttpListReq = {
+  type: "object",
+  properties: {
+    ...listReqBase,
+    namespace: { type: "string", description: "命名空间" },
+    method: { type: "string", description: "请求方式 (GET/POST/PUT/DELETE)" },
+    protocol: { type: "string", description: "协议 (http/https)" },
+    responseStatus: { type: "number", description: "响应状态码" },
+    keyword: { type: "string", description: "关键词 (仅在 URL 中模糊搜索)" },
+    orderBy: orderByWrapper<(typeof HttpRequestLogSortableKeys)[number][]>([
+      ...HttpRequestLogSortableKeys,
+    ]),
+  },
+} as const satisfies JSONSchema;
+
+export const LogHttpListRes = listResponseWrapper(HttpRequestLogVO);
 
 export const LogTimelineReq = {
   type: "object",

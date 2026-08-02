@@ -11442,6 +11442,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/base/log/http/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** HTTP外网请求日志列表 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.log.http.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.log.http.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/base/log/timeline": {
         parameters: {
             query?: never;
@@ -24562,6 +24620,95 @@ export interface components {
                     logValue?: {
                         [key: string]: unknown;
                     };
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.log.http.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /** @description 关键词 (仅在 URL 中模糊搜索) */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description 命名空间 */
+            namespace?: string;
+            /** @description 请求方式 (GET/POST/PUT/DELETE) */
+            method?: string;
+            /** @description 协议 (http/https) */
+            protocol?: string;
+            /** @description 响应状态码 */
+            responseStatus?: number;
+            /** @enum {string} */
+            orderBy?: "id" | "namespace" | "method" | "createTimeUtc";
+        };
+        "admin.base.log.http.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id?: number;
+                    /** @description 租户ID */
+                    tenantId?: ((number | null) | null) | null;
+                    /** @description 命名空间 */
+                    namespace?: string;
+                    /** @description 备注 */
+                    remark?: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId?: number;
+                    /** @description 创建人名称 */
+                    creatorName?: ((string | null) | null) | null;
+                    /** @description 创建时间(UTC) */
+                    createTimeUtc?: number;
+                    /** @description 请求方式 */
+                    method?: string;
+                    /** @description 完整URL */
+                    url?: string;
+                    /** @description 协议 */
+                    protocol?: ((string | null) | null) | null;
+                    /** @description 主机 */
+                    host?: ((string | null) | null) | null;
+                    /** @description 路径 */
+                    path?: ((string | null) | null) | null;
+                    /** @description 查询参数 */
+                    query?: ((string | null) | null) | null;
+                    /** @description 请求头 */
+                    requestHeaders?: (({
+                        [key: string]: unknown;
+                    } | null) | null) | null;
+                    /** @description 请求体 */
+                    requestBody?: ((Record<string, never> | null) | (string | null) | null) | null;
+                    /** @description 响应状态码 */
+                    responseStatus?: ((number | null) | null) | null;
+                    /** @description 响应头 */
+                    responseHeaders?: (({
+                        [key: string]: unknown;
+                    } | null) | null) | null;
+                    /** @description 响应体 */
+                    responseBody?: ((Record<string, never> | null) | (string | null) | null) | null;
+                    /** @description 耗时(ms) */
+                    durationMs?: ((number | null) | null) | null;
+                    /** @description 错误信息 */
+                    errorMessage?: ((string | null) | null) | null;
                 }[];
             };
             message: string;

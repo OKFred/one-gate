@@ -1,7 +1,7 @@
 import * as baseLogRepository from "./repository";
 import type { SysLogPOLike, AuditLogPOLike, BizLogPOLike } from "./model";
 import type { InferInsertModel } from "drizzle-orm";
-import { baseSysLogTable, baseAuditLogTable, baseBizLogTable } from "./model";
+import { baseSysLogTable, baseAuditLogTable, baseBizLogTable, baseHttpRequestLogTable } from "./model";
 
 /**
  * Base Log Services
@@ -69,10 +69,31 @@ const biz = {
   },
 };
 
+const http = {
+  add: async (data: InferInsertModel<typeof baseHttpRequestLogTable>) => {
+    return await baseLogRepository.insertHttpRequestLog(data);
+  },
+  list: async (params: {
+    namespace?: string;
+    method?: string;
+    protocol?: string;
+    responseStatus?: number;
+    keyword?: string;
+    creatorId?: number;
+    pageNo: number;
+    pageSize: number;
+    orderBy?: keyof typeof baseHttpRequestLogTable.$inferSelect;
+    descend?: boolean;
+  }) => {
+    return await baseLogRepository.findHttpRequestLogPage(params);
+  },
+};
+
 const baseLogService = {
   sys,
   audit,
   biz,
+  http,
 };
 
 export default baseLogService;
@@ -88,6 +109,8 @@ import {
   LogAuditListRes,
   LogBizListReq,
   LogBizListRes,
+  LogHttpListReq,
+  LogHttpListRes,
   LogTimelineReq,
   LogTimelineRes,
   type LogTimelineResItem,
@@ -103,8 +126,8 @@ const sysListApi = {
       namespace: obj.namespace,
       pageNo: obj.pageNo,
       pageSize: obj.pageSize,
-      orderBy: obj.orderBy?.[0] as any,
-      descend: obj.orderBy?.[1] === "desc",
+      orderBy: obj.orderBy,
+      descend: obj.descend,
     });
   },
   permission: { action: "read" },
@@ -120,8 +143,8 @@ const auditListApi = {
       namespace: obj.namespace,
       pageNo: obj.pageNo,
       pageSize: obj.pageSize,
-      orderBy: obj.orderBy?.[0] as any,
-      descend: obj.orderBy?.[1] === "desc",
+      orderBy: obj.orderBy,
+      descend: obj.descend,
     });
   },
   permission: { action: "read" },
@@ -137,8 +160,29 @@ const bizListApi = {
       namespace: obj.namespace,
       pageNo: obj.pageNo,
       pageSize: obj.pageSize,
-      orderBy: obj.orderBy?.[0] as any,
-      descend: obj.orderBy?.[1] === "desc",
+      orderBy: obj.orderBy,
+      descend: obj.descend,
+    });
+  },
+  permission: { action: "read" },
+} satisfies API;
+
+const httpListApi = {
+  req: LogHttpListReq,
+  res: LogHttpListRes,
+  pathInfo: { path: "/http/list", method: "post", summary: "HTTP外网请求日志列表" },
+  adapter: bodyAdapter,
+  service: async (obj: FromSchema<typeof LogHttpListReq>) => {
+    return await http.list({
+      namespace: obj.namespace,
+      method: obj.method,
+      protocol: obj.protocol,
+      responseStatus: obj.responseStatus,
+      keyword: obj.keyword,
+      pageNo: obj.pageNo,
+      pageSize: obj.pageSize,
+      orderBy: obj.orderBy,
+      descend: obj.descend,
     });
   },
   permission: { action: "read" },
@@ -211,5 +255,6 @@ export const apis = {
   sysList: sysListApi,
   auditList: auditListApi,
   bizList: bizListApi,
+  httpList: httpListApi,
   timeline: timelineApi,
 };

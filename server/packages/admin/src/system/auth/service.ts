@@ -304,20 +304,24 @@ async function onGithubLogin(
   }
 
   // 1. 获取 Access Token
-  const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-    }),
-  });
+  const tokenData = await registry.base.httpFetch.json<GithubTokenResponse>(
+    "https://github.com/login/oauth/access_token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+      }),
+      namespace: "system.auth.github",
+      remark: "GitHub OAuth AccessToken",
+    }
+  );
 
-  const tokenData = (await tokenRes.json()) as GithubTokenResponse;
   if (tokenData.error) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
       message: `GitHub Auth Error: ${tokenData.error_description}`,
@@ -326,15 +330,17 @@ async function onGithubLogin(
   const accessToken = tokenData.access_token;
 
   // 2. 获取 GitHub 用户信息
-  const userRes = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: "application/json",
-      "User-Agent": "OkFred-Node-Server",
-    },
-  });
-  let githubUserStr = await userRes.text();
-  const githubUser = JSON.parse(githubUserStr) as GithubUser;
+  const githubUser = await registry.base.httpFetch.json<GithubUser>(
+    "https://api.github.com/user",
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+      },
+      namespace: "system.auth.github",
+      remark: "GitHub Get User Profile",
+    }
+  );
   if (!githubUser.id) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
       message: "获取 GitHub 用户信息失败",
@@ -367,15 +373,17 @@ async function onGithubLogin(
     finalLangCode = localUser.langCode;
   } else {
     // 未绑定过，必须在指定组织内才可以自动注册
-    const orgsRes = await fetch("https://api.github.com/user/orgs", {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/json",
-        "User-Agent": "OkFred-Node-Server",
-      },
-    });
-    const orgsText = await orgsRes.text();
-    const orgs = JSON.parse(orgsText) as Array<GithubOrg>;
+    const orgs = await registry.base.httpFetch.json<GithubOrg[]>(
+      "https://api.github.com/user/orgs",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/json",
+        },
+        namespace: "system.auth.github",
+        remark: "GitHub Get User Orgs",
+      }
+    );
     const targetOrgName = process.env.GITHUB_ORG_NAME;
     const isMember = orgs.some((org) => org.login === targetOrgName);
 
@@ -480,20 +488,25 @@ async function onGithubBind(
   const currentUserId = userObj.userId;
 
   // 1. 获取 Access Token
-  const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code,
-    }),
-  });
+  const tokenData = await registry.base.httpFetch.json<GithubTokenResponse>(
+    "https://github.com/login/oauth/access_token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        code,
+      }),
+      namespace: "system.auth.github",
+      creatorId: currentUserId,
+      remark: "GitHub Bind AccessToken",
+    }
+  );
 
-  const tokenData = (await tokenRes.json()) as GithubTokenResponse;
   if (tokenData.error) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
       message: `GitHub Auth Error: ${tokenData.error_description}`,
@@ -502,15 +515,18 @@ async function onGithubBind(
   const accessToken = tokenData.access_token;
 
   // 2. 获取 GitHub 用户信息
-  const userRes = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: "application/json",
-      "User-Agent": "OkFred-Node-Server",
-    },
-  });
-  const githubUserStr = await userRes.text();
-  const githubUser = JSON.parse(githubUserStr) as GithubUser;
+  const githubUser = await registry.base.httpFetch.json<GithubUser>(
+    "https://api.github.com/user",
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/json",
+      },
+      namespace: "system.auth.github",
+      creatorId: currentUserId,
+      remark: "GitHub Bind User Profile",
+    }
+  );
   if (!githubUser.id) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
       message: "获取 GitHub 用户信息失败",

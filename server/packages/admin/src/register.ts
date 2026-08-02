@@ -21,6 +21,7 @@ import { runAiChat, runAiEmbedding } from "./ai/driver.js";
 import aiSearchService from "./ai/search/service.js";
 import aiChatService from "./ai/chat/service.js";
 import { SwarmDockerConfigProvider } from "./swarm/docker_config/provider.js";
+import { safeFetch, safeFetchJson, safeFetchText, type SafeFetchOptions } from "@hodor/core/utils/safeFetch";
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
@@ -32,6 +33,23 @@ export const systemRegister = {
 export const baseRegister = {
   sysConfig: baseConfigUtils,
   log: baseLogService,
+  httpFetch: {
+    fetch: (url: string | URL, options?: SafeFetchOptions) =>
+      safeFetch(url, {
+        logHandler: (logData) => baseLogService.http.add(logData),
+        ...options,
+      }),
+    json: <T = unknown>(url: string | URL, options?: SafeFetchOptions) =>
+      safeFetchJson<T>(url, {
+        logHandler: (logData) => baseLogService.http.add(logData),
+        ...options,
+      }),
+    text: (url: string | URL, options?: SafeFetchOptions) =>
+      safeFetchText(url, {
+        logHandler: (logData) => baseLogService.http.add(logData),
+        ...options,
+      }),
+  },
 };
 
 export const i18nRegister = {

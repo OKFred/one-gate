@@ -3,12 +3,14 @@ import {
   baseSysLogTable,
   baseAuditLogTable,
   baseBizLogTable,
+  baseHttpRequestLogTable,
   type SysLogPOLike,
   type AuditLogPOLike,
   type BizLogPOLike,
 } from "./model";
 import {
   eq,
+  like,
   asc,
   desc,
   count,
@@ -41,6 +43,84 @@ export async function insertSysLog(
     .values(data)
     .returning({ id: baseSysLogTable.id });
   return result[0]?.id;
+}
+
+export async function insertHttpRequestLog(
+  data: InferInsertModel<typeof baseHttpRequestLogTable>
+) {
+  const result = await db
+    .insert(baseHttpRequestLogTable)
+    .values(data)
+    .returning({ id: baseHttpRequestLogTable.id });
+  return result[0]?.id;
+}
+
+export async function findHttpRequestLogPage(params: {
+  namespace?: string;
+  method?: string;
+  protocol?: string;
+  responseStatus?: number;
+  keyword?: string;
+  creatorId?: number;
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof typeof baseHttpRequestLogTable.$inferSelect;
+  descend?: boolean;
+}) {
+  const {
+    namespace,
+    method,
+    protocol,
+    responseStatus,
+    keyword,
+    creatorId,
+    pageNo,
+    pageSize,
+    orderBy = "id",
+    descend = true,
+  } = params;
+  const offset = (pageNo - 1) * pageSize;
+  const orderField =
+    baseHttpRequestLogTable[orderBy] || baseHttpRequestLogTable.id;
+
+  const conditions: SQL[] = [];
+  if (namespace) {
+    conditions.push(eq(baseHttpRequestLogTable.namespace, namespace));
+  }
+  if (method) {
+    conditions.push(eq(baseHttpRequestLogTable.method, method.toUpperCase()));
+  }
+  if (protocol) {
+    conditions.push(eq(baseHttpRequestLogTable.protocol, protocol.toLowerCase()));
+  }
+  if (responseStatus) {
+    conditions.push(eq(baseHttpRequestLogTable.responseStatus, responseStatus));
+  }
+  if (keyword) {
+    conditions.push(like(baseHttpRequestLogTable.url, `%${keyword}%`));
+  }
+  if (creatorId) {
+    conditions.push(eq(baseHttpRequestLogTable.creatorId, creatorId));
+  }
+
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+  const order = descend ? desc(orderField) : asc(orderField);
+
+  const [list, [{ total }]] = await Promise.all([
+    db
+      .select()
+      .from(baseHttpRequestLogTable)
+      .where(where)
+      .limit(pageSize)
+      .offset(offset)
+      .orderBy(order),
+    db
+      .select({ total: count(baseHttpRequestLogTable.id) })
+      .from(baseHttpRequestLogTable)
+      .where(where),
+  ]);
+
+  return { list, total };
 }
 
 export async function findSysLogPage(params: {
