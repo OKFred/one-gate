@@ -1,6 +1,7 @@
 import { getAllEnv, getEnv } from "@hodor/core/utils/env";
 import { getDefaultConfig } from "./config/service";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
+import { registry } from "../common/registry";
 
 /**
  * Message object structure conforming to OpenAI/Workers AI chat standard.
@@ -112,19 +113,24 @@ export async function runAiChat(
     const { baseUrl, apiKey, model: sysModel } = sysConfig;
     const targetModel = sysModel || "gpt-3.5-turbo";
 
-    const res = await fetch(`${baseUrl.replace(/\/$/, "")}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: targetModel,
-        messages,
-        max_tokens,
-        temperature,
-      }),
-    });
+    const res = await registry.base.httpFetch.fetch(
+      `${baseUrl.replace(/\/$/, "")}/chat/completions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: targetModel,
+          messages,
+          max_tokens,
+          temperature,
+        }),
+        namespace: "ai.driver.chat",
+        remark: `AI LLM Chat: ${targetModel}`,
+      }
+    );
 
     if (!res.ok) {
       const errorText = await res.text();
@@ -154,7 +160,7 @@ export async function runAiChat(
     getEnv("CLOUDFLARE_ACCOUNT_ID") || "00000000000000000000000000000000";
   const apiToken = getEnv("CLOUDFLARE_API_TOKEN");
   if (accountId && apiToken) {
-    const res = await fetch(
+    const res = await registry.base.httpFetch.fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
       {
         method: "POST",
@@ -163,6 +169,8 @@ export async function runAiChat(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ messages, max_tokens, temperature }),
+        namespace: "ai.driver.cloudflare",
+        remark: `Cloudflare AI Run: ${model}`,
       }
     );
 

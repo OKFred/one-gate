@@ -328,17 +328,20 @@ async function onVerify(obj: FromSchema<typeof getReq>): Promise<boolean> {
     if (config.apiKey) {
       headers["Authorization"] = `Bearer ${config.apiKey}`;
     }
-    const res = await fetch(`${config.baseUrl}/models`, { headers });
-    const result = (await res.json()) as {
-      object: string;
-      data: {
+    const result = await registry.base.httpFetch.json<{
+      object?: string;
+      data?: {
         id: string;
         object: string;
         created: number;
         owned_by: string;
       }[];
-    };
-    return result.data?.length > 0;
+    }>(`${config.baseUrl}/models`, {
+      headers,
+      namespace: "ai.config.verify",
+      remark: "AI LLM 配置连通性校验",
+    });
+    return (result.data?.length ?? 0) > 0;
   } catch (e) {
     console.error("验证 AI 配置连通性失败", e);
     return false;
