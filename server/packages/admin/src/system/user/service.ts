@@ -531,6 +531,26 @@ async function getUserNameMapByIds(userIds: number[]) {
   return await userRepository.getUserNameMapByIds(userIds);
 }
 
+async function findOauthByProviderId(provider: string, providerId: string) {
+  return await userRepository.findOauthByProviderId(provider, providerId);
+}
+
+async function findOauthByUserAndProvider(userId: number, provider: string) {
+  return await userRepository.findOauthByUserAndProvider(userId, provider);
+}
+
+async function deleteOauthByUserAndProvider(userId: number, provider: string) {
+  return await userRepository.deleteOauthByUserAndProvider(userId, provider);
+}
+
+async function onInsertOauth(data: Parameters<typeof userRepository.onInsertOauth>[0]) {
+  return await userRepository.onInsertOauth(data);
+}
+
+async function onInsert(data: Parameters<typeof userRepository.onInsert>[0]) {
+  return await userRepository.onInsert(data);
+}
+
 export const utils = {
   countDepartmentUsers,
   convertPassword,
@@ -541,6 +561,11 @@ export const utils = {
   getUserNameById,
   getUserNameMapByIds,
   getUser,
+  findOauthByProviderId,
+  findOauthByUserAndProvider,
+  deleteOauthByUserAndProvider,
+  onInsertOauth,
+  onInsert,
 };
 
 export default {

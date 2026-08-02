@@ -297,4 +297,19 @@ export const userTable = sqliteTable("system_user", {
   updateTimeUtc: integer("update_time_utc"),
 });
 
+export const userOauthTable = sqliteTable(
+  "system_user_oauth",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id").notNull(), // No foreign key constraint
+    provider: text("provider").notNull(), // e.g., 'github'
+    providerId: text("provider_id").notNull(), // User ID from the provider
+    providerUsername: text("provider_username"), // Username from the provider
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+  }
+);
+
 export default userTable;

@@ -49,7 +49,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
       if (urlToken) {
         tokenToUse = urlToken;
-        authUtils.setUserInfo({ id: 0, username: 'Loading...', langCode: 'zh-CN', token: urlToken });
+        authUtils.setUserInfo({
+          id: 0,
+          username: 'Loading...',
+          langCode: 'zh-CN',
+          token: urlToken,
+        });
       }
 
       if (!tokenToUse) {

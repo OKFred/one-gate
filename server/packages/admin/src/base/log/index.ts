@@ -8,6 +8,7 @@ export default function route() {
       "sys/list": apis.sysList,
       "audit/list": apis.auditList,
       "biz/list": apis.bizList,
+      "http/list": apis.httpList,
       timeline: apis.timeline,
     },
     "admin.base.log" satisfies BusinessKey

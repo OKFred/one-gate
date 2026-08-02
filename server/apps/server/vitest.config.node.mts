@@ -14,27 +14,52 @@ export default defineConfig({
       {
         find: /^@hodor\/core\/db\/sql\/maintenance_audit_login\.sql(\?raw)?$/,
         replacement:
-          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/base_sys_log.sql").replace(/\\/g, "/") + "$1",
+          path
+            .resolve(
+              __dirname,
+              "../../packages/core/src/db/sql/admin/base_sys_log.sql"
+            )
+            .replace(/\\/g, "/") + "$1",
       },
       {
         find: /^@hodor\/core\/db\/sql\/maintenance_compliance\.sql(\?raw)?$/,
         replacement:
-          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/compliance_archives.sql").replace(/\\/g, "/") + "$1",
+          path
+            .resolve(
+              __dirname,
+              "../../packages/core/src/db/sql/admin/compliance_archives.sql"
+            )
+            .replace(/\\/g, "/") + "$1",
       },
       {
         find: /^@hodor\/core\/db\/sql\/(oss_config|swarm_docker_config|rpa_config)\.sql(\?raw)?$/,
         replacement:
-          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/base_sys_config.sql").replace(/\\/g, "/") + "$1",
+          path
+            .resolve(
+              __dirname,
+              "../../packages/core/src/db/sql/admin/base_sys_config.sql"
+            )
+            .replace(/\\/g, "/") + "$1",
       },
       {
         find: /^@hodor\/core\/db\/sql\/base_user_config\.sql(\?raw)?$/,
         replacement:
-          path.resolve(__dirname, "../../packages/core/src/db/sql/personal/base_user_config.sql").replace(/\\/g, "/") + "$1",
+          path
+            .resolve(
+              __dirname,
+              "../../packages/core/src/db/sql/personal/base_user_config.sql"
+            )
+            .replace(/\\/g, "/") + "$1",
       },
       {
         find: /^@hodor\/core\/db\/sql\/base_(sys_|biz_|audit_)(.*)\.sql(\?raw)?$/,
         replacement:
-          path.resolve(__dirname, "../../packages/core/src/db/sql/admin/base_$1$2.sql").replace(/\\/g, "/") + "$3",
+          path
+            .resolve(
+              __dirname,
+              "../../packages/core/src/db/sql/admin/base_$1$2.sql"
+            )
+            .replace(/\\/g, "/") + "$3",
       },
       {
         find: /^@hodor\/core\/db\/sql\/(system_|maintenance_|i18n_|mail_|oss_|swarm_|ai_|admin_)(.*)\.sql(\?raw)?$/,

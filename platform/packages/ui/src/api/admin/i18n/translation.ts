@@ -2,7 +2,10 @@ import { axiosPlus } from '../../config';
 import type { AxiosConfig } from '../../config';
 
 export const listAllFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/i18n/translation/listAll', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/i18n/translation/listAll', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/i18n/translation/listAll',

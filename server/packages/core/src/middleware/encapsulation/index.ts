@@ -50,7 +50,10 @@ function componentMaker(
 
 const routeWhitelist = [
   "/admin/system/auth/login",
+  "/admin/system/auth/github/url",
+  "/admin/system/auth/github/login",
   "/admin/i18n/translation/listAll",
+  "/admin/mobile/device-app/callback",
 ];
 
 function routeMaker({

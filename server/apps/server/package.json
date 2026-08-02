@@ -10,7 +10,7 @@
     "build": "npx tsgo && npx tsc-alias",
     "start": "node ./dist/node.js",
     "visualize": "npx tsx scripts/dependency-visualize.ts",
-    "worker:dev": "npx wrangler dev",
+    "worker:dev": "npx wrangler dev --ip 0.0.0.0",
     "worker:types": "npx wrangler types",
     "db:init": "npx tsx -r dotenv/config ../../packages/core/src/db/initTable.ts",
     "sync:permissions": "npx tsx ../../scripts/sync-permissions.ts",

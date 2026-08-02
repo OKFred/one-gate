@@ -4,6 +4,7 @@ import { Tabs, Tab, Box } from '@mui/material';
 import SysLogTable from './components/SysLogTable';
 import AuditLogTable from './components/AuditLogTable';
 import BizLogTable from './components/BizLogTable';
+import HttpLogTable from './components/HttpLogTable';
 import GlobalTimeline from './components/GlobalTimeline';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -54,6 +55,7 @@ export default function BaseLogPage() {
           <Tab label={t('log.sysLog')} />
           <Tab label={t('log.auditLog')} />
           <Tab label={t('log.bizLog')} />
+          <Tab label={t('log.httpLog')} />
           <Tab label={t('log.globalTimeline')} />
         </Tabs>
       </Box>
@@ -74,6 +76,11 @@ export default function BaseLogPage() {
           </Suspense>
         </CustomTabPanel>
         <CustomTabPanel value={value} index={3}>
+          <Suspense fallback={<div>{t('common.loading')}</div>}>
+            <HttpLogTable />
+          </Suspense>
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={4}>
           <Suspense fallback={<div>{t('common.loading')}</div>}>
             <GlobalTimeline />
           </Suspense>

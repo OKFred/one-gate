@@ -3,7 +3,10 @@ import { axiosPlus } from '@/api/config';
 
 /** 获取所有 Docker 配置 */
 export const listAllFn = (
-  axiosConfig?: Omit<AxiosConfig<'/api/v1/admin/swarm/docker_config/listAll', 'post'>, 'url' | 'method'>,
+  axiosConfig?: Omit<
+    AxiosConfig<'/api/v1/admin/swarm/docker_config/listAll', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/swarm/docker_config/listAll',
@@ -14,7 +17,10 @@ export const listAllFn = (
 
 /** 分页获取 Docker 配置 */
 export const listFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/swarm/docker_config/list', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/swarm/docker_config/list', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/swarm/docker_config/list',
@@ -47,7 +53,10 @@ export const addFn = (
 
 /** 更新 Docker 配置 */
 export const updateFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/swarm/docker_config/update', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/swarm/docker_config/update', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/swarm/docker_config/update',
@@ -58,7 +67,10 @@ export const updateFn = (
 
 /** 删除 Docker 配置 */
 export const deleteFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/swarm/docker_config/delete', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/swarm/docker_config/delete', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/swarm/docker_config/delete',
@@ -69,7 +81,10 @@ export const deleteFn = (
 
 /** 验证 Docker 配置连通性 */
 export const verifyFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/swarm/docker_config/verify', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/swarm/docker_config/verify', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/swarm/docker_config/verify',

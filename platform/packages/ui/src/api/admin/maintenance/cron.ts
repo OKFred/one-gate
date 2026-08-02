@@ -58,7 +58,10 @@ export const deleteFn = (
 
 /** 获取定时任务执行日志 */
 export const listLogsFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/maintenance/cron/listLogs', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/maintenance/cron/listLogs', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/maintenance/cron/listLogs',

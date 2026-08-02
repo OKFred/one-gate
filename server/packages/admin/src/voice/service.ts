@@ -17,6 +17,7 @@ import {
   VoiceSessionListResSchema,
 } from "./model.js";
 import * as voiceRepository from "./repository.js";
+import { registry } from "../common/registry.js";
 
 // ─── RTK Config Helper ────────────────────────────────────────────────────────
 
@@ -81,12 +82,14 @@ async function onCreateMeeting(
 ) {
   const { accountId, apiToken, appId } = await getRtkConfig();
 
-  const res = await fetch(
+  const res = await registry.base.httpFetch.fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/realtime/kit/${appId}/meetings`,
     {
       method: "POST",
       headers: rtkHeaders(apiToken),
       body: JSON.stringify({ title: params.title ?? "HODOR_TALK Session" }),
+      namespace: "voice.meeting.create",
+      remark: "Voice Meeting Create",
     }
   );
 
@@ -174,7 +177,7 @@ async function onJoinMeeting(
     ? String(userObj.id)
     : `guest_${crypto.randomUUID().substring(0, 8)}`;
 
-  const res = await fetch(
+  const res = await registry.base.httpFetch.fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/realtime/kit/${appId}/meetings/${params.meetingId}/participants`,
     {
       method: "POST",
@@ -184,6 +187,8 @@ async function onJoinMeeting(
         preset_name: preset,
         custom_participant_id: customParticipantId,
       }),
+      namespace: "voice.meeting.join",
+      remark: "Voice Meeting Join",
     }
   );
 
@@ -249,11 +254,13 @@ async function onEndMeeting(
   // 尝试通知 Cloudflare RealtimeKit 释放/销毁会议资源
   try {
     const { accountId, apiToken, appId } = await getRtkConfig();
-    await fetch(
+    await registry.base.httpFetch.fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/realtime/kit/${appId}/meetings/${params.meetingId}`,
       {
         method: "DELETE",
         headers: rtkHeaders(apiToken),
+        namespace: "voice.meeting.end",
+        remark: "Voice Meeting End",
       }
     );
   } catch {}

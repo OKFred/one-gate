@@ -25,9 +25,9 @@ type GlobalWindow = typeof window & {
 const MenuContext = (
   typeof window !== 'undefined'
     ? (window as unknown as GlobalWindow)[GLOBAL_MENU_CONTEXT_KEY] ||
-      ((window as unknown as GlobalWindow)[GLOBAL_MENU_CONTEXT_KEY] = createContext<MenuContextType | undefined>(
-        undefined,
-      ))
+      ((window as unknown as GlobalWindow)[GLOBAL_MENU_CONTEXT_KEY] = createContext<
+        MenuContextType | undefined
+      >(undefined))
     : createContext<MenuContextType | undefined>(undefined)
 ) as React.Context<MenuContextType | undefined>;
 
@@ -88,7 +88,8 @@ export const MenuProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       const resData = await treeFn({ data: {} });
       const normalizedMenus = normalizeMenus(resData.data.data);
-      const scope = (import.meta as unknown as { env: Record<string, string> }).env?.VITE_APP_SCOPE || 'admin';
+      const scope =
+        (import.meta as unknown as { env: Record<string, string> }).env?.VITE_APP_SCOPE || 'admin';
       const filteredMenus = filterMenuByScope(normalizedMenus, scope);
       if (!filteredMenus?.length) {
         // 给到提示：菜单为空，请联系管理员添加菜单

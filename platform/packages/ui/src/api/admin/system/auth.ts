@@ -21,6 +21,46 @@ export const wechatLoginFn = (
   });
 };
 
+export const githubUrlFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/url', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/auth/github/url',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+export const githubLoginFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/login', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/auth/github/login',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+export const githubBindFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/bind', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/auth/github/bind',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+export const githubUnbindFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/unbind', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/auth/github/unbind',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
 export const refreshTokenFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/refresh', 'post'>, 'url' | 'method'>,
 ) => {
@@ -52,7 +92,10 @@ export const getProfileFn = (
 };
 
 export const updateProfileFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/updateProfile', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/updateProfile', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/auth/updateProfile',
@@ -62,7 +105,10 @@ export const updateProfileFn = (
 };
 
 export const updatePasswordFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/updatePassword', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/updatePassword', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/auth/updatePassword',
@@ -72,7 +118,10 @@ export const updatePasswordFn = (
 };
 
 export const updateLangCodeFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/updateLangCode', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/updateLangCode', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/admin/system/auth/updateLangCode',

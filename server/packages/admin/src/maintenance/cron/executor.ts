@@ -6,6 +6,7 @@
 import { type AppDatabase } from "@hodor/core/db/index";
 import { jobsRegistry } from "./registry";
 import { findEnabledByKey } from "../api-task/repository";
+import { registry } from "../../common/registry";
 
 export interface ApiTaskDef {
   baseUrl: string;
@@ -147,11 +148,14 @@ export async function executeApiTask(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const res = await fetch(url.toString(), {
+    const res = await registry.base.httpFetch.fetch(url.toString(), {
       method,
       headers: headersInit,
       body,
       signal: controller.signal,
+      timeoutMs,
+      namespace: "cron.executor",
+      remark: `Cron Job Executor Task: ${task.method} ${task.path}`,
     });
 
     const responseBody = await res.text();

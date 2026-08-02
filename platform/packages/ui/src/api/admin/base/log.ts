@@ -52,3 +52,16 @@ export const timeline = (
 };
 export type TimelineReq = NonNullable<Parameters<typeof timeline>[0]['data']>;
 export type TimelineRes = NonNullable<Awaited<ReturnType<typeof timeline>>['data']['data']>;
+
+// ---- Http Request Log ----
+export const httpList = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/base/log/http/list', 'post'>, 'url' | 'method'>,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/base/log/http/list',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+export type HttpListReq = NonNullable<Parameters<typeof httpList>[0]['data']>;
+export type HttpListRes = NonNullable<Awaited<ReturnType<typeof httpList>>['data']['data']>;

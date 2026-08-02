@@ -282,15 +282,15 @@ let baseRules =
   readAgentFile("global.md") +
   readAgentFile("workflow.md");
 
-// 5. 生成极简日期与递增序号文件名 (<commitHash>_<YYYYMM>_<HHmm>_<001|002>.md)
-function getNextReportFilename(hash: string): string {
+// 5. 生成极简日期与递增序号文件名 (YYYYMMDD_HHMM_编号.md)
+function getNextReportFilename(): string {
   const now = new Date();
   const pad = (n: number) => String(n).padStart(2, "0");
-  const yyyymm = `${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  const yyyymmdd = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
   const hhmm = `${pad(now.getHours())}${pad(now.getMinutes())}`;
 
   const files = fs.readdirSync(reportDir);
-  const prefix = `${hash}_`;
+  const prefix = `${yyyymmdd}_${hhmm}_`;
   let maxSeq = 0;
 
   for (const file of files) {
@@ -308,7 +308,7 @@ function getNextReportFilename(hash: string): string {
   }
 
   const nextSeq = String(maxSeq + 1).padStart(3, "0");
-  return `${hash}_${yyyymm}_${hhmm}_${nextSeq}.md`;
+  return `${yyyymmdd}_${hhmm}_${nextSeq}.md`;
 }
 
 // 6. 依次处理并生成份数报告
@@ -422,7 +422,7 @@ ${chunkDiff}
       process.exit(1);
     }
 
-    const reportFileName = getNextReportFilename(commitHash);
+    const reportFileName = getNextReportFilename();
     const reportPath = path.join(reportDir, reportFileName);
 
     const statsSection = `

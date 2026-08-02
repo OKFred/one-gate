@@ -2,7 +2,10 @@ import { axiosPlus } from '../../config';
 import type { AxiosConfig } from '../../config';
 
 export const listAllFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/organization/attendance/listAll', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/organization/attendance/listAll', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/organization/attendance/listAll',
@@ -12,7 +15,10 @@ export const listAllFn = (
 };
 
 export const listFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/organization/attendance/list', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/organization/attendance/list', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/organization/attendance/list',
@@ -22,7 +28,10 @@ export const listFn = (
 };
 
 export const getFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/organization/attendance/get', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/organization/attendance/get', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/organization/attendance/get',
@@ -32,7 +41,10 @@ export const getFn = (
 };
 
 export const addFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/organization/attendance/add', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/organization/attendance/add', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/organization/attendance/add',
@@ -42,7 +54,10 @@ export const addFn = (
 };
 
 export const updateFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/organization/attendance/update', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/organization/attendance/update', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/organization/attendance/update',
@@ -52,7 +67,10 @@ export const updateFn = (
 };
 
 export const deleteFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/enterprise/organization/attendance/delete', 'post'>, 'url' | 'method'>,
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/enterprise/organization/attendance/delete', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
     url: '/api/v1/enterprise/organization/attendance/delete',

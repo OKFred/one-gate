@@ -1,5 +1,5 @@
 import db from "@hodor/core/db/index";
-import { userTable, type UserPOLike } from "./model";
+import { userTable, userOauthTable, type UserPOLike } from "./model";
 import {
   asc,
   count,
@@ -207,6 +207,61 @@ export class UserRepository {
       .where(eq(userTable.id, id))
       .returning({ id: userTable.id });
     return res[0].id;
+  }
+
+  async findOauthByProviderId(provider: string, providerId: string) {
+    const rows = await db
+      .select()
+      .from(userOauthTable)
+      .where(
+        and(
+          eq(userOauthTable.provider, provider),
+          eq(userOauthTable.providerId, providerId)
+        )
+      )
+      .limit(1);
+    return rows[0] || null;
+  }
+
+  async onInsertOauth(
+    data: Omit<
+      InferInsertModel<typeof userOauthTable>,
+      "id" | "createTimeUtc" | "updateTimeUtc"
+    >
+  ): Promise<number> {
+    const res = await db
+      .insert(userOauthTable)
+      .values({
+        ...data,
+        createTimeUtc: Date.now(),
+      })
+      .returning({ id: userOauthTable.id });
+    return res[0].id;
+  }
+
+  async findOauthByUserAndProvider(userId: number, provider: string) {
+    const rows = await db
+      .select()
+      .from(userOauthTable)
+      .where(
+        and(
+          eq(userOauthTable.userId, userId),
+          eq(userOauthTable.provider, provider)
+        )
+      )
+      .limit(1);
+    return rows[0] || null;
+  }
+
+  async deleteOauthByUserAndProvider(userId: number, provider: string) {
+    await db
+      .delete(userOauthTable)
+      .where(
+        and(
+          eq(userOauthTable.userId, userId),
+          eq(userOauthTable.provider, provider)
+        )
+      );
   }
 }
 
