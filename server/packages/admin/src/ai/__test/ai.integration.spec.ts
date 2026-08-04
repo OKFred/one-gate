@@ -215,7 +215,11 @@ describe("AI 模块全链路集成测试", () => {
       // Mock fetch to return success
       const mockFetch = vi.fn().mockImplementation(async (url, init) => {
         expect(url).toBe("https://api.mock.com/models");
-        expect(init?.headers?.Authorization).toBe("Bearer mock-key");
+        const auth =
+          typeof init?.headers?.get === "function"
+            ? init.headers.get("Authorization")
+            : init?.headers?.Authorization;
+        expect(auth).toBe("Bearer mock-key");
         return {
           ok: true,
           json: async () => ({
@@ -288,8 +292,17 @@ describe("AI 模块全链路集成测试", () => {
       const mockFetch = vi.fn().mockImplementation(async (url, init) => {
         expect(url).toBe("https://api.openai.com/v1/chat/completions");
         expect(init?.method).toBe("POST");
-        expect(init?.headers?.["Content-Type"]).toBe("application/json");
-        expect(init?.headers?.Authorization).toBe("Bearer sk-openai-key");
+        const contentType =
+          typeof init?.headers?.get === "function"
+            ? init.headers.get("Content-Type")
+            : init?.headers?.["Content-Type"];
+        const auth =
+          typeof init?.headers?.get === "function"
+            ? init.headers.get("Authorization")
+            : init?.headers?.Authorization;
+
+        expect(contentType).toBe("application/json");
+        expect(auth).toBe("Bearer sk-openai-key");
 
         const body = JSON.parse(init.body);
         expect(body.model).toBe("gpt-4o");

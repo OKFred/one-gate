@@ -18,6 +18,7 @@ import { initAdminRegistry } from "../../register.js";
 
 // 静态导入 SQL 文件
 import userSql from "@hodor/core/db/sql/system_user.sql?raw";
+import userOauthSql from "@hodor/core/db/sql/system_user_oauth.sql?raw";
 import roleSql from "@hodor/core/db/sql/system_role.sql?raw";
 import permissionSql from "@hodor/core/db/sql/system_permission.sql?raw";
 import rolePermissionSql from "@hodor/core/db/sql/system_role_permission.sql?raw";
@@ -31,6 +32,7 @@ import mailRecipientSql from "@hodor/core/db/sql/mail_recipient.sql?raw";
 describe("System Auth 模块全链路集成测试", () => {
   const testTables = [
     "system_user",
+    "system_user_oauth",
     "system_role",
     "system_permission",
     "system_role_permission",
@@ -48,6 +50,7 @@ describe("System Auth 模块全链路集成测试", () => {
     initAdminRegistry();
     await setupTestDb(db, [
       userSql,
+      userOauthSql,
       roleSql,
       permissionSql,
       rolePermissionSql,
