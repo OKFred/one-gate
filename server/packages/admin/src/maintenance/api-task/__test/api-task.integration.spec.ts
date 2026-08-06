@@ -6,6 +6,7 @@ import { runPendingJobs } from "../../cron/scheduler";
 import { cronTable, cronLogTable } from "../../cron/model";
 import { eq } from "drizzle-orm";
 import type { UserObj } from "@hodor/core/types/app";
+import { initAdminRegistry } from "../../../register";
 
 // 静态导入 SQL 文件
 import apiTaskSql from "@hodor/core/db/sql/maintenance_api_task.sql?raw";
@@ -21,6 +22,7 @@ describe("API Task 全链路集成测试", () => {
   const userObj = { userId: 1 } as unknown as UserObj;
 
   beforeAll(async () => {
+    initAdminRegistry();
     // 设置测试数据库表结构
     await setupTestDb(db, [apiTaskSql, cronSql, cronLogSql]);
     await clearTestData(db, testTables);

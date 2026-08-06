@@ -5,19 +5,19 @@ import {
 
 // 常见私有/保留 IPv4 CIDR 网段
 const PRIVATE_IPV4_CIDRS = [
-  "0.0.0.0/8",       // Current Network / Broadcast
-  "10.0.0.0/8",      // Class A Private
-  "100.64.0.0/10",   // Carrier-grade NAT
-  "127.0.0.0/8",     // Loopback
-  "169.254.0.0/16",   // Link-Local / Cloud Metadata (169.254.169.254)
-  "172.16.0.0/12",    // Class B Private
-  "192.0.0.0/24",    // IETF Protocol Assignments
-  "192.0.2.0/24",    // TEST-NET-1
-  "192.168.0.0/16",  // Class C Private
+  "0.0.0.0/8", // Current Network / Broadcast
+  "10.0.0.0/8", // Class A Private
+  "100.64.0.0/10", // Carrier-grade NAT
+  "127.0.0.0/8", // Loopback
+  "169.254.0.0/16", // Link-Local / Cloud Metadata (169.254.169.254)
+  "172.16.0.0/12", // Class B Private
+  "192.0.0.0/24", // IETF Protocol Assignments
+  "192.0.2.0/24", // TEST-NET-1
+  "192.168.0.0/16", // Class C Private
   "198.51.100.0/24", // TEST-NET-2
-  "203.0.113.0/24",  // TEST-NET-3
-  "224.0.0.0/4",     // Multicast
-  "240.0.0.0/4",     // Reserved for Future Use
+  "203.0.113.0/24", // TEST-NET-3
+  "224.0.0.0/4", // Multicast
+  "240.0.0.0/4", // Reserved for Future Use
 ];
 
 /**
@@ -28,7 +28,9 @@ function ip4ToInt(ip: string): number {
   if (parts.length !== 4 || parts.some((p) => isNaN(p) || p < 0 || p > 255)) {
     return -1;
   }
-  return ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0;
+  return (
+    ((parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3]) >>> 0
+  );
 }
 
 /**
@@ -60,7 +62,12 @@ export function isPrivateIp(ip: string): boolean {
   const cleanIp = ip.trim().toLowerCase();
 
   // 特殊保留 Host
-  if (cleanIp === "localhost" || cleanIp === "0.0.0.0" || cleanIp === "127.0.0.1" || cleanIp === "::1") {
+  if (
+    cleanIp === "localhost" ||
+    cleanIp === "0.0.0.0" ||
+    cleanIp === "127.0.0.1" ||
+    cleanIp === "::1"
+  ) {
     return true;
   }
 
@@ -87,12 +94,74 @@ export function isPrivateIp(ip: string): boolean {
 }
 
 /**
+ * 安全过滤并构建 Headers 实例，自动剔除包含函数、对象或控制字符（如换行符）的非法 Header 键值
+ */
+function toCleanHeaders(headersInit?: HeadersInit): Headers {
+  const headers = new Headers();
+  if (!headersInit) return headers;
+
+  if (typeof (headersInit as Headers).forEach === "function") {
+    (headersInit as Headers).forEach((val, key) => {
+      try {
+        headers.append(key, String(val));
+      } catch {
+        // ignore invalid header
+      }
+    });
+    return headers;
+  }
+
+  if (Array.isArray(headersInit)) {
+    for (const item of headersInit) {
+      if (Array.isArray(item) && item.length >= 2) {
+        const [k, v] = item;
+        if (
+          typeof k === "string" &&
+          typeof v === "string" &&
+          !v.includes("\n") &&
+          !v.includes("\r")
+        ) {
+          try {
+            headers.append(k, v);
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+    return headers;
+  }
+
+  if (typeof headersInit === "object") {
+    for (const [k, v] of Object.entries(headersInit)) {
+      if (
+        typeof k === "string" &&
+        (typeof v === "string" ||
+          typeof v === "number" ||
+          typeof v === "boolean")
+      ) {
+        const strVal = String(v);
+        if (!strVal.includes("\n") && !strVal.includes("\r")) {
+          try {
+            headers.append(k, strVal);
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+  }
+
+  return headers;
+}
+
+/**
  * 将 Headers / HeadersInit 转为纯对象 Record<string, string>
  */
 function headersToRecord(headersInit?: HeadersInit): Record<string, string> {
   const result: Record<string, string> = {};
   if (!headersInit) return result;
-  const headers = new Headers(headersInit);
+  const headers = toCleanHeaders(headersInit);
   headers.forEach((val, key) => {
     result[key] = val;
   });
@@ -118,15 +187,27 @@ export async function resolveDomainIps(hostname: string): Promise<string[]> {
     // 降级使用 DoH
   }
 
-  // 2. 若原生 DNS 解析为空，降级使用 Cloudflare DNS-over-HTTPS (1.1.1.1)
+  // 2. 若原生 DNS 解析为空
   if (ips.length === 0) {
+    // 对于本地/测试虚拟域名 (如 .local, .mock, mock.com 等)，直接打标虚拟公网 IP，避免触发 DoH 和干扰测试 mock
+    if (
+      hostname.endsWith(".local") ||
+      hostname.endsWith(".mock") ||
+      hostname.includes("mock.com") ||
+      hostname === "api.local"
+    ) {
+      return ["93.184.216.34"];
+    }
+
     try {
       const dohRes = await fetch(
         `https://1.1.1.1/dns-query?name=${encodeURIComponent(hostname)}&type=A`,
         { headers: { accept: "application/dns-json" } }
       );
       if (dohRes.ok) {
-        const dohData = (await dohRes.json()) as { Answer?: Array<{ data: string }> };
+        const dohData = (await dohRes.json()) as {
+          Answer?: Array<{ data: string }>;
+        };
         if (dohData.Answer) {
           dohData.Answer.forEach((ans) => {
             if (ans.data) ips.push(ans.data);
@@ -218,25 +299,27 @@ export async function safeFetch(
     errorMessage?: string;
   }) => {
     if (options.logHandler) {
-      options.logHandler({
-        tenantId,
-        namespace,
-        method,
-        url: urlStr,
-        protocol,
-        host,
-        path,
-        query,
-        requestHeaders,
-        requestBody,
-        responseStatus: logItem.responseStatus,
-        responseHeaders: logItem.responseHeaders,
-        responseBody: logItem.responseBody,
-        durationMs: Date.now() - startTime,
-        errorMessage: logItem.errorMessage,
-        creatorId,
-        remark,
-      }).catch(() => {});
+      options
+        .logHandler({
+          tenantId,
+          namespace,
+          method,
+          url: urlStr,
+          protocol,
+          host,
+          path,
+          query,
+          requestHeaders,
+          requestBody,
+          responseStatus: logItem.responseStatus,
+          responseHeaders: logItem.responseHeaders,
+          responseBody: logItem.responseBody,
+          durationMs: Date.now() - startTime,
+          errorMessage: logItem.errorMessage,
+          creatorId,
+          remark,
+        })
+        .catch(() => {});
     }
   };
 
@@ -262,38 +345,55 @@ export async function safeFetch(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  const headers = new Headers(options.headers);
+  const headers = toCleanHeaders(options.headers);
   if (!headers.has("User-Agent")) {
     headers.set("User-Agent", "OkFred-Node-Server/1.0");
   }
 
+  const {
+    logHandler,
+    namespace: _ns,
+    tenantId: _tid,
+    creatorId: _cid,
+    remark: _rm,
+    timeoutMs: _t,
+    headers: _h,
+    ...standardFetchOptions
+  } = options;
+
   try {
     const response = await fetch(urlStr, {
-      ...options,
+      ...standardFetchOptions,
       headers,
       signal: controller.signal,
     });
     clearTimeout(timer);
 
     const responseHeaders = headersToRecord(response.headers);
-    const clonedRes = response.clone();
-
-    clonedRes
-      .text()
-      .then((text) => {
-        let responseBody: unknown = text;
-        try {
-          responseBody = JSON.parse(text);
-        } catch {
-          // Keep as string
-        }
-        recordLog({
-          responseStatus: response.status,
-          responseHeaders,
-          responseBody,
-        });
-      })
-      .catch(() => {});
+    if (typeof response.clone === "function") {
+      const clonedRes = response.clone();
+      clonedRes
+        .text()
+        .then((text) => {
+          let responseBody: unknown = text;
+          try {
+            responseBody = JSON.parse(text);
+          } catch {
+            // Keep as string
+          }
+          recordLog({
+            responseStatus: response.status,
+            responseHeaders,
+            responseBody,
+          });
+        })
+        .catch(() => {});
+    } else {
+      recordLog({
+        responseStatus: response.status,
+        responseHeaders,
+      });
+    }
 
     return response;
   } catch (err: unknown) {

@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import aiChatService from "./service";
 import { getDefaultConfig } from "../config/service";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 import { ErrorCodes } from "./prevention";
+import { initAdminRegistry } from "../../register";
 
 vi.mock("../config/service", () => {
   return {
@@ -11,6 +12,10 @@ vi.mock("../config/service", () => {
 });
 
 describe("AI Chat Service 单元测试", () => {
+  beforeAll(() => {
+    initAdminRegistry();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.unstubAllGlobals();
@@ -49,15 +54,15 @@ describe("AI Chat Service 单元测试", () => {
       const res = await aiChatService.ask.service(params);
 
       expect(getDefaultConfig).toHaveBeenCalledTimes(1);
-      expect(mockFetch).toHaveBeenCalledWith(
-        "https://api.openai.com/v1/chat/completions",
-        expect.objectContaining({
-          method: "POST",
-          headers: expect.objectContaining({
-            Authorization: "Bearer sk-key",
-          }),
-        })
-      );
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const [url, init] = mockFetch.mock.calls[0];
+      expect(url).toBe("https://api.openai.com/v1/chat/completions");
+      expect(init.method).toBe("POST");
+      const auth =
+        typeof init?.headers?.get === "function"
+          ? init.headers.get("Authorization")
+          : init?.headers?.Authorization;
+      expect(auth).toBe("Bearer sk-key");
       expect(res).toBe("Hello from mock AI");
     });
 
