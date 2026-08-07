@@ -34,6 +34,33 @@ export function toHttpException(error: BusinessError) {
     status: StatusCodes.OK,
   };
 
+  // 归一化 details 详细错误数组
+  const details: {
+    type: string;
+    message: string;
+    params?: Record<string, any>;
+  }[] = [];
+
+  if (error.meta) {
+    if (Array.isArray(error.meta.details)) {
+      details.push(...error.meta.details);
+    } else if (Array.isArray(error.meta.fields)) {
+      error.meta.fields.forEach((f: any) => {
+        details.push({
+          type: f.field || f.type || "field_error",
+          message: f.error || f.message || "",
+          params: f.params,
+        });
+      });
+    } else if (typeof error.meta.message === "string") {
+      details.push({
+        type: error.meta.type || "detail_error",
+        message: error.meta.message,
+        params: error.meta.params,
+      });
+    }
+  }
+
   return new HTTPException(
     (presentation.status || StatusCodes.OK) as ContentfulStatusCode,
     {
@@ -41,6 +68,7 @@ export function toHttpException(error: BusinessError) {
       cause: {
         error,
         code: error.code || undefined,
+        details: details.length > 0 ? details : undefined,
         params: error.meta || undefined,
       },
     }

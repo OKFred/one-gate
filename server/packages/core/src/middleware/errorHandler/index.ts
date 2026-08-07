@@ -73,26 +73,66 @@ export default function errorHandler(app: App) {
     const t = await getTranslator(c);
     if (e instanceof HTTPException) {
       const is500 = e.status >= 500;
-      const causeObj = e.cause as { params?: unknown; error?: any } | undefined;
-      // 对于 500 级别的内部错误，即使是 HTTPException 也隐蔽 data 中的内部细节
-      const dataPayload = is500
-        ? {}
-        : causeObj?.params || causeObj?.error?.meta || {};
+      const causeObj = e.cause as
+        | {
+            params?: any;
+            error?: any;
+            details?: {
+              type: string;
+              message: string;
+              params?: Record<string, any>;
+            }[];
+          }
+        | undefined;
+
+      let rawDetails: {
+        type: string;
+        message: string;
+        params?: Record<string, any>;
+      }[] = [];
+      if (!is500 && causeObj) {
+        if (Array.isArray(causeObj.details)) {
+          rawDetails = causeObj.details;
+        } else if (
+          causeObj.params &&
+          typeof causeObj.params.message === "string"
+        ) {
+          rawDetails = [
+            {
+              type: causeObj.params.type || "detail_error",
+              message: causeObj.params.message,
+              params: causeObj.params.params,
+            },
+          ];
+        }
+      }
+
+      // 对 rawDetails 中的每一项异步做多语言插值翻译
+      const details = await Promise.all(
+        rawDetails.map(async (d) => ({
+          type: d.type,
+          message: await t(d.message, d.params),
+        }))
+      );
 
       return c.json<ResJson>(
         {
           ok: false,
           message: await t(e.message),
-          data: dataPayload,
+          data: {
+            details,
+          },
         },
         { status: e.status as ContentfulStatusCode }
       );
     }
-    return c.json<ResJson<Record<string, never>>>(
+    return c.json<ResJson>(
       {
         ok: false,
         message: await t("errorHandler.unknownError"),
-        data: {},
+        data: {
+          details: [],
+        },
       },
       { status: StatusCodes.INTERNAL_SERVER_ERROR as ContentfulStatusCode }
     );
