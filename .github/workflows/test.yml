@@ -48,6 +48,9 @@ jobs:
           TEST_MAIL_HOST: ${{ secrets.TEST_MAIL_HOST }}
           TEST_MAIL_PORT: ${{ secrets.TEST_MAIL_PORT }}
           TEST_MAIL_RECEIVER: ${{ secrets.TEST_MAIL_RECEIVER }}
+          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
           JWT_SECRET: "test-secret-key-for-ci-runs"
           BASE_API_PATH: "/api/v1"
           LOCALE: "zh-CN"
@@ -87,6 +90,14 @@ jobs:
           packageManager: pnpm
           wranglerVersion: "4.100.0"
           command: deploy
+          secrets: |
+            GH_CLIENT_ID
+            GH_CLIENT_SECRET
+            GH_ORG_NAME
+        env:
+          GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+          GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+          GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
 
       # ─── 步骤 2: 部署前端 Pages ───
       - name: Install Frontend Dependencies
