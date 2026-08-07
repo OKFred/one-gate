@@ -2,6 +2,8 @@ import encapsulation from "@hodor/core/middleware/encapsulation";
 import service from "./service.js";
 import { type BusinessKey } from "@hodor/core/types/business";
 
+export { startMqttEventListener, deviceEventBus } from "./listener.js";
+
 /**
  * MQTT 消息管理应用工厂
  * @returns Encapsulated Hono/App
