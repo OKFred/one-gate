@@ -7,6 +7,7 @@
 ## 1. 复盘次数说明 (Review & Stage Loop)
 
 本次 AI 协作交付过程中，基于 `.agents/` 目录规范共进行了 **4 次** 深入复盘与精准整改：
+
 1. **第 1 次复盘**：消灭后端核心文件中的弱类型与 `any` 转换，添加标准的 `GithubTokenResponse` 接口类型。
 2. **第 2 次复盘**：对齐前端 HTTP 拦截与授权路由逻辑，使用 `state` 参数隔离登录模式与绑定模式，修复登录页 GitHub 登录触发 `Session expired` 假弹窗的漏洞。
 3. **第 3 次复盘（OpenAPI 类型同步与 TypeScript 报错消灭）**：
@@ -24,8 +25,9 @@
 ### 实际改动文件列表
 
 #### 后端 Backend
+
 - **[MODIFY] [service.ts](https://github.com/OKFred/one-gate/blob/main/server/packages/admin/src/system/auth/service.ts)**
-  - 调整 GitHub 登录 `onGithubLogin`：优先读取绑定关系放行；未绑定时读取 `process.env.GITHUB_ORG_NAME` 检查组织成员身份。
+  - 调整 GitHub 登录 `onGithubLogin`：优先读取绑定关系放行；未绑定时读取 `process.env.GH_ORG_NAME` 检查组织成员身份。
   - 新增 `onGithubUnbind` 解绑服务。
   - 在 `getProfile` 响应中联查并返回 `githubUsername`。
 - **[MODIFY] [repository.ts](https://github.com/OKFred/one-gate/blob/main/server/packages/admin/src/system/user/repository.ts)**
@@ -33,9 +35,10 @@
 - **[MODIFY] [type.d.ts](https://github.com/OKFred/one-gate/blob/main/server/packages/admin/src/system/auth/type.d.ts)**
   - 消除 `any` 类型定义，规范 `GithubUser` 及 `GithubTokenResponse`。
 - **[MODIFY] [.env.example](https://github.com/OKFred/one-gate/blob/main/server/apps/server/.env.example) / [.dev.vars](https://github.com/OKFred/one-gate/blob/main/server/apps/server/.dev.vars) / [.env](https://github.com/OKFred/one-gate/blob/main/server/apps/server/.env)**
-  - 增加 `GITHUB_ORG_NAME` 环境变量项。
+  - 增加 `GH_ORG_NAME` 环境变量项。
 
 #### 前端 Frontend
+
 - **[MODIFY] [openapi.d.ts](https://github.com/OKFred/one-gate/blob/main/platform/packages/ui/src/types/openapi.d.ts)**
   - 同步 OpenAPI 服务后端文档，彻底消灭 TS 类型推导报错。
 - **[MODIFY] [auth.ts](https://github.com/OKFred/one-gate/blob/main/platform/packages/ui/src/api/admin/system/auth.ts)**
