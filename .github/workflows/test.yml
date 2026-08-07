@@ -94,10 +94,12 @@ jobs:
             GH_CLIENT_ID
             GH_CLIENT_SECRET
             GH_ORG_NAME
+            JWT_SECRET
         env:
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       # ─── 步骤 2: 部署前端 Pages ───
       - name: Install Frontend Dependencies
