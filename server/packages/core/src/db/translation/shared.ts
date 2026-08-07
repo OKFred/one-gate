@@ -142,6 +142,38 @@ export const sharedTranslations = {
         "en-US": "Feature not yet implemented",
       },
     },
+    {
+      application: "backend",
+      tKey: "errorHandler.validation.required",
+      langCodes: {
+        "zh-CN": "字段 {field} 不能为空",
+        "en-US": "Field {field} is required",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.validation.type",
+      langCodes: {
+        "zh-CN": "字段 {field} 类型不符",
+        "en-US": "Field {field} type mismatch",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.validation.minLength",
+      langCodes: {
+        "zh-CN": "字段 {field} 长度不够",
+        "en-US": "Field {field} length is too short",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.validation.invalid",
+      langCodes: {
+        "zh-CN": "字段 {field} 格式不正确",
+        "en-US": "Field {field} is invalid",
+      },
+    },
   ],
 } satisfies Record<
   Extract<

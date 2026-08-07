@@ -19,6 +19,7 @@ import pathRegister from "../../utils/pathRegister.js";
 import { registerSchema } from "../../utils/schemaRegistry.js";
 import { authMiddleware } from "../auth";
 import { can } from "../auth/permission";
+import { getTranslator } from "../../utils/i18n/index.js";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -104,8 +105,35 @@ function routeMaker({
     const bodyObj = await c.req.json();
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
     if (!valid) {
+      const t = await getTranslator(c);
+      const fields = await Promise.all(
+        errors.map(async (err) => {
+          const rawField = err.instanceLocation?.replace(/^\//, "") || "";
+          let fieldName = rawField;
+          let i18nKey = "errorHandler.validation.invalid";
+
+          if (err.keyword === "required") {
+            const reqMatch = err.error?.match(/property '([^']+)'/);
+            if (reqMatch) {
+              fieldName = rawField ? `${rawField}.${reqMatch[1]}` : reqMatch[1];
+            }
+            i18nKey = "errorHandler.validation.required";
+          } else if (err.keyword === "type") {
+            i18nKey = "errorHandler.validation.type";
+          } else if (err.keyword === "minLength") {
+            i18nKey = "errorHandler.validation.minLength";
+          }
+
+          const errorMsg = await t(i18nKey, { field: fieldName || "value" });
+          return {
+            field: fieldName || "value",
+            error: errorMsg,
+          };
+        })
+      );
+
       throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
-        cause: errors,
+        fields,
       });
     }
     c.set("bodyObj", bodyObj);
