@@ -72,11 +72,18 @@ export default function errorHandler(app: App) {
 
     const t = await getTranslator(c);
     if (e instanceof HTTPException) {
+      const is500 = e.status >= 500;
+      const causeObj = e.cause as { params?: unknown; error?: any } | undefined;
+      // 对于 500 级别的内部错误，即使是 HTTPException 也隐蔽 data 中的内部细节
+      const dataPayload = is500
+        ? {}
+        : causeObj?.params || causeObj?.error?.meta || {};
+
       return c.json<ResJson>(
         {
           ok: false,
           message: await t(e.message),
-          data: (e.cause as { params?: unknown })?.params || {},
+          data: dataPayload,
         },
         { status: e.status as ContentfulStatusCode }
       );

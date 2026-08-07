@@ -247,10 +247,10 @@ const githubUrlRes = {
 async function onGithubUrl(
   params: FromSchema<typeof githubUrlReq>
 ): Promise<FromSchema<typeof githubUrlRes>> {
-  const clientId = process.env.GITHUB_CLIENT_ID;
+  const clientId = process.env.GH_CLIENT_ID;
   if (!clientId) {
     throw new BusinessError(BusinessErrorCode.UNKNOWN_ERROR, {
-      message: "Missing GITHUB_CLIENT_ID",
+      message: "Missing GH_CLIENT_ID",
     });
   }
   const stateQuery = params.state
@@ -294,12 +294,12 @@ async function onGithubLogin(
   clientInfo: { ip: string; userAgent: string }
 ): Promise<FromSchema<typeof githubLoginRes>> {
   const { code } = params;
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+  const clientId = process.env.GH_CLIENT_ID;
+  const clientSecret = process.env.GH_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
     throw new BusinessError(BusinessErrorCode.UNKNOWN_ERROR, {
-      message: "Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET",
+      message: "Missing GH_CLIENT_ID or GH_CLIENT_SECRET",
     });
   }
 
@@ -384,7 +384,7 @@ async function onGithubLogin(
         remark: "GitHub Get User Orgs",
       }
     );
-    const targetOrgName = process.env.GITHUB_ORG_NAME;
+    const targetOrgName = process.env.GH_ORG_NAME;
     const isMember = orgs.some((org) => org.login === targetOrgName);
 
     if (!isMember) {
@@ -476,12 +476,12 @@ async function onGithubBind(
   userObj: UserObj
 ): Promise<FromSchema<typeof githubBindRes>> {
   const { code } = params;
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+  const clientId = process.env.GH_CLIENT_ID;
+  const clientSecret = process.env.GH_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
     throw new BusinessError(BusinessErrorCode.UNKNOWN_ERROR, {
-      message: "Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET",
+      message: "Missing GH_CLIENT_ID or GH_CLIENT_SECRET",
     });
   }
 
