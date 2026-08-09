@@ -9,7 +9,8 @@ export type PermissionAction =
   | "view"
   | "batch-delete"
   | "sync"
-  | "install";
+  | "install"
+  | "dispatch";
 
 export type CheckPermissionSeeds<T, Parent extends string = ""> = {
   [K in keyof T & string]: T[K] extends readonly PermissionAction[]
@@ -201,7 +202,7 @@ export const permissionSeeds = {
     app: ["read", "add", "edit", "delete"],
     app_version: ["read", "add", "edit", "delete"],
     device_app: ["read", "sync", "install"],
-    async_task: ["read"],
+    async_task: ["read", "dispatch"],
   },
 } as const;
 

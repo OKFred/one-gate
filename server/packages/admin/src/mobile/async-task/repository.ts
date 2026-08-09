@@ -1,4 +1,4 @@
-import { eq, like, and, desc, sql, lt } from "drizzle-orm";
+import { eq, like, and, desc, sql, lt, inArray } from "drizzle-orm";
 import db from "@hodor/core/db";
 import {
   mobileAsyncTaskTable,
@@ -7,7 +7,9 @@ import {
   type MobileAsyncTaskPOLike,
 } from "./model";
 
+/** 设备异步任务持久化仓库。 */
 export class MobileAsyncTaskRepository {
+  /** 新增一项设备异步任务。 */
   async add(
     data: MobileAsyncTaskAddVOLike & { creatorId: number }
   ): Promise<number> {
@@ -18,6 +20,7 @@ export class MobileAsyncTaskRepository {
     return result.id;
   }
 
+  /** 按主键更新任务。 */
   async update(
     data: MobileAsyncTaskUpdateVOLike & { updaterId: number }
   ): Promise<void> {
@@ -30,6 +33,7 @@ export class MobileAsyncTaskRepository {
       .where(eq(mobileAsyncTaskTable.id, data.id));
   }
 
+  /** 按业务任务标识更新任务。 */
   async updateByTaskId(
     taskId: string,
     data: Partial<MobileAsyncTaskUpdateVOLike> & { updaterId: number }
@@ -43,12 +47,48 @@ export class MobileAsyncTaskRepository {
       .where(eq(mobileAsyncTaskTable.taskId, taskId));
   }
 
+  /**
+   * 仅在任务仍处于执行前/执行中状态时写入终态结果。
+   *
+   * @returns 是否实际更新了一条任务。
+   */
+  async completeByTaskId(
+    taskId: string,
+    clientId: string,
+    data: {
+      status: "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+      resultCode: string;
+      resultMessage: string | null;
+      resultDataJson: string | null;
+      startedAtUtc: number | null;
+      finishedAtUtc: number;
+      updaterId: number;
+    }
+  ): Promise<boolean> {
+    const result = await db
+      .update(mobileAsyncTaskTable)
+      .set({
+        ...data,
+        updateTimeUtc: sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
+      })
+      .where(
+        and(
+          eq(mobileAsyncTaskTable.taskId, taskId),
+          eq(mobileAsyncTaskTable.clientId, clientId),
+          inArray(mobileAsyncTaskTable.status, ["PENDING", "RUNNING"])
+        )
+      );
+    return result.rowsAffected > 0;
+  }
+
+  /** 按主键删除任务。 */
   async delete(id: number): Promise<void> {
     await db
       .delete(mobileAsyncTaskTable)
       .where(eq(mobileAsyncTaskTable.id, id));
   }
 
+  /** 按主键查询任务。 */
   async getById(id: number): Promise<MobileAsyncTaskPOLike | undefined> {
     const [result] = await db
       .select()
@@ -57,6 +97,7 @@ export class MobileAsyncTaskRepository {
     return result;
   }
 
+  /** 按业务任务标识查询任务。 */
   async getByTaskId(
     taskId: string
   ): Promise<MobileAsyncTaskPOLike | undefined> {
@@ -67,12 +108,13 @@ export class MobileAsyncTaskRepository {
     return result;
   }
 
+  /** 分页查询设备异步任务。 */
   async list(params: {
     pageNo: number;
     pageSize: number;
     clientId?: string;
     keyword?: string;
-    status?: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+    status?: MobileAsyncTaskPOLike["status"];
     orderBy?: keyof MobileAsyncTaskPOLike;
     descend?: boolean;
   }) {
@@ -122,14 +164,22 @@ export class MobileAsyncTaskRepository {
     };
   }
 
+  /** 将服务端等待过期的待执行/执行中任务置为超时。 */
   async timeoutPendingTasks(): Promise<number> {
     const now = Date.now();
     const result = await db
       .update(mobileAsyncTaskTable)
-      .set({ status: "TIMEOUT" })
+      .set({
+        status: "TIMEOUT",
+        resultCode: "SERVER_TIMEOUT",
+        resultMessage: "服务端等待设备结果超时",
+        finishedAtUtc: now,
+        updaterId: 0,
+        updateTimeUtc: now,
+      })
       .where(
         and(
-          eq(mobileAsyncTaskTable.status, "PENDING"),
+          inArray(mobileAsyncTaskTable.status, ["PENDING", "RUNNING"]),
           lt(mobileAsyncTaskTable.expiresAtUtc, now)
         )
       );

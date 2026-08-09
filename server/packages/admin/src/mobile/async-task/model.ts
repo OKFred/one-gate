@@ -39,17 +39,78 @@ const MobileAsyncTaskBasePO = {
   },
   script: {
     type: "string",
-    description: "原始下发的脚本指令",
+    description: "兼容字段；v2 任务仅保存 scriptId，不保存脚本源码",
+  },
+  protocolVersion: {
+    type: ["integer", "null"],
+    nullable: true,
+    description: "设备任务协议版本",
+  },
+  scriptId: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "手机端可信脚本标识",
+    maxLength: 100,
+  },
+  scriptVersion: {
+    type: ["integer", "null"],
+    nullable: true,
+    description: "手机端可信脚本版本",
+  },
+  paramsJson: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "结构化任务参数 JSON",
+  },
+  timeoutMs: {
+    type: ["integer", "null"],
+    nullable: true,
+    description: "设备执行超时时间（毫秒）",
+  },
+  traceId: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "任务链路追踪标识",
+    maxLength: 100,
   },
   status: {
     type: "string",
     description: "任务状态",
-    enum: ["PENDING", "SUCCESS", "FAILURE", "TIMEOUT"],
+    enum: [
+      "PENDING",
+      "RUNNING",
+      "SUCCESS",
+      "FAILURE",
+      "TIMEOUT",
+      "REJECTED",
+      "CANCELLED",
+    ],
   },
   resultMessage: {
     type: ["string", "null"],
     nullable: true,
     description: "执行结果或失败原因",
+  },
+  resultCode: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "统一结果码",
+    maxLength: 100,
+  },
+  resultDataJson: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "结构化执行结果 JSON",
+  },
+  startedAtUtc: {
+    type: ["integer", "null"],
+    nullable: true,
+    description: "设备开始执行时间",
+  },
+  finishedAtUtc: {
+    type: ["integer", "null"],
+    nullable: true,
+    description: "设备完成执行时间",
   },
   expiresAtUtc: {
     type: "integer",
@@ -100,8 +161,18 @@ export const MobileAsyncTaskAddVO = {
   clientId: MobileAsyncTaskBasePO.clientId,
   cat: MobileAsyncTaskBasePO.cat,
   script: MobileAsyncTaskBasePO.script,
+  protocolVersion: MobileAsyncTaskBasePO.protocolVersion,
+  scriptId: MobileAsyncTaskBasePO.scriptId,
+  scriptVersion: MobileAsyncTaskBasePO.scriptVersion,
+  paramsJson: MobileAsyncTaskBasePO.paramsJson,
+  timeoutMs: MobileAsyncTaskBasePO.timeoutMs,
+  traceId: MobileAsyncTaskBasePO.traceId,
   status: MobileAsyncTaskBasePO.status,
   resultMessage: MobileAsyncTaskBasePO.resultMessage,
+  resultCode: MobileAsyncTaskBasePO.resultCode,
+  resultDataJson: MobileAsyncTaskBasePO.resultDataJson,
+  startedAtUtc: MobileAsyncTaskBasePO.startedAtUtc,
+  finishedAtUtc: MobileAsyncTaskBasePO.finishedAtUtc,
   expiresAtUtc: MobileAsyncTaskBasePO.expiresAtUtc,
   remark: MobileAsyncTaskBasePO.remark,
 } as const satisfies Partial<Record<keyof MobileAsyncTaskVOLike, JSONSchema>>;
@@ -154,9 +225,20 @@ const MobileAsyncTaskBaseKeys = [
   "clientId",
   "cat",
   "script",
+  "protocolVersion",
+  "scriptId",
+  "scriptVersion",
+  "paramsJson",
+  "timeoutMs",
+  "traceId",
   "status",
   "resultMessage",
+  "resultCode",
+  "resultDataJson",
+  "startedAtUtc",
+  "finishedAtUtc",
   "expiresAtUtc",
+  "remark",
   ...AuditKeys,
 ] as const satisfies RequiredKeys<MobileAsyncTaskPOLike>[];
 
@@ -172,6 +254,74 @@ export const MobileAsyncTaskSortableKeys = [
   "createTimeUtc",
 ] as const satisfies RequiredKeys<MobileAsyncTaskPOLike>[];
 
+/** 服务端与手机客户端共同支持的可信脚本标识。 */
+export const MobileTrustedScriptIds = [
+  "device.apps.list",
+  "app.install",
+  "app.version.check",
+  "app.update.store",
+  "app.update.zip",
+  "file.download",
+  "tiktok.post",
+  "client.self-update",
+] as const;
+
+/** 可信设备任务下发请求字段。 */
+export const MobileAsyncTaskDispatchReqVO = {
+  clientId: { type: "string", minLength: 1, maxLength: 100 },
+  scriptId: {
+    type: "string",
+    enum: MobileTrustedScriptIds,
+    description: "手机端可信脚本标识",
+  },
+  params: {
+    type: "object",
+    additionalProperties: true,
+    description: "传递给本地可信脚本的结构化参数",
+  },
+  timeoutMs: { type: "integer", minimum: 1000, maximum: 900000 },
+  remark: { type: ["string", "null"], nullable: true, maxLength: 500 },
+} as const satisfies Record<string, JSONSchema>;
+
+/** 可信设备任务下发响应字段。 */
+export const MobileAsyncTaskDispatchResVO = {
+  taskId: { type: "string" },
+  status: { type: "string", enum: ["PENDING"] },
+  traceId: { type: "string" },
+  expiresAtUtc: { type: "integer" },
+} as const satisfies Record<string, JSONSchema>;
+
+/** 手机 v2 任务结果回调请求字段。 */
+export const MobileAsyncTaskCallbackReqVO = {
+  protocolVersion: { type: "integer", enum: [2] },
+  taskId: {
+    type: "string",
+    pattern: "^[A-Za-z0-9_-]{8,100}$",
+  },
+  deviceId: {
+    type: "string",
+    pattern: "^[A-Za-z0-9._:-]{1,100}$",
+  },
+  scriptId: {
+    type: "string",
+    pattern: "^[a-z0-9._-]{1,100}$",
+  },
+  status: {
+    type: "string",
+    enum: ["SUCCESS", "FAILURE", "TIMEOUT", "REJECTED", "CANCELLED"],
+  },
+  code: { type: "string", minLength: 1, maxLength: 100 },
+  message: { type: "string", maxLength: 4000 },
+  data: {},
+  startedAt: { type: "integer" },
+  finishedAt: { type: "integer" },
+  durationMs: { type: "integer", minimum: 0 },
+  traceId: {
+    type: "string",
+    pattern: "^[A-Za-z0-9_-]{8,100}$",
+  },
+} as const satisfies Record<string, JSONSchema>;
+
 //----------------- Drizzle Tables ----------------//
 export const mobileAsyncTaskTable = sqliteTable(
   "admin_mobile_async_task",
@@ -181,10 +331,28 @@ export const mobileAsyncTaskTable = sqliteTable(
     clientId: text("client_id").notNull(),
     cat: text("cat").notNull(),
     script: text("script").notNull(),
+    protocolVersion: integer("protocol_version"),
+    scriptId: text("script_id"),
+    scriptVersion: integer("script_version"),
+    paramsJson: text("params_json"),
+    timeoutMs: integer("timeout_ms"),
+    traceId: text("trace_id"),
     status: text("status")
-      .$type<"PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT">()
+      .$type<
+        | "PENDING"
+        | "RUNNING"
+        | "SUCCESS"
+        | "FAILURE"
+        | "TIMEOUT"
+        | "REJECTED"
+        | "CANCELLED"
+      >()
       .notNull(),
     resultMessage: text("result_message"),
+    resultCode: text("result_code"),
+    resultDataJson: text("result_data_json"),
+    startedAtUtc: integer("started_at_utc"),
+    finishedAtUtc: integer("finished_at_utc"),
     expiresAtUtc: integer("expires_at_utc").notNull(),
     remark: text("remark"),
     creatorId: integer("creator_id").notNull(),
