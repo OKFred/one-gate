@@ -13182,6 +13182,180 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/async-task/dispatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 向指定设备下发可信 AutoJS6 脚本任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.dispatch.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.dispatch.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询异步任务详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 接收 AutoJS6 v2 设备任务结果 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.callback.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.callback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -25576,8 +25750,8 @@ export interface components {
             appId?: number;
             /** @description 目标版本 (仅安装时需要) */
             versionId?: number;
-            /** @description 移动端回调地址 (例如 http://xxxx/api/admin/mobile/device-app/callback) */
-            callbackUrl: string;
+            /** @description 旧协议兼容字段；v2 不再由手机 HTTP 回调 */
+            callbackUrl?: string;
         };
         "admin.mobile.device_app.sync.res": {
             ok: boolean;
@@ -25593,8 +25767,8 @@ export interface components {
             appId?: number;
             /** @description 目标版本 (仅安装时需要) */
             versionId?: number;
-            /** @description 移动端回调地址 (例如 http://xxxx/api/admin/mobile/device-app/callback) */
-            callbackUrl: string;
+            /** @description 旧协议兼容字段；v2 不再由手机 HTTP 回调 */
+            callbackUrl?: string;
         };
         "admin.mobile.device_app.install.res": {
             ok: boolean;
@@ -25639,7 +25813,7 @@ export interface components {
              * @description 任务状态
              * @enum {string}
              */
-            status?: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+            status?: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
             /** @enum {string} */
             orderBy?: "id" | "taskId" | "clientId" | "status" | "expiresAtUtc" | "createTimeUtc";
         };
@@ -25666,19 +25840,39 @@ export interface components {
                     clientId: string;
                     /** @description 任务分类 (shell, autojs6 等) */
                     cat: string;
-                    /** @description 原始下发的脚本指令 */
+                    /** @description 兼容字段；v2 任务仅保存 scriptId，不保存脚本源码 */
                     script: string;
+                    /** @description 设备任务协议版本 */
+                    protocolVersion: ((number | null) | null) | null;
+                    /** @description 手机端可信脚本标识 */
+                    scriptId: ((string | null) | null) | null;
+                    /** @description 手机端可信脚本版本 */
+                    scriptVersion: ((number | null) | null) | null;
+                    /** @description 结构化任务参数 JSON */
+                    paramsJson: ((string | null) | null) | null;
+                    /** @description 设备执行超时时间（毫秒） */
+                    timeoutMs: ((number | null) | null) | null;
+                    /** @description 任务链路追踪标识 */
+                    traceId: ((string | null) | null) | null;
                     /**
                      * @description 任务状态
                      * @enum {string}
                      */
-                    status: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+                    status: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
                     /** @description 执行结果或失败原因 */
                     resultMessage: ((string | null) | null) | null;
+                    /** @description 统一结果码 */
+                    resultCode: ((string | null) | null) | null;
+                    /** @description 结构化执行结果 JSON */
+                    resultDataJson: ((string | null) | null) | null;
+                    /** @description 设备开始执行时间 */
+                    startedAtUtc: ((number | null) | null) | null;
+                    /** @description 设备完成执行时间 */
+                    finishedAtUtc: ((number | null) | null) | null;
                     /** @description 任务预期过期时间 */
                     expiresAtUtc: number;
                     /** @description 备注 */
-                    remark?: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
                     /**
@@ -25695,6 +25889,120 @@ export interface components {
                     updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
+            message: string;
+        };
+        "admin.mobile.async_task.dispatch.req": {
+            clientId: string;
+            /**
+             * @description 手机端可信脚本标识
+             * @enum {string}
+             */
+            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "client.self-update";
+            /** @description 传递给本地可信脚本的结构化参数 */
+            params: {
+                [key: string]: unknown;
+            };
+            timeoutMs?: number;
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.async_task.dispatch.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+                /** @enum {string} */
+                status: "PENDING";
+                traceId: string;
+                expiresAtUtc: number;
+            };
+            message: string;
+        };
+        "admin.mobile.async_task.get.req": {
+            /** @description 任务唯一标识 (UUID) */
+            taskId: string;
+        };
+        "admin.mobile.async_task.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 任务唯一标识 (UUID) */
+                taskId: string;
+                /** @description 设备标识 */
+                clientId: string;
+                /** @description 任务分类 (shell, autojs6 等) */
+                cat: string;
+                /** @description 兼容字段；v2 任务仅保存 scriptId，不保存脚本源码 */
+                script: string;
+                /** @description 设备任务协议版本 */
+                protocolVersion: ((number | null) | null) | null;
+                /** @description 手机端可信脚本标识 */
+                scriptId: ((string | null) | null) | null;
+                /** @description 手机端可信脚本版本 */
+                scriptVersion: ((number | null) | null) | null;
+                /** @description 结构化任务参数 JSON */
+                paramsJson: ((string | null) | null) | null;
+                /** @description 设备执行超时时间（毫秒） */
+                timeoutMs: ((number | null) | null) | null;
+                /** @description 任务链路追踪标识 */
+                traceId: ((string | null) | null) | null;
+                /**
+                 * @description 任务状态
+                 * @enum {string}
+                 */
+                status: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+                /** @description 执行结果或失败原因 */
+                resultMessage: ((string | null) | null) | null;
+                /** @description 统一结果码 */
+                resultCode: ((string | null) | null) | null;
+                /** @description 结构化执行结果 JSON */
+                resultDataJson: ((string | null) | null) | null;
+                /** @description 设备开始执行时间 */
+                startedAtUtc: ((number | null) | null) | null;
+                /** @description 设备完成执行时间 */
+                finishedAtUtc: ((number | null) | null) | null;
+                /** @description 任务预期过期时间 */
+                expiresAtUtc: number;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.async_task.callback.req": {
+            /** @enum {integer} */
+            protocolVersion: 2;
+            taskId: string;
+            deviceId: string;
+            scriptId: string;
+            /** @enum {string} */
+            status: "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+            code: string;
+            message: string;
+            data: unknown;
+            startedAt: number;
+            finishedAt: number;
+            durationMs: number;
+            traceId: string;
+        };
+        "admin.mobile.async_task.callback.res": {
+            ok: boolean;
+            data: boolean;
             message: string;
         };
         "organization.attendance.listall.req": {
