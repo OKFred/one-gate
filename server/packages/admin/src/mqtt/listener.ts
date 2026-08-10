@@ -6,9 +6,21 @@ import {
   timeoutExpiredDeviceTasks,
   type DeviceTaskResultPayload,
 } from "../mobile/async-task/service.js";
+import {
+  cleanupExpiredDeviceEvents,
+  markTimedOutDevicesOffline,
+  processDeviceEvent,
+  processDeviceInfo,
+  processDevicePresence,
+  type DeviceEventInput,
+  type DeviceInfoInput,
+  type DevicePresenceInput,
+} from "../mobile/device/service.js";
+import { isRecord } from "../mobile/device/metadata.js";
+import { hashDeviceToken } from "../mobile/device/crypto.js";
 import { getActiveCredentials } from "./service.js";
 
-/** 设备上报事件数据结构。 */
+/** 兼容旧订阅者的设备事件结构。 */
 export interface DeviceEventPayload {
   clientId: string;
   type: string;
@@ -16,26 +28,17 @@ export interface DeviceEventPayload {
   data: Record<string, unknown>;
 }
 
-/** 设备在线状态与能力消息。 */
-export interface DevicePresencePayload {
-  protocolVersion: 2;
-  deviceId: string;
-  status: "ONLINE" | "OFFLINE";
-  clientVersion: string;
-  timestamp: number;
-  scripts: Array<{ scriptId: string; version: number }>;
-}
-
-/** 设备事件总线，供其他服务订阅事件与 Presence。 */
+/** 设备事件总线，供其他服务订阅非敏感事件摘要与 Presence。 */
 export const deviceEventBus = new EventEmitter();
 
 let mqttClient: mqtt.MqttClient | null = null;
 let started = false;
 let timeoutScanner: ReturnType<typeof setInterval> | null = null;
+let retentionScanner: ReturnType<typeof setInterval> | null = null;
 
-/** 判断值是否为普通对象。 */
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+/** 为日志生成不可逆的短设备标签，避免记录真实设备标识。 */
+async function deviceLogLabel(deviceId: string): Promise<string> {
+  return (await hashDeviceToken(deviceId)).slice(0, 12);
 }
 
 /** 将未知 MQTT 载荷解析为 v2 任务结果。 */
@@ -50,8 +53,9 @@ function parseTaskResult(value: unknown): DeviceTaskResultPayload | null {
     "message",
     "traceId",
   ] as const;
-  if (requiredStrings.some((key) => typeof value[key] !== "string"))
+  if (requiredStrings.some((key) => typeof value[key] !== "string")) {
     return null;
+  }
   const status = value.status;
   if (
     status !== "SUCCESS" &&
@@ -63,8 +67,9 @@ function parseTaskResult(value: unknown): DeviceTaskResultPayload | null {
     return null;
   }
   const requiredNumbers = ["startedAt", "finishedAt", "durationMs"] as const;
-  if (requiredNumbers.some((key) => typeof value[key] !== "number"))
+  if (requiredNumbers.some((key) => typeof value[key] !== "number")) {
     return null;
+  }
   return {
     protocolVersion: 2,
     taskId: value.taskId as string,
@@ -81,36 +86,106 @@ function parseTaskResult(value: unknown): DeviceTaskResultPayload | null {
   };
 }
 
-/** 处理 v1/v2 设备事件并转发到事件总线。 */
-function handleEventMessage(value: unknown): void {
-  if (!isRecord(value)) return;
-  const clientId =
-    typeof value.deviceId === "string"
-      ? value.deviceId
-      : typeof value.clientId === "string"
-        ? value.clientId
-        : "unknown_device";
-  const eventPayload: DeviceEventPayload = {
-    clientId,
-    type: typeof value.type === "string" ? value.type : "unknown_type",
-    timestamp:
-      typeof value.timestamp === "number" ? value.timestamp : Date.now(),
-    data: isRecord(value.data) ? value.data : {},
+/** 解析最小 Presence。 */
+function parsePresence(value: unknown): DevicePresenceInput | null {
+  if (
+    !isRecord(value) ||
+    value.protocolVersion !== 2 ||
+    typeof value.deviceId !== "string" ||
+    (value.status !== "ONLINE" && value.status !== "OFFLINE") ||
+    typeof value.timestamp !== "number"
+  ) {
+    return null;
+  }
+  return {
+    protocolVersion: 2,
+    deviceId: value.deviceId,
+    status: value.status,
+    timestamp: value.timestamp,
   };
-  console.log(
-    `[DEVICE_EVENT] [${eventPayload.clientId}] [${eventPayload.type}]`,
-    JSON.stringify(eventPayload.data)
-  );
-  deviceEventBus.emit("device_event", eventPayload);
 }
 
-/** 处理设备在线状态与脚本能力消息。 */
-function handlePresenceMessage(value: unknown): void {
-  if (!isRecord(value) || value.protocolVersion !== 2) return;
-  if (typeof value.deviceId !== "string" || typeof value.status !== "string")
-    return;
-  deviceEventBus.emit("device_presence", value);
-  console.log(`[DEVICE_PRESENCE] [${value.deviceId}] ${value.status}`);
+/** 解析进程级设备信息。 */
+function parseDeviceInfo(value: unknown): DeviceInfoInput | null {
+  if (
+    !isRecord(value) ||
+    value.protocolVersion !== 2 ||
+    typeof value.deviceId !== "string" ||
+    typeof value.timestamp !== "number" ||
+    typeof value.manufacturer !== "string" ||
+    typeof value.brand !== "string" ||
+    typeof value.model !== "string" ||
+    typeof value.androidVersion !== "string" ||
+    (typeof value.androidSdk !== "number" && value.androidSdk !== null) ||
+    typeof value.autojs6Version !== "string" ||
+    typeof value.clientVersion !== "string" ||
+    !isRecord(value.identifiers) ||
+    !Array.isArray(value.identifiers.imeis) ||
+    !value.identifiers.imeis.every((item) => typeof item === "string") ||
+    (value.identifiers.imeiStatus !== "available" &&
+      value.identifiers.imeiStatus !== "unavailable") ||
+    (typeof value.identifiers.serialNumber !== "string" &&
+      value.identifiers.serialNumber !== null) ||
+    (value.identifiers.serialStatus !== "available" &&
+      value.identifiers.serialStatus !== "unavailable") ||
+    !isRecord(value.capabilities) ||
+    !isRecord(value.reportedExtra)
+  ) {
+    return null;
+  }
+  return {
+    protocolVersion: 2,
+    deviceId: value.deviceId,
+    timestamp: value.timestamp,
+    manufacturer: value.manufacturer,
+    brand: value.brand,
+    model: value.model,
+    androidVersion: value.androidVersion,
+    androidSdk: value.androidSdk as number | null,
+    autojs6Version: value.autojs6Version,
+    clientVersion: value.clientVersion,
+    identifiers: {
+      imeis: value.identifiers.imeis,
+      imeiStatus: value.identifiers.imeiStatus,
+      serialNumber: value.identifiers.serialNumber as string | null,
+      serialStatus: value.identifiers.serialStatus,
+    },
+    capabilities: value.capabilities,
+    reportedExtra: value.reportedExtra,
+  };
+}
+
+/** 解析带 eventId 的设备事件。 */
+function parseDeviceEvent(value: unknown): DeviceEventInput | null {
+  if (
+    !isRecord(value) ||
+    value.protocolVersion !== 2 ||
+    typeof value.eventId !== "string" ||
+    typeof value.deviceId !== "string" ||
+    (value.type !== "battery" &&
+      value.type !== "network" &&
+      value.type !== "sms" &&
+      value.type !== "notification") ||
+    typeof value.timestamp !== "number" ||
+    !isRecord(value.data)
+  ) {
+    return null;
+  }
+  return {
+    protocolVersion: 2,
+    eventId: value.eventId,
+    deviceId: value.deviceId,
+    type: value.type,
+    timestamp: value.timestamp,
+    data: value.data,
+  };
+}
+
+/** 校验 Topic 中设备标识与载荷一致。 */
+function assertTopicDevice(topic: string, deviceId: string): void {
+  if (topic.split("/")[3] !== deviceId) {
+    throw new Error("Payload deviceId does not match MQTT topic");
+  }
 }
 
 /** 按 Topic 路由一条 MQTT 入站消息。 */
@@ -119,23 +194,49 @@ async function routeMessage(topic: string, payload: Buffer): Promise<void> {
   if (topic.startsWith("autojs6/v2/devices/") && topic.endsWith("/results")) {
     const result = parseTaskResult(value);
     if (!result) throw new Error("Invalid AutoJS6 v2 task result payload");
-    const topicDeviceId = topic.split("/")[3];
-    if (topicDeviceId !== result.deviceId) {
-      throw new Error("Result deviceId does not match MQTT topic");
-    }
+    assertTopicDevice(topic, result.deviceId);
     await processIncomingDeviceTaskResult(result);
     return;
   }
   if (topic.startsWith("autojs6/v2/devices/") && topic.endsWith("/presence")) {
-    handlePresenceMessage(value);
+    const presence = parsePresence(value);
+    if (!presence) throw new Error("Invalid AutoJS6 Presence payload");
+    assertTopicDevice(topic, presence.deviceId);
+    await processDevicePresence(presence);
+    deviceEventBus.emit("device_presence", presence);
+    console.log(
+      `[DEVICE_PRESENCE] [${await deviceLogLabel(presence.deviceId)}] ${presence.status}`
+    );
     return;
   }
-  handleEventMessage(value);
+  if (topic.startsWith("autojs6/v2/devices/") && topic.endsWith("/info")) {
+    const info = parseDeviceInfo(value);
+    if (!info) throw new Error("Invalid AutoJS6 device info payload");
+    assertTopicDevice(topic, info.deviceId);
+    await processDeviceInfo(info);
+    console.log(
+      `[DEVICE_INFO] [${await deviceLogLabel(info.deviceId)}] snapshot updated`
+    );
+    return;
+  }
+  if (topic.startsWith("autojs6/v2/devices/") && topic.endsWith("/events")) {
+    const event = parseDeviceEvent(value);
+    if (!event) throw new Error("Invalid AutoJS6 device event payload");
+    assertTopicDevice(topic, event.deviceId);
+    const result = await processDeviceEvent(event);
+    deviceEventBus.emit("device_event", {
+      clientId: event.deviceId,
+      type: event.type,
+      timestamp: event.timestamp,
+      data: {},
+    } satisfies DeviceEventPayload);
+    console.log(
+      `[DEVICE_EVENT] [${await deviceLogLabel(event.deviceId)}] [${event.type}] duplicate=${result.duplicate}`
+    );
+  }
 }
 
-/**
- * 启动后端 MQTT 设备事件、任务结果与 Presence 长连接监听服务。
- */
+/** 启动后端 MQTT 设备事件、任务结果、Info 与 Presence 长连接监听。 */
 export async function startMqttEventListener(): Promise<void> {
   if (started) return;
   started = true;
@@ -151,35 +252,49 @@ export async function startMqttEventListener(): Promise<void> {
 
     mqttClient.on("connect", () => {
       const topics = [
-        "autojs6/events/#",
         "autojs6/v2/devices/+/events",
         "autojs6/v2/devices/+/results",
         "autojs6/v2/devices/+/presence",
+        "autojs6/v2/devices/+/info",
       ];
       mqttClient?.subscribe(topics, { qos: 1 }, (error) => {
         if (error) console.error("[MQTT_LISTENER] Subscribe failed", error);
         else console.log(`[MQTT_LISTENER] Subscribed ${topics.join(", ")}`);
       });
     });
-
     mqttClient.on("message", (topic, payload) => {
-      void routeMessage(topic, payload).catch((error) =>
-        console.error(`[MQTT_LISTENER] Failed to process ${topic}`, error)
-      );
+      void routeMessage(topic, payload).catch((error) => {
+        const topicKind = topic.split("/").at(-1) ?? "unknown";
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
+        console.error(
+          `[MQTT_LISTENER] Failed to process ${topicKind}: ${message}`
+        );
+      });
     });
     mqttClient.on("error", (error) =>
       console.error("[MQTT_LISTENER] MQTT connection error", error)
     );
+
     timeoutScanner ??= setInterval(() => {
-      void timeoutExpiredDeviceTasks()
-        .then((count) => {
-          if (count > 0)
-            console.warn(`[AUTOJS6_TASK] Marked ${count} task(s) as TIMEOUT`);
-        })
-        .catch((error) =>
-          console.error("[AUTOJS6_TASK] Timeout scan failed", error)
-        );
+      void Promise.all([
+        timeoutExpiredDeviceTasks(),
+        markTimedOutDevicesOffline(),
+      ]).catch((error) =>
+        console.error("[AUTOJS6] Periodic timeout scan failed", error)
+      );
     }, 60_000);
+    retentionScanner ??= setInterval(
+      () => {
+        void cleanupExpiredDeviceEvents().catch((error) =>
+          console.error("[AUTOJS6] Device event cleanup failed", error)
+        );
+      },
+      24 * 60 * 60 * 1000
+    );
+    void cleanupExpiredDeviceEvents().catch((error) =>
+      console.error("[AUTOJS6] Initial device event cleanup failed", error)
+    );
   } catch (error) {
     started = false;
     console.error("[MQTT_LISTENER] Failed to start", error);

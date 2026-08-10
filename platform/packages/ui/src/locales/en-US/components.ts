@@ -66,6 +66,8 @@ export const components = {
   'status.failure': 'Failure',
   'status.enabled': 'Enabled',
   'status.disabled': 'Disabled',
+  'status.online': 'Online',
+  'status.offline': 'Offline',
 
   'pagination.prev': 'Previous',
   'pagination.next': 'Next',

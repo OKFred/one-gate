@@ -4,6 +4,10 @@ import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
 import { timeoutExpiredDeviceTasks } from "@hodor/admin/mobile/async-task/service.js";
+import {
+  cleanupExpiredDeviceEvents,
+  markTimedOutDevicesOffline,
+} from "@hodor/admin/mobile/device/service.js";
 
 let app: ReturnType<typeof createApp> | null = null;
 
@@ -53,9 +57,12 @@ export default {
 
     // 3. 执行待处理的定时任务
     ctx.waitUntil(
-      Promise.all([runPendingJobs(), timeoutExpiredDeviceTasks()]).then(
-        () => undefined
-      )
+      Promise.all([
+        runPendingJobs(),
+        timeoutExpiredDeviceTasks(),
+        markTimedOutDevicesOffline(),
+        cleanupExpiredDeviceEvents(),
+      ]).then(() => undefined)
     );
   },
 };

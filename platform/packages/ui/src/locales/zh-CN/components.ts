@@ -77,6 +77,8 @@ export const components = {
   'status.failure': '失败',
   'status.enabled': '启用',
   'status.disabled': '禁用',
+  'status.online': '在线',
+  'status.offline': '离线',
 
   // 分页
   'pagination.prev': '上一页',

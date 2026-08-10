@@ -34,7 +34,8 @@
   /**
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
-   * Note: Use `wrangler secret put <KEY>` for sensitive values (JWT_SECRET, passwords etc.)
+   * Note: Use `wrangler secret put <KEY>` for sensitive values.
+   * Required secrets include JWT_SECRET and MOBILE_SENSITIVE_DATA_KEY.
    */
   "vars": {
     "NODE_ENV": "production",

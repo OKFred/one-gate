@@ -56,6 +56,9 @@ const routeWhitelist = [
   "/admin/i18n/translation/listAll",
   "/admin/mobile/device-app/callback",
   "/admin/mobile/async-task/callback",
+  "/admin/mobile/device/report/presence",
+  "/admin/mobile/device/report/info",
+  "/admin/mobile/device/report/event",
 ];
 
 function routeMaker({

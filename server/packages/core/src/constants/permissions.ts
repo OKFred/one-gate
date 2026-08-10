@@ -198,7 +198,7 @@ export const permissionSeeds = {
   /** 移动端管理 */
   "admin.mobile": {
     "": ["read"],
-    device: ["read", "add", "edit", "delete", "sync"],
+    device: ["read", "add", "edit", "delete", "sync", "view"],
     app: ["read", "add", "edit", "delete"],
     app_version: ["read", "add", "edit", "delete"],
     device_app: ["read", "sync", "install"],
