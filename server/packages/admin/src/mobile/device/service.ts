@@ -219,6 +219,14 @@ async function requireTrustedDevice(
   return row;
 }
 
+/** 校验 HTTP 设备上报令牌，供任务结果回调复用同一安全边界。 */
+export async function verifyDeviceReportToken(
+  clientId: string,
+  token: string
+): Promise<void> {
+  await requireTrustedDevice(clientId, token);
+}
+
 /** 处理 MQTT/HTTP 共用的 Presence。 */
 export async function processDevicePresence(
   input: DevicePresenceInput,

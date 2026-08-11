@@ -8,6 +8,7 @@ import {
 import {
   bodyAdapter,
   bodyUserContextAdapter,
+  rawAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
@@ -15,7 +16,9 @@ import { getEnv } from "@hodor/core/utils/env";
 
 import mqttService from "../../mqtt/service";
 import { mobileDeviceRepo } from "../device/repository";
+import { verifyDeviceReportToken } from "../device/service";
 import {
+  MOBILE_TASK_PRIORITIES,
   MobileAsyncTaskVO,
   MobileAsyncTaskListKeys,
   MobileAsyncTaskDetailKeys,
@@ -24,6 +27,7 @@ import {
   MobileAsyncTaskDispatchReqVO,
   MobileAsyncTaskDispatchResVO,
   MobileAsyncTaskCallbackReqVO,
+  type MobileTaskPriority,
 } from "./model";
 import { mobileAsyncTaskRepo } from "./repository";
 
@@ -71,6 +75,11 @@ export const TRUSTED_SCRIPT_CATALOG = {
     version: 1,
     defaultTimeoutMs: 30_000,
     maxTimeoutMs: 60_000,
+  },
+  "device.network.switch": {
+    version: 1,
+    defaultTimeoutMs: 60_000,
+    maxTimeoutMs: 150_000,
   },
 } as const satisfies Record<
   (typeof MobileTrustedScriptIds)[number],
@@ -138,6 +147,26 @@ function validateTrustedScriptParams(
       throw new BusinessError("应用包名格式无效");
     }
   }
+  if (scriptId === "device.network.switch") {
+    const target = requireString("target").toLowerCase();
+    if (target !== "wifi" && target !== "ethernet" && target !== "carrier") {
+      throw new BusinessError(
+        "device.network.switch 的 target 仅支持 wifi/ethernet/carrier"
+      );
+    }
+    const detectionTimeoutMs = params.timeoutMs;
+    if (
+      detectionTimeoutMs !== undefined &&
+      (typeof detectionTimeoutMs !== "number" ||
+        !Number.isFinite(detectionTimeoutMs) ||
+        detectionTimeoutMs < 1000 ||
+        detectionTimeoutMs > 120_000)
+    ) {
+      throw new BusinessError(
+        "device.network.switch 的 timeoutMs 必须介于1000到120000"
+      );
+    }
+  }
 }
 
 /** 创建可信手机脚本任务所需参数。 */
@@ -148,6 +177,13 @@ export interface DispatchTrustedTaskParams {
   timeoutMs?: number;
   remark?: string | null;
   callbackUrl?: string;
+  priority?: MobileTaskPriority;
+  preemptRunning?: boolean;
+}
+
+/** 返回脚本未显式指定时的调度优先级。 */
+function defaultTaskPriority(scriptId: TrustedScriptId): MobileTaskPriority {
+  return scriptId === "device.network.switch" ? "HIGH" : "NORMAL";
 }
 
 /** 设备上报的 v2 统一任务结果。 */
@@ -167,8 +203,9 @@ export interface DeviceTaskResultPayload {
 }
 
 /** 根据当前下发请求生成同源的设备任务回调地址。 */
-export function buildTaskCallbackUrl(requestUrl: string): string {
+export function buildTaskCallbackUrl(requestUrl: string): string | undefined {
   const callbackUrl = new URL(requestUrl);
+  if (callbackUrl.protocol !== "https:") return undefined;
   callbackUrl.pathname = callbackUrl.pathname.replace(
     /\/admin\/.*$/,
     "/admin/mobile/async-task/callback"
@@ -184,6 +221,7 @@ const listReq = {
     ...listReqBase,
     clientId: MobileAsyncTaskVO.clientId,
     status: MobileAsyncTaskVO.status,
+    priority: MobileAsyncTaskVO.priority,
     orderBy: orderByWrapper<(typeof MobileAsyncTaskSortableKeys)[number][]>([
       ...MobileAsyncTaskSortableKeys,
     ]),
@@ -203,6 +241,7 @@ async function onList(
     keyword: params.keyword,
     clientId: params.clientId,
     status: params.status,
+    priority: params.priority,
     orderBy: params.orderBy,
     descend: params.descend,
     pageNo: params.pageNo,
@@ -258,13 +297,30 @@ export async function dispatchTrustedTask(
 
   const definition = TRUSTED_SCRIPT_CATALOG[input.scriptId];
   validateTrustedScriptParams(input.scriptId, input.params);
-  const timeoutMs = Math.max(
+  const priority = input.priority ?? defaultTaskPriority(input.scriptId);
+  if (!MOBILE_TASK_PRIORITIES.includes(priority)) {
+    throw new BusinessError("任务优先级仅支持 LOW/NORMAL/HIGH");
+  }
+  const preemptRunning = input.preemptRunning ?? false;
+  const requestedTimeoutMs = Math.max(
     1000,
     Math.min(
       input.timeoutMs ?? definition.defaultTimeoutMs,
       definition.maxTimeoutMs
     )
   );
+  const networkDetectionTimeoutMs =
+    input.scriptId === "device.network.switch" &&
+    typeof input.params.timeoutMs === "number"
+      ? input.params.timeoutMs
+      : 20_000;
+  const timeoutMs =
+    input.scriptId === "device.network.switch"
+      ? Math.min(
+          definition.maxTimeoutMs,
+          Math.max(requestedTimeoutMs, networkDetectionTimeoutMs + 20_000)
+        )
+      : requestedTimeoutMs;
   const taskId = crypto.randomUUID();
   const traceId = crypto.randomUUID();
   const createdAt = Date.now();
@@ -277,11 +333,8 @@ export async function dispatchTrustedTask(
   let callbackUrl: string | undefined;
   if (rawCallbackUrl) {
     const parsedCallbackUrl = new URL(rawCallbackUrl);
-    if (
-      parsedCallbackUrl.protocol !== "https:" &&
-      parsedCallbackUrl.protocol !== "http:"
-    ) {
-      throw new BusinessError("任务回调地址仅支持 HTTP/HTTPS");
+    if (parsedCallbackUrl.protocol !== "https:") {
+      throw new BusinessError("任务回调地址仅支持 HTTPS");
     }
     callbackUrl = parsedCallbackUrl.toString();
   }
@@ -297,6 +350,9 @@ export async function dispatchTrustedTask(
     paramsJson,
     timeoutMs,
     traceId,
+    priority,
+    preemptRunning,
+    preemptedByTaskId: null,
     status: "PENDING",
     resultMessage: null,
     resultCode: null,
@@ -324,6 +380,8 @@ export async function dispatchTrustedTask(
           createdAt,
           expiresAt: expiresAtUtc,
           traceId,
+          priority,
+          preemptRunning,
           ...(callbackUrl ? { callbackUrl } : {}),
         }),
         qos: 1,
@@ -339,6 +397,7 @@ export async function dispatchTrustedTask(
       resultMessage: error instanceof Error ? error.message : String(error),
       resultDataJson: null,
       startedAtUtc: null,
+      preemptedByTaskId: null,
       finishedAtUtc: Date.now(),
       updaterId: userObj.id,
     });
@@ -360,6 +419,8 @@ async function onDispatch(
       scriptId: params.scriptId as TrustedScriptId,
       params: params.params,
       timeoutMs: params.timeoutMs,
+      priority: params.priority as MobileTaskPriority | undefined,
+      preemptRunning: params.preemptRunning,
       remark: params.remark,
       callbackUrl: buildTaskCallbackUrl(context.req.url),
     },
@@ -432,11 +493,21 @@ export async function handleDeviceTaskResult(
     return false;
   }
 
+  const preemptedByTaskId =
+    result.status === "CANCELLED" &&
+    typeof result.data === "object" &&
+    result.data !== null &&
+    !Array.isArray(result.data) &&
+    typeof (result.data as Record<string, unknown>).preemptedByTaskId ===
+      "string"
+      ? ((result.data as Record<string, unknown>).preemptedByTaskId as string)
+      : null;
   return mobileAsyncTaskRepo.completeByTaskId(result.taskId, result.deviceId, {
     status: result.status,
     resultCode: result.code,
     resultMessage: result.message || null,
     resultDataJson: JSON.stringify(result.data ?? null),
+    preemptedByTaskId,
     startedAtUtc: Number.isFinite(result.startedAt) ? result.startedAt : null,
     finishedAtUtc: Number.isFinite(result.finishedAt)
       ? result.finishedAt
@@ -510,14 +581,6 @@ const callbackReq = {
 } as const satisfies JSONSchema;
 
 /** 接收手机端 v2 HTTP 结果，供 Worker 和 Node 无 MQTT 回调场景使用。 */
-async function onCallback(
-  params: FromSchema<typeof callbackReq>
-): Promise<boolean> {
-  return processIncomingDeviceTaskResult(
-    params as unknown as DeviceTaskResultPayload
-  );
-}
-
 const callbackApi = {
   req: callbackReq,
   res: { type: "boolean" } as const,
@@ -526,14 +589,24 @@ const callbackApi = {
     method: "post",
     summary: "接收 AutoJS6 v2 设备任务结果",
   },
-  adapter: bodyAdapter,
-  service: onCallback,
+  adapter: rawAdapter,
+  service: async (context: Context): Promise<boolean> => {
+    const result = context.get("bodyObj") as DeviceTaskResultPayload;
+    const token = context.req.header("x-device-token");
+    if (!token) throw new BusinessError("缺少设备上报令牌");
+    await verifyDeviceReportToken(result.deviceId, token);
+    return processIncomingDeviceTaskResult(result);
+  },
   permission: false,
 } satisfies API;
 
 /** 将已超过服务端等待时间的任务统一置为超时。 */
 export async function timeoutExpiredDeviceTasks(): Promise<number> {
-  return mobileAsyncTaskRepo.timeoutPendingTasks();
+  const configuredGraceMs = Number(getEnv("AUTOJS6_RESULT_GRACE_MS") || 30_000);
+  const resultGraceMs = Number.isFinite(configuredGraceMs)
+    ? Math.max(0, Math.min(300_000, Math.trunc(configuredGraceMs)))
+    : 30_000;
+  return mobileAsyncTaskRepo.timeoutPendingTasks(resultGraceMs);
 }
 
 export default {

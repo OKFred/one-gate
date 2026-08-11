@@ -19,6 +19,7 @@ import {
 import { isRecord } from "../mobile/device/metadata.js";
 import { hashDeviceToken } from "../mobile/device/crypto.js";
 import { getActiveCredentials } from "./service.js";
+import { getEnv } from "@hodor/core/utils/env";
 
 /** 兼容旧订阅者的设备事件结构。 */
 export interface DeviceEventPayload {
@@ -67,7 +68,11 @@ function parseTaskResult(value: unknown): DeviceTaskResultPayload | null {
     return null;
   }
   const requiredNumbers = ["startedAt", "finishedAt", "durationMs"] as const;
-  if (requiredNumbers.some((key) => typeof value[key] !== "number")) {
+  if (
+    requiredNumbers.some(
+      (key) => typeof value[key] !== "number" || !Number.isFinite(value[key])
+    )
+  ) {
     return null;
   }
   return {
@@ -242,11 +247,18 @@ export async function startMqttEventListener(): Promise<void> {
   started = true;
   try {
     const credentials = await getActiveCredentials();
+    const configuredClientId = String(
+      getEnv("AUTOJS6_MQTT_RESULT_CLIENT_ID") || ""
+    ).trim();
+    const clientId =
+      configuredClientId || `${credentials.clientId}_autojs6_result_listener`;
     mqttClient = mqtt.connect(credentials.brokerUrl, {
-      clientId: `${credentials.clientId}_server_listener_${Date.now().toString(36)}`,
+      protocolVersion: 5,
+      clientId,
       username: credentials.username,
       password: credentials.password,
-      clean: true,
+      clean: false,
+      properties: { sessionExpiryInterval: 86_400 },
       reconnectPeriod: 5000,
     });
 

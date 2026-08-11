@@ -20,6 +20,9 @@ import {
 } from "@hodor/core/db/common/schema";
 import { type RequiredKeys } from "@hodor/core/types/app";
 
+export const MOBILE_TASK_PRIORITIES = ["LOW", "NORMAL", "HIGH"] as const;
+export type MobileTaskPriority = (typeof MOBILE_TASK_PRIORITIES)[number];
+
 //----------------- PO ----------------//
 const MobileAsyncTaskBasePO = {
   taskId: {
@@ -71,6 +74,21 @@ const MobileAsyncTaskBasePO = {
     type: ["string", "null"],
     nullable: true,
     description: "任务链路追踪标识",
+    maxLength: 100,
+  },
+  priority: {
+    type: "string",
+    enum: MOBILE_TASK_PRIORITIES,
+    description: "手机端队列调度优先级",
+  },
+  preemptRunning: {
+    type: "boolean",
+    description: "是否显式抢占不高于当前优先级的运行任务",
+  },
+  preemptedByTaskId: {
+    type: ["string", "null"],
+    nullable: true,
+    description: "抢占当前任务的任务标识",
     maxLength: 100,
   },
   status: {
@@ -167,6 +185,9 @@ export const MobileAsyncTaskAddVO = {
   paramsJson: MobileAsyncTaskBasePO.paramsJson,
   timeoutMs: MobileAsyncTaskBasePO.timeoutMs,
   traceId: MobileAsyncTaskBasePO.traceId,
+  priority: MobileAsyncTaskBasePO.priority,
+  preemptRunning: MobileAsyncTaskBasePO.preemptRunning,
+  preemptedByTaskId: MobileAsyncTaskBasePO.preemptedByTaskId,
   status: MobileAsyncTaskBasePO.status,
   resultMessage: MobileAsyncTaskBasePO.resultMessage,
   resultCode: MobileAsyncTaskBasePO.resultCode,
@@ -203,6 +224,8 @@ export const MobileAsyncTaskAddKeys = [
   "clientId",
   "cat",
   "script",
+  "priority",
+  "preemptRunning",
   "status",
   "expiresAtUtc",
 ] as const satisfies RequiredKeys<MobileAsyncTaskAddVOLike>[];
@@ -231,6 +254,9 @@ const MobileAsyncTaskBaseKeys = [
   "paramsJson",
   "timeoutMs",
   "traceId",
+  "priority",
+  "preemptRunning",
+  "preemptedByTaskId",
   "status",
   "resultMessage",
   "resultCode",
@@ -250,6 +276,7 @@ export const MobileAsyncTaskSortableKeys = [
   "taskId",
   "clientId",
   "status",
+  "priority",
   "expiresAtUtc",
   "createTimeUtc",
 ] as const satisfies RequiredKeys<MobileAsyncTaskPOLike>[];
@@ -264,6 +291,7 @@ export const MobileTrustedScriptIds = [
   "file.download",
   "tiktok.post",
   "client.self-update",
+  "device.network.switch",
 ] as const;
 
 /** 可信设备任务下发请求字段。 */
@@ -280,6 +308,15 @@ export const MobileAsyncTaskDispatchReqVO = {
     description: "传递给本地可信脚本的结构化参数",
   },
   timeoutMs: { type: "integer", minimum: 1000, maximum: 900000 },
+  priority: {
+    type: "string",
+    enum: MOBILE_TASK_PRIORITIES,
+    description: "可选任务优先级；网络切换默认 HIGH，其余默认 NORMAL",
+  },
+  preemptRunning: {
+    type: "boolean",
+    description: "是否抢占同级或更低优先级运行任务；默认 false",
+  },
   remark: { type: ["string", "null"], nullable: true, maxLength: 500 },
 } as const satisfies Record<string, JSONSchema>;
 
@@ -337,6 +374,9 @@ export const mobileAsyncTaskTable = sqliteTable(
     paramsJson: text("params_json"),
     timeoutMs: integer("timeout_ms"),
     traceId: text("trace_id"),
+    priority: text("priority").$type<MobileTaskPriority>().notNull(),
+    preemptRunning: integer("preempt_running", { mode: "boolean" }).notNull(),
+    preemptedByTaskId: text("preempted_by_task_id"),
     status: text("status")
       .$type<
         | "PENDING"

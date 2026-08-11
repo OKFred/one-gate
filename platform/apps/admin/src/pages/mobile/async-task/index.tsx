@@ -24,6 +24,7 @@ export default function AsyncTaskPage() {
           keyword: filters.keyword || undefined,
           clientId: filters.clientId || undefined,
           status: filters.status || undefined,
+          priority: filters.priority || undefined,
           orderBy: filters.orderBy,
           descend: filters.descend,
         }) as ListAsyncTaskReq,

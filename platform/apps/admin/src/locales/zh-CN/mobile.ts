@@ -92,6 +92,11 @@ export const mobile = {
   'mobile.asyncTask.status': '执行状态',
   'mobile.asyncTask.resultMessage': '回执信息',
   'mobile.asyncTask.expiresAtUtc': '过期时间',
+  'mobile.asyncTask.priority': '任务优先级',
+  'mobile.asyncTask.preemptRunning': '允许抢占',
+  'mobile.asyncTask.preemptedByTaskId': '抢占任务ID',
+  'mobile.asyncTask.yes': '是',
+  'mobile.asyncTask.no': '否',
 
   // Missing keys for precommit
   'column.keyword': '关键字',

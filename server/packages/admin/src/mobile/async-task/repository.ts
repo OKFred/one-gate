@@ -60,6 +60,7 @@ export class MobileAsyncTaskRepository {
       resultCode: string;
       resultMessage: string | null;
       resultDataJson: string | null;
+      preemptedByTaskId: string | null;
       startedAtUtc: number | null;
       finishedAtUtc: number;
       updaterId: number;
@@ -115,11 +116,20 @@ export class MobileAsyncTaskRepository {
     clientId?: string;
     keyword?: string;
     status?: MobileAsyncTaskPOLike["status"];
+    priority?: MobileAsyncTaskPOLike["priority"];
     orderBy?: keyof MobileAsyncTaskPOLike;
     descend?: boolean;
   }) {
-    const { pageNo, pageSize, clientId, keyword, status, orderBy, descend } =
-      params;
+    const {
+      pageNo,
+      pageSize,
+      clientId,
+      keyword,
+      status,
+      priority,
+      orderBy,
+      descend,
+    } = params;
     const conditions = [];
 
     if (keyword) {
@@ -128,6 +138,7 @@ export class MobileAsyncTaskRepository {
     const whereCondition = and(
       conditions.length > 0 ? sql`(${conditions[0]})` : undefined,
       status ? eq(mobileAsyncTaskTable.status, status) : undefined,
+      priority ? eq(mobileAsyncTaskTable.priority, priority) : undefined,
       clientId ? eq(mobileAsyncTaskTable.clientId, clientId) : undefined
     );
 
@@ -143,11 +154,16 @@ export class MobileAsyncTaskRepository {
       .$dynamic();
 
     if (orderBy) {
-      query = query.orderBy(
-        descend
-          ? desc(mobileAsyncTaskTable[orderBy])
-          : mobileAsyncTaskTable[orderBy]
-      );
+      if (orderBy === "priority") {
+        const priorityRank = sql<number>`CASE ${mobileAsyncTaskTable.priority} WHEN 'HIGH' THEN 3 WHEN 'NORMAL' THEN 2 ELSE 1 END`;
+        query = query.orderBy(descend ? desc(priorityRank) : priorityRank);
+      } else {
+        query = query.orderBy(
+          descend
+            ? desc(mobileAsyncTaskTable[orderBy])
+            : mobileAsyncTaskTable[orderBy]
+        );
+      }
     } else {
       query = query.orderBy(desc(mobileAsyncTaskTable.createTimeUtc));
     }
@@ -165,8 +181,9 @@ export class MobileAsyncTaskRepository {
   }
 
   /** 将服务端等待过期的待执行/执行中任务置为超时。 */
-  async timeoutPendingTasks(): Promise<number> {
+  async timeoutPendingTasks(resultGraceMs: number): Promise<number> {
     const now = Date.now();
+    const deadlineCutoff = now - resultGraceMs;
     const result = await db
       .update(mobileAsyncTaskTable)
       .set({
@@ -180,7 +197,7 @@ export class MobileAsyncTaskRepository {
       .where(
         and(
           inArray(mobileAsyncTaskTable.status, ["PENDING", "RUNNING"]),
-          lt(mobileAsyncTaskTable.expiresAtUtc, now)
+          lt(mobileAsyncTaskTable.expiresAtUtc, deadlineCutoff)
         )
       );
     return result.rowsAffected;

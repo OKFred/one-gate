@@ -94,6 +94,11 @@ export const mobile = {
   'mobile.asyncTask.status': 'Status',
   'mobile.asyncTask.resultMessage': 'Result Message',
   'mobile.asyncTask.expiresAtUtc': 'Expires At',
+  'mobile.asyncTask.priority': 'Priority',
+  'mobile.asyncTask.preemptRunning': 'Allow Preemption',
+  'mobile.asyncTask.preemptedByTaskId': 'Preempted By Task',
+  'mobile.asyncTask.yes': 'Yes',
+  'mobile.asyncTask.no': 'No',
 
   // Missing keys for precommit
   'column.keyword': 'Keyword',

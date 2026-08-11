@@ -26464,8 +26464,13 @@ export interface components {
              * @enum {string}
              */
             status?: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+            /**
+             * @description 手机端队列调度优先级
+             * @enum {string}
+             */
+            priority?: "LOW" | "NORMAL" | "HIGH";
             /** @enum {string} */
-            orderBy?: "id" | "taskId" | "clientId" | "status" | "expiresAtUtc" | "createTimeUtc";
+            orderBy?: "id" | "taskId" | "clientId" | "status" | "priority" | "expiresAtUtc" | "createTimeUtc";
         };
         "admin.mobile.async_task.list.res": {
             ok: boolean;
@@ -26504,6 +26509,15 @@ export interface components {
                     timeoutMs: ((number | null) | null) | null;
                     /** @description 任务链路追踪标识 */
                     traceId: ((string | null) | null) | null;
+                    /**
+                     * @description 手机端队列调度优先级
+                     * @enum {string}
+                     */
+                    priority: "LOW" | "NORMAL" | "HIGH";
+                    /** @description 是否显式抢占不高于当前优先级的运行任务 */
+                    preemptRunning: boolean;
+                    /** @description 抢占当前任务的任务标识 */
+                    preemptedByTaskId: ((string | null) | null) | null;
                     /**
                      * @description 任务状态
                      * @enum {string}
@@ -26547,12 +26561,19 @@ export interface components {
              * @description 手机端可信脚本标识
              * @enum {string}
              */
-            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "client.self-update";
+            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "client.self-update" | "device.network.switch";
             /** @description 传递给本地可信脚本的结构化参数 */
             params: {
                 [key: string]: unknown;
             };
             timeoutMs?: number;
+            /**
+             * @description 可选任务优先级；网络切换默认 HIGH，其余默认 NORMAL
+             * @enum {string}
+             */
+            priority?: "LOW" | "NORMAL" | "HIGH";
+            /** @description 是否抢占同级或更低优先级运行任务；默认 false */
+            preemptRunning?: boolean;
             remark?: ((string | null) | null) | null;
         };
         "admin.mobile.async_task.dispatch.res": {
@@ -26598,6 +26619,15 @@ export interface components {
                 timeoutMs: ((number | null) | null) | null;
                 /** @description 任务链路追踪标识 */
                 traceId: ((string | null) | null) | null;
+                /**
+                 * @description 手机端队列调度优先级
+                 * @enum {string}
+                 */
+                priority: "LOW" | "NORMAL" | "HIGH";
+                /** @description 是否显式抢占不高于当前优先级的运行任务 */
+                preemptRunning: boolean;
+                /** @description 抢占当前任务的任务标识 */
+                preemptedByTaskId: ((string | null) | null) | null;
                 /**
                  * @description 任务状态
                  * @enum {string}
