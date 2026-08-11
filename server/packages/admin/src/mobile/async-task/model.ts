@@ -19,9 +19,18 @@ import {
   type AuditUpdateOmitKeyLike,
 } from "@hodor/core/db/common/schema";
 import { type RequiredKeys } from "@hodor/core/types/app";
+import {
+  MOBILE_TASK_PRIORITIES,
+  MOBILE_TASK_STATUSES,
+  MOBILE_TASK_TERMINAL_STATUSES,
+  type MobileTaskPriority,
+} from "./domain/task.js";
+import { MOBILE_TRUSTED_SCRIPT_IDS } from "./domain/trusted-script.js";
 
-export const MOBILE_TASK_PRIORITIES = ["LOW", "NORMAL", "HIGH"] as const;
-export type MobileTaskPriority = (typeof MOBILE_TASK_PRIORITIES)[number];
+export {
+  MOBILE_TASK_PRIORITIES,
+  type MobileTaskPriority,
+} from "./domain/task.js";
 
 //----------------- PO ----------------//
 const MobileAsyncTaskBasePO = {
@@ -94,15 +103,7 @@ const MobileAsyncTaskBasePO = {
   status: {
     type: "string",
     description: "任务状态",
-    enum: [
-      "PENDING",
-      "RUNNING",
-      "SUCCESS",
-      "FAILURE",
-      "TIMEOUT",
-      "REJECTED",
-      "CANCELLED",
-    ],
+    enum: MOBILE_TASK_STATUSES,
   },
   resultMessage: {
     type: ["string", "null"],
@@ -282,17 +283,7 @@ export const MobileAsyncTaskSortableKeys = [
 ] as const satisfies RequiredKeys<MobileAsyncTaskPOLike>[];
 
 /** 服务端与手机客户端共同支持的可信脚本标识。 */
-export const MobileTrustedScriptIds = [
-  "device.apps.list",
-  "app.install",
-  "app.version.check",
-  "app.update.store",
-  "app.update.zip",
-  "file.download",
-  "tiktok.post",
-  "client.self-update",
-  "device.network.switch",
-] as const;
+export const MobileTrustedScriptIds = MOBILE_TRUSTED_SCRIPT_IDS;
 
 /** 可信设备任务下发请求字段。 */
 export const MobileAsyncTaskDispatchReqVO = {
@@ -345,7 +336,7 @@ export const MobileAsyncTaskCallbackReqVO = {
   },
   status: {
     type: "string",
-    enum: ["SUCCESS", "FAILURE", "TIMEOUT", "REJECTED", "CANCELLED"],
+    enum: MOBILE_TASK_TERMINAL_STATUSES,
   },
   code: { type: "string", minLength: 1, maxLength: 100 },
   message: { type: "string", maxLength: 4000 },
@@ -378,15 +369,7 @@ export const mobileAsyncTaskTable = sqliteTable(
     preemptRunning: integer("preempt_running", { mode: "boolean" }).notNull(),
     preemptedByTaskId: text("preempted_by_task_id"),
     status: text("status")
-      .$type<
-        | "PENDING"
-        | "RUNNING"
-        | "SUCCESS"
-        | "FAILURE"
-        | "TIMEOUT"
-        | "REJECTED"
-        | "CANCELLED"
-      >()
+      .$type<(typeof MOBILE_TASK_STATUSES)[number]>()
       .notNull(),
     resultMessage: text("result_message"),
     resultCode: text("result_code"),

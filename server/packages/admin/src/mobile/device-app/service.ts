@@ -16,14 +16,15 @@ import {
   MobileDeviceAppSortableKeys,
 } from "./model";
 import { mobileDeviceAppRepo } from "./repository";
-import { mobileAsyncTaskRepo } from "../async-task/repository";
 import { mobileAppRepo } from "../app/repository";
 import { mobileAppVersionRepo } from "../app-version/repository";
 import {
+  completeLegacyDeviceTask,
   dispatchTrustedTask,
-  buildTaskCallbackUrl,
   type DeviceTaskResultPayload,
-} from "../async-task/service";
+} from "../async-task/facade.js";
+import { buildTaskCallbackUrl } from "../async-task/interfaces/http/callback-url.js";
+import { adaptDeviceTaskHttpError } from "../async-task/interfaces/http/error.js";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 
 // 列表 (分页)
@@ -102,16 +103,18 @@ async function onSync(
   userObj: UserObj,
   context: Context
 ): Promise<FromSchema<typeof taskRes>> {
-  const task = await dispatchTrustedTask(
-    {
-      clientId: params.clientId,
-      scriptId: "device.apps.list",
-      params: {},
-      timeoutMs: 120_000,
-      remark: "同步设备应用列表",
-      callbackUrl: buildTaskCallbackUrl(context.req.url),
-    },
-    userObj
+  const task = await adaptDeviceTaskHttpError(() =>
+    dispatchTrustedTask(
+      {
+        clientId: params.clientId,
+        scriptId: "device.apps.list",
+        params: {},
+        timeoutMs: 120_000,
+        remark: "同步设备应用列表",
+        callbackUrl: buildTaskCallbackUrl(context.req.url),
+      },
+      userObj
+    )
   );
   return { taskId: task.taskId };
 }
@@ -148,16 +151,18 @@ async function onInstall(
     throw new BusinessError("应用安装仅允许 HTTPS 下载地址");
   }
 
-  const task = await dispatchTrustedTask(
-    {
-      clientId: params.clientId,
-      scriptId: "app.install",
-      params: { downloadUrl: apkUrl.toString() },
-      timeoutMs: 600_000,
-      remark: `安装应用版本 ${version.versionName}`,
-      callbackUrl: buildTaskCallbackUrl(context.req.url),
-    },
-    userObj
+  const task = await adaptDeviceTaskHttpError(() =>
+    dispatchTrustedTask(
+      {
+        clientId: params.clientId,
+        scriptId: "app.install",
+        params: { downloadUrl: apkUrl.toString() },
+        timeoutMs: 600_000,
+        remark: `安装应用版本 ${version.versionName}`,
+        callbackUrl: buildTaskCallbackUrl(context.req.url),
+      },
+      userObj
+    )
   );
   return { taskId: task.taskId };
 }
@@ -272,26 +277,23 @@ export async function handleDeviceAppTaskResult(
 
 /** 兼容旧手机客户端的 HTTP 回调。 */
 async function onCallback(params: FromSchema<typeof callbackReq>) {
-  const task = await mobileAsyncTaskRepo.getByTaskId(params.taskId);
-  if (!task) throw new BusinessError("Task not found");
-  if (task.status !== "PENDING" && params.status !== "PROGRESS") {
-    return true; // Already processed
-  }
+  const completion = await adaptDeviceTaskHttpError(() =>
+    completeLegacyDeviceTask({
+      taskId: params.taskId,
+      status: params.status,
+      message: params.message,
+    })
+  );
 
-  if (params.status === "PROGRESS") {
-    return true; // Optionally log progress, but we skip saving to avoid DB spam
-  }
-
-  await mobileAsyncTaskRepo.updateByTaskId(params.taskId, {
-    status: params.status as "SUCCESS" | "FAILURE",
-    resultMessage: params.message || null,
-    updaterId: 0, // System
-  });
-
-  if (params.status === "SUCCESS" && task.cat === "sync" && params.message) {
+  if (
+    completion.completed &&
+    params.status === "SUCCESS" &&
+    completion.task.cat === "sync" &&
+    params.message
+  ) {
     try {
       await syncDiscoveredApps(
-        task.clientId,
+        completion.task.clientId,
         JSON.parse(params.message) as unknown
       );
     } catch (error) {

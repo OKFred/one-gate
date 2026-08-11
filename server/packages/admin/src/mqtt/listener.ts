@@ -5,7 +5,7 @@ import {
   processIncomingDeviceTaskResult,
   timeoutExpiredDeviceTasks,
   type DeviceTaskResultPayload,
-} from "../mobile/async-task/service.js";
+} from "../mobile/async-task/facade.js";
 import {
   cleanupExpiredDeviceEvents,
   markTimedOutDevicesOffline,
@@ -20,6 +20,7 @@ import { isRecord } from "../mobile/device/metadata.js";
 import { hashDeviceToken } from "../mobile/device/crypto.js";
 import { getActiveCredentials } from "./service.js";
 import { getEnv } from "@hodor/core/utils/env";
+import { initializeMobileTaskResultHandlers } from "../mobile/bootstrap.js";
 
 /** 兼容旧订阅者的设备事件结构。 */
 export interface DeviceEventPayload {
@@ -244,6 +245,7 @@ async function routeMessage(topic: string, payload: Buffer): Promise<void> {
 /** 启动后端 MQTT 设备事件、任务结果、Info 与 Presence 长连接监听。 */
 export async function startMqttEventListener(): Promise<void> {
   if (started) return;
+  initializeMobileTaskResultHandlers();
   started = true;
   try {
     const credentials = await getActiveCredentials();

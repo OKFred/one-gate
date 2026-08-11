@@ -6,8 +6,10 @@ import appModule from "./app/index.js";
 import appVersion from "./app-version/index.js";
 import deviceApp from "./device-app/index.js";
 import asyncTask from "./async-task/index.js";
+import { initializeMobileTaskResultHandlers } from "./bootstrap.js";
 
 function createMobileApp() {
+  initializeMobileTaskResultHandlers();
   const app = new OpenAPIHono<AppBindings>();
   app.route("/device", device());
   app.route("/app", appModule());

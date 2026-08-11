@@ -1,15 +1,8 @@
 import mqtt from "mqtt";
 import type { FromSchema } from "json-schema-to-ts";
-import {
-  bodyAdapter,
-  queryAdapter,
-} from "@hodor/core/middleware/encapsulation/adapter";
+import { bodyAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import type { UserObj } from "@hodor/core/types/app";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@hodor/core/middleware/errorHandler/businessError/index";
+import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError/index";
 import baseLogService from "../base/log/service.js";
 import * as baseSysConfigRepository from "../base/sys_config/repository.js";
 import {
@@ -22,13 +15,17 @@ import {
   MqttTestConnectionReqSchema,
   MqttTestConnectionResSchema,
   type MqttBizLogItem,
-  type MqttLogValueLike,
 } from "./model.js";
 import {
   getMqttConnectionInfo,
-  type MqttConfigOptions,
   type MqttConnectionCredentials,
 } from "./driver.js";
+
+/** MQTT 发布日志所需的最小操作者信息。 */
+interface MqttAuditActor {
+  userId: number;
+  username: string;
+}
 
 /**
  * 获取当前系统激活的 MQTT 配置并生成签名连接凭证
@@ -135,7 +132,7 @@ async function connectMqttWithFallback(
  */
 async function onPublish(
   params: FromSchema<typeof MqttPublishReqSchema>,
-  userObj?: UserObj
+  userObj?: MqttAuditActor
 ) {
   const qos = (params.qos ?? 0) as 0 | 1 | 2;
   const retain = params.retain ?? false;
@@ -166,7 +163,9 @@ async function onPublish(
     if (client) {
       try {
         (client as mqtt.MqttClient).end(true);
-      } catch {}
+      } catch {
+        // 连接关闭属于尽力清理，不覆盖原始发布结果。
+      }
     }
   }
 
@@ -262,7 +261,9 @@ async function onTestConnection(
     if (client) {
       try {
         (client as mqtt.MqttClient).end(true);
-      } catch {}
+      } catch {
+        // 连接关闭属于尽力清理，不覆盖原始测试结果。
+      }
     }
   }
 }

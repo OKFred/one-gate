@@ -3,7 +3,7 @@ import { setD1Binding } from "@hodor/core/db/index.js";
 import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
-import { timeoutExpiredDeviceTasks } from "@hodor/admin/mobile/async-task/service.js";
+import { timeoutExpiredDeviceTasks } from "@hodor/admin/mobile/async-task/facade.js";
 import {
   cleanupExpiredDeviceEvents,
   markTimedOutDevicesOffline,

@@ -1,18 +1,19 @@
-import { eq, like, and, desc, sql, lt, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, like, lt, sql } from "drizzle-orm";
 import db from "@hodor/core/db";
-import {
-  mobileAsyncTaskTable,
-  type MobileAsyncTaskAddVOLike,
-  type MobileAsyncTaskUpdateVOLike,
-  type MobileAsyncTaskPOLike,
-} from "./model";
+import { mobileAsyncTaskTable } from "../model.js";
+import type { DeviceTaskCompletion } from "../domain/task.js";
+import type {
+  DeviceTaskCreateRecord,
+  DeviceTaskListParams,
+  DeviceTaskPage,
+  DeviceTaskRecord,
+  DeviceTaskRepository,
+} from "../application/ports.js";
 
-/** 设备异步任务持久化仓库。 */
-export class MobileAsyncTaskRepository {
+/** 基于 Drizzle 的设备任务持久化适配器。 */
+export class DrizzleDeviceTaskRepository implements DeviceTaskRepository {
   /** 新增一项设备异步任务。 */
-  async add(
-    data: MobileAsyncTaskAddVOLike & { creatorId: number }
-  ): Promise<number> {
+  async add(data: DeviceTaskCreateRecord): Promise<number> {
     const [result] = await db
       .insert(mobileAsyncTaskTable)
       .values(data)
@@ -20,51 +21,11 @@ export class MobileAsyncTaskRepository {
     return result.id;
   }
 
-  /** 按主键更新任务。 */
-  async update(
-    data: MobileAsyncTaskUpdateVOLike & { updaterId: number }
-  ): Promise<void> {
-    await db
-      .update(mobileAsyncTaskTable)
-      .set({
-        ...data,
-        updateTimeUtc: sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
-      })
-      .where(eq(mobileAsyncTaskTable.id, data.id));
-  }
-
-  /** 按业务任务标识更新任务。 */
-  async updateByTaskId(
-    taskId: string,
-    data: Partial<MobileAsyncTaskUpdateVOLike> & { updaterId: number }
-  ): Promise<void> {
-    await db
-      .update(mobileAsyncTaskTable)
-      .set({
-        ...data,
-        updateTimeUtc: sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
-      })
-      .where(eq(mobileAsyncTaskTable.taskId, taskId));
-  }
-
-  /**
-   * 仅在任务仍处于执行前/执行中状态时写入终态结果。
-   *
-   * @returns 是否实际更新了一条任务。
-   */
+  /** 仅在任务仍为活动状态时写入终态结果。 */
   async completeByTaskId(
     taskId: string,
     clientId: string,
-    data: {
-      status: "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
-      resultCode: string;
-      resultMessage: string | null;
-      resultDataJson: string | null;
-      preemptedByTaskId: string | null;
-      startedAtUtc: number | null;
-      finishedAtUtc: number;
-      updaterId: number;
-    }
+    data: DeviceTaskCompletion
   ): Promise<boolean> {
     const result = await db
       .update(mobileAsyncTaskTable)
@@ -82,26 +43,8 @@ export class MobileAsyncTaskRepository {
     return result.rowsAffected > 0;
   }
 
-  /** 按主键删除任务。 */
-  async delete(id: number): Promise<void> {
-    await db
-      .delete(mobileAsyncTaskTable)
-      .where(eq(mobileAsyncTaskTable.id, id));
-  }
-
-  /** 按主键查询任务。 */
-  async getById(id: number): Promise<MobileAsyncTaskPOLike | undefined> {
-    const [result] = await db
-      .select()
-      .from(mobileAsyncTaskTable)
-      .where(eq(mobileAsyncTaskTable.id, id));
-    return result;
-  }
-
   /** 按业务任务标识查询任务。 */
-  async getByTaskId(
-    taskId: string
-  ): Promise<MobileAsyncTaskPOLike | undefined> {
+  async getByTaskId(taskId: string): Promise<DeviceTaskRecord | undefined> {
     const [result] = await db
       .select()
       .from(mobileAsyncTaskTable)
@@ -110,16 +53,7 @@ export class MobileAsyncTaskRepository {
   }
 
   /** 分页查询设备异步任务。 */
-  async list(params: {
-    pageNo: number;
-    pageSize: number;
-    clientId?: string;
-    keyword?: string;
-    status?: MobileAsyncTaskPOLike["status"];
-    priority?: MobileAsyncTaskPOLike["priority"];
-    orderBy?: keyof MobileAsyncTaskPOLike;
-    descend?: boolean;
-  }) {
+  async list(params: DeviceTaskListParams): Promise<DeviceTaskPage> {
     const {
       pageNo,
       pageSize,
@@ -128,7 +62,7 @@ export class MobileAsyncTaskRepository {
       status,
       priority,
       orderBy,
-      descend,
+      descend: shouldDescend,
     } = params;
     const conditions = [];
 
@@ -156,10 +90,12 @@ export class MobileAsyncTaskRepository {
     if (orderBy) {
       if (orderBy === "priority") {
         const priorityRank = sql<number>`CASE ${mobileAsyncTaskTable.priority} WHEN 'HIGH' THEN 3 WHEN 'NORMAL' THEN 2 ELSE 1 END`;
-        query = query.orderBy(descend ? desc(priorityRank) : priorityRank);
+        query = query.orderBy(
+          shouldDescend ? desc(priorityRank) : priorityRank
+        );
       } else {
         query = query.orderBy(
-          descend
+          shouldDescend
             ? desc(mobileAsyncTaskTable[orderBy])
             : mobileAsyncTaskTable[orderBy]
         );
@@ -169,7 +105,6 @@ export class MobileAsyncTaskRepository {
     }
 
     const list = await query.limit(pageSize).offset((pageNo - 1) * pageSize);
-
     return {
       list,
       total: count,
@@ -180,19 +115,38 @@ export class MobileAsyncTaskRepository {
     };
   }
 
+  /** 写入旧手机客户端的兼容终态结果。 */
+  async updateLegacyResult(
+    taskId: string,
+    data: {
+      status: "SUCCESS" | "FAILURE";
+      resultMessage: string | null;
+      updaterId: number;
+    }
+  ): Promise<void> {
+    await db
+      .update(mobileAsyncTaskTable)
+      .set({
+        ...data,
+        updateTimeUtc: sql`(CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER))`,
+      })
+      .where(eq(mobileAsyncTaskTable.taskId, taskId));
+  }
+
   /** 将服务端等待过期的待执行/执行中任务置为超时。 */
-  async timeoutPendingTasks(resultGraceMs: number): Promise<number> {
-    const now = Date.now();
-    const deadlineCutoff = now - resultGraceMs;
+  async timeoutPendingTasks(
+    deadlineCutoff: number,
+    finishedAtUtc: number
+  ): Promise<number> {
     const result = await db
       .update(mobileAsyncTaskTable)
       .set({
         status: "TIMEOUT",
         resultCode: "SERVER_TIMEOUT",
         resultMessage: "服务端等待设备结果超时",
-        finishedAtUtc: now,
+        finishedAtUtc,
         updaterId: 0,
-        updateTimeUtc: now,
+        updateTimeUtc: finishedAtUtc,
       })
       .where(
         and(
@@ -203,5 +157,3 @@ export class MobileAsyncTaskRepository {
     return result.rowsAffected;
   }
 }
-
-export const mobileAsyncTaskRepo = new MobileAsyncTaskRepository();
