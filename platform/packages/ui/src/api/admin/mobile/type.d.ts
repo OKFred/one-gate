@@ -17,6 +17,20 @@ export type UpdateDeviceRes = Awaited<ReturnType<typeof DeviceAPI.updateFn>>['da
 export type DeleteDeviceReq = NonNullable<Parameters<typeof DeviceAPI.deleteFn>[0]['data']>;
 export type DeleteDeviceRes = Awaited<ReturnType<typeof DeviceAPI.deleteFn>>['data']['data'];
 
+export type GetDeviceReq = NonNullable<Parameters<typeof DeviceAPI.getFn>[0]['data']>;
+export type GetDeviceRes = Awaited<ReturnType<typeof DeviceAPI.getFn>>['data']['data'];
+
+export type UpdateDeviceMetadataReq = NonNullable<
+  Parameters<typeof DeviceAPI.updateMetadataFn>[0]['data']
+>;
+
+export type ListDeviceEventReq = NonNullable<Parameters<typeof DeviceAPI.listEventsFn>[0]['data']>;
+export type ListDeviceEventRes = Awaited<ReturnType<typeof DeviceAPI.listEventsFn>>['data']['data'];
+
+export type RevealDeviceSensitiveReq = NonNullable<
+  Parameters<typeof DeviceAPI.revealSensitiveFn>[0]['data']
+>;
+
 // --- App ---
 export type ListAppReq = NonNullable<Parameters<typeof AppAPI.listFn>[0]['data']>;
 export type ListAppRes = Awaited<ReturnType<typeof AppAPI.listFn>>['data']['data'];

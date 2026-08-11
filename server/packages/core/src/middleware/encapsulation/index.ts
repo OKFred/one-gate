@@ -55,6 +55,10 @@ const routeWhitelist = [
   "/admin/system/auth/github/login",
   "/admin/i18n/translation/listAll",
   "/admin/mobile/device-app/callback",
+  "/admin/mobile/async-task/callback",
+  "/admin/mobile/device/report/presence",
+  "/admin/mobile/device/report/info",
+  "/admin/mobile/device/report/event",
 ];
 
 function routeMaker({
@@ -81,8 +85,9 @@ function routeMaker({
         cause: ["Content-Type must be application/json"],
       });
     }
-    const ignoreError = routeWhitelist.some((path) =>
-      c.req.path?.replace(getEnv("BASE_API_PATH") ?? "", "").startsWith(path)
+    const requestPath = c.req.path?.replace(getEnv("BASE_API_PATH") ?? "", "");
+    const ignoreError = routeWhitelist.some(
+      (path) => requestPath === path || requestPath?.startsWith(`${path}/`)
     );
     try {
       await authMiddleware(c);
@@ -106,7 +111,7 @@ function routeMaker({
     const { valid, errors } = validate(bodyObj, reqSchema as object, "2020-12");
     if (!valid) {
       const t = await getTranslator(c);
-      const fields = await Promise.all(
+      const details = await Promise.all(
         errors.map(async (err) => {
           const rawField = err.instanceLocation?.replace(/^\//, "") || "";
           let fieldName = rawField;
@@ -126,14 +131,14 @@ function routeMaker({
 
           const errorMsg = await t(i18nKey, { field: fieldName || "value" });
           return {
-            field: fieldName || "value",
-            error: errorMsg,
+            type: fieldName || "value",
+            message: errorMsg,
           };
         })
       );
 
       throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
-        fields,
+        details,
       });
     }
     c.set("bodyObj", bodyObj);
@@ -203,7 +208,7 @@ export interface API {
   /** 适配器：负责从 Context 中提取参数并注入到 service 函数 */
   adapter: AdapterFn;
   /** 业务逻辑函数：接收适配器提取的参数，返回业务数据 */
-  service: (...args: unknown[]) => Promise<unknown>;
+  service: (...args: never[]) => Promise<unknown>;
   /** 声明此 API 需要的 action 权限，由 encapsulation 在调用 service 前自动检查 */
   permission?: { action: string } | false;
 }
@@ -238,7 +243,9 @@ export default function main(apiObj: Record<string, API>, nameSpace: string) {
       app.openAPIRegistry.registerComponent(
         "schemas",
         component.name,
-        component.component as any
+        component.component as unknown as Parameters<
+          typeof app.openAPIRegistry.registerComponent
+        >[2]
       );
       registerSchema(component.name, component.component as object);
     });

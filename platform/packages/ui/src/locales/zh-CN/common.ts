@@ -13,6 +13,8 @@ export const common = {
   'common.refresh': '刷新',
   'common.add': '新增',
   'common.close': '关闭',
+  'common.copy': '复制',
+  'common.all': '全部',
   'common.search': '搜索',
   'common.reset': '重置',
   'common.export': '导出',

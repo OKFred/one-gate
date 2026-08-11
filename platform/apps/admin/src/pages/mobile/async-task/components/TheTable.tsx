@@ -1,10 +1,17 @@
 import dayjs from 'dayjs';
+import { Chip, Tooltip, type ChipProps } from '@mui/material';
 import type { SchemaCrudConfig } from '@/components/Crud';
 import type { ListAsyncTaskReq, ListAsyncTaskRes } from '@/api/admin/mobile/type';
 import type { FilterState } from './TheFilter';
-import { Chip, Tooltip } from '@mui/material';
+import { TaskStatusChip } from './TaskStatusChip';
 
 export type AsyncTaskRes = NonNullable<ListAsyncTaskRes['list']>[0];
+
+const PRIORITY_COLORS = {
+  HIGH: 'error',
+  NORMAL: 'primary',
+  LOW: 'default',
+} satisfies Record<AsyncTaskRes['priority'], NonNullable<ChipProps['color']>>;
 
 export const tableConfig: SchemaCrudConfig<AsyncTaskRes, FilterState, ListAsyncTaskReq>['table'] = {
   columns: (t) => [
@@ -13,16 +20,22 @@ export const tableConfig: SchemaCrudConfig<AsyncTaskRes, FilterState, ListAsyncT
     { title: t('mobile.device.clientId'), render: (row) => row.clientId },
     { title: t('mobile.asyncTask.cat'), render: (row) => row.cat },
     {
+      title: t('mobile.asyncTask.priority'),
+      render: (row) => (
+        <Chip label={row.priority} color={PRIORITY_COLORS[row.priority]} size="small" />
+      ),
+    },
+    {
+      title: t('mobile.asyncTask.preemptRunning'),
+      render: (row) => (row.preemptRunning ? t('mobile.asyncTask.yes') : t('mobile.asyncTask.no')),
+    },
+    {
       title: t('status.label'),
-      render: (row) => {
-        const colorMap: Record<string, 'default' | 'primary' | 'success' | 'error' | 'warning'> = {
-          PENDING: 'warning',
-          SUCCESS: 'success',
-          FAILURE: 'error',
-          TIMEOUT: 'default',
-        };
-        return <Chip label={row.status} color={colorMap[row.status] || 'default'} size="small" />;
-      },
+      render: (row) => <TaskStatusChip status={row.status} />,
+    },
+    {
+      title: t('mobile.asyncTask.preemptedByTaskId'),
+      render: (row) => row.preemptedByTaskId || '-',
     },
     {
       title: t('columns.createTime'),

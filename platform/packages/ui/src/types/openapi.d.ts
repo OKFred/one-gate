@@ -12312,6 +12312,412 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/device/metadata/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新设备自定义元数据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.metadata.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.metadata.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/event/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询设备事件 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.event.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.event.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/sensitive/reveal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查看设备敏感信息 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.sensitive.reveal.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.sensitive.reveal.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/report-token/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 生成或重置设备上报令牌 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report-token.reset.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report-token.reset.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/report/presence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设备 Presence 上报 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report.presence.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report.presence.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/report/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设备静态信息上报 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report.info.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report.info.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/report/event": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设备事件上报 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report.event.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report.event.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/mobile/app/list": {
         parameters: {
             query?: never;
@@ -13154,6 +13560,180 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.mobile.async_task.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/dispatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 向指定设备下发可信 AutoJS6 脚本任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.dispatch.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.dispatch.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询异步任务详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/async-task/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 接收 AutoJS6 v2 设备任务结果 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.callback.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.callback.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -24977,8 +25557,10 @@ export interface components {
             pageSize: number;
             /** @description 是否启用 */
             isEnabled?: boolean;
+            /** @enum {string|null|null} */
+            onlineStatus?: "ONLINE" | "OFFLINE" | null;
             /** @enum {string} */
-            orderBy?: "id" | "clientId" | "deviceName" | "isEnabled" | "createTimeUtc";
+            orderBy?: "id" | "clientId" | "deviceName" | "isEnabled" | "lastHeartbeatTimeUtc" | "batteryLevel" | "createTimeUtc";
         };
         "admin.mobile.device.list.res": {
             ok: boolean;
@@ -25004,7 +25586,39 @@ export interface components {
                     /** @description 是否启用 */
                     isEnabled: boolean;
                     /** @description 备注 */
-                    remark?: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
+                    /** @enum {string|null|null} */
+                    reportedStatus: "ONLINE" | "OFFLINE" | null;
+                    /** @description 150 秒窗口内有效在线 */
+                    isOnline: boolean;
+                    lastHeartbeatTimeUtc: ((number | null) | null) | null;
+                    lastOnlineTimeUtc: ((number | null) | null) | null;
+                    lastOfflineTimeUtc: ((number | null) | null) | null;
+                    manufacturer: ((string | null) | null) | null;
+                    brand: ((string | null) | null) | null;
+                    model: ((string | null) | null) | null;
+                    androidVersion: ((string | null) | null) | null;
+                    androidSdk: ((number | null) | null) | null;
+                    autojs6Version: ((string | null) | null) | null;
+                    clientVersion: ((string | null) | null) | null;
+                    protocolVersion: ((number | null) | null) | null;
+                    batteryLevel: ((number | null) | null) | null;
+                    isCharging: ((boolean | null) | null) | null;
+                    networkConnected: ((boolean | null) | null) | null;
+                    networkType: ((string | null) | null) | null;
+                    imeiStatus: ((string | null) | null) | null;
+                    imeiMasked: string[];
+                    serialStatus: ((string | null) | null) | null;
+                    serialMasked: ((string | null) | null) | null;
+                    capabilities: {
+                        [key: string]: unknown;
+                    };
+                    reportedExtra: {
+                        [key: string]: unknown;
+                    };
+                    customMetadata: {
+                        [key: string]: unknown;
+                    };
                     /** @description 创建人ID */
                     creatorId: number;
                     /**
@@ -25059,11 +25673,7 @@ export interface components {
         };
         "admin.mobile.device.update.res": {
             ok: boolean;
-            /**
-             * @description id
-             * @example 1
-             */
-            data: number;
+            data: boolean;
             message: string;
         };
         "admin.mobile.device.get.req": {
@@ -25088,7 +25698,39 @@ export interface components {
                 /** @description 是否启用 */
                 isEnabled: boolean;
                 /** @description 备注 */
-                remark?: ((string | null) | null) | null;
+                remark: ((string | null) | null) | null;
+                /** @enum {string|null|null} */
+                reportedStatus: "ONLINE" | "OFFLINE" | null;
+                /** @description 150 秒窗口内有效在线 */
+                isOnline: boolean;
+                lastHeartbeatTimeUtc: ((number | null) | null) | null;
+                lastOnlineTimeUtc: ((number | null) | null) | null;
+                lastOfflineTimeUtc: ((number | null) | null) | null;
+                manufacturer: ((string | null) | null) | null;
+                brand: ((string | null) | null) | null;
+                model: ((string | null) | null) | null;
+                androidVersion: ((string | null) | null) | null;
+                androidSdk: ((number | null) | null) | null;
+                autojs6Version: ((string | null) | null) | null;
+                clientVersion: ((string | null) | null) | null;
+                protocolVersion: ((number | null) | null) | null;
+                batteryLevel: ((number | null) | null) | null;
+                isCharging: ((boolean | null) | null) | null;
+                networkConnected: ((boolean | null) | null) | null;
+                networkType: ((string | null) | null) | null;
+                imeiStatus: ((string | null) | null) | null;
+                imeiMasked: string[];
+                serialStatus: ((string | null) | null) | null;
+                serialMasked: ((string | null) | null) | null;
+                capabilities: {
+                    [key: string]: unknown;
+                };
+                reportedExtra: {
+                    [key: string]: unknown;
+                };
+                customMetadata: {
+                    [key: string]: unknown;
+                };
                 /** @description 创建人ID */
                 creatorId: number;
                 /**
@@ -25116,6 +25758,188 @@ export interface components {
         "admin.mobile.device.delete.res": {
             ok: boolean;
             data: boolean;
+            message: string;
+        };
+        "admin.mobile.device.metadata.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            customMetadata: {
+                [key: string]: {
+                    value: unknown;
+                    sensitive: boolean;
+                };
+            };
+        };
+        "admin.mobile.device.metadata.update.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "admin.mobile.device.event.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /**
+             * @description id
+             * @example 1
+             */
+            deviceId: number;
+            /** @enum {string|null|null} */
+            eventType?: "battery" | "network" | "sms" | "notification" | null;
+            startTimeUtc?: ((number | null) | null) | null;
+            endTimeUtc?: ((number | null) | null) | null;
+        };
+        "admin.mobile.device.event.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    eventId: string;
+                    /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+                    clientId: string;
+                    /** @enum {string} */
+                    eventType: "battery" | "network" | "sms" | "notification";
+                    eventTimeUtc: number;
+                    summary: {
+                        [key: string]: unknown;
+                    };
+                    hasSensitivePayload: boolean;
+                    createTimeUtc: number;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mobile.device.sensitive.reveal.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @enum {string} */
+            target: "identifiers" | "customMetadata" | "event";
+        };
+        "admin.mobile.device.sensitive.reveal.res": {
+            ok: boolean;
+            data: {
+                [key: string]: unknown;
+            };
+            message: string;
+        };
+        "admin.mobile.device.report-token.reset.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.mobile.device.report-token.reset.res": {
+            ok: boolean;
+            data: {
+                token: string;
+            };
+            message: string;
+        };
+        "admin.mobile.device.report.presence.req": {
+            /** @constant */
+            protocolVersion: 2;
+            /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+            deviceId: string;
+            /** @enum {string} */
+            status: "ONLINE" | "OFFLINE";
+            timestamp: number;
+        };
+        "admin.mobile.device.report.presence.res": {
+            ok: boolean;
+            data: {
+                accepted: boolean;
+                duplicate: boolean;
+            };
+            message: string;
+        };
+        "admin.mobile.device.report.info.req": {
+            /** @constant */
+            protocolVersion: 2;
+            /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+            deviceId: string;
+            timestamp: number;
+            manufacturer: string;
+            brand: string;
+            model: string;
+            androidVersion: string;
+            androidSdk: ((number | null) | null) | null;
+            autojs6Version: string;
+            clientVersion: string;
+            identifiers: {
+                imeis: string[];
+                /** @enum {string} */
+                imeiStatus: "available" | "unavailable";
+                serialNumber: ((string | null) | null) | null;
+                /** @enum {string} */
+                serialStatus: "available" | "unavailable";
+            };
+            capabilities: {
+                [key: string]: unknown;
+            };
+            reportedExtra: {
+                [key: string]: unknown;
+            };
+        };
+        "admin.mobile.device.report.info.res": {
+            ok: boolean;
+            data: {
+                accepted: boolean;
+                duplicate: boolean;
+            };
+            message: string;
+        };
+        "admin.mobile.device.report.event.req": {
+            /** @constant */
+            protocolVersion: 2;
+            eventId: string;
+            /** @description 设备标识 (唯一，对应 MQTT ClientId) */
+            deviceId: string;
+            /** @enum {string} */
+            type: "battery" | "network" | "sms" | "notification";
+            timestamp: number;
+            data: {
+                [key: string]: unknown;
+            };
+        };
+        "admin.mobile.device.report.event.res": {
+            ok: boolean;
+            data: {
+                accepted: boolean;
+                duplicate: boolean;
+            };
             message: string;
         };
         "admin.mobile.app.list.req": {
@@ -25576,8 +26400,8 @@ export interface components {
             appId?: number;
             /** @description 目标版本 (仅安装时需要) */
             versionId?: number;
-            /** @description 移动端回调地址 (例如 http://xxxx/api/admin/mobile/device-app/callback) */
-            callbackUrl: string;
+            /** @description 旧协议兼容字段；v2 不再由手机 HTTP 回调 */
+            callbackUrl?: string;
         };
         "admin.mobile.device_app.sync.res": {
             ok: boolean;
@@ -25593,8 +26417,8 @@ export interface components {
             appId?: number;
             /** @description 目标版本 (仅安装时需要) */
             versionId?: number;
-            /** @description 移动端回调地址 (例如 http://xxxx/api/admin/mobile/device-app/callback) */
-            callbackUrl: string;
+            /** @description 旧协议兼容字段；v2 不再由手机 HTTP 回调 */
+            callbackUrl?: string;
         };
         "admin.mobile.device_app.install.res": {
             ok: boolean;
@@ -25639,9 +26463,14 @@ export interface components {
              * @description 任务状态
              * @enum {string}
              */
-            status?: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+            status?: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+            /**
+             * @description 手机端队列调度优先级
+             * @enum {string}
+             */
+            priority?: "LOW" | "NORMAL" | "HIGH";
             /** @enum {string} */
-            orderBy?: "id" | "taskId" | "clientId" | "status" | "expiresAtUtc" | "createTimeUtc";
+            orderBy?: "id" | "taskId" | "clientId" | "status" | "priority" | "expiresAtUtc" | "createTimeUtc";
         };
         "admin.mobile.async_task.list.res": {
             ok: boolean;
@@ -25666,19 +26495,48 @@ export interface components {
                     clientId: string;
                     /** @description 任务分类 (shell, autojs6 等) */
                     cat: string;
-                    /** @description 原始下发的脚本指令 */
+                    /** @description 兼容字段；v2 任务仅保存 scriptId，不保存脚本源码 */
                     script: string;
+                    /** @description 设备任务协议版本 */
+                    protocolVersion: ((number | null) | null) | null;
+                    /** @description 手机端可信脚本标识 */
+                    scriptId: ((string | null) | null) | null;
+                    /** @description 手机端可信脚本版本 */
+                    scriptVersion: ((number | null) | null) | null;
+                    /** @description 结构化任务参数 JSON */
+                    paramsJson: ((string | null) | null) | null;
+                    /** @description 设备执行超时时间（毫秒） */
+                    timeoutMs: ((number | null) | null) | null;
+                    /** @description 任务链路追踪标识 */
+                    traceId: ((string | null) | null) | null;
+                    /**
+                     * @description 手机端队列调度优先级
+                     * @enum {string}
+                     */
+                    priority: "LOW" | "NORMAL" | "HIGH";
+                    /** @description 是否显式抢占不高于当前优先级的运行任务 */
+                    preemptRunning: boolean;
+                    /** @description 抢占当前任务的任务标识 */
+                    preemptedByTaskId: ((string | null) | null) | null;
                     /**
                      * @description 任务状态
                      * @enum {string}
                      */
-                    status: "PENDING" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+                    status: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
                     /** @description 执行结果或失败原因 */
                     resultMessage: ((string | null) | null) | null;
+                    /** @description 统一结果码 */
+                    resultCode: ((string | null) | null) | null;
+                    /** @description 结构化执行结果 JSON */
+                    resultDataJson: ((string | null) | null) | null;
+                    /** @description 设备开始执行时间 */
+                    startedAtUtc: ((number | null) | null) | null;
+                    /** @description 设备完成执行时间 */
+                    finishedAtUtc: ((number | null) | null) | null;
                     /** @description 任务预期过期时间 */
                     expiresAtUtc: number;
                     /** @description 备注 */
-                    remark?: ((string | null) | null) | null;
+                    remark: ((string | null) | null) | null;
                     /** @description 创建人ID */
                     creatorId: number;
                     /**
@@ -25695,6 +26553,136 @@ export interface components {
                     updateTimeUtc: ((number | null) | null) | null;
                 }[];
             };
+            message: string;
+        };
+        "admin.mobile.async_task.dispatch.req": {
+            clientId: string;
+            /**
+             * @description 手机端可信脚本标识
+             * @enum {string}
+             */
+            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "client.self-update" | "device.network.switch";
+            /** @description 传递给本地可信脚本的结构化参数 */
+            params: {
+                [key: string]: unknown;
+            };
+            timeoutMs?: number;
+            /**
+             * @description 可选任务优先级；网络切换默认 HIGH，其余默认 NORMAL
+             * @enum {string}
+             */
+            priority?: "LOW" | "NORMAL" | "HIGH";
+            /** @description 是否抢占同级或更低优先级运行任务；默认 false */
+            preemptRunning?: boolean;
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.async_task.dispatch.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+                /** @enum {string} */
+                status: "PENDING";
+                traceId: string;
+                expiresAtUtc: number;
+            };
+            message: string;
+        };
+        "admin.mobile.async_task.get.req": {
+            /** @description 任务唯一标识 (UUID) */
+            taskId: string;
+        };
+        "admin.mobile.async_task.get.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description 任务唯一标识 (UUID) */
+                taskId: string;
+                /** @description 设备标识 */
+                clientId: string;
+                /** @description 任务分类 (shell, autojs6 等) */
+                cat: string;
+                /** @description 兼容字段；v2 任务仅保存 scriptId，不保存脚本源码 */
+                script: string;
+                /** @description 设备任务协议版本 */
+                protocolVersion: ((number | null) | null) | null;
+                /** @description 手机端可信脚本标识 */
+                scriptId: ((string | null) | null) | null;
+                /** @description 手机端可信脚本版本 */
+                scriptVersion: ((number | null) | null) | null;
+                /** @description 结构化任务参数 JSON */
+                paramsJson: ((string | null) | null) | null;
+                /** @description 设备执行超时时间（毫秒） */
+                timeoutMs: ((number | null) | null) | null;
+                /** @description 任务链路追踪标识 */
+                traceId: ((string | null) | null) | null;
+                /**
+                 * @description 手机端队列调度优先级
+                 * @enum {string}
+                 */
+                priority: "LOW" | "NORMAL" | "HIGH";
+                /** @description 是否显式抢占不高于当前优先级的运行任务 */
+                preemptRunning: boolean;
+                /** @description 抢占当前任务的任务标识 */
+                preemptedByTaskId: ((string | null) | null) | null;
+                /**
+                 * @description 任务状态
+                 * @enum {string}
+                 */
+                status: "PENDING" | "RUNNING" | "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+                /** @description 执行结果或失败原因 */
+                resultMessage: ((string | null) | null) | null;
+                /** @description 统一结果码 */
+                resultCode: ((string | null) | null) | null;
+                /** @description 结构化执行结果 JSON */
+                resultDataJson: ((string | null) | null) | null;
+                /** @description 设备开始执行时间 */
+                startedAtUtc: ((number | null) | null) | null;
+                /** @description 设备完成执行时间 */
+                finishedAtUtc: ((number | null) | null) | null;
+                /** @description 任务预期过期时间 */
+                expiresAtUtc: number;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.async_task.callback.req": {
+            /** @enum {integer} */
+            protocolVersion: 2;
+            taskId: string;
+            deviceId: string;
+            scriptId: string;
+            /** @enum {string} */
+            status: "SUCCESS" | "FAILURE" | "TIMEOUT" | "REJECTED" | "CANCELLED";
+            code: string;
+            message: string;
+            data: unknown;
+            startedAt: number;
+            finishedAt: number;
+            durationMs: number;
+            traceId: string;
+        };
+        "admin.mobile.async_task.callback.res": {
+            ok: boolean;
+            data: boolean;
             message: string;
         };
         "organization.attendance.listall.req": {

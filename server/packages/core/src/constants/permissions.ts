@@ -9,7 +9,8 @@ export type PermissionAction =
   | "view"
   | "batch-delete"
   | "sync"
-  | "install";
+  | "install"
+  | "dispatch";
 
 export type CheckPermissionSeeds<T, Parent extends string = ""> = {
   [K in keyof T & string]: T[K] extends readonly PermissionAction[]
@@ -197,11 +198,11 @@ export const permissionSeeds = {
   /** 移动端管理 */
   "admin.mobile": {
     "": ["read"],
-    device: ["read", "add", "edit", "delete", "sync"],
+    device: ["read", "add", "edit", "delete", "sync", "view"],
     app: ["read", "add", "edit", "delete"],
     app_version: ["read", "add", "edit", "delete"],
     device_app: ["read", "sync", "install"],
-    async_task: ["read"],
+    async_task: ["read", "dispatch"],
   },
 } as const;
 

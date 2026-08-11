@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Drawer,
   Box,
   Typography,
   Button,
   IconButton,
-  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -16,8 +15,6 @@ import {
 import { Close as CloseIcon } from '@mui/icons-material';
 import { useTranslation } from '@/hooks/useTranslation';
 import * as DeviceAppAPI from '@/api/admin/mobile/device-app';
-import type { ListDeviceAppRes } from '@/api/admin/mobile/type';
-import dayjs from 'dayjs';
 import { showSnackbar } from '@/components/Notification';
 
 export interface DeviceAppDrawerProps {
@@ -28,7 +25,6 @@ export interface DeviceAppDrawerProps {
 
 export function DeviceAppDrawer({ open, clientId, onClose }: DeviceAppDrawerProps) {
   const t = useTranslation();
-  const [apps, setApps] = useState<NonNullable<ListDeviceAppRes['list']>>([]);
 
   // Install dialog state
   const [installOpen, setInstallOpen] = useState(false);
@@ -37,29 +33,6 @@ export function DeviceAppDrawer({ open, clientId, onClose }: DeviceAppDrawerProp
 
   const defaultCallbackUrl = `${import.meta.env.VITE_SERVER_URL || window.location.origin}/api/v1/admin/mobile/device-app/callback`;
   const [callbackUrl, setCallbackUrl] = useState(defaultCallbackUrl);
-
-  useEffect(() => {
-    const loadApps = () => {
-      if (open && clientId) {
-        DeviceAppAPI.listFn({ data: { clientId, pageNo: 1, pageSize: 100 } })
-          .then((res) => {
-            setApps(res.data.data.list || []);
-          })
-          .catch(() => {});
-      }
-    };
-    loadApps();
-  }, [open, clientId]);
-
-  const handleSync = async () => {
-    if (!clientId) return;
-    try {
-      await DeviceAppAPI.syncFn({ data: { clientId, callbackUrl } });
-      showSnackbar({ message: t('mobile.device.syncSuccess'), type: 'success' });
-    } catch {
-      // API handler shows error
-    }
-  };
 
   const handleInstallSubmit = async () => {
     if (!clientId || !appId || !versionId) return;
@@ -96,9 +69,6 @@ export function DeviceAppDrawer({ open, clientId, onClose }: DeviceAppDrawerProp
             </IconButton>
           </Box>
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-            <Button variant="outlined" color="primary" onClick={handleSync}>
-              {t('mobile.device.actions.sync')}
-            </Button>
             <Button variant="contained" color="primary" onClick={() => setInstallOpen(true)}>
               {t('mobile.deviceApp.actions.install')}
             </Button>
@@ -113,45 +83,6 @@ export function DeviceAppDrawer({ open, clientId, onClose }: DeviceAppDrawerProp
               helperText="If the device fails to fetch, change localhost to your PC's IP address."
             />
           </Box>
-          {apps.map((app) => (
-            <Box
-              key={app.id}
-              sx={{
-                mb: 2,
-                p: 2,
-                border: '1px solid #eee',
-                borderRadius: 1,
-                display: 'flex',
-                gap: 2,
-              }}
-            >
-              {(app as any).appIconUrl ? (
-                <img
-                  src={(app as any).appIconUrl}
-                  alt="icon"
-                  style={{ width: 48, height: 48, borderRadius: 8 }}
-                />
-              ) : (
-                <Box sx={{ width: 48, height: 48, bgcolor: 'grey.200', borderRadius: 2 }} />
-              )}
-              <Box>
-                <Typography variant="subtitle1">
-                  {(app as any).appName || (app as any).appPackageName || app.appId}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  {t('mobile.deviceApp.installedVersionCode')}: {app.installedVersionCode} (
-                  {app.installedVersionName})
-                </Typography>
-                <Chip label={app.installStatus} size="small" sx={{ mt: 1 }} />
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  {t('mobile.deviceApp.lastSyncTimeUtc')}:{' '}
-                  {app.lastSyncTimeUtc
-                    ? dayjs(app.lastSyncTimeUtc).format('YYYY-MM-DD HH:mm:ss')
-                    : '-'}
-                </Typography>
-              </Box>
-            </Box>
-          ))}
         </Box>
       </Drawer>
 

@@ -3,12 +3,14 @@ import type { ListDeviceReq } from '@/api/admin/mobile/type';
 
 export interface FilterState {
   keyword: string;
+  onlineStatus: '' | 'ONLINE' | 'OFFLINE';
   orderBy: ListDeviceReq['orderBy'];
   descend: boolean;
 }
 
 export const defaultFilters: FilterState = {
   keyword: '',
+  onlineStatus: '',
   orderBy: 'id',
   descend: true,
 };
@@ -26,6 +28,16 @@ export const filterConfig: SchemaCrudConfig<
       type: 'text',
       label: t('column.keyword'),
       placeholder: t('common.searchPlaceholder'),
+    },
+    {
+      name: 'onlineStatus',
+      type: 'select',
+      label: t('mobile.device.onlineStatus'),
+      options: [
+        { label: t('common.all'), value: '' },
+        { label: t('status.online'), value: 'ONLINE' },
+        { label: t('status.offline'), value: 'OFFLINE' },
+      ],
     },
   ],
 };

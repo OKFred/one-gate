@@ -216,6 +216,10 @@ export const actionTranslations = {
     "zh-CN": "批量删除",
     "en-US": "Batch Delete",
   },
+  dispatch: {
+    "zh-CN": "下发",
+    "en-US": "Dispatch",
+  },
   unknown: {
     "zh-CN": "未知动作",
     "en-US": "Unknown Action",

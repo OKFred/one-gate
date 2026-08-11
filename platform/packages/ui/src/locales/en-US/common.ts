@@ -9,6 +9,8 @@ export const common = {
   'common.refresh': 'Refresh',
   'common.add': 'Add',
   'common.close': 'Close',
+  'common.copy': 'Copy',
+  'common.all': 'All',
   'common.search': 'Search',
   'common.reset': 'Reset',
   'common.export': 'Export',

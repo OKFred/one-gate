@@ -338,6 +338,7 @@ export const permissions = {
         edit: 'admin.mobile.device:edit',
         delete: 'admin.mobile.device:delete',
         sync: 'admin.mobile.device:sync',
+        view: 'admin.mobile.device:view',
       },
       /** app */
       app: {
@@ -362,6 +363,7 @@ export const permissions = {
       /** async_task */
       async_task: {
         read: 'admin.mobile.async_task:read',
+        dispatch: 'admin.mobile.async_task:dispatch',
       },
     },
   },

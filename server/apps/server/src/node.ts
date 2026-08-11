@@ -3,7 +3,9 @@ import { getEnv } from "@hodor/core/utils/env.js";
 import { serve } from "@hono/node-server";
 import cron from "node-cron";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
+import { startMqttEventListener } from "@hodor/admin/mqtt/listener.js";
 
+/** 启动 Node HTTP、定时任务与 AutoJS6 MQTT 监听服务。 */
 function main() {
   const app = createApp();
   // 启动服务器
@@ -14,6 +16,7 @@ function main() {
     fetch: app.fetch,
   });
   console.log(`🚀 Server started: http://localhost:${PORT}`);
+  void startMqttEventListener();
 
   // 启动定时任务驱动 (每分钟扫描并执行一次)
   cron.schedule("* * * * *", async () => {

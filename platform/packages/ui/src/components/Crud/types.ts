@@ -52,6 +52,9 @@ export interface SchemaCrudConfig<
   TAddData = never,
   TUpdateData = never,
 > {
+  /** 页面可见时静默刷新间隔；不设置则不轮询。 */
+  refreshIntervalMs?: number;
+
   /** 启用游标分页模式：total 与翻页解耦，由 hasMore/cursor 驱动翻页 */
   cursorPagination?: boolean;
 

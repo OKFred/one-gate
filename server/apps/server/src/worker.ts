@@ -3,6 +3,11 @@ import { setD1Binding } from "@hodor/core/db/index.js";
 import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
+import { timeoutExpiredDeviceTasks } from "@hodor/admin/mobile/async-task/facade.js";
+import {
+  cleanupExpiredDeviceEvents,
+  markTimedOutDevicesOffline,
+} from "@hodor/admin/mobile/device/service.js";
 
 let app: ReturnType<typeof createApp> | null = null;
 
@@ -34,7 +39,11 @@ export default {
   /**
    * Cloudflare Workers scheduled event handler.
    */
-  async scheduled(event: any, env: Env, ctx: ExecutionContext) {
+  async scheduled(
+    _event: ScheduledController,
+    env: Env,
+    ctx: ExecutionContext
+  ) {
     // 1. 将绑定注入数据库和缓存层
     if (env.DB) {
       setD1Binding(env.DB);
@@ -47,6 +56,13 @@ export default {
     setEnv(env);
 
     // 3. 执行待处理的定时任务
-    ctx.waitUntil(runPendingJobs());
+    ctx.waitUntil(
+      Promise.all([
+        runPendingJobs(),
+        timeoutExpiredDeviceTasks(),
+        markTimedOutDevicesOffline(),
+        cleanupExpiredDeviceEvents(),
+      ]).then(() => undefined)
+    );
   },
 };

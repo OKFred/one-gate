@@ -159,8 +159,8 @@ export function SchemaCrudPage<
 
   // 获取/刷新表格数据
   const fetchList = useCallback(
-    async (currentQuery: QueryState<TFilters>) => {
-      updateState({ loading: true });
+    async (currentQuery: QueryState<TFilters>, silent = false) => {
+      if (!silent) updateState({ loading: true });
       try {
         let dataPayload = {
           pageNo: currentQuery.page,
@@ -214,17 +214,31 @@ export function SchemaCrudPage<
           }));
         }
       } catch {
-        updateState({
-          list: [],
-          total: 0,
-          filterCount: 0,
-          loading: false,
-          isSearching: false,
-        });
+        if (!silent) {
+          updateState({
+            list: [],
+            total: 0,
+            filterCount: 0,
+            loading: false,
+            isSearching: false,
+          });
+        }
       }
     },
     [updateState],
   );
+
+  // 页面可见时静默刷新，始终读取最新分页与筛选，不触发表格 loading 闪烁。
+  useEffect(() => {
+    const intervalMs = configRef.current.refreshIntervalMs;
+    if (!intervalMs) return;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void fetchList(stateRef.current.query, true);
+      }
+    }, intervalMs);
+    return () => window.clearInterval(timer);
+  }, [fetchList]);
 
   // 初始加载及分页大小变化监听
   useEffect(() => {
