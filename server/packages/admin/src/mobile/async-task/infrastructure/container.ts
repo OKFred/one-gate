@@ -1,5 +1,5 @@
 import { getEnv } from "@hodor/core/utils/env";
-import { mobileDeviceRepo } from "../../device/repository.js";
+import { findDeviceTaskTarget } from "../../device/facade.js";
 import { DeviceTaskCenter } from "../application/task-center.js";
 import { DeviceTaskResultHandlerRegistry } from "../application/result-handler-registry.js";
 import { DrizzleDeviceTaskRepository } from "./repository.js";
@@ -10,7 +10,7 @@ const resultHandlers = new DeviceTaskResultHandlerRegistry();
 /** 默认生产依赖装配后的设备任务中心。 */
 export const deviceTaskCenter = new DeviceTaskCenter({
   repository: new DrizzleDeviceTaskRepository(),
-  devices: mobileDeviceRepo,
+  devices: { getByClientId: findDeviceTaskTarget },
   publisher: new MqttDeviceTaskPublisher(),
   clock: { now: () => Date.now() },
   ids: { next: () => crypto.randomUUID() },

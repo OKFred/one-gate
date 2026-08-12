@@ -8,6 +8,7 @@ import {
 } from "../mobile/async-task/facade.js";
 import {
   cleanupExpiredDeviceEvents,
+  getDeviceLogLabel,
   markTimedOutDevicesOffline,
   processDeviceEvent,
   processDeviceInfo,
@@ -15,9 +16,7 @@ import {
   type DeviceEventInput,
   type DeviceInfoInput,
   type DevicePresenceInput,
-} from "../mobile/device/service.js";
-import { isRecord } from "../mobile/device/metadata.js";
-import { hashDeviceToken } from "../mobile/device/crypto.js";
+} from "../mobile/device/facade.js";
 import { getActiveCredentials } from "./service.js";
 import { getEnv } from "@hodor/core/utils/env";
 import { initializeMobileTaskResultHandlers } from "../mobile/bootstrap.js";
@@ -40,7 +39,12 @@ let retentionScanner: ReturnType<typeof setInterval> | null = null;
 
 /** 为日志生成不可逆的短设备标签，避免记录真实设备标识。 */
 async function deviceLogLabel(deviceId: string): Promise<string> {
-  return (await hashDeviceToken(deviceId)).slice(0, 12);
+  return getDeviceLogLabel(deviceId);
+}
+
+/** 判断 MQTT 解码值是否为普通对象。 */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 /** 将未知 MQTT 载荷解析为 v2 任务结果。 */
