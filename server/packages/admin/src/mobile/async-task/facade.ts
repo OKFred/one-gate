@@ -28,6 +28,7 @@ export type {
   LegacyDeviceTaskResult,
   LegacyDeviceTaskCompletion,
 } from "./application/task-center.js";
+export { DeviceTaskApplicationError } from "./application/error.js";
 export type { DeviceTaskResultHandler } from "./application/ports.js";
 
 /** 注册或幂等替换一个可信脚本结果后处理器。 */
