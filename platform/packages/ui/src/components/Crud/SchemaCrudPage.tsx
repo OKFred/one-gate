@@ -18,6 +18,12 @@ import { Filter } from './components/Filter';
 import { FormDialog } from './components/FormDialog';
 import { DeleteConfirmDialog } from './components/DeleteConfirmDialog';
 
+const CUSTOM_FORM_FALLBACK_SCHEMA = {
+  type: 'object',
+  properties: {},
+  additionalProperties: true,
+} as const;
+
 export interface CrudState<TRecord, TFilters> {
   list: TRecord[];
   loading: boolean;
@@ -140,18 +146,40 @@ export function SchemaCrudPage<
   );
 
   const resolvedSchema = useMemo(() => {
-    if (isStringSchema) return dynamicSchema.schema;
+    if (isStringSchema) {
+      if (dynamicSchema.schema) return dynamicSchema.schema;
+      if (!dynamicSchema.loading && config.form.renderForm) return CUSTOM_FORM_FALLBACK_SCHEMA;
+      return null;
+    }
     return config.form.schema as Record<string, unknown>;
-  }, [isStringSchema, dynamicSchema.schema, config.form.schema]);
+  }, [isStringSchema, dynamicSchema.schema, dynamicSchema.loading, config.form]);
 
   const resolvedUpdateSchema = useMemo(() => {
-    if (typeof config.form.updateSchema === 'string') return dynamicSchema.updateSchema;
+    if (typeof config.form.updateSchema === 'string') {
+      if (dynamicSchema.updateSchema) return dynamicSchema.updateSchema;
+      if (!dynamicSchema.loading && config.form.renderForm) return CUSTOM_FORM_FALLBACK_SCHEMA;
+      return undefined;
+    }
     return config.form.updateSchema as Record<string, unknown> | undefined;
-  }, [config.form.updateSchema, dynamicSchema.updateSchema]);
+  }, [config.form, dynamicSchema.loading, dynamicSchema.updateSchema]);
+
+  const addUsesFallbackSchema = isStringSchema && !dynamicSchema.loading && !dynamicSchema.schema;
+  const updateUsesFallbackSchema =
+    typeof config.form.updateSchema === 'string' &&
+    !dynamicSchema.loading &&
+    !dynamicSchema.updateSchema;
+  const usingFallbackSchema =
+    !!config.form.renderForm &&
+    (editId
+      ? config.form.updateSchema
+        ? updateUsesFallbackSchema
+        : addUsesFallbackSchema
+      : addUsesFallbackSchema);
+  const activeDialogSchema = editId ? resolvedUpdateSchema || resolvedSchema : resolvedSchema;
 
   // AJV 表单验证与校验错误处理 Hook
   const { fieldErrors, handleFormError, clearErrors, setFieldErrors, clearFieldError, rootSchema } =
-    useFormError(resolvedSchema ?? undefined);
+    useFormError(activeDialogSchema ?? undefined);
   const { validate: validateAdd } = useValidator(resolvedSchema);
   const { validate: validateUpdate } = useValidator(resolvedUpdateSchema || resolvedSchema);
 
@@ -448,6 +476,7 @@ export function SchemaCrudPage<
         updateState({ query: newQuery });
         await fetchList(newQuery);
       } catch {
+        // 全局 HTTP 拦截器已统一展示失败原因。
       } finally {
         handleCloseDeleteConfirm();
       }
@@ -611,9 +640,11 @@ export function SchemaCrudPage<
         form={form}
         setForm={setForm}
         formLoading={formLoading}
+        schemaLoading={isStringSchema && dynamicSchema.loading}
+        usingFallbackSchema={usingFallbackSchema}
         errorContextValue={errorContextValue}
         config={config}
-        resolvedSchema={resolvedSchema}
+        resolvedSchema={activeDialogSchema}
         extraContext={extraContext}
         onSubmit={handleFormSubmit}
         isMobile={isMobile}

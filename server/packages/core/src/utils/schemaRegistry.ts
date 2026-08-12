@@ -37,6 +37,22 @@ export function getAllSchemas(): Map<string, object> {
 }
 
 /**
+ * 按 code 前缀读取已随当前发布产物注册的 schema。
+ * 返回副本，避免调用方修改全局注册中心。
+ */
+export function getSchemasByPrefix(prefix: string): Map<string, object> {
+  const result = new Map<string, object>();
+  if (!prefix) return result;
+
+  for (const [name, schema] of schemaStore) {
+    if (name.startsWith(prefix)) {
+      result.set(name, schema);
+    }
+  }
+  return result;
+}
+
+/**
  * 简单的字符串哈希（djb2 变体），兼容 Node.js 和 Cloudflare Workers
  */
 function simpleHash(str: string): string {

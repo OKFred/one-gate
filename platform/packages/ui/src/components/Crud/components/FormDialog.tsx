@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
   Box,
+  Alert,
   IconButton,
   CircularProgress,
   useTheme,
@@ -21,6 +22,8 @@ interface FormDialogProps<TRecord, TFilters, TApiData, TExtra = unknown> {
   form: Partial<TRecord>;
   setForm: React.Dispatch<React.SetStateAction<Partial<TRecord>>>;
   formLoading: boolean;
+  schemaLoading: boolean;
+  usingFallbackSchema: boolean;
   errorContextValue: {
     fieldErrors: Record<string, string>;
     clearFieldError: (path: string) => void;
@@ -41,6 +44,8 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
   form,
   setForm,
   formLoading,
+  schemaLoading,
+  usingFallbackSchema,
   errorContextValue,
   config,
   resolvedSchema,
@@ -89,27 +94,38 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
           px: isMobile ? 2 : 3,
         }}
       >
-        {!resolvedSchema ? (
+        {schemaLoading ? (
           <Box
             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 200 }}
           >
             <CircularProgress />
           </Box>
+        ) : !resolvedSchema ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {t('form.schemaUnavailable')}
+          </Alert>
         ) : (
-          <SchemaForm schema={resolvedSchema} contextValue={errorContextValue}>
-            <Box sx={{ pt: 2 }}>
-              {config.form.renderForm ? (
-                config.form.renderForm(form, setForm, isMobile, t, extraContext)
-              ) : (
-                <DynamicForm
-                  schema={resolvedSchema}
-                  value={form as Record<string, unknown>}
-                  onChange={(val) => setForm(val as Partial<TRecord>)}
-                  disabled={formLoading}
-                />
-              )}
-            </Box>
-          </SchemaForm>
+          <>
+            {usingFallbackSchema && (
+              <Alert severity="warning" sx={{ mt: 2 }}>
+                {t('form.schemaValidationFallback')}
+              </Alert>
+            )}
+            <SchemaForm schema={resolvedSchema} contextValue={errorContextValue}>
+              <Box sx={{ pt: 2 }}>
+                {config.form.renderForm ? (
+                  config.form.renderForm(form, setForm, isMobile, t, extraContext)
+                ) : (
+                  <DynamicForm
+                    schema={resolvedSchema}
+                    value={form as Record<string, unknown>}
+                    onChange={(val) => setForm(val as Partial<TRecord>)}
+                    disabled={formLoading}
+                  />
+                )}
+              </Box>
+            </SchemaForm>
+          </>
         )}
       </DialogContent>
 
@@ -136,7 +152,7 @@ export function FormDialog<TRecord, TFilters, TApiData, TExtra = unknown>({
           color="primary"
           fullWidth={isMobile}
           size={isMobile ? 'large' : 'medium'}
-          disabled={formLoading || !resolvedSchema}
+          disabled={formLoading || schemaLoading || !resolvedSchema}
         >
           {t('dialog.save')}
         </Button>

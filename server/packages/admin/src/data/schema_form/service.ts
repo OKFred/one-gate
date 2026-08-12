@@ -8,7 +8,6 @@ import {
   SchemaFormUpdateVO,
   SchemaFormListKeys,
   SchemaFormDetailKeys,
-  SchemaFormGetKeys,
   SchemaFormDeleteKeys,
   SchemaFormAddKeys,
   SchemaFormUpdateKeys,
@@ -19,7 +18,6 @@ import {
   type SchemaFormAddVOLike,
   type SchemaFormUpdateVOLike,
   type SchemaFormDeleteVOLike,
-  type SchemaFormGetVOLike,
 } from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
@@ -35,6 +33,11 @@ import {
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { schemaFormRepository } from "./repository";
+import {
+  getSchemasByPrefix,
+  getVersionHash,
+} from "@hodor/core/utils/schemaRegistry";
+import { mergeSchemaSources } from "./schema-source";
 
 const listReq = {
   type: "object",
@@ -312,23 +315,6 @@ const batchGetRes = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-function cleanSchema(schema: any): any {
-  if (schema === null || typeof schema !== "object") {
-    return schema;
-  }
-  if (Array.isArray(schema)) {
-    return schema.map(cleanSchema);
-  }
-  const result: Record<string, any> = {};
-  for (const key of Object.keys(schema)) {
-    if (key === "example" || key === "examples" || key === "description") {
-      continue;
-    }
-    result[key] = cleanSchema(schema[key]);
-  }
-  return result;
-}
-
 function hasPermissionForSchema(
   rowCode: string,
   permissions: { code: string }[],
@@ -382,8 +368,6 @@ async function onBatchGet(
 ): Promise<FromSchema<typeof batchGetRes>> {
   const { prefix, version: clientVersion } = params;
 
-  // 从全局 registry 获取当前版本号
-  const { getVersionHash } = await import("@hodor/core/utils/schemaRegistry");
   const currentVersion = getVersionHash();
 
   // 版本号一致，返回 notModified
@@ -408,31 +392,21 @@ async function onBatchGet(
     }
   }
 
-  // 从数据库按前缀模糊查询
+  // 运行时 Registry 保证系统 Schema 随代码发布即可用；D1 同名数据保持热修复优先级。
+  const registeredSchemas = getSchemasByPrefix(prefix);
   const rows = await schemaFormRepository.findByPrefix(prefix);
+  const mergedSchemas = mergeSchemaSources(registeredSchemas, rows);
 
   const schemas: Record<string, string> = {};
-  for (const row of rows) {
+  for (const [code, schemaData] of mergedSchemas) {
     // 权限校验过滤：只返回用户拥有权限的 schema
     if (
       isSystem &&
-      !hasPermissionForSchema(
-        row.code,
-        userObj.permissions,
-        userObj.isSuperAdmin
-      )
+      !hasPermissionForSchema(code, userObj.permissions, userObj.isSuperAdmin)
     ) {
       continue;
     }
-
-    // 清洗无关字段
-    try {
-      const parsed = JSON.parse(row.schemaData);
-      const cleaned = cleanSchema(parsed);
-      schemas[row.code] = JSON.stringify(cleaned);
-    } catch (e) {
-      schemas[row.code] = row.schemaData;
-    }
+    schemas[code] = schemaData;
   }
 
   return {

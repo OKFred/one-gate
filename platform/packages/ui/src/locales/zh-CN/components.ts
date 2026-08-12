@@ -38,6 +38,8 @@ export const components = {
   'form.pleaseEnter': '请输入',
   'form.select': '请选择',
   'form.missingCredentials': '请输入用户名和密码',
+  'form.schemaUnavailable': '表单配置暂不可用，请刷新页面或联系管理员。',
+  'form.schemaValidationFallback': '动态表单配置暂不可用，当前由服务端在保存时完成校验。',
 
   // 筛选器
   'filter.title': '搜索与筛选',
