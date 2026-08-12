@@ -9,6 +9,7 @@ on:
     branches:
       - feature/SOC-20260611-fred
       - dev
+      - master
   pull_request:
     branches:
       - main
@@ -81,6 +82,21 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./server
 
+      # D1 结构是 Worker 发布前置条件；迁移或合约失败必须阻断新代码上线。
+      - name: Apply Remote D1 Migrations
+        run: pnpm run db:migrate:worker:remote
+        working-directory: ./server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify Remote D1 Schema Contract
+        run: pnpm run db:check:worker:remote
+        working-directory: ./server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy Workers Backend
         uses: cloudflare/wrangler-action@v4
         with:
@@ -95,11 +111,13 @@ jobs:
             GH_CLIENT_SECRET
             GH_ORG_NAME
             JWT_SECRET
+            MOBILE_SENSITIVE_DATA_KEY
         env:
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
 
       # 系统 Schema 属于发布产物的一部分；失败时阻断 Pages 发布，避免 UI 依赖空 D1 配置。
       - name: Sync System Schemas to Remote D1

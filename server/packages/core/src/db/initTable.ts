@@ -4,7 +4,7 @@ import db from "@hodor/core/db/index";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 import { fileURLToPath } from "node:url";
 
@@ -16,6 +16,14 @@ interface SqlFileInfo {
   relativePath: string;
   name: string;
   absolutePath: string;
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function getExecutable(name: "npx" | "pnpm"): string {
+  return process.platform === "win32" ? `${name}.cmd` : name;
 }
 
 function getSqlFilesRec(dir: string, baseDir = dir): SqlFileInfo[] {
@@ -140,6 +148,7 @@ async function runWranglerInit(
   console.log(`📂 发现 ${files.length} 个 SQL 脚本\n`);
 
   let successCount = 0;
+  const failedFiles: string[] = [];
   for (const file of files) {
     const filePath = file.absolutePath;
     let tempFilePath: string | null = null;
@@ -169,17 +178,27 @@ async function runWranglerInit(
       );
       fs.writeFileSync(tempFilePath, safeSqlContent, "utf8");
 
-      execSync(
-        `npx wrangler d1 execute hodor_db ${targetFlag} --file=${tempFilePath} --yes`,
+      execFileSync(
+        getExecutable("npx"),
+        [
+          "wrangler",
+          "d1",
+          "execute",
+          "hodor_db",
+          targetFlag,
+          `--file=${tempFilePath}`,
+          "--yes",
+        ],
         {
           stdio: "inherit",
         }
       );
       successCount++;
-    } catch (error: any) {
+    } catch (error: unknown) {
+      failedFiles.push(file.relativePath);
       console.error(
         `\n❌ [Wrangler] ${file.relativePath} 同步失败:`,
-        error.message
+        getErrorMessage(error)
       );
     } finally {
       if (tempFilePath && fs.existsSync(tempFilePath)) {
@@ -190,6 +209,27 @@ async function runWranglerInit(
 
   console.log(
     `\n✨ D1 [${target}] 同步完成: 成功 ${successCount}/${files.length} 个脚本`
+  );
+  if (failedFiles.length > 0) {
+    throw new Error(`D1 同步失败: ${failedFiles.join(", ")}`);
+  }
+}
+
+/** 使用 Wrangler 官方账本只应用未执行的 Worker D1 迁移。 */
+function runWranglerMigrations(target: "local" | "remote"): void {
+  const workerDir = path.resolve(__dirname, "../../../../apps/server");
+  execFileSync(
+    getExecutable("pnpm"),
+    [
+      "exec",
+      "wrangler",
+      "d1",
+      "migrations",
+      "apply",
+      "hodor_db",
+      target === "remote" ? "--remote" : "--local",
+    ],
+    { cwd: workerDir, stdio: "inherit" }
   );
 }
 
@@ -285,8 +325,8 @@ async function main() {
         "ALTER TABLE system_schema_form ADD COLUMN source TEXT NOT NULL DEFAULT 'user';"
       );
       console.log("ℹ️ 已手动为 system_schema_form 补充 source 字段");
-    } catch (e: any) {
-      const msg = e.message || "";
+    } catch (error: unknown) {
+      const msg = getErrorMessage(error);
       if (
         !msg.includes("duplicate column name") &&
         !msg.includes("already exists")
@@ -309,7 +349,11 @@ async function main() {
 
   if (flags.isWorker) {
     const target = flags.isRemote ? "remote" : "local";
-    await runWranglerInit(target, flags.isMigration);
+    if (flags.isMigration) {
+      runWranglerMigrations(target);
+    } else {
+      await runWranglerInit(target, false);
+    }
   }
 
   console.log("\n🎉 数据库 DDL 指令执行完毕！\n");
