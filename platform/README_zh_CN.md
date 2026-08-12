@@ -41,6 +41,20 @@ pnpm run dev
 - `pnpm run lint`：执行代码风格检查。
 - `pnpm run i18n:scan`：自动扫描源代码中的国际化 Key。
 
+## Playwright 冒烟测试
+
+复制与部署无关的模板，并填写自己的管理前端/API Origin：
+
+```bash
+cp .env.playwright.example .env.playwright.local
+pnpm test:e2e:auth
+pnpm test:e2e
+```
+
+`HODOR_E2E_BASE_URL` 必填；`HODOR_E2E_ALLOWED_ORIGINS` 和
+`HODOR_E2E_DEVICE_CLIENT_ID` 可选。本地环境文件和保存的浏览器登录态均由
+Git 忽略。
+
 ---
 
 [English Version (README.md)](README.md)

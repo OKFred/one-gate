@@ -23,3 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 i18n-scan-report.md
+
+# Playwright authentication and test artifacts
+playwright/.auth/
+playwright-report/
+blob-report/
+test-results/
