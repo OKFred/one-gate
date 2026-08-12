@@ -30,6 +30,10 @@ export const components = {
   'form.pleaseEnter': 'Please Enter',
   'form.select': 'Please Select',
   'form.missingCredentials': 'Please enter username and password',
+  'form.schemaUnavailable':
+    'The form configuration is unavailable. Refresh or contact an administrator.',
+  'form.schemaValidationFallback':
+    'The dynamic form configuration is unavailable. Validation will run on the server when saved.',
 
   'filter.title': 'Search & Filter',
   'filter.clear': 'Clear Filters',

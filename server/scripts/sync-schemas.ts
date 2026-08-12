@@ -125,7 +125,9 @@ async function main() {
         }
       }
     }
-    console.log(`\n🎉 D1 [${target}] 364 个 Schema 全部批次自动同步成功！\n`);
+    console.log(
+      `\n🎉 D1 [${target}] ${schemaCount} 个 Schema 全部批次自动同步成功！\n`
+    );
   } else {
     console.log(`\n💡 [导入指引] 您可以直接通过以下命令完成导入：`);
     console.log(`\n  - 本地 D1 数据库：`);

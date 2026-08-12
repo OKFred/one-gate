@@ -66,44 +66,50 @@ async function fetchSchemas(
   names: string[],
   cachedVersion?: string,
 ): Promise<SchemaCacheEntry | null> {
-  const cacheKey = names.sort().join(',');
+  const sortedNames = [...names].sort();
+  const cacheKey = `${cachedVersion ?? '<full>'}:${sortedNames.join(',')}`;
   const existing = pendingRequests.get(cacheKey);
   if (existing) return existing;
 
-  const prefix = names.length > 0 ? getPrefixFromCode(names[0]) : '';
-
-  const promise = batchGetFn({
-    data: { prefix, version: cachedVersion },
-  })
-    .then((res) => {
-      const data = res.data?.data;
-      if (!data) return null;
-
-      if (data.notModified) {
-        // 服务端确认缓存有效
+  const prefixes = [...new Set(sortedNames.map(getPrefixFromCode))].filter(Boolean);
+  const promise = Promise.all(
+    prefixes.map(async (prefix) => {
+      try {
+        const res = await batchGetFn({
+          data: { prefix, version: cachedVersion },
+        });
+        return res.data?.data ?? null;
+      } catch {
+        return null;
+      }
+    }),
+  )
+    .then((responses) => {
+      const availableResponses = responses.filter((response) => response !== null);
+      if (availableResponses.length === 0 || availableResponses.every((data) => data.notModified)) {
         return null;
       }
 
-      // 解析 schemas：后端返回的是 JSON 字符串，需要 parse
       const parsed: Record<string, Record<string, unknown>> = {};
-      for (const [key, val] of Object.entries(data.schemas || {})) {
-        try {
-          parsed[key] =
-            typeof val === 'string' ? JSON.parse(val) : (val as Record<string, unknown>);
-        } catch {
-          console.warn(`[useSchema] 解析 schema "${key}" 失败`);
+      for (const data of availableResponses) {
+        if (data.notModified) continue;
+        for (const [key, val] of Object.entries(data.schemas || {})) {
+          try {
+            parsed[key] =
+              typeof val === 'string' ? JSON.parse(val) : (val as Record<string, unknown>);
+          } catch {
+            // 单条无效 Schema 视为缺失，由调用方进入明确的缺失/降级状态。
+          }
         }
       }
 
-      const entry: SchemaCacheEntry = {
-        version: data.version,
+      const version = availableResponses.find((data) => !data.notModified)?.version;
+      if (!version) return null;
+
+      return {
+        version,
         schemas: parsed,
-      };
-      return entry;
-    })
-    .catch((err) => {
-      console.error('[useSchema] 获取 schema 失败:', err);
-      return null;
+      } satisfies SchemaCacheEntry;
     })
     .finally(() => {
       pendingRequests.delete(cacheKey);
@@ -129,6 +135,15 @@ export function useSchema(config: { schema: string; updateSchema?: string }): {
 
     async function load() {
       const { schema: schemaName, updateSchema: updateSchemaName } = configRef.current;
+      if (!schemaName) {
+        if (!cancelled) {
+          setSchemas({});
+          setLoading(false);
+        }
+        return;
+      }
+
+      if (!cancelled) setLoading(true);
       const names = [schemaName];
       if (updateSchemaName) names.push(updateSchemaName);
 

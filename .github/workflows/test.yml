@@ -101,6 +101,14 @@ jobs:
           GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
+      # 系统 Schema 属于发布产物的一部分；失败时阻断 Pages 发布，避免 UI 依赖空 D1 配置。
+      - name: Sync System Schemas to Remote D1
+        run: pnpm run sync:schemas --remote
+        working-directory: ./server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       # ─── 步骤 2: 部署前端 Pages ───
       - name: Install Frontend Dependencies
         run: pnpm install --frozen-lockfile
