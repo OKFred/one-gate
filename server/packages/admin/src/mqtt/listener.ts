@@ -7,6 +7,11 @@ import {
   type DeviceTaskResultPayload,
 } from "../mobile/async-task/facade.js";
 import {
+  processIncomingDeploymentEvent,
+  timeoutExpiredClientDeployments,
+} from "../mobile/client-deployment/facade.js";
+import { parseDeviceDeploymentEvent } from "../mobile/client-deployment/domain/deployment.js";
+import {
   cleanupExpiredDeviceEvents,
   markTimedOutDevicesOffline,
   processDeviceEvent,
@@ -194,9 +199,26 @@ function assertTopicDevice(topic: string, deviceId: string): void {
   }
 }
 
+/** 校验独立部署管理 Topic 中的设备标识。 */
+function assertDeploymentTopicDevice(topic: string, deviceId: string): void {
+  if (topic.split("/")[4] !== deviceId) {
+    throw new Error("Deployment payload deviceId does not match MQTT topic");
+  }
+}
+
 /** 按 Topic 路由一条 MQTT 入站消息。 */
 async function routeMessage(topic: string, payload: Buffer): Promise<void> {
   const value: unknown = JSON.parse(payload.toString());
+  if (
+    topic.startsWith("autojs6/deploy/v1/devices/") &&
+    topic.endsWith("/events")
+  ) {
+    const event = parseDeviceDeploymentEvent(value);
+    if (!event) throw new Error("Invalid AutoJS6 deployment event payload");
+    assertDeploymentTopicDevice(topic, event.deviceId);
+    await processIncomingDeploymentEvent(event);
+    return;
+  }
   if (topic.startsWith("autojs6/v2/devices/") && topic.endsWith("/results")) {
     const result = parseTaskResult(value);
     if (!result) throw new Error("Invalid AutoJS6 v2 task result payload");
@@ -270,6 +292,7 @@ export async function startMqttEventListener(): Promise<void> {
         "autojs6/v2/devices/+/results",
         "autojs6/v2/devices/+/presence",
         "autojs6/v2/devices/+/info",
+        "autojs6/deploy/v1/devices/+/events",
       ];
       mqttClient?.subscribe(topics, { qos: 1 }, (error) => {
         if (error) console.error("[MQTT_LISTENER] Subscribe failed", error);
@@ -293,6 +316,7 @@ export async function startMqttEventListener(): Promise<void> {
     timeoutScanner ??= setInterval(() => {
       void Promise.all([
         timeoutExpiredDeviceTasks(),
+        timeoutExpiredClientDeployments(),
         markTimedOutDevicesOffline(),
       ]).catch((error) =>
         console.error("[AUTOJS6] Periodic timeout scan failed", error)

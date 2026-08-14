@@ -12,6 +12,7 @@ on:
       - master
   pull_request:
     branches:
+      - dev
       - main
       - master
 
@@ -112,12 +113,14 @@ jobs:
             GH_ORG_NAME
             JWT_SECRET
             MOBILE_SENSITIVE_DATA_KEY
+            MOBILE_RELEASE_PUBLISH_TOKEN
         env:
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
+          MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
 
       # 系统 Schema 属于发布产物的一部分；失败时阻断 Pages 发布，避免 UI 依赖空 D1 配置。
       - name: Sync System Schemas to Remote D1

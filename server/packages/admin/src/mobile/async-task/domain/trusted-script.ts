@@ -9,7 +9,6 @@ export const MOBILE_TRUSTED_SCRIPT_IDS = [
   "app.update.zip",
   "file.download",
   "tiktok.post",
-  "client.self-update",
   "device.network.switch",
 ] as const;
 export type TrustedScriptId = (typeof MOBILE_TRUSTED_SCRIPT_IDS)[number];
@@ -62,11 +61,6 @@ export const TRUSTED_SCRIPT_CATALOG = {
     version: 1,
     defaultTimeoutMs: 420_000,
     maxTimeoutMs: 900_000,
-  },
-  "client.self-update": {
-    version: 1,
-    defaultTimeoutMs: 30_000,
-    maxTimeoutMs: 60_000,
   },
   "device.network.switch": {
     version: 1,

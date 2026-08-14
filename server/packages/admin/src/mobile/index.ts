@@ -7,6 +7,11 @@ import appVersion from "./app-version/index.js";
 import deviceApp from "./device-app/index.js";
 import asyncTask from "./async-task/index.js";
 import tiktokTask from "./tiktok-task/index.js";
+import {
+  createClientDeploymentApp,
+  createClientEnvironmentApp,
+  createClientReleaseApp,
+} from "./client-deployment/index.js";
 import { initializeMobileTaskResultHandlers } from "./bootstrap.js";
 
 function createMobileApp() {
@@ -18,6 +23,9 @@ function createMobileApp() {
   app.route("/device-app", deviceApp());
   app.route("/async-task", asyncTask());
   app.route("/tiktok-task", tiktokTask());
+  app.route("/client-release", createClientReleaseApp());
+  app.route("/client-environment", createClientEnvironmentApp());
+  app.route("/client-deployment", createClientDeploymentApp());
   return app;
 }
 

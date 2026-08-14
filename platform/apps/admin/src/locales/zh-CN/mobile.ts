@@ -19,6 +19,7 @@ export const mobile = {
   'mobile.device.tabs.overview': '概览',
   'mobile.device.tabs.metadata': '扩展信息',
   'mobile.device.tabs.events': '事件',
+  'mobile.device.tabs.deployments': '客户端部署',
   'mobile.device.hardware': '硬件信息',
   'mobile.device.clientVersions': '客户端版本',
   'mobile.device.battery': '电量',
@@ -54,6 +55,36 @@ export const mobile = {
   'mobile.device.reportToken': '设备上报令牌',
   'mobile.device.tokenOnce': '该明文只显示一次；关闭后无法再次查看，只能重置。',
   'mobile.device.tokenCopied': '令牌已复制',
+
+  // Client release, environment and deployment
+  'mobile.deployment.isolationHint':
+    '每台手机只运行一个实例；版本内容只读，环境状态与密钥独立持久化。',
+  'mobile.deployment.applyTitle': '切换版本与环境',
+  'mobile.deployment.release': '客户端版本',
+  'mobile.deployment.environment': '环境',
+  'mobile.deployment.activationMode': '切换模式',
+  'mobile.deployment.apply': '开始部署',
+  'mobile.deployment.forceConfirm':
+    'FORCE 会抢占当前任务并执行引擎、输入法和临时文件清理。确定继续吗？',
+  'mobile.deployment.accepted': '部署已受理',
+  'mobile.deployment.environments': '环境模板修订',
+  'mobile.deployment.secretKeys': '个本地密钥键',
+  'mobile.deployment.releases': '不可变发布版本',
+  'mobile.deployment.revoke': '撤销新部署',
+  'mobile.deployment.revokeConfirm': '撤销后不能用于新部署，但不会删除设备仍引用的制品。继续吗？',
+  'mobile.deployment.history': '设备部署历史',
+  'mobile.deployment.empty': '暂无部署记录',
+  'mobile.deployment.rollback': '回滚到部署前组合',
+  'mobile.deployment.rollbackConfirm': '将创建一个新的优雅回滚部署，确定继续吗？',
+  'mobile.deployment.rollbackAccepted': '回滚部署已受理',
+  'mobile.deployment.editEnvironment': '新建环境修订',
+  'mobile.deployment.environmentWarning':
+    '配置只能包含非敏感业务策略；MQTT、设备身份、上报凭据和密钥值禁止写入。',
+  'mobile.deployment.configJson': '非敏感配置 JSON',
+  'mobile.deployment.requiredSecretKeys': '设备本地密钥键名',
+  'mobile.deployment.requiredSecretKeysHint': '每行或逗号分隔；只填写键名，不填写密钥值。',
+  'mobile.deployment.invalidJson': '配置必须是有效的 JSON 对象',
+  'mobile.deployment.environmentSaved': '新的不可变环境修订已激活',
 
   // App Management
   'mobile.app.title': '应用管理',

@@ -48,6 +48,7 @@ export class S3Provider implements StorageProvider {
       Bucket: this.bucket,
       Key: key,
       ContentType: options?.contentType,
+      Metadata: options?.customMetadata,
     });
     return getSignedUrl(this.client, command, {
       expiresIn: options?.expiresIn || 3600,
@@ -106,6 +107,7 @@ export class S3Provider implements StorageProvider {
         size: response.ContentLength,
         contentType: response.ContentType,
         lastModified: response.LastModified,
+        customMetadata: response.Metadata,
       };
     } catch (error: any) {
       if (

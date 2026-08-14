@@ -14,6 +14,7 @@ export interface StorageObjectMetadata {
 export interface PresignedUrlOptions {
   expiresIn?: number; // 秒
   contentType?: string;
+  customMetadata?: Record<string, string>;
 }
 
 export interface StorageListOptions {

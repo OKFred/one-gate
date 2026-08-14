@@ -23,6 +23,7 @@ interface __BaseEnv_Env {
   TEST_MAIL_WRONG_ADDRESS: string;
   TEST_MAIL_WRONG_PASSWORD: string;
   TEST_MAIL_RECEIVER: string;
+  MOBILE_RELEASE_PUBLISH_TOKEN: string;
 }
 declare namespace Cloudflare {
   interface GlobalProps {
@@ -57,6 +58,7 @@ declare namespace NodeJS {
       | "TEST_MAIL_WRONG_ADDRESS"
       | "TEST_MAIL_WRONG_PASSWORD"
       | "TEST_MAIL_RECEIVER"
+      | "MOBILE_RELEASE_PUBLISH_TOKEN"
     >
   > {}
 }
