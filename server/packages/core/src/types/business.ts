@@ -159,6 +159,12 @@ export const BUSINESS = {
   "admin.mobile.async_task": "admin.mobile.async_task",
   /** 自动生成: admin.mobile.device_app */
   "admin.mobile.device_app": "admin.mobile.device_app",
+  /** AutoJS6 客户端发布 */
+  "admin.mobile.client_release": "admin.mobile.client_release",
+  /** AutoJS6 客户端环境 */
+  "admin.mobile.client_environment": "admin.mobile.client_environment",
+  /** AutoJS6 客户端部署 */
+  "admin.mobile.client_deployment": "admin.mobile.client_deployment",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

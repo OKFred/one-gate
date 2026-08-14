@@ -17,6 +17,8 @@ describe("public authentication route whitelist", () => {
 
     expect(source).toContain('"/admin/system/auth/oauth/login/url"');
     expect(source).toContain('"/admin/system/auth/oauth/login/callback"');
+    expect(source).toContain('"/admin/mobile/client-release/upload/prepare"');
+    expect(source).toContain('"/admin/mobile/client-release/upload/finalize"');
     expect(source).not.toContain('"/admin/system/auth/github/url"');
     expect(source).not.toContain('"/admin/system/auth/github/login"');
     expect(source).not.toContain('"/admin/system/auth/oauth/account/url"');

@@ -13927,6 +13927,702 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/client-release/upload/prepare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 准备客户端不可变发布上传 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_release.upload.prepare.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_release.upload.prepare.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-release/upload/finalize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 完成客户端不可变发布 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_release.upload.finalize.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_release.upload.finalize.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-release/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页查询客户端发布 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_release.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_release.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-release/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取客户端发布详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_release.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_release.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-release/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 撤销客户端版本的新部署资格 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_release.revoke.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_release.revoke.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-environment/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 列出客户端环境当前修订 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_environment.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_environment.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-environment/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取客户端环境当前修订 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_environment.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_environment.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-environment/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 新建并激活客户端环境修订 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_environment.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_environment.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-deployment/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 异步部署客户端版本和环境 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_deployment.apply.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_deployment.apply.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-deployment/rollback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 回滚到部署前健康组合 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_deployment.rollback.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_deployment.rollback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-deployment/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询客户端部署状态 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_deployment.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_deployment.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/client-deployment/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页查询客户端部署历史 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.client_deployment.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.client_deployment.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -26812,7 +27508,7 @@ export interface components {
              * @description 手机端可信脚本标识
              * @enum {string}
              */
-            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "client.self-update" | "device.network.switch";
+            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "device.network.switch";
             /** @description 传递给本地可信脚本的结构化参数 */
             params: {
                 [key: string]: unknown;
@@ -26996,6 +27692,372 @@ export interface components {
                 /** @enum {string} */
                 action: "publish" | "preflight" | "recover" | "status";
                 publicationId: string;
+            };
+            message: string;
+        };
+        "admin.mobile.client_release.upload.prepare.req": {
+            releaseVersion: string;
+            artifactSha256: string;
+            artifactSize: number;
+            manifest: {
+                [key: string]: unknown;
+            };
+        };
+        "admin.mobile.client_release.upload.prepare.res": {
+            ok: boolean;
+            data: {
+                uploadId: string;
+                uploadUrl: string;
+                artifactKey: string;
+                expiresAt: number;
+            };
+            message: string;
+        };
+        "admin.mobile.client_release.upload.finalize.req": {
+            uploadId: string;
+            releaseNotes?: ((string | null) | null) | null;
+        };
+        "admin.mobile.client_release.upload.finalize.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                releaseVersion: string;
+                artifactKey: string;
+                artifactSha256: string;
+                artifactSize: number;
+                manifest: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                status: "PUBLISHED" | "REVOKED";
+                releaseNotes: ((string | null) | null) | null;
+                creatorId: number;
+                updaterId: ((number | null) | null) | null;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.client_release.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+        };
+        "admin.mobile.client_release.list.res": {
+            ok: boolean;
+            data: {
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageNo: number;
+                pageSize: number;
+                list: {
+                    id: number;
+                    releaseVersion: string;
+                    artifactKey: string;
+                    artifactSha256: string;
+                    artifactSize: number;
+                    manifest: {
+                        [key: string]: unknown;
+                    };
+                    /** @enum {string} */
+                    status: "PUBLISHED" | "REVOKED";
+                    releaseNotes: ((string | null) | null) | null;
+                    creatorId: number;
+                    updaterId: ((number | null) | null) | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.mobile.client_release.get.req": {
+            releaseVersion: string;
+        };
+        "admin.mobile.client_release.get.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                releaseVersion: string;
+                artifactKey: string;
+                artifactSha256: string;
+                artifactSize: number;
+                manifest: {
+                    [key: string]: unknown;
+                };
+                /** @enum {string} */
+                status: "PUBLISHED" | "REVOKED";
+                releaseNotes: ((string | null) | null) | null;
+                creatorId: number;
+                updaterId: ((number | null) | null) | null;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.client_release.revoke.req": {
+            releaseVersion: string;
+        };
+        "admin.mobile.client_release.revoke.res": {
+            ok: boolean;
+            data: boolean;
+            message: string;
+        };
+        "admin.mobile.client_environment.list.req": Record<string, never>;
+        "admin.mobile.client_environment.list.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                /** @enum {string} */
+                name: "development" | "staging" | "production";
+                isEnabled: boolean;
+                revision: number;
+                config: {
+                    [key: string]: unknown;
+                };
+                requiredSecretKeys: string[];
+                createTimeUtc: number;
+            }[];
+            message: string;
+        };
+        "admin.mobile.client_environment.get.req": {
+            /** @enum {string} */
+            environment: "development" | "staging" | "production";
+        };
+        "admin.mobile.client_environment.get.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                /** @enum {string} */
+                name: "development" | "staging" | "production";
+                isEnabled: boolean;
+                revision: number;
+                config: {
+                    [key: string]: unknown;
+                };
+                requiredSecretKeys: string[];
+                createTimeUtc: number;
+            };
+            message: string;
+        };
+        "admin.mobile.client_environment.update.req": {
+            /** @enum {string} */
+            environment: "development" | "staging" | "production";
+            config: {
+                [key: string]: unknown;
+            };
+            requiredSecretKeys: string[];
+        };
+        "admin.mobile.client_environment.update.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                /** @enum {string} */
+                name: "development" | "staging" | "production";
+                isEnabled: boolean;
+                revision: number;
+                config: {
+                    [key: string]: unknown;
+                };
+                requiredSecretKeys: string[];
+                createTimeUtc: number;
+            };
+            message: string;
+        };
+        "admin.mobile.client_deployment.apply.req": {
+            clientId: string;
+            releaseVersion: string;
+            /** @enum {string} */
+            environment: "development" | "staging" | "production";
+            /**
+             * @default GRACEFUL
+             * @enum {string}
+             */
+            activationMode: "GRACEFUL" | "FORCE";
+            /** @default 900000 */
+            drainTimeoutMs: number;
+            /** @default false */
+            forceConfirmed: boolean;
+        };
+        "admin.mobile.client_deployment.apply.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                deploymentId: string;
+                clientId: string;
+                releaseVersion: string;
+                releaseDigest: string;
+                /** @enum {string} */
+                environment: "development" | "staging" | "production";
+                environmentRevision: number;
+                /** @enum {string} */
+                activationMode: "GRACEFUL" | "FORCE";
+                drainTimeoutMs: number;
+                /** @enum {string} */
+                phase: "PENDING" | "STAGING" | "DRAINING" | "PREEMPTING" | "ACTIVATING" | "VERIFYING" | "SUCCEEDED" | "FAILED" | "ROLLED_BACK" | "TIMED_OUT" | "CANCELLED";
+                previousReleaseVersion: ((string | null) | null) | null;
+                previousReleaseDigest: ((string | null) | null) | null;
+                /** @enum {string|null|null} */
+                previousEnvironment: "development" | "staging" | "production" | null;
+                previousEnvironmentRevision: ((number | null) | null) | null;
+                resultCode: ((string | null) | null) | null;
+                resultMessage: ((string | null) | null) | null;
+                expiresAtUtc: number;
+                startedAtUtc: ((number | null) | null) | null;
+                finishedAtUtc: ((number | null) | null) | null;
+                creatorId: number;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.client_deployment.rollback.req": {
+            deploymentId: string;
+            /**
+             * @default GRACEFUL
+             * @enum {string}
+             */
+            activationMode: "GRACEFUL" | "FORCE";
+            /** @default false */
+            forceConfirmed: boolean;
+        };
+        "admin.mobile.client_deployment.rollback.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                deploymentId: string;
+                clientId: string;
+                releaseVersion: string;
+                releaseDigest: string;
+                /** @enum {string} */
+                environment: "development" | "staging" | "production";
+                environmentRevision: number;
+                /** @enum {string} */
+                activationMode: "GRACEFUL" | "FORCE";
+                drainTimeoutMs: number;
+                /** @enum {string} */
+                phase: "PENDING" | "STAGING" | "DRAINING" | "PREEMPTING" | "ACTIVATING" | "VERIFYING" | "SUCCEEDED" | "FAILED" | "ROLLED_BACK" | "TIMED_OUT" | "CANCELLED";
+                previousReleaseVersion: ((string | null) | null) | null;
+                previousReleaseDigest: ((string | null) | null) | null;
+                /** @enum {string|null|null} */
+                previousEnvironment: "development" | "staging" | "production" | null;
+                previousEnvironmentRevision: ((number | null) | null) | null;
+                resultCode: ((string | null) | null) | null;
+                resultMessage: ((string | null) | null) | null;
+                expiresAtUtc: number;
+                startedAtUtc: ((number | null) | null) | null;
+                finishedAtUtc: ((number | null) | null) | null;
+                creatorId: number;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.client_deployment.get.req": {
+            deploymentId: string;
+        };
+        "admin.mobile.client_deployment.get.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                deploymentId: string;
+                clientId: string;
+                releaseVersion: string;
+                releaseDigest: string;
+                /** @enum {string} */
+                environment: "development" | "staging" | "production";
+                environmentRevision: number;
+                /** @enum {string} */
+                activationMode: "GRACEFUL" | "FORCE";
+                drainTimeoutMs: number;
+                /** @enum {string} */
+                phase: "PENDING" | "STAGING" | "DRAINING" | "PREEMPTING" | "ACTIVATING" | "VERIFYING" | "SUCCEEDED" | "FAILED" | "ROLLED_BACK" | "TIMED_OUT" | "CANCELLED";
+                previousReleaseVersion: ((string | null) | null) | null;
+                previousReleaseDigest: ((string | null) | null) | null;
+                /** @enum {string|null|null} */
+                previousEnvironment: "development" | "staging" | "production" | null;
+                previousEnvironmentRevision: ((number | null) | null) | null;
+                resultCode: ((string | null) | null) | null;
+                resultMessage: ((string | null) | null) | null;
+                expiresAtUtc: number;
+                startedAtUtc: ((number | null) | null) | null;
+                finishedAtUtc: ((number | null) | null) | null;
+                creatorId: number;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.client_deployment.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            clientId?: string;
+        };
+        "admin.mobile.client_deployment.list.res": {
+            ok: boolean;
+            data: {
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageNo: number;
+                pageSize: number;
+                list: {
+                    id: number;
+                    deploymentId: string;
+                    clientId: string;
+                    releaseVersion: string;
+                    releaseDigest: string;
+                    /** @enum {string} */
+                    environment: "development" | "staging" | "production";
+                    environmentRevision: number;
+                    /** @enum {string} */
+                    activationMode: "GRACEFUL" | "FORCE";
+                    drainTimeoutMs: number;
+                    /** @enum {string} */
+                    phase: "PENDING" | "STAGING" | "DRAINING" | "PREEMPTING" | "ACTIVATING" | "VERIFYING" | "SUCCEEDED" | "FAILED" | "ROLLED_BACK" | "TIMED_OUT" | "CANCELLED";
+                    previousReleaseVersion: ((string | null) | null) | null;
+                    previousReleaseDigest: ((string | null) | null) | null;
+                    /** @enum {string|null|null} */
+                    previousEnvironment: "development" | "staging" | "production" | null;
+                    previousEnvironmentRevision: ((number | null) | null) | null;
+                    resultCode: ((string | null) | null) | null;
+                    resultMessage: ((string | null) | null) | null;
+                    expiresAtUtc: number;
+                    startedAtUtc: ((number | null) | null) | null;
+                    finishedAtUtc: ((number | null) | null) | null;
+                    creatorId: number;
+                    createTimeUtc: number;
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
             };
             message: string;
         };

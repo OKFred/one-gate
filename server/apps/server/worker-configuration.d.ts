@@ -32,6 +32,7 @@ interface __BaseEnv_Env {
   OAUTH_ALLOWED_REDIRECT_ORIGINS: string;
   OAUTH_SENSITIVE_DATA_KEY: string;
   MOBILE_SENSITIVE_DATA_KEY: string;
+  MOBILE_RELEASE_PUBLISH_TOKEN: string;
 }
 declare namespace Cloudflare {
   interface GlobalProps {
@@ -75,6 +76,7 @@ declare namespace NodeJS {
       | "OAUTH_ALLOWED_REDIRECT_ORIGINS"
       | "OAUTH_SENSITIVE_DATA_KEY"
       | "MOBILE_SENSITIVE_DATA_KEY"
+      | "MOBILE_RELEASE_PUBLISH_TOKEN"
     >
   > {}
 }

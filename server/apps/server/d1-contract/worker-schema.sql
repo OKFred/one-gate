@@ -128,3 +128,25 @@ LIMIT 0;
 SELECT `id`
 FROM `system_user_oauth` INDEXED BY `system_user_oauth_user_provider_unique`
 LIMIT 0;
+
+SELECT `id`, `release_version`, `artifact_key`, `artifact_sha256`, `artifact_size`, `manifest_json`, `status`
+FROM `admin_mobile_client_release`
+LIMIT 0;
+SELECT `id` FROM `admin_mobile_client_release` INDEXED BY `admin_mobile_client_release_version_unique` LIMIT 0;
+SELECT `id` FROM `admin_mobile_client_release` INDEXED BY `admin_mobile_client_release_digest_unique` LIMIT 0;
+
+SELECT `id`, `name`, `active_revision_id`, `is_enabled`
+FROM `admin_mobile_client_environment`
+LIMIT 0;
+SELECT `id` FROM `admin_mobile_client_environment` INDEXED BY `admin_mobile_client_environment_name_unique` LIMIT 0;
+
+SELECT `id`, `environment_id`, `revision`, `config_json`, `required_secret_keys_json`
+FROM `admin_mobile_client_environment_revision`
+LIMIT 0;
+SELECT `id` FROM `admin_mobile_client_environment_revision` INDEXED BY `admin_mobile_client_env_revision_unique` LIMIT 0;
+
+SELECT `id`, `deployment_id`, `client_id`, `active_client_id`, `release_version`, `release_digest`, `environment`, `environment_revision`, `activation_mode`, `phase`, `expires_at_utc`
+FROM `admin_mobile_client_deployment`
+LIMIT 0;
+SELECT `id` FROM `admin_mobile_client_deployment` INDEXED BY `admin_mobile_client_deployment_id_unique` LIMIT 0;
+SELECT `id` FROM `admin_mobile_client_deployment` INDEXED BY `admin_mobile_client_deployment_active_device_unique` LIMIT 0;

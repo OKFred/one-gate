@@ -221,4 +221,62 @@ describe("legacy D1 schema migrations", () => {
       })
     ).rejects.toThrow();
   });
+
+  it("creates immutable client release, environment revision, and deployment tables", async () => {
+    const client = createMemoryClient();
+    await executeSqlFile(
+      client,
+      readMigration("./20260814_01_mobile_client_deployment.sql")
+    );
+
+    const objects = await client.execute(`
+      SELECT name FROM sqlite_master
+      WHERE name LIKE 'admin_mobile_client_%'
+    `);
+    const names = new Set(objects.rows.map((item) => String(item.name)));
+    expect(names).toEqual(
+      new Set([
+        "admin_mobile_client_release",
+        "admin_mobile_client_release_version_unique",
+        "admin_mobile_client_release_digest_unique",
+        "admin_mobile_client_release_status_idx",
+        "admin_mobile_client_environment",
+        "admin_mobile_client_environment_name_unique",
+        "admin_mobile_client_environment_revision",
+        "admin_mobile_client_env_revision_unique",
+        "admin_mobile_client_deployment",
+        "admin_mobile_client_deployment_id_unique",
+        "admin_mobile_client_deployment_active_device_unique",
+        "admin_mobile_client_deployment_device_time_idx",
+        "admin_mobile_client_deployment_phase_idx",
+      ])
+    );
+
+    await client.execute(`
+      INSERT INTO admin_mobile_client_deployment (
+        deployment_id, client_id, active_client_id, release_id,
+        release_version, release_digest, environment_revision_id,
+        environment, environment_revision, activation_mode,
+        drain_timeout_ms, phase, expires_at_utc, creator_id
+      ) VALUES (
+        '00000000-0000-4000-8000-000000000001', 'phone-001', 'phone-001', 1,
+        'v1.2.3', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1,
+        'production', 1, 'GRACEFUL', 900000, 'PENDING', 1, 1
+      )
+    `);
+    await expect(
+      client.execute(`
+        INSERT INTO admin_mobile_client_deployment (
+          deployment_id, client_id, active_client_id, release_id,
+          release_version, release_digest, environment_revision_id,
+          environment, environment_revision, activation_mode,
+          drain_timeout_ms, phase, expires_at_utc, creator_id
+        ) VALUES (
+          '00000000-0000-4000-8000-000000000002', 'phone-001', 'phone-001', 1,
+          'v1.2.3', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 1,
+          'production', 1, 'GRACEFUL', 900000, 'PENDING', 1, 1
+        )
+      `)
+    ).rejects.toThrow();
+  });
 });
