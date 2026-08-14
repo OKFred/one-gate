@@ -1,4 +1,9 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  integer,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
@@ -305,11 +310,28 @@ export const userOauthTable = sqliteTable(
     provider: text("provider").notNull(), // e.g., 'github'
     providerId: text("provider_id").notNull(), // User ID from the provider
     providerUsername: text("provider_username"), // Username from the provider
+    providerTenantId: text("provider_tenant_id"),
+    encryptedProfile: text("encrypted_profile"),
+    encryptedAccessToken: text("encrypted_access_token"),
+    encryptedRefreshToken: text("encrypted_refresh_token"),
+    scopes: text("scopes", { mode: "json" }).$type<string[]>(),
+    tokenExpiresAtUtc: integer("token_expires_at_utc"),
+    lastVerifiedAtUtc: integer("last_verified_at_utc"),
     createTimeUtc: integer("create_time_utc")
       .notNull()
       .default(getCurrentTimestampUtcSql()),
     updateTimeUtc: integer("update_time_utc"),
-  }
+  },
+  (table) => [
+    uniqueIndex("system_user_oauth_provider_identity_unique").on(
+      table.provider,
+      table.providerId
+    ),
+    uniqueIndex("system_user_oauth_user_provider_unique").on(
+      table.userId,
+      table.provider
+    ),
+  ]
 );
 
 export default userTable;

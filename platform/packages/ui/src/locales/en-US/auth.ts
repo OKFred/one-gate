@@ -19,7 +19,8 @@ export const auth = {
   'github.bound': 'Bound: {{username}}',
   'github.unbind': 'Unbind GitHub',
   'github.unbindTitle': 'Confirm Unbinding GitHub Account?',
-  'github.unbindConfirm': 'Currently bound to GitHub account {{username}}. After unbinding, you will not be able to log in directly with this GitHub account. Are you sure?',
+  'github.unbindConfirm':
+    'Currently bound to GitHub account {{username}}. After unbinding, you will not be able to log in directly with this GitHub account. Are you sure?',
   'github.unbindSuccess': 'GitHub account unbound successfully!',
   'github.bindSuccess': 'GitHub account bound successfully!',
   'github.loginSuccess': 'Login successful',
@@ -29,6 +30,27 @@ export const auth = {
   'github.verifying': 'Verifying GitHub authorization, please wait...',
   'github.back': 'Back',
   'github.confirmUnbind': 'Confirm Unbind',
+
+  'oauth.provider.github': 'GitHub',
+  'oauth.provider.feishu': 'Feishu',
+  'oauth.bind': 'Bind {{provider}}',
+  'oauth.unbind': 'Unbind {{provider}}',
+  'oauth.unbindTitle': 'Unbind this account?',
+  'oauth.unbindConfirm':
+    'You will no longer be able to sign in with {{provider}}. GitHub may require reauthorization to revoke the remote grant. Continue?',
+  'oauth.confirmUnbind': 'Unbind',
+  'oauth.unbindSuccess': 'Account unbound successfully',
+  'oauth.bindSuccess': 'Account bound successfully',
+  'oauth.loginSuccess': 'Signed in successfully',
+  'oauth.authFailed': 'Authorization failed',
+  'oauth.authFailedRetry': 'Authorization failed. Please go back and try again.',
+  'oauth.missingCallbackParameters':
+    'The authorization code or security state is missing. Start authorization again.',
+  'oauth.verifying': 'Verifying authorization...',
+  'oauth.back': 'Back',
+  'feishu.signIn': 'Sign in with Feishu',
+  'feishu.viewProfile': 'View Feishu profile',
+  'feishu.profileTitle': 'Feishu directory profile',
 
   'me.title': 'My Profile',
   'me.subtitle': 'Personal Information',

@@ -5,7 +5,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginFn, githubUrlFn } from '@/api/admin/system/auth';
+import { loginFn, oauthLoginUrlFn } from '@/api/admin/system/auth';
 import type { LoginReq } from '@/api/admin/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -75,11 +75,11 @@ export default function TheForm() {
         const redirectUrl = `${redirect}${separator}token=${encodeURIComponent(userObj.token)}`;
         window.location.href = redirectUrl;
       } else {
-        const nextPath = findFirstValidPath(menus);
+        const nextPath = findFirstValidPath(menus, '/me');
         navigate(nextPath);
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      // Global HTTP interception presents the error.
     } finally {
       setLoading(false);
     }
@@ -90,18 +90,17 @@ export default function TheForm() {
     showSnackbar({ message: t('login.wechatWIP'), type: 'info' });
   };
 
-  // 处理 GitHub 登录
-  const handleGithubLogin = async () => {
+  const handleOAuthLogin = async (provider: 'github' | 'feishu') => {
     try {
       setLoading(true);
-      const res = await githubUrlFn({ data: {} });
-      const responseData = res.data.data as any;
-      if (responseData.url) {
-        window.location.href = responseData.url;
+      const response = await oauthLoginUrlFn({
+        data: { provider, redirectUri: `${window.location.origin}/oauth/callback` },
+      });
+      if (response.data.data.url) {
+        window.location.href = response.data.data.url;
       }
-    } catch (err) {
-      console.log(err);
-      showSnackbar({ message: '获取 GitHub 登录链接失败', type: 'error' });
+    } catch {
+      // Global HTTP interception presents the error.
     } finally {
       setLoading(false);
     }
@@ -192,10 +191,22 @@ export default function TheForm() {
           fullWidth
           size={isMobile ? 'large' : 'medium'}
           sx={{ py: isMobile ? 1.5 : 1 }}
-          onClick={handleGithubLogin}
+          onClick={() => handleOAuthLogin('github')}
           disabled={loading}
         >
           {t('github.signIn')}
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          size={isMobile ? 'large' : 'medium'}
+          sx={{ py: isMobile ? 1.5 : 1 }}
+          onClick={() => handleOAuthLogin('feishu')}
+          disabled={loading}
+        >
+          {t('feishu.signIn')}
         </Button>
       </Stack>
     </Box>

@@ -102,3 +102,29 @@ FROM `admin_mobile_async_task`
 LIMIT 0;
 
 SELECT `source` FROM `system_schema_form` LIMIT 0;
+
+SELECT
+  `id`,
+  `user_id`,
+  `provider`,
+  `provider_id`,
+  `provider_username`,
+  `provider_tenant_id`,
+  `encrypted_profile`,
+  `encrypted_access_token`,
+  `encrypted_refresh_token`,
+  `scopes`,
+  `token_expires_at_utc`,
+  `last_verified_at_utc`,
+  `create_time_utc`,
+  `update_time_utc`
+FROM `system_user_oauth`
+LIMIT 0;
+
+SELECT `id`
+FROM `system_user_oauth` INDEXED BY `system_user_oauth_provider_identity_unique`
+LIMIT 0;
+
+SELECT `id`
+FROM `system_user_oauth` INDEXED BY `system_user_oauth_user_provider_unique`
+LIMIT 0;

@@ -5923,7 +5923,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system/auth/github/url": {
+    "/api/v1/admin/system/auth/oauth/login/url": {
         parameters: {
             query?: never;
             header?: never;
@@ -5932,7 +5932,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 获取GitHub登录授权链接 */
+        /** 获取 OAuth 登录地址 */
         post: {
             parameters: {
                 query?: never;
@@ -5942,7 +5942,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.system.auth.github.url.req"];
+                    "application/json": components["schemas"]["admin.system.auth.oauth.login.url.req"];
                 };
             };
             responses: {
@@ -5952,7 +5952,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.system.auth.github.url.res"];
+                        "application/json": components["schemas"]["admin.system.auth.oauth.login.url.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -5981,7 +5981,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system/auth/github/login": {
+    "/api/v1/admin/system/auth/oauth/login/callback": {
         parameters: {
             query?: never;
             header?: never;
@@ -5990,10 +5990,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * GitHub 登录回调
-         * @description 使用 GitHub 的授权 code 进行登录，如果之前未绑定过但属于指定组织，则自动创建账号
-         */
+        /** OAuth 登录回调 */
         post: {
             parameters: {
                 query?: never;
@@ -6003,7 +6000,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.system.auth.github.login.req"];
+                    "application/json": components["schemas"]["admin.system.auth.oauth.login.callback.req"];
                 };
             };
             responses: {
@@ -6013,7 +6010,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.system.auth.github.login.res"];
+                        "application/json": components["schemas"]["admin.system.auth.oauth.login.callback.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6042,7 +6039,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system/auth/github/bind": {
+    "/api/v1/admin/system/auth/oauth/account/url": {
         parameters: {
             query?: never;
             header?: never;
@@ -6051,10 +6048,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 当前登录用户绑定 GitHub
-         * @description 当前登录用户通过 GitHub code 绑定其账号
-         */
+        /** 获取 OAuth 账号操作地址 */
         post: {
             parameters: {
                 query?: never;
@@ -6064,7 +6058,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.system.auth.github.bind.req"];
+                    "application/json": components["schemas"]["admin.system.auth.oauth.account.url.req"];
                 };
             };
             responses: {
@@ -6074,7 +6068,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.system.auth.github.bind.res"];
+                        "application/json": components["schemas"]["admin.system.auth.oauth.account.url.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -6103,7 +6097,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system/auth/github/unbind": {
+    "/api/v1/admin/system/auth/oauth/account/callback": {
         parameters: {
             query?: never;
             header?: never;
@@ -6112,10 +6106,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * 当前登录用户解绑 GitHub
-         * @description 删除当前登录用户绑定的 GitHub OAuth 记录
-         */
+        /** OAuth 账号操作回调 */
         post: {
             parameters: {
                 query?: never;
@@ -6125,7 +6116,7 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["admin.system.auth.github.unbind.req"];
+                    "application/json": components["schemas"]["admin.system.auth.oauth.account.callback.req"];
                 };
             };
             responses: {
@@ -6135,7 +6126,123 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["admin.system.auth.github.unbind.res"];
+                        "application/json": components["schemas"]["admin.system.auth.oauth.account.callback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/oauth/binding/unbind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 解绑 OAuth 账号 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.oauth.binding.unbind.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.oauth.binding.unbind.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/oauth/binding/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 读取 OAuth 加密档案 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.oauth.binding.profile.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.oauth.binding.profile.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -13762,6 +13869,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/tiktok-task/v2/dispatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 下发 TikTok v2 预检、发布、补链或状态任务 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.async_task.v2.dispatch.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.async_task.v2.dispatch.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/organization/attendance/listAll": {
         parameters: {
             query?: never;
@@ -21155,7 +21320,19 @@ export interface components {
                      */
                     updateTimeUtc: ((number | null) | null) | null;
                     /** @description 绑定的 GitHub 用户名 */
-                    githubUsername?: string | null;
+                    githubUsername: string | null;
+                    /** @description 已绑定的 OAuth 账号摘要 */
+                    oauthBindings: {
+                        /**
+                         * @description OAuth Provider
+                         * @enum {string}
+                         */
+                        provider: "github" | "feishu";
+                        providerUsername: string | null;
+                        providerTenantId: string | null;
+                        lastVerifiedAtUtc: number | null;
+                        hasProfile: boolean;
+                    }[];
                 };
             };
             message: string;
@@ -21281,23 +21458,31 @@ export interface components {
             };
             message: string;
         };
-        "admin.system.auth.github.url.req": {
-            /** @description OAuth state */
-            state?: string;
+        "admin.system.auth.oauth.login.url.req": {
+            /**
+             * @description OAuth Provider
+             * @enum {string}
+             */
+            provider: "github" | "feishu";
+            /**
+             * Format: uri
+             * @description 固定指向 /oauth/callback 的前端回调地址
+             */
+            redirectUri: string;
         };
-        "admin.system.auth.github.url.res": {
+        "admin.system.auth.oauth.login.url.res": {
             ok: boolean;
             data: {
-                /** @description GitHub OAuth URL */
+                /** Format: uri */
                 url: string;
             };
             message: string;
         };
-        "admin.system.auth.github.login.req": {
-            /** @description GitHub OAuth Code */
+        "admin.system.auth.oauth.login.callback.req": {
             code: string;
+            state: string;
         };
-        "admin.system.auth.github.login.res": {
+        "admin.system.auth.oauth.login.callback.res": {
             ok: boolean;
             data: {
                 userObj: {
@@ -21326,22 +21511,88 @@ export interface components {
             };
             message: string;
         };
-        "admin.system.auth.github.bind.req": {
-            /** @description GitHub OAuth Code */
-            code: string;
+        "admin.system.auth.oauth.account.url.req": {
+            /**
+             * @description OAuth Provider
+             * @enum {string}
+             */
+            provider: "github" | "feishu";
+            /**
+             * Format: uri
+             * @description 固定指向 /oauth/callback 的前端回调地址
+             */
+            redirectUri: string;
+            /**
+             * @description 账号操作意图
+             * @enum {string}
+             */
+            intent?: "bind" | "unbind";
         };
-        "admin.system.auth.github.bind.res": {
+        "admin.system.auth.oauth.account.url.res": {
             ok: boolean;
             data: {
-                message: string;
+                /** Format: uri */
+                url: string;
             };
             message: string;
         };
-        "admin.system.auth.github.unbind.req": Record<string, never>;
-        "admin.system.auth.github.unbind.res": {
+        "admin.system.auth.oauth.account.callback.req": {
+            code: string;
+            state: string;
+        };
+        "admin.system.auth.oauth.account.callback.res": {
             ok: boolean;
             data: {
                 message: string;
+                unbound: boolean;
+            };
+            message: string;
+        };
+        "admin.system.auth.oauth.binding.unbind.req": {
+            /**
+             * @description OAuth Provider
+             * @enum {string}
+             */
+            provider: "github" | "feishu";
+            /**
+             * Format: uri
+             * @description 固定指向 /oauth/callback 的前端回调地址
+             */
+            redirectUri?: string;
+        };
+        "admin.system.auth.oauth.binding.unbind.res": {
+            ok: boolean;
+            data: {
+                message: string;
+                unbound: boolean;
+                reauthorizationRequired: boolean;
+                /** Format: uri */
+                url?: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.oauth.binding.profile.req": {
+            /**
+             * @description OAuth Provider
+             * @enum {string}
+             */
+            provider: "github" | "feishu";
+        };
+        "admin.system.auth.oauth.binding.profile.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description OAuth Provider
+                 * @enum {string}
+                 */
+                provider: "github" | "feishu";
+                providerId: string;
+                providerUsername: string | null;
+                providerTenantId: string | null;
+                profile: {
+                    [key: string]: unknown;
+                };
+                lastVerifiedAtUtc: number | null;
             };
             message: string;
         };
@@ -26683,6 +26934,69 @@ export interface components {
         "admin.mobile.async_task.callback.res": {
             ok: boolean;
             data: boolean;
+            message: string;
+        };
+        "admin.mobile.async_task.v2.dispatch.req": {
+            clientId: string;
+            /** @enum {integer} */
+            contractVersion: 2;
+            /** @enum {string} */
+            action: "publish" | "preflight" | "recover" | "status";
+            /** @description publish/preflight 可省略；recover/status 必须复用原 UUID */
+            publicationId?: string;
+            expectedHandle?: string;
+            media?: {
+                /** @enum {string} */
+                mode: "direct" | "pool";
+                /** @enum {string} */
+                kind: "image" | "video" | "auto";
+                path?: string;
+                paths?: string[];
+                directory?: string;
+            };
+            content?: {
+                title?: string;
+                details?: string;
+                titles?: string[];
+                detailsPool?: string[];
+            };
+            policy?: {
+                /** @description 最小发布间隔；手机端本地策略可进一步收紧 */
+                minIntervalSeconds?: number;
+                /** @description 每日发布上限；手机端本地策略可进一步收紧 */
+                maxPostsPerDay?: number;
+                materialReuseSeconds?: number;
+                captionReuseSeconds?: number;
+            };
+            link?: {
+                maxAttempts?: number;
+                retrySeconds?: number;
+            };
+            /** @description 手机端任务超时秒数，默认 420 */
+            timeout?: number;
+            /**
+             * @description 可选任务优先级，默认 NORMAL
+             * @enum {string}
+             */
+            priority?: "LOW" | "NORMAL" | "HIGH";
+            /** @description 是否抢占同级或更低优先级运行任务，默认 false */
+            preemptRunning?: boolean;
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.mobile.async_task.v2.dispatch.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+                /** @enum {string} */
+                status: "PENDING";
+                traceId: string;
+                expiresAtUtc: number;
+                /** @enum {integer} */
+                contractVersion: 2;
+                /** @enum {string} */
+                action: "publish" | "preflight" | "recover" | "status";
+                publicationId: string;
+            };
             message: string;
         };
         "organization.attendance.listall.req": {

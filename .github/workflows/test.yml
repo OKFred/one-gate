@@ -52,9 +52,34 @@ jobs:
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
+          FEISHU_APP_ID: "cli_test_feishu_app"
+          FEISHU_APP_SECRET: "test-feishu-secret"
+          FEISHU_ALLOWED_TENANT_KEYS: "tenant-test"
+          OAUTH_ALLOWED_REDIRECT_ORIGINS: "http://localhost:5173"
+          OAUTH_SENSITIVE_DATA_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
           JWT_SECRET: "test-secret-key-for-ci-runs"
           BASE_API_PATH: "/api/v1"
           LOCALE: "zh-CN"
+
+      - name: Install Frontend Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ./platform
+
+      - name: Build Admin for Mock OAuth E2E
+        run: pnpm run build:admin
+        working-directory: ./platform
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+        working-directory: ./platform
+
+      - name: Run Mock OAuth E2E
+        run: pnpm run test:e2e:oauth
+        working-directory: ./platform
+        env:
+          HODOR_E2E_BASE_URL: http://127.0.0.1:4173
+          HODOR_E2E_ALLOWED_ORIGINS: http://127.0.0.1:4173
+          HODOR_E2E_MOCK_OAUTH: "true"
 
   # Job 2：部署（仅在测试成功，且为 master/dev 分支时运行）
   deploy:
@@ -110,12 +135,22 @@ jobs:
             GH_CLIENT_ID
             GH_CLIENT_SECRET
             GH_ORG_NAME
+            FEISHU_APP_ID
+            FEISHU_APP_SECRET
+            FEISHU_ALLOWED_TENANT_KEYS
+            OAUTH_ALLOWED_REDIRECT_ORIGINS
+            OAUTH_SENSITIVE_DATA_KEY
             JWT_SECRET
             MOBILE_SENSITIVE_DATA_KEY
         env:
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
           GH_ORG_NAME: ${{ secrets.GH_ORG_NAME }}
+          FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
+          FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
+          FEISHU_ALLOWED_TENANT_KEYS: ${{ secrets.FEISHU_ALLOWED_TENANT_KEYS }}
+          OAUTH_ALLOWED_REDIRECT_ORIGINS: ${{ secrets.OAUTH_ALLOWED_REDIRECT_ORIGINS }}
+          OAUTH_SENSITIVE_DATA_KEY: ${{ secrets.OAUTH_SENSITIVE_DATA_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
 
