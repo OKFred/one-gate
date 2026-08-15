@@ -12,7 +12,8 @@ import {
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
-import { verifyDeviceReportToken } from "../device/service.js";
+import { verifyDeviceReportToken } from "../device/facade.js";
+import { adaptDeviceHttpError } from "../device/interfaces/http/error.js";
 import {
   MobileAsyncTaskVO,
   MobileAsyncTaskListKeys,
@@ -197,7 +198,9 @@ const callbackApi = {
     const result = context.get("bodyObj") as DeviceTaskResultPayload;
     const token = context.req.header("x-device-token");
     if (!token) throw new BusinessError("缺少设备上报令牌");
-    await verifyDeviceReportToken(result.deviceId, token);
+    await adaptDeviceHttpError(() =>
+      verifyDeviceReportToken(result.deviceId, token)
+    );
     return processIncomingDeviceTaskResult(result);
   },
   permission: false,

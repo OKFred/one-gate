@@ -104,7 +104,19 @@ Chrome CDP 只读连接重试成功，生产设备页显示 `mobile_352493116375
 - 结果消息：`Script execution succeeded`
 - 手机执行区间：`1786536942001 -> 1786536943324`
 
-该结果确认现有生产 Worker、D1 任务写入、EMQX 发布与鉴权、设备订阅执行及结果回传链路正常。当前新增的 TikTok 专用接口尚未提交部署，因此本轮没有下发真实 `preflight`、`publish`、`recover` 或 `status`；部署后仍应先从新接口下发 `preflight`，确认成功后再进入真实发布。
+该结果确认现有生产 Worker、D1 任务写入、EMQX 发布与鉴权、设备订阅执行及结果回传链路正常。
+
+新代码部署后，又通过 `/mobile/tiktok-task/v2/dispatch` 下发一次不启动 TikTok UI 的随机 publication 状态查询：
+
+- `taskId`：`deb8aa0c-0e52-4106-94d7-9191c2aa0cea`
+- `publicationId`：`3f3de961-8313-4bf1-afe4-51a77628bcbf`
+- 接口响应：HTTP 200，`PENDING`，`contractVersion=2`，`action=status`
+- 手机终态：`REJECTED`
+- 结果码：`PUBLICATION_NOT_FOUND`
+- 结果消息：`TikTok task rejected by local policy: PUBLICATION_NOT_FOUND`
+- 手机执行时间：`1786542839635`，在本地策略层立即终结
+
+随机 ID 不存在于手机私有账本，因此该拒绝是预期结果。它确认了新 HTTP 路由、TikTok DDD 编排、任务持久化、EMQX、手机 v2 归一化与本地账本策略、结果回传的完整链路。任务后再次查询设备，`reportedStatus=ONLINE`、客户端版本 `2.0.0`、最后心跳 `1786542862820`；没有执行 `preflight` 或 `publish`，也没有打开 TikTok UI。
 
 ## 5. 复盘记录
 
@@ -116,7 +128,7 @@ Chrome CDP 只读连接重试成功，生产设备页显示 `mobile_352493116375
 
 ## 6. 后续建议
 
-1. 合并部署后先调用 `preflight`，不要直接发布；保留返回的 `publicationId` 和 `taskId`。
+1. 获得手机 UI 验证授权后先调用 `preflight`，不要直接发布；保留返回的 `publicationId` 和 `taskId`。
 2. 通过 `/async-task/get` 等待终态，只有手机明确返回成功才视为预检通过。
 3. 实际发布必须使用新的 `publicationId`；结果未知时先 `status`，确需补链时再 `recover`，不要重复 `publish`。
 4. 后续新增前端页面时复用生成 OpenAPI 类型，并把发布表单、任务状态和作品事实分开建模。

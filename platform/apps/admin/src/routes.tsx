@@ -69,7 +69,7 @@ const childrenRoutes: RouteObject[] = [
 
 const Layout = lazy(() => import('@/layout'));
 const Login = lazy(() => import('./pages/login'));
-const GithubCallback = lazy(() => import('./pages/github-callback'));
+const OAuthCallback = lazy(() => import('./pages/oauth-callback'));
 const NotFound = lazy(() => import('@/components/NotFound'));
 const ProtectedRoute = lazy(() => import('@/components/ProtectedRoute'));
 
@@ -88,10 +88,10 @@ export default function AppRoutes() {
       ),
     },
     {
-      path: '/github/callback',
+      path: '/oauth/callback',
       element: (
         <Suspense fallback={<PageLoading />}>
-          <GithubCallback />
+          <OAuthCallback />
         </Suspense>
       ),
     },

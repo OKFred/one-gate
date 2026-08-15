@@ -1,26 +1,22 @@
 import { and, desc, eq, isNull, like, lt, ne, or, sql } from "drizzle-orm";
 
 import db from "@hodor/core/db";
+import type {
+  DeviceAdminUpdateRecord,
+  DeviceCreateRecord,
+  DeviceEventListParams,
+  DeviceEventPage,
+  DeviceEventRecord,
+  DeviceListParams,
+  DevicePage,
+  DeviceRecord,
+  DeviceRepositoryPort,
+  DeviceSnapshotUpdate,
+} from "../application/ports.js";
+import { mobileDeviceEventTable, mobileDeviceTable } from "../model.js";
 
-import {
-  mobileDeviceEventTable,
-  mobileDeviceTable,
-  type DeviceEventType,
-  type MobileDeviceAddVOLike,
-  type MobileDeviceEventPOLike,
-  type MobileDevicePOLike,
-  type MobileDeviceUpdateVOLike,
-} from "./model";
-
-type DeviceSnapshotUpdate = Partial<
-  Omit<MobileDevicePOLike, "id" | "clientId" | "creatorId" | "createTimeUtc">
->;
-
-export class MobileDeviceRepository {
-  /** 新增一台管理设备。 */
-  async add(
-    data: MobileDeviceAddVOLike & { creatorId: number }
-  ): Promise<number> {
+export class DrizzleDeviceRepository implements DeviceRepositoryPort {
+  async add(data: DeviceCreateRecord): Promise<number> {
     const [result] = await db
       .insert(mobileDeviceTable)
       .values(data)
@@ -28,10 +24,7 @@ export class MobileDeviceRepository {
     return result.id;
   }
 
-  /** 更新管理员维护字段。 */
-  async update(
-    data: MobileDeviceUpdateVOLike & { updaterId: number }
-  ): Promise<void> {
+  async update(data: DeviceAdminUpdateRecord): Promise<void> {
     const { id, ...update } = data;
     await db
       .update(mobileDeviceTable)
@@ -42,21 +35,16 @@ export class MobileDeviceRepository {
       .where(eq(mobileDeviceTable.id, id));
   }
 
-  /** 更新设备可信上报快照。 */
   async updateSnapshot(
     clientId: string,
     data: DeviceSnapshotUpdate
   ): Promise<void> {
     await db
       .update(mobileDeviceTable)
-      .set({
-        ...data,
-        updateTimeUtc: Date.now(),
-      })
+      .set({ ...data, updateTimeUtc: Date.now() })
       .where(eq(mobileDeviceTable.clientId, clientId));
   }
 
-  /** 删除设备及其事件。 */
   async delete(id: number): Promise<void> {
     const row = await this.getById(id);
     if (!row) return;
@@ -66,8 +54,7 @@ export class MobileDeviceRepository {
     await db.delete(mobileDeviceTable).where(eq(mobileDeviceTable.id, id));
   }
 
-  /** 按主键获取设备。 */
-  async getById(id: number): Promise<MobileDevicePOLike | undefined> {
+  async getById(id: number): Promise<DeviceRecord | undefined> {
     const [result] = await db
       .select()
       .from(mobileDeviceTable)
@@ -75,10 +62,7 @@ export class MobileDeviceRepository {
     return result;
   }
 
-  /** 按 clientId 获取设备。 */
-  async getByClientId(
-    clientId: string
-  ): Promise<MobileDevicePOLike | undefined> {
+  async getByClientId(clientId: string): Promise<DeviceRecord | undefined> {
     const [result] = await db
       .select()
       .from(mobileDeviceTable)
@@ -86,86 +70,67 @@ export class MobileDeviceRepository {
     return result;
   }
 
-  /** 分页查询设备，在线状态按 150 秒窗口实时判定。 */
-  async list(params: {
-    pageNo: number;
-    pageSize: number;
-    keyword?: string;
-    isEnabled?: boolean;
-    onlineStatus?: "ONLINE" | "OFFLINE";
-    onlineCutoff: number;
-    orderBy?: keyof MobileDevicePOLike;
-    descend?: boolean;
-  }) {
-    const {
-      pageNo,
-      pageSize,
-      keyword,
-      isEnabled,
-      onlineStatus,
-      onlineCutoff,
-      orderBy,
-      descend,
-    } = params;
+  async list(params: DeviceListParams): Promise<DevicePage> {
     const onlineCondition = and(
       eq(mobileDeviceTable.reportedStatus, "ONLINE"),
-      sql`${mobileDeviceTable.lastHeartbeatTimeUtc} >= ${onlineCutoff}`
+      sql`${mobileDeviceTable.lastHeartbeatTimeUtc} >= ${params.onlineCutoff}`
     );
     const offlineCondition = or(
       isNull(mobileDeviceTable.reportedStatus),
       ne(mobileDeviceTable.reportedStatus, "ONLINE"),
       isNull(mobileDeviceTable.lastHeartbeatTimeUtc),
-      lt(mobileDeviceTable.lastHeartbeatTimeUtc, onlineCutoff)
+      lt(mobileDeviceTable.lastHeartbeatTimeUtc, params.onlineCutoff)
     );
     const whereCondition = and(
-      keyword
+      params.keyword
         ? or(
-            like(mobileDeviceTable.clientId, `%${keyword}%`),
-            like(mobileDeviceTable.deviceName, `%${keyword}%`),
-            like(mobileDeviceTable.model, `%${keyword}%`)
+            like(mobileDeviceTable.clientId, `%${params.keyword}%`),
+            like(mobileDeviceTable.deviceName, `%${params.keyword}%`),
+            like(mobileDeviceTable.model, `%${params.keyword}%`)
           )
         : undefined,
-      isEnabled === undefined
+      params.isEnabled === undefined
         ? undefined
-        : eq(mobileDeviceTable.isEnabled, isEnabled),
-      onlineStatus === "ONLINE"
+        : eq(mobileDeviceTable.isEnabled, params.isEnabled),
+      params.onlineStatus === "ONLINE"
         ? onlineCondition
-        : onlineStatus === "OFFLINE"
+        : params.onlineStatus === "OFFLINE"
           ? offlineCondition
           : undefined
     );
-
     const [{ count }] = await db
       .select({ count: sql<number>`count(*)` })
       .from(mobileDeviceTable)
       .where(whereCondition);
-
     let query = db
       .select()
       .from(mobileDeviceTable)
       .where(whereCondition)
       .$dynamic();
-    if (orderBy) {
+    if (params.orderBy) {
       query = query.orderBy(
-        descend ? desc(mobileDeviceTable[orderBy]) : mobileDeviceTable[orderBy]
+        params.descend
+          ? desc(mobileDeviceTable[params.orderBy])
+          : mobileDeviceTable[params.orderBy]
       );
     } else {
       query = query.orderBy(desc(mobileDeviceTable.createTimeUtc));
     }
-    const list = await query.limit(pageSize).offset((pageNo - 1) * pageSize);
+    const list = await query
+      .limit(params.pageSize)
+      .offset((params.pageNo - 1) * params.pageSize);
     return {
       list,
       total: count,
-      totalPage: Math.ceil(count / pageSize),
-      currentPage: pageNo,
-      pageNo,
-      pageSize,
+      totalPage: Math.ceil(count / params.pageSize),
+      currentPage: params.pageNo,
+      pageNo: params.pageNo,
+      pageSize: params.pageSize,
     };
   }
 
-  /** 幂等插入一条设备事件。 */
   async insertEvent(
-    data: Omit<MobileDeviceEventPOLike, "id" | "createTimeUtc">
+    data: Omit<DeviceEventRecord, "id" | "createTimeUtc">
   ): Promise<boolean> {
     const rows = await db
       .insert(mobileDeviceEventTable)
@@ -180,15 +145,7 @@ export class MobileDeviceRepository {
     return rows.length > 0;
   }
 
-  /** 分页查询设备 30 天内事件。 */
-  async listEvents(params: {
-    clientId: string;
-    pageNo: number;
-    pageSize: number;
-    eventType?: DeviceEventType;
-    startTimeUtc?: number;
-    endTimeUtc?: number;
-  }) {
+  async listEvents(params: DeviceEventListParams): Promise<DeviceEventPage> {
     const whereCondition = and(
       eq(mobileDeviceEventTable.clientId, params.clientId),
       params.eventType
@@ -222,8 +179,7 @@ export class MobileDeviceRepository {
     };
   }
 
-  /** 按主键获取一条设备事件。 */
-  async getEventById(id: number): Promise<MobileDeviceEventPOLike | undefined> {
+  async getEventById(id: number): Promise<DeviceEventRecord | undefined> {
     const [row] = await db
       .select()
       .from(mobileDeviceEventTable)
@@ -231,7 +187,6 @@ export class MobileDeviceRepository {
     return row;
   }
 
-  /** 将超过在线窗口的设备状态校正为离线。 */
   async markTimedOutOffline(cutoff: number, now: number): Promise<number> {
     const rows = await db
       .update(mobileDeviceTable)
@@ -250,7 +205,6 @@ export class MobileDeviceRepository {
     return rows.length;
   }
 
-  /** 清理截止时间之前的设备事件。 */
   async deleteEventsBefore(cutoff: number): Promise<number> {
     const rows = await db
       .delete(mobileDeviceEventTable)
@@ -259,5 +213,3 @@ export class MobileDeviceRepository {
     return rows.length;
   }
 }
-
-export const mobileDeviceRepo = new MobileDeviceRepository();

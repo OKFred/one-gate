@@ -7,7 +7,7 @@ import { timeoutExpiredDeviceTasks } from "@hodor/admin/mobile/async-task/facade
 import {
   cleanupExpiredDeviceEvents,
   markTimedOutDevicesOffline,
-} from "@hodor/admin/mobile/device/service.js";
+} from "@hodor/admin/mobile/device/facade.js";
 
 let app: ReturnType<typeof createApp> | null = null;
 

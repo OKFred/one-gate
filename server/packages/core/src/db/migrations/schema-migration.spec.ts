@@ -152,6 +152,76 @@ describe("legacy D1 schema migrations", () => {
     );
   });
 
+  it("upgrades OAuth bindings with encrypted data columns and unique identities", async () => {
+    const client = createMemoryClient();
+    await client.execute(`
+      CREATE TABLE system_user_oauth (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        user_id INTEGER NOT NULL,
+        provider TEXT NOT NULL,
+        provider_id TEXT NOT NULL,
+        provider_username TEXT,
+        create_time_utc INTEGER NOT NULL,
+        update_time_utc INTEGER
+      )
+    `);
+    await client.execute({
+      sql: `INSERT INTO system_user_oauth
+        (user_id, provider, provider_id, provider_username, create_time_utc)
+        VALUES (?, ?, ?, ?, ?)`,
+      args: [7, "github", "provider-user-7", "octocat", 1],
+    });
+
+    await executeSqlFile(
+      client,
+      readMigration("./20260813_01_system_user_oauth_security.sql")
+    );
+
+    const columns = await client.execute(
+      "PRAGMA table_info('system_user_oauth')"
+    );
+    expect(columns.rows.map((row) => String(row.name))).toHaveLength(14);
+    expect(columns.rows.map((row) => String(row.name))).toEqual(
+      expect.arrayContaining([
+        "provider_tenant_id",
+        "encrypted_profile",
+        "encrypted_access_token",
+        "encrypted_refresh_token",
+        "scopes",
+        "token_expires_at_utc",
+        "last_verified_at_utc",
+      ])
+    );
+
+    const indexes = await client.execute(`
+      SELECT name FROM sqlite_master
+      WHERE type = 'index' AND name LIKE 'system_user_oauth_%_unique'
+    `);
+    expect(new Set(indexes.rows.map((item) => String(item.name)))).toEqual(
+      new Set([
+        "system_user_oauth_provider_identity_unique",
+        "system_user_oauth_user_provider_unique",
+      ])
+    );
+
+    await expect(
+      client.execute({
+        sql: `INSERT INTO system_user_oauth
+          (user_id, provider, provider_id, create_time_utc)
+          VALUES (?, ?, ?, ?)`,
+        args: [8, "github", "provider-user-7", 2],
+      })
+    ).rejects.toThrow();
+    await expect(
+      client.execute({
+        sql: `INSERT INTO system_user_oauth
+          (user_id, provider, provider_id, create_time_utc)
+          VALUES (?, ?, ?, ?)`,
+        args: [7, "github", "provider-user-8", 2],
+      })
+    ).rejects.toThrow();
+  });
+
   it("creates immutable client release, environment revision, and deployment tables", async () => {
     const client = createMemoryClient();
     await executeSqlFile(

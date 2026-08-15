@@ -132,7 +132,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return false;
   };
 
-  if (!isValidPath(navItems, location.pathname)) {
+  const isAccountPath = location.pathname === '/home' || location.pathname === '/me';
+  if (!isAccountPath && !isValidPath(navItems, location.pathname)) {
     return <Navigate to="/error/NotFound" replace />;
   }
 

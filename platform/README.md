@@ -41,6 +41,20 @@ Dashboard will be served at `http://localhost:5173`.
 - `pnpm run lint`: Lint and fix code issues.
 - `pnpm run i18n:scan`: Scan source code for i18n keys.
 
+## Playwright smoke tests
+
+Copy the deployment-neutral template and set your own admin/API origins:
+
+```bash
+cp .env.playwright.example .env.playwright.local
+pnpm test:e2e:auth
+pnpm test:e2e
+```
+
+`HODOR_E2E_BASE_URL` is required. `HODOR_E2E_ALLOWED_ORIGINS` and
+`HODOR_E2E_DEVICE_CLIENT_ID` are optional. The local environment file and saved
+browser authentication state are ignored by Git.
+
 ---
 
 [中文说明 (README_zh_CN.md)](README_zh_CN.md)
