@@ -8,9 +8,15 @@ import {
   getMissingPresignedStorageFields,
   getReleaseArtifactMetadataValidationError,
   MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY,
+  RELEASE_UPLOAD_TICKET_MAX_LENGTH,
 } from "./service.js";
 
 describe("客户端版本、环境与部署 HTTP 契约", () => {
+  it("finalize 票据上限可容纳大型清单但仍保持有界", () => {
+    expect(RELEASE_UPLOAD_TICKET_MAX_LENGTH).toBe(1_000_000);
+    expect(RELEASE_UPLOAD_TICKET_MAX_LENGTH).toBeGreaterThan(320_000);
+  });
+
   it("发布制品固定使用独立 OSS 配置且不复用默认配置", () => {
     expect(MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY).toBe(
       "mobile-client-release"
