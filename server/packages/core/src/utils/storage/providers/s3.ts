@@ -16,6 +16,28 @@ import {
 } from "../types";
 import { applyAwsPolyfills } from "../awsPolyfill";
 
+/** 判断 S3 异常是否仅表示目标对象不存在，而不是 Bucket 不存在。 */
+export function isMissingS3ObjectError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null || Array.isArray(error)) {
+    return false;
+  }
+  const record = error as Record<string, unknown>;
+  const codes = [record.name, record.code, record.Code].filter(
+    (value): value is string => typeof value === "string" && value.length > 0
+  );
+  if (codes.includes("NoSuchBucket")) return false;
+  if (codes.includes("NotFound") || codes.includes("NoSuchKey")) return true;
+  const metadata = record.$metadata;
+  if (
+    typeof metadata !== "object" ||
+    metadata === null ||
+    Array.isArray(metadata)
+  ) {
+    return false;
+  }
+  return (metadata as Record<string, unknown>).httpStatusCode === 404;
+}
+
 export class S3Provider implements StorageProvider {
   private client: S3Client;
   private bucket: string;
@@ -109,13 +131,8 @@ export class S3Provider implements StorageProvider {
         lastModified: response.LastModified,
         customMetadata: response.Metadata,
       };
-    } catch (error: any) {
-      if (
-        error.name === "NotFound" ||
-        error.$metadata?.httpStatusCode === 404
-      ) {
-        return null;
-      }
+    } catch (error: unknown) {
+      if (isMissingS3ObjectError(error)) return null;
       throw error;
     }
   }
