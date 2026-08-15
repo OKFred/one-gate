@@ -15,6 +15,10 @@ import type { API } from "@hodor/core/middleware/encapsulation";
 import type { Context } from "@hodor/core/types/app";
 import { preventStorageInitFailure } from "./prevention";
 import { getStorage } from "@hodor/core/utils/storage";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "@hodor/core/middleware/errorHandler/businessError";
 import { registry } from "../../common/registry";
 import {
   IndexVO,
@@ -331,8 +335,25 @@ export async function getDefaultConfig() {
   return await registry.base.sysConfig.getMergedConfig("oss");
 }
 
+/** 按配置名精确读取已启用的 OSS 配置，不回退到默认配置。 */
+export async function getEnabledConfigByName(name: string) {
+  const row = await registry.base.sysConfig.getConfigByKey("oss", name);
+  if (!row) {
+    throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
+      message: `对象存储配置 ${name} 不存在`,
+    });
+  }
+  if (!row.isEnabled) {
+    throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, {
+      message: `对象存储配置 ${name} 已禁用`,
+    });
+  }
+  return row.configValue;
+}
+
 export const utils = {
   getDefaultConfig,
+  getEnabledConfigByName,
 };
 
 export default {
