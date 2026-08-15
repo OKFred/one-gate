@@ -13,7 +13,10 @@ import {
 } from "@hodor/core/middleware/errorHandler/businessError";
 import type { Context, UserObj } from "@hodor/core/types/app";
 import { getEnv } from "@hodor/core/utils/env";
-import { getActiveStorage } from "../../oss/file/service.js";
+import {
+  getActiveStorage,
+  getActiveStorageConfig,
+} from "../../oss/file/service.js";
 import mqttService from "../../mqtt/service.js";
 import {
   CLIENT_DEPLOYMENT_ACTIVATION_MODES,
@@ -62,6 +65,30 @@ interface ReleaseUploadTicket {
 /** 抛出统一校验业务错误。 */
 function invalid(message: string): never {
   throw new BusinessError(BusinessErrorCode.VALIDATION_FAILED, { message });
+}
+
+/** 判断配置字段是否为非空文本。 */
+function hasText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+/** 返回生成对象存储预签名地址所缺少的配置字段。 */
+export function getMissingPresignedStorageFields(config: unknown): string[] {
+  if (typeof config !== "object" || config === null || Array.isArray(config)) {
+    return ["provider", "bucket", "accessKey", "secretKey"];
+  }
+  const storageConfig = config as Record<string, unknown>;
+  const missing = ["provider", "bucket", "accessKey", "secretKey"].filter(
+    (field) => !hasText(storageConfig[field])
+  );
+  if (
+    hasText(storageConfig.provider) &&
+    storageConfig.provider.toUpperCase() === "R2" &&
+    !hasText(storageConfig.accountId)
+  ) {
+    missing.push("accountId");
+  }
+  return missing;
 }
 
 /** 将发布数据库行转换为不泄露存储签名的接口模型。 */
@@ -257,15 +284,27 @@ const uploadPrepareApi = {
       invalid("客户端版本已存在且不可覆盖");
     }
     const artifactKey = `mobile-client/releases/${input.releaseVersion}/${input.artifactSha256}.tar.gz`;
+    const storageConfig = await getActiveStorageConfig();
+    const missingStorageFields =
+      getMissingPresignedStorageFields(storageConfig);
+    if (missingStorageFields.length > 0) {
+      invalid(
+        `默认对象存储配置缺少预签名字段: ${missingStorageFields.join(", ")}`
+      );
+    }
     const storage = await getActiveStorage(context.env);
-    if (await storage.head(artifactKey))
-      invalid("发布制品路径已存在且不可覆盖");
+    const existingArtifact = await storage
+      .head(artifactKey)
+      .catch(() => invalid("对象存储连接检查失败，请检查默认 OSS 配置"));
+    if (existingArtifact) invalid("发布制品路径已存在且不可覆盖");
     const expiresAt = Date.now() + 60 * 60 * 1000;
-    const uploadUrl = await storage.getPresignedPutUrl(artifactKey, {
-      expiresIn: 3600,
-      contentType: "application/gzip",
-      customMetadata: { sha256: input.artifactSha256 },
-    });
+    const uploadUrl = await storage
+      .getPresignedPutUrl(artifactKey, {
+        expiresIn: 3600,
+        contentType: "application/gzip",
+        customMetadata: { sha256: input.artifactSha256 },
+      })
+      .catch(() => invalid("对象存储预签名失败，请检查访问密钥和 R2/S3 端点"));
     const uploadId = await signUploadTicket(
       {
         releaseVersion: input.releaseVersion,

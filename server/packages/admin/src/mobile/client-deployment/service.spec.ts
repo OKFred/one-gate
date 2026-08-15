@@ -4,6 +4,7 @@ import {
   clientDeploymentService,
   clientEnvironmentService,
   clientReleaseService,
+  getMissingPresignedStorageFields,
 } from "./service.js";
 
 describe("客户端版本、环境与部署 HTTP 契约", () => {
@@ -83,5 +84,31 @@ describe("客户端版本、环境与部署 HTTP 契约", () => {
     expect(clientEnvironmentService.update.req.additionalProperties).toBe(
       false
     );
+  });
+
+  it("预签名存储配置按提供商报告缺失字段且不返回配置值", () => {
+    expect(
+      getMissingPresignedStorageFields({
+        provider: "S3",
+        endpoint: "https://example.invalid",
+      })
+    ).toEqual(["bucket", "accessKey", "secretKey"]);
+    expect(
+      getMissingPresignedStorageFields({
+        provider: "R2",
+        bucket: "hodor",
+        accessKey: "configured",
+        secretKey: "configured",
+      })
+    ).toEqual(["accountId"]);
+    expect(
+      getMissingPresignedStorageFields({
+        provider: "R2",
+        bucket: "hodor",
+        accessKey: "configured",
+        secretKey: "configured",
+        accountId: "configured",
+      })
+    ).toEqual([]);
   });
 });
