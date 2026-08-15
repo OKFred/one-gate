@@ -6,9 +6,16 @@ import {
   clientEnvironmentService,
   clientReleaseService,
   getMissingPresignedStorageFields,
+  MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY,
 } from "./service.js";
 
 describe("客户端版本、环境与部署 HTTP 契约", () => {
+  it("发布制品固定使用独立 OSS 配置且不复用默认配置", () => {
+    expect(MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY).toBe(
+      "mobile-client-release"
+    );
+  });
+
   it("全部接口保持 POST 并使用约定路径", () => {
     expect(
       Object.values(clientReleaseService).map((api) => [

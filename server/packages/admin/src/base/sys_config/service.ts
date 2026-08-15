@@ -78,6 +78,22 @@ export async function getMergedConfig(namespace: string) {
   return defaultValues;
 }
 
+/** 按命名空间和配置键精确读取单条配置，不回退到主配置。 */
+export async function getConfigByKey(namespace: string, configKey: string) {
+  const row = await baseSysConfigRepository.findByNamespaceAndKey(
+    namespace,
+    configKey
+  );
+  if (!row) return null;
+  return {
+    ...row,
+    configValue:
+      typeof row.configValue === "string"
+        ? (JSON.parse(row.configValue) as unknown)
+        : row.configValue,
+  };
+}
+
 // ======================= API: LIST =======================
 const listReq = {
   type: "object",
@@ -344,6 +360,7 @@ const namespacesApi = {
 export const utils = {
   getProvider,
   getMergedConfig,
+  getConfigByKey,
   list: onList,
   detail: onDetail,
   add: onAdd,

@@ -14,8 +14,8 @@ import {
 import type { Context, UserObj } from "@hodor/core/types/app";
 import { getEnv } from "@hodor/core/utils/env";
 import {
-  getActiveStorage,
-  getActiveStorageConfig,
+  getStorageByConfigKey,
+  getStorageConfigByKey,
 } from "../../oss/file/service.js";
 import mqttService from "../../mqtt/service.js";
 import {
@@ -52,6 +52,9 @@ const deploymentIdSchema = {
   minLength: 36,
   maxLength: 36,
 } as const satisfies JSONSchema;
+
+/** 客户端发布制品专用 OSS 配置名；禁止回退到默认 OSS。 */
+export const MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY = "mobile-client-release";
 
 interface ReleaseUploadTicket {
   releaseVersion: string;
@@ -366,15 +369,20 @@ const uploadPrepareApi = {
       invalid("客户端版本已存在且不可覆盖");
     }
     const artifactKey = `mobile-client/releases/${input.releaseVersion}/${input.artifactSha256}.tar.gz`;
-    const storageConfig = await getActiveStorageConfig();
+    const storageConfig = await getStorageConfigByKey(
+      MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY
+    );
     const missingStorageFields =
       getMissingPresignedStorageFields(storageConfig);
     if (missingStorageFields.length > 0) {
       invalid(
-        `默认对象存储配置缺少预签名字段: ${missingStorageFields.join(", ")}`
+        `客户端发布对象存储配置缺少预签名字段: ${missingStorageFields.join(", ")}`
       );
     }
-    const storage = await getActiveStorage(context.env);
+    const storage = await getStorageByConfigKey(
+      context.env,
+      MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY
+    );
     const existingArtifact = await storage
       .head(artifactKey)
       .catch((error: unknown) =>
@@ -443,7 +451,10 @@ const uploadFinalizeApi = {
     ) {
       invalid("客户端版本已存在且不可覆盖");
     }
-    const storage = await getActiveStorage(context.env);
+    const storage = await getStorageByConfigKey(
+      context.env,
+      MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY
+    );
     const metadata = await storage.head(ticket.artifactKey);
     if (
       !metadata ||
@@ -701,7 +712,10 @@ async function createDeployment(
   const now = Date.now();
   const deploymentId = crypto.randomUUID();
   const commandExpiresAt = now + 60 * 60 * 1000;
-  const storage = await getActiveStorage(context.env);
+  const storage = await getStorageByConfigKey(
+    context.env,
+    MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY
+  );
   if (
     await clientDeploymentRepository.getActiveDeploymentByClientId(
       input.clientId

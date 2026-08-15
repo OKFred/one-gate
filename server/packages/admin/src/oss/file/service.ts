@@ -1,4 +1,4 @@
-import { getDefaultConfig } from "../config/service";
+import { getDefaultConfig, getEnabledConfigByName } from "../config/service";
 import { getStorage } from "@hodor/core/utils/storage";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { preventStorageInitFailure } from "../config/prevention";
@@ -112,8 +112,20 @@ export async function getActiveStorageConfig(): Promise<ActiveStorageConfig> {
   return (await getDefaultConfig()) as unknown as ActiveStorageConfig;
 }
 
-export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
-  const config = await getActiveStorageConfig();
+/** 按配置键读取已启用的对象存储配置，不回退到默认配置。 */
+export async function getStorageConfigByKey(
+  configKey: string
+): Promise<ActiveStorageConfig> {
+  return (await getEnabledConfigByName(
+    configKey
+  )) as unknown as ActiveStorageConfig;
+}
+
+/** 使用已解析的配置创建对象存储驱动。 */
+function createStorage(
+  config: ActiveStorageConfig,
+  env: unknown
+): StorageProvider {
   preventEmpty(config);
 
   const storage = getStorage(
@@ -131,6 +143,18 @@ export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
 
   preventStorageInitFailure(storage);
   return storage;
+}
+
+export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
+  return createStorage(await getActiveStorageConfig(), env);
+}
+
+/** 按配置键创建对象存储驱动，不回退到默认配置。 */
+export async function getStorageByConfigKey(
+  env: unknown,
+  configKey: string
+): Promise<StorageProvider> {
+  return createStorage(await getStorageConfigByKey(configKey), env);
 }
 
 async function onList(
@@ -360,6 +384,7 @@ const deleteApi = {
 
 export const utils = {
   getActiveStorage,
+  getStorageByConfigKey,
   normalizeObjectKey,
   normalizePrefix,
 };
