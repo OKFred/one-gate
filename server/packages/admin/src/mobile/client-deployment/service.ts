@@ -485,7 +485,17 @@ const uploadFinalizeApi = {
       artifactSize: ticket.artifactSize,
       artifactSha256: ticket.artifactSha256,
     });
-    if (metadataError) invalid(metadataError);
+    if (metadataError) {
+      console.warn("[MobileClientReleaseFinalize] artifact validation failed", {
+        reason: metadataError,
+        objectFound: metadata !== null,
+        actualSize: metadata?.size ?? null,
+        expectedSize: ticket.artifactSize,
+        contentType: metadata?.contentType ?? null,
+        hasSha256Metadata: metadata?.customMetadata?.sha256 !== undefined,
+      });
+      invalid(metadataError);
+    }
     const release = await clientDeploymentRepository.addRelease({
       releaseVersion: ticket.releaseVersion,
       artifactKey: ticket.artifactKey,
