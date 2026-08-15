@@ -96,7 +96,7 @@ function toFileVO(item: StorageObjectMetadata) {
   };
 }
 
-interface OssConfig {
+export interface ActiveStorageConfig {
   provider: "s3" | "oss" | "r2" | "cos" | "minio" | "local";
   endpoint?: string;
   region?: string;
@@ -107,8 +107,13 @@ interface OssConfig {
   accountId?: string;
 }
 
+/** 读取当前默认对象存储配置，供同一 OSS 门面内的调用方校验能力。 */
+export async function getActiveStorageConfig(): Promise<ActiveStorageConfig> {
+  return (await getDefaultConfig()) as unknown as ActiveStorageConfig;
+}
+
 export async function getActiveStorage(env: unknown): Promise<StorageProvider> {
-  const config = (await getDefaultConfig()) as unknown as OssConfig;
+  const config = await getActiveStorageConfig();
   preventEmpty(config);
 
   const storage = getStorage(
