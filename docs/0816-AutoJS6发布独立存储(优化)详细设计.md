@@ -46,7 +46,7 @@ OSS 文件门面增加：
 - Region：`ap-southeast-1`
 - Enabled：是
 - Default：否
-- Bucket：私有，单文件上限 100 MB，允许 `application/gzip`
+- Bucket：私有，单文件上限 50 MB（Supabase 项目全局上限），允许 `application/gzip`
 
 访问密钥沿用当前 Supabase S3 凭据，但只在浏览器当前登录会话内复制，不输出到终端、日志或文档。
 

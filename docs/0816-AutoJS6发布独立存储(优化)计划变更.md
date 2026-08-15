@@ -15,7 +15,7 @@
 
 ## 预计生产操作
 
-1. Supabase 新建私有桶 `mobile-client-releases`，上限 100 MB，仅允许 `application/gzip`。
+1. Supabase 新建私有桶 `mobile-client-releases`，上限 50 MB（项目全局上限），仅允许 `application/gzip`。
 2. Gate 新增非默认 OSS 配置 `mobile-client-release`，复用现有 Supabase S3 凭据但使用新桶。
 3. 合并并部署 Node Server。
 4. 运行 Mobile release preflight。

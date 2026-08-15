@@ -21,7 +21,9 @@
 - 相关 Node Vitest：3 个测试文件、12 个用例全部通过。
 - `tsgo -p apps/server/tsconfig.json --noEmit`：通过。
 - `pnpm --filter @hodor/server build`：通过。
-- 生产 Supabase/Gate 配置、预检和真实 `v2.0.1` 发布：合并部署阶段执行并在完成后补充结果。
+- Supabase 已创建私有桶 `mobile-client-releases`：50 MB（项目全局上限），仅允许 `application/gzip`。
+- Gate 已创建启用、非默认的 `mobile-client-release` S3 配置并指向新桶；`anyway-assets` 未修改。
+- 生产预检和真实 `v2.0.1` 发布：合并部署后执行并补充结果。
 
 ## 后续建议
 
