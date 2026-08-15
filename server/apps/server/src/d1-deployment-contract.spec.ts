@@ -93,5 +93,12 @@ describe("D1 deployment contract", () => {
     const config = readRepositoryFile("../wrangler.jsonc");
     expect(config).toContain('"secrets"');
     expect(config).toContain('"OAUTH_SENSITIVE_DATA_KEY"');
+    for (const secretName of [
+      "FEISHU_APP_ID",
+      "FEISHU_APP_SECRET",
+      "FEISHU_ALLOWED_TENANT_KEYS",
+    ]) {
+      expect(config).not.toContain(`      "${secretName}",`);
+    }
   });
 });
