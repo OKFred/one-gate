@@ -13,6 +13,7 @@ import {
 } from "@hodor/core/middleware/errorHandler/businessError";
 import type { Context, UserObj } from "@hodor/core/types/app";
 import { getEnv } from "@hodor/core/utils/env";
+import type { StorageObjectMetadata } from "@hodor/core/utils/storage/types";
 import {
   getStorageByConfigKey,
   getStorageConfigByKey,
@@ -174,6 +175,30 @@ export function classifyStorageConnectionError(error: unknown): string {
     return "对象存储连接检查失败: Endpoint 不可达或 TLS/网络异常";
   }
   return "对象存储连接检查失败: 请核对 Provider、Endpoint、Region、Bucket 和访问密钥";
+}
+
+/**
+ * 校验上传制品的 HEAD 元数据。
+ *
+ * 部分 S3 兼容服务不会在 HEAD 中回传自定义 metadata；这种情况下仍校验
+ * 对象存在性、精确大小和 MIME，并依赖签名票据、内容寻址键及客户端摘要校验。
+ */
+export function getReleaseArtifactMetadataValidationError(
+  metadata: StorageObjectMetadata | null,
+  expected: { artifactSize: number; artifactSha256: string }
+): string | null {
+  if (!metadata) return "上传制品不存在";
+  if (metadata.size !== expected.artifactSize) {
+    return "上传制品大小与票据不一致";
+  }
+  if (metadata.contentType !== "application/gzip") {
+    return "上传制品 MIME 与发布格式不一致";
+  }
+  const storedSha256 = metadata.customMetadata?.sha256;
+  if (storedSha256 !== undefined && storedSha256 !== expected.artifactSha256) {
+    return "上传制品摘要元数据与票据不一致";
+  }
+  return null;
 }
 
 /** 将发布数据库行转换为不泄露存储签名的接口模型。 */
@@ -456,13 +481,11 @@ const uploadFinalizeApi = {
       MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY
     );
     const metadata = await storage.head(ticket.artifactKey);
-    if (
-      !metadata ||
-      metadata.size !== ticket.artifactSize ||
-      metadata.customMetadata?.sha256 !== ticket.artifactSha256
-    ) {
-      invalid("上传制品不存在，或大小/摘要元数据与票据不一致");
-    }
+    const metadataError = getReleaseArtifactMetadataValidationError(metadata, {
+      artifactSize: ticket.artifactSize,
+      artifactSha256: ticket.artifactSha256,
+    });
+    if (metadataError) invalid(metadataError);
     const release = await clientDeploymentRepository.addRelease({
       releaseVersion: ticket.releaseVersion,
       artifactKey: ticket.artifactKey,

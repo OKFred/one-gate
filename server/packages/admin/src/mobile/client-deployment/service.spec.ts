@@ -6,6 +6,7 @@ import {
   clientEnvironmentService,
   clientReleaseService,
   getMissingPresignedStorageFields,
+  getReleaseArtifactMetadataValidationError,
   MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY,
 } from "./service.js";
 
@@ -153,5 +154,78 @@ describe("客户端版本、环境与部署 HTTP 契约", () => {
     expect(classifyStorageConnectionError({ unexpected: "secret" })).toBe(
       "对象存储连接检查失败: 请核对 Provider、Endpoint、Region、Bucket 和访问密钥"
     );
+  });
+
+  it("finalize 兼容不回传自定义摘要的 S3 服务", () => {
+    const expected = {
+      artifactSize: 2_128_000,
+      artifactSha256: "a".repeat(64),
+    };
+
+    expect(
+      getReleaseArtifactMetadataValidationError(
+        {
+          key: "mobile-client/releases/v2.0.1/artifact.tar.gz",
+          size: expected.artifactSize,
+          contentType: "application/gzip",
+        },
+        expected
+      )
+    ).toBeNull();
+    expect(
+      getReleaseArtifactMetadataValidationError(
+        {
+          key: "mobile-client/releases/v2.0.1/artifact.tar.gz",
+          size: expected.artifactSize,
+          contentType: "application/gzip",
+          customMetadata: { sha256: expected.artifactSha256 },
+        },
+        expected
+      )
+    ).toBeNull();
+  });
+
+  it("finalize 拒绝缺失对象及不一致的大小、MIME 和显式摘要", () => {
+    const expected = {
+      artifactSize: 2_128_000,
+      artifactSha256: "a".repeat(64),
+    };
+
+    expect(getReleaseArtifactMetadataValidationError(null, expected)).toBe(
+      "上传制品不存在"
+    );
+    expect(
+      getReleaseArtifactMetadataValidationError(
+        { key: "artifact.tar.gz", size: expected.artifactSize - 1 },
+        expected
+      )
+    ).toBe("上传制品大小与票据不一致");
+    expect(
+      getReleaseArtifactMetadataValidationError(
+        { key: "artifact.tar.gz", size: expected.artifactSize },
+        expected
+      )
+    ).toBe("上传制品 MIME 与发布格式不一致");
+    expect(
+      getReleaseArtifactMetadataValidationError(
+        {
+          key: "artifact.tar.gz",
+          size: expected.artifactSize,
+          contentType: "application/octet-stream",
+        },
+        expected
+      )
+    ).toBe("上传制品 MIME 与发布格式不一致");
+    expect(
+      getReleaseArtifactMetadataValidationError(
+        {
+          key: "artifact.tar.gz",
+          size: expected.artifactSize,
+          contentType: "application/gzip",
+          customMetadata: { sha256: "b".repeat(64) },
+        },
+        expected
+      )
+    ).toBe("上传制品摘要元数据与票据不一致");
   });
 });
