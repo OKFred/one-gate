@@ -1,10 +1,10 @@
 import { getEnv } from "@hodor/core/utils/env";
+import type { DeviceCryptoPort } from "../application/ports.js";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const CIPHER_VERSION = "v1";
 
-/** 将字节编码为无填充 Base64URL。 */
 function toBase64Url(value: Uint8Array): string {
   let binary = "";
   for (const byte of value) binary += String.fromCharCode(byte);
@@ -14,7 +14,6 @@ function toBase64Url(value: Uint8Array): string {
     .replace(/=+$/, "");
 }
 
-/** 解码 Base64 或 Base64URL。 */
 function fromBase64(value: string): Uint8Array {
   const normalized = value.replaceAll("-", "+").replaceAll("_", "/");
   const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
@@ -22,7 +21,6 @@ function fromBase64(value: string): Uint8Array {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
-/** 读取并校验 AES-256-GCM 密钥，禁止缺失时降级。 */
 async function importSensitiveKey(): Promise<CryptoKey> {
   const raw = getEnv("MOBILE_SENSITIVE_DATA_KEY");
   if (!raw) {
@@ -43,7 +41,6 @@ async function importSensitiveKey(): Promise<CryptoKey> {
   ]);
 }
 
-/** 使用 AES-256-GCM 加密 UTF-8 文本，并绑定字段级 AAD。 */
 export async function encryptSensitiveText(
   plaintext: string,
   aad: string
@@ -63,7 +60,6 @@ export async function encryptSensitiveText(
   return `${CIPHER_VERSION}.${toBase64Url(iv)}.${toBase64Url(new Uint8Array(encrypted))}`;
 }
 
-/** 解密本服务生成的 AES-256-GCM 文本。 */
 export async function decryptSensitiveText(
   ciphertext: string,
   aad: string
@@ -86,13 +82,11 @@ export async function decryptSensitiveText(
   return decoder.decode(decrypted);
 }
 
-/** 对上报令牌计算 SHA-256 摘要。 */
 export async function hashDeviceToken(token: string): Promise<string> {
   const digest = await crypto.subtle.digest("SHA-256", encoder.encode(token));
   return toBase64Url(new Uint8Array(digest));
 }
 
-/** 常量时间比较设备令牌与数据库摘要。 */
 export async function verifyDeviceToken(
   token: string,
   expectedHash: string
@@ -107,7 +101,6 @@ export async function verifyDeviceToken(
   return difference === 0;
 }
 
-/** 生成只展示一次的设备上报令牌及其摘要。 */
 export async function generateDeviceToken(): Promise<{
   token: string;
   tokenHash: string;
@@ -116,8 +109,10 @@ export async function generateDeviceToken(): Promise<{
   return { token, tokenHash: await hashDeviceToken(token) };
 }
 
-/** 仅保留标识尾四位，其他字符统一遮罩。 */
-export function maskIdentifier(value: string): string {
-  if (value.length <= 4) return "****";
-  return `${"*".repeat(Math.min(12, value.length - 4))}${value.slice(-4)}`;
-}
+export const webCryptoDeviceAdapter: DeviceCryptoPort = {
+  encrypt: encryptSensitiveText,
+  decrypt: decryptSensitiveText,
+  hashToken: hashDeviceToken,
+  verifyToken: verifyDeviceToken,
+  generateToken: generateDeviceToken,
+};

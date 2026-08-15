@@ -35,7 +35,7 @@
    * Environment Variables
    * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
    * Note: Use `wrangler secret put <KEY>` for sensitive values.
-   * Required secrets include JWT_SECRET and MOBILE_SENSITIVE_DATA_KEY.
+   * Required secrets are declared below and must be uploaded before deploy.
    */
   "vars": {
     "NODE_ENV": "production",
@@ -43,6 +43,22 @@
     "LOCALE": "en-US",
     "VERSION": "20260705010933-926da5fb",
     "CLOUDFLARE_ACCOUNT_ID": "00000000000000000000000000000000",
+  },
+
+  "secrets": {
+    "required": [
+      "GH_CLIENT_ID",
+      "GH_CLIENT_SECRET",
+      "GH_ORG_NAME",
+      "FEISHU_APP_ID",
+      "FEISHU_APP_SECRET",
+      "FEISHU_ALLOWED_TENANT_KEYS",
+      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
+      "OAUTH_SENSITIVE_DATA_KEY",
+      "JWT_SECRET",
+      "MOBILE_SENSITIVE_DATA_KEY",
+      "MOBILE_RELEASE_PUBLISH_TOKEN",
+    ],
   },
 
   /**

@@ -168,6 +168,95 @@ function headersToRecord(headersInit?: HeadersInit): Record<string, string> {
   return result;
 }
 
+const SENSITIVE_FIELD_NAMES = [
+  "authorization",
+  "cookie",
+  "setcookie",
+  "code",
+  "state",
+  "token",
+  "secret",
+  "password",
+  "passwd",
+  "mobile",
+  "phone",
+] as const;
+const SENSITIVE_STRING_PATTERNS = [
+  /\bBearer\s+[^\s]+/gi,
+  /\bBasic\s+[^\s]+/gi,
+  /\bgh[opusr]_[A-Za-z0-9_]+/g,
+  /\b1[3-9]\d{9}\b/g,
+] as const;
+const REDACTED_VALUE = "[REDACTED]";
+
+function isSensitiveField(key: string): boolean {
+  const normalized = key.toLowerCase().replaceAll("-", "").replaceAll("_", "");
+  return SENSITIVE_FIELD_NAMES.some((name) => normalized.includes(name));
+}
+
+function redactString(value: string): string {
+  return SENSITIVE_STRING_PATTERNS.reduce(
+    (result, pattern) => result.replace(pattern, REDACTED_VALUE),
+    value
+  );
+}
+
+function redactTextPayload(value: string): string {
+  try {
+    return JSON.stringify(redactAuditValue(JSON.parse(value)));
+  } catch {
+    return redactString(value);
+  }
+}
+
+function redactAuditValue(
+  value: unknown,
+  depth = 0,
+  seen: WeakSet<object> = new WeakSet<object>()
+): unknown {
+  if (depth > 8) return "[TRUNCATED]";
+  if (typeof value === "string") return redactString(value);
+  if (value === null || typeof value !== "object") return value;
+  if (seen.has(value)) return "[CIRCULAR]";
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    return value.map((item) => redactAuditValue(item, depth + 1, seen));
+  }
+
+  const result: Record<string, unknown> = {};
+  for (const [key, item] of Object.entries(value)) {
+    result[key] = isSensitiveField(key)
+      ? REDACTED_VALUE
+      : redactAuditValue(item, depth + 1, seen);
+  }
+  return result;
+}
+
+function redactHeaders(
+  headers: Record<string, string>
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(headers).map(([key, value]) => [
+      key,
+      isSensitiveField(key) ? REDACTED_VALUE : redactString(value),
+    ])
+  );
+}
+
+function redactUrl(url: URL): { url: string; query?: string } {
+  const safeUrl = new URL(url.toString());
+  for (const key of safeUrl.searchParams.keys()) {
+    if (isSensitiveField(key)) {
+      safeUrl.searchParams.set(key, REDACTED_VALUE);
+    }
+  }
+  return {
+    url: safeUrl.toString(),
+    query: safeUrl.search || undefined,
+  };
+}
+
 /**
  * 域名 DNS 解析 (支持 Node.js 环境与 Cloudflare Workers DoH 降级)
  */
@@ -228,6 +317,8 @@ export interface SafeFetchOptions extends RequestInit {
   creatorId?: number;
   tenantId?: number;
   remark?: string;
+  auditMode?: "standard" | "metadata-only";
+  auditProvider?: string;
   logHandler?: (logData: {
     tenantId?: number;
     namespace: string;
@@ -258,6 +349,8 @@ export async function safeFetch(
 ): Promise<Response> {
   const urlStr = typeof url === "string" ? url : url.toString();
   const parsedUrl = new URL(urlStr);
+  const auditMode = options.auditMode ?? "standard";
+  const safeUrl = redactUrl(parsedUrl);
 
   // 1. 协议拦截
   if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
@@ -270,27 +363,35 @@ export async function safeFetch(
   const protocol = parsedUrl.protocol.replace(":", "");
   const host = parsedUrl.host;
   const path = parsedUrl.pathname;
-  const query = parsedUrl.search || undefined;
+  const query = auditMode === "metadata-only" ? undefined : safeUrl.query;
   const method = (options.method || "GET").toUpperCase();
   const startTime = Date.now();
   const namespace = options.namespace || "http.outbound";
   const tenantId = options.tenantId;
   const creatorId = options.creatorId || 0;
-  const remark = options.remark;
+  const remark =
+    auditMode === "metadata-only" && options.auditProvider
+      ? `oauth:${options.auditProvider}`
+      : options.remark;
 
-  const requestHeaders = headersToRecord(options.headers);
+  const requestHeaders =
+    auditMode === "metadata-only"
+      ? undefined
+      : redactHeaders(headersToRecord(options.headers));
 
   let requestBody: unknown = null;
   if (options.body) {
     try {
-      requestBody =
+      const parsedBody =
         typeof options.body === "string"
           ? JSON.parse(options.body)
           : String(options.body);
+      requestBody = redactAuditValue(parsedBody);
     } catch {
-      requestBody = String(options.body);
+      requestBody = redactString(String(options.body));
     }
   }
+  if (auditMode === "metadata-only") requestBody = undefined;
 
   const recordLog = (logItem: {
     responseStatus?: number;
@@ -304,7 +405,10 @@ export async function safeFetch(
           tenantId,
           namespace,
           method,
-          url: urlStr,
+          url:
+            auditMode === "metadata-only"
+              ? `${parsedUrl.origin}${path}`
+              : safeUrl.url,
           protocol,
           host,
           path,
@@ -312,8 +416,12 @@ export async function safeFetch(
           requestHeaders,
           requestBody,
           responseStatus: logItem.responseStatus,
-          responseHeaders: logItem.responseHeaders,
-          responseBody: logItem.responseBody,
+          responseHeaders:
+            auditMode === "metadata-only" ? undefined : logItem.responseHeaders,
+          responseBody:
+            auditMode === "metadata-only"
+              ? undefined
+              : redactAuditValue(logItem.responseBody),
           durationMs: Date.now() - startTime,
           errorMessage: logItem.errorMessage,
           creatorId,
@@ -356,6 +464,8 @@ export async function safeFetch(
     tenantId: _tid,
     creatorId: _cid,
     remark: _rm,
+    auditMode: _auditMode,
+    auditProvider: _auditProvider,
     timeoutMs: _t,
     headers: _h,
     ...standardFetchOptions
@@ -369,7 +479,7 @@ export async function safeFetch(
     });
     clearTimeout(timer);
 
-    const responseHeaders = headersToRecord(response.headers);
+    const responseHeaders = redactHeaders(headersToRecord(response.headers));
     if (typeof response.clone === "function") {
       const clonedRes = response.clone();
       clonedRes
@@ -398,7 +508,10 @@ export async function safeFetch(
     return response;
   } catch (err: unknown) {
     clearTimeout(timer);
-    const errorMsg = err instanceof Error ? err.message : String(err);
+    const errorMsg =
+      auditMode === "metadata-only"
+        ? "OAuth outbound request failed"
+        : redactString(err instanceof Error ? err.message : String(err));
     recordLog({
       responseStatus: 504,
       errorMessage: errorMsg,
@@ -418,7 +531,10 @@ export async function safeFetchJson<T = unknown>(
   if (!response.ok) {
     const text = await response.text();
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-      message: `HTTP Error ${response.status}: ${text || response.statusText}`,
+      message:
+        options.auditMode === "metadata-only"
+          ? `HTTP Error ${response.status}: ${response.statusText}`
+          : `HTTP Error ${response.status}: ${redactTextPayload(text) || response.statusText}`,
     });
   }
   return (await response.json()) as T;
@@ -435,7 +551,10 @@ export async function safeFetchText(
   if (!response.ok) {
     const text = await response.text();
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS, {
-      message: `HTTP Error ${response.status}: ${text || response.statusText}`,
+      message:
+        options.auditMode === "metadata-only"
+          ? `HTTP Error ${response.status}: ${response.statusText}`
+          : `HTTP Error ${response.status}: ${redactTextPayload(text) || response.statusText}`,
     });
   }
   return await response.text();

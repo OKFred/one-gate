@@ -21,41 +21,79 @@ export const wechatLoginFn = (
   });
 };
 
-export const githubUrlFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/url', 'post'>, 'url' | 'method'>,
+export const oauthLoginUrlFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/oauth/login/url', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
-    url: '/api/v1/admin/system/auth/github/url',
+    url: '/api/v1/admin/system/auth/oauth/login/url',
     method: 'post',
     ...axiosConfig,
   });
 };
 
-export const githubLoginFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/login', 'post'>, 'url' | 'method'>,
+export const oauthLoginCallbackFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/oauth/login/callback', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
-    url: '/api/v1/admin/system/auth/github/login',
+    url: '/api/v1/admin/system/auth/oauth/login/callback',
     method: 'post',
     ...axiosConfig,
   });
 };
 
-export const githubBindFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/bind', 'post'>, 'url' | 'method'>,
+export const oauthAccountUrlFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/oauth/account/url', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
-    url: '/api/v1/admin/system/auth/github/bind',
+    url: '/api/v1/admin/system/auth/oauth/account/url',
     method: 'post',
     ...axiosConfig,
   });
 };
 
-export const githubUnbindFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/github/unbind', 'post'>, 'url' | 'method'>,
+export const oauthAccountCallbackFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/oauth/account/callback', 'post'>,
+    'url' | 'method'
+  >,
 ) => {
   return axiosPlus({
-    url: '/api/v1/admin/system/auth/github/unbind',
+    url: '/api/v1/admin/system/auth/oauth/account/callback',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+export const oauthBindingUnbindFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/oauth/binding/unbind', 'post'>,
+    'url' | 'method'
+  >,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/auth/oauth/binding/unbind',
+    method: 'post',
+    ...axiosConfig,
+  });
+};
+
+export const oauthBindingProfileFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/oauth/binding/profile', 'post'>,
+    'url' | 'method'
+  >,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/auth/oauth/binding/profile',
     method: 'post',
     ...axiosConfig,
   });

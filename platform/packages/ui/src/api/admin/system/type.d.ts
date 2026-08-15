@@ -130,6 +130,42 @@ export type DeleteMenuRes = Awaited<ReturnType<typeof MenuAPI.deleteFn>>['data']
 export type LoginReq = NonNullable<Parameters<typeof AuthAPI.loginFn>[0]['data']>;
 export type LoginRes = Awaited<ReturnType<typeof AuthAPI.loginFn>>['data']['data'];
 
+export type OAuthProvider = NonNullable<
+  Parameters<typeof AuthAPI.oauthLoginUrlFn>[0]['data']
+>['provider'];
+export type OAuthLoginUrlReq = NonNullable<Parameters<typeof AuthAPI.oauthLoginUrlFn>[0]['data']>;
+export type OAuthLoginUrlRes = Awaited<ReturnType<typeof AuthAPI.oauthLoginUrlFn>>['data']['data'];
+export type OAuthLoginCallbackReq = NonNullable<
+  Parameters<typeof AuthAPI.oauthLoginCallbackFn>[0]['data']
+>;
+export type OAuthLoginCallbackRes = Awaited<
+  ReturnType<typeof AuthAPI.oauthLoginCallbackFn>
+>['data']['data'];
+export type OAuthAccountUrlReq = NonNullable<
+  Parameters<typeof AuthAPI.oauthAccountUrlFn>[0]['data']
+>;
+export type OAuthAccountUrlRes = Awaited<
+  ReturnType<typeof AuthAPI.oauthAccountUrlFn>
+>['data']['data'];
+export type OAuthAccountCallbackReq = NonNullable<
+  Parameters<typeof AuthAPI.oauthAccountCallbackFn>[0]['data']
+>;
+export type OAuthAccountCallbackRes = Awaited<
+  ReturnType<typeof AuthAPI.oauthAccountCallbackFn>
+>['data']['data'];
+export type OAuthBindingUnbindReq = NonNullable<
+  Parameters<typeof AuthAPI.oauthBindingUnbindFn>[0]['data']
+>;
+export type OAuthBindingUnbindRes = Awaited<
+  ReturnType<typeof AuthAPI.oauthBindingUnbindFn>
+>['data']['data'];
+export type OAuthBindingProfileReq = NonNullable<
+  Parameters<typeof AuthAPI.oauthBindingProfileFn>[0]['data']
+>;
+export type OAuthBindingProfileRes = Awaited<
+  ReturnType<typeof AuthAPI.oauthBindingProfileFn>
+>['data']['data'];
+
 // 微信登录
 export type WechatLoginReq = NonNullable<Parameters<typeof AuthAPI.wechatLoginFn>[0]['data']>;
 export type WechatLoginRes = Awaited<ReturnType<typeof AuthAPI.wechatLoginFn>>['data']['data'];

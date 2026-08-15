@@ -24,7 +24,8 @@ export const auth = {
   'github.bound': '已绑定: {{username}}',
   'github.unbind': '解绑 GitHub',
   'github.unbindTitle': '确认解绑 GitHub 账号？',
-  'github.unbindConfirm': '当前已绑定 GitHub 账号 {{username}}。解绑后，你将无法使用该 GitHub 账号直接登录本系统。确定解绑吗？',
+  'github.unbindConfirm':
+    '当前已绑定 GitHub 账号 {{username}}。解绑后，你将无法使用该 GitHub 账号直接登录本系统。确定解绑吗？',
   'github.unbindSuccess': 'GitHub 账号解绑成功！',
   'github.bindSuccess': 'GitHub 账号绑定成功！',
   'github.loginSuccess': '登录成功',
@@ -34,6 +35,27 @@ export const auth = {
   'github.verifying': '正在验证 GitHub 授权，请稍候...',
   'github.back': '返回',
   'github.confirmUnbind': '确定解绑',
+
+  // 统一 OAuth 与飞书
+  'oauth.provider.github': 'GitHub',
+  'oauth.provider.feishu': '飞书',
+  'oauth.bind': '绑定 {{provider}}',
+  'oauth.unbind': '解绑 {{provider}}',
+  'oauth.unbindTitle': '确认解绑账号？',
+  'oauth.unbindConfirm':
+    '解绑后将无法继续使用 {{provider}} 登录。GitHub 可能需要重新授权以撤销远端授权，确定继续吗？',
+  'oauth.confirmUnbind': '确定解绑',
+  'oauth.unbindSuccess': '账号解绑成功',
+  'oauth.bindSuccess': '账号绑定成功',
+  'oauth.loginSuccess': '登录成功',
+  'oauth.authFailed': '授权失败',
+  'oauth.authFailedRetry': '授权失败，请返回后重试',
+  'oauth.missingCallbackParameters': '未找到授权码或安全状态，请重新发起授权。',
+  'oauth.verifying': '正在验证授权，请稍候...',
+  'oauth.back': '返回',
+  'feishu.signIn': '使用飞书登录',
+  'feishu.viewProfile': '查看飞书档案',
+  'feishu.profileTitle': '飞书通讯录档案',
 
   // 个人中心 / 我的
   'me.title': '我的',

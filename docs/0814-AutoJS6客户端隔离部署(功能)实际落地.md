@@ -12,7 +12,7 @@
 
 ## 数据库与配置
 
-- 新增 `20260814_01_mobile_client_deployment.sql` 及对应 D1 `0001` 迁移。
+- 新增 `20260814_01_mobile_client_deployment.sql` 及对应 D1 `0002` 迁移。
 - 更新全量 SQL、D1 contract、`.env.example`、Wrangler secret 声明和 Worker 环境类型。
 - 新增发布、环境、部署三个独立业务键及 `read/dispatch` 权限；部署时需执行既有权限同步流程。
 - 三个环境首次访问时幂等创建修订 1，内容为 `{}` 和空密钥键列表。

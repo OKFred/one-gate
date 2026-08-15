@@ -21,16 +21,14 @@ import {
 } from "@hodor/core/db/common/schema";
 import type { RequiredKeys } from "@hodor/core/types/app";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
+import {
+  DEVICE_EVENT_TYPES,
+  type DeviceEventType,
+  type DeviceReportedStatus,
+} from "./domain/device.js";
 
-export const DEVICE_EVENT_TYPES = [
-  "battery",
-  "network",
-  "sms",
-  "notification",
-] as const;
-
-export type DeviceEventType = (typeof DEVICE_EVENT_TYPES)[number];
-export type DeviceReportedStatus = "ONLINE" | "OFFLINE";
+export { DEVICE_EVENT_TYPES };
+export type { DeviceEventType, DeviceReportedStatus };
 
 //----------------- Drizzle Tables ----------------//
 export const mobileDeviceTable = sqliteTable(

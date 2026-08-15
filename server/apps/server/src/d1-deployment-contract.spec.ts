@@ -19,6 +19,16 @@ describe("D1 deployment contract", () => {
       "../d1-migrations/0000_legacy_schema_baseline.sql"
     );
     expect(baseline).toContain("legacy_schema_baseline");
+
+    const oauthMigration = readRepositoryFile(
+      "../d1-migrations/0001_system_user_oauth_security.sql"
+    );
+    expect(oauthMigration).toContain("provider_tenant_id");
+    expect(oauthMigration).toContain("encrypted_profile");
+    expect(oauthMigration).toContain(
+      "system_user_oauth_provider_identity_unique"
+    );
+    expect(oauthMigration).toContain("system_user_oauth_user_provider_unique");
   });
 
   it("checks the critical production tables before Worker deployment", () => {
@@ -32,6 +42,14 @@ describe("D1 deployment contract", () => {
     );
     expect(contract).toContain(
       "INDEXED BY `admin_mobile_device_event_client_event_unique`"
+    );
+    expect(contract).toContain("FROM `system_user_oauth`");
+    expect(contract).toContain("`encrypted_access_token`");
+    expect(contract).toContain(
+      "INDEXED BY `system_user_oauth_provider_identity_unique`"
+    );
+    expect(contract).toContain(
+      "INDEXED BY `system_user_oauth_user_provider_unique`"
     );
   });
 
@@ -48,10 +66,25 @@ describe("D1 deployment contract", () => {
     expect(deployAt).toBeGreaterThan(contractAt);
   });
 
-  it("deploys the required mobile sensitive-data secret", () => {
+  it("deploys all required sensitive-data and OAuth secrets", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
-    expect(workflow).toContain("MOBILE_SENSITIVE_DATA_KEY");
+    for (const secretName of [
+      "MOBILE_SENSITIVE_DATA_KEY",
+      "OAUTH_SENSITIVE_DATA_KEY",
+      "FEISHU_APP_ID",
+      "FEISHU_APP_SECRET",
+      "FEISHU_ALLOWED_TENANT_KEYS",
+      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
+    ]) {
+      expect(workflow).toContain(
+        `${secretName}: \${{ secrets.${secretName} }}`
+      );
+    }
+
+    const config = readRepositoryFile("../wrangler.jsonc");
+    expect(config).toContain('"secrets"');
+    expect(config).toContain('"OAUTH_SENSITIVE_DATA_KEY"');
   });
 });

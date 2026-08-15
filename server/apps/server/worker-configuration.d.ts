@@ -23,6 +23,15 @@ interface __BaseEnv_Env {
   TEST_MAIL_WRONG_ADDRESS: string;
   TEST_MAIL_WRONG_PASSWORD: string;
   TEST_MAIL_RECEIVER: string;
+  GH_CLIENT_ID: string;
+  GH_CLIENT_SECRET: string;
+  GH_ORG_NAME: string;
+  FEISHU_APP_ID: string;
+  FEISHU_APP_SECRET: string;
+  FEISHU_ALLOWED_TENANT_KEYS: string;
+  OAUTH_ALLOWED_REDIRECT_ORIGINS: string;
+  OAUTH_SENSITIVE_DATA_KEY: string;
+  MOBILE_SENSITIVE_DATA_KEY: string;
   MOBILE_RELEASE_PUBLISH_TOKEN: string;
 }
 declare namespace Cloudflare {
@@ -58,6 +67,15 @@ declare namespace NodeJS {
       | "TEST_MAIL_WRONG_ADDRESS"
       | "TEST_MAIL_WRONG_PASSWORD"
       | "TEST_MAIL_RECEIVER"
+      | "GH_CLIENT_ID"
+      | "GH_CLIENT_SECRET"
+      | "GH_ORG_NAME"
+      | "FEISHU_APP_ID"
+      | "FEISHU_APP_SECRET"
+      | "FEISHU_ALLOWED_TENANT_KEYS"
+      | "OAUTH_ALLOWED_REDIRECT_ORIGINS"
+      | "OAUTH_SENSITIVE_DATA_KEY"
+      | "MOBILE_SENSITIVE_DATA_KEY"
       | "MOBILE_RELEASE_PUBLISH_TOKEN"
     >
   > {}
