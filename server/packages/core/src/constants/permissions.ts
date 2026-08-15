@@ -203,6 +203,9 @@ export const permissionSeeds = {
     app_version: ["read", "add", "edit", "delete"],
     device_app: ["read", "sync", "install"],
     async_task: ["read", "dispatch"],
+    client_release: ["read", "dispatch"],
+    client_environment: ["read", "dispatch"],
+    client_deployment: ["read", "dispatch"],
   },
 } as const;
 

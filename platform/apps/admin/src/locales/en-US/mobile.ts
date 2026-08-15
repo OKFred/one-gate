@@ -19,6 +19,7 @@ export const mobile = {
   'mobile.device.tabs.overview': 'Overview',
   'mobile.device.tabs.metadata': 'Extended Data',
   'mobile.device.tabs.events': 'Events',
+  'mobile.device.tabs.deployments': 'Client Deployment',
   'mobile.device.hardware': 'Hardware',
   'mobile.device.clientVersions': 'Client Versions',
   'mobile.device.battery': 'Battery',
@@ -56,6 +57,38 @@ export const mobile = {
   'mobile.device.tokenOnce':
     'This plaintext is shown once. After closing, it can only be reset, not viewed again.',
   'mobile.device.tokenCopied': 'Token copied',
+
+  // Client release, environment and deployment
+  'mobile.deployment.isolationHint':
+    'Each phone runs one instance; release content is read-only while environment state and secrets remain isolated.',
+  'mobile.deployment.applyTitle': 'Switch Version and Environment',
+  'mobile.deployment.release': 'Client Release',
+  'mobile.deployment.environment': 'Environment',
+  'mobile.deployment.activationMode': 'Activation Mode',
+  'mobile.deployment.apply': 'Deploy',
+  'mobile.deployment.forceConfirm':
+    'FORCE preempts the running task and cleans engines, input methods, and temporary files. Continue?',
+  'mobile.deployment.accepted': 'Deployment accepted',
+  'mobile.deployment.environments': 'Environment Revisions',
+  'mobile.deployment.secretKeys': 'local secret keys',
+  'mobile.deployment.releases': 'Immutable Releases',
+  'mobile.deployment.revoke': 'Revoke New Deployments',
+  'mobile.deployment.revokeConfirm':
+    'Revocation blocks new deployments but preserves artifacts referenced by devices. Continue?',
+  'mobile.deployment.history': 'Device Deployment History',
+  'mobile.deployment.empty': 'No deployments yet',
+  'mobile.deployment.rollback': 'Rollback to Previous Combination',
+  'mobile.deployment.rollbackConfirm': 'Create a new graceful rollback deployment?',
+  'mobile.deployment.rollbackAccepted': 'Rollback deployment accepted',
+  'mobile.deployment.editEnvironment': 'Create Environment Revision',
+  'mobile.deployment.environmentWarning':
+    'Only non-sensitive business policy belongs here. MQTT, device identity, reporting credentials, and secret values are forbidden.',
+  'mobile.deployment.configJson': 'Non-sensitive Configuration JSON',
+  'mobile.deployment.requiredSecretKeys': 'Device-local Secret Key Names',
+  'mobile.deployment.requiredSecretKeysHint':
+    'One per line or comma-separated. Enter key names only, never secret values.',
+  'mobile.deployment.invalidJson': 'Configuration must be a valid JSON object',
+  'mobile.deployment.environmentSaved': 'New immutable environment revision activated',
 
   // App Management
   'mobile.app.title': 'App Management',

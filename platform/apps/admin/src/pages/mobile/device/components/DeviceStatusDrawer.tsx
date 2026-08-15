@@ -41,6 +41,7 @@ import { ResponsiveButton } from '@/components/Responsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
 import { THIS_PERMISSION } from '../constant';
+import { ClientDeploymentPanel } from './ClientDeploymentPanel';
 
 interface DeviceStatusDrawerProps {
   open: boolean;
@@ -226,6 +227,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
             <Tab label={t('mobile.device.tabs.overview')} />
             <Tab label={t('mobile.device.tabs.metadata')} />
             <Tab label={t('mobile.device.tabs.events')} />
+            <Tab label={t('mobile.device.tabs.deployments')} />
           </Tabs>
           <Divider />
 
@@ -452,6 +454,8 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
               ))}
             </Stack>
           )}
+
+          {tab === 3 && clientId && <ClientDeploymentPanel clientId={clientId} />}
         </Box>
       </Drawer>
 

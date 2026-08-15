@@ -57,6 +57,7 @@ export class R2Provider implements StorageProvider {
       Bucket: this.bucketName,
       Key: key,
       ContentType: options?.contentType,
+      Metadata: options?.customMetadata,
     });
     return getSignedUrl(this.s3Client, command, {
       expiresIn: options?.expiresIn || 3600,
@@ -102,6 +103,7 @@ export class R2Provider implements StorageProvider {
       size: object.size,
       contentType: object.httpMetadata?.contentType,
       lastModified: object.uploaded,
+      customMetadata: object.customMetadata,
     };
   }
 

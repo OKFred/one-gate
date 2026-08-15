@@ -365,6 +365,21 @@ export const permissions = {
         read: 'admin.mobile.async_task:read',
         dispatch: 'admin.mobile.async_task:dispatch',
       },
+      /** client_release */
+      client_release: {
+        read: 'admin.mobile.client_release:read',
+        dispatch: 'admin.mobile.client_release:dispatch',
+      },
+      /** client_environment */
+      client_environment: {
+        read: 'admin.mobile.client_environment:read',
+        dispatch: 'admin.mobile.client_environment:dispatch',
+      },
+      /** client_deployment */
+      client_deployment: {
+        read: 'admin.mobile.client_deployment:read',
+        dispatch: 'admin.mobile.client_deployment:dispatch',
+      },
     },
   },
   enterprise: {
