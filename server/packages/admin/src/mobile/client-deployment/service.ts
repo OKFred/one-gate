@@ -56,6 +56,8 @@ const deploymentIdSchema = {
 
 /** 客户端发布制品专用 OSS 配置名；禁止回退到默认 OSS。 */
 export const MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY = "mobile-client-release";
+/** 上传票据包含完整清单；保留明确上限以兼容大型文件清单并限制请求体。 */
+export const RELEASE_UPLOAD_TICKET_MAX_LENGTH = 1_000_000;
 
 interface ReleaseUploadTicket {
   releaseVersion: string;
@@ -441,7 +443,11 @@ const uploadPrepareApi = {
 const uploadFinalizeReq = {
   type: "object",
   properties: {
-    uploadId: { type: "string", minLength: 20, maxLength: 200000 },
+    uploadId: {
+      type: "string",
+      minLength: 20,
+      maxLength: RELEASE_UPLOAD_TICKET_MAX_LENGTH,
+    },
     releaseNotes: { type: ["string", "null"], nullable: true, maxLength: 4000 },
   },
   required: ["uploadId"],
