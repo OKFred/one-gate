@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  classifyStorageConnectionError,
   clientDeploymentService,
   clientEnvironmentService,
   clientReleaseService,
@@ -92,7 +93,17 @@ describe("客户端版本、环境与部署 HTTP 契约", () => {
         provider: "S3",
         endpoint: "https://example.invalid",
       })
-    ).toEqual(["bucket", "accessKey", "secretKey"]);
+    ).toEqual(["bucket", "accessKey", "secretKey", "region"]);
+    expect(
+      getMissingPresignedStorageFields({
+        provider: "S3",
+        endpoint: "https://example.invalid",
+        region: "ap-southeast-1",
+        bucket: "releases",
+        accessKey: "configured",
+        secretKey: "configured",
+      })
+    ).toEqual([]);
     expect(
       getMissingPresignedStorageFields({
         provider: "R2",
@@ -110,5 +121,30 @@ describe("客户端版本、环境与部署 HTTP 契约", () => {
         accountId: "configured",
       })
     ).toEqual([]);
+  });
+
+  it("对象存储连接异常只返回固定安全分类", () => {
+    expect(
+      classifyStorageConnectionError({ name: "SignatureDoesNotMatch" })
+    ).toBe("对象存储连接检查失败: S3 签名或 Region 不匹配");
+    expect(
+      classifyStorageConnectionError({
+        name: "S3ServiceException",
+        $metadata: { httpStatusCode: 403 },
+      })
+    ).toBe("对象存储连接检查失败: S3 Access Key 无效或权限不足");
+    expect(
+      classifyStorageConnectionError({
+        name: "S3ServiceException",
+        code: "NoSuchBucket",
+        $metadata: { httpStatusCode: 404 },
+      })
+    ).toBe("对象存储连接检查失败: Bucket 不存在");
+    expect(
+      classifyStorageConnectionError(new TypeError("secret endpoint"))
+    ).toBe("对象存储连接检查失败: Endpoint 不可达或 TLS/网络异常");
+    expect(classifyStorageConnectionError({ unexpected: "secret" })).toBe(
+      "对象存储连接检查失败: 请核对 Provider、Endpoint、Region、Bucket 和访问密钥"
+    );
   });
 });

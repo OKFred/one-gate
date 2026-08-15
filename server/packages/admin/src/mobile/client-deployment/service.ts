@@ -83,12 +83,94 @@ export function getMissingPresignedStorageFields(config: unknown): string[] {
   );
   if (
     hasText(storageConfig.provider) &&
+    storageConfig.provider.toUpperCase() === "S3"
+  ) {
+    ["endpoint", "region"].forEach((field) => {
+      if (!hasText(storageConfig[field])) missing.push(field);
+    });
+  }
+  if (
+    hasText(storageConfig.provider) &&
     storageConfig.provider.toUpperCase() === "R2" &&
     !hasText(storageConfig.accountId)
   ) {
     missing.push("accountId");
   }
   return missing;
+}
+
+/** 从未知异常中读取 AWS 兼容错误码，不暴露原始响应或配置。 */
+function getStorageErrorCodes(error: unknown): string[] {
+  if (typeof error !== "object" || error === null || Array.isArray(error)) {
+    return [];
+  }
+  const record = error as Record<string, unknown>;
+  return [record.name, record.code, record.Code].filter(hasText);
+}
+
+/** 从未知异常中读取 HTTP 状态码。 */
+function getStorageErrorHttpStatus(error: unknown): number | undefined {
+  if (typeof error !== "object" || error === null || Array.isArray(error)) {
+    return undefined;
+  }
+  const metadata = (error as Record<string, unknown>).$metadata;
+  if (
+    typeof metadata !== "object" ||
+    metadata === null ||
+    Array.isArray(metadata)
+  ) {
+    return undefined;
+  }
+  const status = (metadata as Record<string, unknown>).httpStatusCode;
+  return typeof status === "number" ? status : undefined;
+}
+
+/** 将对象存储异常收敛为不含端点、密钥和上游响应的安全诊断。 */
+export function classifyStorageConnectionError(error: unknown): string {
+  const codes = getStorageErrorCodes(error);
+  const status = getStorageErrorHttpStatus(error);
+  if (
+    codes.some((code) =>
+      [
+        "SignatureDoesNotMatch",
+        "AuthorizationHeaderMalformed",
+        "InvalidRegion",
+      ].includes(code)
+    ) ||
+    status === 400
+  ) {
+    return "对象存储连接检查失败: S3 签名或 Region 不匹配";
+  }
+  if (
+    codes.some((code) =>
+      [
+        "InvalidAccessKeyId",
+        "UnrecognizedClientException",
+        "AccessDenied",
+        "Forbidden",
+      ].includes(code)
+    ) ||
+    status === 401 ||
+    status === 403
+  ) {
+    return "对象存储连接检查失败: S3 Access Key 无效或权限不足";
+  }
+  if (codes.includes("NoSuchBucket")) {
+    return "对象存储连接检查失败: Bucket 不存在";
+  }
+  if (
+    codes.some((code) =>
+      [
+        "TimeoutError",
+        "RequestTimeout",
+        "NetworkingError",
+        "TypeError",
+      ].includes(code)
+    )
+  ) {
+    return "对象存储连接检查失败: Endpoint 不可达或 TLS/网络异常";
+  }
+  return "对象存储连接检查失败: 请核对 Provider、Endpoint、Region、Bucket 和访问密钥";
 }
 
 /** 将发布数据库行转换为不泄露存储签名的接口模型。 */
@@ -295,7 +377,9 @@ const uploadPrepareApi = {
     const storage = await getActiveStorage(context.env);
     const existingArtifact = await storage
       .head(artifactKey)
-      .catch(() => invalid("对象存储连接检查失败，请检查默认 OSS 配置"));
+      .catch((error: unknown) =>
+        invalid(classifyStorageConnectionError(error))
+      );
     if (existingArtifact) invalid("发布制品路径已存在且不可覆盖");
     const expiresAt = Date.now() + 60 * 60 * 1000;
     const uploadUrl = await storage
