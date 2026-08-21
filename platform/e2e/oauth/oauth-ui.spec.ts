@@ -5,6 +5,15 @@ const environment = readE2EEnvironment();
 
 test.skip(!environment.mockOAuth, 'Set HODOR_E2E_MOCK_OAUTH=true for the mock provider UI suite.');
 
+test.beforeEach(async ({ page }) => {
+  await page.route('**/api/v1/admin/i18n/translation/listAll', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: true, data: [], message: 'ok' }),
+    });
+  });
+});
+
 test('login page exposes both OAuth providers without persisting provider profiles', async ({
   page,
 }) => {

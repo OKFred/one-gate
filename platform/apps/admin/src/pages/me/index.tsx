@@ -1,8 +1,8 @@
-import { useRef, useMemo, useCallback, useEffect } from 'react';
+import { useRef, useMemo, useCallback, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import TheProfile, { type TheProfileRef } from './components/TheProfile';
+import TheProfile, { type TheProfileRef, type UserWithOAuth } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
 import * as AuthApi from '@/api/admin/system/auth';
 export interface Props {
@@ -19,6 +19,7 @@ export default function Page() {
   const t = useTranslation();
   const profileRef = useRef<TheProfileRef>(null);
   const detailsRef = useRef<TheDetailsRef>(null);
+  const [currentUser, setCurrentUser] = useState<UserWithOAuth | null>(null);
 
   // 获取当前用户信息
   const fetchCurrentUser = useCallback(async () => {
@@ -27,9 +28,7 @@ export default function Page() {
       const response = await AuthApi.getProfileFn({ data: {} });
       const { userObj } = response.data.data;
 
-      // 通知各个组件更新数据
-      profileRef.current?.updateUser(userObj);
-      detailsRef.current?.updateUser(userObj);
+      setCurrentUser(userObj);
     } catch (error) {
       console.warn(error);
     }
@@ -44,6 +43,12 @@ export default function Page() {
   useEffect(() => {
     fetchCurrentUser();
   }, [fetchCurrentUser]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    profileRef.current?.updateUser(currentUser);
+    detailsRef.current?.updateUser(currentUser);
+  }, [currentUser]);
 
   return (
     <PageLayout title={t('me.title')}>
