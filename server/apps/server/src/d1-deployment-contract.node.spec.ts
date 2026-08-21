@@ -1,13 +1,9 @@
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
 function readRepositoryFile(relativeUrl: string): string {
-  return readFileSync(
-    fileURLToPath(new URL(relativeUrl, import.meta.url)),
-    "utf8"
-  );
+  return readFileSync(new URL(relativeUrl, import.meta.url), "utf8");
 }
 
 describe("D1 deployment contract", () => {
@@ -29,6 +25,13 @@ describe("D1 deployment contract", () => {
       "system_user_oauth_provider_identity_unique"
     );
     expect(oauthMigration).toContain("system_user_oauth_user_provider_unique");
+
+    const opsMigration = readRepositoryFile(
+      "../d1-migrations/0003_mobile_device_ops.sql"
+    );
+    expect(opsMigration).toContain("admin_mobile_device_ops_session");
+    expect(opsMigration).toContain("admin_mobile_device_ops_audit");
+    expect(opsMigration).not.toContain("operator_ticket");
   });
 
   it("checks the critical production tables before Worker deployment", () => {
@@ -51,6 +54,15 @@ describe("D1 deployment contract", () => {
     expect(contract).toContain(
       "INDEXED BY `system_user_oauth_user_provider_unique`"
     );
+    expect(contract).toContain("FROM `admin_mobile_device_ops_session`");
+    expect(contract).toContain("FROM `admin_mobile_device_ops_audit`");
+  });
+
+  it("configures one Durable Object per operations session", () => {
+    const config = readRepositoryFile("../wrangler.jsonc");
+    expect(config).toContain('"name": "MOBILE_OPS"');
+    expect(config).toContain('"class_name": "MobileOpsSession"');
+    expect(config).toContain('"new_sqlite_classes": ["MobileOpsSession"]');
   });
 
   it("runs migrations and the schema contract before Worker deployment", () => {

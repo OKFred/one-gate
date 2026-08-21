@@ -42,6 +42,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 import { THIS_PERMISSION } from '../constant';
 import { ClientDeploymentPanel } from './ClientDeploymentPanel';
+import { DeviceOpsPanel } from './DeviceOpsPanel';
 
 interface DeviceStatusDrawerProps {
   open: boolean;
@@ -228,6 +229,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
             <Tab label={t('mobile.device.tabs.metadata')} />
             <Tab label={t('mobile.device.tabs.events')} />
             <Tab label={t('mobile.device.tabs.deployments')} />
+            <Tab label={t('mobile.device.tabs.ops')} />
           </Tabs>
           <Divider />
 
@@ -456,6 +458,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
           )}
 
           {tab === 3 && clientId && <ClientDeploymentPanel clientId={clientId} />}
+          {tab === 4 && clientId && <DeviceOpsPanel clientId={clientId} />}
         </Box>
       </Drawer>
 

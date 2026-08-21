@@ -43,6 +43,7 @@
     "LOCALE": "en-US",
     "VERSION": "20260705010933-926da5fb",
     "CLOUDFLARE_ACCOUNT_ID": "00000000000000000000000000000000",
+    "MOBILE_OPS_ALLOWED_ORIGINS": "https://gate.example.com,https://gate-enterprise.example.com,https://gate-personal.example.com",
   },
 
   "secrets": {
@@ -69,6 +70,21 @@
       "database_name": "hodor_db",
       "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "d1-migrations",
+    },
+  ],
+
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MOBILE_OPS",
+        "class_name": "MobileOpsSession",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "mobile-ops-v1",
+      "new_sqlite_classes": ["MobileOpsSession"],
     },
   ],
 

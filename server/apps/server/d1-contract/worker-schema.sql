@@ -72,6 +72,32 @@ FROM `admin_mobile_device_event` INDEXED BY `admin_mobile_device_event_type_idx`
 LIMIT 0;
 
 SELECT
+  `id`, `session_id`, `active_client_id`, `client_id`, `actor_id`,
+  `actor_name`, `status`, `connected_at_utc`, `last_active_at_utc`,
+  `expires_at_utc`, `closed_at_utc`, `close_code`, `close_message`,
+  `create_time_utc`, `update_time_utc`
+FROM `admin_mobile_device_ops_session`
+LIMIT 0;
+
+SELECT `id`
+FROM `admin_mobile_device_ops_session`
+INDEXED BY `admin_mobile_device_ops_active_client_unique`
+LIMIT 0;
+
+SELECT
+  `id`, `session_id`, `request_id`, `client_id`, `actor_id`,
+  `operation`, `status`, `result_code`, `duration_ms`, `request_bytes`,
+  `response_bytes`, `request_ciphertext`, `response_ciphertext`,
+  `create_time_utc`, `finish_time_utc`
+FROM `admin_mobile_device_ops_audit`
+LIMIT 0;
+
+SELECT `id`
+FROM `admin_mobile_device_ops_audit`
+INDEXED BY `admin_mobile_device_ops_audit_request_unique`
+LIMIT 0;
+
+SELECT
   `id`,
   `task_id`,
   `client_id`,

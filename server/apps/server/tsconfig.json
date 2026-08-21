@@ -21,7 +21,15 @@
     }
   },
   "include": ["src/**/*", "worker-configuration.d.ts"],
-  "exclude": ["node_modules", "dist", "build", "coverage", "test/**/**"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    "test/**/**",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ],
   "tsc-alias": {
     "verbose": true,
     "resolveFullPaths": true

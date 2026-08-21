@@ -20,6 +20,7 @@ export const mobile = {
   'mobile.device.tabs.metadata': '扩展信息',
   'mobile.device.tabs.events': '事件',
   'mobile.device.tabs.deployments': '客户端部署',
+  'mobile.device.tabs.ops': '短期运维',
   'mobile.device.hardware': '硬件信息',
   'mobile.device.clientVersions': '客户端版本',
   'mobile.device.battery': '电量',

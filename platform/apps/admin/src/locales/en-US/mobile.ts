@@ -20,6 +20,7 @@ export const mobile = {
   'mobile.device.tabs.metadata': 'Extended Data',
   'mobile.device.tabs.events': 'Events',
   'mobile.device.tabs.deployments': 'Client Deployment',
+  'mobile.device.tabs.ops': 'Operations',
   'mobile.device.hardware': 'Hardware',
   'mobile.device.clientVersions': 'Client Versions',
   'mobile.device.battery': 'Battery',

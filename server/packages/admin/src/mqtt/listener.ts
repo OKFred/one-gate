@@ -12,6 +12,11 @@ import {
 } from "../mobile/client-deployment/facade.js";
 import { parseDeviceDeploymentEvent } from "../mobile/client-deployment/domain/deployment.js";
 import {
+  cleanupDeviceOpsAudits,
+  expireDeviceOpsSessions,
+  processDeviceOpsSessionEvent,
+} from "../mobile/device-ops/facade.js";
+import {
   cleanupExpiredDeviceEvents,
   getDeviceLogLabel,
   markTimedOutDevicesOffline,
@@ -210,9 +215,47 @@ function assertDeploymentTopicDevice(topic: string, deviceId: string): void {
   }
 }
 
+/** Parse a non-sensitive device operations session lifecycle event. */
+function parseDeviceOpsEvent(value: unknown) {
+  if (
+    !isRecord(value) ||
+    value.protocolVersion !== 1 ||
+    typeof value.sessionId !== "string" ||
+    typeof value.deviceId !== "string" ||
+    (value.status !== "CONNECTING" &&
+      value.status !== "CONNECTED" &&
+      value.status !== "CLOSED" &&
+      value.status !== "REJECTED") ||
+    typeof value.code !== "string" ||
+    typeof value.message !== "string" ||
+    typeof value.timestamp !== "number"
+  ) {
+    return null;
+  }
+  return {
+    protocolVersion: 1 as const,
+    sessionId: value.sessionId,
+    deviceId: value.deviceId,
+    status: value.status as "CONNECTING" | "CONNECTED" | "CLOSED" | "REJECTED",
+    code: value.code,
+    message: value.message,
+    timestamp: value.timestamp,
+  };
+}
+
 /** 按 Topic 路由一条 MQTT 入站消息。 */
 async function routeMessage(topic: string, payload: Buffer): Promise<void> {
   const value: unknown = JSON.parse(payload.toString());
+  if (
+    topic.startsWith("autojs6/ops/v1/devices/") &&
+    topic.endsWith("/events")
+  ) {
+    const event = parseDeviceOpsEvent(value);
+    if (!event) throw new Error("Invalid AutoJS6 operations event payload");
+    assertDeploymentTopicDevice(topic, event.deviceId);
+    await processDeviceOpsSessionEvent(event);
+    return;
+  }
   if (
     topic.startsWith("autojs6/deploy/v1/devices/") &&
     topic.endsWith("/events")
@@ -297,6 +340,7 @@ export async function startMqttEventListener(): Promise<void> {
         "autojs6/v2/devices/+/presence",
         "autojs6/v2/devices/+/info",
         "autojs6/deploy/v1/devices/+/events",
+        "autojs6/ops/v1/devices/+/events",
       ];
       mqttClient?.subscribe(topics, { qos: 1 }, (error) => {
         if (error) console.error("[MQTT_LISTENER] Subscribe failed", error);
@@ -322,20 +366,27 @@ export async function startMqttEventListener(): Promise<void> {
         timeoutExpiredDeviceTasks(),
         timeoutExpiredClientDeployments(),
         markTimedOutDevicesOffline(),
+        expireDeviceOpsSessions(),
       ]).catch((error) =>
         console.error("[AUTOJS6] Periodic timeout scan failed", error)
       );
     }, 60_000);
     retentionScanner ??= setInterval(
       () => {
-        void cleanupExpiredDeviceEvents().catch((error) =>
-          console.error("[AUTOJS6] Device event cleanup failed", error)
+        void Promise.all([
+          cleanupExpiredDeviceEvents(),
+          cleanupDeviceOpsAudits(),
+        ]).catch((error) =>
+          console.error("[AUTOJS6] Device retention cleanup failed", error)
         );
       },
       24 * 60 * 60 * 1000
     );
     void cleanupExpiredDeviceEvents().catch((error) =>
       console.error("[AUTOJS6] Initial device event cleanup failed", error)
+    );
+    void cleanupDeviceOpsAudits().catch((error) =>
+      console.error("[AUTOJS6] Initial operations audit cleanup failed", error)
     );
   } catch (error) {
     started = false;

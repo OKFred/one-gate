@@ -53,6 +53,13 @@ export interface DeviceEventInput {
 export interface TrustedDeviceCapabilities {
   root: boolean;
   trustedScripts: Array<{ scriptId: string; version: number }>;
+  deployment?: { protocolVersion: 1; supervisorVersion: string };
+  ops?: {
+    protocolVersion: 1;
+    enabled: boolean;
+    arbitraryShell: false;
+    operations: string[];
+  };
 }
 
 export interface DevicePresenceState {
@@ -121,7 +128,58 @@ export function validateCapabilities(
     }
     return { scriptId: item.scriptId, version: item.version };
   });
-  return { root: value.root, trustedScripts };
+  let deployment: TrustedDeviceCapabilities["deployment"];
+  if (value.deployment !== undefined) {
+    if (
+      typeof value.deployment !== "object" ||
+      value.deployment === null ||
+      Array.isArray(value.deployment) ||
+      !("protocolVersion" in value.deployment) ||
+      value.deployment.protocolVersion !== 1 ||
+      !("supervisorVersion" in value.deployment) ||
+      typeof value.deployment.supervisorVersion !== "string"
+    ) {
+      fail("Invalid deployment capability");
+    }
+    deployment = {
+      protocolVersion: 1,
+      supervisorVersion: value.deployment.supervisorVersion,
+    };
+  }
+  let ops: TrustedDeviceCapabilities["ops"];
+  if (value.ops !== undefined) {
+    if (
+      typeof value.ops !== "object" ||
+      value.ops === null ||
+      Array.isArray(value.ops) ||
+      !("protocolVersion" in value.ops) ||
+      value.ops.protocolVersion !== 1 ||
+      !("enabled" in value.ops) ||
+      typeof value.ops.enabled !== "boolean" ||
+      !("arbitraryShell" in value.ops) ||
+      value.ops.arbitraryShell !== false ||
+      !("operations" in value.ops) ||
+      !Array.isArray(value.ops.operations) ||
+      value.ops.operations.length > 50 ||
+      !value.ops.operations.every(
+        (operation) =>
+          typeof operation === "string" &&
+          /^device\.(?:ops|audio|storage|files|foreground|network)\.[a-z]+$/.test(
+            operation
+          ) &&
+          !operation.includes("shell")
+      )
+    ) {
+      fail("Invalid operations capability");
+    }
+    ops = {
+      protocolVersion: 1,
+      enabled: value.ops.enabled,
+      arbitraryShell: false,
+      operations: [...value.ops.operations] as string[],
+    };
+  }
+  return { root: value.root, trustedScripts, deployment, ops };
 }
 
 /** 去重并校验设备标识符与可用状态的一致性。 */

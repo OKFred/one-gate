@@ -124,6 +124,67 @@ async function connectMqttWithFallback(
 }
 
 /**
+ * Publish a device-management command while auditing metadata only.
+ * The command payload is intentionally excluded from logs so future protocol
+ * extensions cannot accidentally persist credentials or sensitive parameters.
+ */
+export async function publishDeviceManagementCommand(input: {
+  topic: string;
+  payload: Record<string, unknown>;
+  actor: MqttAuditActor;
+  sessionId: string;
+  clientId: string;
+  commandType: string;
+}): Promise<{ traceId: string }> {
+  const traceId = `mqtt_ops_${Date.now()}_${crypto.randomUUID().substring(0, 8)}`;
+  const credentials = await getActiveCredentials();
+  let client: mqtt.MqttClient | null = null;
+  let errorMessage = "";
+  try {
+    client = await connectMqttWithFallback(credentials, {
+      connectTimeout: 7000,
+      timeoutMs: 8000,
+      clientIdPrefix: "ops_",
+    });
+    await client.publishAsync(input.topic, JSON.stringify(input.payload), {
+      qos: 1,
+      retain: false,
+    });
+  } catch (error) {
+    errorMessage = error instanceof Error ? error.message : String(error);
+    throw new BusinessError(`设备管理命令发布失败: ${errorMessage}`);
+  } finally {
+    client?.end(true);
+    await baseLogService.biz
+      .add({
+        namespace: "mqtt",
+        status: !errorMessage,
+        payloadType: "json",
+        remark: errorMessage
+          ? `设备运维命令发布失败: ${errorMessage}`
+          : `设备运维命令已发布: ${input.topic}`,
+        creatorId: input.actor.userId,
+        creatorName: input.actor.username,
+        logValue: {
+          traceId,
+          topic: input.topic,
+          qos: 1,
+          retain: false,
+          direction: "OUT",
+          sessionId: input.sessionId,
+          clientId: input.clientId,
+          commandType: input.commandType,
+          payload: "[REDACTED_DEVICE_MANAGEMENT_COMMAND]",
+        },
+      })
+      .catch((error) =>
+        console.error("[MQTT Ops] Failed to record metadata audit", error)
+      );
+  }
+  return { traceId };
+}
+
+/**
  * 执行 MQTT 消息发布服务
  *
  * @param params 包含 topic, payload, qos, retain 的发布参数
