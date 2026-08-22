@@ -55,19 +55,24 @@ export function NetworkRoutingPanel({ clientId }: Props) {
       ? routing.lastResult.rollback
       : null;
 
-  const load = useCallback(async () => {
-    const response = await NetworkRoutingAPI.getNetworkRouting(clientId);
-    const next = response.data.data as NetworkRoutingView;
-    setRouting(next);
-    setCidrs(next.lanCidrs.join('\n'));
-    setLanProbes(next.lanProbeUrls.join('\n'));
-    setInternetProbe(next.internetProbeUrl);
-    setProbeTimeoutMs(next.probeTimeoutMs);
-    setTarget(next.desiredTarget ?? next.actualTarget ?? 'wifi');
-  }, [clientId]);
+  const load = useCallback(
+    async (syncForm = false) => {
+      const response = await NetworkRoutingAPI.getNetworkRouting(clientId);
+      const next = response.data.data as NetworkRoutingView;
+      setRouting(next);
+      if (syncForm) {
+        setCidrs(next.lanCidrs.join('\n'));
+        setLanProbes(next.lanProbeUrls.join('\n'));
+        setInternetProbe(next.internetProbeUrl);
+        setProbeTimeoutMs(next.probeTimeoutMs);
+        setTarget(next.desiredTarget ?? next.actualTarget ?? 'wifi');
+      }
+    },
+    [clientId],
+  );
 
   useEffect(() => {
-    void load().catch(() => undefined);
+    void load(true).catch(() => undefined);
     const timer = window.setInterval(() => {
       if (document.visibilityState === 'visible') void load().catch(() => undefined);
     }, 5_000);
@@ -86,7 +91,7 @@ export function NetworkRoutingPanel({ clientId }: Props) {
         probeTimeoutMs,
       });
       showSnackbar({ message: t('mobile.networkRouting.saved'), type: 'success' });
-      await load();
+      await load(true);
     } finally {
       setSaving(false);
     }
