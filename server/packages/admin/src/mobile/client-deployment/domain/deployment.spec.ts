@@ -49,9 +49,40 @@ describe("client deployment domain", () => {
       })
     ).toBe(true);
     expect(
+      canApplyDeploymentEvent(
+        "PENDING",
+        { ...event, phase: "VERIFYING" },
+        {
+          deploymentId: event.deploymentId,
+          clientId: event.deviceId,
+          releaseVersion: event.releaseVersion,
+          environment: event.environment,
+          environmentRevision: event.environmentRevision,
+        }
+      )
+    ).toBe(true);
+    expect(
+      canApplyDeploymentEvent("VERIFYING", event, {
+        deploymentId: event.deploymentId,
+        clientId: event.deviceId,
+        releaseVersion: event.releaseVersion,
+        environment: event.environment,
+        environmentRevision: event.environmentRevision,
+      })
+    ).toBe(false);
+    expect(
       canApplyDeploymentEvent("SUCCEEDED", event, {
         deploymentId: event.deploymentId,
         clientId: event.deviceId,
+        releaseVersion: event.releaseVersion,
+        environment: event.environment,
+        environmentRevision: event.environmentRevision,
+      })
+    ).toBe(false);
+    expect(
+      canApplyDeploymentEvent("PENDING", event, {
+        deploymentId: event.deploymentId,
+        clientId: "another-device",
         releaseVersion: event.releaseVersion,
         environment: event.environment,
         environmentRevision: event.environmentRevision,

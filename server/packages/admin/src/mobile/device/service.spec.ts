@@ -15,9 +15,10 @@ describe("设备注册与上报 HTTP API 契约", () => {
     ["reportPresence", "/report/presence", false],
     ["reportInfo", "/report/info", false],
     ["reportEvent", "/report/event", false],
+    ["reportDeployment", "/report/deployment", false],
   ] as const;
 
-  it("仅导出原有十二个纯 API 定义", () => {
+  it("导出设备管理与四类设备上报 API 定义", () => {
     expect(Object.keys(service)).toEqual(apiShape.map(([name]) => name));
   });
 
@@ -54,8 +55,12 @@ describe("设备注册与上报 HTTP API 契约", () => {
     expect(service.reportEvent.req.required).toEqual(
       Object.keys(service.reportEvent.req.properties)
     );
+    expect(service.reportDeployment.req.required).toEqual(
+      Object.keys(service.reportDeployment.req.properties)
+    );
     expect(service.reportPresence.req.additionalProperties).toBe(false);
     expect(service.reportInfo.req.additionalProperties).toBe(false);
     expect(service.reportEvent.req.additionalProperties).toBe(false);
+    expect(service.reportDeployment.req.additionalProperties).toBe(false);
   });
 });

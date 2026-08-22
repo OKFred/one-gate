@@ -26,10 +26,18 @@ import {
   revealDeviceSensitive,
   updateDevice,
   updateDeviceMetadata,
+  verifyDeviceReportToken,
   type DeviceEventInput,
   type DeviceInfoInput,
   type DevicePresenceInput,
 } from "./facade.js";
+import {
+  parseDeviceDeploymentEvent,
+  type DeviceDeploymentEvent,
+} from "../client-deployment/domain/deployment.js";
+import { processIncomingDeploymentEvent } from "../client-deployment/facade.js";
+import { ClientDeploymentReportVO } from "../client-deployment/model.js";
+import { DeviceApplicationError } from "./application/error.js";
 import { adaptDeviceHttpError } from "./interfaces/http/error.js";
 import { reportTokenFromContext } from "./interfaces/http/report-token.js";
 import {
@@ -291,6 +299,12 @@ const eventReportReq = {
   required: Object.keys(DeviceEventReportVO),
   additionalProperties: false,
 } as const satisfies JSONSchema;
+const deploymentReportReq = {
+  type: "object",
+  properties: ClientDeploymentReportVO,
+  required: Object.keys(ClientDeploymentReportVO),
+  additionalProperties: false,
+} as const satisfies JSONSchema;
 const acceptedRes = {
   type: "object",
   properties: {
@@ -354,6 +368,32 @@ const reportEventApi = {
     }),
   permission: false,
 } satisfies API;
+const reportDeploymentApi = {
+  req: deploymentReportReq,
+  res: acceptedRes,
+  pathInfo: {
+    path: "/report/deployment",
+    method: "post",
+    summary: "设备客户端部署阶段上报",
+  },
+  adapter: rawAdapter,
+  service: (context: Context) =>
+    adaptDeviceHttpError(async () => {
+      const parsed = parseDeviceDeploymentEvent(context.get("bodyObj"));
+      if (!parsed) throw new DeviceApplicationError("Invalid deployment event");
+      const event: DeviceDeploymentEvent = parsed;
+      await verifyDeviceReportToken(
+        event.deviceId,
+        reportTokenFromContext(context)
+      );
+      const result = await processIncomingDeploymentEvent(event);
+      if (result === "REJECTED") {
+        throw new DeviceApplicationError("Deployment event was rejected");
+      }
+      return { accepted: true, duplicate: result === "DUPLICATE" };
+    }),
+  permission: false,
+} satisfies API;
 
 export default {
   list: listApi,
@@ -368,4 +408,5 @@ export default {
   reportPresence: reportPresenceApi,
   reportInfo: reportInfoApi,
   reportEvent: reportEventApi,
+  reportDeployment: reportDeploymentApi,
 };

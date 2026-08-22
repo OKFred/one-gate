@@ -3,7 +3,6 @@ import { and, desc, eq, lte, sql } from "drizzle-orm";
 import db from "@hodor/core/db";
 import { mobileDeviceTable } from "../device/model.js";
 import type {
-  ClientDeploymentPhase,
   ClientEnvironmentName,
   DeviceDeploymentEvent,
 } from "./domain/deployment.js";
@@ -362,9 +361,7 @@ export class ClientDeploymentRepository {
         activeClientId: terminal ? null : current.clientId,
         resultCode: event.code,
         resultMessage: event.message,
-        startedAtUtc:
-          current.startedAtUtc ??
-          (event.phase === "STAGING" ? Date.now() : null),
+        startedAtUtc: current.startedAtUtc ?? Date.now(),
         finishedAtUtc: terminal ? Date.now() : null,
         updaterId: 0,
         updateTimeUtc: Date.now(),

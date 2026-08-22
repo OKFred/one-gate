@@ -245,3 +245,20 @@ export const ClientDeploymentVO = {
   createTimeUtc: { type: "number" },
   updateTimeUtc: nullableNumber,
 } as const satisfies Record<string, JSONSchema>;
+
+/** 设备经 HTTPS 回传的客户端部署事件字段。 */
+export const ClientDeploymentReportVO = {
+  protocolVersion: { type: "number", const: 1 },
+  deploymentId: {
+    ...ClientDeploymentVO.deploymentId,
+    pattern: "^[0-9a-fA-F-]{36}$",
+  },
+  deviceId: ClientDeploymentVO.clientId,
+  phase: ClientDeploymentVO.phase,
+  code: { type: "string", minLength: 1, maxLength: 100 },
+  message: { type: "string", minLength: 1, maxLength: 2000 },
+  releaseVersion: ClientDeploymentVO.releaseVersion,
+  environment: ClientDeploymentVO.environment,
+  environmentRevision: ClientDeploymentVO.environmentRevision,
+  timestamp: { type: "number" },
+} as const satisfies Record<string, JSONSchema>;

@@ -199,21 +199,13 @@ export function parseDeviceDeploymentEvent(
   };
 }
 
-const ALLOWED_TRANSITIONS: Record<
-  ClientDeploymentPhase,
-  readonly ClientDeploymentPhase[]
-> = {
-  PENDING: ["STAGING", "FAILED", "TIMED_OUT", "CANCELLED"],
-  STAGING: ["DRAINING", "PREEMPTING", "FAILED", "TIMED_OUT", "CANCELLED"],
-  DRAINING: ["ACTIVATING", "FAILED", "TIMED_OUT", "CANCELLED"],
-  PREEMPTING: ["ACTIVATING", "FAILED", "TIMED_OUT", "CANCELLED"],
-  ACTIVATING: ["VERIFYING", "FAILED", "ROLLED_BACK", "TIMED_OUT"],
-  VERIFYING: ["SUCCEEDED", "FAILED", "ROLLED_BACK", "TIMED_OUT"],
-  SUCCEEDED: [],
-  FAILED: [],
-  ROLLED_BACK: [],
-  TIMED_OUT: [],
-  CANCELLED: [],
+const DEPLOYMENT_PHASE_RANK: Partial<Record<ClientDeploymentPhase, number>> = {
+  PENDING: 0,
+  STAGING: 1,
+  DRAINING: 2,
+  PREEMPTING: 2,
+  ACTIVATING: 3,
+  VERIFYING: 4,
 };
 
 /** 确认设备事件可推进当前部署状态。 */
@@ -228,12 +220,22 @@ export function canApplyDeploymentEvent(
     environmentRevision: number;
   }
 ): boolean {
+  if (
+    identity.deploymentId !== event.deploymentId ||
+    identity.clientId !== event.deviceId ||
+    identity.releaseVersion !== event.releaseVersion ||
+    identity.environment !== event.environment ||
+    identity.environmentRevision !== event.environmentRevision ||
+    isTerminalDeploymentPhase(current)
+  ) {
+    return false;
+  }
+  if (isTerminalDeploymentPhase(event.phase)) return true;
+  const currentRank = DEPLOYMENT_PHASE_RANK[current];
+  const incomingRank = DEPLOYMENT_PHASE_RANK[event.phase];
   return (
-    identity.deploymentId === event.deploymentId &&
-    identity.clientId === event.deviceId &&
-    identity.releaseVersion === event.releaseVersion &&
-    identity.environment === event.environment &&
-    identity.environmentRevision === event.environmentRevision &&
-    ALLOWED_TRANSITIONS[current].includes(event.phase)
+    currentRank !== undefined &&
+    incomingRank !== undefined &&
+    incomingRank > currentRank
   );
 }
