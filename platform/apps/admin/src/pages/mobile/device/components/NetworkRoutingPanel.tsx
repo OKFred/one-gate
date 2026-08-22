@@ -54,6 +54,10 @@ export function NetworkRoutingPanel({ clientId }: Props) {
     routing?.lastResult && typeof routing.lastResult.rollback === 'object'
       ? routing.lastResult.rollback
       : null;
+  const failureStage =
+    routing?.lastResult && typeof routing.lastResult.failureStage === 'string'
+      ? routing.lastResult.failureStage
+      : null;
 
   const load = useCallback(
     async (syncForm = false) => {
@@ -143,6 +147,7 @@ export function NetworkRoutingPanel({ clientId }: Props) {
       {(routing.lastErrorCode || routing.state === 'DEGRADED') && (
         <Alert severity={routing.state === 'DEGRADED' ? 'warning' : 'error'}>
           {routing.lastErrorCode ?? 'DEGRADED'}
+          {failureStage && <Box component="span"> · stage: {failureStage}</Box>}
           {rollbackResult !== null && (
             <Box component="span"> · rollback: {JSON.stringify(rollbackResult)}</Box>
           )}
