@@ -697,13 +697,17 @@ const environmentUpdateApi = {
   permission: { action: "dispatch" },
 } satisfies API;
 
-/** 从设备上报中读取上一个健康组合。 */
-function previousDeployment(reportedExtraJson: string | null): {
+export interface ClientDeploymentCombination {
   releaseVersion: string | null;
   releaseDigest: string | null;
   environment: ClientEnvironmentName | null;
   environmentRevision: number | null;
-} {
+}
+
+/** 从设备上报中读取当前健康组合；非法或不完整字段按未知处理。 */
+export function parseReportedDeployment(
+  reportedExtraJson: string | null
+): ClientDeploymentCombination {
   try {
     const root = JSON.parse(reportedExtraJson || "{}") as {
       deployment?: Record<string, unknown>;
@@ -735,6 +739,24 @@ function previousDeployment(reportedExtraJson: string | null): {
   }
 }
 
+/** 判断设备当前组合是否与部署目标完全一致。 */
+export function isSameDeploymentCombination(
+  current: ClientDeploymentCombination,
+  target: {
+    releaseVersion: string;
+    releaseDigest: string;
+    environment: ClientEnvironmentName;
+    environmentRevision: number;
+  }
+): boolean {
+  return (
+    current.releaseVersion === target.releaseVersion &&
+    current.releaseDigest === target.releaseDigest &&
+    current.environment === target.environment &&
+    current.environmentRevision === target.environmentRevision
+  );
+}
+
 /** 创建部署记录并通过独立管理主题异步下发。 */
 async function createDeployment(
   input: {
@@ -743,7 +765,7 @@ async function createDeployment(
     environment: EnvironmentRevisionView;
     activationMode: ClientDeploymentActivationMode;
     drainTimeoutMs: number;
-    previous: ReturnType<typeof previousDeployment>;
+    previous: ClientDeploymentCombination;
   },
   user: UserObj,
   context: Context
@@ -890,6 +912,17 @@ const deploymentApplyApi = {
         params.environment as ClientEnvironmentName
       );
     if (!environment?.environment.isEnabled) invalid("目标环境不存在或已停用");
+    const current = parseReportedDeployment(device.reportedExtraJson);
+    if (
+      isSameDeploymentCombination(current, {
+        releaseVersion: release.releaseVersion,
+        releaseDigest: release.artifactSha256,
+        environment: environment.environment.name,
+        environmentRevision: environment.revision.revision,
+      })
+    ) {
+      invalid("设备已运行目标版本和环境修订");
+    }
     const activationMode = (params.activationMode ||
       "GRACEFUL") as ClientDeploymentActivationMode;
     if (activationMode === "FORCE" && params.forceConfirmed !== true) {
@@ -903,7 +936,7 @@ const deploymentApplyApi = {
           environment,
           activationMode,
           drainTimeoutMs: params.drainTimeoutMs || 900000,
-          previous: previousDeployment(device.reportedExtraJson),
+          previous: current,
         },
         user,
         context
@@ -1039,6 +1072,17 @@ const deploymentRollbackApi = {
     }
     const device = await clientDeploymentRepository.getDevice(source.clientId);
     if (!device?.isEnabled) invalid("目标设备不存在或已停用");
+    const current = parseReportedDeployment(device.reportedExtraJson);
+    if (
+      isSameDeploymentCombination(current, {
+        releaseVersion: release.releaseVersion,
+        releaseDigest: release.artifactSha256,
+        environment: environment.environment.name,
+        environmentRevision: environment.revision.revision,
+      })
+    ) {
+      invalid("设备已运行回滚目标版本和环境修订");
+    }
     return deploymentView(
       await createDeployment(
         {
@@ -1047,7 +1091,7 @@ const deploymentRollbackApi = {
           environment,
           activationMode,
           drainTimeoutMs: 900000,
-          previous: previousDeployment(device.reportedExtraJson),
+          previous: current,
         },
         user,
         context

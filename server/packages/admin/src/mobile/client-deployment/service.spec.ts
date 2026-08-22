@@ -1,4 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { Context, UserObj } from "@hodor/core/types/app";
+import type { MobileClientDeployment, MobileClientRelease } from "./model.js";
+import {
+  clientDeploymentRepository,
+  type EnvironmentRevisionView,
+} from "./repository.js";
 
 import {
   classifyStorageConnectionError,
@@ -7,11 +14,66 @@ import {
   clientReleaseService,
   getMissingPresignedStorageFields,
   getReleaseArtifactMetadataValidationError,
+  isSameDeploymentCombination,
   MOBILE_CLIENT_RELEASE_STORAGE_CONFIG_KEY,
+  parseReportedDeployment,
   RELEASE_UPLOAD_TICKET_MAX_LENGTH,
 } from "./service.js";
 
+const release = {
+  id: 7,
+  releaseVersion: "v2.1.7",
+  artifactKey: "mobile-client/releases/v2.1.7/artifact.tar.gz",
+  artifactSha256: "a".repeat(64),
+  artifactSize: 1024,
+  manifestJson: "{}",
+  status: "PUBLISHED",
+  releaseNotes: null,
+  creatorId: 1,
+  updaterId: null,
+  createTimeUtc: 1,
+  updateTimeUtc: null,
+} as const satisfies MobileClientRelease;
+
+const environment = {
+  environment: {
+    id: 3,
+    name: "production",
+    activeRevisionId: 31,
+    isEnabled: true,
+    creatorId: 1,
+    updaterId: null,
+    createTimeUtc: 1,
+    updateTimeUtc: null,
+  },
+  revision: {
+    id: 31,
+    environmentId: 3,
+    revision: 1,
+    configJson: "{}",
+    requiredSecretKeysJson: "[]",
+    creatorId: 1,
+    createTimeUtc: 1,
+  },
+  config: {},
+  requiredSecretKeys: [],
+} as const satisfies EnvironmentRevisionView;
+
+const reportedExtraJson = JSON.stringify({
+  deployment: {
+    releaseVersion: release.releaseVersion,
+    releaseDigest: release.artifactSha256,
+    environment: environment.environment.name,
+    environmentRevision: environment.revision.revision,
+  },
+});
+
+const user = { id: 1 } as UserObj;
+const context = {} as Context;
+
 describe("客户端版本、环境与部署 HTTP 契约", () => {
+  afterEach(() => vi.restoreAllMocks());
+
   it("finalize 票据上限可容纳大型清单但仍保持有界", () => {
     expect(RELEASE_UPLOAD_TICKET_MAX_LENGTH).toBe(1_000_000);
     expect(RELEASE_UPLOAD_TICKET_MAX_LENGTH).toBeGreaterThan(320_000);
@@ -90,6 +152,169 @@ describe("客户端版本、环境与部署 HTTP 契约", () => {
       }
     );
     expect(clientDeploymentService.apply.req.additionalProperties).toBe(false);
+  });
+
+  it("设备当前版本、摘要、环境和修订全部相同时识别为无变化部署", () => {
+    const current = parseReportedDeployment(
+      JSON.stringify({
+        deployment: {
+          releaseVersion: "v2.1.7",
+          releaseDigest: "a".repeat(64),
+          environment: "production",
+          environmentRevision: 1,
+          lastDeploymentId: crypto.randomUUID(),
+        },
+      })
+    );
+    const target = {
+      releaseVersion: "v2.1.7",
+      releaseDigest: "a".repeat(64),
+      environment: "production" as const,
+      environmentRevision: 1,
+    };
+
+    expect(isSameDeploymentCombination(current, target)).toBe(true);
+    expect(
+      isSameDeploymentCombination(current, {
+        ...target,
+        releaseDigest: "b".repeat(64),
+      })
+    ).toBe(false);
+    expect(
+      isSameDeploymentCombination(current, {
+        ...target,
+        environment: "staging",
+      })
+    ).toBe(false);
+    expect(
+      isSameDeploymentCombination(current, {
+        ...target,
+        environmentRevision: 2,
+      })
+    ).toBe(false);
+  });
+
+  it("非法或不完整设备上报不阻断修复部署", () => {
+    const target = {
+      releaseVersion: "v2.1.7",
+      releaseDigest: "a".repeat(64),
+      environment: "production" as const,
+      environmentRevision: 1,
+    };
+
+    expect(
+      isSameDeploymentCombination(parseReportedDeployment("not-json"), target)
+    ).toBe(false);
+    expect(
+      isSameDeploymentCombination(
+        parseReportedDeployment(
+          JSON.stringify({
+            deployment: {
+              releaseVersion: target.releaseVersion,
+              environment: target.environment,
+              environmentRevision: target.environmentRevision,
+            },
+          })
+        ),
+        target
+      )
+    ).toBe(false);
+  });
+
+  it("apply 在写审计和下发命令前拒绝设备当前组合", async () => {
+    vi.spyOn(clientDeploymentRepository, "getDevice").mockResolvedValue({
+      isEnabled: true,
+      reportedExtraJson,
+    });
+    vi.spyOn(
+      clientDeploymentRepository,
+      "getReleaseByVersion"
+    ).mockResolvedValue(release);
+    vi.spyOn(
+      clientDeploymentRepository,
+      "ensureEnvironments"
+    ).mockResolvedValue();
+    vi.spyOn(
+      clientDeploymentRepository,
+      "getActiveEnvironmentRevision"
+    ).mockResolvedValue(environment);
+    const addDeployment = vi.spyOn(clientDeploymentRepository, "addDeployment");
+
+    await expect(
+      clientDeploymentService.apply.service(
+        {
+          clientId: "phone-001",
+          releaseVersion: release.releaseVersion,
+          environment: environment.environment.name,
+        },
+        user,
+        context
+      )
+    ).rejects.toMatchObject({
+      meta: { message: "设备已运行目标版本和环境修订" },
+    });
+    expect(addDeployment).not.toHaveBeenCalled();
+  });
+
+  it("rollback 在写审计和下发命令前拒绝设备当前组合", async () => {
+    const source = {
+      id: 9,
+      deploymentId: "11111111-1111-4111-8111-111111111111",
+      clientId: "phone-001",
+      activeClientId: null,
+      releaseId: 8,
+      releaseVersion: "v2.1.8",
+      releaseDigest: "b".repeat(64),
+      environmentRevisionId: 41,
+      environment: "staging",
+      environmentRevision: 2,
+      activationMode: "GRACEFUL",
+      drainTimeoutMs: 900_000,
+      phase: "SUCCEEDED",
+      previousReleaseVersion: release.releaseVersion,
+      previousReleaseDigest: release.artifactSha256,
+      previousEnvironment: environment.environment.name,
+      previousEnvironmentRevision: environment.revision.revision,
+      resultCode: null,
+      resultMessage: null,
+      expiresAtUtc: 2,
+      startedAtUtc: 1,
+      finishedAtUtc: 2,
+      creatorId: 1,
+      updaterId: null,
+      createTimeUtc: 1,
+      updateTimeUtc: 2,
+    } as const satisfies MobileClientDeployment;
+    vi.spyOn(clientDeploymentRepository, "getDeployment").mockResolvedValue(
+      source
+    );
+    vi.spyOn(
+      clientDeploymentRepository,
+      "getReleaseByVersion"
+    ).mockResolvedValue(release);
+    vi.spyOn(clientDeploymentRepository, "getEnvironment").mockResolvedValue(
+      environment.environment
+    );
+    vi.spyOn(
+      clientDeploymentRepository,
+      "getEnvironmentRevision"
+    ).mockResolvedValue(environment);
+    vi.spyOn(clientDeploymentRepository, "getDevice").mockResolvedValue({
+      isEnabled: true,
+      reportedExtraJson,
+    });
+    const addDeployment = vi.spyOn(clientDeploymentRepository, "addDeployment");
+
+    await expect(
+      clientDeploymentService.rollback.service(
+        { deploymentId: source.deploymentId },
+        user,
+        context
+      )
+    ).rejects.toMatchObject({
+      meta: { message: "设备已运行回滚目标版本和环境修订" },
+    });
+    expect(addDeployment).not.toHaveBeenCalled();
   });
 
   it("环境模板接口只接受配置和本地密钥键名", () => {

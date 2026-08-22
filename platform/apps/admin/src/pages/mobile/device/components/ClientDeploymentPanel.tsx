@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import {
   Alert,
@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 
 import * as DeploymentAPI from '@/api/admin/mobile/client-deployment';
+import * as DeviceAPI from '@/api/admin/mobile/device';
 import type {
   ClientDeployment,
   ClientDeploymentActivationMode,
@@ -28,10 +29,91 @@ import { permissions } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 
 interface ClientDeploymentPanelProps {
+  deviceId: number;
   clientId: string;
 }
 
+interface DeploymentCombination {
+  releaseVersion: string;
+  releaseDigest: string;
+  environment: ClientEnvironmentName;
+  environmentRevision: number;
+}
+
 const TERMINAL_PHASES = new Set(['SUCCEEDED', 'FAILED', 'ROLLED_BACK', 'TIMED_OUT', 'CANCELLED']);
+const ENVIRONMENT_NAMES = new Set<ClientEnvironmentName>(['development', 'staging', 'production']);
+
+/** 从设备详情的只读心跳快照中解析当前运行组合。 */
+function parseReportedDeployment(value: unknown): DeploymentCombination | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+  const deployment = (value as Record<string, unknown>).deployment;
+  if (typeof deployment !== 'object' || deployment === null || Array.isArray(deployment)) {
+    return null;
+  }
+  const current = deployment as Record<string, unknown>;
+  if (
+    typeof current.releaseVersion !== 'string' ||
+    typeof current.releaseDigest !== 'string' ||
+    !ENVIRONMENT_NAMES.has(current.environment as ClientEnvironmentName) ||
+    typeof current.environmentRevision !== 'number' ||
+    !Number.isInteger(current.environmentRevision)
+  ) {
+    return null;
+  }
+  return {
+    releaseVersion: current.releaseVersion,
+    releaseDigest: current.releaseDigest,
+    environment: current.environment as ClientEnvironmentName,
+    environmentRevision: current.environmentRevision,
+  };
+}
+
+/** 判断当前运行组合与页面目标是否完全一致。 */
+function isSameDeploymentCombination(
+  current: DeploymentCombination | null,
+  target: DeploymentCombination | null,
+): boolean {
+  return (
+    current !== null &&
+    target !== null &&
+    current.releaseVersion === target.releaseVersion &&
+    current.releaseDigest === target.releaseDigest &&
+    current.environment === target.environment &&
+    current.environmentRevision === target.environmentRevision
+  );
+}
+
+/** 读取部署记录中的回滚目标组合。 */
+function getRollbackTarget(item: ClientDeployment): DeploymentCombination | null {
+  if (
+    !item.previousReleaseVersion ||
+    !item.previousReleaseDigest ||
+    !item.previousEnvironment ||
+    !item.previousEnvironmentRevision
+  ) {
+    return null;
+  }
+  return {
+    releaseVersion: item.previousReleaseVersion,
+    releaseDigest: item.previousReleaseDigest,
+    environment: item.previousEnvironment,
+    environmentRevision: item.previousEnvironmentRevision,
+  };
+}
+
+/** 根据最新终态部署推导部署完成后的实际组合。 */
+function getResultingCombination(item: ClientDeployment | undefined): DeploymentCombination | null {
+  if (!item || !TERMINAL_PHASES.has(item.phase)) return null;
+  if (item.phase === 'SUCCEEDED') {
+    return {
+      releaseVersion: item.releaseVersion,
+      releaseDigest: item.releaseDigest,
+      environment: item.environment,
+      environmentRevision: item.environmentRevision,
+    };
+  }
+  return getRollbackTarget(item);
+}
 
 /** 根据部署终态选择颜色。 */
 function phaseColor(phase: ClientDeployment['phase']): 'success' | 'error' | 'warning' | 'info' {
@@ -42,7 +124,7 @@ function phaseColor(phase: ClientDeployment['phase']): 'success' | 'error' | 'wa
 }
 
 /** 设备版本、环境修订和部署历史控制面。 */
-export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) {
+export function ClientDeploymentPanel({ deviceId, clientId }: ClientDeploymentPanelProps) {
   const t = useTranslation();
   const [releases, setReleases] = useState<ClientRelease[]>([]);
   const [environments, setEnvironments] = useState<ClientEnvironmentRevision[]>([]);
@@ -51,32 +133,59 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
   const [environment, setEnvironment] = useState<ClientEnvironmentName>('development');
   const [activationMode, setActivationMode] = useState<ClientDeploymentActivationMode>('GRACEFUL');
   const [submitting, setSubmitting] = useState(false);
+  const [reportedDeployment, setReportedDeployment] = useState<DeploymentCombination | null>(null);
   const [editingEnvironment, setEditingEnvironment] = useState<ClientEnvironmentRevision | null>(
     null,
   );
   const [configText, setConfigText] = useState('{}');
   const [secretKeysText, setSecretKeysText] = useState('');
+  const submittingRef = useRef(false);
+  const loadSequenceRef = useRef(0);
 
   const publishedReleases = useMemo(
     () => releases.filter((release) => release.status === 'PUBLISHED'),
     [releases],
   );
 
+  const selectedTarget = useMemo<DeploymentCombination | null>(() => {
+    const release = publishedReleases.find((item) => item.releaseVersion === releaseVersion);
+    const environmentRevision = environments.find((item) => item.name === environment);
+    if (!release || !environmentRevision) return null;
+    return {
+      releaseVersion: release.releaseVersion,
+      releaseDigest: release.artifactSha256,
+      environment: environmentRevision.name,
+      environmentRevision: environmentRevision.revision,
+    };
+  }, [environment, environments, publishedReleases, releaseVersion]);
+
+  const activeDeployment = deployments.some((item) => !TERMINAL_PHASES.has(item.phase));
+  const currentDeployment = useMemo(
+    () => getResultingCombination(deployments[0]) ?? reportedDeployment,
+    [deployments, reportedDeployment],
+  );
+  const currentSelection = isSameDeploymentCombination(currentDeployment, selectedTarget);
+
   const load = useCallback(async () => {
-    const [releaseResponse, environmentResponse, deploymentResponse] = await Promise.all([
-      DeploymentAPI.listClientReleases(),
-      DeploymentAPI.listClientEnvironments(),
-      DeploymentAPI.listClientDeployments({ clientId }),
-    ]);
+    const sequence = ++loadSequenceRef.current;
+    const [releaseResponse, environmentResponse, deploymentResponse, deviceResponse] =
+      await Promise.all([
+        DeploymentAPI.listClientReleases(),
+        DeploymentAPI.listClientEnvironments(),
+        DeploymentAPI.listClientDeployments({ clientId }),
+        DeviceAPI.getFn({ data: { id: deviceId }, ignoreAbort: true }),
+      ]);
+    if (sequence !== loadSequenceRef.current) return;
     const nextReleases = releaseResponse.data.data.list;
     setReleases(nextReleases);
     setEnvironments(environmentResponse.data.data);
     setDeployments(deploymentResponse.data.data.list);
+    setReportedDeployment(parseReportedDeployment(deviceResponse.data.data.reportedExtra));
     setReleaseVersion((current) => {
       if (nextReleases.some((release) => release.releaseVersion === current)) return current;
       return nextReleases.find((release) => release.status === 'PUBLISHED')?.releaseVersion ?? '';
     });
-  }, [clientId]);
+  }, [clientId, deviceId]);
 
   useEffect(() => {
     void load().catch(() => undefined);
@@ -87,16 +196,17 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
   }, [load]);
 
   const apply = async () => {
-    if (!releaseVersion) return;
-    const forceConfirmed =
-      activationMode !== 'FORCE' ||
-      (await showConfirm({
-        message: t('mobile.deployment.forceConfirm'),
-        type: 'warning',
-      }));
-    if (!forceConfirmed) return;
+    if (!releaseVersion || activeDeployment || currentSelection || submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     try {
+      const forceConfirmed =
+        activationMode !== 'FORCE' ||
+        (await showConfirm({
+          message: t('mobile.deployment.forceConfirm'),
+          type: 'warning',
+        }));
+      if (!forceConfirmed) return;
       const response = await DeploymentAPI.applyClientDeployment({
         clientId,
         releaseVersion,
@@ -110,15 +220,31 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
       });
       await load();
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
 
-  const rollback = async (deploymentId: string) => {
-    if (!(await showConfirm({ message: t('mobile.deployment.rollbackConfirm') }))) return;
-    await DeploymentAPI.rollbackClientDeployment({ deploymentId });
-    showSnackbar({ message: t('mobile.deployment.rollbackAccepted'), type: 'success' });
-    await load();
+  const rollback = async (item: ClientDeployment) => {
+    const rollbackTarget = getRollbackTarget(item);
+    if (
+      activeDeployment ||
+      isSameDeploymentCombination(currentDeployment, rollbackTarget) ||
+      submittingRef.current
+    ) {
+      return;
+    }
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      if (!(await showConfirm({ message: t('mobile.deployment.rollbackConfirm') }))) return;
+      await DeploymentAPI.rollbackClientDeployment({ deploymentId: item.deploymentId });
+      showSnackbar({ message: t('mobile.deployment.rollbackAccepted'), type: 'success' });
+      await load();
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
+    }
   };
 
   const revoke = async (version: string) => {
@@ -171,6 +297,12 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
 
       <Box>
         <Typography variant="subtitle1">{t('mobile.deployment.applyTitle')}</Typography>
+        {currentDeployment && (
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            {t('mobile.deployment.current')}: {currentDeployment.releaseVersion} /{' '}
+            {currentDeployment.environment}/r{currentDeployment.environmentRevision}
+          </Typography>
+        )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mt: 1 }}>
           <TextField
             select
@@ -216,12 +348,22 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
           </TextField>
           <ResponsiveButton
             permissionCodes={[permissions.admin.mobile.client_deployment.dispatch]}
-            disabled={!releaseVersion || submitting}
+            disabled={!releaseVersion || submitting || activeDeployment || currentSelection}
             onClick={() => void apply()}
           >
             {t('mobile.deployment.apply')}
           </ResponsiveButton>
         </Stack>
+        {currentSelection && (
+          <Alert severity="info" sx={{ mt: 1 }}>
+            {t('mobile.deployment.alreadyCurrent')}
+          </Alert>
+        )}
+        {activeDeployment && (
+          <Alert severity="warning" sx={{ mt: 1 }}>
+            {t('mobile.deployment.inProgress')}
+          </Alert>
+        )}
       </Box>
 
       <Divider />
@@ -321,8 +463,13 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
                 <ResponsiveButton
                   size="small"
                   variant="text"
+                  disabled={
+                    submitting ||
+                    activeDeployment ||
+                    isSameDeploymentCombination(currentDeployment, getRollbackTarget(item))
+                  }
                   permissionCodes={[permissions.admin.mobile.client_deployment.dispatch]}
-                  onClick={() => void rollback(item.deploymentId)}
+                  onClick={() => void rollback(item)}
                 >
                   {t('mobile.deployment.rollback')}
                 </ResponsiveButton>

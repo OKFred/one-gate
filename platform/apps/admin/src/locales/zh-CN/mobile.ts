@@ -65,6 +65,9 @@ export const mobile = {
   'mobile.deployment.environment': '环境',
   'mobile.deployment.activationMode': '切换模式',
   'mobile.deployment.apply': '开始部署',
+  'mobile.deployment.current': '当前运行组合',
+  'mobile.deployment.alreadyCurrent': '设备已运行所选版本和环境修订，无需重复部署。',
+  'mobile.deployment.inProgress': '设备有未完成的部署，完成或终结前不能再次切换。',
   'mobile.deployment.forceConfirm':
     'FORCE 会抢占当前任务并执行引擎、输入法和临时文件清理。确定继续吗？',
   'mobile.deployment.accepted': '部署已受理',

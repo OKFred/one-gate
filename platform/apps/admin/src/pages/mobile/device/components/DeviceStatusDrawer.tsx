@@ -463,7 +463,9 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
             </Stack>
           )}
 
-          {tab === 3 && clientId && <ClientDeploymentPanel clientId={clientId} />}
+          {tab === 3 && clientId && deviceId !== null && (
+            <ClientDeploymentPanel deviceId={deviceId} clientId={clientId} />
+          )}
           {tab === 4 && clientId && <DeviceOpsPanel clientId={clientId} />}
         </Box>
       </Drawer>

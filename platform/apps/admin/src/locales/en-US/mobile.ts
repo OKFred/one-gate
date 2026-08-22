@@ -67,6 +67,11 @@ export const mobile = {
   'mobile.deployment.environment': 'Environment',
   'mobile.deployment.activationMode': 'Activation Mode',
   'mobile.deployment.apply': 'Deploy',
+  'mobile.deployment.current': 'Current combination',
+  'mobile.deployment.alreadyCurrent':
+    'The device is already running the selected release and environment revision.',
+  'mobile.deployment.inProgress':
+    'The device has an active deployment. Wait for it to reach a terminal state before switching again.',
   'mobile.deployment.forceConfirm':
     'FORCE preempts the running task and cleans engines, input methods, and temporary files. Continue?',
   'mobile.deployment.accepted': 'Deployment accepted',

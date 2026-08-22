@@ -49,6 +49,7 @@ export interface ClientDeployment {
   drainTimeoutMs: number;
   phase: ClientDeploymentPhase;
   previousReleaseVersion: string | null;
+  previousReleaseDigest: string | null;
   previousEnvironment: ClientEnvironmentName | null;
   previousEnvironmentRevision: number | null;
   resultCode: string | null;
