@@ -22,3 +22,4 @@
 - 先完成两端静态检查、测试和构建，再提交推送 `dev`。
 - GitHub Actions 成功后验证 Worker 版本更新和生产健康状态。
 - 只验证当前组合的无变化请求，不创建新部署，不触发 TikTok 任务或任意 Shell。
+- 修正 Pages 版本盖章时机：Actions 在 Worker 部署和前端构建前写入同一当前提交版本，pre-commit 不再写入上一个 HEAD。

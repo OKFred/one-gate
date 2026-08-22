@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  buildFrontendVersionSource,
   buildWorkerVersion,
   replaceWorkerVersion,
 } from "../../../scripts/stamp-worker-version.js";
@@ -34,14 +35,30 @@ describe("Worker deployment version", () => {
     expect(() => replaceWorkerVersion("{}", "new-version")).toThrow(/missing/);
   });
 
-  it("stamps the Worker config before the deploy action", () => {
+  it("writes the same public version shape consumed by Pages", () => {
+    expect(buildFrontendVersionSource("20260822102505-5de7e790")).toBe(
+      '{"version":"20260822102505-5de7e790"}\n'
+    );
+  });
+
+  it("stamps Worker and Pages before their deployment steps", () => {
     const workflow = readFileSync(
       resolve(import.meta.dirname, "../../../../.github/workflows/test.yml"),
       "utf8"
     );
-    const stampAt = workflow.indexOf("Stamp Worker Version");
-    const deployAt = workflow.indexOf("Deploy Workers Backend");
+    const stampAt = workflow.indexOf("Stamp Deployment Versions");
+    const workerDeployAt = workflow.indexOf("Deploy Workers Backend");
+    const frontendBuildAt = workflow.indexOf("Build Frontend");
     expect(stampAt).toBeGreaterThan(0);
-    expect(deployAt).toBeGreaterThan(stampAt);
+    expect(workerDeployAt).toBeGreaterThan(stampAt);
+    expect(frontendBuildAt).toBeGreaterThan(stampAt);
+  });
+
+  it("does not commit a version derived from the previous HEAD", () => {
+    const hook = readFileSync(
+      resolve(import.meta.dirname, "../../../../hooks/pre-commit"),
+      "utf8"
+    );
+    expect(hook).not.toContain("platform/public/version.json");
   });
 });

@@ -4,7 +4,7 @@ import { pathToFileURL } from "node:url";
 
 const VERSION_ENTRY = /("VERSION"\s*:\s*")[^"]*(")/;
 
-export function buildWorkerVersion(
+export function buildDeploymentVersion(
   commitSha: string,
   now = new Date()
 ): string {
@@ -14,6 +14,14 @@ export function buildWorkerVersion(
   }
   const timestamp = now.toISOString().replace(/\D/g, "").slice(0, 14);
   return `${timestamp}-${normalizedSha.slice(0, 8)}`;
+}
+
+/** 保留原函数名，兼容已有调用方。 */
+export const buildWorkerVersion = buildDeploymentVersion;
+
+/** 生成供 Pages 发布的公开版本文件。 */
+export function buildFrontendVersionSource(version: string): string {
+  return `${JSON.stringify({ version })}\n`;
 }
 
 export function replaceWorkerVersion(
@@ -37,11 +45,38 @@ export async function stampWorkerVersion(
   return version;
 }
 
+/** 使用同一部署版本盖章 Pages 静态版本文件。 */
+export async function stampFrontendVersion(
+  versionPath: string,
+  commitSha: string,
+  now = new Date()
+): Promise<string> {
+  const version = buildDeploymentVersion(commitSha, now);
+  await writeFile(versionPath, buildFrontendVersionSource(version), "utf8");
+  return version;
+}
+
 async function main() {
-  const commitSha = process.argv[2] || process.env.WORKER_COMMIT_SHA || "";
+  const commitSha =
+    process.argv[2] ||
+    process.env.DEPLOYMENT_COMMIT_SHA ||
+    process.env.WORKER_COMMIT_SHA ||
+    "";
   const configPath = resolve(process.argv[3] || "apps/server/wrangler.jsonc");
-  const version = await stampWorkerVersion(configPath, commitSha);
-  console.log(`Stamped Worker VERSION=${version}`);
+  const frontendVersionPath = resolve(
+    process.argv[4] || "../platform/public/version.json"
+  );
+  const now = new Date();
+  const workerVersion = await stampWorkerVersion(configPath, commitSha, now);
+  const frontendVersion = await stampFrontendVersion(
+    frontendVersionPath,
+    commitSha,
+    now
+  );
+  if (workerVersion !== frontendVersion) {
+    throw new Error("Worker and Pages deployment versions diverged");
+  }
+  console.log(`Stamped Worker and Pages VERSION=${workerVersion}`);
 }
 
 const entrypoint = process.argv[1]

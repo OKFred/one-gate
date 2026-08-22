@@ -48,3 +48,7 @@
 - Platform 格式化、类型检查、构建、原生弹窗扫描和 lint 检查通过。
 - 生产页面选择设备当前的 `v2.1.7 / production / r1` 时按钮禁用。
 - 直接调用生产 apply 接口返回无变化错误，部署历史数量不增加。
+
+## 发布版本盖章
+
+生产验收发现 pre-commit 在新提交产生前读取 `HEAD`，导致 Pages 的 `version.json` 永远标记上一个提交。发布工作流改为在 Worker 部署和 Pages 构建之前，使用同一个 `${github.sha}` 和时间戳同时盖章 Wrangler `VERSION` 与三套 Pages 共用的静态版本文件。本地仓库保留 `local-development` 占位值，pre-commit 不再提交不准确的旧 SHA。

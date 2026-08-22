@@ -53,15 +53,7 @@ if [ -f "$DEV_VARS_FILE" ]; then
   echo "  ✅ .dev.vars updated"
 fi
 
-# --- 4. Update platform/public/version.json (committed, used by Frontend) ---
-VERSION_JSON_FILE="platform/public/version.json"
-if [ -d "platform/public" ]; then
-  echo "{\"version\": \"$VERSION\"}" > "$VERSION_JSON_FILE"
-  git add "$VERSION_JSON_FILE"
-  echo "  ✅ platform/public/version.json updated"
-fi
-
-# --- 5. Run I18n validation check ---
+# --- 4. Run I18n validation check ---
 echo "🌐 Running I18n compliance check..."
 if ! node platform/scripts/scan-i18n-enhanced.js --fail-on-missing; then
   echo "❌ Git Commit Aborted: I18n validation failed! Please fix the missing keys listed above."
@@ -76,7 +68,7 @@ if ! node platform/scripts/check-locale-parity.js --fail-on-missing; then
 fi
 echo "  ✅ Locale parity check passed"
 
-# --- 6. Format changed files ---
+# --- 5. Format changed files ---
 echo "🧹 Formatting changed files..."
 echo "  🔹 server..."
 cd server && npx lint-staged
