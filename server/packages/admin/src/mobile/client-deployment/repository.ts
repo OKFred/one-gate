@@ -18,6 +18,19 @@ import {
   type MobileClientRelease,
 } from "./model.js";
 
+/** 兼容 LibSQL 与 Cloudflare D1 的数据库变更结果。 */
+export function didMutationAffectRows(result: unknown): boolean {
+  if (typeof result !== "object" || result === null) return false;
+  const record = result as Record<string, unknown>;
+  if (typeof record.rowsAffected === "number") {
+    return record.rowsAffected > 0;
+  }
+  const meta = record.meta;
+  if (typeof meta !== "object" || meta === null) return false;
+  const changes = (meta as Record<string, unknown>).changes;
+  return typeof changes === "number" && changes > 0;
+}
+
 /** 环境及当前不可变修订读取模型。 */
 export interface EnvironmentRevisionView {
   environment: MobileClientEnvironment;
@@ -372,7 +385,7 @@ export class ClientDeploymentRepository {
           eq(mobileClientDeploymentTable.phase, current.phase)
         )
       );
-    return Number(result.rowsAffected || 0) > 0;
+    return didMutationAffectRows(result);
   }
 
   /** 将 MQTT 发布失败的部署置为失败。 */
