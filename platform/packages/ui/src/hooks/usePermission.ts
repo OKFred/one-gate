@@ -365,6 +365,11 @@ export const permissions = {
         read: 'admin.mobile.async_task:read',
         dispatch: 'admin.mobile.async_task:dispatch',
       },
+      /** network_routing */
+      network_routing: {
+        read: 'admin.mobile.network_routing:read',
+        edit: 'admin.mobile.network_routing:edit',
+      },
       /** client_release */
       client_release: {
         read: 'admin.mobile.client_release:read',

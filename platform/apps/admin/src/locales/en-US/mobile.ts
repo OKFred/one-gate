@@ -21,6 +21,7 @@ export const mobile = {
   'mobile.device.tabs.events': 'Events',
   'mobile.device.tabs.deployments': 'Client Deployment',
   'mobile.device.tabs.ops': 'Operations',
+  'mobile.device.tabs.networkRouting': 'Network Routing',
   'mobile.device.hardware': 'Hardware',
   'mobile.device.clientVersions': 'Client Versions',
   'mobile.device.battery': 'Battery',
@@ -95,6 +96,25 @@ export const mobile = {
     'One per line or comma-separated. Enter key names only, never secret values.',
   'mobile.deployment.invalidJson': 'Configuration must be a valid JSON object',
   'mobile.deployment.environmentSaved': 'New immutable environment revision activated',
+
+  // Per-device network routing
+  'mobile.networkRouting.hint':
+    'LAN always uses Wi-Fi. Internet egress can switch between Wi-Fi and China Telecom with pre/post probes and rollback.',
+  'mobile.networkRouting.desired': 'Desired egress',
+  'mobile.networkRouting.actual': 'Actual egress',
+  'mobile.networkRouting.cidrs': 'LAN CIDRs (one per line)',
+  'mobile.networkRouting.cidrsHint': 'Canonical RFC1918 IPv4 only, for example 192.168.0.0/16.',
+  'mobile.networkRouting.lanProbes': 'LAN probes (one per line)',
+  'mobile.networkRouting.internetProbe': 'Internet probe',
+  'mobile.networkRouting.timeout': 'Probe timeout (ms)',
+  'mobile.networkRouting.target': 'Internet egress',
+  'mobile.networkRouting.saved': 'Network routing revision saved',
+  'mobile.networkRouting.apply': 'Apply routing',
+  'mobile.networkRouting.accepted': 'Network routing task accepted',
+  'mobile.networkRouting.disable': 'Disable and restore default',
+  'mobile.networkRouting.disableConfirm':
+    'Managed policy routes will be removed and Android default routing restored. Legacy network switching is available only after this step.',
+  'mobile.networkRouting.disableAccepted': 'Disable task accepted',
 
   // App Management
   'mobile.app.title': 'App Management',

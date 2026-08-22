@@ -14,6 +14,7 @@ import {
   createClientReleaseApp,
 } from "./client-deployment/index.js";
 import { initializeMobileTaskResultHandlers } from "./bootstrap.js";
+import networkRouting from "./network-routing/index.js";
 
 function createMobileApp() {
   initializeMobileTaskResultHandlers();
@@ -28,6 +29,7 @@ function createMobileApp() {
   app.route("/client-release", createClientReleaseApp());
   app.route("/client-environment", createClientEnvironmentApp());
   app.route("/client-deployment", createClientDeploymentApp());
+  app.route("/network-routing", networkRouting());
   return app;
 }
 

@@ -21,6 +21,7 @@ export const mobile = {
   'mobile.device.tabs.events': '事件',
   'mobile.device.tabs.deployments': '客户端部署',
   'mobile.device.tabs.ops': '短期运维',
+  'mobile.device.tabs.networkRouting': '网络分流',
   'mobile.device.hardware': '硬件信息',
   'mobile.device.clientVersions': '客户端版本',
   'mobile.device.battery': '电量',
@@ -89,6 +90,25 @@ export const mobile = {
   'mobile.deployment.requiredSecretKeysHint': '每行或逗号分隔；只填写键名，不填写密钥值。',
   'mobile.deployment.invalidJson': '配置必须是有效的 JSON 对象',
   'mobile.deployment.environmentSaved': '新的不可变环境修订已激活',
+
+  // Per-device network routing
+  'mobile.networkRouting.hint':
+    '内网始终走 Wi-Fi；Internet 出口可在 Wi-Fi 和中国电信间切换。切换前后探测，失败自动回滚。',
+  'mobile.networkRouting.desired': '期望出口',
+  'mobile.networkRouting.actual': '实际出口',
+  'mobile.networkRouting.cidrs': '内网 CIDR（每行一个）',
+  'mobile.networkRouting.cidrsHint': '仅允许规范 RFC1918 IPv4 网段，例如 192.168.0.0/16。',
+  'mobile.networkRouting.lanProbes': '内网探针（每行一个）',
+  'mobile.networkRouting.internetProbe': 'Internet 探针',
+  'mobile.networkRouting.timeout': '单探针超时（毫秒）',
+  'mobile.networkRouting.target': 'Internet 出口',
+  'mobile.networkRouting.saved': '网络分流配置修订已保存',
+  'mobile.networkRouting.apply': '应用分流',
+  'mobile.networkRouting.accepted': '网络分流任务已受理',
+  'mobile.networkRouting.disable': '停用并恢复默认路由',
+  'mobile.networkRouting.disableConfirm':
+    '将删除受管策略路由并恢复 Android 默认路由。停用后才可使用旧网络切换功能。',
+  'mobile.networkRouting.disableAccepted': '停用任务已受理',
 
   // App Management
   'mobile.app.title': '应用管理',

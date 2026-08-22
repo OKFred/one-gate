@@ -165,6 +165,8 @@ export const BUSINESS = {
   "admin.mobile.client_environment": "admin.mobile.client_environment",
   /** AutoJS6 客户端部署 */
   "admin.mobile.client_deployment": "admin.mobile.client_deployment",
+  /** 每设备网络分流 */
+  "admin.mobile.network_routing": "admin.mobile.network_routing",
 } as const;
 
 export type BusinessKey = keyof typeof BUSINESS;

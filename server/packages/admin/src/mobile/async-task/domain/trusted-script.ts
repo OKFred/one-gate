@@ -1,4 +1,5 @@
 import { MOBILE_TASK_PRIORITIES, type MobileTaskPriority } from "./task.js";
+import { normalizeNetworkRoutingConfig } from "../../network-routing/domain.js";
 
 /** 服务端与手机客户端共同支持的可信脚本标识。 */
 export const MOBILE_TRUSTED_SCRIPT_IDS = [
@@ -10,6 +11,8 @@ export const MOBILE_TRUSTED_SCRIPT_IDS = [
   "file.download",
   "tiktok.post",
   "device.network.switch",
+  "device.network.routing.apply",
+  "device.network.routing.disable",
 ] as const;
 export type TrustedScriptId = (typeof MOBILE_TRUSTED_SCRIPT_IDS)[number];
 
@@ -66,6 +69,16 @@ export const TRUSTED_SCRIPT_CATALOG = {
     version: 1,
     defaultTimeoutMs: 60_000,
     maxTimeoutMs: 150_000,
+  },
+  "device.network.routing.apply": {
+    version: 1,
+    defaultTimeoutMs: 120_000,
+    maxTimeoutMs: 300_000,
+  },
+  "device.network.routing.disable": {
+    version: 1,
+    defaultTimeoutMs: 60_000,
+    maxTimeoutMs: 120_000,
   },
 } as const satisfies Record<TrustedScriptId, TrustedScriptDefinition>;
 
@@ -180,13 +193,59 @@ export function validateTrustedScriptParams(
       );
     }
   }
+  if (scriptId === "device.network.routing.apply") {
+    if (!Number.isInteger(params.generation) || Number(params.generation) < 1) {
+      throw new DeviceTaskRuleViolation(
+        "network routing generation 必须是正整数"
+      );
+    }
+    if (
+      !Number.isInteger(params.policyRevision) ||
+      Number(params.policyRevision) < 1
+    ) {
+      throw new DeviceTaskRuleViolation(
+        "network routing policyRevision 必须是正整数"
+      );
+    }
+    if (
+      params.internetTarget !== "wifi" &&
+      params.internetTarget !== "carrier"
+    ) {
+      throw new DeviceTaskRuleViolation(
+        "network routing internetTarget 仅支持 wifi/carrier"
+      );
+    }
+    try {
+      normalizeNetworkRoutingConfig({
+        lanCidrs: params.lanCidrs as string[],
+        lanProbeUrls: params.lanProbeUrls as string[],
+        internetProbeUrl: params.internetProbeUrl as string,
+        probeTimeoutMs: params.probeTimeoutMs as number,
+      });
+    } catch (error) {
+      throw new DeviceTaskRuleViolation(
+        error instanceof Error ? error.message : "network routing 参数无效"
+      );
+    }
+  }
+  if (
+    scriptId === "device.network.routing.disable" &&
+    (!Number.isInteger(params.generation) || Number(params.generation) < 1)
+  ) {
+    throw new DeviceTaskRuleViolation(
+      "network routing generation 必须是正整数"
+    );
+  }
 }
 
 /** 返回脚本未显式指定时的调度优先级。 */
 export function defaultTaskPriority(
   scriptId: TrustedScriptId
 ): MobileTaskPriority {
-  return scriptId === "device.network.switch" ? "HIGH" : "NORMAL";
+  return scriptId === "device.network.switch" ||
+    scriptId.startsWith("device.network.routing.")
+    ? "HIGH"
+    : "NORMAL";
 }
 
 /** 计算受脚本策略约束的设备执行超时。 */

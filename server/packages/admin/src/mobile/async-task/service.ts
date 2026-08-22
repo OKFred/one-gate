@@ -34,6 +34,7 @@ import {
 } from "./facade.js";
 import { buildTaskCallbackUrl } from "./interfaces/http/callback-url.js";
 import { adaptDeviceTaskHttpError } from "./interfaces/http/error.js";
+import { networkRoutingRepository } from "../network-routing/repository.js";
 
 const listReq = {
   type: "object",
@@ -102,6 +103,17 @@ async function onDispatch(
   userObj: UserObj,
   context: Context
 ): Promise<FromSchema<typeof dispatchRes>> {
+  if (String(params.scriptId).startsWith("device.network.routing.")) {
+    throw new BusinessError(
+      "网络分流指令必须通过专用 network-routing 控制面下发"
+    );
+  }
+  if (
+    params.scriptId === "device.network.switch" &&
+    (await networkRoutingRepository.isPersistentRoutingActive(params.clientId))
+  ) {
+    throw new BusinessError("NETWORK_ROUTING_ACTIVE: 请先停用持久网络分流");
+  }
   return adaptDeviceTaskHttpError(() =>
     dispatchTrustedTask(
       {

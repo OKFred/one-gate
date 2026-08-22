@@ -43,6 +43,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { THIS_PERMISSION } from '../constant';
 import { ClientDeploymentPanel } from './ClientDeploymentPanel';
 import { DeviceOpsPanel } from './DeviceOpsPanel';
+import { NetworkRoutingPanel } from './NetworkRoutingPanel';
 
 interface DeviceStatusDrawerProps {
   open: boolean;
@@ -236,6 +237,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
             <Tab label={t('mobile.device.tabs.events')} />
             <Tab label={t('mobile.device.tabs.deployments')} />
             <Tab label={t('mobile.device.tabs.ops')} />
+            <Tab label={t('mobile.device.tabs.networkRouting')} />
           </Tabs>
           <Divider />
 
@@ -467,6 +469,7 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
             <ClientDeploymentPanel deviceId={deviceId} clientId={clientId} />
           )}
           {tab === 4 && clientId && <DeviceOpsPanel clientId={clientId} />}
+          {tab === 5 && clientId && <NetworkRoutingPanel clientId={clientId} />}
         </Box>
       </Drawer>
 

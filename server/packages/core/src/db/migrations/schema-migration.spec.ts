@@ -315,4 +315,52 @@ describe("legacy D1 schema migrations", () => {
       "admin.mobile.client_release:read",
     ]);
   });
+
+  it("creates per-device network routing state and permissions idempotently", async () => {
+    const client = createMemoryClient();
+    await client.execute(`
+      CREATE TABLE system_permission (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        code TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        resource TEXT,
+        business TEXT,
+        remark TEXT,
+        is_enabled INTEGER NOT NULL,
+        creator_id INTEGER NOT NULL
+      )
+    `);
+    await executeSqlFile(
+      client,
+      readMigration("./20260822_02_mobile_network_routing.sql")
+    );
+    const permissionMigration = readMigration(
+      "./20260822_03_mobile_network_routing_permissions.sql"
+    );
+    await executeSqlFile(client, permissionMigration);
+    await executeSqlFile(client, permissionMigration);
+
+    const objects = await client.execute(`
+      SELECT name FROM sqlite_master
+      WHERE name LIKE 'admin_mobile_network_routing%'
+    `);
+    expect(new Set(objects.rows.map((row) => String(row.name)))).toEqual(
+      new Set([
+        "admin_mobile_network_routing",
+        "admin_mobile_network_routing_client_unique",
+        "admin_mobile_network_routing_active_task_unique",
+        "admin_mobile_network_routing_state_idx",
+      ])
+    );
+    const permissions = await client.execute(`
+      SELECT code FROM system_permission
+      WHERE code LIKE 'admin.mobile.network_routing:%'
+      ORDER BY code
+    `);
+    expect(permissions.rows.map((row) => String(row.code))).toEqual([
+      "admin.mobile.network_routing:edit",
+      "admin.mobile.network_routing:read",
+    ]);
+  });
 });

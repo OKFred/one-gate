@@ -80,6 +80,37 @@ describe("可信设备脚本领域规则", () => {
     ).toThrow("必须介于1000到120000");
   });
 
+  it("校验独立网络分流指令并使用 HIGH 优先级", () => {
+    expect(() =>
+      validateTrustedScriptParams("device.network.routing.apply", {
+        generation: 2,
+        policyRevision: 3,
+        internetTarget: "carrier",
+        lanCidrs: ["192.168.0.0/16"],
+        lanProbeUrls: ["http://192.168.1.4/"],
+        internetProbeUrl: "http://ip.3322.net/",
+        probeTimeoutMs: 10_000,
+      })
+    ).not.toThrow();
+    expect(() =>
+      validateTrustedScriptParams("device.network.routing.apply", {
+        generation: 2,
+        policyRevision: 3,
+        internetTarget: "carrier",
+        lanCidrs: ["192.168.0.0/16"],
+        lanProbeUrls: ["http://8.8.8.8/"],
+        internetProbeUrl: "http://ip.3322.net/",
+        probeTimeoutMs: 10_000,
+      })
+    ).toThrow(/CIDR/);
+    expect(() =>
+      validateTrustedScriptParams("device.network.routing.disable", {
+        generation: 0,
+      })
+    ).toThrow(/正整数/);
+    expect(defaultTaskPriority("device.network.routing.apply")).toBe("HIGH");
+  });
+
   it("应用包名只允许安全字符", () => {
     expect(() =>
       validateTrustedScriptParams("app.update.store", {

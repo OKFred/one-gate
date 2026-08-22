@@ -12825,6 +12825,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/mobile/device/report/deployment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设备客户端部署阶段上报 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report.deployment.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report.deployment.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/mobile/app/list": {
         parameters: {
             query?: never;
@@ -15001,6 +15059,238 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.mobile.client_deployment.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/network-routing/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取设备网络分流配置和状态 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.network_routing.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.network_routing.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/network-routing/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新设备网络分流配置并生成新修订 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.network_routing.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.network_routing.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/network-routing/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 异步应用设备网络分流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.network_routing.apply.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.network_routing.apply.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/network-routing/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 异步停用设备网络分流 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.network_routing.disable.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.network_routing.disable.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -27295,6 +27585,29 @@ export interface components {
             };
             message: string;
         };
+        "admin.mobile.device.report.deployment.req": {
+            /** @constant */
+            protocolVersion: 1;
+            deploymentId: string;
+            deviceId: string;
+            /** @enum {string} */
+            phase: "PENDING" | "STAGING" | "DRAINING" | "PREEMPTING" | "ACTIVATING" | "VERIFYING" | "SUCCEEDED" | "FAILED" | "ROLLED_BACK" | "TIMED_OUT" | "CANCELLED";
+            code: string;
+            message: string;
+            releaseVersion: string;
+            /** @enum {string} */
+            environment: "development" | "staging" | "production";
+            environmentRevision: number;
+            timestamp: number;
+        };
+        "admin.mobile.device.report.deployment.res": {
+            ok: boolean;
+            data: {
+                accepted: boolean;
+                duplicate: boolean;
+            };
+            message: string;
+        };
         "admin.mobile.app.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -27914,7 +28227,7 @@ export interface components {
              * @description 手机端可信脚本标识
              * @enum {string}
              */
-            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "device.network.switch";
+            scriptId: "device.apps.list" | "app.install" | "app.version.check" | "app.update.store" | "app.update.zip" | "file.download" | "tiktok.post" | "device.network.switch" | "device.network.routing.apply" | "device.network.routing.disable";
             /** @description 传递给本地可信脚本的结构化参数 */
             params: {
                 [key: string]: unknown;
@@ -28638,6 +28951,104 @@ export interface components {
                     createTimeUtc: number;
                     updateTimeUtc: ((number | null) | null) | null;
                 }[];
+            };
+            message: string;
+        };
+        "admin.mobile.network_routing.get.req": {
+            clientId: string;
+        };
+        "admin.mobile.network_routing.get.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                clientId: string;
+                policyRevision: number;
+                generation: number;
+                lanCidrs: string[];
+                lanProbeUrls: string[];
+                internetProbeUrl: string;
+                probeTimeoutMs: number;
+                /** @enum {string|null|null} */
+                desiredTarget: "wifi" | "carrier" | null;
+                /** @enum {string|null|null} */
+                actualTarget: "wifi" | "carrier" | null;
+                /** @enum {string} */
+                state: "DISABLED" | "APPLYING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
+                lastTaskId: ((string | null) | null) | null;
+                lastErrorCode: ((string | null) | null) | null;
+                lastResult: (({
+                    [key: string]: unknown;
+                } | null) | null) | null;
+                lastVerifiedTimeUtc: ((number | null) | null) | null;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.network_routing.update.req": {
+            clientId: string;
+            lanCidrs: string[];
+            lanProbeUrls: string[];
+            internetProbeUrl: string;
+            probeTimeoutMs: number;
+        };
+        "admin.mobile.network_routing.update.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                clientId: string;
+                policyRevision: number;
+                generation: number;
+                lanCidrs: string[];
+                lanProbeUrls: string[];
+                internetProbeUrl: string;
+                probeTimeoutMs: number;
+                /** @enum {string|null|null} */
+                desiredTarget: "wifi" | "carrier" | null;
+                /** @enum {string|null|null} */
+                actualTarget: "wifi" | "carrier" | null;
+                /** @enum {string} */
+                state: "DISABLED" | "APPLYING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
+                lastTaskId: ((string | null) | null) | null;
+                lastErrorCode: ((string | null) | null) | null;
+                lastResult: (({
+                    [key: string]: unknown;
+                } | null) | null) | null;
+                lastVerifiedTimeUtc: ((number | null) | null) | null;
+                createTimeUtc: number;
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.mobile.network_routing.apply.req": {
+            clientId: string;
+            /** @enum {string} */
+            internetTarget: "wifi" | "carrier";
+        };
+        "admin.mobile.network_routing.apply.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+                /** @enum {string} */
+                status: "PENDING";
+                generation: number;
+                traceId: string;
+                expiresAtUtc: number;
+            };
+            message: string;
+        };
+        "admin.mobile.network_routing.disable.req": {
+            clientId: string;
+        };
+        "admin.mobile.network_routing.disable.res": {
+            ok: boolean;
+            data: {
+                taskId: string;
+                /** @enum {string} */
+                status: "PENDING";
+                generation: number;
+                traceId: string;
+                expiresAtUtc: number;
             };
             message: string;
         };
