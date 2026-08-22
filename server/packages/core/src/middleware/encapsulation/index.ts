@@ -59,6 +59,7 @@ const routeWhitelist = [
   "/admin/mobile/device/report/presence",
   "/admin/mobile/device/report/info",
   "/admin/mobile/device/report/event",
+  "/admin/mobile/device/report/deployment",
   "/admin/mobile/client-release/upload/prepare",
   "/admin/mobile/client-release/upload/finalize",
 ];
