@@ -18,7 +18,7 @@ import {
   getStorageByConfigKey,
   getStorageConfigByKey,
 } from "../../oss/file/service.js";
-import mqttService from "../../mqtt/service.js";
+import { publishDeviceManagementCommand } from "../../mqtt/service.js";
 import {
   CLIENT_DEPLOYMENT_ACTIVATION_MODES,
   CLIENT_ENVIRONMENT_NAMES,
@@ -814,16 +814,14 @@ async function createDeployment(
     expiresAt: commandExpiresAt,
   };
   try {
-    await mqttService.publish.service(
-      {
-        topic: `autojs6/deploy/v1/devices/${input.clientId}/commands`,
-        payload: JSON.stringify(command),
-        qos: 1,
-        retain: false,
-        remark: `AutoJS6 client deployment ${deploymentId}`,
-      },
-      user
-    );
+    await publishDeviceManagementCommand({
+      topic: `autojs6/deploy/v1/devices/${input.clientId}/commands`,
+      payload: { ...command },
+      actor: { userId: user.userId, username: user.username },
+      sessionId: deploymentId,
+      clientId: input.clientId,
+      commandType: "CLIENT_DEPLOYMENT_APPLY",
+    });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : "MQTT publish failed";
