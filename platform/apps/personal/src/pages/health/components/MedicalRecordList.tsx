@@ -31,6 +31,7 @@ import {
 import * as HealthAPI from '@/api/personal/health';
 import type { ListHealthReq, ListHealthRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
+import { showConfirm } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type MedicalCategory = NonNullable<ListHealthReq['category']>;
@@ -108,7 +109,13 @@ export const MedicalRecordList: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('personal.health.record.deleteConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('personal.health.record.deleteConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await HealthAPI.deleteFn({ data: { id } });
       fetchRecords();

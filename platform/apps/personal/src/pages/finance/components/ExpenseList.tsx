@@ -29,6 +29,7 @@ import {
 import * as FinancialAPI from '@/api/personal/financial';
 import type { ListExpenseRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
+import { showConfirm } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type ExpenseItem = NonNullable<ListExpenseRes['list']>[0];
@@ -90,7 +91,13 @@ export const ExpenseList: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('personal.finance.expense.deleteConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('personal.finance.expense.deleteConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await FinancialAPI.expenseDeleteFn({ data: { id } });
       fetchList();

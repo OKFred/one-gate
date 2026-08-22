@@ -1,9 +1,34 @@
 import { createRoot, type Root } from 'react-dom/client';
+import { ConfirmationDialog, type ConfirmationOptions } from './ConfirmationDialog';
 import { NotificationDialog, type NotificationOptions } from './NotificationDialog';
 import { SnackbarStack, type SnackbarOptions } from './Snackbar';
 
 // 导出类型
-export type { NotificationOptions, SnackbarOptions };
+export type { ConfirmationOptions, NotificationOptions, SnackbarOptions };
+
+/** 显示现代确认对话框，并以 Promise 返回用户选择。 */
+export const showConfirm = (options: ConfirmationOptions): Promise<boolean> =>
+  new Promise((resolve) => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    let settled = false;
+
+    const finish = (confirmed: boolean) => {
+      if (settled) return;
+      settled = true;
+      resolve(confirmed);
+    };
+
+    const cleanup = () => {
+      setTimeout(() => {
+        root.unmount();
+        if (document.body.contains(container)) document.body.removeChild(container);
+      }, 0);
+    };
+
+    root.render(<ConfirmationDialog {...options} onResult={finish} onExited={cleanup} />);
+  });
 
 export const showGlobalNotification = (options: NotificationOptions) => {
   const container = document.createElement('div');

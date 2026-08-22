@@ -20,7 +20,7 @@ import {
   type DeviceOpsAudit,
   type DeviceOpsTicket,
 } from '@/api/admin/mobile/device-ops';
-import { showSnackbar } from '@/components/Notification';
+import { showConfirm, showSnackbar } from '@/components/Notification';
 import { ResponsiveButton } from '@/components/Responsive';
 
 import { THIS_PERMISSION } from '../constant';
@@ -125,8 +125,15 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
     );
   };
 
-  const confirmAudio = (operation: string, params: Record<string, unknown>) => {
-    if (window.confirm(`确定执行 ${operation} (${stream})？`)) execute(operation, params);
+  const confirmAudio = async (operation: string, params: Record<string, unknown>) => {
+    if (
+      await showConfirm({
+        title: '确认设备操作',
+        message: `确定执行 ${operation} (${stream})？`,
+        type: 'warning',
+      })
+    )
+      execute(operation, params);
   };
 
   const refreshAudits = async () => {
@@ -210,14 +217,14 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
           读取
         </ResponsiveButton>
         <ResponsiveButton
-          onClick={() => confirmAudio('device.audio.set', { stream, level: Number(level) })}
+          onClick={() => void confirmAudio('device.audio.set', { stream, level: Number(level) })}
         >
           设置
         </ResponsiveButton>
-        <ResponsiveButton onClick={() => confirmAudio('device.audio.mute', { stream })}>
+        <ResponsiveButton onClick={() => void confirmAudio('device.audio.mute', { stream })}>
           静音
         </ResponsiveButton>
-        <ResponsiveButton onClick={() => confirmAudio('device.audio.unmute', { stream })}>
+        <ResponsiveButton onClick={() => void confirmAudio('device.audio.unmute', { stream })}>
           恢复
         </ResponsiveButton>
       </Stack>

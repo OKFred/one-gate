@@ -22,7 +22,7 @@ import type {
   ClientEnvironmentRevision,
   ClientRelease,
 } from '@/api/admin/mobile/client-deployment';
-import { showSnackbar } from '@/components/Notification';
+import { showConfirm, showSnackbar } from '@/components/Notification';
 import { ResponsiveButton } from '@/components/Responsive';
 import { permissions } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -89,7 +89,11 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
   const apply = async () => {
     if (!releaseVersion) return;
     const forceConfirmed =
-      activationMode !== 'FORCE' || window.confirm(t('mobile.deployment.forceConfirm'));
+      activationMode !== 'FORCE' ||
+      (await showConfirm({
+        message: t('mobile.deployment.forceConfirm'),
+        type: 'warning',
+      }));
     if (!forceConfirmed) return;
     setSubmitting(true);
     try {
@@ -111,14 +115,20 @@ export function ClientDeploymentPanel({ clientId }: ClientDeploymentPanelProps) 
   };
 
   const rollback = async (deploymentId: string) => {
-    if (!window.confirm(t('mobile.deployment.rollbackConfirm'))) return;
+    if (!(await showConfirm({ message: t('mobile.deployment.rollbackConfirm') }))) return;
     await DeploymentAPI.rollbackClientDeployment({ deploymentId });
     showSnackbar({ message: t('mobile.deployment.rollbackAccepted'), type: 'success' });
     await load();
   };
 
   const revoke = async (version: string) => {
-    if (!window.confirm(t('mobile.deployment.revokeConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('mobile.deployment.revokeConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     await DeploymentAPI.revokeClientRelease(version);
     await load();
   };

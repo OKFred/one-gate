@@ -29,6 +29,7 @@ import {
 import * as FinancialAPI from '@/api/personal/financial';
 import type { ListIncomeRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
+import { showConfirm } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type IncomeItem = NonNullable<ListIncomeRes['list']>[0];
@@ -88,7 +89,13 @@ export const IncomeList: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('personal.finance.income.deleteConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('personal.finance.income.deleteConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await FinancialAPI.incomeDeleteFn({ data: { id } });
       fetchList();

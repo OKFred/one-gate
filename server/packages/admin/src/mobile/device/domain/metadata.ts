@@ -2,6 +2,11 @@ import { DeviceRuleViolation } from "./device.js";
 
 export type MetadataPrimitive = string | number | boolean;
 export type MetadataValue = MetadataPrimitive | MetadataValue[];
+export type ReportedMetadataValue =
+  | MetadataPrimitive
+  | null
+  | ReportedMetadataValue[]
+  | { [key: string]: ReportedMetadataValue };
 
 export interface CustomMetadataEntry {
   value: MetadataValue;
@@ -9,7 +14,7 @@ export interface CustomMetadataEntry {
 }
 
 export type CustomMetadata = Record<string, CustomMetadataEntry>;
-export type ReportedExtra = Record<string, MetadataValue>;
+export type ReportedExtra = Record<string, ReportedMetadataValue>;
 
 export const SENSITIVE_METADATA_PLACEHOLDER = "••••••";
 
@@ -75,23 +80,58 @@ function validateValue(
   fail("Unsupported metadata value type");
 }
 
+function validateReportedKey(key: string): void {
+  if (!KEY_PATTERN.test(key)) fail(`Invalid metadata key: ${key}`);
+  const compact = key.replace(/[_.-]/g, "").toLowerCase();
+  if (
+    FORBIDDEN_REPORTED_KEYS.has(compact) ||
+    SENSITIVE_KEY_FRAGMENT.test(key)
+  ) {
+    fail(`Sensitive or reserved reportedExtra key: ${key}`);
+  }
+}
+
+/** reportedExtra 允许有限深度的普通对象，并递归执行键名安全检查。 */
+function validateReportedValue(
+  value: unknown,
+  depth: number,
+  keyCounter: { value: number }
+): asserts value is ReportedMetadataValue {
+  if (depth > MAX_DEPTH) fail("Metadata nesting exceeds depth 3");
+  if (value === null) return;
+  if (typeof value === "string" || typeof value === "boolean") return;
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) fail("Metadata number must be finite");
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      validateReportedValue(item, depth + 1, keyCounter);
+    }
+    return;
+  }
+  if (isRecord(value)) {
+    for (const [key, child] of Object.entries(value)) {
+      validateReportedKey(key);
+      keyCounter.value += 1;
+      if (keyCounter.value > MAX_KEYS) fail("Metadata exceeds 50 keys");
+      validateReportedValue(child, depth + 1, keyCounter);
+    }
+    return;
+  }
+  fail("Unsupported metadata value type");
+}
+
 /** 验证上报扩展信息，并拒绝正式字段与敏感语义键。 */
 export function validateReportedExtra(value: unknown): ReportedExtra {
   if (!isRecord(value)) fail("reportedExtra must be an object");
   const result: ReportedExtra = {};
-  let keyCount = 0;
+  const keyCounter = { value: 0 };
   for (const [key, child] of Object.entries(value)) {
-    if (!KEY_PATTERN.test(key)) fail(`Invalid metadata key: ${key}`);
-    const compact = key.replace(/[_.-]/g, "").toLowerCase();
-    if (
-      FORBIDDEN_REPORTED_KEYS.has(compact) ||
-      SENSITIVE_KEY_FRAGMENT.test(key)
-    ) {
-      fail(`Sensitive or reserved reportedExtra key: ${key}`);
-    }
-    keyCount += 1;
-    if (keyCount > MAX_KEYS) fail("Metadata exceeds 50 keys");
-    validateValue(child, 1);
+    validateReportedKey(key);
+    keyCounter.value += 1;
+    if (keyCounter.value > MAX_KEYS) fail("Metadata exceeds 50 keys");
+    validateReportedValue(child, 1, keyCounter);
     result[key] = child;
   }
   assertSerializedSize(value);

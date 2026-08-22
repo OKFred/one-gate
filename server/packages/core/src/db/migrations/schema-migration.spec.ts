@@ -279,4 +279,40 @@ describe("legacy D1 schema migrations", () => {
       `)
     ).rejects.toThrow();
   });
+
+  it("adds mobile client control-plane permissions idempotently", async () => {
+    const client = createMemoryClient();
+    await client.execute(`
+      CREATE TABLE system_permission (
+        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        code TEXT NOT NULL UNIQUE,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        resource TEXT,
+        business TEXT,
+        remark TEXT,
+        is_enabled INTEGER NOT NULL,
+        creator_id INTEGER NOT NULL
+      )
+    `);
+    const migration = readMigration(
+      "./20260822_01_mobile_client_permissions.sql"
+    );
+    await executeSqlFile(client, migration);
+    await executeSqlFile(client, migration);
+
+    const rows = await client.execute(`
+      SELECT code FROM system_permission
+      WHERE code LIKE 'admin.mobile.client_%'
+      ORDER BY code
+    `);
+    expect(rows.rows.map((row) => String(row.code))).toEqual([
+      "admin.mobile.client_deployment:dispatch",
+      "admin.mobile.client_deployment:read",
+      "admin.mobile.client_environment:dispatch",
+      "admin.mobile.client_environment:read",
+      "admin.mobile.client_release:dispatch",
+      "admin.mobile.client_release:read",
+    ]);
+  });
 });

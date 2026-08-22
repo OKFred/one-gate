@@ -507,7 +507,10 @@ async function onGetButtonPermission(
   // 必须手动触发加载，因为该接口本身不走 RBAC 校验
   await userObj.ensureLoaded();
 
-  const buttonPermissions = userObj.permissions;
+  // 超级管理员应立即看到数据库中的全部有效权限，避免旧 KV 权限包遮蔽新功能按钮。
+  const buttonPermissions = userObj.isSuperAdmin
+    ? await registry.system.getPermissionsByRoleIds(userObj.roleIds)
+    : userObj.permissions;
   return { permissions: buttonPermissions };
 }
 const getButtonPermissionApi = {

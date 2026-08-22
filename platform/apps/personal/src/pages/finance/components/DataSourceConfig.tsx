@@ -31,6 +31,7 @@ import {
 import * as FinancialAPI from '@/api/personal/financial';
 import type { ListDataSourceRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
+import { showConfirm } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type DataSourceItem = NonNullable<ListDataSourceRes['list']>[0];
@@ -109,7 +110,13 @@ export const DataSourceConfig: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('personal.finance.dataSource.deleteConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('personal.finance.dataSource.deleteConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await FinancialAPI.dataSourceDeleteFn({ data: { id } });
       fetchList();

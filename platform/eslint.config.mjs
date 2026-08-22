@@ -21,6 +21,32 @@ export default defineConfig([
     },
     rules: {
       'react-compiler/react-compiler': 'error',
+      'no-restricted-globals': [
+        'error',
+        { name: 'alert', message: 'Use the shared Notification components instead.' },
+        { name: 'confirm', message: 'Use showConfirm instead.' },
+        { name: 'prompt', message: 'Use a controlled MUI dialog instead.' },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='alert']",
+          message: 'Use the shared Notification components instead of window.alert.',
+        },
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='confirm']",
+          message: 'Use showConfirm instead of window.confirm.',
+        },
+        {
+          selector: "CallExpression[callee.object.name='window'][callee.property.name='prompt']",
+          message: 'Use a controlled MUI dialog instead of window.prompt.',
+        },
+        {
+          selector:
+            "CallExpression[callee.object.name='globalThis'][callee.property.name=/^(alert|confirm|prompt)$/]",
+          message: 'Native browser dialogs are prohibited.',
+        },
+      ],
     },
     languageOptions: {
       ecmaVersion: 2020,

@@ -11,8 +11,28 @@ import {
 describe("设备元数据领域规则", () => {
   it("接收有限深度的普通 reportedExtra", () => {
     expect(
-      validateReportedExtra({ locale: "zh-CN", flags: [true, false] })
-    ).toEqual({ locale: "zh-CN", flags: [true, false] });
+      validateReportedExtra({
+        locale: "zh-CN",
+        flags: [true, false],
+        deployment: {
+          releaseVersion: "v2.1.3",
+          releaseDigest: "a".repeat(64),
+          environment: "development",
+          environmentRevision: 4,
+          lastDeploymentId: null,
+        },
+      })
+    ).toEqual({
+      locale: "zh-CN",
+      flags: [true, false],
+      deployment: {
+        releaseVersion: "v2.1.3",
+        releaseDigest: "a".repeat(64),
+        environment: "development",
+        environmentRevision: 4,
+        lastDeploymentId: null,
+      },
+    });
   });
 
   it.each(["imei", "report_token", "phoneNumber", "deviceId"])(
@@ -23,6 +43,12 @@ describe("设备元数据领域规则", () => {
       );
     }
   );
+
+  it("递归拒绝嵌套对象中的敏感或保留字段", () => {
+    expect(() =>
+      validateReportedExtra({ deployment: { reportToken: "secret" } })
+    ).toThrow("Sensitive or reserved reportedExtra key");
+  });
 
   it("拒绝非有限数字、非法键和超深数组", () => {
     expect(() => validateReportedExtra({ score: Number.NaN })).toThrow(

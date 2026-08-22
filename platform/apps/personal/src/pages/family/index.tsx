@@ -31,6 +31,7 @@ import {
   Star as SelfIcon,
 } from '@mui/icons-material';
 import { PageLayout } from '@/components/Responsive/index';
+import { showConfirm } from '@/components/Notification';
 import * as FamilyAPI from '@/api/personal/family';
 import type { ListFamilyRes } from '@/api/personal/type';
 import dayjs from 'dayjs';
@@ -103,7 +104,13 @@ export default function FamilyPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('personal.family.deleteConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('personal.family.deleteConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await FamilyAPI.deleteFn({ data: { id } });
       fetchMembers();

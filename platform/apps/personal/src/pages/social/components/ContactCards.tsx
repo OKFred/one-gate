@@ -31,6 +31,7 @@ import {
 } from '@mui/icons-material';
 import * as SocialAPI from '@/api/personal/social';
 import type { ListContactRes } from '@/api/personal/type';
+import { showConfirm } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
 
 type ContactItem = NonNullable<ListContactRes['list']>[0];
@@ -98,7 +99,13 @@ export const ContactCards: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm(t('personal.social.cards.deleteConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('personal.social.cards.deleteConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       await SocialAPI.contactDeleteFn({ data: { id } });
       fetchContacts();

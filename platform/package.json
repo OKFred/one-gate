@@ -22,7 +22,9 @@
     "i18n:scan": "node ./scripts/scan-i18n-enhanced.js",
     "i18n:scan:json": "node ./scripts/scan-i18n-enhanced.js --json",
     "format": "prettier --write .",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "lint:check": "eslint .",
+    "check:native-dialogs": "node ./scripts/check-native-dialogs.mjs"
   },
   "lint-staged": {
     "*.{js,ts,tsx,json,md}": [

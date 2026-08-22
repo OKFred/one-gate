@@ -36,7 +36,7 @@ import type {
   ListDeviceEventRes,
   UpdateDeviceMetadataReq,
 } from '@/api/admin/mobile/type';
-import { showSnackbar } from '@/components/Notification';
+import { showConfirm, showSnackbar } from '@/components/Notification';
 import { ResponsiveButton } from '@/components/Responsive';
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -195,7 +195,13 @@ export function DeviceStatusDrawer({ open, deviceId, clientId, onClose }: Device
 
   const resetToken = async () => {
     if (!deviceId) return;
-    if (!window.confirm(t('mobile.device.resetTokenConfirm'))) return;
+    if (
+      !(await showConfirm({
+        message: t('mobile.device.resetTokenConfirm'),
+        destructive: true,
+      }))
+    )
+      return;
     try {
       const response = await DeviceAPI.resetReportTokenFn({ data: { id: deviceId } });
       setToken(response.data.data.token);
