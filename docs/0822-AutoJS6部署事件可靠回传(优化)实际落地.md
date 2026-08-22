@@ -6,6 +6,7 @@
 - Cloudflare Worker 的机器路由白名单已包含部署事件入口；请求跳过用户登录鉴权后仍必须通过设备令牌、部署身份和状态转换校验。
 - 部署阶段支持身份严格的单调前进，可从 `PENDING` 恢复到更高阶段或终态，终态、倒退和身份错配仍被拒绝。
 - LibSQL 的 `rowsAffected` 与 Cloudflare D1 的 `meta.changes` 均可准确识别，HTTP 响应不再把真实写入误报为重复事件。
+- Worker 发布前由 GitHub Actions 注入部署时间与 Git SHA，`/version.json` 不再长期返回静态旧版本。
 - 手机在 supervisor 注入 `AUTOJS6_REPORT_URL` 时自动启用 HTTPS 管理回传，空业务环境模板不能关闭该设备级通道。
 - Linux 发布构建使用 `--hard-dereference`，最终归档不含软链或硬链；新客户端仍可安全校验归档内部相对软链并拒绝越界链接。
 
@@ -27,16 +28,16 @@
 
 ## 验证证据
 
-- Node Server：62 个测试文件通过，338 个测试通过、3 个跳过；Server 构建、Prettier、ESLint、Wrangler dry-run、`git diff --check` 和 LF/BOM 检查通过。
+- Node Server：63 个测试文件通过，341 个测试通过、3 个跳过；Server 构建、Prettier、ESLint、Wrangler dry-run、`git diff --check` 和 LF/BOM 检查通过。
 - one-autojs6：类型检查及 8 组测试通过；Windows 发布构建通过；WSL Linux 连续两次构建得到相同 SHA-256，且归档零链接。
-- GitHub Actions：Node Server #163、#164 成功；移动发布 #9 (`v2.1.6`) 和 #10 (`v2.1.7`) 成功；#8 (`v2.1.5`) 保留为可审计失败记录。
+- GitHub Actions：Node Server #163、#164、#165 成功；移动发布 #9 (`v2.1.6`) 和 #10 (`v2.1.7`) 成功；#8 (`v2.1.5`) 保留为可审计失败记录。
 - Pixel 5：`current` 指向 `releases/v2.1.7`；设备上报为 `ONLINE / Client 2.1.7 / Protocol 2 / WIFI`；本地仅保留 `v2.1.7、v2.1.6、v2.1.3`。
 - WSS 运维：能力、前台应用、网络、存储、目录和媒体音量读取全部成功并写入审计；会话已主动关闭，`arbitraryShell=false`。
 - 发布治理：`v2.1.0` 与 `v2.1.1` 已撤销新部署资格，仍保留不可变制品和历史引用。
 
 ## 复盘与建议
 
-- 本次共进行了 5 轮代码审查或生产验证纠正：结果类型、文档边界、Linux 硬链、HTTP 白名单与设备级通道、D1 变更计数。
+- 本次共进行了 6 轮代码审查或生产验证纠正：结果类型、文档边界、Linux 硬链、HTTP 白名单与设备级通道、D1 变更计数、Worker 版本可追溯性。
 - 后续应把 Linux 发布构建加入每次移动端 PR 的 preflight，而不只在 Tag 后验证，以减少失败 Tag。
 - 可增加 Worker 路由级集成测试，直接覆盖合法设备令牌、错误令牌、重复事件和 D1 写入结果。
 - 失败的 `v2.1.5` Tag 不应复用；如需对外展示，可在控制面增加“构建失败但未发布”的独立审计状态。

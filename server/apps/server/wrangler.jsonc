@@ -41,7 +41,8 @@
     "NODE_ENV": "production",
     "BASE_API_PATH": "/api/v1",
     "LOCALE": "en-US",
-    "VERSION": "20260705010933-926da5fb",
+    // GitHub Actions stamps this placeholder with deploy time and commit SHA.
+    "VERSION": "local-development",
     "CLOUDFLARE_ACCOUNT_ID": "00000000000000000000000000000000",
     "MOBILE_OPS_ALLOWED_ORIGINS": "https://gate.example.com,https://gate-enterprise.example.com,https://gate-personal.example.com",
   },

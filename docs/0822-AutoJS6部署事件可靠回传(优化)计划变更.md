@@ -6,6 +6,7 @@
 - 修改 `mobile/client-deployment/model.ts`：集中声明部署事件 HTTP 请求字段。
 - 修改 `mobile/device/service.ts`：新增 POST `/report/deployment`，使用设备上报令牌并调用部署领域 facade。
 - 修改核心路由白名单：仅放行部署事件机器入口，业务处理仍执行设备令牌校验。
+- GitHub Actions 在 Worker 发布前根据部署时间和 Git SHA 写入 `VERSION`，使线上版本可追溯。
 - 补充部署领域、设备 HTTP 边界和 Worker 兼容测试。
 - 不修改数据库表，不新增 D1 migration，不改变管理端 apply/get/list/rollback 公共接口。
 

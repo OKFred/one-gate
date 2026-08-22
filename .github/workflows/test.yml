@@ -144,6 +144,13 @@ jobs:
             fi
           done
 
+      # 生产版本必须能追溯到本次部署提交，不能长期使用 wrangler.jsonc 的静态占位值。
+      - name: Stamp Worker Version
+        working-directory: ./server
+        env:
+          WORKER_COMMIT_SHA: ${{ github.sha }}
+        run: pnpm exec tsx scripts/stamp-worker-version.ts "$WORKER_COMMIT_SHA"
+
       - name: Deploy Workers Backend
         uses: cloudflare/wrangler-action@v4
         with:
