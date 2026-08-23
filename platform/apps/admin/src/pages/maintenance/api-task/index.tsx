@@ -1,17 +1,22 @@
 import { FULL_PREFIX, THIS_PERMISSION } from './constant';
 import { useState } from 'react';
-import { PlayArrow as PlayIcon, SystemUpdateAlt as ImportIcon } from '@mui/icons-material';
+import {
+  Code as CurlIcon,
+  PlayArrow as PlayIcon,
+  SystemUpdateAlt as ImportIcon,
+} from '@mui/icons-material';
 import { SchemaCrudPage, type SchemaCrudConfig } from '@/components/Crud';
 import * as ApiTaskAPI from '@/api/admin/maintenance/api-task';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ApiTaskObj, ListApiTaskReq } from '@/api/admin/maintenance/type';
-import { Button, Chip, Typography } from '@mui/material';
+import { Button, Chip, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 
 // Subcomponents
 import { TheForm } from './components/TheForm';
 import { RunTestDialog } from './components/RunTestDialog';
 import { ImportDialog } from './components/ImportDialog';
+import { CurlImportDialog } from './components/CurlImportDialog';
 
 const DEFAULT_FORM: Partial<ApiTaskObj> = {
   taskKey: '',
@@ -38,6 +43,7 @@ export default function ApiTaskManagement() {
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<ApiTaskObj | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [curlImportDialogOpen, setCurlImportDialogOpen] = useState(false);
 
   const config: SchemaCrudConfig<ApiTaskObj, typeof defaultFilters, ListApiTaskReq> = {
     apiKeyName: 'id',
@@ -195,14 +201,24 @@ export default function ApiTaskManagement() {
         key={refreshKey}
         config={config}
         customActions={
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<ImportIcon />}
-            onClick={() => setImportDialogOpen(true)}
-          >
-            {t('apiTask.button.importFromDocs')}
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<CurlIcon />}
+              onClick={() => setCurlImportDialogOpen(true)}
+            >
+              {t('apiTask.button.importFromCurl')}
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<ImportIcon />}
+              onClick={() => setImportDialogOpen(true)}
+            >
+              {t('apiTask.button.importFromDocs')}
+            </Button>
+          </Stack>
         }
       />
 
@@ -217,6 +233,13 @@ export default function ApiTaskManagement() {
       <ImportDialog
         open={importDialogOpen}
         onClose={() => setImportDialogOpen(false)}
+        onSuccess={() => setRefreshKey((prev) => prev + 1)}
+      />
+
+      {/* 从 cURL 导入弹窗 */}
+      <CurlImportDialog
+        open={curlImportDialogOpen}
+        onClose={() => setCurlImportDialogOpen(false)}
         onSuccess={() => setRefreshKey((prev) => prev + 1)}
       />
     </>

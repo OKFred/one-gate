@@ -105,6 +105,7 @@ export const maintenance = {
   'apiTask.button.run': 'Run Now',
   'apiTask.run.success': 'Request executed successfully',
   'apiTask.run.failed': 'Request execution failed',
+  'apiTask.button.importFromCurl': 'Import from cURL',
   'apiTask.button.importFromDocs': 'Import from Docs',
   'apiTask.test.title': 'Run Test',
   'apiTask.test.result': 'Execution Result',
@@ -128,4 +129,26 @@ export const maintenance = {
   'apiTask.import.taskKey': 'Task Key',
   'apiTask.import.errorReason': 'Error Reason',
   'apiTask.import.selectDoc': 'Select Uploaded Document',
+  'apiTask.curlImport.title': 'Import API Task from cURL',
+  'apiTask.curlImport.description':
+    'Paste one cURL command to extract its method, URL, headers, and JSON request body.',
+  'apiTask.curlImport.securityWarning':
+    'Sensitive headers such as Authorization and Cookie are stored with the task. Review them before importing.',
+  'apiTask.curlImport.placeholder':
+    "curl -X POST 'https://api.example.com/v1/data' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"pageNo\":1}'",
+  'apiTask.curlImport.supported':
+    'Bash backslash (\\) and caret (^) line continuations are supported. The request body must be an inline JSON object.',
+  'apiTask.curlImport.import': 'Import',
+  'apiTask.curlImport.importing': 'Importing...',
+  'apiTask.curlImport.error.empty': 'Paste a cURL command first.',
+  'apiTask.curlImport.error.missingCommand': 'No curl or curl.exe command was found.',
+  'apiTask.curlImport.error.unclosedQuote': 'The command contains an unclosed quote.',
+  'apiTask.curlImport.error.missingOptionValue': 'Option {{detail}} is missing its value.',
+  'apiTask.curlImport.error.missingUrl': 'No HTTP or HTTPS request URL was found.',
+  'apiTask.curlImport.error.invalidUrl': 'Invalid URL: {{detail}}',
+  'apiTask.curlImport.error.unsupportedProtocol': 'Protocol {{detail}} is not supported.',
+  'apiTask.curlImport.error.unsupportedMethod': 'HTTP method {{detail}} is not supported.',
+  'apiTask.curlImport.error.invalidHeader': 'Invalid header: {{detail}}',
+  'apiTask.curlImport.error.unsupportedBody':
+    'The body cannot be imported. Only one inline JSON object is supported; files, forms, and multiple -d values are not.',
 } as const satisfies Record<string, string>;

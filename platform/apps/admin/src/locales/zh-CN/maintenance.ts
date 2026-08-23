@@ -115,6 +115,7 @@ export const maintenance = {
   'apiTask.button.run': '立即执行',
   'apiTask.run.success': '请求执行成功',
   'apiTask.run.failed': '请求执行失败',
+  'apiTask.button.importFromCurl': '从 cURL 导入',
   'apiTask.button.importFromDocs': '从文档导入',
   'apiTask.test.title': '立即执行测试',
   'apiTask.test.result': '执行结果',
@@ -138,4 +139,26 @@ export const maintenance = {
   'apiTask.import.taskKey': '任务 Key',
   'apiTask.import.errorReason': '错误原因',
   'apiTask.import.selectDoc': '选择已上传文档',
+  'apiTask.curlImport.title': '从 cURL 导入 API 任务',
+  'apiTask.curlImport.description':
+    '粘贴一条 cURL 命令，系统会自动提取请求方法、URL、请求头和 JSON 请求体。',
+  'apiTask.curlImport.securityWarning':
+    'Authorization、Cookie 等敏感请求头会随任务保存，请在导入前确认内容可以持久化。',
+  'apiTask.curlImport.placeholder':
+    "curl -X POST 'https://api.example.com/v1/data' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"pageNo\":1}'",
+  'apiTask.curlImport.supported':
+    '支持 Bash 反斜杠（\\）和脱字符（^）多行续行；请求体当前仅支持 JSON 对象。',
+  'apiTask.curlImport.import': '一键导入',
+  'apiTask.curlImport.importing': '正在导入...',
+  'apiTask.curlImport.error.empty': '请先粘贴 cURL 命令。',
+  'apiTask.curlImport.error.missingCommand': '未找到 curl 或 curl.exe 命令。',
+  'apiTask.curlImport.error.unclosedQuote': '命令中存在未闭合的引号。',
+  'apiTask.curlImport.error.missingOptionValue': '选项 {{detail}} 缺少参数值。',
+  'apiTask.curlImport.error.missingUrl': '未找到 HTTP 或 HTTPS 请求 URL。',
+  'apiTask.curlImport.error.invalidUrl': 'URL 格式无效：{{detail}}',
+  'apiTask.curlImport.error.unsupportedProtocol': '暂不支持 {{detail}} 协议。',
+  'apiTask.curlImport.error.unsupportedMethod': '暂不支持 {{detail}} 请求方法。',
+  'apiTask.curlImport.error.invalidHeader': '请求头格式无效：{{detail}}',
+  'apiTask.curlImport.error.unsupportedBody':
+    '请求体无法导入：当前仅支持内联 JSON 对象，不支持文件、表单或多段 -d。',
 } as const satisfies Record<string, string>;
