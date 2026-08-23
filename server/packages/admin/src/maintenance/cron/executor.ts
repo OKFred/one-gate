@@ -7,6 +7,7 @@ import { type AppDatabase } from "@hodor/core/db/index";
 import { jobsRegistry } from "./registry";
 import { findEnabledByKey } from "../api-task/repository";
 import { registry } from "../../common/registry";
+import { formatCronNotification, parseCronParameters } from "./notification";
 
 export interface ApiTaskDef {
   baseUrl: string;
@@ -247,14 +248,14 @@ export class StaticJobExecutor implements JobExecutor {
  * HTTP 动态 API 任务执行器
  */
 export class HttpJobExecutor implements JobExecutor {
-  supports(jobKey: string): boolean {
+  supports(_jobKey: string): boolean {
     // 作为兜底执行器
     return true;
   }
 
   async execute(
     job: { jobKey: string; parameters?: string | null; name: string },
-    db: AppDatabase
+    _db: AppDatabase
   ): Promise<JobExecutorResult> {
     const apiTask = await findEnabledByKey(job.jobKey);
     if (!apiTask) {
@@ -265,20 +266,52 @@ export class HttpJobExecutor implements JobExecutor {
     }
 
     try {
-      const params: Record<string, unknown> = job.parameters
-        ? JSON.parse(job.parameters)
-        : {};
-      const result = await executeApiTask(apiTask, params);
+      const { request, notification } = parseCronParameters(job.parameters);
+      const result = await executeApiTask(apiTask, request);
       if (result.success) {
+        if (notification) {
+          let text: string;
+          try {
+            text = formatCronNotification(
+              job.name,
+              result.responseBody,
+              notification
+            );
+          } catch (error: unknown) {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            await registry.base.webhook.send({
+              source: notification.webhookSource,
+              text: `【${notification.title?.trim() || job.name}】\n采集成功，但响应解析失败：${message.slice(0, 500)}`,
+            });
+            throw error;
+          }
+          await registry.base.webhook.send({
+            source: notification.webhookSource,
+            text,
+          });
+          return {
+            status: true,
+            responseBody: text,
+          };
+        }
         return {
           status: true,
           responseBody: result.responseBody,
         };
       } else {
+        if (notification) {
+          await registry.base.webhook.send({
+            source: notification.webhookSource,
+            text: `【${notification.title?.trim() || job.name}】\n采集失败：HTTP ${result.statusCode} ${result.statusText ?? ""}`.trim(),
+          });
+        }
         return {
           status: false,
           errorMessage: `HTTP ${result.statusCode}: ${result.responseBody.slice(0, 500)}`,
-          responseBody: result.responseBody,
+          responseBody: notification
+            ? result.responseBody.slice(0, 20_000)
+            : result.responseBody,
         };
       }
     } catch (err: unknown) {

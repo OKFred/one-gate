@@ -5,4 +5,5 @@ export const baseTranslations: Partial<
   Record<BusinessKey, TranslationInputItem[]>
 > = {
   "admin.base": [],
+  "admin.base.webhook_config": [],
 };

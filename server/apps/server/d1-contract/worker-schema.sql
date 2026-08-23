@@ -176,3 +176,6 @@ FROM `admin_mobile_client_deployment`
 LIMIT 0;
 SELECT `id` FROM `admin_mobile_client_deployment` INDEXED BY `admin_mobile_client_deployment_id_unique` LIMIT 0;
 SELECT `id` FROM `admin_mobile_client_deployment` INDEXED BY `admin_mobile_client_deployment_active_device_unique` LIMIT 0;
+SELECT `source`, `is_enabled`, `is_primary`, `creator_id`, `create_time_utc`
+FROM `base_webhook_config`
+LIMIT 0;

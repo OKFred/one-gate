@@ -15,13 +15,19 @@ import { getActiveStorage } from "./oss/file/service.js";
 import { OssConfigProvider } from "./oss/config/provider.js";
 import { utils as baseConfigUtils } from "./base/sys_config/service.js";
 import baseLogService from "./base/log/service.js";
+import { sendWebhookNotification } from "./base/webhook_config/notifier.js";
 import { getDefaultConfig as aiGetDefaultConfig } from "./ai/config/service.js";
 import { AiConfigProvider } from "./ai/config/provider.js";
 import { runAiChat, runAiEmbedding } from "./ai/driver.js";
 import aiSearchService from "./ai/search/service.js";
 import aiChatService from "./ai/chat/service.js";
 import { SwarmDockerConfigProvider } from "./swarm/docker_config/provider.js";
-import { safeFetch, safeFetchJson, safeFetchText, type SafeFetchOptions } from "@hodor/core/utils/safeFetch";
+import {
+  safeFetch,
+  safeFetchJson,
+  safeFetchText,
+  type SafeFetchOptions,
+} from "@hodor/core/utils/safeFetch";
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
@@ -33,6 +39,9 @@ export const systemRegister = {
 export const baseRegister = {
   sysConfig: baseConfigUtils,
   log: baseLogService,
+  webhook: {
+    send: sendWebhookNotification,
+  },
   httpFetch: {
     fetch: (url: string | URL, options?: SafeFetchOptions) =>
       safeFetch(url, {

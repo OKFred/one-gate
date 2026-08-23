@@ -118,6 +118,8 @@ export const BUSINESS = {
   "admin.base": "admin.base",
   /** 基础配置 - 具体配置 */
   "admin.base.sys_config": "admin.base.sys_config",
+  /** 基础配置 - Webhook 配置 */
+  "admin.base.webhook_config": "admin.base.webhook_config",
   "enterprise.mail": "enterprise.mail",
   "personal.base.user_config": "personal.base.user_config",
 

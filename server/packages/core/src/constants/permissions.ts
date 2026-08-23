@@ -27,6 +27,8 @@ export const permissionSeeds = {
   "admin.base": {
     "": ["read"],
     sys_config: ["read", "add", "edit", "delete"],
+    /** Webhook 配置 */
+    webhook_config: ["read", "add", "edit", "delete"],
     /** 日志 */
     log: ["read"],
   },

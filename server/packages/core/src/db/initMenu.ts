@@ -556,6 +556,15 @@ export const initialMenuData = [
     business: "admin.base.log",
   },
   {
+    id: 106,
+    name: "sidebar.menu.admin.base.webhookConfig",
+    icon: "material-symbols:webhook",
+    path: "/admin/base/webhook_config",
+    parentId: 49,
+    sort: 3,
+    business: "admin.base.webhook_config",
+  },
+  {
     id: 77,
     name: "sidebar.menu.voice",
     icon: "material-symbols:call",

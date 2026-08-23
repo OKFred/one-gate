@@ -27,6 +27,13 @@ export const permissions = {
         edit: 'admin.base.sys_config:edit',
         delete: 'admin.base.sys_config:delete',
       },
+      /** Webhook 配置 */
+      webhook_config: {
+        read: 'admin.base.webhook_config:read',
+        add: 'admin.base.webhook_config:add',
+        edit: 'admin.base.webhook_config:edit',
+        delete: 'admin.base.webhook_config:delete',
+      },
       /** 日志 */
       log: {
         read: 'admin.base.log:read',

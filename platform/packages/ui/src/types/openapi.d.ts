@@ -11665,6 +11665,296 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/base/webhook_config/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 分页获取 Webhook 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.webhook_config.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.webhook_config.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/webhook_config/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 添加 Webhook 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.webhook_config.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.webhook_config.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/webhook_config/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 更新 Webhook 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.webhook_config.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.webhook_config.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/webhook_config/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 Webhook 配置详情 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.webhook_config.detail.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.webhook_config.detail.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/base/webhook_config/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除 Webhook 配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.webhook_config.delete.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.webhook_config.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/mqtt/publish": {
         parameters: {
             query?: never;
@@ -26992,6 +27282,193 @@ export interface components {
                 nextCursor?: number | null;
                 hasMore: boolean;
             };
+            message: string;
+        };
+        "admin.base.webhook_config.list.req": {
+            /** @description 是否降序 */
+            descend?: boolean;
+            /**
+             * @description 关键词
+             * @example
+             */
+            keyword?: string;
+            /**
+             * @description 页码
+             * @default 1
+             */
+            pageNo: number;
+            /**
+             * @description 每页记录数
+             * @default 10
+             */
+            pageSize: number;
+            /** @description Webhook 来源，例如 feishu */
+            source?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @enum {string} */
+            orderBy?: "id" | "source" | "isEnabled" | "isPrimary" | "createTimeUtc";
+        };
+        "admin.base.webhook_config.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                list: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /** @description Webhook 来源，例如 feishu */
+                    source: string;
+                    /**
+                     * Format: uri
+                     * @description Webhook HTTPS URL
+                     */
+                    url: string;
+                    /** @description 是否启用 */
+                    isEnabled: boolean;
+                    /** @description 是否为当前来源的主配置 */
+                    isPrimary: boolean;
+                    /** @description 备注 */
+                    remark: ((string | null) | null) | null;
+                    /** @description 创建人ID */
+                    creatorId: number;
+                    /**
+                     * @description 创建时间
+                     * @example 1672531199000
+                     */
+                    createTimeUtc: number;
+                    /** @description 更新人ID */
+                    updaterId: ((number | null) | null) | null;
+                    /**
+                     * @description 更新时间
+                     * @example 1672531199000
+                     */
+                    updateTimeUtc: ((number | null) | null) | null;
+                }[];
+            };
+            message: string;
+        };
+        "admin.base.webhook_config.add.req": {
+            /** @description Webhook 来源，例如 feishu */
+            source: string;
+            /**
+             * Format: uri
+             * @description Webhook HTTPS URL
+             */
+            url: string;
+            /** @description 是否启用 */
+            isEnabled: boolean;
+            /** @description 是否为当前来源的主配置 */
+            isPrimary: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.base.webhook_config.add.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.base.webhook_config.update.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+            /** @description Webhook 来源，例如 feishu */
+            source?: string;
+            /**
+             * Format: uri
+             * @description Webhook HTTPS URL
+             */
+            url?: string;
+            /** @description 是否启用 */
+            isEnabled?: boolean;
+            /** @description 是否为当前来源的主配置 */
+            isPrimary?: boolean;
+            /** @description 备注 */
+            remark?: ((string | null) | null) | null;
+        };
+        "admin.base.webhook_config.update.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
+            message: string;
+        };
+        "admin.base.webhook_config.detail.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.base.webhook_config.detail.res": {
+            ok: boolean;
+            data: {
+                /**
+                 * @description id
+                 * @example 1
+                 */
+                id: number;
+                /** @description Webhook 来源，例如 feishu */
+                source: string;
+                /**
+                 * Format: uri
+                 * @description Webhook HTTPS URL
+                 */
+                url: string;
+                /** @description 是否启用 */
+                isEnabled: boolean;
+                /** @description 是否为当前来源的主配置 */
+                isPrimary: boolean;
+                /** @description 备注 */
+                remark: ((string | null) | null) | null;
+                /** @description 创建人ID */
+                creatorId: number;
+                /**
+                 * @description 创建时间
+                 * @example 1672531199000
+                 */
+                createTimeUtc: number;
+                /** @description 更新人ID */
+                updaterId: ((number | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
+            };
+            message: string;
+        };
+        "admin.base.webhook_config.delete.req": {
+            /**
+             * @description id
+             * @example 1
+             */
+            id: number;
+        };
+        "admin.base.webhook_config.delete.res": {
+            ok: boolean;
+            /**
+             * @description id
+             * @example 1
+             */
+            data: number;
             message: string;
         };
         "admin.mqtt.publish.req": {

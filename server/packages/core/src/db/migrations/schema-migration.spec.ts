@@ -363,4 +363,54 @@ describe("legacy D1 schema migrations", () => {
       "admin.mobile.network_routing:read",
     ]);
   });
+
+  it("creates Webhook config and seeds the Treasury task idempotently", async () => {
+    const client = createMemoryClient();
+    await client.execute(`
+      CREATE TABLE maintenance_api_task (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_key TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        base_url TEXT NOT NULL,
+        path TEXT NOT NULL,
+        method TEXT NOT NULL,
+        headers TEXT,
+        timeout_ms INTEGER NOT NULL,
+        is_enabled INTEGER NOT NULL,
+        creator_id INTEGER NOT NULL
+      )
+    `);
+    await client.execute(`
+      CREATE TABLE system_cron_job (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        job_key TEXT NOT NULL,
+        name TEXT NOT NULL,
+        cron_expression TEXT NOT NULL,
+        status INTEGER NOT NULL,
+        parameters TEXT,
+        run_count INTEGER NOT NULL,
+        creator_id INTEGER NOT NULL
+      )
+    `);
+
+    const migration = readMigration("./20260823_01_webhook_config.sql");
+    await executeSqlFile(client, migration);
+    await executeSqlFile(client, migration);
+
+    const webhookTable = await client.execute(
+      "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'base_webhook_config'"
+    );
+    expect(webhookTable.rows).toHaveLength(1);
+    const tasks = await client.execute(
+      "SELECT task_key FROM maintenance_api_task WHERE task_key = 'us_treasury_30y_yield'"
+    );
+    const jobs = await client.execute(
+      "SELECT job_key, cron_expression FROM system_cron_job WHERE job_key = 'us_treasury_30y_yield'"
+    );
+    expect(tasks.rows).toHaveLength(1);
+    expect(jobs.rows).toMatchObject([
+      { job_key: "us_treasury_30y_yield", cron_expression: "0 1 * * *" },
+    ]);
+  });
 });
