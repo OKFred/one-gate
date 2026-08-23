@@ -1,6 +1,6 @@
 import { axiosPlus } from '../../config';
 
-export type NetworkRoutingTarget = 'wifi' | 'carrier';
+export type NetworkRoutingTarget = 'default' | 'wifi' | 'carrier';
 export type NetworkRoutingState =
   | 'DISABLED'
   | 'APPLYING'

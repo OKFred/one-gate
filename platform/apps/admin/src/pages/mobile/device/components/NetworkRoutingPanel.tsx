@@ -58,9 +58,21 @@ export function NetworkRoutingPanel({ clientId }: Props) {
     routing?.lastResult && typeof routing.lastResult.failureStage === 'string'
       ? routing.lastResult.failureStage
       : null;
+  const hasUnsavedConfig =
+    routing !== null &&
+    (JSON.stringify(lines(cidrs)) !== JSON.stringify(routing.lanCidrs) ||
+      JSON.stringify(lines(lanProbes)) !== JSON.stringify(routing.lanProbeUrls) ||
+      internetProbe.trim() !== routing.internetProbeUrl ||
+      probeTimeoutMs !== routing.probeTimeoutMs);
+  const targetLabel = (value: NetworkRoutingTarget | null) => {
+    if (value === 'default') return t('mobile.networkRouting.targetDefault');
+    if (value === 'wifi') return t('mobile.networkRouting.targetWifi');
+    if (value === 'carrier') return t('mobile.networkRouting.targetCarrier');
+    return '-';
+  };
 
   const load = useCallback(
-    async (syncForm = false) => {
+    async (syncForm = false, syncTarget = syncForm) => {
       const response = await NetworkRoutingAPI.getNetworkRouting(clientId);
       const next = response.data.data as NetworkRoutingView;
       setRouting(next);
@@ -69,6 +81,8 @@ export function NetworkRoutingPanel({ clientId }: Props) {
         setLanProbes(next.lanProbeUrls.join('\n'));
         setInternetProbe(next.internetProbeUrl);
         setProbeTimeoutMs(next.probeTimeoutMs);
+      }
+      if (syncTarget) {
         setTarget(next.desiredTarget ?? next.actualTarget ?? 'wifi');
       }
     },
@@ -95,14 +109,14 @@ export function NetworkRoutingPanel({ clientId }: Props) {
         probeTimeoutMs,
       });
       showSnackbar({ message: t('mobile.networkRouting.saved'), type: 'success' });
-      await load(true);
+      await load(true, false);
     } finally {
       setSaving(false);
     }
   };
 
   const apply = async () => {
-    if (saving || routing?.state === 'APPLYING') return;
+    if (saving || routing?.state === 'APPLYING' || hasUnsavedConfig) return;
     setSaving(true);
     try {
       const response = await NetworkRoutingAPI.applyNetworkRouting({
@@ -139,13 +153,21 @@ export function NetworkRoutingPanel({ clientId }: Props) {
       <Alert severity="info">{t('mobile.networkRouting.hint')}</Alert>
       <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
         <Chip label={routing.state} color={chipColor(routing.state)} />
-        <Chip label={`${t('mobile.networkRouting.desired')}: ${routing.desiredTarget ?? '-'}`} />
-        <Chip label={`${t('mobile.networkRouting.actual')}: ${routing.actualTarget ?? '-'}`} />
+        <Chip
+          label={`${t('mobile.networkRouting.desired')}: ${targetLabel(routing.desiredTarget)}`}
+        />
+        <Chip
+          label={`${t('mobile.networkRouting.actual')}: ${targetLabel(routing.actualTarget)}`}
+        />
         <Chip label={`r${routing.policyRevision} / g${routing.generation}`} />
       </Stack>
 
       {routing.state === 'RECOVERING' && (
         <Alert severity="info">{t('mobile.networkRouting.recovering')}</Alert>
+      )}
+
+      {hasUnsavedConfig && (
+        <Alert severity="warning">{t('mobile.networkRouting.unsavedConfig')}</Alert>
       )}
 
       {routing.state !== 'RECOVERING' &&
@@ -196,8 +218,9 @@ export function NetworkRoutingPanel({ clientId }: Props) {
           sx={{ minWidth: 220 }}
           slotProps={{ select: { native: true } }}
         >
-          <option value="wifi">Wi-Fi</option>
-          <option value="carrier">中国电信 (46011)</option>
+          <option value="default">{t('mobile.networkRouting.targetDefault')}</option>
+          <option value="wifi">{t('mobile.networkRouting.targetWifi')}</option>
+          <option value="carrier">{t('mobile.networkRouting.targetCarrier')}</option>
         </TextField>
         <ResponsiveButton
           variant="outlined"
@@ -205,14 +228,14 @@ export function NetworkRoutingPanel({ clientId }: Props) {
           permissionCodes={[permissions.admin.mobile.network_routing.edit]}
           onClick={() => void save()}
         >
-          {t('common.save')}
+          {t('mobile.networkRouting.saveConfig')}
         </ResponsiveButton>
         <ResponsiveButton
-          disabled={saving || routing.state === 'APPLYING'}
+          disabled={saving || routing.state === 'APPLYING' || hasUnsavedConfig}
           permissionCodes={[permissions.admin.mobile.network_routing.edit]}
           onClick={() => void apply()}
         >
-          {t('mobile.networkRouting.apply')}
+          {t('mobile.networkRouting.applySavedConfig')}
         </ResponsiveButton>
         <ResponsiveButton
           color="warning"

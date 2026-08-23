@@ -96,6 +96,17 @@ describe("可信设备脚本领域规则", () => {
       validateTrustedScriptParams("device.network.routing.apply", {
         generation: 2,
         policyRevision: 3,
+        internetTarget: "default",
+        lanCidrs: ["192.168.0.0/16"],
+        lanProbeUrls: ["http://192.168.1.4/"],
+        internetProbeUrl: "http://ip.3322.net/",
+        probeTimeoutMs: 10_000,
+      })
+    ).not.toThrow();
+    expect(() =>
+      validateTrustedScriptParams("device.network.routing.apply", {
+        generation: 2,
+        policyRevision: 3,
         internetTarget: "carrier",
         lanCidrs: ["192.168.0.0/16"],
         lanProbeUrls: ["http://8.8.8.8/"],

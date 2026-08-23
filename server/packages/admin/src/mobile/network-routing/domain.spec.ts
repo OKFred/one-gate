@@ -41,6 +41,12 @@ describe("mobile network routing policy", () => {
     } as const;
     expect(parseNetworkRoutingStatusEvent(status)).toEqual(status);
     expect(
+      parseNetworkRoutingStatusEvent({ ...status, target: "default" })
+    ).toEqual({ ...status, target: "default" });
+    expect(
+      parseNetworkRoutingStatusEvent({ ...status, target: "automatic" })
+    ).toBeNull();
+    expect(
       parseNetworkRoutingStatusEvent({ ...status, publicIpv4: "203.0.113.1" })
     ).toBeNull();
     expect(

@@ -10,7 +10,7 @@ export const NETWORK_ROUTING_STATES = [
   "DEGRADED",
 ] as const;
 export type NetworkRoutingState = (typeof NETWORK_ROUTING_STATES)[number];
-export type NetworkRoutingTarget = "wifi" | "carrier";
+export type NetworkRoutingTarget = "default" | "wifi" | "carrier";
 export const NETWORK_ROUTING_RUNTIME_STATES = [
   "DISABLED",
   "RECOVERING",
@@ -76,7 +76,10 @@ export function parseNetworkRoutingStatusEvent(
     !NETWORK_ROUTING_RUNTIME_STATES.includes(
       state as NetworkRoutingRuntimeState
     ) ||
-    (target !== null && target !== "wifi" && target !== "carrier") ||
+    (target !== null &&
+      target !== "default" &&
+      target !== "wifi" &&
+      target !== "carrier") ||
     (policyRevision !== null &&
       (!Number.isInteger(policyRevision) || Number(policyRevision) < 1)) ||
     typeof value.code !== "string" ||

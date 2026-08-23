@@ -68,7 +68,7 @@ const nullableNumber = {
 } as const satisfies JSONSchema;
 const targetSchema = {
   type: ["string", "null"],
-  enum: ["wifi", "carrier", null],
+  enum: ["default", "wifi", "carrier", null],
   nullable: true,
 } as const satisfies JSONSchema;
 

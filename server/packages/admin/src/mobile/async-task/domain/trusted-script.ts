@@ -208,11 +208,12 @@ export function validateTrustedScriptParams(
       );
     }
     if (
+      params.internetTarget !== "default" &&
       params.internetTarget !== "wifi" &&
       params.internetTarget !== "carrier"
     ) {
       throw new DeviceTaskRuleViolation(
-        "network routing internetTarget 仅支持 wifi/carrier"
+        "network routing internetTarget 仅支持 default/wifi/carrier"
       );
     }
     try {

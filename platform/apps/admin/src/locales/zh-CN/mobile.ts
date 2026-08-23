@@ -93,7 +93,7 @@ export const mobile = {
 
   // Per-device network routing
   'mobile.networkRouting.hint':
-    '内网始终走 Wi-Fi；Internet 出口可在 Wi-Fi 和中国电信间切换。切换前后探测，失败自动回滚。',
+    '内网始终走 Wi-Fi；Internet 出口可选择 Android 默认、Wi-Fi 或中国电信。默认仅不接管 Internet，内网分流仍保持启用。切换前后探测，失败自动回滚。',
   'mobile.networkRouting.desired': '期望出口',
   'mobile.networkRouting.actual': '实际出口',
   'mobile.networkRouting.cidrs': '内网 CIDR（每行一个）',
@@ -102,8 +102,14 @@ export const mobile = {
   'mobile.networkRouting.internetProbe': 'Internet 探针',
   'mobile.networkRouting.timeout': '单探针超时（毫秒）',
   'mobile.networkRouting.target': 'Internet 出口',
+  'mobile.networkRouting.targetDefault': '默认（Android 自动选择）',
+  'mobile.networkRouting.targetWifi': 'Wi-Fi',
+  'mobile.networkRouting.targetCarrier': '中国电信（46011）',
+  'mobile.networkRouting.saveConfig': '保存配置',
   'mobile.networkRouting.saved': '网络分流配置修订已保存',
-  'mobile.networkRouting.apply': '应用分流',
+  'mobile.networkRouting.applySavedConfig': '应用已保存配置',
+  'mobile.networkRouting.unsavedConfig':
+    '配置有未保存修改。请先保存；应用分流只会使用服务端已保存的配置。',
   'mobile.networkRouting.accepted': '网络分流任务已受理',
   'mobile.networkRouting.disable': '停用并恢复默认路由',
   'mobile.networkRouting.disableConfirm':

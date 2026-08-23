@@ -99,7 +99,7 @@ export const mobile = {
 
   // Per-device network routing
   'mobile.networkRouting.hint':
-    'LAN always uses Wi-Fi. Internet egress can switch between Wi-Fi and China Telecom with pre/post probes and rollback.',
+    'LAN always uses Wi-Fi. Internet egress can use the Android default, Wi-Fi, or China Telecom. Default leaves only Internet unmanaged while LAN routing stays active. Probes run before and after changes with rollback on failure.',
   'mobile.networkRouting.desired': 'Desired egress',
   'mobile.networkRouting.actual': 'Actual egress',
   'mobile.networkRouting.cidrs': 'LAN CIDRs (one per line)',
@@ -108,8 +108,14 @@ export const mobile = {
   'mobile.networkRouting.internetProbe': 'Internet probe',
   'mobile.networkRouting.timeout': 'Probe timeout (ms)',
   'mobile.networkRouting.target': 'Internet egress',
+  'mobile.networkRouting.targetDefault': 'Default (Android managed)',
+  'mobile.networkRouting.targetWifi': 'Wi-Fi',
+  'mobile.networkRouting.targetCarrier': 'China Telecom (46011)',
+  'mobile.networkRouting.saveConfig': 'Save configuration',
   'mobile.networkRouting.saved': 'Network routing revision saved',
-  'mobile.networkRouting.apply': 'Apply routing',
+  'mobile.networkRouting.applySavedConfig': 'Apply saved configuration',
+  'mobile.networkRouting.unsavedConfig':
+    'There are unsaved configuration changes. Save first; apply uses only the server-side saved configuration.',
   'mobile.networkRouting.accepted': 'Network routing task accepted',
   'mobile.networkRouting.disable': 'Disable and restore default',
   'mobile.networkRouting.disableConfirm':

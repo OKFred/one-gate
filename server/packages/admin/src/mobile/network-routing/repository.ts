@@ -212,7 +212,9 @@ export class NetworkRoutingRepository {
     const isDisable = result.scriptId === "device.network.routing.disable";
     const succeeded = result.status === "SUCCESS";
     const target =
-      data.target === "wifi" || data.target === "carrier"
+      data.target === "default" ||
+      data.target === "wifi" ||
+      data.target === "carrier"
         ? data.target
         : current.desiredTarget;
     await db

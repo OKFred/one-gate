@@ -28969,9 +28969,9 @@ export interface components {
                 internetProbeUrl: string;
                 probeTimeoutMs: number;
                 /** @enum {string|null|null} */
-                desiredTarget: "wifi" | "carrier" | null;
+                desiredTarget: "default" | "wifi" | "carrier" | null;
                 /** @enum {string|null|null} */
-                actualTarget: "wifi" | "carrier" | null;
+                actualTarget: "default" | "wifi" | "carrier" | null;
                 /** @enum {string} */
                 state: "DISABLED" | "APPLYING" | "RECOVERING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
                 lastTaskId: ((string | null) | null) | null;
@@ -29004,9 +29004,9 @@ export interface components {
                 internetProbeUrl: string;
                 probeTimeoutMs: number;
                 /** @enum {string|null|null} */
-                desiredTarget: "wifi" | "carrier" | null;
+                desiredTarget: "default" | "wifi" | "carrier" | null;
                 /** @enum {string|null|null} */
-                actualTarget: "wifi" | "carrier" | null;
+                actualTarget: "default" | "wifi" | "carrier" | null;
                 /** @enum {string} */
                 state: "DISABLED" | "APPLYING" | "RECOVERING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
                 lastTaskId: ((string | null) | null) | null;
@@ -29023,7 +29023,7 @@ export interface components {
         "admin.mobile.network_routing.apply.req": {
             clientId: string;
             /** @enum {string} */
-            internetTarget: "wifi" | "carrier";
+            internetTarget: "default" | "wifi" | "carrier";
         };
         "admin.mobile.network_routing.apply.res": {
             ok: boolean;

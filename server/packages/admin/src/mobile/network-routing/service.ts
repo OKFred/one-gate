@@ -35,7 +35,7 @@ const clientIdSchema = {
 } as const satisfies JSONSchema;
 const targetSchema = {
   type: "string",
-  enum: ["wifi", "carrier"],
+  enum: ["default", "wifi", "carrier"],
 } as const satisfies JSONSchema;
 const getReq = {
   type: "object",

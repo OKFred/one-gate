@@ -4,7 +4,7 @@
 
 - 新能力使用 `device.network.routing.apply` 与 `device.network.routing.disable`，不改变旧 `device.network.switch` 的请求和执行行为。
 - Node Server 是唯一持久分流控制面；PC 接口只代理 Node Server，不提供 MQTT 直连回退。
-- 策略按设备保存。业务内网固定走 Wi-Fi，Internet 出口可选 Wi-Fi 或默认数据卡为 `46011` 的中国电信。
+- 策略按设备保存。业务内网固定走 Wi-Fi，Internet 出口可选 Android 默认、Wi-Fi 或默认数据卡为 `46011` 的中国电信。
 - 分流启用或状态未知时，旧网络切换在服务端与手机端均拒绝执行。
 
 ## 数据与接口
@@ -26,8 +26,8 @@ Termux Node 客户端直接执行结构化白名单动作，不启动 AutoJS，�
 
 1. 从 `dumpsys connectivity`、`ip route` 和 `ip rule` 动态识别接口、netId 与 Android 路由表。
 2. 要求 Wi-Fi、蜂窝均为 `CONNECTED + VALIDATED`，移动数据和 `mobile_data_always_on` 已启用；蜂窝目标额外校验默认数据卡 MCC/MNC 为 `46011`。
-3. 拒绝活动 VPN；先分别绑定 Wi-Fi/目标接口执行探针，失败不修改路由。
-4. 在受管优先级 `10400-10699` 写入显式绑定接口保护、管理直连保护、LAN 到 Wi-Fi 和未绑定 Internet 到目标出口规则，并通过 netd 设置默认 Network。
+3. 拒绝活动 VPN；内网探针绑定 Wi-Fi，Wi-Fi/中国电信出口探针绑定目标接口，`default` 出口探针使用 Android 当前默认链路；失败不修改路由。
+4. 在受管优先级 `10400-10699` 写入显式绑定接口保护、管理直连保护和 LAN 到 Wi-Fi 规则。选择 Wi-Fi/中国电信时再写入未绑定 Internet 到目标出口规则并通过 netd 设置默认 Network；选择 `default` 时不写 Internet 规则、不调用 netd，交由 Android 自动选择出口。
 5. 目标缺少 IPv6 默认路由时写入专用不可达表，阻止从另一个网络回落泄漏。
 6. 重建管理 MQTT 连接，使用未绑定探针验证全设备真实路径；失败恢复先前健康策略或原默认 netId，并将任务保持为失败。
 7. 将成功策略原子写入 `AUTOJS6_SHARED_STATE_DIR/network-routing/state.json`，启动时恢复；`ip monitor link address route` 实时触发去抖后的自愈，每分钟巡检作为兜底。自然断网只标记 `DEGRADED`，不切换出口。
@@ -44,7 +44,9 @@ Termux Node 客户端直接执行结构化白名单动作，不启动 AutoJS，�
 
 ## 页面与 PC 兼容层
 
-设备详情新增“网络分流”页签，可编辑 CIDR、LAN/Internet 探针和超时，选择 Wi-Fi/中国电信，查看期望/实际出口、状态、任务、错误与回滚结果，并通过 MUI Dialog 停用分流。页面只使用 Snackbar/MUI 对话框，无原生 `confirm/alert`。
+设备详情新增“网络分流”页签，可编辑 CIDR、LAN/Internet 探针和超时，选择 Android 默认/Wi-Fi/中国电信，查看期望/实际出口、状态、任务、错误与回滚结果，并通过 MUI Dialog 停用分流。页面只使用 Snackbar/MUI 对话框，无原生 `confirm/alert`。
+
+“保存配置”只在 Node Server 生成新的配置修订，不改变设备当前路由；“应用已保存配置”才递增 generation 并通过 MQTT 派发任务。页面存在未保存修改时禁用应用按钮，避免把旧配置误认为当前编辑内容。选择 `default` 后分流仍为 `ACTIVE`，LAN 规则继续生效且旧 `device.network.switch` 仍互斥；只有“停用并恢复默认路由”会删除全部受管规则。
 
 PC 新增：
 
