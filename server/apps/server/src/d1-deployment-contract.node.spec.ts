@@ -39,6 +39,15 @@ describe("D1 deployment contract", () => {
     expect(webhookMigration).toContain("base_webhook_config");
     expect(webhookMigration).toContain("us_treasury_30y_yield");
     expect(webhookMigration).not.toContain("open-apis/bot/v2/hook/");
+
+    const webhookAccessMigration = readRepositoryFile(
+      "../d1-migrations/0007_webhook_menu_permissions.sql"
+    );
+    expect(webhookAccessMigration).toContain("/admin/base/webhook_config");
+    expect(webhookAccessMigration).toContain("admin.base.webhook_config:read");
+    expect(webhookAccessMigration).toContain(
+      "admin.base.webhook_config:delete"
+    );
   });
 
   it("checks the critical production tables before Worker deployment", () => {

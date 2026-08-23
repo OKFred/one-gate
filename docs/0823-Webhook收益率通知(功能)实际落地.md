@@ -7,6 +7,7 @@
 ### Webhook 配置
 
 - 新增 `base_webhook_config` 模型、全量 DDL、Node 增量迁移和 Wrangler D1 迁移。
+- 生产 D1 使用 `0006_webhook_treasury_notification.sql` 创建表和任务，使用 `0007_webhook_menu_permissions.sql` 补齐动态路由所需菜单及四项权限。
 - 新增 `/admin/base/webhook_config` 管理页与 `list/detail/add/update/delete` 接口。
 - 字段包含 `source`、`url`、`isEnabled`、`isPrimary`、`remark` 及公共审计字段。
 - 列表 URL 脱敏，完整 URL 仅通过需要 `edit` 权限的详情接口返回。
@@ -31,22 +32,23 @@
 
 ## 与计划的差异
 
-- 用户提供的飞书 Webhook URL 未写入源码或迁移，避免进入 Git 历史。目标环境完成部署和迁移后，需通过新管理页写入运行时数据库。
+- 用户提供的飞书 Webhook URL 未写入源码或迁移，避免进入 Git 历史；生产发布后仅通过新管理页写入运行时数据库。
 - 未执行真实飞书消息发送，避免在未确认测试消息内容和接收范围时产生外部通知；使用独立执行器集成测试验证了调用参数和通知正文。
-- 本轮代码已按用户授权提交并推送；未部署、未应用远程 D1 迁移，也未写入真实 Webhook 配置或发送外部消息。
+- 首轮生产发布发现远程 D1 缺少新增菜单与权限，动态路由把页面重定向到 404；新增幂等的 `0007` 迁移并重新发布，保留最新 `dev` 的移动设备运维能力。
 
 ## 验证结果
 
-- 改动前：服务端构建通过；管理端生产构建通过。
-- 改动后：服务端构建通过；管理端生产构建通过。
-- 新增相关测试：5 个测试文件、15 项测试全部通过。
+- 合并到最新 `dev` 后，服务端构建和 Admin、Enterprise、Personal 三套生产构建全部通过。
+- 完整后端 CI：67 个测试文件，360 项通过、3 项跳过。
+- 新增通知与迁移相关测试在合并后为 5 个测试文件、18 项全部通过。
 - 官方财政部实时 XML 验证：成功解析 `2026-08-21` 的 30 年期收益率 `5.27%`。
 - `pnpm run db:generate` 已执行并生成 `base_webhook_config` DDL。
 - 服务端和管理端相关文件 ESLint 通过。
 - Webhook 密钥扫描无匹配，用户提供的 Hook Token 未进入工作区文件。
+- 远程 D1 迁移、结构合约、Worker、系统 Schema 与三套 Pages 均通过生产流水线发布。
 
 ## 已知边界与后续建议
 
-- 生产环境尚未部署新表和接口，因此运行时 Webhook 记录、API Task 和每日 Cron 尚未在生产生效；代码推送本身不改变该边界。
-- 旧的 `api-task.integration.spec.ts` 在独立运行时仍会命中仓库既有的无扩展名 `businessError` 别名解析问题；本次新增通知链路已由独立集成测试覆盖，且服务端构建无新增 TypeScript 报错。
-- 部署后建议先写入 Webhook 配置，再手动执行一次 Cron 或 API Task 进行受控验收；真实测试消息发送前应确认接收群和消息内容。
+- 生产已启用 `us_treasury_30y_yield` API Task 与每天 09:00（上海时间）的 Cron；真实 Webhook 配置只存在于运行时 D1。
+- 未主动发送真实飞书测试消息；下一次定时触发会进行首次真实通知验收。
+- `dist/renrui.sh` 含 Authorization、Cookie 和 JSESSIONID，仍未传入生产；其每 7 天任务需要单独确认凭据传输范围。
