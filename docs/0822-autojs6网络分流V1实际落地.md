@@ -72,4 +72,13 @@ PC 新增：
 - 停用后恢复 Android 默认出口，并确认 IPv4/IPv6 的 `10400-10699` 受管规则全部删除。
 - 故障注入在蜂窝切换完成后强制后置 Internet 探针失败，返回 `NETWORK_ROUTING_ROLLED_BACK`，规则与默认出口均成功恢复。
 
-本次 ADB 管理链路使用 Wi-Fi TCP，而非原计划中的 `bt-pan`；LAN 保护规则使整个切换过程 ADB 保持在线。此次受控测试执行了与手机客户端相同的路由管理器，但尚未通过已发布手机客户端从 Node Server/MQTT 下发，因此 MQTT 任务回传、客户端重启恢复仍需在发布金丝雀版本后完成端到端验收。
+随后通过 GitHub Actions 发布手机客户端 `v2.1.18`，由生产 Gate/Node Server 经 MQTT 部署到 Pixel 5。首次真实应用任务安全地在预检阶段返回 `CARRIER_UNAVAILABLE`，没有写入受管规则。现场对照发现 Android 13 会在最后一个 `NetworkAgentInfo` 后追加包含多种 Transport 的诊断段，旧解析器因此把蜂窝误判为 Wi-Fi。
+
+修复版 `v2.1.19` 完成测试、构建、不可变发布和生产部署后，继续完成端到端验收：
+
+- Gate 应用 Wi-Fi 出口策略后进入 `ACTIVE`，generation 为 13；两个 LAN 探针均返回 3xx，Internet 探针确认有效公网 IPv4，但未输出或持久化具体地址。
+- 客户端保持一个 `ip monitor link address route` 监听进程，生产页面能收到运行状态更新。
+- 通过 USB ADB 暂停蜂窝数据后，状态进入 `DEGRADED / CARRIER_UNAVAILABLE`，实际出口仍为 Wi-Fi，没有自动切换到其他出口。
+- 恢复蜂窝后，页面捕获到 `RECOVERING → ACTIVE`；蜂窝从 netId 117、`rmnet_data1` 漂移到 netId 118、`rmnet_data2`，客户端重新识别接口和路由表并更新持久状态。
+- 恢复后两个 LAN 探针、Internet 探针以及 USB、`bt-pan`、Wi-Fi 三条 ADB 通道均正常，MQTT 任务结果成功回传。
+- 最后由 Gate 使用 MUI 确认对话框停用分流，generation 递增到 14，状态为 `DISABLED`，IPv4/IPv6 受管规则均清理为 0，Android 蜂窝连接保持 `CONNECTED + VALIDATED`。
