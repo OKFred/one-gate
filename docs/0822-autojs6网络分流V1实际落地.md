@@ -30,9 +30,17 @@ Termux Node 客户端直接执行结构化白名单动作，不启动 AutoJS，�
 4. 在受管优先级 `10400-10699` 写入显式绑定接口保护、管理直连保护、LAN 到 Wi-Fi 和未绑定 Internet 到目标出口规则，并通过 netd 设置默认 Network。
 5. 目标缺少 IPv6 默认路由时写入专用不可达表，阻止从另一个网络回落泄漏。
 6. 重建管理 MQTT 连接，使用未绑定探针验证全设备真实路径；失败恢复先前健康策略或原默认 netId，并将任务保持为失败。
-7. 将成功策略原子写入 `AUTOJS6_SHARED_STATE_DIR/network-routing/state.json`，启动时恢复，每分钟检查接口、受管规则和连通性漂移；自然断网只标记本地 `DEGRADED`，不切换出口。
+7. 将成功策略原子写入 `AUTOJS6_SHARED_STATE_DIR/network-routing/state.json`，启动时恢复；`ip monitor link address route` 实时触发去抖后的自愈，每分钟巡检作为兜底。自然断网只标记 `DEGRADED`，不切换出口。
 
 探针结果只回传成功状态、接口名、策略修订和回滚信息；公网 IP 只在进程内校验，不进入任务结果和日志。
+
+## IP 变化自愈与状态上报
+
+- 蜂窝公网 IP 或本机地址变化不会直接使策略失效，规则绑定当前接口和 Android 路由表，不绑定具体 IP。
+- 网络变化时状态先进入 `RECOVERING`，重新识别 Wi-Fi/蜂窝接口、netId 和路由表；规则漂移时重建规则，随后强制重连管理 MQTT，并复验 LAN 与 Internet 出口。
+- 恢复成功回到 `ACTIVE`；目标网络或探针仍不可用时进入 `DEGRADED`，等待下一次网络事件或周期巡检，不自动切换到另一出口。
+- 手机向 `autojs6/v2/devices/{deviceId}/network-routing/status` 发布 QoS 1 retained 状态，同时向 `/admin/mobile/device/report/network-routing` 发送同载荷 HTTPS 回传。生产 Worker 因此不依赖常驻 MQTT 订阅。
+- 服务端只接受与当前设备 generation 精确匹配的状态；旧 retained 消息不会覆盖新策略。状态载荷只包含策略修订、接口名、错误码和验证时间，不包含公网 IP。
 
 ## 页面与 PC 兼容层
 

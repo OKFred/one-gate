@@ -30,6 +30,8 @@ import {
 import { getActiveCredentials } from "./service.js";
 import { getEnv } from "@hodor/core/utils/env";
 import { initializeMobileTaskResultHandlers } from "../mobile/bootstrap.js";
+import { parseNetworkRoutingStatusEvent } from "../mobile/network-routing/domain.js";
+import { processNetworkRoutingStatus } from "../mobile/network-routing/facade.js";
 
 /** 兼容旧订阅者的设备事件结构。 */
 export interface DeviceEventPayload {
@@ -247,6 +249,19 @@ function parseDeviceOpsEvent(value: unknown) {
 async function routeMessage(topic: string, payload: Buffer): Promise<void> {
   const value: unknown = JSON.parse(payload.toString());
   if (
+    topic.startsWith("autojs6/v2/devices/") &&
+    topic.endsWith("/network-routing/status")
+  ) {
+    const event = parseNetworkRoutingStatusEvent(value);
+    if (!event) throw new Error("Invalid network routing status payload");
+    assertTopicDevice(topic, event.deviceId);
+    const updated = await processNetworkRoutingStatus(event);
+    console.log(
+      `[NETWORK_ROUTING] [${await deviceLogLabel(event.deviceId)}] state=${event.state} generation=${event.generation} updated=${updated}`
+    );
+    return;
+  }
+  if (
     topic.startsWith("autojs6/ops/v1/devices/") &&
     topic.endsWith("/events")
   ) {
@@ -341,6 +356,7 @@ export async function startMqttEventListener(): Promise<void> {
         "autojs6/v2/devices/+/info",
         "autojs6/deploy/v1/devices/+/events",
         "autojs6/ops/v1/devices/+/events",
+        "autojs6/v2/devices/+/network-routing/status",
       ];
       mqttClient?.subscribe(topics, { qos: 1 }, (error) => {
         if (error) console.error("[MQTT_LISTENER] Subscribe failed", error);

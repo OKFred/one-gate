@@ -10,6 +10,7 @@ import {
 
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
+  NETWORK_ROUTING_RUNTIME_STATES,
   NETWORK_ROUTING_STATES,
   type NetworkRoutingState,
   type NetworkRoutingTarget,
@@ -103,4 +104,24 @@ export const NetworkRoutingVO = {
   lastVerifiedTimeUtc: nullableNumber,
   createTimeUtc: { type: "integer" },
   updateTimeUtc: nullableNumber,
+} as const satisfies Record<string, JSONSchema>;
+
+/** 设备通过 MQTT/HTTPS 双通道上报的非敏感运行状态。 */
+export const NetworkRoutingStatusReportVO = {
+  protocolVersion: { type: "integer", const: 1 },
+  deviceId: { type: "string", minLength: 1, maxLength: 100 },
+  generation: { type: "integer", minimum: 0 },
+  policyRevision: {
+    type: ["integer", "null"],
+    minimum: 1,
+    nullable: true,
+  },
+  target: targetSchema,
+  state: { type: "string", enum: NETWORK_ROUTING_RUNTIME_STATES },
+  code: { type: "string", minLength: 1, maxLength: 100 },
+  message: { type: "string", maxLength: 500 },
+  timestamp: { type: "integer", minimum: 0 },
+  verifiedAt: nullableNumber,
+  wifiInterface: nullableString,
+  carrierInterface: nullableString,
 } as const satisfies Record<string, JSONSchema>;

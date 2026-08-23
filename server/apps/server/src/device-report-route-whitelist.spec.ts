@@ -19,5 +19,6 @@ describe("mobile device report route whitelist", () => {
     expect(source).toContain('"/admin/mobile/device/report/info"');
     expect(source).toContain('"/admin/mobile/device/report/event"');
     expect(source).toContain('"/admin/mobile/device/report/deployment"');
+    expect(source).toContain('"/admin/mobile/device/report/network-routing"');
   });
 });

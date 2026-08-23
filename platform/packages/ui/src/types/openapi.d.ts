@@ -28973,7 +28973,7 @@ export interface components {
                 /** @enum {string|null|null} */
                 actualTarget: "wifi" | "carrier" | null;
                 /** @enum {string} */
-                state: "DISABLED" | "APPLYING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
+                state: "DISABLED" | "APPLYING" | "RECOVERING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
                 lastTaskId: ((string | null) | null) | null;
                 lastErrorCode: ((string | null) | null) | null;
                 lastResult: (({
@@ -29008,7 +29008,7 @@ export interface components {
                 /** @enum {string|null|null} */
                 actualTarget: "wifi" | "carrier" | null;
                 /** @enum {string} */
-                state: "DISABLED" | "APPLYING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
+                state: "DISABLED" | "APPLYING" | "RECOVERING" | "ACTIVE" | "FAILED" | "ROLLBACK_FAILED" | "DEGRADED";
                 lastTaskId: ((string | null) | null) | null;
                 lastErrorCode: ((string | null) | null) | null;
                 lastResult: (({

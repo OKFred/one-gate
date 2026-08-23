@@ -33,7 +33,7 @@ function lines(value: string): string[] {
 
 function chipColor(state: NetworkRoutingView['state']) {
   if (state === 'ACTIVE') return 'success' as const;
-  if (state === 'APPLYING') return 'info' as const;
+  if (state === 'APPLYING' || state === 'RECOVERING') return 'info' as const;
   if (state === 'FAILED' || state === 'ROLLBACK_FAILED') return 'error' as const;
   if (state === 'DEGRADED') return 'warning' as const;
   return 'default' as const;
@@ -143,6 +143,10 @@ export function NetworkRoutingPanel({ clientId }: Props) {
         <Chip label={`${t('mobile.networkRouting.actual')}: ${routing.actualTarget ?? '-'}`} />
         <Chip label={`r${routing.policyRevision} / g${routing.generation}`} />
       </Stack>
+
+      {routing.state === 'RECOVERING' && (
+        <Alert severity="info">{t('mobile.networkRouting.recovering')}</Alert>
+      )}
 
       {(routing.lastErrorCode || routing.state === 'DEGRADED') && (
         <Alert severity={routing.state === 'DEGRADED' ? 'warning' : 'error'}>

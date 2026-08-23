@@ -5,6 +5,7 @@ import type { DeviceTaskResultPayload } from "../async-task/domain/task.js";
 import {
   DEFAULT_NETWORK_ROUTING_CONFIG,
   type NetworkRoutingConfig,
+  type NetworkRoutingStatusEvent,
   type NetworkRoutingTarget,
 } from "./domain.js";
 import {
@@ -248,6 +249,40 @@ export class NetworkRoutingRepository {
       );
   }
 
+  /** 仅在 generation 精确匹配时更新设备主动上报的运行状态。 */
+  async updateRuntimeStatus(
+    event: NetworkRoutingStatusEvent
+  ): Promise<boolean> {
+    const current = await this.get(event.deviceId);
+    if (!current || current.generation !== event.generation) return false;
+    const healthy = event.state === "ACTIVE" || event.state === "DISABLED";
+    const result = await db
+      .update(mobileNetworkRoutingTable)
+      .set({
+        actualTarget:
+          event.state === "DISABLED"
+            ? null
+            : event.state === "ACTIVE"
+              ? event.target
+              : current.actualTarget || event.target,
+        state: event.state,
+        lastErrorCode: healthy ? null : event.code,
+        lastVerifiedTimeUtc:
+          event.state === "ACTIVE"
+            ? (event.verifiedAt ?? event.timestamp)
+            : current.lastVerifiedTimeUtc,
+        updaterId: 0,
+        updateTimeUtc: Date.now(),
+      })
+      .where(
+        and(
+          eq(mobileNetworkRoutingTable.clientId, event.deviceId),
+          eq(mobileNetworkRoutingTable.generation, event.generation)
+        )
+      );
+    return affected(result);
+  }
+
   async isPersistentRoutingActive(clientId: string): Promise<boolean> {
     const [row] = await db
       .select({ id: mobileNetworkRoutingTable.id })
@@ -258,6 +293,7 @@ export class NetworkRoutingRepository {
           or(
             sql`${mobileNetworkRoutingTable.actualTarget} is not null`,
             eq(mobileNetworkRoutingTable.state, "APPLYING"),
+            eq(mobileNetworkRoutingTable.state, "RECOVERING"),
             eq(mobileNetworkRoutingTable.state, "DEGRADED"),
             eq(mobileNetworkRoutingTable.state, "ROLLBACK_FAILED")
           )

@@ -115,6 +115,8 @@ export const mobile = {
   'mobile.networkRouting.disableConfirm':
     'Managed policy routes will be removed and Android default routing restored. Legacy network switching is available only after this step.',
   'mobile.networkRouting.disableAccepted': 'Disable task accepted',
+  'mobile.networkRouting.recovering':
+    'A network change was detected. Routes and the management connection are being verified.',
 
   // App Management
   'mobile.app.title': 'App Management',

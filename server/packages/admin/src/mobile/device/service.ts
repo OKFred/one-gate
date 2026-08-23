@@ -37,6 +37,9 @@ import {
 } from "../client-deployment/domain/deployment.js";
 import { processIncomingDeploymentEvent } from "../client-deployment/facade.js";
 import { ClientDeploymentReportVO } from "../client-deployment/model.js";
+import { parseNetworkRoutingStatusEvent } from "../network-routing/domain.js";
+import { processNetworkRoutingStatus } from "../network-routing/facade.js";
+import { NetworkRoutingStatusReportVO } from "../network-routing/model.js";
 import { DeviceApplicationError } from "./application/error.js";
 import { adaptDeviceHttpError } from "./interfaces/http/error.js";
 import { reportTokenFromContext } from "./interfaces/http/report-token.js";
@@ -305,6 +308,12 @@ const deploymentReportReq = {
   required: Object.keys(ClientDeploymentReportVO),
   additionalProperties: false,
 } as const satisfies JSONSchema;
+const networkRoutingStatusReportReq = {
+  type: "object",
+  properties: NetworkRoutingStatusReportVO,
+  required: Object.keys(NetworkRoutingStatusReportVO),
+  additionalProperties: false,
+} as const satisfies JSONSchema;
 const acceptedRes = {
   type: "object",
   properties: {
@@ -394,6 +403,29 @@ const reportDeploymentApi = {
     }),
   permission: false,
 } satisfies API;
+const reportNetworkRoutingApi = {
+  req: networkRoutingStatusReportReq,
+  res: acceptedRes,
+  pathInfo: {
+    path: "/report/network-routing",
+    method: "post",
+    summary: "设备网络分流运行状态上报",
+  },
+  adapter: rawAdapter,
+  service: (context: Context) =>
+    adaptDeviceHttpError(async () => {
+      const event = parseNetworkRoutingStatusEvent(context.get("bodyObj"));
+      if (!event)
+        throw new DeviceApplicationError("Invalid network routing status");
+      await verifyDeviceReportToken(
+        event.deviceId,
+        reportTokenFromContext(context)
+      );
+      const updated = await processNetworkRoutingStatus(event);
+      return { accepted: true, duplicate: !updated };
+    }),
+  permission: false,
+} satisfies API;
 
 export default {
   list: listApi,
@@ -409,4 +441,5 @@ export default {
   reportInfo: reportInfoApi,
   reportEvent: reportEventApi,
   reportDeployment: reportDeploymentApi,
+  reportNetworkRouting: reportNetworkRoutingApi,
 };

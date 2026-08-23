@@ -109,6 +109,7 @@ export const mobile = {
   'mobile.networkRouting.disableConfirm':
     '将删除受管策略路由并恢复 Android 默认路由。停用后才可使用旧网络切换功能。',
   'mobile.networkRouting.disableAccepted': '停用任务已受理',
+  'mobile.networkRouting.recovering': '检测到网络变化，正在重新校验路由并恢复管理连接。',
 
   // App Management
   'mobile.app.title': '应用管理',

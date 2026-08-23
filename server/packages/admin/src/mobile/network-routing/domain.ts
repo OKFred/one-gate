@@ -3,6 +3,7 @@ import { isIP } from "node:net";
 export const NETWORK_ROUTING_STATES = [
   "DISABLED",
   "APPLYING",
+  "RECOVERING",
   "ACTIVE",
   "FAILED",
   "ROLLBACK_FAILED",
@@ -10,6 +11,112 @@ export const NETWORK_ROUTING_STATES = [
 ] as const;
 export type NetworkRoutingState = (typeof NETWORK_ROUTING_STATES)[number];
 export type NetworkRoutingTarget = "wifi" | "carrier";
+export const NETWORK_ROUTING_RUNTIME_STATES = [
+  "DISABLED",
+  "RECOVERING",
+  "ACTIVE",
+  "DEGRADED",
+] as const;
+export type NetworkRoutingRuntimeState =
+  (typeof NETWORK_ROUTING_RUNTIME_STATES)[number];
+
+export interface NetworkRoutingStatusEvent {
+  protocolVersion: 1;
+  deviceId: string;
+  generation: number;
+  policyRevision: number | null;
+  target: NetworkRoutingTarget | null;
+  state: NetworkRoutingRuntimeState;
+  code: string;
+  message: string;
+  timestamp: number;
+  verifiedAt: number | null;
+  wifiInterface: string | null;
+  carrierInterface: string | null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** 严格解析手机客户端 retained 网络分流状态，不接收公网 IP 等额外字段。 */
+export function parseNetworkRoutingStatusEvent(
+  value: unknown
+): NetworkRoutingStatusEvent | null {
+  if (!isRecord(value) || value.protocolVersion !== 1) return null;
+  const allowedKeys = new Set([
+    "protocolVersion",
+    "deviceId",
+    "generation",
+    "policyRevision",
+    "target",
+    "state",
+    "code",
+    "message",
+    "timestamp",
+    "verifiedAt",
+    "wifiInterface",
+    "carrierInterface",
+  ]);
+  if (Object.keys(value).some((key) => !allowedKeys.has(key))) return null;
+  const state = value.state;
+  const target = value.target;
+  const policyRevision = value.policyRevision;
+  const verifiedAt = value.verifiedAt;
+  const interfacePattern = /^[A-Za-z0-9_.:@-]{1,32}$/;
+  const nullableInterface = (input: unknown) =>
+    input === null ||
+    (typeof input === "string" && interfacePattern.test(input));
+  if (
+    typeof value.deviceId !== "string" ||
+    value.deviceId.length < 1 ||
+    value.deviceId.length > 100 ||
+    !Number.isInteger(value.generation) ||
+    Number(value.generation) < 0 ||
+    !NETWORK_ROUTING_RUNTIME_STATES.includes(
+      state as NetworkRoutingRuntimeState
+    ) ||
+    (target !== null && target !== "wifi" && target !== "carrier") ||
+    (policyRevision !== null &&
+      (!Number.isInteger(policyRevision) || Number(policyRevision) < 1)) ||
+    typeof value.code !== "string" ||
+    value.code.length < 1 ||
+    value.code.length > 100 ||
+    typeof value.message !== "string" ||
+    value.message.length > 500 ||
+    typeof value.timestamp !== "number" ||
+    !Number.isFinite(value.timestamp) ||
+    (verifiedAt !== null &&
+      (typeof verifiedAt !== "number" || !Number.isFinite(verifiedAt))) ||
+    !nullableInterface(value.wifiInterface) ||
+    !nullableInterface(value.carrierInterface)
+  ) {
+    return null;
+  }
+  if (
+    (state === "DISABLED" && (target !== null || policyRevision !== null)) ||
+    (state !== "DISABLED" &&
+      (target === null || !Number.isInteger(policyRevision)))
+  ) {
+    return null;
+  }
+  return {
+    protocolVersion: 1,
+    deviceId: value.deviceId,
+    generation: Number(value.generation),
+    policyRevision: policyRevision === null ? null : Number(policyRevision),
+    target: target as NetworkRoutingTarget | null,
+    state: state as NetworkRoutingRuntimeState,
+    code: value.code,
+    message: value.message,
+    timestamp: value.timestamp,
+    verifiedAt: verifiedAt === null ? null : Number(verifiedAt),
+    wifiInterface:
+      value.wifiInterface === null ? null : String(value.wifiInterface),
+    carrierInterface:
+      value.carrierInterface === null ? null : String(value.carrierInterface),
+  };
+}
 
 export const DEFAULT_NETWORK_ROUTING_CONFIG = {
   lanCidrs: ["192.168.0.0/16"],

@@ -4,6 +4,7 @@ export type NetworkRoutingTarget = 'wifi' | 'carrier';
 export type NetworkRoutingState =
   | 'DISABLED'
   | 'APPLYING'
+  | 'RECOVERING'
   | 'ACTIVE'
   | 'FAILED'
   | 'ROLLBACK_FAILED'
