@@ -17,6 +17,14 @@ export { MobileOpsSession } from "./mobile-ops-session.js";
 
 let app: ReturnType<typeof createApp> | null = null;
 
+/** Initialize the application-wide service registry once per Worker isolate. */
+function getApp(): ReturnType<typeof createApp> {
+  if (!app) {
+    app = createApp();
+  }
+  return app;
+}
+
 /** Handle the dedicated device-operations WebSocket upgrade route. */
 async function handleMobileOpsUpgrade(
   request: Request,
@@ -105,13 +113,8 @@ export default {
     const opsResponse = await handleMobileOpsUpgrade(request, env);
     if (opsResponse) return opsResponse;
 
-    // 3. 将应用实例初始化为单例
-    if (!app) {
-      app = createApp();
-    }
-
-    // 4. 通过 Hono 处理请求
-    return app.fetch(request, env, ctx);
+    // 3. 初始化应用及跨领域服务注册中心，并通过 Hono 处理请求
+    return getApp().fetch(request, env, ctx);
   },
 
   /**
@@ -133,7 +136,10 @@ export default {
     // 2. 全局设置环境变量
     setEnv(env);
 
-    // 3. 执行待处理的定时任务
+    // 3. scheduled 事件可能先于 fetch 到达，需先初始化跨领域服务注册中心
+    getApp();
+
+    // 4. 执行待处理的定时任务
     ctx.waitUntil(
       Promise.all([
         runPendingJobs(),
