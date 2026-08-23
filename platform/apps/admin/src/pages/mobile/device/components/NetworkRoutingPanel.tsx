@@ -148,15 +148,16 @@ export function NetworkRoutingPanel({ clientId }: Props) {
         <Alert severity="info">{t('mobile.networkRouting.recovering')}</Alert>
       )}
 
-      {(routing.lastErrorCode || routing.state === 'DEGRADED') && (
-        <Alert severity={routing.state === 'DEGRADED' ? 'warning' : 'error'}>
-          {routing.lastErrorCode ?? 'DEGRADED'}
-          {failureStage && <Box component="span"> · stage: {failureStage}</Box>}
-          {rollbackResult !== null && (
-            <Box component="span"> · rollback: {JSON.stringify(rollbackResult)}</Box>
-          )}
-        </Alert>
-      )}
+      {routing.state !== 'RECOVERING' &&
+        (routing.lastErrorCode || routing.state === 'DEGRADED') && (
+          <Alert severity={routing.state === 'DEGRADED' ? 'warning' : 'error'}>
+            {routing.lastErrorCode ?? 'DEGRADED'}
+            {failureStage && <Box component="span"> · stage: {failureStage}</Box>}
+            {rollbackResult !== null && (
+              <Box component="span"> · rollback: {JSON.stringify(rollbackResult)}</Box>
+            )}
+          </Alert>
+        )}
 
       <TextField
         label={t('mobile.networkRouting.cidrs')}
