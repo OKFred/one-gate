@@ -44,6 +44,8 @@ function json(data: unknown, status = 200): Response {
 
 /** Per-session WebSocket coordinator with hibernation support. */
 export class MobileOpsSession implements DurableObject {
+  private messageTail: Promise<void> = Promise.resolve();
+
   /** Create a session Durable Object. */
   constructor(
     private readonly state: DurableObjectState,
@@ -217,8 +219,20 @@ export class MobileOpsSession implements DurableObject {
     });
   }
 
-  /** Relay and audit a structured WebSocket frame. */
-  async webSocketMessage(
+  /** Preserve device frame order while asynchronous audit writes are in flight. */
+  webSocketMessage(
+    socket: WebSocket,
+    message: string | ArrayBuffer
+  ): Promise<void> {
+    const next = this.messageTail.then(() =>
+      this.relayWebSocketMessage(socket, message)
+    );
+    this.messageTail = next.catch(() => undefined);
+    return next;
+  }
+
+  /** Relay and audit one structured WebSocket frame. */
+  private async relayWebSocketMessage(
     socket: WebSocket,
     message: string | ArrayBuffer
   ): Promise<void> {

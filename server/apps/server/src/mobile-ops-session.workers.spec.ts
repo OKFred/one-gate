@@ -24,25 +24,25 @@ function nextMessage(socket: WebSocket): Promise<Record<string, unknown>> {
   });
 }
 
-/** Wait for the next binary message from a WebSocket. */
-function nextBinaryMessage(socket: WebSocket): Promise<ArrayBuffer> {
+/** Wait for an ordered sequence of WebSocket frames. */
+function nextFrames(
+  socket: WebSocket,
+  count: number
+): Promise<Array<string | ArrayBuffer>> {
   return new Promise((resolve, reject) => {
+    const frames: Array<string | ArrayBuffer> = [];
     const timer = setTimeout(
-      () => reject(new Error("WebSocket binary message timeout")),
+      () => reject(new Error("WebSocket frame sequence timeout")),
       2000
     );
-    socket.addEventListener(
-      "message",
-      (event) => {
-        clearTimeout(timer);
-        if (typeof event.data === "string") {
-          reject(new Error("Expected a binary WebSocket message"));
-          return;
-        }
-        resolve(event.data);
-      },
-      { once: true }
-    );
+    const receive = (event: MessageEvent<string | ArrayBuffer>) => {
+      frames.push(event.data);
+      if (frames.length < count) return;
+      clearTimeout(timer);
+      socket.removeEventListener("message", receive);
+      resolve(frames);
+    };
+    socket.addEventListener("message", receive);
   });
 }
 
@@ -285,14 +285,6 @@ describe("MobileOpsSession Durable Object", () => {
       operation: "device.screen.capture",
     });
 
-    const frame = screenshotFrame(request);
-    const browserArtifact = nextBinaryMessage(operator);
-    device.send(frame);
-    await expect(browserArtifact).resolves.toHaveProperty(
-      "byteLength",
-      frame.byteLength
-    );
-
     const response = {
       protocolVersion: 1,
       type: "response",
@@ -315,10 +307,17 @@ describe("MobileOpsSession Durable Object", () => {
       finishedAt: createdAt + 1,
       durationMs: 1,
     };
+    const frame = screenshotFrame(request);
     const responseText = JSON.stringify(response);
-    const browserResponse = nextMessage(operator);
+    const browserFrames = nextFrames(operator, 2);
+    // The phone intentionally sends these back-to-back. Audit I/O must not let
+    // the terminal JSON overtake and invalidate the preceding binary artifact.
+    device.send(frame);
     device.send(responseText);
-    await expect(browserResponse).resolves.toMatchObject({
+    const [browserArtifact, browserResponse] = await browserFrames;
+    expect(browserArtifact).not.toBeTypeOf("string");
+    expect((browserArtifact as ArrayBuffer).byteLength).toBe(frame.byteLength);
+    expect(JSON.parse(String(browserResponse))).toMatchObject({
       status: "SUCCESS",
     });
 
