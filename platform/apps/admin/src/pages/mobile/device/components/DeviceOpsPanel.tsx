@@ -123,6 +123,8 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
   const screenshotUrlRef = useRef<string | null>(null);
   const screenshotRequestRef = useRef<string | null>(null);
   const pendingArtifactRef = useRef<PendingScreenshotArtifact | null>(null);
+  const pendingScreenshotResponseRef = useRef<Record<string, unknown> | null>(null);
+  const screenshotTimeoutRef = useRef<number | null>(null);
   const [ticket, setTicket] = useState<DeviceOpsTicket | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('DISCONNECTED');
   const [operations, setOperations] = useState<string[] | null>(null);
@@ -137,9 +139,14 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
 
   /** Release the current in-browser screenshot without server persistence. */
   const clearScreenshot = useCallback(() => {
+    if (screenshotTimeoutRef.current !== null) {
+      window.clearTimeout(screenshotTimeoutRef.current);
+      screenshotTimeoutRef.current = null;
+    }
     if (screenshotUrlRef.current) URL.revokeObjectURL(screenshotUrlRef.current);
     screenshotUrlRef.current = null;
     pendingArtifactRef.current = null;
+    pendingScreenshotResponseRef.current = null;
     screenshotRequestRef.current = null;
     setScreenshotPending(false);
     setScreenshot(null);
@@ -153,7 +160,12 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
       if (screenshotUrlRef.current) URL.revokeObjectURL(screenshotUrlRef.current);
       screenshotUrlRef.current = null;
       pendingArtifactRef.current = null;
+      pendingScreenshotResponseRef.current = null;
       screenshotRequestRef.current = null;
+      if (screenshotTimeoutRef.current !== null) {
+        window.clearTimeout(screenshotTimeoutRef.current);
+        screenshotTimeoutRef.current = null;
+      }
     },
     [],
   );
@@ -186,7 +198,12 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
 
   /** Clear an active screenshot request and show a consistent failure Snackbar. */
   const failScreenshot = (message: string) => {
+    if (screenshotTimeoutRef.current !== null) {
+      window.clearTimeout(screenshotTimeoutRef.current);
+      screenshotTimeoutRef.current = null;
+    }
     pendingArtifactRef.current = null;
+    pendingScreenshotResponseRef.current = null;
     screenshotRequestRef.current = null;
     setScreenshotPending(false);
     showSnackbar({ message, type: 'error' });
@@ -202,8 +219,13 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
       );
       return;
     }
+    pendingScreenshotResponseRef.current = frame;
     const artifact = pendingArtifactRef.current;
-    if (!artifact || !screenshotResultMatches(frame.data, artifact)) {
+    // The Durable Object audits the binary frame and terminal JSON separately,
+    // so either frame can reach the browser first. Keep the successful response
+    // until the matching ephemeral artifact arrives within the request window.
+    if (!artifact) return;
+    if (!screenshotResultMatches(frame.data, artifact)) {
       failScreenshot(t('mobile.device.ops.screenshotInvalid'));
       return;
     }
@@ -231,7 +253,12 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
     if (screenshotUrlRef.current) URL.revokeObjectURL(screenshotUrlRef.current);
     screenshotUrlRef.current = url;
     setScreenshot({ ...artifact.header, url });
+    if (screenshotTimeoutRef.current !== null) {
+      window.clearTimeout(screenshotTimeoutRef.current);
+      screenshotTimeoutRef.current = null;
+    }
     pendingArtifactRef.current = null;
+    pendingScreenshotResponseRef.current = null;
     screenshotRequestRef.current = null;
     setScreenshotPending(false);
     showSnackbar({ message: t('mobile.device.ops.screenshotReady'), type: 'success' });
@@ -248,6 +275,8 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
         }
         pendingArtifactRef.current = artifact;
         setLastResult({ ...artifact.header, content: '[ephemeral binary]' });
+        const pendingResponse = pendingScreenshotResponseRef.current;
+        if (pendingResponse) await finishScreenshot(pendingResponse);
       } catch {
         failScreenshot(t('mobile.device.ops.screenshotInvalid'));
       }
@@ -269,7 +298,12 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
   /** Connect the browser side of a short-lived operations session. */
   const connect = (next: DeviceOpsTicket) => {
     socketRef.current?.close();
+    if (screenshotTimeoutRef.current !== null) {
+      window.clearTimeout(screenshotTimeoutRef.current);
+      screenshotTimeoutRef.current = null;
+    }
     pendingArtifactRef.current = null;
+    pendingScreenshotResponseRef.current = null;
     screenshotRequestRef.current = null;
     setScreenshotPending(false);
     setStatus('CONNECTING');
@@ -292,7 +326,12 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
       if (socketRef.current !== socket) return;
       setStatus('DISCONNECTED');
       pendingArtifactRef.current = null;
+      pendingScreenshotResponseRef.current = null;
       screenshotRequestRef.current = null;
+      if (screenshotTimeoutRef.current !== null) {
+        window.clearTimeout(screenshotTimeoutRef.current);
+        screenshotTimeoutRef.current = null;
+      }
       setScreenshotPending(false);
     };
   };
@@ -343,10 +382,16 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
   const captureScreenshot = () => {
     if (screenshotPending) return;
     pendingArtifactRef.current = null;
+    pendingScreenshotResponseRef.current = null;
     const requestId = execute('device.screen.capture');
     if (!requestId) return;
     screenshotRequestRef.current = requestId;
     setScreenshotPending(true);
+    screenshotTimeoutRef.current = window.setTimeout(() => {
+      if (screenshotRequestRef.current === requestId) {
+        failScreenshot(t('mobile.device.ops.screenshotFailed'));
+      }
+    }, 15_500);
   };
 
   /** Download the already verified browser-memory screenshot. */
