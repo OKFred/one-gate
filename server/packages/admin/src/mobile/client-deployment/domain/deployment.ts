@@ -208,6 +208,43 @@ const DEPLOYMENT_PHASE_RANK: Partial<Record<ClientDeploymentPhase, number>> = {
   VERIFYING: 4,
 };
 
+/** 判断阶段是否属于当前切换模式的合法执行分支。 */
+function phaseMatchesActivationMode(
+  phase: ClientDeploymentPhase,
+  activationMode: ClientDeploymentActivationMode
+): boolean {
+  if (phase === "DRAINING") return activationMode === "GRACEFUL";
+  if (phase === "PREEMPTING") return activationMode === "FORCE";
+  return true;
+}
+
+/**
+ * 判断同一部署的晚到事件是否已被服务端当前阶段覆盖。
+ *
+ * MQTT 与 HTTPS 会并行上报同一阶段，较慢通道可能在服务端已经推进后才到达。
+ * 仅合法执行分支中的较早非终态可作为幂等重复；冲突终态和错误分支仍拒绝。
+ */
+export function isStaleDeploymentPhase(
+  current: ClientDeploymentPhase,
+  incoming: ClientDeploymentPhase,
+  activationMode: ClientDeploymentActivationMode
+): boolean {
+  if (
+    isTerminalDeploymentPhase(incoming) ||
+    !phaseMatchesActivationMode(incoming, activationMode)
+  ) {
+    return false;
+  }
+  if (isTerminalDeploymentPhase(current)) return true;
+  const currentRank = DEPLOYMENT_PHASE_RANK[current];
+  const incomingRank = DEPLOYMENT_PHASE_RANK[incoming];
+  return (
+    currentRank !== undefined &&
+    incomingRank !== undefined &&
+    incomingRank < currentRank
+  );
+}
+
 /** 确认设备事件可推进当前部署状态。 */
 export function canApplyDeploymentEvent(
   current: ClientDeploymentPhase,

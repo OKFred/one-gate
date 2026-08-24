@@ -77,6 +77,33 @@ describe("client deployment event facade", () => {
     expect(apply).not.toHaveBeenCalled();
   });
 
+  it("treats a late valid-path event as an idempotent duplicate", async () => {
+    vi.spyOn(clientDeploymentRepository, "getDeployment").mockResolvedValue({
+      ...current,
+      phase: "SUCCEEDED",
+    });
+    const apply = vi.spyOn(clientDeploymentRepository, "applyDeploymentEvent");
+
+    await expect(processIncomingDeploymentEvent(event)).resolves.toBe(
+      "DUPLICATE"
+    );
+    expect(apply).not.toHaveBeenCalled();
+  });
+
+  it("rejects conflicting terminal events and invalid activation branches", async () => {
+    const get = vi.spyOn(clientDeploymentRepository, "getDeployment");
+    get
+      .mockResolvedValueOnce({ ...current, phase: "SUCCEEDED" })
+      .mockResolvedValueOnce({ ...current, phase: "ACTIVATING" });
+
+    await expect(
+      processIncomingDeploymentEvent({ ...event, phase: "FAILED" })
+    ).resolves.toBe("REJECTED");
+    await expect(
+      processIncomingDeploymentEvent({ ...event, phase: "PREEMPTING" })
+    ).resolves.toBe("REJECTED");
+  });
+
   it("rejects unknown deployments and identity mismatches", async () => {
     const get = vi.spyOn(clientDeploymentRepository, "getDeployment");
     get.mockResolvedValueOnce(undefined).mockResolvedValueOnce(current);

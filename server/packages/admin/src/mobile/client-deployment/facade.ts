@@ -1,5 +1,6 @@
 import {
   canApplyDeploymentEvent,
+  isStaleDeploymentPhase,
   type DeviceDeploymentEvent,
 } from "./domain/deployment.js";
 import { clientDeploymentRepository } from "./repository.js";
@@ -22,6 +23,11 @@ export async function processIncomingDeploymentEvent(
     current.environmentRevision === event.environmentRevision;
   if (!identityMatches) return "REJECTED";
   if (current.phase === event.phase) return "DUPLICATE";
+  if (
+    isStaleDeploymentPhase(current.phase, event.phase, current.activationMode)
+  ) {
+    return "DUPLICATE";
+  }
   if (
     !canApplyDeploymentEvent(current.phase, event, {
       deploymentId: current.deploymentId,

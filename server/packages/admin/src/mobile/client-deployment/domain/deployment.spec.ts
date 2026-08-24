@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   assertEnvironmentConfig,
   canApplyDeploymentEvent,
+  isStaleDeploymentPhase,
   normalizeRequiredSecretKeys,
   parseDeviceDeploymentEvent,
 } from "./deployment.js";
@@ -88,5 +89,20 @@ describe("client deployment domain", () => {
         environmentRevision: event.environmentRevision,
       })
     ).toBe(false);
+  });
+
+  it("classifies only covered phases from the valid activation branch as stale", () => {
+    expect(isStaleDeploymentPhase("VERIFYING", "DRAINING", "GRACEFUL")).toBe(
+      true
+    );
+    expect(isStaleDeploymentPhase("VERIFYING", "PREEMPTING", "GRACEFUL")).toBe(
+      false
+    );
+    expect(isStaleDeploymentPhase("SUCCEEDED", "VERIFYING", "GRACEFUL")).toBe(
+      true
+    );
+    expect(isStaleDeploymentPhase("SUCCEEDED", "FAILED", "GRACEFUL")).toBe(
+      false
+    );
   });
 });
