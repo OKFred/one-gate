@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import dayjs from 'dayjs';
 import {
   Alert,
   Box,
   Chip,
+  CircularProgress,
   Divider,
   MenuItem,
   Select,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 
@@ -22,8 +25,14 @@ import {
 } from '@/api/admin/mobile/device-ops';
 import { showConfirm, showSnackbar } from '@/components/Notification';
 import { ResponsiveButton } from '@/components/Responsive';
+import { useTranslation } from '@/hooks/useTranslation';
 
 import { THIS_PERMISSION } from '../constant';
+import {
+  parseDeviceOpsArtifactFrame,
+  sha256Hex,
+  type DeviceOpsArtifactHeader,
+} from './device-ops-artifact';
 
 const AUDIO_STREAMS = [
   'media',
@@ -43,11 +52,82 @@ interface DeviceOpsPanelProps {
   clientId: string;
 }
 
+interface PendingScreenshotArtifact {
+  header: DeviceOpsArtifactHeader;
+  content: Uint8Array;
+}
+
+interface ScreenshotPreview extends DeviceOpsArtifactHeader {
+  url: string;
+}
+
+/** Parse an untrusted JSON value as a record. */
+function record(value: unknown): Record<string, unknown> | null {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+/** Read the fixed operation list from a capabilities payload. */
+function capabilityOperations(value: unknown): string[] | null {
+  const capabilities = record(value);
+  if (!capabilities) return null;
+  if (!Array.isArray(capabilities.operations)) return [];
+  return capabilities.operations.filter((item): item is string => typeof item === 'string');
+}
+
+/** Send one bounded structured operation request and return its identifier. */
+function sendOperation(
+  socket: WebSocket,
+  ticket: DeviceOpsTicket,
+  operation: string,
+  params: Record<string, unknown> = {},
+): string {
+  const createdAt = Date.now();
+  const requestId = `req_${crypto.randomUUID().replaceAll('-', '')}`;
+  socket.send(
+    JSON.stringify({
+      protocolVersion: 1,
+      type: 'request',
+      sessionId: ticket.sessionId,
+      requestId,
+      operation,
+      params,
+      createdAt,
+      expiresAt: createdAt + 15_000,
+    }),
+  );
+  return requestId;
+}
+
+/** Verify that terminal screenshot metadata matches the preceding binary frame. */
+function screenshotResultMatches(value: unknown, artifact: PendingScreenshotArtifact): boolean {
+  const result = record(value);
+  return Boolean(
+    result &&
+    result.artifactId === artifact.header.artifactId &&
+    result.mimeType === artifact.header.mimeType &&
+    result.sizeBytes === artifact.header.sizeBytes &&
+    result.sha256 === artifact.header.sha256 &&
+    result.width === artifact.header.width &&
+    result.height === artifact.header.height &&
+    result.capturedAt === artifact.header.capturedAt,
+  );
+}
+
 /** Short-lived structured WSS device operations panel. */
 export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
+  const t = useTranslation();
   const socketRef = useRef<WebSocket | null>(null);
+  const ticketRef = useRef<DeviceOpsTicket | null>(null);
+  const screenshotUrlRef = useRef<string | null>(null);
+  const screenshotRequestRef = useRef<string | null>(null);
+  const pendingArtifactRef = useRef<PendingScreenshotArtifact | null>(null);
   const [ticket, setTicket] = useState<DeviceOpsTicket | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('DISCONNECTED');
+  const [operations, setOperations] = useState<string[] | null>(null);
+  const [screenshotPending, setScreenshotPending] = useState(false);
+  const [screenshot, setScreenshot] = useState<ScreenshotPreview | null>(null);
   const [stream, setStream] = useState<(typeof AUDIO_STREAMS)[number]>('media');
   const [level, setLevel] = useState('5');
   const [rootId, setRootId] = useState('shared-download');
@@ -55,76 +135,232 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
   const [lastResult, setLastResult] = useState<unknown>(null);
   const [audits, setAudits] = useState<DeviceOpsAudit[]>([]);
 
+  /** Release the current in-browser screenshot without server persistence. */
+  const clearScreenshot = useCallback(() => {
+    if (screenshotUrlRef.current) URL.revokeObjectURL(screenshotUrlRef.current);
+    screenshotUrlRef.current = null;
+    pendingArtifactRef.current = null;
+    screenshotRequestRef.current = null;
+    setScreenshotPending(false);
+    setScreenshot(null);
+  }, []);
+
   useEffect(
     () => () => {
       socketRef.current?.close();
       socketRef.current = null;
+      ticketRef.current = null;
+      if (screenshotUrlRef.current) URL.revokeObjectURL(screenshotUrlRef.current);
+      screenshotUrlRef.current = null;
+      pendingArtifactRef.current = null;
+      screenshotRequestRef.current = null;
     },
     [],
   );
 
-  const connect = (next: DeviceOpsTicket) => {
+  useEffect(() => {
+    const staleTicket = ticketRef.current;
+    if (staleTicket) void closeDeviceOpsSession(staleTicket.sessionId).catch(() => undefined);
     socketRef.current?.close();
-    setStatus('CONNECTING');
-    const socket = new WebSocket(next.wsUrl, ['autojs6-ops-v1', `ticket.${next.operatorTicket}`]);
-    socketRef.current = socket;
-    socket.onopen = () => setStatus('CONNECTED');
-    socket.onmessage = (event) => {
-      try {
-        setLastResult(JSON.parse(String(event.data)) as unknown);
-      } catch {
-        setLastResult({ code: 'OPS_FRAME_INVALID' });
-      }
-    };
-    socket.onerror = () => setStatus('DISCONNECTED');
-    socket.onclose = () => setStatus('DISCONNECTED');
+    socketRef.current = null;
+    ticketRef.current = null;
+    setTicket(null);
+    setStatus('DISCONNECTED');
+    setOperations(null);
+    clearScreenshot();
+  }, [clientId, clearScreenshot]);
+
+  /** Apply capabilities from hello or the explicit capabilities response. */
+  const updateCapabilities = (frame: Record<string, unknown>) => {
+    const capabilities =
+      frame.type === 'hello'
+        ? frame.capabilities
+        : frame.type === 'response' &&
+            frame.operation === 'device.ops.capabilities' &&
+            frame.status === 'SUCCESS'
+          ? frame.data
+          : null;
+    const nextOperations = capabilityOperations(capabilities);
+    if (nextOperations !== null) setOperations(nextOperations);
   };
 
+  /** Clear an active screenshot request and show a consistent failure Snackbar. */
+  const failScreenshot = (message: string) => {
+    pendingArtifactRef.current = null;
+    screenshotRequestRef.current = null;
+    setScreenshotPending(false);
+    showSnackbar({ message, type: 'error' });
+  };
+
+  /** Finalize a screenshot only after metadata and digest verification. */
+  const finishScreenshot = async (frame: Record<string, unknown>) => {
+    const requestId = typeof frame.requestId === 'string' ? frame.requestId : '';
+    if (requestId !== screenshotRequestRef.current) return;
+    if (frame.status !== 'SUCCESS') {
+      failScreenshot(
+        typeof frame.message === 'string' ? frame.message : t('mobile.device.ops.screenshotFailed'),
+      );
+      return;
+    }
+    const artifact = pendingArtifactRef.current;
+    if (!artifact || !screenshotResultMatches(frame.data, artifact)) {
+      failScreenshot(t('mobile.device.ops.screenshotInvalid'));
+      return;
+    }
+    let digest: string;
+    try {
+      digest = await sha256Hex(artifact.content);
+    } catch {
+      failScreenshot(t('mobile.device.ops.screenshotInvalid'));
+      return;
+    }
+    if (requestId !== screenshotRequestRef.current) return;
+    if (digest !== artifact.header.sha256) {
+      failScreenshot(t('mobile.device.ops.screenshotInvalid'));
+      return;
+    }
+    let url: string;
+    try {
+      url = URL.createObjectURL(
+        new Blob([Uint8Array.from(artifact.content).buffer], { type: artifact.header.mimeType }),
+      );
+    } catch {
+      failScreenshot(t('mobile.device.ops.screenshotInvalid'));
+      return;
+    }
+    if (screenshotUrlRef.current) URL.revokeObjectURL(screenshotUrlRef.current);
+    screenshotUrlRef.current = url;
+    setScreenshot({ ...artifact.header, url });
+    pendingArtifactRef.current = null;
+    screenshotRequestRef.current = null;
+    setScreenshotPending(false);
+    showSnackbar({ message: t('mobile.device.ops.screenshotReady'), type: 'success' });
+  };
+
+  /** Handle one text or binary frame from the operations channel. */
+  const handleSocketMessage = async (data: unknown, currentTicket: DeviceOpsTicket) => {
+    if (data instanceof ArrayBuffer || data instanceof Blob) {
+      try {
+        const frame = data instanceof Blob ? await data.arrayBuffer() : data;
+        const artifact = parseDeviceOpsArtifactFrame(frame, currentTicket.sessionId);
+        if (artifact.header.requestId !== screenshotRequestRef.current) {
+          throw new Error('OPS_ARTIFACT_NOT_EXPECTED');
+        }
+        pendingArtifactRef.current = artifact;
+        setLastResult({ ...artifact.header, content: '[ephemeral binary]' });
+      } catch {
+        failScreenshot(t('mobile.device.ops.screenshotInvalid'));
+      }
+      return;
+    }
+    try {
+      const frame = record(JSON.parse(String(data)));
+      if (!frame) throw new Error('OPS_FRAME_INVALID');
+      updateCapabilities(frame);
+      setLastResult(frame);
+      if (frame.type === 'response' && frame.operation === 'device.screen.capture') {
+        await finishScreenshot(frame);
+      }
+    } catch {
+      setLastResult({ code: 'OPS_FRAME_INVALID' });
+    }
+  };
+
+  /** Connect the browser side of a short-lived operations session. */
+  const connect = (next: DeviceOpsTicket) => {
+    socketRef.current?.close();
+    pendingArtifactRef.current = null;
+    screenshotRequestRef.current = null;
+    setScreenshotPending(false);
+    setStatus('CONNECTING');
+    setOperations(null);
+    const socket = new WebSocket(next.wsUrl, ['autojs6-ops-v1', `ticket.${next.operatorTicket}`]);
+    socket.binaryType = 'arraybuffer';
+    socketRef.current = socket;
+    socket.onopen = () => {
+      if (socketRef.current !== socket) return;
+      setStatus('CONNECTED');
+      sendOperation(socket, next, 'device.ops.capabilities');
+    };
+    socket.onmessage = (event) => {
+      if (socketRef.current === socket) void handleSocketMessage(event.data, next);
+    };
+    socket.onerror = () => {
+      if (socketRef.current === socket) setStatus('DISCONNECTED');
+    };
+    socket.onclose = () => {
+      if (socketRef.current !== socket) return;
+      setStatus('DISCONNECTED');
+      pendingArtifactRef.current = null;
+      screenshotRequestRef.current = null;
+      setScreenshotPending(false);
+    };
+  };
+
+  /** Open a new device operations session. */
   const open = async () => {
     const response = await openDeviceOpsSession(clientId);
     const next = response.data.data;
+    ticketRef.current = next;
     setTicket(next);
     connect(next);
   };
 
+  /** Reissue the one-time operator ticket and reconnect the browser. */
   const reconnect = async () => {
     if (!ticket) return;
     const response = await reconnectDeviceOpsSession(ticket.sessionId);
     const next = response.data.data;
+    ticketRef.current = next;
     setTicket(next);
     connect(next);
   };
 
+  /** Close the session and release its ephemeral screenshot. */
   const close = async () => {
     if (!ticket) return;
     await closeDeviceOpsSession(ticket.sessionId);
     socketRef.current?.close();
     socketRef.current = null;
+    ticketRef.current = null;
     setStatus('DISCONNECTED');
     setTicket(null);
+    setOperations(null);
+    clearScreenshot();
   };
 
-  const execute = (operation: string, params: Record<string, unknown> = {}) => {
+  /** Send one operation through the connected WSS. */
+  const execute = (operation: string, params: Record<string, unknown> = {}): string | null => {
     const socket = socketRef.current;
     if (!ticket || socket?.readyState !== WebSocket.OPEN) {
       showSnackbar({ message: '运维会话尚未连接', type: 'warning' });
-      return;
+      return null;
     }
-    const createdAt = Date.now();
-    socket.send(
-      JSON.stringify({
-        protocolVersion: 1,
-        type: 'request',
-        sessionId: ticket.sessionId,
-        requestId: `req_${crypto.randomUUID().replaceAll('-', '')}`,
-        operation,
-        params,
-        createdAt,
-        expiresAt: createdAt + 15_000,
-      }),
-    );
+    return sendOperation(socket, ticket, operation, params);
   };
 
+  /** Request one screenshot without changing the business task lifecycle. */
+  const captureScreenshot = () => {
+    if (screenshotPending) return;
+    pendingArtifactRef.current = null;
+    const requestId = execute('device.screen.capture');
+    if (!requestId) return;
+    screenshotRequestRef.current = requestId;
+    setScreenshotPending(true);
+  };
+
+  /** Download the already verified browser-memory screenshot. */
+  const downloadScreenshot = () => {
+    if (!screenshot) return;
+    const link = document.createElement('a');
+    link.href = screenshot.url;
+    link.download = `screenshot-${clientId}-${dayjs(screenshot.capturedAt).format(
+      'YYYYMMDD-HHmmss',
+    )}.png`;
+    link.click();
+  };
+
+  /** Confirm one state-changing audio operation. */
   const confirmAudio = async (operation: string, params: Record<string, unknown>) => {
     if (
       await showConfirm({
@@ -136,15 +372,26 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
       execute(operation, params);
   };
 
+  /** Refresh the last twenty operations audits. */
   const refreshAudits = async () => {
     const response = await listDeviceOpsAudits({ clientId, pageSize: 20 });
     setAudits(response.data.data.list as DeviceOpsAudit[]);
   };
 
+  /** Reveal one encrypted audit through the existing privileged endpoint. */
   const revealAudit = async (id: number) => {
     const response = await revealDeviceOpsAudit(id);
     setLastResult(response.data.data);
   };
+
+  const screenshotSupported = operations?.includes('device.screen.capture') === true;
+  const screenshotDisabled = status !== 'CONNECTED' || !screenshotSupported || screenshotPending;
+  const screenshotHint =
+    operations === null
+      ? t('mobile.device.ops.capabilitiesPending')
+      : screenshotSupported
+        ? ''
+        : t('mobile.device.ops.screenshotUnsupported');
 
   return (
     <Stack spacing={2} sx={{ mt: 3 }}>
@@ -182,7 +429,7 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
         )}
         {ticket && (
           <Typography variant="caption">
-            到期：{new Date(ticket.expiresAtUtc).toLocaleString()}
+            到期：{dayjs(ticket.expiresAtUtc).format('YYYY-MM-DD HH:mm:ss')}
           </Typography>
         )}
       </Stack>
@@ -195,7 +442,46 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
           前台应用/页面
         </ResponsiveButton>
         <ResponsiveButton onClick={() => execute('device.network.get')}>网络信息</ResponsiveButton>
+        <Tooltip title={screenshotHint}>
+          <span>
+            <ResponsiveButton disabled={screenshotDisabled} onClick={captureScreenshot}>
+              {screenshotPending && <CircularProgress size={16} sx={{ mr: 1 }} />}
+              {t('mobile.device.ops.captureScreenshot')}
+            </ResponsiveButton>
+          </span>
+        </Tooltip>
       </Stack>
+
+      {screenshot && (
+        <Stack spacing={1}>
+          <Box
+            sx={{
+              border: 1,
+              borderColor: 'divider',
+              borderRadius: 1,
+              bgcolor: 'background.default',
+              p: 1,
+              textAlign: 'center',
+            }}
+          >
+            <Box
+              component="img"
+              src={screenshot.url}
+              alt={t('mobile.device.ops.screenshotPreview')}
+              sx={{ display: 'block', maxWidth: '100%', maxHeight: '70vh', mx: 'auto' }}
+            />
+          </Box>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: 'center' }}>
+            <Typography variant="caption" sx={{ flex: 1 }}>
+              {screenshot.width} × {screenshot.height} · {Math.ceil(screenshot.sizeBytes / 1024)}{' '}
+              KiB · {dayjs(screenshot.capturedAt).format('YYYY-MM-DD HH:mm:ss')}
+            </Typography>
+            <ResponsiveButton onClick={downloadScreenshot}>
+              {t('mobile.device.ops.downloadScreenshot')}
+            </ResponsiveButton>
+          </Stack>
+        </Stack>
+      )}
 
       <Divider />
       <Typography variant="subtitle1">音量</Typography>
@@ -276,7 +562,8 @@ export function DeviceOpsPanel({ clientId }: DeviceOpsPanelProps) {
             sx={{ alignItems: { sm: 'center' } }}
           >
             <Typography variant="body2" sx={{ flex: 1 }}>
-              {new Date(audit.createTimeUtc).toLocaleString()} · {audit.operation} · {audit.status}
+              {dayjs(audit.createTimeUtc).format('YYYY-MM-DD HH:mm:ss')} · {audit.operation} ·{' '}
+              {audit.status}
               {audit.resultCode ? ` · ${audit.resultCode}` : ''}
             </Typography>
             <ResponsiveButton

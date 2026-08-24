@@ -3,6 +3,10 @@ import {
   encryptSensitiveText,
   hashDeviceToken,
 } from "@hodor/admin/mobile/device/infrastructure/crypto.js";
+import {
+  MobileOpsArtifactError,
+  parseMobileOpsArtifactFrame,
+} from "./mobile-ops-artifact.js";
 
 const MAX_FRAME_BYTES = 64 * 1024;
 const ALLOWED_OPERATIONS = new Set([
@@ -15,6 +19,7 @@ const ALLOWED_OPERATIONS = new Set([
   "device.files.list",
   "device.foreground.get",
   "device.network.get",
+  "device.screen.capture",
 ]);
 
 interface SessionMetadata {
@@ -225,10 +230,58 @@ export class MobileOpsSession implements DurableObject {
       socket.close(1008, "OPS_SESSION_INVALID");
       return;
     }
-    if (
-      typeof message !== "string" ||
-      new TextEncoder().encode(message).byteLength > MAX_FRAME_BYTES
-    ) {
+    if (typeof message !== "string") {
+      if (attachment.role !== "device") {
+        socket.close(1008, "OPS_BINARY_NOT_ALLOWED");
+        return;
+      }
+      try {
+        const header = parseMobileOpsArtifactFrame(message, metadata.sessionId);
+        const audit = await this.env.DB.prepare(
+          `SELECT operation, status, response_bytes AS responseBytes
+           FROM admin_mobile_device_ops_audit
+           WHERE session_id = ? AND request_id = ?`
+        )
+          .bind(metadata.sessionId, header.requestId)
+          .first<{
+            operation: string;
+            status: string;
+            responseBytes: number | null;
+          }>();
+        if (
+          audit?.operation !== "device.screen.capture" ||
+          audit.status !== "EXECUTING" ||
+          (audit.responseBytes ?? 0) > 0
+        ) {
+          socket.close(1008, "OPS_ARTIFACT_NOT_EXPECTED");
+          return;
+        }
+        const artifactAudit = await this.env.DB.prepare(
+          `UPDATE admin_mobile_device_ops_audit
+           SET response_bytes = COALESCE(response_bytes, 0) + ?
+           WHERE session_id = ? AND request_id = ? AND status = 'EXECUTING'
+             AND COALESCE(response_bytes, 0) = 0`
+        )
+          .bind(message.byteLength, metadata.sessionId, header.requestId)
+          .run();
+        if ((artifactAudit.meta.changes ?? 0) !== 1) {
+          socket.close(1008, "OPS_ARTIFACT_NOT_EXPECTED");
+          return;
+        }
+        for (const peer of this.state.getWebSockets("operator")) {
+          peer.send(message);
+        }
+        await this.updateSession(metadata, { status: "CONNECTED" });
+      } catch (error) {
+        const artifactError =
+          error instanceof MobileOpsArtifactError
+            ? error
+            : new MobileOpsArtifactError("OPS_ARTIFACT_INVALID");
+        socket.close(artifactError.closeCode, artifactError.message);
+      }
+      return;
+    }
+    if (new TextEncoder().encode(message).byteLength > MAX_FRAME_BYTES) {
       socket.close(1009, "OPS_FRAME_TOO_LARGE");
       return;
     }
@@ -285,9 +338,10 @@ export class MobileOpsSession implements DurableObject {
         );
         await this.env.DB.prepare(
           `UPDATE admin_mobile_device_ops_audit
-           SET status = ?, result_code = ?, duration_ms = ?, response_bytes = ?,
+           SET status = ?, result_code = ?, duration_ms = ?,
+               response_bytes = COALESCE(response_bytes, 0) + ?,
                response_ciphertext = ?, finish_time_utc = ?
-           WHERE session_id = ? AND request_id = ?`
+           WHERE session_id = ? AND request_id = ? AND finish_time_utc IS NULL`
         )
           .bind(
             typeof frame.status === "string" ? frame.status : "FAILURE",

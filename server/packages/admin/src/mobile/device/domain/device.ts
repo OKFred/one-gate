@@ -164,7 +164,7 @@ export function validateCapabilities(
       !value.ops.operations.every(
         (operation) =>
           typeof operation === "string" &&
-          /^device\.(?:ops|audio|storage|files|foreground|network)\.[a-z]+$/.test(
+          /^device\.(?:ops|audio|storage|files|foreground|network|screen)\.[a-z]+$/.test(
             operation
           ) &&
           !operation.includes("shell")

@@ -118,6 +118,18 @@ describe("设备领域规则", () => {
         trustedScripts: [{ scriptId: "bad script", version: 0 }],
       })
     ).toThrow("Invalid trusted script capability");
+    expect(
+      validateCapabilities({
+        root: true,
+        trustedScripts: [],
+        ops: {
+          protocolVersion: 1,
+          enabled: true,
+          arbitraryShell: false,
+          operations: ["device.screen.capture"],
+        },
+      }).ops?.operations
+    ).toEqual(["device.screen.capture"]);
   });
 
   it("去重 IMEI 并约束标识符状态一致", () => {

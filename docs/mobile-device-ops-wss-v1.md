@@ -6,6 +6,7 @@
 - ops/v1 MQTT 主题只唤醒设备建立短期 WSS，不携带票据或设备 Token。
 - 一台设备同时最多一个运维会话；每个会话对应一个 `MobileOpsSession` Durable Object。
 - V1 不提供 Shell、JavaScript、PTY、ttyd、文件内容读取或下载。
+- `device.screen.capture` 是唯一允许返回二进制制品的固定只读操作；它不进入 AutoJS 业务队列。
 
 ## 连接流程
 
@@ -14,8 +15,17 @@
 3. 专用 MQTT 发布器只记录会话元数据，发送不含凭据的 `OPEN_SESSION`。
 4. 手机以现有设备上报 Token 作为 `Authorization: Device ...` 主动连接 WSS。
 5. 浏览器以 `autojs6-ops-v1` 和 `ticket.<base64url>` 子协议连接；票据验证后立即失效。
-6. Durable Object 只转发固定 RPC 帧，并将完整请求和响应用 `MOBILE_SENSITIVE_DATA_KEY`
-   加密后写入 D1。
+6. Durable Object 只转发固定 RPC 帧，并将结构化请求和响应用 `MOBILE_SENSITIVE_DATA_KEY`
+   加密后写入 D1。截图二进制仅转发给当前操作员，不进入加密审计正文。
+
+## 屏幕截图
+
+- 手机使用固定的低优先级 `su -c "nice -n 10 screencap -p"`，不启动 AutoJS、不暂停或抢占前台任务。
+- 同一设备最多一个截图请求；捕获限时 10 秒，请求限时 15 秒，PNG 最大 16 MiB。
+- 单个二进制帧格式为 `uint32be(headerLength) | UTF-8 JSON header | PNG bytes`，JSON 控制帧仍限制 64 KiB。
+- 手机、Durable Object 和浏览器分别校验边界；浏览器还会复核 SHA-256 后才创建 Blob URL。
+- 关闭会话、切换设备或用新截图替换旧截图时撤销 Blob URL；原图下载只读取浏览器内存。
+- 活动 VPN、日常 MQTT 任务与截图相互独立；Android `FLAG_SECURE` 页面按系统规则可能是黑屏。
 
 生产浏览器 Origin 固定为三个 Gate 域名。WSS Upgrade 是唯一 GET 例外，其他管理接口全部采用
 POST 和既有统一响应信封。
@@ -24,6 +34,7 @@ POST 和既有统一响应信封。
 
 - `admin_mobile_device_ops_session` 保存会话生命周期，不保存明文票据。
 - `admin_mobile_device_ops_audit` 保存非敏感索引和 AES-GCM 密文。
+- 截图审计只保存请求、终态、尺寸、摘要、耗时和总响应字节数，不保存 PNG 正文。
 - AAD 为 `mobile-ops:{sessionId}:{requestId}:{request|response}`。
 - Scheduled handler 每分钟结束过期会话，并删除超过 30 天的加密审计。
 - 历史完整内容只允许超级管理员 Reveal，Reveal 本身进入业务审计。

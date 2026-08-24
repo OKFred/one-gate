@@ -59,6 +59,14 @@ export const mobile = {
   'mobile.device.tokenOnce':
     'This plaintext is shown once. After closing, it can only be reset, not viewed again.',
   'mobile.device.tokenCopied': 'Token copied',
+  'mobile.device.ops.captureScreenshot': 'Capture Screenshot',
+  'mobile.device.ops.downloadScreenshot': 'Download Original',
+  'mobile.device.ops.screenshotPreview': 'Current device screenshot',
+  'mobile.device.ops.capabilitiesPending': 'Waiting for device capabilities',
+  'mobile.device.ops.screenshotUnsupported': 'The current client does not support screenshots',
+  'mobile.device.ops.screenshotReady': 'Screenshot captured',
+  'mobile.device.ops.screenshotFailed': 'Screenshot capture failed',
+  'mobile.device.ops.screenshotInvalid': 'Screenshot integrity validation failed',
 
   // Client release, environment and deployment
   'mobile.deployment.isolationHint':

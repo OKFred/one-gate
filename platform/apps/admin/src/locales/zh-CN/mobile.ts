@@ -57,6 +57,14 @@ export const mobile = {
   'mobile.device.reportToken': '设备上报令牌',
   'mobile.device.tokenOnce': '该明文只显示一次；关闭后无法再次查看，只能重置。',
   'mobile.device.tokenCopied': '令牌已复制',
+  'mobile.device.ops.captureScreenshot': '获取截屏',
+  'mobile.device.ops.downloadScreenshot': '下载原图',
+  'mobile.device.ops.screenshotPreview': '设备当前屏幕截图',
+  'mobile.device.ops.capabilitiesPending': '正在等待设备能力信息',
+  'mobile.device.ops.screenshotUnsupported': '当前客户端版本不支持屏幕截图',
+  'mobile.device.ops.screenshotReady': '屏幕截图获取成功',
+  'mobile.device.ops.screenshotFailed': '屏幕截图获取失败',
+  'mobile.device.ops.screenshotInvalid': '屏幕截图完整性校验失败',
 
   // Client release, environment and deployment
   'mobile.deployment.isolationHint':
