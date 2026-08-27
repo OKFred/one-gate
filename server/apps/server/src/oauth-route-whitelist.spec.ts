@@ -1,27 +1,35 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it } from "vitest";
+
+import {
+  browserAccessProtectedAnonymous,
+  machineAccessBypass,
+} from "../../../packages/core/src/middleware/accessRoutePolicy";
 
 describe("public authentication route whitelist", () => {
   it("exposes only the unified OAuth login entry points", () => {
-    const source = readFileSync(
-      fileURLToPath(
-        new URL(
-          "../../../packages/core/src/middleware/encapsulation/index.ts",
-          import.meta.url
-        )
-      ),
-      "utf8"
+    expect(browserAccessProtectedAnonymous).toContain(
+      "/admin/system/auth/oauth/login/url"
     );
-
-    expect(source).toContain('"/admin/system/auth/oauth/login/url"');
-    expect(source).toContain('"/admin/system/auth/oauth/login/callback"');
-    expect(source).toContain('"/admin/mobile/client-release/upload/prepare"');
-    expect(source).toContain('"/admin/mobile/client-release/upload/finalize"');
-    expect(source).not.toContain('"/admin/system/auth/github/url"');
-    expect(source).not.toContain('"/admin/system/auth/github/login"');
-    expect(source).not.toContain('"/admin/system/auth/oauth/account/url"');
-    expect(source).not.toContain('"/admin/system/auth/oauth/account/callback"');
+    expect(browserAccessProtectedAnonymous).toContain(
+      "/admin/system/auth/oauth/login/callback"
+    );
+    expect(machineAccessBypass).toContain(
+      "/admin/mobile/client-release/upload/prepare"
+    );
+    expect(machineAccessBypass).toContain(
+      "/admin/mobile/client-release/upload/finalize"
+    );
+    expect(browserAccessProtectedAnonymous).not.toContain(
+      "/admin/system/auth/github/url"
+    );
+    expect(browserAccessProtectedAnonymous).not.toContain(
+      "/admin/system/auth/github/login"
+    );
+    expect(browserAccessProtectedAnonymous).not.toContain(
+      "/admin/system/auth/oauth/account/url"
+    );
+    expect(browserAccessProtectedAnonymous).not.toContain(
+      "/admin/system/auth/oauth/account/callback"
+    );
   });
 });
