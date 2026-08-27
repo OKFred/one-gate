@@ -57,6 +57,24 @@ export const auth = {
   'feishu.viewProfile': '查看飞书档案',
   'feishu.profileTitle': '飞书通讯录档案',
 
+  // one-sso
+  'sso.signIn': '使用统一身份中心登录',
+  'sso.bind': '绑定统一身份中心',
+  'sso.unbind': '解绑统一身份中心',
+  'sso.bound': '已绑定统一身份中心',
+  'sso.bindingTenant': '租户：{{tenant}}',
+  'sso.unbindTitle': '确认解绑统一身份中心？',
+  'sso.unbindConfirm': '解绑后将无法继续使用统一身份中心登录，确定继续吗？',
+  'sso.confirmUnbind': '确定解绑',
+  'sso.unbindSuccess': '统一身份中心解绑成功',
+  'sso.bindSuccess': '统一身份中心绑定成功',
+  'sso.loginSuccess': '统一身份中心登录成功',
+  'sso.authFailed': '统一身份中心授权失败',
+  'sso.authFailedRetry': '授权失败，请返回后重试',
+  'sso.missingCallbackParameters': '未找到授权码或安全状态，请重新发起授权。',
+  'sso.verifying': '正在验证统一身份中心授权，请稍候...',
+  'sso.back': '返回',
+
   // 个人中心 / 我的
   'me.title': '我的',
   'me.subtitle': '个人信息',

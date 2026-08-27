@@ -1,5 +1,47 @@
-import type { AxiosConfig } from '../../config';
-import { axiosPlus } from '../../config';
+import type { AxiosConfig, ExplicitPostConfig } from '../../config';
+import { axiosExplicitPost, axiosPlus } from '../../config';
+
+export interface SsoAuthorizationUrlReq {
+  redirectUri: string;
+}
+
+export interface SsoAuthorizationUrlRes {
+  url: string;
+}
+
+export interface SsoCallbackReq {
+  code: string;
+  state: string;
+}
+
+export interface SsoLoginCallbackRes {
+  userObj: {
+    id: number;
+    username: string;
+    langCode: string;
+    token: string;
+  };
+}
+
+export interface SsoBindingSummary {
+  bound: boolean;
+  issuer: string | null;
+  tenantId: string | null;
+  membershipId: string | null;
+  clientId: string | null;
+  amr: readonly string[];
+  scope: readonly string[];
+  createTimeUtc: number | null;
+  updateTimeUtc: number | null;
+}
+
+export interface SsoAccountCallbackRes {
+  message: string;
+}
+
+export interface SsoUnbindRes {
+  message: string;
+}
 
 export const loginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/login', 'post'>, 'url' | 'method'>,
@@ -98,6 +140,42 @@ export const oauthBindingProfileFn = (
     ...axiosConfig,
   });
 };
+
+export const ssoLoginUrlFn = (axiosConfig: ExplicitPostConfig<SsoAuthorizationUrlReq>) =>
+  axiosExplicitPost<SsoAuthorizationUrlReq, SsoAuthorizationUrlRes>(
+    '/api/v1/admin/system/auth/sso/login/url',
+    axiosConfig,
+  );
+
+export const ssoLoginCallbackFn = (axiosConfig: ExplicitPostConfig<SsoCallbackReq>) =>
+  axiosExplicitPost<SsoCallbackReq, SsoLoginCallbackRes>(
+    '/api/v1/admin/system/auth/sso/login/callback',
+    axiosConfig,
+  );
+
+export const ssoAccountUrlFn = (axiosConfig: ExplicitPostConfig<SsoAuthorizationUrlReq>) =>
+  axiosExplicitPost<SsoAuthorizationUrlReq, SsoAuthorizationUrlRes>(
+    '/api/v1/admin/system/auth/sso/account/url',
+    axiosConfig,
+  );
+
+export const ssoAccountCallbackFn = (axiosConfig: ExplicitPostConfig<SsoCallbackReq>) =>
+  axiosExplicitPost<SsoCallbackReq, SsoAccountCallbackRes>(
+    '/api/v1/admin/system/auth/sso/account/callback',
+    axiosConfig,
+  );
+
+export const ssoBindingUnbindFn = (axiosConfig: ExplicitPostConfig<Record<string, never>>) =>
+  axiosExplicitPost<Record<string, never>, SsoUnbindRes>(
+    '/api/v1/admin/system/auth/sso/binding/unbind',
+    axiosConfig,
+  );
+
+export const ssoBindingSummaryFn = (axiosConfig: ExplicitPostConfig<Record<string, never>>) =>
+  axiosExplicitPost<Record<string, never>, SsoBindingSummary>(
+    '/api/v1/admin/system/auth/sso/binding/summary',
+    axiosConfig,
+  );
 
 export const refreshTokenFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/refresh', 'post'>, 'url' | 'method'>,

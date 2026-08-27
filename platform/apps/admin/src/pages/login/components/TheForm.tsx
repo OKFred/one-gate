@@ -5,7 +5,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginFn, oauthLoginUrlFn } from '@/api/admin/system/auth';
+import { loginFn, oauthLoginUrlFn, ssoLoginUrlFn } from '@/api/admin/system/auth';
 import type { LoginReq } from '@/api/admin/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
@@ -99,6 +99,20 @@ export default function TheForm() {
       if (response.data.data.url) {
         window.location.href = response.data.data.url;
       }
+    } catch {
+      // Global HTTP interception presents the error.
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSsoLogin = async () => {
+    try {
+      setLoading(true);
+      const response = await ssoLoginUrlFn({
+        data: { redirectUri: `${window.location.origin}/sso/callback` },
+      });
+      window.location.assign(response.data.data.url);
     } catch {
       // Global HTTP interception presents the error.
     } finally {
@@ -207,6 +221,18 @@ export default function TheForm() {
           disabled={loading}
         >
           {t('feishu.signIn')}
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          size={isMobile ? 'large' : 'medium'}
+          sx={{ py: isMobile ? 1.5 : 1 }}
+          onClick={handleSsoLogin}
+          disabled={loading}
+        >
+          {t('sso.signIn')}
         </Button>
       </Stack>
     </Box>

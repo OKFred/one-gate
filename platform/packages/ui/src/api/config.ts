@@ -54,6 +54,16 @@ export type AxiosConfig<U, M> = Omit<
 > &
   RequestGeneric<U, M> & { ignoreAbort?: boolean };
 
+export type ExplicitPostConfig<TRequest> = Omit<AxiosRequestConfig, 'url' | 'method' | 'data'> & {
+  data: TRequest;
+};
+
+export interface ApiResponseEnvelope<TData> {
+  ok: boolean;
+  data: TData;
+  message: string;
+}
+
 /** @description  axios 实例 */
 const service = axios.create({
   baseURL: import.meta.env.MODE === 'production' ? import.meta.env.VITE_SERVER_URL : '',
@@ -148,7 +158,9 @@ function setupInterceptors(service: AxiosInstance) {
         // 使用 hash 路由检查当前位置（因为项目使用了 HashRouter）
         const currentHash = window.location.hash.slice(1); // 移除 # 前缀
         const isAuthPage =
-          currentHash.startsWith(loginPath) || currentHash.startsWith('/oauth/callback');
+          currentHash.startsWith(loginPath) ||
+          currentHash.startsWith('/oauth/callback') ||
+          currentHash.startsWith('/sso/callback');
         if (!isAuthPage) {
           // abort 队列中的所有其他请求
           requestQueueManager.abortAllRequests(requestId);
@@ -207,4 +219,16 @@ const axiosPlus = async <U extends keyof paths, M extends keyof UrlGeneric<U>>(
   return await service(axiosConfig as AxiosRequestConfig);
 };
 
-export { axiosPlus };
+/**
+ * Temporary typed adapter for a new POST endpoint before OpenAPI types are regenerated.
+ * Callers must provide explicit request/response DTOs and migrate to AxiosConfig afterwards.
+ */
+const axiosExplicitPost = async <TRequest, TResponse>(
+  url: string,
+  axiosConfig: ExplicitPostConfig<TRequest>,
+): Promise<AxiosResponse<ApiResponseEnvelope<TResponse>>> => {
+  const { data, ...config } = axiosConfig;
+  return await service.post<ApiResponseEnvelope<TResponse>>(url, data, config);
+};
+
+export { axiosExplicitPost, axiosPlus };
