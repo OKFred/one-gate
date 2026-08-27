@@ -86,6 +86,11 @@ export class SsoCenter {
       completed.configuration
     );
     const user = await this.requireEnabledUser(binding.userId);
+    await this.dependencies.repository.updateBindingVerification(
+      binding.id,
+      completed.principal,
+      this.dependencies.clock.now()
+    );
     const token = await this.dependencies.tokenIssuer.issue({
       user,
       principal: completed.principal,
@@ -158,6 +163,15 @@ export class SsoCenter {
       throw new SsoError(SsoErrorCode.BINDING_NOT_FOUND, "SSO 绑定不存在");
     }
     return { message: "解绑成功" };
+  }
+
+  async getBindingSummary(userId: number): Promise<SsoBinding | null> {
+    await this.requireEnabledUser(userId);
+    const configuration = this.getConfiguration();
+    return this.dependencies.repository.findBindingByUserAndIssuer(
+      userId,
+      configuration.issuer
+    );
   }
 
   private async createAuthorization(

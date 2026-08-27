@@ -75,6 +75,27 @@ class FakeRepository implements SsoRepositoryPort {
     return { outcome: "created", bindingId };
   }
 
+  async updateBindingVerification(
+    bindingId: number,
+    verified: VerifiedSsoPrincipal,
+    verifiedAtUtc: number
+  ): Promise<void> {
+    this.bindings = this.bindings.map((binding) =>
+      binding.id === bindingId
+        ? {
+            ...binding,
+            principalUserId: verified.userId,
+            tenantId: verified.tenantId,
+            membershipId: verified.membershipId,
+            clientId: verified.clientId,
+            amr: [...verified.amr],
+            scope: [...verified.scope],
+            updateTimeUtc: verifiedAtUtc,
+          }
+        : binding
+    );
+  }
+
   async deleteBinding(userId: number, issuer: string): Promise<boolean> {
     const before = this.bindings.length;
     this.bindings = this.bindings.filter(
@@ -287,6 +308,12 @@ describe("SsoCenter", () => {
         langCode: "zh-CN",
         token: "hodor-1-subject-1",
       },
+    });
+    expect(repository.bindings[0]?.updateTimeUtc).toBe(now);
+    await expect(center.getBindingSummary(1)).resolves.toMatchObject({
+      userId: 1,
+      issuer: "https://sso.example.com",
+      subject: "subject-1",
     });
     await expect(center.unbind({ userId: 1 })).resolves.toEqual({
       message: "解绑成功",

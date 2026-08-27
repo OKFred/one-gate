@@ -33,6 +33,11 @@ export interface SsoRepositoryPort {
     issuer: string
   ): Promise<SsoBinding | null>;
   createBinding(binding: NewSsoBinding): Promise<SsoBindingCreateResult>;
+  updateBindingVerification(
+    bindingId: number,
+    principal: VerifiedSsoPrincipal,
+    verifiedAtUtc: number
+  ): Promise<void>;
   deleteBinding(userId: number, issuer: string): Promise<boolean>;
   findLocalUser(userId: number): Promise<LocalSsoUser | null>;
 }
