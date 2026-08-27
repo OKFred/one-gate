@@ -204,6 +204,16 @@ export function initAdminRegistry() {
   reg.register("mail", mailRegister);
   reg.register("mqtt", mqttRegister);
   reg.register("voice", voiceRegister);
-  console.log(`[ADMIN] registered domains`, reg.domains);
+  const domains = Object.keys(reg.domains).sort();
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: "info",
+      service: "hodor-server",
+      event: "admin.registry.initialized",
+      domainCount: domains.length,
+      domains,
+    })
+  );
   setRegistry(reg);
 }

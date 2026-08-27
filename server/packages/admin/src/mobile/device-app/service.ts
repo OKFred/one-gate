@@ -312,7 +312,17 @@ async function onCallback(
         JSON.parse(params.message) as unknown
       );
     } catch (error) {
-      console.error("[Callback] Error processing sync data", error);
+      console.error(
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          level: "error",
+          service: "hodor-server",
+          event: "mobile.device_app.legacy_sync.failed",
+          requestId: context.get("requestId"),
+          failureKind:
+            error instanceof SyntaxError ? "invalid_payload" : "sync_failed",
+        })
+      );
     }
   }
 
