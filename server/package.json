@@ -11,6 +11,7 @@
     "start": "pnpm --filter @hodor/server start",
     "worker:dev": "pnpm --filter @hodor/server worker:dev",
     "worker:types": "pnpm --filter @hodor/server worker:types",
+    "totp:enroll": "pnpm --filter @hodor/server totp:enroll",
     "db:init": "pnpm --filter @hodor/server db:init",
     "db:migrate:worker:local": "pnpm --filter @hodor/server db:migrate:worker:local",
     "db:migrate:worker:remote": "pnpm --filter @hodor/server db:migrate:worker:remote",

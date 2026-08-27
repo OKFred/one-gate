@@ -19,6 +19,8 @@ import crypto from "crypto";
 import { apiTokenRepository } from "../../../../admin/src/system/api-token/repository";
 
 export const authMiddleware = async (c: Context) => {
+  if (c.get("userObj")) return;
+
   // 从Authorization header中获取token
   const authHeader = c.req.header("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -195,7 +197,9 @@ export const authMiddleware = async (c: Context) => {
             try {
               const ids: number[] = JSON.parse(role.customDeptIds);
               mergedCustomDeptIds.push(...ids);
-            } catch {}
+            } catch {
+              // Ignore malformed legacy role scope values and keep the safe default.
+            }
           }
         }
       }

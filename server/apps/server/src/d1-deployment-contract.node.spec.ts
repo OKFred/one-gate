@@ -110,6 +110,14 @@ describe("D1 deployment contract", () => {
     expect(config).toContain('"new_sqlite_classes": ["MobileOpsSession"]');
   });
 
+  it("configures a SQLite Durable Object for deployment-wide TOTP coordination", () => {
+    const config = readRepositoryFile("../wrangler.jsonc");
+    expect(config).toContain('"name": "TOTP_GATE_COORDINATOR"');
+    expect(config).toContain('"class_name": "TotpGateCoordinator"');
+    expect(config).toContain('"tag": "totp-gate-v1"');
+    expect(config).toContain('"new_sqlite_classes": ["TotpGateCoordinator"]');
+  });
+
   it("runs migrations and the schema contract before Worker deployment", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
@@ -123,7 +131,7 @@ describe("D1 deployment contract", () => {
     expect(deployAt).toBeGreaterThan(contractAt);
   });
 
-  it("deploys required identity and Access settings while Feishu stays optional", () => {
+  it("deploys required identity and TOTP settings while Feishu stays optional", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
@@ -136,8 +144,7 @@ describe("D1 deployment contract", () => {
       "SSO_AUDIENCE",
       "SSO_ALLOWED_TENANT_ID",
       "SSO_ALLOWED_REDIRECT_URIS",
-      "CF_ACCESS_TEAM_DOMAIN",
-      "CF_ACCESS_APPLICATION_AUDIENCE",
+      "HODOR_TOTP_GATE_SECRET",
       "HODOR_ALLOWED_WEB_ORIGINS",
     ]) {
       expect(workflow).toContain(

@@ -1,19 +1,19 @@
 import { describe, expect, it } from "vitest";
 
-import { machineAccessBypass } from "../../../packages/core/src/middleware/accessRoutePolicy";
+import { machineCredentialBypass } from "../../../packages/core/src/middleware/authenticationRoutePolicy";
 
 describe("mobile client release route whitelist", () => {
   it("exposes only the machine-token upload entry points", () => {
-    expect(machineAccessBypass).toContain(
+    expect(machineCredentialBypass).toContain(
       "/admin/mobile/client-release/upload/prepare"
     );
-    expect(machineAccessBypass).toContain(
+    expect(machineCredentialBypass).toContain(
       "/admin/mobile/client-release/upload/finalize"
     );
-    expect(machineAccessBypass).not.toContain(
+    expect(machineCredentialBypass).not.toContain(
       "/admin/mobile/client-release/list"
     );
-    expect(machineAccessBypass).not.toContain(
+    expect(machineCredentialBypass).not.toContain(
       "/admin/mobile/client-release/revoke"
     );
   });

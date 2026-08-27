@@ -62,8 +62,7 @@
       "SSO_AUDIENCE",
       "SSO_ALLOWED_TENANT_ID",
       "SSO_ALLOWED_REDIRECT_URIS",
-      "CF_ACCESS_TEAM_DOMAIN",
-      "CF_ACCESS_APPLICATION_AUDIENCE",
+      "HODOR_TOTP_GATE_SECRET",
       "HODOR_ALLOWED_WEB_ORIGINS",
     ],
   },
@@ -88,12 +87,20 @@
         "name": "MOBILE_OPS",
         "class_name": "MobileOpsSession",
       },
+      {
+        "name": "TOTP_GATE_COORDINATOR",
+        "class_name": "TotpGateCoordinator",
+      },
     ],
   },
   "migrations": [
     {
       "tag": "mobile-ops-v1",
       "new_sqlite_classes": ["MobileOpsSession"],
+    },
+    {
+      "tag": "totp-gate-v1",
+      "new_sqlite_classes": ["TotpGateCoordinator"],
     },
   ],
 

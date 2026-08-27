@@ -14,8 +14,9 @@ import mobile from "./mobile/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { initAdminRegistry } from "./register.js";
+import type { AuthAppOptions } from "./system/auth/index.js";
 
-function createAdminApp(): App {
+function createAdminApp(options: AuthAppOptions): App {
   initAdminRegistry();
   const app = new OpenAPIHono<AppBindings>();
   app.route("/i18n", i18n());
@@ -23,7 +24,7 @@ function createAdminApp(): App {
   app.route("/maintenance", maintenance());
   app.route("/data", data());
   app.route("/oss", oss());
-  app.route("/system", system());
+  app.route("/system", system(options));
   app.route("/swarm", swarm());
   app.route("/ai", ai());
   app.route("/rpa", rpa());

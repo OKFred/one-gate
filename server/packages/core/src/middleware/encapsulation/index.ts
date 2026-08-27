@@ -20,7 +20,7 @@ import { registerSchema } from "../../utils/schemaRegistry.js";
 import { authMiddleware } from "../auth";
 import { can } from "../auth/permission";
 import { getTranslator } from "../../utils/i18n/index.js";
-import { isHodorAuthBypassed } from "../accessRoutePolicy/index.js";
+import { isHodorAuthBypassed } from "../authenticationRoutePolicy/index.js";
 
 function componentMaker(
   dataType: "request" | "response",

@@ -4,10 +4,18 @@ import { serve } from "@hono/node-server";
 import cron from "node-cron";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
 import { startMqttEventListener } from "@hodor/admin/mqtt/listener.js";
+import {
+  InMemoryTotpAttemptCoordinator,
+  createTotpGateCenter,
+} from "@hodor/admin/system/auth/totp-gate/index.js";
+
+const totpCoordinator = new InMemoryTotpAttemptCoordinator();
 
 /** 启动 Node HTTP、定时任务与 AutoJS6 MQTT 监听服务。 */
 function main() {
-  const app = createApp();
+  const app = createApp({
+    resolveTotpGateCenter: () => createTotpGateCenter(totpCoordinator),
+  });
   // 启动服务器
   const PORT = Number(getEnv("PORT"));
   if (!PORT) throw new Error("Env:PORT is missing");

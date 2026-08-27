@@ -10,24 +10,38 @@ import { getEnv } from "@hodor/core/utils/env.js";
 import createAdminApp from "@hodor/admin/index.js";
 import createEnterpriseApp from "@hodor/enterprise/index.js";
 import createPersonalApp from "@hodor/personal/index.js";
-import { registerCloudflareAccessOrigin } from "./security/cloudflare-access.js";
+import type { TotpGateCenterResolver } from "@hodor/admin/system/auth/totp-gate/index.js";
+import { registerTotpGateMiddleware } from "./security/totp-gate.js";
 
-function createApp() {
+export interface ServerAppOptions {
+  readonly resolveTotpGateCenter: TotpGateCenterResolver;
+}
+
+function createApp(options: ServerAppOptions) {
   const app = new OpenAPIHono<AppBindings>();
 
   serveStaticFiles(app);
   errorHandler(app);
   logHandler(app);
   corsHandler(app);
-  registerCloudflareAccessOrigin(app);
   serverTiming(app);
 
+  const baseApiPath = getEnv("BASE_API_PATH") || "";
+  registerTotpGateMiddleware(app, {
+    baseApiPath,
+    resolveTotpGateCenter: options.resolveTotpGateCenter,
+  });
+
   const apiApp = new OpenAPIHono<AppBindings>();
-  apiApp.route("/admin", createAdminApp());
+  apiApp.route(
+    "/admin",
+    createAdminApp({
+      resolveTotpGateCenter: options.resolveTotpGateCenter,
+    })
+  );
   apiApp.route("/enterprise", createEnterpriseApp());
   apiApp.route("/personal", createPersonalApp());
 
-  const baseApiPath = getEnv("BASE_API_PATH");
   if (!baseApiPath) {
     console.error("❌.MISSING ENV: BASE_API_PATH");
   }

@@ -8,10 +8,11 @@ import user from "./user/index";
 import apiToken from "./api-token/index";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
+import type { AuthAppOptions } from "./auth/index.js";
 
-function createApp(): App {
+function createApp(options: AuthAppOptions): App {
   const app = new OpenAPIHono<AppBindings>();
-  app.route("/auth", auth());
+  app.route("/auth", auth(options));
   app.route("/department", department());
   app.route("/menu", menu());
   app.route("/permission", permission());

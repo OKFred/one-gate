@@ -18,3 +18,4 @@ midscene_run/
 
 code-reviews/
 tsconfig.tsbuildinfo
+.secrets/

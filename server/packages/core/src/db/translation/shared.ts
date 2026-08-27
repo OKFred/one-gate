@@ -32,6 +32,38 @@ export const sharedTranslations = {
     },
     {
       application: "backend",
+      tKey: "errorHandler.totpGateRequired",
+      langCodes: {
+        "zh-CN": "请先完成动态验证码验证",
+        "en-US": "Authenticator verification is required",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.totpCodeInvalid",
+      langCodes: {
+        "zh-CN": "动态验证码错误、已过期或已使用",
+        "en-US": "Authenticator code is invalid, expired, or already used",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.totpGateRateLimited",
+      langCodes: {
+        "zh-CN": "验证尝试过于频繁，请稍后再试",
+        "en-US": "Too many verification attempts; try again later",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.totpGateUnavailable",
+      langCodes: {
+        "zh-CN": "动态验证码门禁暂不可用",
+        "en-US": "Authenticator gate is temporarily unavailable",
+      },
+    },
+    {
+      application: "backend",
       tKey: "errorHandler.notFound",
       langCodes: {
         "zh-CN": "未找到请求的资源",

@@ -1,18 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import { machineAccessBypass } from "../../../packages/core/src/middleware/accessRoutePolicy";
+import { machineCredentialBypass } from "../../../packages/core/src/middleware/authenticationRoutePolicy";
 
 describe("mobile device report route whitelist", () => {
   it("exposes all device-token report entry points before user authentication", () => {
-    expect(machineAccessBypass).toContain(
+    expect(machineCredentialBypass).toContain(
       "/admin/mobile/device/report/presence"
     );
-    expect(machineAccessBypass).toContain("/admin/mobile/device/report/info");
-    expect(machineAccessBypass).toContain("/admin/mobile/device/report/event");
-    expect(machineAccessBypass).toContain(
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/info"
+    );
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/event"
+    );
+    expect(machineCredentialBypass).toContain(
       "/admin/mobile/device/report/deployment"
     );
-    expect(machineAccessBypass).toContain(
+    expect(machineCredentialBypass).toContain(
       "/admin/mobile/device/report/network-routing"
     );
   });

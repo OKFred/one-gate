@@ -9,6 +9,25 @@ import { BusinessError } from "./businessError/index.js";
 import { toHttpException } from "./businessError";
 import { convertSqlErrorToBusinessError } from "./sqlError";
 
+function readBusinessErrorCode(error: unknown): string | undefined {
+  if (!(error instanceof HTTPException)) return undefined;
+  const cause = error.cause;
+  if (!cause || typeof cause !== "object" || !("error" in cause)) {
+    return undefined;
+  }
+  const businessError = cause.error;
+  if (
+    !businessError ||
+    typeof businessError !== "object" ||
+    !("code" in businessError)
+  ) {
+    return undefined;
+  }
+  return typeof businessError.code === "string"
+    ? businessError.code
+    : undefined;
+}
+
 export default function errorHandler(app: App) {
   // 移入函数内，避免模块加载副作用
   if (getRuntimeKey() !== "workerd") {
@@ -70,6 +89,7 @@ export default function errorHandler(app: App) {
     }
 
     const status = e instanceof HTTPException ? e.status : 500;
+    const businessCode = readBusinessErrorCode(e);
     const requestId = c.get("requestId") || crypto.randomUUID();
     const errorEvent = {
       timestamp: new Date().toISOString(),
@@ -80,13 +100,18 @@ export default function errorHandler(app: App) {
       method: c.req.method,
       route: c.req.routePath || "unmatched",
       status,
-      code: status < 500 ? `HTTP_${status}` : "INTERNAL_ERROR",
+      code:
+        businessCode ?? (status < 500 ? `HTTP_${status}` : "INTERNAL_ERROR"),
     };
     if (c.var.logger) {
       c.var.logger[errorEvent.level](errorEvent);
     } else {
       const line = JSON.stringify(errorEvent);
-      errorEvent.level === "warn" ? console.warn(line) : console.error(line);
+      if (errorEvent.level === "warn") {
+        console.warn(line);
+      } else {
+        console.error(line);
+      }
     }
     c.header("x-request-id", requestId);
 
@@ -96,7 +121,7 @@ export default function errorHandler(app: App) {
       const causeObj = e.cause as
         | {
             params?: any;
-            error?: any;
+            error?: { code?: unknown };
             details?: {
               type: string;
               message: string;
@@ -140,6 +165,10 @@ export default function errorHandler(app: App) {
           ok: false,
           message: await t(e.message),
           data: {
+            code:
+              typeof causeObj?.error?.code === "string"
+                ? causeObj.error.code
+                : undefined,
             details,
           },
         },
