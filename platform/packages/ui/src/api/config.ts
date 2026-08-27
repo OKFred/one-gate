@@ -58,6 +58,7 @@ export type AxiosConfig<U, M> = Omit<
 const service = axios.create({
   baseURL: import.meta.env.MODE === 'production' ? import.meta.env.VITE_SERVER_URL : '',
   timeout: import.meta.env.MODE !== 'production' ? 180000 : 30000,
+  withCredentials: true,
 });
 
 // 初始化拦截器（只执行一次）
@@ -78,6 +79,9 @@ function setupInterceptors(service: AxiosInstance) {
         config.requestId = requestId;
         config.signal = controller.signal;
       }
+      const correlationId = config.requestId ?? globalThis.crypto.randomUUID();
+      config.requestId = correlationId;
+      config.headers['X-Request-Id'] = correlationId;
 
       // 自动添加认证token
       const token = authUtils.getUserInfo()?.token;
