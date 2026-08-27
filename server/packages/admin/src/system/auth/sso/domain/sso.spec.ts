@@ -13,6 +13,7 @@ import {
 const productionConfiguration: SsoClientConfiguration = {
   issuer: "https://sso.example.com/identity/",
   clientId: "hodor-admin",
+  audience: "https://hodor.example.com/api/v1",
   tenantId: "self",
   redirectUris: ["https://admin.example.com/oauth/callback"],
   allowInsecureLocalhost: false,

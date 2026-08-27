@@ -139,6 +139,7 @@ class FakeProvider implements SsoOidcProviderPort {
 const configuration: SsoClientConfiguration = {
   issuer: "https://sso.example.com/",
   clientId: "hodor-admin",
+  audience: "https://hodor.example.com/api/v1",
   tenantId: "self",
   redirectUris: ["https://admin.example.com/oauth/callback"],
   allowInsecureLocalhost: false,
@@ -154,6 +155,8 @@ const principal: VerifiedSsoPrincipal = {
   amr: ["pwd"],
   scope: ["openid", "profile"],
 };
+
+const REQUEST_ID = "request-sso-center-123";
 
 describe("SsoCenter", () => {
   let repository: FakeRepository;
@@ -212,6 +215,7 @@ describe("SsoCenter", () => {
     expect(transaction.expectedUserId).toBeNull();
     expect(transaction.stateDigest).not.toBe(state);
     expect(provider.lastAuthorizationInput).toMatchObject({
+      requestId: REQUEST_ID,
       issuer: "https://sso.example.com",
       clientId: "hodor-admin",
       pkce: { codeChallengeMethod: "S256" },
@@ -222,15 +226,27 @@ describe("SsoCenter", () => {
     const expired = await createLoginState(center);
     now += 10 * 60 * 1000;
     await expect(
-      center.loginCallback({ code: "code", state: expired.state })
+      center.loginCallback({
+        code: "code",
+        state: expired.state,
+        requestId: REQUEST_ID,
+      })
     ).rejects.toMatchObject({ code: SsoErrorCode.INVALID_STATE });
 
     const replayed = await createLoginState(center);
     await expect(
-      center.loginCallback({ code: "code", state: replayed.state })
+      center.loginCallback({
+        code: "code",
+        state: replayed.state,
+        requestId: REQUEST_ID,
+      })
     ).rejects.toMatchObject({ code: SsoErrorCode.ACCOUNT_NOT_BOUND });
     await expect(
-      center.loginCallback({ code: "code", state: replayed.state })
+      center.loginCallback({
+        code: "code",
+        state: replayed.state,
+        requestId: REQUEST_ID,
+      })
     ).rejects.toMatchObject({ code: SsoErrorCode.INVALID_STATE });
   });
 
@@ -238,7 +254,7 @@ describe("SsoCenter", () => {
     const userCount = repository.users.length;
     const { state } = await createLoginState(center);
     await expect(
-      center.loginCallback({ code: "code", state })
+      center.loginCallback({ code: "code", state, requestId: REQUEST_ID })
     ).rejects.toMatchObject({
       code: SsoErrorCode.ACCOUNT_NOT_BOUND,
       message: "账号未绑定，请联系管理员",
@@ -252,13 +268,14 @@ describe("SsoCenter", () => {
       center.createBindUrl({
         userId: 2,
         redirectUri: configuration.redirectUris[0],
+        requestId: REQUEST_ID,
       })
     ).rejects.toMatchObject({ code: SsoErrorCode.ACCOUNT_DISABLED });
 
     repository.bindings.push(makeBinding(2, principal));
     const { state } = await createLoginState(center);
     await expect(
-      center.loginCallback({ code: "code", state })
+      center.loginCallback({ code: "code", state, requestId: REQUEST_ID })
     ).rejects.toMatchObject({ code: SsoErrorCode.ACCOUNT_DISABLED });
   });
 
@@ -266,11 +283,17 @@ describe("SsoCenter", () => {
     const authorization = await center.createBindUrl({
       userId: 1,
       redirectUri: configuration.redirectUris[0],
+      requestId: REQUEST_ID,
     });
     const state = new URL(authorization.url).searchParams.get("state");
     if (!state) throw new Error("Fake Provider 未返回 state");
     await expect(
-      center.bindCallback({ code: "code", state, userId: 3 })
+      center.bindCallback({
+        code: "code",
+        state,
+        userId: 3,
+        requestId: REQUEST_ID,
+      })
     ).rejects.toMatchObject({ code: SsoErrorCode.INVALID_STATE });
     expect(repository.createBindingCalls).toBe(0);
   });
@@ -300,7 +323,7 @@ describe("SsoCenter", () => {
 
     const { state } = await createLoginState(center);
     await expect(
-      center.loginCallback({ code: "code", state })
+      center.loginCallback({ code: "code", state, requestId: REQUEST_ID })
     ).resolves.toEqual({
       userObj: {
         id: 1,
@@ -308,6 +331,10 @@ describe("SsoCenter", () => {
         langCode: "zh-CN",
         token: "hodor-1-subject-1",
       },
+    });
+    expect(provider.lastExchangeInput).toMatchObject({
+      requestId: REQUEST_ID,
+      audience: configuration.audience,
     });
     expect(repository.bindings[0]?.updateTimeUtc).toBe(now);
     await expect(center.getBindingSummary(1)).resolves.toMatchObject({
@@ -332,7 +359,7 @@ describe("SsoCenter", () => {
     provider.principal = mismatchedPrincipal;
     const { state } = await createLoginState(center);
     await expect(
-      center.loginCallback({ code: "code", state })
+      center.loginCallback({ code: "code", state, requestId: REQUEST_ID })
     ).rejects.toMatchObject({ code: SsoErrorCode.PRINCIPAL_MISMATCH });
   });
 });
@@ -340,6 +367,7 @@ describe("SsoCenter", () => {
 async function createLoginState(center: SsoCenter): Promise<{ state: string }> {
   const result = await center.createLoginUrl({
     redirectUri: configuration.redirectUris[0],
+    requestId: REQUEST_ID,
   });
   const state = new URL(result.url).searchParams.get("state");
   if (!state) throw new Error("Fake Provider 未返回 state");
@@ -350,10 +378,16 @@ async function bind(center: SsoCenter, userId: number) {
   const result = await center.createBindUrl({
     userId,
     redirectUri: configuration.redirectUris[0],
+    requestId: REQUEST_ID,
   });
   const state = new URL(result.url).searchParams.get("state");
   if (!state) throw new Error("Fake Provider 未返回 state");
-  return center.bindCallback({ code: "code", state, userId });
+  return center.bindCallback({
+    code: "code",
+    state,
+    userId,
+    requestId: REQUEST_ID,
+  });
 }
 
 function makeBinding(

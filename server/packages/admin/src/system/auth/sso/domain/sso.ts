@@ -34,6 +34,7 @@ export type SsoIssuerPolicy = {
 export type SsoClientConfiguration = SsoIssuerPolicy & {
   issuer: string;
   clientId: string;
+  audience: string;
   tenantId: string;
   redirectUris: readonly string[];
 };

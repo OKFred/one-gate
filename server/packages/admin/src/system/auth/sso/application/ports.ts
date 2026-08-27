@@ -44,6 +44,7 @@ export interface SsoRepositoryPort {
 
 export interface SsoOidcProviderPort {
   createAuthorizationUrl(input: {
+    requestId: string;
     issuer: string;
     clientId: string;
     redirectUri: string;
@@ -52,8 +53,10 @@ export interface SsoOidcProviderPort {
     pkce: Pick<S256PkceInput, "codeChallenge" | "codeChallengeMethod">;
   }): Promise<string>;
   exchangeCode(input: {
+    requestId: string;
     issuer: string;
     clientId: string;
+    audience: string;
     redirectUri: string;
     code: string;
     codeVerifier: string;

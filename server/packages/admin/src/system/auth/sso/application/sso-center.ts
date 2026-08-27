@@ -41,29 +41,34 @@ export class SsoCenter {
 
   async createLoginUrl(params: {
     redirectUri: string;
+    requestId: string;
   }): Promise<{ url: string }> {
     return this.createAuthorization({
       intent: "login",
       redirectUri: params.redirectUri,
       userId: null,
+      requestId: params.requestId,
     });
   }
 
   async createBindUrl(params: {
     redirectUri: string;
     userId: number;
+    requestId: string;
   }): Promise<{ url: string }> {
     await this.requireEnabledUser(params.userId);
     return this.createAuthorization({
       intent: "bind",
       redirectUri: params.redirectUri,
       userId: params.userId,
+      requestId: params.requestId,
     });
   }
 
   async loginCallback(params: {
     code: string;
     state: string;
+    requestId: string;
   }): Promise<SsoLoginResult> {
     const completed = await this.completeAuthorization({
       ...params,
@@ -109,6 +114,7 @@ export class SsoCenter {
     code: string;
     state: string;
     userId: number;
+    requestId: string;
   }): Promise<SsoBindingResult> {
     const completed = await this.completeAuthorization({
       ...params,
@@ -175,7 +181,7 @@ export class SsoCenter {
   }
 
   private async createAuthorization(
-    input: CreateSsoAuthorizationInput
+    input: CreateSsoAuthorizationInput & { requestId: string }
   ): Promise<{ url: string }> {
     if (
       (input.intent === "login" && input.userId !== null) ||
@@ -219,6 +225,7 @@ export class SsoCenter {
       createTimeUtc: now,
     });
     const url = await this.dependencies.provider.createAuthorizationUrl({
+      requestId: input.requestId,
       issuer: configuration.issuer,
       clientId: configuration.clientId,
       redirectUri,
@@ -237,6 +244,7 @@ export class SsoCenter {
     state: string;
     expectedIntent: SsoIntent;
     currentUserId: number | null;
+    requestId: string;
   }): Promise<{
     principal: VerifiedSsoPrincipal;
     transaction: SsoTransaction;
@@ -278,8 +286,10 @@ export class SsoCenter {
     }
     const codeVerifier = await this.decryptVerifier(transaction);
     const verifiedPrincipal = await this.dependencies.provider.exchangeCode({
+      requestId: params.requestId,
       issuer: transaction.issuer,
       clientId: transaction.clientId,
+      audience: configuration.audience,
       redirectUri: transaction.redirectUri,
       code: params.code,
       codeVerifier,
@@ -296,7 +306,7 @@ export class SsoCenter {
   private getConfiguration(): SsoClientConfiguration {
     const raw = this.dependencies.configuration();
     const issuer = normalizeSsoIssuer(raw.issuer, raw);
-    if (!raw.clientId.trim() || !raw.tenantId.trim()) {
+    if (!raw.clientId.trim() || !raw.audience.trim() || !raw.tenantId.trim()) {
       throw new SsoError(
         SsoErrorCode.INVALID_REQUEST,
         "SSO 客户端或租户配置无效"
