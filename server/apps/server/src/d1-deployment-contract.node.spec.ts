@@ -123,7 +123,7 @@ describe("D1 deployment contract", () => {
     expect(deployAt).toBeGreaterThan(contractAt);
   });
 
-  it("deploys required OAuth secrets and treats Feishu credentials as optional", () => {
+  it("deploys required identity and Access settings while Feishu stays optional", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
@@ -131,6 +131,14 @@ describe("D1 deployment contract", () => {
       "MOBILE_SENSITIVE_DATA_KEY",
       "OAUTH_SENSITIVE_DATA_KEY",
       "OAUTH_ALLOWED_REDIRECT_ORIGINS",
+      "SSO_ISSUER",
+      "SSO_CLIENT_ID",
+      "SSO_AUDIENCE",
+      "SSO_ALLOWED_TENANT_ID",
+      "SSO_ALLOWED_REDIRECT_URIS",
+      "CF_ACCESS_TEAM_DOMAIN",
+      "CF_ACCESS_APPLICATION_AUDIENCE",
+      "HODOR_ALLOWED_WEB_ORIGINS",
     ]) {
       expect(workflow).toContain(
         `${secretName}: \${{ secrets.${secretName} }}`

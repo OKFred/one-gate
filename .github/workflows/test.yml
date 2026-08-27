@@ -169,6 +169,14 @@ jobs:
             JWT_SECRET
             MOBILE_SENSITIVE_DATA_KEY
             MOBILE_RELEASE_PUBLISH_TOKEN
+            SSO_ISSUER
+            SSO_CLIENT_ID
+            SSO_AUDIENCE
+            SSO_ALLOWED_TENANT_ID
+            SSO_ALLOWED_REDIRECT_URIS
+            CF_ACCESS_TEAM_DOMAIN
+            CF_ACCESS_APPLICATION_AUDIENCE
+            HODOR_ALLOWED_WEB_ORIGINS
         env:
           GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
           GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
@@ -178,6 +186,14 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
           MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
+          SSO_ISSUER: ${{ secrets.SSO_ISSUER }}
+          SSO_CLIENT_ID: ${{ secrets.SSO_CLIENT_ID }}
+          SSO_AUDIENCE: ${{ secrets.SSO_AUDIENCE }}
+          SSO_ALLOWED_TENANT_ID: ${{ secrets.SSO_ALLOWED_TENANT_ID }}
+          SSO_ALLOWED_REDIRECT_URIS: ${{ secrets.SSO_ALLOWED_REDIRECT_URIS }}
+          CF_ACCESS_TEAM_DOMAIN: ${{ secrets.CF_ACCESS_TEAM_DOMAIN }}
+          CF_ACCESS_APPLICATION_AUDIENCE: ${{ secrets.CF_ACCESS_APPLICATION_AUDIENCE }}
+          HODOR_ALLOWED_WEB_ORIGINS: ${{ secrets.HODOR_ALLOWED_WEB_ORIGINS }}
 
       # 系统 Schema 属于发布产物的一部分；失败时阻断 Pages 发布，避免 UI 依赖空 D1 配置。
       - name: Sync System Schemas to Remote D1
