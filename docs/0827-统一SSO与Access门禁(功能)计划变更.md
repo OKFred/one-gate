@@ -2,8 +2,8 @@
 
 ## 实施顺序
 
-1. 新增类型化路由政策 manifest，并让 `encapsulation` 从中推导认证豁免；将无来源认证的旧
-   `device-app/callback` 标记为 Access 部署阻塞项。
+1. 新增类型化路由政策 manifest，并让 `encapsulation` 从中推导认证豁免；为旧
+   `device-app/callback` 补设备令牌来源认证后纳入机器路由 Access Bypass。
 2. 统一 core request ID、结构化访问/错误日志和安全出站日志，补 CORS/OPTIONS 契约。
 3. 增加 SSO domain/application/ports 及 Fake Ports 测试。
 4. 追加无外键 migration、Drizzle model 与 repository；验证空库和升级路径。
