@@ -21,6 +21,7 @@ const expectedBrowserRoutes = [
 
 const expectedMachineRoutes = [
   "/admin/mobile/async-task/callback",
+  "/admin/mobile/device-app/callback",
   "/admin/mobile/device/report/presence",
   "/admin/mobile/device/report/info",
   "/admin/mobile/device/report/event",
@@ -34,9 +35,7 @@ describe("access route policy", () => {
   it("keeps each policy category immutable and complete", () => {
     expect(browserAccessProtectedAnonymous).toEqual(expectedBrowserRoutes);
     expect(machineAccessBypass).toEqual(expectedMachineRoutes);
-    expect(blockedLegacyUnauthenticated).toEqual([
-      "/admin/mobile/device-app/callback",
-    ]);
+    expect(blockedLegacyUnauthenticated).toEqual([]);
     expect(websocketAccessBypass).toEqual(["/admin/mobile/device-ops/ws"]);
 
     expect(Object.isFrozen(browserAccessProtectedAnonymous)).toBe(true);
@@ -80,15 +79,13 @@ describe("access route policy", () => {
     expect(isHodorAuthBypassed(websocketSessionPath)).toBe(false);
   });
 
-  it("blocks the unauthenticated legacy callback from Access bypass deployment", () => {
+  it("allows the device-token-authenticated legacy callback to bypass Access", () => {
     const legacyCallback = "/admin/mobile/device-app/callback";
 
-    expect(classifyAccessRoute(legacyCallback)).toBe(
-      "blockedLegacyUnauthenticated"
-    );
+    expect(classifyAccessRoute(legacyCallback)).toBe("machineAccessBypass");
     expect(isHodorAuthBypassed(legacyCallback)).toBe(true);
-    expect(getAccessDeploymentDecision(legacyCallback)).toBe("block");
-    expect(machineAccessBypass).not.toContain(legacyCallback);
+    expect(getAccessDeploymentDecision(legacyCallback)).toBe("bypass");
+    expect(machineAccessBypass).toContain(legacyCallback);
   });
 
   it("exports explicit deployment decisions for every deployable category", () => {

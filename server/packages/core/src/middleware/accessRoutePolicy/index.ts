@@ -27,6 +27,7 @@ export const browserAccessProtectedAnonymous = freezeRoutePaths([
 /** Machine routes that bypass Access and authenticate with application credentials. */
 export const machineAccessBypass = freezeRoutePaths([
   "/admin/mobile/async-task/callback",
+  "/admin/mobile/device-app/callback",
   "/admin/mobile/device/report/presence",
   "/admin/mobile/device/report/info",
   "/admin/mobile/device/report/event",
@@ -40,9 +41,7 @@ export const machineAccessBypass = freezeRoutePaths([
  * Legacy routes that currently skip Hodor auth but lack a safe machine
  * credential. Access deployment must stop instead of creating a bypass policy.
  */
-export const blockedLegacyUnauthenticated = freezeRoutePaths([
-  "/admin/mobile/device-app/callback",
-] as const);
+export const blockedLegacyUnauthenticated = freezeRoutePaths([] as const);
 
 /** WebSocket routes have a separate Access policy and are not HTTP auth exemptions. */
 export const websocketAccessBypass = freezeRoutePaths([

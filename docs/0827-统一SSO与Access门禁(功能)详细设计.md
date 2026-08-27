@@ -62,10 +62,9 @@ Hodor 不导入 `one-person-company` 内部包；协议适配器仅使用标准 
 核验脚本读取同一 manifest 检查更具体路径优先级、OPTIONS 和机器 service-token 策略。Access 放行
 不等于应用鉴权放行：机器路由继续验证现有 Hodor API Token。
 
-`/admin/mobile/device-app/callback` 经代码复核确认尚无设备 Token 或 HMAC。为保持旧客户端兼容，
-应用层暂时保留其既有 Hodor JWT 豁免，但 manifest 必须标记为 `blockedLegacyUnauthenticated`，Access
-部署核验遇到该路径必须失败，禁止生成 Bypass policy。后续只有在补充来源认证或确认废弃后才能解除
-阻塞。
+`/admin/mobile/device-app/callback` 保留旧 payload 与响应，并强制从 `X-Device-Token` 读取令牌；服务端
+先按 `taskId` 查询任务归属的 `clientId` 并校验设备上报令牌，认证通过后才允许写入任务状态，因此可按
+机器路由配置 Access Bypass。query/body 中的令牌不参与认证。
 
 Access OTP 仅允许 `developer@example.com`。自动化调用使用 Cloudflare Access Service Token，再叠加
 现有 Hodor API Token。远端 Access 政策写入必须在代码、本地测试和配置 diff 经确认后执行。
