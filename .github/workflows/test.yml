@@ -76,7 +76,7 @@ jobs:
         working-directory: ./platform
 
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install chromium
         working-directory: ./platform
 
       - name: Run Mock OAuth E2E
