@@ -28,6 +28,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 11
+          dest: ~/setup-pnpm-node-server
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -99,6 +100,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 11
+          dest: ~/setup-pnpm-node-server
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
