@@ -10,15 +10,17 @@ import { getEnv } from "@hodor/core/utils/env.js";
 import createAdminApp from "@hodor/admin/index.js";
 import createEnterpriseApp from "@hodor/enterprise/index.js";
 import createPersonalApp from "@hodor/personal/index.js";
+import { registerCloudflareAccessOrigin } from "./security/cloudflare-access.js";
 
 function createApp() {
   const app = new OpenAPIHono<AppBindings>();
 
   serveStaticFiles(app);
   errorHandler(app);
-  corsHandler(app);
-  serverTiming(app);
   logHandler(app);
+  corsHandler(app);
+  registerCloudflareAccessOrigin(app);
+  serverTiming(app);
 
   const apiApp = new OpenAPIHono<AppBindings>();
   apiApp.route("/admin", createAdminApp());
@@ -26,7 +28,9 @@ function createApp() {
   apiApp.route("/personal", createPersonalApp());
 
   const baseApiPath = getEnv("BASE_API_PATH");
-  !baseApiPath && console.error("❌.MISSING ENV: BASE_API_PATH");
+  if (!baseApiPath) {
+    console.error("❌.MISSING ENV: BASE_API_PATH");
+  }
   app.route(baseApiPath || "", apiApp);
 
   app.get("/healthCheck", (c: Context) => {
@@ -43,7 +47,9 @@ function createApp() {
       message: "Version OK!",
     });
   });
-  getEnv("NODE_ENV") !== "production" && docRegister(app);
+  if (getEnv("NODE_ENV") !== "production") {
+    docRegister(app);
+  }
   return app;
 }
 export default createApp;
