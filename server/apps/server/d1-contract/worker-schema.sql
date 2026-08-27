@@ -155,6 +155,59 @@ SELECT `id`
 FROM `system_user_oauth` INDEXED BY `system_user_oauth_user_provider_unique`
 LIMIT 0;
 
+SELECT
+  `id`,
+  `user_id`,
+  `issuer`,
+  `subject`,
+  `principal_user_id`,
+  `tenant_id`,
+  `membership_id`,
+  `client_id`,
+  `amr`,
+  `scope`,
+  `create_time_utc`,
+  `update_time_utc`
+FROM `system_user_sso_identity`
+LIMIT 0;
+
+SELECT `id`
+FROM `system_user_sso_identity`
+INDEXED BY `system_user_sso_identity_issuer_subject_unique`
+LIMIT 0;
+
+SELECT `id`
+FROM `system_user_sso_identity`
+INDEXED BY `system_user_sso_identity_user_issuer_unique`
+LIMIT 0;
+
+SELECT
+  `id`,
+  `state_digest`,
+  `intent`,
+  `expected_user_id`,
+  `issuer`,
+  `client_id`,
+  `tenant_id`,
+  `redirect_uri`,
+  `encrypted_code_verifier`,
+  `nonce_digest`,
+  `expires_at_utc`,
+  `consumed_at_utc`,
+  `create_time_utc`
+FROM `system_sso_oidc_transaction`
+LIMIT 0;
+
+SELECT `id`
+FROM `system_sso_oidc_transaction`
+INDEXED BY `system_sso_oidc_transaction_state_unique`
+LIMIT 0;
+
+SELECT `id`
+FROM `system_sso_oidc_transaction`
+INDEXED BY `system_sso_oidc_transaction_expiry_idx`
+LIMIT 0;
+
 SELECT `id`, `release_version`, `artifact_key`, `artifact_sha256`, `artifact_size`, `manifest_json`, `status`
 FROM `admin_mobile_client_release`
 LIMIT 0;

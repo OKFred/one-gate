@@ -222,6 +222,77 @@ describe("legacy D1 schema migrations", () => {
     ).rejects.toThrow();
   });
 
+  it("creates SSO bindings and one-time OIDC transactions without foreign keys", async () => {
+    const client = createMemoryClient();
+    const migration = readMigration("./20260827_01_sso_gateway_identity.sql");
+
+    expect(migration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(migration).not.toMatch(/\bREFERENCES\b/i);
+    await executeSqlFile(client, migration);
+
+    const objects = await client.execute(`
+      SELECT name FROM sqlite_master
+      WHERE name LIKE 'system_user_sso_identity%'
+         OR name LIKE 'system_sso_oidc_transaction%'
+    `);
+    expect(new Set(objects.rows.map((row) => String(row.name)))).toEqual(
+      new Set([
+        "system_user_sso_identity",
+        "system_user_sso_identity_issuer_subject_unique",
+        "system_user_sso_identity_user_issuer_unique",
+        "system_sso_oidc_transaction",
+        "system_sso_oidc_transaction_state_unique",
+        "system_sso_oidc_transaction_expiry_idx",
+      ])
+    );
+
+    const identityForeignKeys = await client.execute(
+      "PRAGMA foreign_key_list('system_user_sso_identity')"
+    );
+    const transactionForeignKeys = await client.execute(
+      "PRAGMA foreign_key_list('system_sso_oidc_transaction')"
+    );
+    expect(identityForeignKeys.rows).toHaveLength(0);
+    expect(transactionForeignKeys.rows).toHaveLength(0);
+
+    const identityColumns = await client.execute(
+      "PRAGMA table_info('system_user_sso_identity')"
+    );
+    expect(identityColumns.rows.map((row) => String(row.name))).toEqual([
+      "id",
+      "user_id",
+      "issuer",
+      "subject",
+      "principal_user_id",
+      "tenant_id",
+      "membership_id",
+      "client_id",
+      "amr",
+      "scope",
+      "create_time_utc",
+      "update_time_utc",
+    ]);
+
+    const transactionColumns = await client.execute(
+      "PRAGMA table_info('system_sso_oidc_transaction')"
+    );
+    expect(transactionColumns.rows.map((row) => String(row.name))).toEqual([
+      "id",
+      "state_digest",
+      "intent",
+      "expected_user_id",
+      "issuer",
+      "client_id",
+      "tenant_id",
+      "redirect_uri",
+      "encrypted_code_verifier",
+      "nonce_digest",
+      "expires_at_utc",
+      "consumed_at_utc",
+      "create_time_utc",
+    ]);
+  });
+
   it("creates immutable client release, environment revision, and deployment tables", async () => {
     const client = createMemoryClient();
     await executeSqlFile(
