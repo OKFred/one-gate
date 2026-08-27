@@ -34,6 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
+          mirror: https://nodejs.org/dist
           cache: "pnpm"
           cache-dependency-path: "server/pnpm-lock.yaml"
 
@@ -76,7 +77,7 @@ jobs:
         working-directory: ./platform
 
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --no-shell chromium
         working-directory: ./platform
 
       - name: Run Mock OAuth E2E
@@ -106,6 +107,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
+          mirror: https://nodejs.org/dist
           cache: "pnpm"
           cache-dependency-path: "server/pnpm-lock.yaml"
 
