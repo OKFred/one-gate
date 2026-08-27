@@ -180,15 +180,15 @@ describe("Cloudflare Access origin middleware", () => {
     ]);
   });
 
-  it("keeps the blocked legacy callback protected instead of bypassing it", async () => {
+  it("bypasses Access for the device-token-authenticated legacy callback", async () => {
     const logs: CloudflareAccessLogEvent[] = [];
     const app = createTestApp(logs);
     const response = await app.request(
       "/api/v1/admin/mobile/device-app/callback"
     );
 
-    expect(response.status).toBe(403);
-    expect(logs.at(-1)?.authOutcome).toBe("denied_missing");
+    expect(response.status).toBe(200);
+    expect(logs.at(-1)?.authOutcome).toBe("bypassed_machine");
   });
 
   it("fails closed when production Access configuration is missing", async () => {
@@ -239,7 +239,7 @@ describe("Access route requirements", () => {
         "/api/v1/admin/mobile/device-app/callback",
         "/api/v1"
       )
-    ).toBe("required");
+    ).toBe("machine-bypass");
     expect(
       resolveAccessRequirement(
         "/other/api/v1/admin/system/auth/login",
