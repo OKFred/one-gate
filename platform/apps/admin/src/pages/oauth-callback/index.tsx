@@ -4,9 +4,6 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 import { showSnackbar } from '@/components/Notification';
 import { authUtils } from '@/utils/auth';
 import { oauthAccountCallbackFn, oauthLoginCallbackFn } from '@/api/admin/system/auth';
-import { useMenu } from '@/hooks/useMenu';
-import { findFirstValidPath } from '@/hooks/useFirstValidPath';
-import { usePermission } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 
 function readCallbackParameters() {
@@ -24,8 +21,6 @@ export default function OAuthCallback() {
   const navigate = useNavigate();
   const t = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
-  const { loadMenus } = useMenu();
-  const { refreshPermissions } = usePermission();
 
   useEffect(() => {
     const { code, state } = readCallbackParameters();
@@ -49,8 +44,7 @@ export default function OAuthCallback() {
         authUtils.removeUserInfo();
         const response = await oauthLoginCallbackFn({ data: { code, state } });
         authUtils.setUserInfo(response.data.data.userObj);
-        const [menus] = await Promise.all([loadMenus(), refreshPermissions()]);
-        navigate(findFirstValidPath(menus, '/me'), { replace: true });
+        navigate('/login', { replace: true });
         showSnackbar({ message: t('oauth.loginSuccess'), type: 'success' });
       } catch {
         setErrorMessage(t('oauth.authFailedRetry'));
@@ -58,7 +52,7 @@ export default function OAuthCallback() {
     };
 
     void processCallback();
-  }, [loadMenus, navigate, refreshPermissions, t]);
+  }, [navigate, t]);
 
   return (
     <Box

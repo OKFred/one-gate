@@ -4,9 +4,6 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 import { showSnackbar } from '@/components/Notification';
 import { authUtils } from '@/utils/auth';
 import { ssoAccountCallbackFn, ssoLoginCallbackFn } from '@/api/admin/system/auth';
-import { useMenu } from '@/hooks/useMenu';
-import { findFirstValidPath } from '@/hooks/useFirstValidPath';
-import { usePermission } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { SsoCallbackIntent } from '@/utils/oauthCallback';
 
@@ -30,8 +27,6 @@ export default function SsoCallback() {
   const navigate = useNavigate();
   const t = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
-  const { loadMenus } = useMenu();
-  const { refreshPermissions } = usePermission();
 
   useEffect(() => {
     const { code, state, intent } = readCallbackParameters();
@@ -52,8 +47,7 @@ export default function SsoCallback() {
         authUtils.removeUserInfo();
         const response = await ssoLoginCallbackFn({ data: { code, state } });
         authUtils.setUserInfo(response.data.data.userObj);
-        const [menus] = await Promise.all([loadMenus(), refreshPermissions()]);
-        navigate(findFirstValidPath(menus, '/me'), { replace: true });
+        navigate('/login', { replace: true });
         showSnackbar({ message: t('sso.loginSuccess'), type: 'success' });
       } catch {
         setErrorMessage(t('sso.authFailedRetry'));
@@ -61,7 +55,7 @@ export default function SsoCallback() {
     };
 
     void processCallback();
-  }, [loadMenus, navigate, refreshPermissions, t]);
+  }, [navigate, t]);
 
   const backPath = authUtils.isAuthenticated() ? '/me' : '/login';
 

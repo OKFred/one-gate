@@ -70,6 +70,12 @@ export const auth = {
   'sso.verifying': 'Verifying Identity Center authorization...',
   'sso.back': 'Back',
 
+  'totpGate.title': 'Security verification',
+  'totpGate.description': 'Enter the current 6-digit code from Microsoft Authenticator or 2FAS.',
+  'totpGate.code': 'Authenticator code',
+  'totpGate.verify': 'Verify and continue',
+  'totpGate.sixDigitRequired': 'Enter a 6-digit code',
+
   'me.title': 'My Profile',
   'me.subtitle': 'Personal Information',
   'me.region': 'Country/Region',

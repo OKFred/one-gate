@@ -102,14 +102,20 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
     }
   };
   // 处理登出
-  const handleLogout = () => {
+  const handleLogout = async () => {
     handleClose();
-    authUtils.logout();
-    if (import.meta.env.VITE_APP_SCOPE !== 'admin') {
-      const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
-      window.location.href = `${adminUrl}/#/login`;
-    } else {
-      navigate(loginPath);
+    try {
+      await AuthAPI.totpGateLogoutFn({ data: {} });
+    } catch {
+      // Local auth is still cleared; a stale cookie cannot pass with a new token.
+    } finally {
+      authUtils.logout();
+      if (import.meta.env.VITE_APP_SCOPE !== 'admin') {
+        const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
+        window.location.href = `${adminUrl}/#/login`;
+      } else {
+        navigate(loginPath);
+      }
     }
   };
 

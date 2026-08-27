@@ -14,6 +14,33 @@ export const loginFn = (
   });
 };
 
+export const totpGateStatusFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/gate/status', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/gate/status',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const totpGateVerifyFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/gate/verify', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/gate/verify',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const totpGateLogoutFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/gate/logout', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/gate/logout',
+    method: 'post',
+    ...axiosConfig,
+  });
+
 export const wechatLoginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/wechat', 'post'>, 'url' | 'method'>,
 ) => {

@@ -9,7 +9,7 @@ import type { paths } from '@/types/openapi'; //由openapi-typescript自动生�
 import { showGlobalNotification, showSnackbar } from '@/components/Notification';
 
 // 导入认证工具
-import { authUtils } from '@/utils/auth';
+import { authUtils, TOTP_GATE_REQUIRED_EVENT } from '@/utils/auth';
 // 导入翻译函数创建器（非Hook版本，可在拦截器中使用）
 import { createTranslator } from '@/hooks/useTranslation';
 import { loginPath } from '@/routes';
@@ -140,8 +140,20 @@ function setupInterceptors(service: AxiosInstance) {
       const langCode = authUtils.getUserInfo()?.langCode;
       const t = createTranslator(langCode);
       const status = error.response?.status;
+      const errorCode = readErrorCode(error.response?.data);
       const requestId = (error.config as InternalAxiosRequestConfig & { requestId?: string })
         ?.requestId;
+
+      if (status === 401 && errorCode?.startsWith('TOTP_')) {
+        if (requestId) requestQueueManager.removeRequest(requestId);
+        if (errorCode === 'TOTP_GATE_REQUIRED') {
+          requestQueueManager.abortAllRequests(requestId);
+          window.dispatchEvent(new Event(TOTP_GATE_REQUIRED_EVENT));
+        } else {
+          handleErrorResponse(error.response?.data, error.message || t('error.requestFailed'));
+        }
+        return Promise.reject(error);
+      }
 
       // 401 未授权：清理并跳转登录
       if (status === 401) {
@@ -185,6 +197,13 @@ function setupInterceptors(service: AxiosInstance) {
     },
   );
   return service;
+}
+
+function readErrorCode(data: unknown): string | undefined {
+  if (!data || typeof data !== 'object' || !('data' in data)) return undefined;
+  const payload = data.data;
+  if (!payload || typeof payload !== 'object' || !('code' in payload)) return undefined;
+  return typeof payload.code === 'string' ? payload.code : undefined;
 }
 
 function handleErrorResponse(
