@@ -49,7 +49,6 @@ Hodor 不导入 `one-person-company` 内部包；协议适配器仅使用标准 
 
 ### 机器调用，可绕过 Access OTP，但仍须应用层机器凭证
 
-- `/admin/mobile/device-app/callback`
 - `/admin/mobile/async-task/callback`
 - `/admin/mobile/device/report/presence`
 - `/admin/mobile/device/report/info`
@@ -62,6 +61,11 @@ Hodor 不导入 `one-person-company` 内部包；协议适配器仅使用标准 
 设备运维 WebSocket 单独分类。`encapsulation` 只从 manifest 推导“免 Hodor 用户 JWT”集合；Access
 核验脚本读取同一 manifest 检查更具体路径优先级、OPTIONS 和机器 service-token 策略。Access 放行
 不等于应用鉴权放行：机器路由继续验证现有 Hodor API Token。
+
+`/admin/mobile/device-app/callback` 经代码复核确认尚无设备 Token 或 HMAC。为保持旧客户端兼容，
+应用层暂时保留其既有 Hodor JWT 豁免，但 manifest 必须标记为 `blockedLegacyUnauthenticated`，Access
+部署核验遇到该路径必须失败，禁止生成 Bypass policy。后续只有在补充来源认证或确认废弃后才能解除
+阻塞。
 
 Access OTP 仅允许 `developer@example.com`。自动化调用使用 Cloudflare Access Service Token，再叠加
 现有 Hodor API Token。远端 Access 政策写入必须在代码、本地测试和配置 diff 经确认后执行。
@@ -113,4 +117,3 @@ ID 作为 AAD。清理任务只删除已过期 transaction，不级联业务数�
 - 前端：SSO 登录、绑定/解绑、callback、现有三种登录回归，凭证不落 localStorage。
 - Windows 运行 server/platform TypeScript、定向 Vitest、build、OpenAPI 生成、ESLint/Prettier。
 - 联合本地验收后，再经确认创建 OIDC client、应用 migration、配置 Access、部署 staging 与 production。
-
