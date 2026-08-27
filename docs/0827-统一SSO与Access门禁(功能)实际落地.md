@@ -6,7 +6,10 @@
 - 新增登录 URL、登录回调、绑定 URL、绑定回调、解绑和绑定摘要六个 POST 接口。
 - 使用服务端一次性 state、S256 PKCE、nonce、严格 issuer/audience/tenant 校验；OIDC token、
   code、verifier 和 nonce 不写入数据库、浏览器存储或日志。
+- login/bind 使用带 `intent` query 的两个精确 callback URI；后端把 intent 和当前用户纳入原子消费
+  条件，错误入口不会烧掉 state。
 - 新增两张无外键表保存 SSO 身份绑定和十分钟事务；事务以条件更新实现单次消费。
+- 每次创建授权前清理已消费或过期 transaction，避免中间数据无限保留。
 - Node 与 Worker 使用本地锁定的 `jose` 校验 one-sso EdDSA JWT 和 Cloudflare Access JWT。
 - 管理端保留密码、GitHub、飞书入口，并新增 one-sso 登录、固定 callback、绑定和解绑。
 - OpenAPI 类型由 Windows 本地 Worker `/doc.json` 生成，前端不保留手写重复 DTO。
@@ -41,7 +44,8 @@
 
 1. 在 one-sso 为 `self` 租户创建 public OIDC client，保存只显示一次的 client ID。
 2. 配置 Hodor 本地忽略变量、GitHub Environment 和 Worker secrets。
-3. 配置 Cloudflare Access OTP 与机器 Bypass/Service Token policy。
+3. 配置 Cloudflare Access OTP 与机器 Bypass/Service Token policy；跨域 API Access 应用必须开启
+   `options_preflight_bypass`，并用真实浏览器验证 OPTIONS。
 4. 执行远程 migration、部署，再验收未绑定 403、显式绑定、登录、解绑、设备回调和 requestId
    串联日志。
 

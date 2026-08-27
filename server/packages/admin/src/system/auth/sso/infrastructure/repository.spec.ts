@@ -5,7 +5,7 @@ import userSql from "@hodor/core/db/sql/admin/system_user.sql?raw";
 import ssoIdentitySql from "@hodor/core/db/sql/admin/system_user_sso_identity.sql?raw";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { userTable } from "../../../user/model.js";
-import type { NewSsoBinding } from "../application/ports.js";
+import type { NewSsoBinding, SsoRepositoryPort } from "../application/ports.js";
 import {
   SsoErrorCode,
   type SsoTransaction,
@@ -93,22 +93,42 @@ beforeEach(async () => {
 });
 
 describe("DrizzleSsoRepository transactions", () => {
+  const consume = (
+    consumedAtUtc: number,
+    overrides: Partial<
+      Parameters<SsoRepositoryPort["consumeTransaction"]>[0]
+    > = {}
+  ) =>
+    repository.consumeTransaction({
+      stateDigest: "state-digest-1",
+      expectedIntent: "login",
+      expectedUserId: null,
+      consumedAtUtc,
+      ...overrides,
+    });
+
   it("atomically consumes a valid transaction once", async () => {
     await repository.createTransaction(createTransaction());
 
-    const results = await Promise.all([
-      repository.consumeTransaction("state-digest-1", 10_000),
-      repository.consumeTransaction("state-digest-1", 10_001),
-    ]);
+    const results = await Promise.all([consume(10_000), consume(10_001)]);
 
     expect(results.filter((item) => item !== null)).toHaveLength(1);
     expect(results.find((item) => item !== null)).toMatchObject({
       id: "transaction-1",
       stateDigest: "state-digest-1",
     });
+    await expect(consume(10_002)).resolves.toBeNull();
+  });
+
+  it("does not consume a transaction for the wrong intent", async () => {
+    await repository.createTransaction(createTransaction());
+
     await expect(
-      repository.consumeTransaction("state-digest-1", 10_002)
+      consume(10_000, { expectedIntent: "bind", expectedUserId: 1 })
     ).resolves.toBeNull();
+    await expect(consume(10_001)).resolves.toMatchObject({
+      id: "transaction-1",
+    });
   });
 
   it("does not consume an expired transaction", async () => {
@@ -116,12 +136,27 @@ describe("DrizzleSsoRepository transactions", () => {
       createTransaction({ expiresAtUtc: 10_000 })
     );
 
-    await expect(
-      repository.consumeTransaction("state-digest-1", 10_000)
-    ).resolves.toBeNull();
+    await expect(consume(10_000)).resolves.toBeNull();
 
     const rows = await db.select().from(ssoOidcTransactionTable);
     expect(rows[0].consumedAtUtc).toBeNull();
+  });
+
+  it("deletes consumed and expired transactions", async () => {
+    await repository.createTransaction(createTransaction());
+    await repository.createTransaction(
+      createTransaction({
+        id: "transaction-2",
+        stateDigest: "state-digest-2",
+        expiresAtUtc: 9_000,
+      })
+    );
+    await consume(10_000);
+
+    await expect(repository.deleteRetiredTransactions(10_000)).resolves.toBe(2);
+    await expect(
+      db.select().from(ssoOidcTransactionTable)
+    ).resolves.toHaveLength(0);
   });
 });
 

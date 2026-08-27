@@ -27,13 +27,34 @@ class FakeRepository implements SsoRepositoryPort {
   }
 
   async consumeTransaction(
-    stateDigest: string,
-    consumedAtUtc: number
+    input: Parameters<SsoRepositoryPort["consumeTransaction"]>[0]
   ): Promise<SsoTransaction | null> {
-    const transaction = this.transactions.get(stateDigest);
-    if (!transaction || transaction.consumedAtUtc !== null) return null;
-    transaction.consumedAtUtc = consumedAtUtc;
+    const transaction = this.transactions.get(input.stateDigest);
+    if (
+      !transaction ||
+      transaction.consumedAtUtc !== null ||
+      transaction.intent !== input.expectedIntent ||
+      transaction.expectedUserId !== input.expectedUserId ||
+      transaction.expiresAtUtc <= input.consumedAtUtc
+    ) {
+      return null;
+    }
+    transaction.consumedAtUtc = input.consumedAtUtc;
     return structuredClone(transaction);
+  }
+
+  async deleteRetiredTransactions(nowUtc: number): Promise<number> {
+    let deleted = 0;
+    for (const [stateDigest, transaction] of this.transactions) {
+      if (
+        transaction.consumedAtUtc !== null ||
+        transaction.expiresAtUtc <= nowUtc
+      ) {
+        this.transactions.delete(stateDigest);
+        deleted += 1;
+      }
+    }
+    return deleted;
   }
 
   async findBindingBySubject(issuer: string, subject: string) {
@@ -248,6 +269,37 @@ describe("SsoCenter", () => {
         requestId: REQUEST_ID,
       })
     ).rejects.toMatchObject({ code: SsoErrorCode.INVALID_STATE });
+  });
+
+  it("错误 callback intent 不消费 state，随后仍可走正确入口", async () => {
+    const { state } = await createLoginState(center);
+
+    await expect(
+      center.bindCallback({
+        code: "code",
+        state,
+        userId: 1,
+        requestId: REQUEST_ID,
+      })
+    ).rejects.toMatchObject({ code: SsoErrorCode.INVALID_STATE });
+    await expect(
+      center.loginCallback({ code: "code", state, requestId: REQUEST_ID })
+    ).rejects.toMatchObject({ code: SsoErrorCode.ACCOUNT_NOT_BOUND });
+  });
+
+  it("创建新授权前清理已消费或过期 transaction", async () => {
+    const first = await createLoginState(center);
+    await expect(
+      center.loginCallback({
+        code: "code",
+        state: first.state,
+        requestId: REQUEST_ID,
+      })
+    ).rejects.toMatchObject({ code: SsoErrorCode.ACCOUNT_NOT_BOUND });
+    expect(repository.transactions.size).toBe(1);
+
+    await createLoginState(center);
+    expect(repository.transactions.size).toBe(1);
   });
 
   it("未绑定登录返回 ACCOUNT_NOT_BOUND 且绝不创建用户或绑定", async () => {

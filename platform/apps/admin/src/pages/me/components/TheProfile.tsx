@@ -47,6 +47,7 @@ import {
   ssoBindingUnbindFn,
 } from '@/api/admin/system/auth';
 import type { SsoBindingSummary } from '@/api/admin/system/auth';
+import { getSsoCallbackUrl } from '@/utils/oauthCallback';
 
 type OAuthBindingSummary = NonNullable<GetProfileRes['userObj']['oauthBindings']>[number];
 type OAuthProfileData = OAuthBindingProfileRes;
@@ -244,7 +245,7 @@ const TheProfile = memo(
       setSsoLoading(true);
       try {
         const response = await ssoAccountUrlFn({
-          data: { redirectUri: `${window.location.origin}/sso/callback` },
+          data: { redirectUri: getSsoCallbackUrl(window.location.origin, 'bind') },
         });
         window.location.assign(response.data.data.url);
       } catch {

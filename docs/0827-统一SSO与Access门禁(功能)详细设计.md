@@ -68,6 +68,9 @@ Hodor 不导入 `one-person-company` 内部包；协议适配器仅使用标准 
 
 Access OTP 仅允许 `developer@example.com`。自动化调用使用 Cloudflare Access Service Token，再叠加
 现有 Hodor API Token。远端 Access 政策写入必须在代码、本地测试和配置 diff 经确认后执行。
+因 Admin Pages 与 Hodor API 跨域，Access 应用必须开启 `options_preflight_bypass`；否则浏览器的
+JSON/Authorization/`X-Request-Id` OPTIONS 预检会在到达 Worker CORS 前被边缘门禁拒绝。该项属于
+部署前硬性核验，不允许仅凭 Worker OPTIONS 测试判定通过。
 
 ## SSO 数据与状态
 
@@ -80,7 +83,8 @@ Access OTP 仅允许 `developer@example.com`。自动化调用使用 Cloudflare 
 
 应用层原子写入并验证 user 存在和启用状态。state、nonce 和 PKCE verifier 10 分钟过期且只消费
 一次；数据库只保存 state/nonce 摘要，verifier 使用现有根敏感数据密钥 AES-GCM 加密并以 transaction
-ID 作为 AAD。清理任务只删除已过期 transaction，不级联业务数据。
+ID 作为 AAD。login/bind 使用两个带 intent query 的精确 callback URI；intent 和当前用户进入原子
+消费条件，错误入口不会消费 state。创建新授权前删除已消费或过期 transaction，不级联业务数据。
 
 ## HTTP 与登录行为
 
@@ -93,7 +97,8 @@ ID 作为 AAD。清理任务只删除已过期 transaction，不级联业务数�
 - `/admin/system/auth/sso/binding/unbind`
 - `/admin/system/auth/sso/binding/summary`
 
-前端固定回调页接收 OIDC `code/state` 后 POST 给 Hodor；授权 URL 和 callback redirect 均需精确白名单。
+前端固定回调页接收 OIDC `code/state/intent` 后 POST 给 Hodor；授权 URL 和两个 callback redirect
+均需精确白名单，前端不再根据本地 JWT 猜测 login/bind。
 登录回调验证 Token 后，以 `(issuer, sub)` 查找绑定；不存在返回 403且用户数不变。绑定意图必须携带
 已认证 Hodor user，且 subject 和 user 两侧均不得重复绑定。成功登录继续签发现有 Hodor JWT。
 

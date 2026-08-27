@@ -20,10 +20,14 @@ export interface SsoRepositoryPort {
    * Atomically marks an unconsumed transaction as consumed and returns it.
    * A missing or previously consumed digest returns null.
    */
-  consumeTransaction(
-    stateDigest: string,
-    consumedAtUtc: number
-  ): Promise<SsoTransaction | null>;
+  consumeTransaction(input: {
+    stateDigest: string;
+    expectedIntent: SsoIntent;
+    expectedUserId: number | null;
+    consumedAtUtc: number;
+  }): Promise<SsoTransaction | null>;
+  /** Delete consumed or expired transactions before creating another flow. */
+  deleteRetiredTransactions(nowUtc: number): Promise<number>;
   findBindingBySubject(
     issuer: string,
     subject: string

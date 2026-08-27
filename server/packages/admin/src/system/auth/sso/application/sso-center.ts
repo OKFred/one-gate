@@ -209,6 +209,7 @@ export class SsoCenter {
       id,
       pkce.codeVerifier
     );
+    await this.dependencies.repository.deleteRetiredTransactions(now);
     await this.dependencies.repository.createTransaction({
       id,
       stateDigest,
@@ -257,16 +258,13 @@ export class SsoCenter {
     const stateDigest = await this.dependencies.hash.sha256Base64Url(
       params.state
     );
-    const transaction = await this.dependencies.repository.consumeTransaction(
+    const transaction = await this.dependencies.repository.consumeTransaction({
       stateDigest,
-      now
-    );
-    if (
-      !transaction ||
-      transaction.expiresAtUtc <= now ||
-      transaction.intent !== params.expectedIntent ||
-      transaction.expectedUserId !== params.currentUserId
-    ) {
+      expectedIntent: params.expectedIntent,
+      expectedUserId: params.currentUserId,
+      consumedAtUtc: now,
+    });
+    if (!transaction || transaction.expiresAtUtc <= now) {
       throw new SsoError(
         SsoErrorCode.INVALID_STATE,
         "SSO state 无效、已过期或已被使用"

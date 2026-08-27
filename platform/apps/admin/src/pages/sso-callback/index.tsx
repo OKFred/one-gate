@@ -8,6 +8,7 @@ import { useMenu } from '@/hooks/useMenu';
 import { findFirstValidPath } from '@/hooks/useFirstValidPath';
 import { usePermission } from '@/hooks/usePermission';
 import { useTranslation } from '@/hooks/useTranslation';
+import type { SsoCallbackIntent } from '@/utils/oauthCallback';
 
 function readCallbackParameters() {
   const hash = window.location.hash;
@@ -17,7 +18,12 @@ function readCallbackParameters() {
   return {
     code: searchParams.get('code'),
     state: searchParams.get('state'),
+    intent: searchParams.get('intent'),
   };
+}
+
+function isSsoCallbackIntent(value: string | null): value is SsoCallbackIntent {
+  return value === 'login' || value === 'bind';
 }
 
 export default function SsoCallback() {
@@ -28,15 +34,15 @@ export default function SsoCallback() {
   const { refreshPermissions } = usePermission();
 
   useEffect(() => {
-    const { code, state } = readCallbackParameters();
-    if (!code || !state) {
+    const { code, state, intent } = readCallbackParameters();
+    if (!code || !state || !isSsoCallbackIntent(intent)) {
       setErrorMessage(t('sso.missingCallbackParameters'));
       return;
     }
 
     const processCallback = async () => {
       try {
-        if (authUtils.isAuthenticated()) {
+        if (intent === 'bind') {
           await ssoAccountCallbackFn({ data: { code, state } });
           showSnackbar({ message: t('sso.bindSuccess'), type: 'success' });
           navigate('/me', { replace: true });

@@ -13,6 +13,7 @@ import { findFirstValidPath } from '@/hooks/useFirstValidPath';
 import { useMenu } from '@/hooks/useMenu';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getSsoCallbackUrl } from '@/utils/oauthCallback';
 import { usePermission } from '@/hooks/usePermission';
 
 export default function TheForm() {
@@ -110,7 +111,7 @@ export default function TheForm() {
     try {
       setLoading(true);
       const response = await ssoLoginUrlFn({
-        data: { redirectUri: `${window.location.origin}/sso/callback` },
+        data: { redirectUri: getSsoCallbackUrl(window.location.origin, 'login') },
       });
       window.location.assign(response.data.data.url);
     } catch {

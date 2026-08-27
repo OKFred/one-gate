@@ -1,5 +1,14 @@
 import db from "@hodor/core/db/index";
-import { and, eq, gt, isNull, type InferInsertModel } from "drizzle-orm";
+import {
+  and,
+  eq,
+  gt,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+  type InferInsertModel,
+} from "drizzle-orm";
 import { userTable } from "../../../user/model.js";
 import type {
   NewSsoBinding,
@@ -50,21 +59,39 @@ export class DrizzleSsoRepository implements SsoRepositoryPort {
   }
 
   async consumeTransaction(
-    stateDigest: string,
-    consumedAtUtc: number
+    input: Parameters<SsoRepositoryPort["consumeTransaction"]>[0]
   ): Promise<SsoTransaction | null> {
+    const expectedUserCondition =
+      input.expectedUserId === null
+        ? isNull(ssoOidcTransactionTable.expectedUserId)
+        : eq(ssoOidcTransactionTable.expectedUserId, input.expectedUserId);
     const rows = await db
       .update(ssoOidcTransactionTable)
-      .set({ consumedAtUtc })
+      .set({ consumedAtUtc: input.consumedAtUtc })
       .where(
         and(
-          eq(ssoOidcTransactionTable.stateDigest, stateDigest),
+          eq(ssoOidcTransactionTable.stateDigest, input.stateDigest),
+          eq(ssoOidcTransactionTable.intent, input.expectedIntent),
+          expectedUserCondition,
           isNull(ssoOidcTransactionTable.consumedAtUtc),
-          gt(ssoOidcTransactionTable.expiresAtUtc, consumedAtUtc)
+          gt(ssoOidcTransactionTable.expiresAtUtc, input.consumedAtUtc)
         )
       )
       .returning();
     return rows[0] ? toTransaction(rows[0]) : null;
+  }
+
+  async deleteRetiredTransactions(nowUtc: number): Promise<number> {
+    const rows = await db
+      .delete(ssoOidcTransactionTable)
+      .where(
+        or(
+          lte(ssoOidcTransactionTable.expiresAtUtc, nowUtc),
+          isNotNull(ssoOidcTransactionTable.consumedAtUtc)
+        )
+      )
+      .returning({ id: ssoOidcTransactionTable.id });
+    return rows.length;
   }
 
   async findBindingBySubject(
