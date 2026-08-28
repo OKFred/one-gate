@@ -13,6 +13,10 @@ import fs from "node:fs";
 import path from "node:path";
 import createApp from "../apps/server/src/index.js";
 import {
+  InMemoryTotpAttemptCoordinator,
+  createTotpGateCenter,
+} from "../packages/admin/src/system/auth/totp-gate/index.js";
+import {
   getAllSchemas,
   getVersionHash,
 } from "../packages/core/src/utils/schemaRegistry.js";
@@ -21,7 +25,10 @@ async function main() {
   console.log("\n🔄 正在初始化应用以收集 Schema 注册信息...");
 
   // 创建 app 触发 encapsulation → registerSchema
-  createApp();
+  const totpCoordinator = new InMemoryTotpAttemptCoordinator();
+  createApp({
+    resolveTotpGateCenter: () => createTotpGateCenter(totpCoordinator),
+  });
 
   const allSchemas = getAllSchemas();
   const schemaCount = allSchemas.size;
