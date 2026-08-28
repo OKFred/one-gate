@@ -27,10 +27,24 @@ class FakeState implements OAuthStatePort {
     return state;
   }
 
-  async consume(state: string): Promise<OAuthStateRecord | null> {
+  async consume(
+    state: string,
+    _consumedAtUtc: number
+  ): Promise<OAuthStateRecord | null> {
     const record = this.records.get(state) ?? null;
     this.records.delete(state);
     return record;
+  }
+
+  async deleteRetired(nowUtc: number): Promise<number> {
+    let deleted = 0;
+    for (const [state, record] of this.records) {
+      if (record.expiresAtUtc <= nowUtc) {
+        this.records.delete(state);
+        deleted += 1;
+      }
+    }
+    return deleted;
   }
 }
 

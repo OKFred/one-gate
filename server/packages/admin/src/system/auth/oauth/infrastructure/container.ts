@@ -6,7 +6,7 @@ import { webCryptoOAuthCipher } from "./cipher.js";
 import { githubOAuthProvider } from "./providers/github.js";
 import { feishuOAuthProvider } from "./providers/feishu.js";
 import { drizzleOAuthBindingRepository } from "./repository.js";
-import { kvOAuthStateAdapter } from "./state.js";
+import { drizzleOAuthStateAdapter } from "./state.js";
 
 function allowedRedirectOrigins(): string[] {
   const raw = getEnv("OAUTH_ALLOWED_REDIRECT_ORIGINS");
@@ -35,7 +35,7 @@ let center: OAuthCenter | null = null;
 export function getOAuthCenter(): OAuthCenter {
   if (!center) {
     center = new OAuthCenter({
-      state: kvOAuthStateAdapter,
+      state: drizzleOAuthStateAdapter,
       repository: drizzleOAuthBindingRepository,
       cipher: webCryptoOAuthCipher,
       clock: { now: () => Date.now() },

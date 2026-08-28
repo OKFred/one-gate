@@ -1,10 +1,9 @@
-import { kv } from "@hodor/core/middleware/cache/index.js";
+import db from "@hodor/core/db/index";
+import { and, eq, gt, isNotNull, isNull, lte, or } from "drizzle-orm";
+
 import type { OAuthStatePort } from "../application/ports.js";
 import type { OAuthStateRecord } from "../domain/oauth.js";
-
-const STATE_KEY_PREFIX = "system.auth.oauth.state:";
-const STATE_TTL_SECONDS = 10 * 60;
-export const oauthStateInFlight = new Set<string>();
+import { oauthStateTable } from "../model.js";
 
 function randomState(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
@@ -16,24 +15,69 @@ function randomState(): string {
     .replace(/=+$/, "");
 }
 
-export const kvOAuthStateAdapter: OAuthStatePort = {
-  async create(record) {
+export const drizzleOAuthStateAdapter: OAuthStatePort = {
+  async create(record: OAuthStateRecord) {
     const state = randomState();
-    await kv.put(`${STATE_KEY_PREFIX}${state}`, record, {
-      expirationTtl: STATE_TTL_SECONDS,
+    await db.insert(oauthStateTable).values({
+      stateDigest: await stateDigest(state),
+      provider: record.provider,
+      intent: record.intent,
+      redirectUri: record.redirectUri,
+      userId: record.userId,
+      expiresAtUtc: record.expiresAtUtc,
+      consumedAtUtc: null,
     });
     return state;
   },
-  async consume(state) {
-    const key = `${STATE_KEY_PREFIX}${state}`;
-    if (oauthStateInFlight.has(key)) return null;
-    oauthStateInFlight.add(key);
-    try {
-      const record = await kv.get<OAuthStateRecord>(key, { type: "json" });
-      if (record) await kv.delete(key);
-      return record;
-    } finally {
-      oauthStateInFlight.delete(key);
-    }
+  async consume(state: string, consumedAtUtc: number) {
+    const rows = await db
+      .update(oauthStateTable)
+      .set({ consumedAtUtc })
+      .where(
+        and(
+          eq(oauthStateTable.stateDigest, await stateDigest(state)),
+          isNull(oauthStateTable.consumedAtUtc),
+          gt(oauthStateTable.expiresAtUtc, consumedAtUtc)
+        )
+      )
+      .returning();
+    return rows[0] ? toRecord(rows[0]) : null;
+  },
+  async deleteRetired(nowUtc: number) {
+    const rows = await db
+      .delete(oauthStateTable)
+      .where(
+        or(
+          lte(oauthStateTable.expiresAtUtc, nowUtc),
+          isNotNull(oauthStateTable.consumedAtUtc)
+        )
+      )
+      .returning({ stateDigest: oauthStateTable.stateDigest });
+    return rows.length;
   },
 };
+
+async function stateDigest(state: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(state)
+  );
+  let binary = "";
+  for (const byte of new Uint8Array(digest)) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replace(/=+$/u, "");
+}
+
+function toRecord(row: typeof oauthStateTable.$inferSelect): OAuthStateRecord {
+  return {
+    provider: row.provider,
+    intent: row.intent,
+    redirectUri: row.redirectUri,
+    userId: row.userId,
+    expiresAtUtc: row.expiresAtUtc,
+  };
+}
