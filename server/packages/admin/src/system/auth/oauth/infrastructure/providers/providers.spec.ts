@@ -52,6 +52,59 @@ describe("OAuth provider adapters", () => {
     );
   });
 
+  it("GitHub 通过 active 组织成员列表校验登录资格", async () => {
+    mocks.json
+      .mockResolvedValueOnce({
+        access_token: "github-token",
+        scope: "user:email,read:org",
+      })
+      .mockResolvedValueOnce({ id: 1, login: "octocat" });
+    mocks.fetch.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify([
+          { state: "active", organization: { login: "OKFred" } },
+        ]),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      )
+    );
+
+    await expect(
+      new GithubOAuthProvider().exchangeAndVerify({
+        code: "code",
+        redirectUri: "http://localhost:5173/oauth/callback",
+        intent: "login",
+      })
+    ).resolves.toMatchObject({
+      providerId: "1",
+      providerTenantId: "OKFred",
+      providerUsername: "octocat",
+    });
+    expect(mocks.fetch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pathname: "/user/memberships/orgs",
+      }),
+      expect.objectContaining({
+        auditMode: "metadata-only",
+        auditProvider: "github",
+      })
+    );
+  });
+
+  it("GitHub 组织成员列表被拒绝时返回资格拒绝", async () => {
+    mocks.json
+      .mockResolvedValueOnce({ access_token: "github-token" })
+      .mockResolvedValueOnce({ id: 1, login: "octocat" });
+    mocks.fetch.mockResolvedValueOnce(new Response(null, { status: 403 }));
+
+    await expect(
+      new GithubOAuthProvider().exchangeAndVerify({
+        code: "code",
+        redirectUri: "http://localhost:5173/oauth/callback",
+        intent: "login",
+      })
+    ).rejects.toMatchObject({ code: OAuthErrorCode.ELIGIBILITY_REJECTED });
+  });
+
   it("飞书授权 URL 请求完整档案所需的最小用户权限", () => {
     const url = new URL(
       new FeishuOAuthProvider().getAuthorizationUrl({

@@ -175,24 +175,53 @@ export class GithubOAuthProvider implements OAuthProviderPort {
     accessToken: string
   ): Promise<void> {
     const organization = requiredConfig("GH_ORG_NAME");
-    const membership =
-      await registry.base.httpFetch.json<GithubMembershipResponse>(
-        `https://api.github.com/user/memberships/orgs/${encodeURIComponent(
-          organization
-        )}`,
-        {
-          headers: githubHeaders(accessToken),
-          namespace: "system.auth.oauth",
-          remark: "GitHub active organization membership",
-          auditMode: "metadata-only",
-          auditProvider: "github",
-        }
+    const membershipsUrl = new URL(
+      "https://api.github.com/user/memberships/orgs"
+    );
+    membershipsUrl.searchParams.set("state", "active");
+    membershipsUrl.searchParams.set("per_page", "100");
+    const response = await registry.base.httpFetch.fetch(membershipsUrl, {
+      headers: githubHeaders(accessToken),
+      namespace: "system.auth.oauth",
+      remark: "GitHub active organization memberships",
+      auditMode: "metadata-only",
+      auditProvider: "github",
+    });
+    if (response.status === 403) {
+      throw new OAuthError(
+        OAuthErrorCode.ELIGIBILITY_REJECTED,
+        `GitHub 未授权读取 ${organization} 组织成员身份`
       );
-    if (
-      membership.state !== "active" ||
-      membership.organization?.login?.toLowerCase() !==
-        organization.toLowerCase()
-    ) {
+    }
+    if (!response.ok) {
+      throw new OAuthError(
+        OAuthErrorCode.PROVIDER_REJECTED,
+        "获取 GitHub 组织成员身份失败"
+      );
+    }
+    const memberships: unknown = await response.json();
+    if (!Array.isArray(memberships)) {
+      throw new OAuthError(
+        OAuthErrorCode.PROVIDER_REJECTED,
+        "GitHub 组织成员身份格式无效"
+      );
+    }
+    const hasActiveMembership = memberships.some((membership: unknown) => {
+      if (
+        !membership ||
+        typeof membership !== "object" ||
+        Array.isArray(membership)
+      ) {
+        return false;
+      }
+      const candidate = membership as GithubMembershipResponse;
+      return (
+        candidate.state === "active" &&
+        candidate.organization?.login?.toLowerCase() ===
+          organization.toLowerCase()
+      );
+    });
+    if (!hasActiveMembership) {
       throw new OAuthError(
         OAuthErrorCode.ELIGIBILITY_REJECTED,
         `仅允许 ${organization} 组织的 active 成员登录或绑定`
