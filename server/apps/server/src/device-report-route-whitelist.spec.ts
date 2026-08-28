@@ -1,24 +1,23 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
 import { describe, expect, it } from "vitest";
+
+import { machineCredentialBypass } from "../../../packages/core/src/middleware/authenticationRoutePolicy";
 
 describe("mobile device report route whitelist", () => {
   it("exposes all device-token report entry points before user authentication", () => {
-    const source = readFileSync(
-      fileURLToPath(
-        new URL(
-          "../../../packages/core/src/middleware/encapsulation/index.ts",
-          import.meta.url
-        )
-      ),
-      "utf8"
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/presence"
     );
-
-    expect(source).toContain('"/admin/mobile/device/report/presence"');
-    expect(source).toContain('"/admin/mobile/device/report/info"');
-    expect(source).toContain('"/admin/mobile/device/report/event"');
-    expect(source).toContain('"/admin/mobile/device/report/deployment"');
-    expect(source).toContain('"/admin/mobile/device/report/network-routing"');
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/info"
+    );
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/event"
+    );
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/deployment"
+    );
+    expect(machineCredentialBypass).toContain(
+      "/admin/mobile/device/report/network-routing"
+    );
   });
 });

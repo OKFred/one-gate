@@ -18,6 +18,11 @@ if (appLocales[userLang]) {
 import keySvg from '@/assets/imgs/key.svg?raw';
 import { useState, useEffect } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { AuthenticationBoundary } from '@/components/AuthenticationBoundary';
+
+function renderNothing() {
+  return null;
+}
 
 function App() {
   const isTranslationsLoaded = useLoadTranslations();
@@ -122,11 +127,17 @@ function App() {
   return (
     <ChunkErrorBoundary>
       <ThemeProvider>
-        <PermissionProvider>
-          <MenuProvider>
-            <AppContent />
-          </MenuProvider>
-        </PermissionProvider>
+        <AuthenticationBoundary
+          scope="enterprise"
+          renderPrimaryAuth={renderNothing}
+          renderPrimaryAuthCallback={renderNothing}
+        >
+          <PermissionProvider>
+            <MenuProvider>
+              <AppContent />
+            </MenuProvider>
+          </PermissionProvider>
+        </AuthenticationBoundary>
       </ThemeProvider>
     </ChunkErrorBoundary>
   );

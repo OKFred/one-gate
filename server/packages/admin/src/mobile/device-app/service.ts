@@ -8,6 +8,7 @@ import {
 import {
   bodyAdapter,
   bodyUserContextAdapter,
+  rawAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import {
@@ -21,11 +22,16 @@ import { mobileAppVersionRepo } from "../app-version/repository";
 import {
   completeLegacyDeviceTask,
   dispatchTrustedTask,
+  getDeviceTask,
   type DeviceTaskResultPayload,
 } from "../async-task/facade.js";
 import { buildTaskCallbackUrl } from "../async-task/interfaces/http/callback-url.js";
 import { adaptDeviceTaskHttpError } from "../async-task/interfaces/http/error.js";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
+import { verifyDeviceReportToken } from "../device/facade.js";
+import { adaptDeviceHttpError } from "../device/interfaces/http/error.js";
+import { reportTokenFromContext } from "../device/interfaces/http/report-token.js";
+import { completeAuthenticatedLegacyDeviceAppCallback } from "./legacy-callback.js";
 
 // 列表 (分页)
 const listReq = {
@@ -276,13 +282,22 @@ export async function handleDeviceAppTaskResult(
 }
 
 /** 兼容旧手机客户端的 HTTP 回调。 */
-async function onCallback(params: FromSchema<typeof callbackReq>) {
+async function onCallback(
+  params: FromSchema<typeof callbackReq>,
+  context: Context
+) {
   const completion = await adaptDeviceTaskHttpError(() =>
-    completeLegacyDeviceTask({
-      taskId: params.taskId,
-      status: params.status,
-      message: params.message,
-    })
+    adaptDeviceHttpError(async () =>
+      completeAuthenticatedLegacyDeviceAppCallback(
+        {
+          taskId: params.taskId,
+          status: params.status,
+          message: params.message,
+        },
+        reportTokenFromContext(context),
+        { getDeviceTask, verifyDeviceReportToken, completeLegacyDeviceTask }
+      )
+    )
   );
 
   if (
@@ -297,7 +312,17 @@ async function onCallback(params: FromSchema<typeof callbackReq>) {
         JSON.parse(params.message) as unknown
       );
     } catch (error) {
-      console.error("[Callback] Error processing sync data", error);
+      console.error(
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          level: "error",
+          service: "hodor-server",
+          event: "mobile.device_app.legacy_sync.failed",
+          requestId: context.get("requestId"),
+          failureKind:
+            error instanceof SyntaxError ? "invalid_payload" : "sync_failed",
+        })
+      );
     }
   }
 
@@ -312,8 +337,11 @@ const callbackApi = {
     method: "post",
     summary: "接收移动端任务执行结果",
   },
-  adapter: bodyAdapter,
-  service: onCallback,
+  adapter: rawAdapter,
+  service: async (context: Context) => {
+    const params = context.get("bodyObj") as FromSchema<typeof callbackReq>;
+    return onCallback(params, context);
+  },
   permission: { action: "read" }, // Allow webhook? In real app this would bypass permissions or use specific token.
 } satisfies API;
 

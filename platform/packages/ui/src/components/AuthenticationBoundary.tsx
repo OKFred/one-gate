@@ -1,0 +1,148 @@
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Box, CircularProgress } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { totpGateStatusFn } from '@/api/admin/system/auth';
+import { TotpGateForm } from '@/components/TotpGateForm';
+import {
+  AUTH_CHANGED_EVENT,
+  TOTP_GATE_REQUIRED_EVENT,
+  authUtils,
+  type UserInfo,
+} from '@/utils/auth';
+import {
+  completePrimaryAuthReturn,
+  readTransferredToken,
+  rememberPrimaryAuthReturnTarget,
+} from '@/utils/authFlow';
+
+export type AuthenticationPhase =
+  | 'PRIMARY_AUTH_REQUIRED'
+  | 'PRIMARY_AUTH_CALLBACK'
+  | 'TOTP_REQUIRED'
+  | 'READY'
+  | 'CHECKING';
+
+interface AuthenticationBoundaryProps {
+  readonly scope: 'admin' | 'enterprise' | 'personal';
+  readonly renderPrimaryAuth: () => ReactNode;
+  readonly renderPrimaryAuthCallback: () => ReactNode;
+  readonly children: ReactNode;
+}
+
+function isAuthenticationCallback(pathname: string): boolean {
+  return pathname === '/oauth/callback' || pathname === '/sso/callback';
+}
+
+function transferredUser(token: string): UserInfo {
+  return { id: 0, username: 'Loading...', langCode: 'zh-CN', token };
+}
+
+function LoadingScreen() {
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  );
+}
+
+export function AuthenticationBoundary({
+  scope,
+  renderPrimaryAuth,
+  renderPrimaryAuthCallback,
+  children,
+}: AuthenticationBoundaryProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const evaluation = useRef(0);
+  const [phase, setPhase] = useState<AuthenticationPhase>('CHECKING');
+
+  const redirectToAdmin = useCallback(() => {
+    const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
+    window.location.assign(
+      `${adminUrl}/#/login?redirect=${encodeURIComponent(window.location.href)}`,
+    );
+  }, []);
+
+  const evaluate = useCallback(async () => {
+    const currentEvaluation = evaluation.current + 1;
+    evaluation.current = currentEvaluation;
+    const callback = isAuthenticationCallback(location.pathname);
+    if (scope === 'admin') rememberPrimaryAuthReturnTarget();
+
+    let user = authUtils.getUserInfo();
+    const urlToken = readTransferredToken();
+    if (!user?.token && urlToken) {
+      user = transferredUser(urlToken);
+      authUtils.setUserInfo(user);
+    }
+
+    if (!user?.token) {
+      if (scope !== 'admin') {
+        redirectToAdmin();
+        return;
+      }
+      setPhase(callback ? 'PRIMARY_AUTH_CALLBACK' : 'PRIMARY_AUTH_REQUIRED');
+      return;
+    }
+
+    setPhase('CHECKING');
+    try {
+      const response = await totpGateStatusFn({ data: {} });
+      if (evaluation.current !== currentEvaluation) return;
+      setPhase(response.data.data.verified ? 'READY' : 'TOTP_REQUIRED');
+    } catch {
+      if (evaluation.current !== currentEvaluation) return;
+      if (!authUtils.isAuthenticated()) {
+        setPhase(callback ? 'PRIMARY_AUTH_CALLBACK' : 'PRIMARY_AUTH_REQUIRED');
+      } else {
+        setPhase('TOTP_REQUIRED');
+      }
+    }
+  }, [location.pathname, redirectToAdmin, scope]);
+
+  useEffect(() => {
+    void evaluate();
+    const handleAuthChanged = () => void evaluate();
+    const handleGateRequired = () => setPhase('TOTP_REQUIRED');
+    window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
+    window.addEventListener(TOTP_GATE_REQUIRED_EVENT, handleGateRequired);
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
+      window.removeEventListener(TOTP_GATE_REQUIRED_EVENT, handleGateRequired);
+    };
+  }, [evaluate]);
+
+  useEffect(() => {
+    if (phase !== 'READY' || scope !== 'admin' || location.pathname !== '/login') return;
+    if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
+  }, [location.pathname, navigate, phase, scope]);
+
+  useEffect(() => {
+    if (phase === 'TOTP_REQUIRED' && scope !== 'admin') redirectToAdmin();
+  }, [phase, redirectToAdmin, scope]);
+
+  if (phase === 'CHECKING') return <LoadingScreen />;
+  if (phase === 'PRIMARY_AUTH_CALLBACK') return <>{renderPrimaryAuthCallback()}</>;
+  if (phase === 'PRIMARY_AUTH_REQUIRED') return <>{renderPrimaryAuth()}</>;
+  if (phase === 'TOTP_REQUIRED') {
+    if (scope !== 'admin') return <LoadingScreen />;
+    return (
+      <TotpGateForm
+        onVerified={() => {
+          setPhase('READY');
+          if (isAuthenticationCallback(location.pathname)) return;
+          if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
+        }}
+      />
+    );
+  }
+  return <>{children}</>;
+}

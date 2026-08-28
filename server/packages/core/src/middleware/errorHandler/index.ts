@@ -9,15 +9,51 @@ import { BusinessError } from "./businessError/index.js";
 import { toHttpException } from "./businessError";
 import { convertSqlErrorToBusinessError } from "./sqlError";
 
+function readBusinessErrorCode(error: unknown): string | undefined {
+  if (!(error instanceof HTTPException)) return undefined;
+  const cause = error.cause;
+  if (!cause || typeof cause !== "object" || !("error" in cause)) {
+    return undefined;
+  }
+  const businessError = cause.error;
+  if (
+    !businessError ||
+    typeof businessError !== "object" ||
+    !("code" in businessError)
+  ) {
+    return undefined;
+  }
+  return typeof businessError.code === "string"
+    ? businessError.code
+    : undefined;
+}
+
 export default function errorHandler(app: App) {
   // 移入函数内，避免模块加载副作用
   if (getRuntimeKey() !== "workerd") {
-    process.on("uncaughtException", function (err) {
-      console.error("uncaughtException:", err);
+    process.on("uncaughtException", function () {
+      console.error(
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          level: "error",
+          service: "hodor-server",
+          event: "process.uncaught_exception",
+          code: "UNCAUGHT_EXCEPTION",
+        })
+      );
     });
   }
 
-  console.log(`🚀 Server started in ${getEnv("NODE_ENV")} mode`);
+  console.log(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: "info",
+      service: "hodor-server",
+      event: "service.started",
+      runtime: getRuntimeKey(),
+      environment: getEnv("NODE_ENV") ?? "unknown",
+    })
+  );
 
   app.notFound(async (c: Context) => {
     const t = await getTranslator(c);
@@ -52,23 +88,32 @@ export default function errorHandler(app: App) {
       e = toHttpException(e);
     }
 
-    const isClientError = e instanceof HTTPException && e.status < 500;
-    if (isClientError) {
-      // 客户端错误或业务异常，仅打印简短日志，不输出完整堆栈以避免污染控制台
-      const msg = `[BusinessWarning] ${e.message}`;
-      if (c.var.logger && typeof c.var.logger.warn === "function") {
-        c.var.logger.warn(msg);
-      } else {
-        console.warn(msg);
-      }
+    const status = e instanceof HTTPException ? e.status : 500;
+    const businessCode = readBusinessErrorCode(e);
+    const requestId = c.get("requestId") || crypto.randomUUID();
+    const errorEvent = {
+      timestamp: new Date().toISOString(),
+      level: status < 500 ? ("warn" as const) : ("error" as const),
+      service: "hodor-server",
+      event: "http.request.failed",
+      requestId,
+      method: c.req.method,
+      route: c.req.routePath || "unmatched",
+      status,
+      code:
+        businessCode ?? (status < 500 ? `HTTP_${status}` : "INTERNAL_ERROR"),
+    };
+    if (c.var.logger) {
+      c.var.logger[errorEvent.level](errorEvent);
     } else {
-      // 服务端内部异常，保留完整堆栈
-      if (c.var.logger && typeof c.var.logger.error === "function") {
-        c.var.logger.error(err);
+      const line = JSON.stringify(errorEvent);
+      if (errorEvent.level === "warn") {
+        console.warn(line);
       } else {
-        console.error(err);
+        console.error(line);
       }
     }
+    c.header("x-request-id", requestId);
 
     const t = await getTranslator(c);
     if (e instanceof HTTPException) {
@@ -76,7 +121,7 @@ export default function errorHandler(app: App) {
       const causeObj = e.cause as
         | {
             params?: any;
-            error?: any;
+            error?: { code?: unknown };
             details?: {
               type: string;
               message: string;
@@ -120,6 +165,10 @@ export default function errorHandler(app: App) {
           ok: false,
           message: await t(e.message),
           data: {
+            code:
+              typeof causeObj?.error?.code === "string"
+                ? causeObj.error.code
+                : undefined,
             details,
           },
         },

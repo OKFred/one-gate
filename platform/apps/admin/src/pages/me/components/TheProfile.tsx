@@ -1,4 +1,12 @@
-import { forwardRef, memo, useImperativeHandle, useRef, useState } from 'react';
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   Avatar,
   Box,
@@ -16,7 +24,12 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { Edit as EditIcon, GitHub as GitHubIcon, Person as PersonIcon } from '@mui/icons-material';
+import {
+  AccountTree as AccountTreeIcon,
+  Edit as EditIcon,
+  GitHub as GitHubIcon,
+  Person as PersonIcon,
+} from '@mui/icons-material';
 import { ResponsiveButton } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
 import { permissions } from '@/hooks/usePermission';
@@ -29,7 +42,12 @@ import {
   oauthAccountUrlFn,
   oauthBindingProfileFn,
   oauthBindingUnbindFn,
+  ssoAccountUrlFn,
+  ssoBindingSummaryFn,
+  ssoBindingUnbindFn,
 } from '@/api/admin/system/auth';
+import type { SsoBindingSummary } from '@/api/admin/system/auth';
+import { getSsoCallbackUrl } from '@/utils/oauthCallback';
 
 type OAuthBindingSummary = NonNullable<GetProfileRes['userObj']['oauthBindings']>[number];
 type OAuthProfileData = OAuthBindingProfileRes;
@@ -104,6 +122,36 @@ function BindingButton({
   );
 }
 
+interface SsoBindingButtonProps {
+  binding: SsoBindingSummary | null;
+  loading: boolean;
+  onBind: () => void;
+  onUnbind: () => void;
+}
+
+function SsoBindingButton({ binding, loading, onBind, onUnbind }: SsoBindingButtonProps) {
+  const t = useTranslation();
+  return (
+    <Box sx={{ mt: 2 }}>
+      <ResponsiveButton
+        variant={binding ? 'contained' : 'outlined'}
+        color={binding ? 'error' : 'primary'}
+        startIcon={<AccountTreeIcon />}
+        onClick={binding ? onUnbind : onBind}
+        disabled={loading}
+        fullWidth
+      >
+        {binding ? t('sso.unbind') : t('sso.bind')}
+      </ResponsiveButton>
+      {binding ? (
+        <Typography color="text.secondary" sx={{ mt: 0.5 }} variant="caption">
+          {t('sso.bindingTenant').replace('{{tenant}}', binding.tenantId ?? '—')}
+        </Typography>
+      ) : null}
+    </Box>
+  );
+}
+
 const TheProfile = memo(
   forwardRef<TheProfileRef, Props>(({ localObj }, ref) => {
     const t = useTranslation();
@@ -112,6 +160,9 @@ const TheProfile = memo(
     const [loadingProvider, setLoadingProvider] = useState<OAuthProvider | null>(null);
     const [pendingUnbind, setPendingUnbind] = useState<OAuthProvider | null>(null);
     const [profileData, setProfileData] = useState<OAuthProfileData | null>(null);
+    const [ssoBinding, setSsoBinding] = useState<SsoBindingSummary | null>(null);
+    const [ssoLoading, setSsoLoading] = useState(false);
+    const [ssoUnbindOpen, setSsoUnbindOpen] = useState(false);
     const passwordDialogRef = useRef<ThePasswordDialogRef>(null);
 
     useImperativeHandle(ref, () => ({ updateUser: setUser }), []);
@@ -119,6 +170,27 @@ const TheProfile = memo(
     const bindings = user?.oauthBindings ?? [];
     const getBinding = (provider: OAuthProvider) =>
       bindings.find((binding) => binding.provider === provider);
+
+    const refreshSsoBinding = useCallback(async () => {
+      setSsoLoading(true);
+      try {
+        const response = await ssoBindingSummaryFn({ data: {} });
+        const summary = response.data.data;
+        setSsoBinding(summary.bound ? summary : null);
+      } catch {
+        // Global HTTP interception presents the error.
+      } finally {
+        setSsoLoading(false);
+      }
+    }, []);
+
+    useEffect(() => {
+      if (!user) {
+        setSsoBinding(null);
+        return;
+      }
+      void refreshSsoBinding();
+    }, [refreshSsoBinding, user]);
 
     const handleBind = async (provider: OAuthProvider) => {
       setLoadingProvider(provider);
@@ -169,6 +241,33 @@ const TheProfile = memo(
       }
     };
 
+    const handleSsoBind = async () => {
+      setSsoLoading(true);
+      try {
+        const response = await ssoAccountUrlFn({
+          data: { redirectUri: getSsoCallbackUrl(window.location.origin, 'bind') },
+        });
+        window.location.assign(response.data.data.url);
+      } catch {
+        // Global HTTP interception presents the error.
+        setSsoLoading(false);
+      }
+    };
+
+    const handleSsoUnbind = async () => {
+      setSsoLoading(true);
+      try {
+        await ssoBindingUnbindFn({ data: {} });
+        setSsoBinding(null);
+        setSsoUnbindOpen(false);
+        showSnackbar({ message: t('sso.unbindSuccess'), type: 'success' });
+      } catch {
+        // Global HTTP interception presents the error.
+      } finally {
+        setSsoLoading(false);
+      }
+    };
+
     if (!user) return null;
 
     return (
@@ -205,6 +304,12 @@ const TheProfile = memo(
                 onUnbind={setPendingUnbind}
               />
             ))}
+            <SsoBindingButton
+              binding={ssoBinding}
+              loading={ssoLoading}
+              onBind={handleSsoBind}
+              onUnbind={() => setSsoUnbindOpen(true)}
+            />
           </CardContent>
         </Card>
 
@@ -222,6 +327,19 @@ const TheProfile = memo(
             <Button onClick={() => setPendingUnbind(null)}>{t('common.cancel')}</Button>
             <Button onClick={handleConfirmUnbind} color="error" variant="contained">
               {t('oauth.confirmUnbind')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={ssoUnbindOpen} onClose={() => setSsoUnbindOpen(false)}>
+          <DialogTitle>{t('sso.unbindTitle')}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{t('sso.unbindConfirm')}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setSsoUnbindOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSsoUnbind} color="error" variant="contained">
+              {t('sso.confirmUnbind')}
             </Button>
           </DialogActions>
         </Dialog>

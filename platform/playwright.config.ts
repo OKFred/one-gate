@@ -46,7 +46,7 @@ export default defineConfig({
       testIgnore: /auth\.setup\.ts/,
       use: {
         ...devices['Desktop Chrome'],
-        ...(process.env.CI ? {} : { channel: 'chrome' as const }),
+        channel: process.env.CI ? 'chromium' : 'chrome',
         storageState: authBundle?.storageState,
       },
     },

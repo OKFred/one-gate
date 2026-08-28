@@ -21,6 +21,14 @@ export const BusinessErrorCode = {
   DATABASE_ERROR: "DATABASE_ERROR",
   /** @description Docker API 调用错误 */
   DOCKER_API_ERROR: "DOCKER_API_ERROR",
+  /** @description 尚未完成 TOTP 二次门禁 */
+  TOTP_GATE_REQUIRED: "TOTP_GATE_REQUIRED",
+  /** @description TOTP 验证码错误、过期或已消费 */
+  TOTP_CODE_INVALID: "TOTP_CODE_INVALID",
+  /** @description TOTP 验证过于频繁 */
+  TOTP_GATE_RATE_LIMITED: "TOTP_GATE_RATE_LIMITED",
+  /** @description TOTP 门禁配置或协调器不可用 */
+  TOTP_GATE_UNAVAILABLE: "TOTP_GATE_UNAVAILABLE",
 } as const;
 
 export type BusinessErrorCode =
@@ -77,5 +85,21 @@ export const ERROR_PRESENTATION_MAP: Record<
   DOCKER_API_ERROR: {
     status: 502,
     i18nKey: "errorHandler.dockerApiError",
+  },
+  TOTP_GATE_REQUIRED: {
+    status: 401,
+    i18nKey: "errorHandler.totpGateRequired",
+  },
+  TOTP_CODE_INVALID: {
+    status: 401,
+    i18nKey: "errorHandler.totpCodeInvalid",
+  },
+  TOTP_GATE_RATE_LIMITED: {
+    status: 429,
+    i18nKey: "errorHandler.totpGateRateLimited",
+  },
+  TOTP_GATE_UNAVAILABLE: {
+    status: 503,
+    i18nKey: "errorHandler.totpGateUnavailable",
   },
 };

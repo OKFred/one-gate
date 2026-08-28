@@ -6271,6 +6271,497 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/system/auth/sso/login/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 SSO 登录地址 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.sso.login.url.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.sso.login.url.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/sso/login/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** SSO 登录回调 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.sso.login.callback.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.sso.login.callback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/sso/account/url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取 SSO 绑定地址 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.sso.account.url.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.sso.account.url.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/sso/account/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** SSO 账号绑定回调 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.sso.account.callback.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.sso.account.callback.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/sso/binding/unbind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 解绑 SSO 账号 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.sso.binding.unbind.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.sso.binding.unbind.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/sso/binding/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 读取 SSO 绑定摘要 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.auth.sso.binding.summary.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.auth.sso.binding.summary.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/gate/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询动态验证码门禁状态 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description 当前 Hodor 登录态的门禁状态 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            data: {
+                                verified: boolean;
+                                expiresAtUtc: string | null;
+                            };
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/gate/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 验证动态验证码 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        code: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description 验证成功并签发门禁 Cookie */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            data: {
+                                verified: boolean;
+                                expiresAtUtc: string | null;
+                            };
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/auth/gate/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 清除动态验证码门禁 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            responses: {
+                /** @description 门禁 Cookie 已清除 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            data: {
+                                verified: boolean;
+                                expiresAtUtc: string | null;
+                            };
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/system/department/listAll": {
         parameters: {
             query?: never;
@@ -13145,6 +13636,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.mobile.device.report.deployment.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/mobile/device/report/network-routing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 设备网络分流运行状态上报 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.mobile.device.report.network-routing.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.mobile.device.report.network-routing.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -23278,6 +23827,104 @@ export interface components {
             };
             message: string;
         };
+        "admin.system.auth.sso.login.url.req": {
+            /**
+             * Format: uri
+             * @description SSO 回调地址，必须与服务端白名单精确匹配
+             */
+            redirectUri: string;
+        };
+        "admin.system.auth.sso.login.url.res": {
+            ok: boolean;
+            data: {
+                /** Format: uri */
+                url: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.sso.login.callback.req": {
+            code: string;
+            state: string;
+        };
+        "admin.system.auth.sso.login.callback.res": {
+            ok: boolean;
+            data: {
+                userObj: {
+                    /**
+                     * @description id
+                     * @example 1
+                     */
+                    id: number;
+                    /**
+                     * @description 用户名
+                     * @example user
+                     */
+                    username: string;
+                    /**
+                     * @description 语言代码
+                     * @example en-US
+                     * @example zh-CN
+                     */
+                    langCode: string;
+                    /**
+                     * @description 用户的token
+                     * @example example-session-token
+                     */
+                    token: string;
+                };
+            };
+            message: string;
+        };
+        "admin.system.auth.sso.account.url.req": {
+            /**
+             * Format: uri
+             * @description SSO 回调地址，必须与服务端白名单精确匹配
+             */
+            redirectUri: string;
+        };
+        "admin.system.auth.sso.account.url.res": {
+            ok: boolean;
+            data: {
+                /** Format: uri */
+                url: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.sso.account.callback.req": {
+            code: string;
+            state: string;
+        };
+        "admin.system.auth.sso.account.callback.res": {
+            ok: boolean;
+            data: {
+                message: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.sso.binding.unbind.req": Record<string, never>;
+        "admin.system.auth.sso.binding.unbind.res": {
+            ok: boolean;
+            data: {
+                message: string;
+            };
+            message: string;
+        };
+        "admin.system.auth.sso.binding.summary.req": Record<string, never>;
+        "admin.system.auth.sso.binding.summary.res": {
+            ok: boolean;
+            data: {
+                bound: boolean;
+                issuer: string | null;
+                tenantId: string | null;
+                membershipId: string | null;
+                clientId: string | null;
+                amr: string[];
+                scope: string[];
+                createTimeUtc: number | null;
+                updateTimeUtc: number | null;
+            };
+            message: string;
+        };
         "admin.system.department.listall.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -28078,6 +28725,31 @@ export interface components {
             timestamp: number;
         };
         "admin.mobile.device.report.deployment.res": {
+            ok: boolean;
+            data: {
+                accepted: boolean;
+                duplicate: boolean;
+            };
+            message: string;
+        };
+        "admin.mobile.device.report.network-routing.req": {
+            /** @constant */
+            protocolVersion: 1;
+            deviceId: string;
+            generation: number;
+            policyRevision: ((number | null) | null) | null;
+            /** @enum {string|null|null} */
+            target: "default" | "wifi" | "carrier" | null;
+            /** @enum {string} */
+            state: "DISABLED" | "RECOVERING" | "ACTIVE" | "DEGRADED";
+            code: string;
+            message: string;
+            timestamp: number;
+            verifiedAt: ((number | null) | null) | null;
+            wifiInterface: ((string | null) | null) | null;
+            carrierInterface: ((string | null) | null) | null;
+        };
+        "admin.mobile.device.report.network-routing.res": {
             ok: boolean;
             data: {
                 accepted: boolean;

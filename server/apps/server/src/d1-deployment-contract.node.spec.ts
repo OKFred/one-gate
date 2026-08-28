@@ -48,6 +48,21 @@ describe("D1 deployment contract", () => {
     expect(webhookAccessMigration).toContain(
       "admin.base.webhook_config:delete"
     );
+
+    const ssoMigration = readRepositoryFile(
+      "../d1-migrations/0008_sso_gateway_identity.sql"
+    );
+    expect(ssoMigration).toContain("system_user_sso_identity");
+    expect(ssoMigration).toContain("system_sso_oidc_transaction");
+    expect(ssoMigration).toContain(
+      "system_user_sso_identity_issuer_subject_unique"
+    );
+    expect(ssoMigration).toContain(
+      "system_user_sso_identity_user_issuer_unique"
+    );
+    expect(ssoMigration).toContain("system_sso_oidc_transaction_state_unique");
+    expect(ssoMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(ssoMigration).not.toMatch(/\bREFERENCES\b/i);
   });
 
   it("checks the critical production tables before Worker deployment", () => {
@@ -70,6 +85,20 @@ describe("D1 deployment contract", () => {
     expect(contract).toContain(
       "INDEXED BY `system_user_oauth_user_provider_unique`"
     );
+    expect(contract).toContain("FROM `system_user_sso_identity`");
+    expect(contract).toContain(
+      "INDEXED BY `system_user_sso_identity_issuer_subject_unique`"
+    );
+    expect(contract).toContain(
+      "INDEXED BY `system_user_sso_identity_user_issuer_unique`"
+    );
+    expect(contract).toContain("FROM `system_sso_oidc_transaction`");
+    expect(contract).toContain(
+      "INDEXED BY `system_sso_oidc_transaction_state_unique`"
+    );
+    expect(contract).toContain(
+      "INDEXED BY `system_sso_oidc_transaction_expiry_idx`"
+    );
     expect(contract).toContain("FROM `admin_mobile_device_ops_session`");
     expect(contract).toContain("FROM `admin_mobile_device_ops_audit`");
   });
@@ -79,6 +108,14 @@ describe("D1 deployment contract", () => {
     expect(config).toContain('"name": "MOBILE_OPS"');
     expect(config).toContain('"class_name": "MobileOpsSession"');
     expect(config).toContain('"new_sqlite_classes": ["MobileOpsSession"]');
+  });
+
+  it("configures a SQLite Durable Object for deployment-wide TOTP coordination", () => {
+    const config = readRepositoryFile("../wrangler.jsonc");
+    expect(config).toContain('"name": "TOTP_GATE_COORDINATOR"');
+    expect(config).toContain('"class_name": "TotpGateCoordinator"');
+    expect(config).toContain('"tag": "totp-gate-v1"');
+    expect(config).toContain('"new_sqlite_classes": ["TotpGateCoordinator"]');
   });
 
   it("runs migrations and the schema contract before Worker deployment", () => {
@@ -94,7 +131,7 @@ describe("D1 deployment contract", () => {
     expect(deployAt).toBeGreaterThan(contractAt);
   });
 
-  it("deploys required OAuth secrets and treats Feishu credentials as optional", () => {
+  it("deploys required identity and TOTP settings while Feishu stays optional", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
@@ -102,6 +139,13 @@ describe("D1 deployment contract", () => {
       "MOBILE_SENSITIVE_DATA_KEY",
       "OAUTH_SENSITIVE_DATA_KEY",
       "OAUTH_ALLOWED_REDIRECT_ORIGINS",
+      "SSO_ISSUER",
+      "SSO_CLIENT_ID",
+      "SSO_AUDIENCE",
+      "SSO_ALLOWED_TENANT_ID",
+      "SSO_ALLOWED_REDIRECT_URIS",
+      "HODOR_TOTP_GATE_SECRET",
+      "HODOR_ALLOWED_WEB_ORIGINS",
     ]) {
       expect(workflow).toContain(
         `${secretName}: \${{ secrets.${secretName} }}`

@@ -15,8 +15,41 @@ if (appLocales[userLang]) {
 }
 
 import keySvg from '@/assets/imgs/key.svg?raw';
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { AuthenticationBoundary } from '@/components/AuthenticationBoundary';
+import { CircularProgress } from '@mui/material';
+import { useLocation } from 'react-router-dom';
+
+const Login = lazy(() => import('./pages/login'));
+const OAuthCallback = lazy(() => import('./pages/oauth-callback'));
+const SsoCallback = lazy(() => import('./pages/sso-callback'));
+
+function AuthPageLoading() {
+  return <CircularProgress />;
+}
+
+function renderPrimaryAuth() {
+  return (
+    <Suspense fallback={<AuthPageLoading />}>
+      <Login />
+    </Suspense>
+  );
+}
+
+function PrimaryAuthCallback() {
+  const location = useLocation();
+  const Callback = location.pathname === '/sso/callback' ? SsoCallback : OAuthCallback;
+  return (
+    <Suspense fallback={<AuthPageLoading />}>
+      <Callback />
+    </Suspense>
+  );
+}
+
+function renderPrimaryAuthCallback() {
+  return <PrimaryAuthCallback />;
+}
 
 function App() {
   const isTranslationsLoaded = useLoadTranslations();
@@ -121,11 +154,17 @@ function App() {
   return (
     <ChunkErrorBoundary>
       <ThemeProvider>
-        <PermissionProvider>
-          <MenuProvider>
-            <AppRoutes />
-          </MenuProvider>
-        </PermissionProvider>
+        <AuthenticationBoundary
+          scope="admin"
+          renderPrimaryAuth={renderPrimaryAuth}
+          renderPrimaryAuthCallback={renderPrimaryAuthCallback}
+        >
+          <PermissionProvider>
+            <MenuProvider>
+              <AppRoutes />
+            </MenuProvider>
+          </PermissionProvider>
+        </AuthenticationBoundary>
       </ThemeProvider>
     </ChunkErrorBoundary>
   );

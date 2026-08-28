@@ -3,24 +3,18 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { loginFn, oauthLoginUrlFn } from '@/api/admin/system/auth';
+import { loginFn, oauthLoginUrlFn, ssoLoginUrlFn } from '@/api/admin/system/auth';
 import type { LoginReq } from '@/api/admin/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
-import { findFirstValidPath } from '@/hooks/useFirstValidPath';
-import { useMenu } from '@/hooks/useMenu';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { usePermission } from '@/hooks/usePermission';
+import { getSsoCallbackUrl } from '@/utils/oauthCallback';
 
 export default function TheForm() {
-  const navigate = useNavigate();
   const { isMobile } = useResponsive();
   const t = useTranslation();
-  const { loadMenus } = useMenu();
-  const { refreshPermissions } = usePermission();
 
   // 状态管理
   const [credentials, setCredentials] = useState<LoginReq>({
@@ -54,30 +48,6 @@ export default function TheForm() {
       const loginData = response.data.data;
       const { userObj } = loginData;
       authUtils.setUserInfo(userObj);
-      // 重新加载权限和菜单
-      const [menus] = await Promise.all([loadMenus(), refreshPermissions()]);
-
-      const getQueryParam = (name: string) => {
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams.has(name)) return searchParams.get(name);
-        const hash = window.location.hash;
-        const queryIdx = hash.indexOf('?');
-        if (queryIdx !== -1) {
-          const hashParams = new URLSearchParams(hash.substring(queryIdx + 1));
-          if (hashParams.has(name)) return hashParams.get(name);
-        }
-        return null;
-      };
-
-      const redirect = getQueryParam('redirect');
-      if (redirect) {
-        const separator = redirect.includes('?') ? '&' : '?';
-        const redirectUrl = `${redirect}${separator}token=${encodeURIComponent(userObj.token)}`;
-        window.location.href = redirectUrl;
-      } else {
-        const nextPath = findFirstValidPath(menus, '/me');
-        navigate(nextPath);
-      }
     } catch {
       // Global HTTP interception presents the error.
     } finally {
@@ -99,6 +69,20 @@ export default function TheForm() {
       if (response.data.data.url) {
         window.location.href = response.data.data.url;
       }
+    } catch {
+      // Global HTTP interception presents the error.
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSsoLogin = async () => {
+    try {
+      setLoading(true);
+      const response = await ssoLoginUrlFn({
+        data: { redirectUri: getSsoCallbackUrl(window.location.origin, 'login') },
+      });
+      window.location.assign(response.data.data.url);
     } catch {
       // Global HTTP interception presents the error.
     } finally {
@@ -207,6 +191,18 @@ export default function TheForm() {
           disabled={loading}
         >
           {t('feishu.signIn')}
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          size={isMobile ? 'large' : 'medium'}
+          sx={{ py: isMobile ? 1.5 : 1 }}
+          onClick={handleSsoLogin}
+          disabled={loading}
+        >
+          {t('sso.signIn')}
         </Button>
       </Stack>
     </Box>

@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   cleanupExpiredDeviceEvents: vi.fn(async () => undefined),
   createApp: vi.fn(() => ({ fetch: vi.fn() })),
   expireDeviceOpsSessions: vi.fn(async () => undefined),
+  getEnv: vi.fn(() => ""),
   markTimedOutDevicesOffline: vi.fn(async () => undefined),
   runPendingJobs: vi.fn(async () => undefined),
   setD1Binding: vi.fn(),
@@ -16,13 +17,23 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("./index.js", () => ({ default: mocks.createApp }));
 vi.mock("./mobile-ops-session.js", () => ({ MobileOpsSession: class {} }));
+vi.mock("./totp-gate-coordinator.js", () => ({
+  CloudflareTotpAttemptCoordinator: class {},
+  TotpGateCoordinator: class {},
+}));
+vi.mock("@hodor/admin/system/auth/totp-gate/index.js", () => ({
+  createTotpGateCenter: vi.fn(),
+}));
 vi.mock("@hodor/core/db/index.js", () => ({
   setD1Binding: mocks.setD1Binding,
 }));
 vi.mock("@hodor/core/middleware/cache/index.js", () => ({
   setKVBinding: mocks.setKVBinding,
 }));
-vi.mock("@hodor/core/utils/env.js", () => ({ setEnv: mocks.setEnv }));
+vi.mock("@hodor/core/utils/env.js", () => ({
+  getEnv: mocks.getEnv,
+  setEnv: mocks.setEnv,
+}));
 vi.mock("@hodor/admin/maintenance/cron/scheduler.js", () => ({
   runPendingJobs: mocks.runPendingJobs,
 }));

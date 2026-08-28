@@ -26,6 +26,7 @@ import {
 import { preventLoginFailure, preventWrongPassword } from "./prevention";
 import { getOAuthCenter, oauthHttpService } from "./oauth/index.js";
 import { OAuthBindingSummaryVO } from "./oauth/interfaces/http/model.js";
+import { ssoHttpService } from "./sso/index.js";
 
 // 普通登录
 const loginReq = {
@@ -537,4 +538,5 @@ export default {
   updatePassword: updatePasswordApi,
   getButtonPermission: getButtonPermissionApi,
   ...oauthHttpService,
+  ...ssoHttpService,
 };

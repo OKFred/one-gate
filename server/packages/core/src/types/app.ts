@@ -67,6 +67,7 @@ export type AppBindings = {
     bodyObj?: any;
     userObj?: UserObj;
     timing?: TimingVariables;
+    requestId: string;
     logger: import("pino").Logger;
   };
   Bindings: Env;

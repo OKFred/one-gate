@@ -1,5 +1,8 @@
-import type { AxiosConfig } from '../../config';
+import type { AxiosConfig, ResponseGeneric } from '../../config';
 import { axiosPlus } from '../../config';
+
+type SsoBindingSummaryPath = '/api/v1/admin/system/auth/sso/binding/summary';
+export type SsoBindingSummary = ResponseGeneric<SsoBindingSummaryPath, 'post'>['data']['data'];
 
 export const loginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/login', 'post'>, 'url' | 'method'>,
@@ -10,6 +13,33 @@ export const loginFn = (
     ...axiosConfig,
   });
 };
+
+export const totpGateStatusFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/gate/status', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/gate/status',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const totpGateVerifyFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/gate/verify', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/gate/verify',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const totpGateLogoutFn = (
+  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/gate/logout', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/gate/logout',
+    method: 'post',
+    ...axiosConfig,
+  });
 
 export const wechatLoginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/wechat', 'post'>, 'url' | 'method'>,
@@ -98,6 +128,75 @@ export const oauthBindingProfileFn = (
     ...axiosConfig,
   });
 };
+
+export const ssoLoginUrlFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/login/url', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/login/url',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoLoginCallbackFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/login/callback', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/login/callback',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoAccountUrlFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/account/url', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/account/url',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoAccountCallbackFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/account/callback', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/account/callback',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoBindingUnbindFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/binding/unbind', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/binding/unbind',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoBindingSummaryFn = (
+  axiosConfig: Omit<AxiosConfig<SsoBindingSummaryPath, 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/binding/summary',
+    method: 'post',
+    ...axiosConfig,
+  });
 
 export const refreshTokenFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/refresh', 'post'>, 'url' | 'method'>,

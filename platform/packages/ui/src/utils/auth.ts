@@ -2,6 +2,8 @@
 import type { components } from '@/types/openapi';
 
 const USER_KEY = 'userInfo';
+export const AUTH_CHANGED_EVENT = 'hodor:auth-changed';
+export const TOTP_GATE_REQUIRED_EVENT = 'hodor:totp-gate-required';
 export type LoginResponse = components['schemas']['admin.system.auth.login.res']['data'];
 export type UserInfo = LoginResponse['userObj'];
 
@@ -15,6 +17,7 @@ export const authUtils = {
   // 设置用户信息
   setUserInfo(userInfo: UserInfo) {
     localStorage.setItem(USER_KEY, JSON.stringify(userInfo));
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
   },
 
   // 获取用户信息
@@ -31,6 +34,7 @@ export const authUtils = {
   // 移除用户信息
   removeUserInfo() {
     localStorage.removeItem(USER_KEY);
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
   },
 
   // 登出（清理所有认证信息）

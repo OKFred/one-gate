@@ -20,6 +20,7 @@ import { registerSchema } from "../../utils/schemaRegistry.js";
 import { authMiddleware } from "../auth";
 import { can } from "../auth/permission";
 import { getTranslator } from "../../utils/i18n/index.js";
+import { isHodorAuthBypassed } from "../authenticationRoutePolicy/index.js";
 
 function componentMaker(
   dataType: "request" | "response",
@@ -49,22 +50,6 @@ function componentMaker(
   }
 }
 
-const routeWhitelist = [
-  "/admin/system/auth/login",
-  "/admin/system/auth/oauth/login/url",
-  "/admin/system/auth/oauth/login/callback",
-  "/admin/i18n/translation/listAll",
-  "/admin/mobile/device-app/callback",
-  "/admin/mobile/async-task/callback",
-  "/admin/mobile/device/report/presence",
-  "/admin/mobile/device/report/info",
-  "/admin/mobile/device/report/event",
-  "/admin/mobile/device/report/deployment",
-  "/admin/mobile/device/report/network-routing",
-  "/admin/mobile/client-release/upload/prepare",
-  "/admin/mobile/client-release/upload/finalize",
-];
-
 function routeMaker({
   pathInfo,
   nameSpace,
@@ -90,9 +75,7 @@ function routeMaker({
       });
     }
     const requestPath = c.req.path?.replace(getEnv("BASE_API_PATH") ?? "", "");
-    const ignoreError = routeWhitelist.some(
-      (path) => requestPath === path || requestPath?.startsWith(`${path}/`)
-    );
+    const ignoreError = requestPath ? isHodorAuthBypassed(requestPath) : false;
     try {
       await authMiddleware(c);
       // 基于 action 的权限检查（RBAC）

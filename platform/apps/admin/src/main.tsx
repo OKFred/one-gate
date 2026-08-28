@@ -3,13 +3,13 @@ import './index.css';
 import App from './App.tsx';
 import { HashRouter } from 'react-router-dom';
 import { reloadOnce, clearReloadFlag } from '@/components/ChunkErrorBoundary';
-import { getOAuthHashBridgeUrl } from '@/utils/oauthCallback';
+import { getAuthHashBridgeUrl } from '@/utils/oauthCallback';
 
 // OAuth providers use a fixed callback path; bridge it into HashRouter without losing code/state.
-const oauthHashBridgeUrl = getOAuthHashBridgeUrl(window.location);
-if (oauthHashBridgeUrl) {
+const authHashBridgeUrl = getAuthHashBridgeUrl(window.location);
+if (authHashBridgeUrl) {
   window.history.replaceState({}, document.title, '/');
-  window.location.replace(oauthHashBridgeUrl);
+  window.location.replace(authHashBridgeUrl);
 }
 
 // Vite 5+ 内置事件：<link rel="modulepreload"> 预加载失败时触发（发版后旧 chunk 404）

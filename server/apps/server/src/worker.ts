@@ -13,14 +13,24 @@ import {
   cleanupDeviceOpsAudits,
   expireDeviceOpsSessions,
 } from "@hodor/admin/mobile/device-ops/facade.js";
+import { createTotpGateCenter } from "@hodor/admin/system/auth/totp-gate/index.js";
+import { CloudflareTotpAttemptCoordinator } from "./totp-gate-coordinator.js";
 export { MobileOpsSession } from "./mobile-ops-session.js";
+export { TotpGateCoordinator } from "./totp-gate-coordinator.js";
 
 let app: ReturnType<typeof createApp> | null = null;
 
 /** Initialize the application-wide service registry once per Worker isolate. */
 function getApp(): ReturnType<typeof createApp> {
   if (!app) {
-    app = createApp();
+    app = createApp({
+      resolveTotpGateCenter: (context) =>
+        createTotpGateCenter(
+          new CloudflareTotpAttemptCoordinator(
+            context.env.TOTP_GATE_COORDINATOR
+          )
+        ),
+    });
   }
   return app;
 }
