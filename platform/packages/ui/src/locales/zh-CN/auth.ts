@@ -17,6 +17,8 @@ export const auth = {
   'login.forgotPassword': '忘记密码？',
   'login.title': 'Open The Gate',
   'login.subtitle': '通用企业级权限管理后台',
+  'auth.errorCode': '错误码',
+  'auth.requestId': '请求编号',
 
   // GitHub 相关
   'github.signIn': '使用 GITHUB 登录',

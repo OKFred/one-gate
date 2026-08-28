@@ -293,6 +293,40 @@ describe("legacy D1 schema migrations", () => {
     ]);
   });
 
+  it("creates one-time OAuth state storage without foreign keys", async () => {
+    const client = createMemoryClient();
+    const migration = readMigration(
+      "./20260828_01_oauth_state_consistency.sql"
+    );
+
+    expect(migration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(migration).not.toMatch(/\bREFERENCES\b/i);
+    await executeSqlFile(client, migration);
+
+    const columns = await client.execute(
+      "PRAGMA table_info('system_oauth_state')"
+    );
+    expect(columns.rows.map((row) => String(row.name))).toEqual([
+      "state_digest",
+      "provider",
+      "intent",
+      "redirect_uri",
+      "user_id",
+      "expires_at_utc",
+      "consumed_at_utc",
+      "create_time_utc",
+    ]);
+    const foreignKeys = await client.execute(
+      "PRAGMA foreign_key_list('system_oauth_state')"
+    );
+    expect(foreignKeys.rows).toHaveLength(0);
+    const indexes = await client.execute(`
+      SELECT name FROM sqlite_master
+      WHERE type = 'index' AND name = 'system_oauth_state_expiry_idx'
+    `);
+    expect(indexes.rows).toHaveLength(1);
+  });
+
   it("creates immutable client release, environment revision, and deployment tables", async () => {
     const client = createMemoryClient();
     await executeSqlFile(

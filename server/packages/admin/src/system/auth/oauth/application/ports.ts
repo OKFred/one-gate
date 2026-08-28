@@ -10,7 +10,11 @@ import type {
 
 export interface OAuthStatePort {
   create(record: OAuthStateRecord): Promise<string>;
-  consume(state: string): Promise<OAuthStateRecord | null>;
+  consume(
+    state: string,
+    consumedAtUtc: number
+  ): Promise<OAuthStateRecord | null>;
+  deleteRetired(nowUtc: number): Promise<number>;
 }
 
 export interface OAuthProviderPort {

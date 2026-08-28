@@ -266,16 +266,18 @@ export class OAuthCenter {
     intent: OAuthIntent;
     userId: number | null;
   }): Promise<{ url: string }> {
+    const nowUtc = this.dependencies.clock.now();
     const redirectUri = validateRedirectUri(
       params.redirectUri,
       this.dependencies.allowedRedirectOrigins()
     );
+    await this.dependencies.state.deleteRetired(nowUtc);
     const state = await this.dependencies.state.create({
       provider: params.provider,
       intent: params.intent,
       redirectUri,
       userId: params.userId,
-      expiresAtUtc: this.dependencies.clock.now() + STATE_TTL_MS,
+      expiresAtUtc: nowUtc + STATE_TTL_MS,
     });
     return {
       url: this.dependencies.providers[params.provider].getAuthorizationUrl({
@@ -289,13 +291,14 @@ export class OAuthCenter {
     rawState: string,
     expectedIntent: OAuthIntent | readonly OAuthIntent[]
   ) {
-    const state = await this.dependencies.state.consume(rawState);
+    const nowUtc = this.dependencies.clock.now();
+    const state = await this.dependencies.state.consume(rawState, nowUtc);
     const expected = Array.isArray(expectedIntent)
       ? expectedIntent
       : [expectedIntent];
     if (
       !state ||
-      state.expiresAtUtc <= this.dependencies.clock.now() ||
+      state.expiresAtUtc <= nowUtc ||
       !expected.includes(state.intent)
     ) {
       throw new OAuthError(

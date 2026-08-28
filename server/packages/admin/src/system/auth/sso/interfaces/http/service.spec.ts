@@ -137,6 +137,9 @@ describe("SSO HTTP interface", () => {
       if (!(error instanceof HTTPException)) throw error;
       expect(error.status).toBe(403);
       expect(error.message).toBe("账号未绑定，请联系管理员");
+      expect(error.cause).toEqual({
+        error: { code: SsoErrorCode.ACCOUNT_NOT_BOUND },
+      });
     }
   });
 });

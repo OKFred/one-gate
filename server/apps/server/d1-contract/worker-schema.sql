@@ -156,6 +156,22 @@ FROM `system_user_oauth` INDEXED BY `system_user_oauth_user_provider_unique`
 LIMIT 0;
 
 SELECT
+  `state_digest`,
+  `provider`,
+  `intent`,
+  `redirect_uri`,
+  `user_id`,
+  `expires_at_utc`,
+  `consumed_at_utc`,
+  `create_time_utc`
+FROM `system_oauth_state`
+LIMIT 0;
+
+SELECT `state_digest`
+FROM `system_oauth_state` INDEXED BY `system_oauth_state_expiry_idx`
+LIMIT 0;
+
+SELECT
   `id`,
   `user_id`,
   `issuer`,

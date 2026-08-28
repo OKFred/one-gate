@@ -63,6 +63,14 @@ describe("D1 deployment contract", () => {
     expect(ssoMigration).toContain("system_sso_oidc_transaction_state_unique");
     expect(ssoMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
     expect(ssoMigration).not.toMatch(/\bREFERENCES\b/i);
+
+    const oauthStateMigration = readRepositoryFile(
+      "../d1-migrations/0009_oauth_state_consistency.sql"
+    );
+    expect(oauthStateMigration).toContain("system_oauth_state");
+    expect(oauthStateMigration).toContain("system_oauth_state_expiry_idx");
+    expect(oauthStateMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(oauthStateMigration).not.toMatch(/\bREFERENCES\b/i);
   });
 
   it("checks the critical production tables before Worker deployment", () => {
@@ -85,6 +93,8 @@ describe("D1 deployment contract", () => {
     expect(contract).toContain(
       "INDEXED BY `system_user_oauth_user_provider_unique`"
     );
+    expect(contract).toContain("FROM `system_oauth_state`");
+    expect(contract).toContain("INDEXED BY `system_oauth_state_expiry_idx`");
     expect(contract).toContain("FROM `system_user_sso_identity`");
     expect(contract).toContain(
       "INDEXED BY `system_user_sso_identity_issuer_subject_unique`"

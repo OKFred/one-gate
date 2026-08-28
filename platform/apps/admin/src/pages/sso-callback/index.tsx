@@ -6,6 +6,7 @@ import { authUtils } from '@/utils/auth';
 import { ssoAccountCallbackFn, ssoLoginCallbackFn } from '@/api/admin/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { SsoCallbackIntent } from '@/utils/oauthCallback';
+import { readApiErrorReference, type ApiErrorReference } from '@/api/config';
 
 function readCallbackParameters() {
   const hash = window.location.hash;
@@ -27,6 +28,7 @@ export default function SsoCallback() {
   const navigate = useNavigate();
   const t = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorReference, setErrorReference] = useState<ApiErrorReference | null>(null);
 
   useEffect(() => {
     const { code, state, intent } = readCallbackParameters();
@@ -49,7 +51,8 @@ export default function SsoCallback() {
         authUtils.setUserInfo(response.data.data.userObj);
         navigate('/login', { replace: true });
         showSnackbar({ message: t('sso.loginSuccess'), type: 'success' });
-      } catch {
+      } catch (error) {
+        setErrorReference(readApiErrorReference(error));
         setErrorMessage(t('sso.authFailedRetry'));
       }
     };
@@ -76,6 +79,16 @@ export default function SsoCallback() {
             {t('sso.authFailed')}
           </Typography>
           <Typography color="error">{errorMessage}</Typography>
+          {errorReference?.code ? (
+            <Typography color="text.secondary">
+              {t('auth.errorCode')}: {errorReference.code}
+            </Typography>
+          ) : null}
+          {errorReference?.requestId ? (
+            <Typography color="text.secondary">
+              {t('auth.requestId')}: {errorReference.requestId}
+            </Typography>
+          ) : null}
           <Typography
             role="link"
             tabIndex={0}

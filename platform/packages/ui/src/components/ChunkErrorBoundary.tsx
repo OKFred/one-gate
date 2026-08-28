@@ -9,6 +9,10 @@ interface State {
 }
 
 const RELOAD_FLAG_KEY = 'chunk_reload_attempted';
+const RELOAD_DELAY_MS = 250;
+const STABLE_PAGE_DELAY_MS = 10_000;
+let scheduledReload: number | null = null;
+let scheduledFlagClear: number | null = null;
 
 /**
  * 捕获 JS chunk 加载失败（发版后旧 chunk 文件不存在导致的 404）
@@ -53,13 +57,20 @@ function isChunkLoadError(error: Error): boolean {
  */
 export function reloadOnce() {
   const flag = sessionStorage.getItem(RELOAD_FLAG_KEY);
-  if (!flag) {
-    sessionStorage.setItem(RELOAD_FLAG_KEY, '1');
+  if (flag || scheduledReload !== null) return;
+
+  sessionStorage.setItem(RELOAD_FLAG_KEY, '1');
+  scheduledReload = window.setTimeout(() => {
+    scheduledReload = null;
     window.location.reload();
-  }
+  }, RELOAD_DELAY_MS);
 }
 
-/** 页面正常加载后清除标记，为下一次发版做准备 */
+/** 页面稳定运行后清除标记，为下一次发版做准备 */
 export function clearReloadFlag() {
-  sessionStorage.removeItem(RELOAD_FLAG_KEY);
+  if (scheduledFlagClear !== null) window.clearTimeout(scheduledFlagClear);
+  scheduledFlagClear = window.setTimeout(() => {
+    scheduledFlagClear = null;
+    sessionStorage.removeItem(RELOAD_FLAG_KEY);
+  }, STABLE_PAGE_DELAY_MS);
 }
