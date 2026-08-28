@@ -97,7 +97,15 @@ export function AuthenticationBoundary({
     try {
       const response = await totpGateStatusFn({ data: {} });
       if (evaluation.current !== currentEvaluation) return;
-      setPhase(response.data.data.verified ? 'READY' : 'TOTP_REQUIRED');
+      if (!response.data.data.verified) {
+        setPhase('TOTP_REQUIRED');
+        return;
+      }
+      if (scope === 'admin' && location.pathname === '/login') {
+        if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
+        return;
+      }
+      setPhase('READY');
     } catch {
       if (evaluation.current !== currentEvaluation) return;
       if (!authUtils.isAuthenticated()) {
@@ -106,7 +114,7 @@ export function AuthenticationBoundary({
         setPhase('TOTP_REQUIRED');
       }
     }
-  }, [location.pathname, redirectToAdmin, scope]);
+  }, [location.pathname, navigate, redirectToAdmin, scope]);
 
   useEffect(() => {
     void evaluate();
@@ -121,11 +129,6 @@ export function AuthenticationBoundary({
   }, [evaluate]);
 
   useEffect(() => {
-    if (phase !== 'READY' || scope !== 'admin' || location.pathname !== '/login') return;
-    if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
-  }, [location.pathname, navigate, phase, scope]);
-
-  useEffect(() => {
     if (phase === 'TOTP_REQUIRED' && scope !== 'admin') redirectToAdmin();
   }, [phase, redirectToAdmin, scope]);
 
@@ -137,9 +140,16 @@ export function AuthenticationBoundary({
     return (
       <TotpGateForm
         onVerified={() => {
+          if (isAuthenticationCallback(location.pathname)) {
+            setPhase('READY');
+            return;
+          }
+          if (location.pathname === '/login') {
+            setPhase('CHECKING');
+            if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
+            return;
+          }
           setPhase('READY');
-          if (isAuthenticationCallback(location.pathname)) return;
-          if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
         }}
       />
     );
