@@ -206,6 +206,26 @@ function readErrorCode(data: unknown): string | undefined {
   return typeof payload.code === 'string' ? payload.code : undefined;
 }
 
+export type ApiErrorReference = {
+  code: string | null;
+  requestId: string | null;
+};
+
+function safeReferencePart(value: unknown): string | null {
+  return typeof value === 'string' && /^[A-Za-z0-9._:-]{1,128}$/u.test(value) ? value : null;
+}
+
+export function readApiErrorReference(error: unknown): ApiErrorReference | null {
+  if (!axios.isAxiosError(error)) return null;
+  const code = safeReferencePart(readErrorCode(error.response?.data));
+  const responseRequestId = safeReferencePart(error.response?.headers?.['x-request-id']);
+  const requestRequestId = safeReferencePart(
+    (error.config as (InternalAxiosRequestConfig & { requestId?: string }) | undefined)?.requestId,
+  );
+  const requestId = responseRequestId ?? requestRequestId;
+  return code || requestId ? { code, requestId } : null;
+}
+
 function handleErrorResponse(
   data: { message?: string; data?: unknown } | null | undefined,
   fallbackMessage: string,

@@ -12,6 +12,8 @@ export const auth = {
   'login.forgotPassword': 'Forgot password?',
   'login.title': 'Open The Gate',
   'login.subtitle': 'General Enterprise Permission Management Platform',
+  'auth.errorCode': 'Error code',
+  'auth.requestId': 'Request ID',
 
   // GitHub Relative
   'github.signIn': 'Sign in with GITHUB',

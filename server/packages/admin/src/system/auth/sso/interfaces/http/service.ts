@@ -3,10 +3,6 @@ import {
   bodyUserContextAdapter,
   rawAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@hodor/core/middleware/errorHandler/businessError/index";
 import type { Context, UserObj } from "@hodor/core/types/app";
 import type { FromSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
@@ -49,29 +45,27 @@ function clientInfoFrom(context: Context): { ip: string; userAgent: string } {
 
 export function mapSsoHttpError(error: unknown): never {
   if (error instanceof SsoConfigurationError) {
-    throw new HTTPException(503, {
-      message: "SSO 登录暂不可用，请联系管理员",
-    });
+    return throwSsoHttpError(
+      503,
+      "SSO 登录暂不可用，请联系管理员",
+      "SSO_CONFIGURATION_ERROR"
+    );
   }
   if (error instanceof SsoOidcProviderError) {
-    throw new HTTPException(
+    return throwSsoHttpError(
       error.code === "INVALID_CONFIGURATION" ? 503 : 502,
-      {
-        message:
-          error.code === "INVALID_CONFIGURATION"
-            ? "SSO 登录暂不可用，请联系管理员"
-            : "SSO 服务暂时不可用，请稍后重试",
-      }
+      error.code === "INVALID_CONFIGURATION"
+        ? "SSO 登录暂不可用，请联系管理员"
+        : "SSO 服务暂时不可用，请稍后重试",
+      `SSO_${error.code}`
     );
   }
   if (!(error instanceof SsoError)) throw error;
   if (error.code === SsoErrorCode.ACCOUNT_NOT_BOUND) {
-    throw new HTTPException(403, { message: "账号未绑定，请联系管理员" });
+    return throwSsoHttpError(403, "账号未绑定，请联系管理员", error.code);
   }
   if (error.code === SsoErrorCode.SENSITIVE_DATA_FAILURE) {
-    throw new HTTPException(503, {
-      message: "SSO 登录暂不可用，请联系管理员",
-    });
+    return throwSsoHttpError(503, "SSO 登录暂不可用，请联系管理员", error.code);
   }
 
   const invalidCodes = [
@@ -81,21 +75,33 @@ export function mapSsoHttpError(error: unknown): never {
     SsoErrorCode.INVALID_PKCE,
     SsoErrorCode.INVALID_STATE,
   ] as const;
-  let code: (typeof BusinessErrorCode)[keyof typeof BusinessErrorCode] =
-    BusinessErrorCode.UNKNOWN_ERROR;
   if (invalidCodes.some((value) => value === error.code)) {
-    code = BusinessErrorCode.INVALID_PARAMS;
-  } else if (
+    return throwSsoHttpError(400, error.message, error.code);
+  }
+  if (
     error.code === SsoErrorCode.ACCOUNT_DISABLED ||
     error.code === SsoErrorCode.PRINCIPAL_MISMATCH
   ) {
-    code = BusinessErrorCode.PERMISSION_DENIED;
-  } else if (error.code === SsoErrorCode.BINDING_CONFLICT) {
-    code = BusinessErrorCode.DUPLICATE_DATA;
-  } else if (error.code === SsoErrorCode.BINDING_NOT_FOUND) {
-    code = BusinessErrorCode.NOT_EXIST_OR_DISABLED;
+    return throwSsoHttpError(403, error.message, error.code);
   }
-  throw new BusinessError(code, { message: error.message });
+  if (error.code === SsoErrorCode.BINDING_CONFLICT) {
+    return throwSsoHttpError(409, error.message, error.code);
+  }
+  if (error.code === SsoErrorCode.BINDING_NOT_FOUND) {
+    return throwSsoHttpError(404, error.message, error.code);
+  }
+  return throwSsoHttpError(500, "errorHandler.unknownError", error.code);
+}
+
+function throwSsoHttpError(
+  status: 400 | 403 | 404 | 409 | 500 | 502 | 503,
+  message: string,
+  code: string
+): never {
+  throw new HTTPException(status, {
+    message,
+    cause: { error: { code } },
+  });
 }
 
 export async function onSsoLoginUrl(

@@ -19,6 +19,9 @@ describe("OAuth HTTP error mapping", () => {
       if (!(error instanceof HTTPException)) throw error;
       expect(error.status).toBe(403);
       expect(error.message).toBe("账号未绑定，请联系管理员");
+      expect(error.cause).toEqual({
+        error: { code: OAuthErrorCode.ACCOUNT_NOT_BOUND },
+      });
     }
   });
 
@@ -33,6 +36,9 @@ describe("OAuth HTTP error mapping", () => {
       if (!(error instanceof HTTPException)) throw error;
       expect(error.status).toBe(502);
       expect(error.message).toBe("撤销 GitHub OAuth 授权失败，本地绑定已保留");
+      expect(error.cause).toEqual({
+        error: { code: OAuthErrorCode.REVOKE_FAILED },
+      });
     }
   });
 
@@ -51,6 +57,28 @@ describe("OAuth HTTP error mapping", () => {
       expect(error.status).toBe(503);
       expect(error.message).toBe("OAuth 登录暂不可用，请联系管理员");
       expect(error.message).not.toContain("secret");
+      expect(error.cause).toEqual({
+        error: { code: OAuthErrorCode.PROVIDER_NOT_CONFIGURED },
+      });
+    }
+  });
+
+  it("state 失败保留精确安全错误码", () => {
+    try {
+      mapOAuthError(
+        new OAuthError(
+          OAuthErrorCode.INVALID_STATE,
+          "OAuth state 无效、已过期或已被使用"
+        )
+      );
+      throw new Error("expected mapOAuthError to throw");
+    } catch (error) {
+      expect(error).toBeInstanceOf(HTTPException);
+      if (!(error instanceof HTTPException)) throw error;
+      expect(error.status).toBe(400);
+      expect(error.cause).toEqual({
+        error: { code: OAuthErrorCode.INVALID_STATE },
+      });
     }
   });
 

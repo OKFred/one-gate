@@ -5,6 +5,7 @@ import { showSnackbar } from '@/components/Notification';
 import { authUtils } from '@/utils/auth';
 import { oauthAccountCallbackFn, oauthLoginCallbackFn } from '@/api/admin/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
+import { readApiErrorReference, type ApiErrorReference } from '@/api/config';
 
 function readCallbackParameters() {
   const hash = window.location.hash;
@@ -21,6 +22,7 @@ export default function OAuthCallback() {
   const navigate = useNavigate();
   const t = useTranslation();
   const [errorMessage, setErrorMessage] = useState('');
+  const [errorReference, setErrorReference] = useState<ApiErrorReference | null>(null);
 
   useEffect(() => {
     const { code, state } = readCallbackParameters();
@@ -46,7 +48,8 @@ export default function OAuthCallback() {
         authUtils.setUserInfo(response.data.data.userObj);
         navigate('/login', { replace: true });
         showSnackbar({ message: t('oauth.loginSuccess'), type: 'success' });
-      } catch {
+      } catch (error) {
+        setErrorReference(readApiErrorReference(error));
         setErrorMessage(t('oauth.authFailedRetry'));
       }
     };
@@ -71,6 +74,16 @@ export default function OAuthCallback() {
             {t('oauth.authFailed')}
           </Typography>
           <Typography color="error">{errorMessage}</Typography>
+          {errorReference?.code ? (
+            <Typography color="text.secondary">
+              {t('auth.errorCode')}: {errorReference.code}
+            </Typography>
+          ) : null}
+          {errorReference?.requestId ? (
+            <Typography color="text.secondary">
+              {t('auth.requestId')}: {errorReference.requestId}
+            </Typography>
+          ) : null}
           <Typography
             role="link"
             tabIndex={0}

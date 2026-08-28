@@ -5,10 +5,6 @@ import {
   bodyClientInfoAdapter,
   bodyUserAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@hodor/core/middleware/errorHandler/businessError/index";
 import type { UserObj } from "@hodor/core/types/app";
 import { HTTPException } from "hono/http-exception";
 import { registry } from "../../../../../common/registry.js";
@@ -35,17 +31,28 @@ import {
 export function mapOAuthError(error: unknown): never {
   if (!(error instanceof OAuthError)) throw error;
   if (error.code === OAuthErrorCode.ACCOUNT_NOT_BOUND) {
-    throw new HTTPException(403, { message: "账号未绑定，请联系管理员" });
+    return throwOAuthHttpError(403, "账号未绑定，请联系管理员", error.code);
   }
   if (error.code === OAuthErrorCode.REVOKE_FAILED) {
-    throw new HTTPException(502, {
-      message: "撤销 GitHub OAuth 授权失败，本地绑定已保留",
-    });
+    return throwOAuthHttpError(
+      502,
+      "撤销 GitHub OAuth 授权失败，本地绑定已保留",
+      error.code
+    );
   }
   if (error.code === OAuthErrorCode.PROVIDER_NOT_CONFIGURED) {
-    throw new HTTPException(503, {
-      message: "OAuth 登录暂不可用，请联系管理员",
-    });
+    return throwOAuthHttpError(
+      503,
+      "OAuth 登录暂不可用，请联系管理员",
+      error.code
+    );
+  }
+  if (error.code === OAuthErrorCode.SENSITIVE_DATA_FAILURE) {
+    return throwOAuthHttpError(
+      503,
+      "OAuth 登录暂不可用，请联系管理员",
+      error.code
+    );
   }
   const invalidCodes = [
     OAuthErrorCode.INVALID_REQUEST,
@@ -58,18 +65,30 @@ export function mapOAuthError(error: unknown): never {
     OAuthErrorCode.ACCOUNT_NOT_BOUND,
     OAuthErrorCode.ACCOUNT_DISABLED,
   ] as const;
-  let code: (typeof BusinessErrorCode)[keyof typeof BusinessErrorCode] =
-    BusinessErrorCode.UNKNOWN_ERROR;
   if (invalidCodes.some((value) => value === error.code)) {
-    code = BusinessErrorCode.INVALID_PARAMS;
-  } else if (permissionCodes.some((value) => value === error.code)) {
-    code = BusinessErrorCode.PERMISSION_DENIED;
-  } else if (error.code === OAuthErrorCode.BINDING_CONFLICT) {
-    code = BusinessErrorCode.DUPLICATE_DATA;
-  } else if (error.code === OAuthErrorCode.BINDING_NOT_FOUND) {
-    code = BusinessErrorCode.NOT_EXIST_OR_DISABLED;
+    return throwOAuthHttpError(400, error.message, error.code);
   }
-  throw new BusinessError(code, { message: error.message });
+  if (permissionCodes.some((value) => value === error.code)) {
+    return throwOAuthHttpError(403, error.message, error.code);
+  }
+  if (error.code === OAuthErrorCode.BINDING_CONFLICT) {
+    return throwOAuthHttpError(409, error.message, error.code);
+  }
+  if (error.code === OAuthErrorCode.BINDING_NOT_FOUND) {
+    return throwOAuthHttpError(404, error.message, error.code);
+  }
+  return throwOAuthHttpError(500, "errorHandler.unknownError", error.code);
+}
+
+function throwOAuthHttpError(
+  status: 400 | 403 | 404 | 409 | 500 | 502 | 503,
+  message: string,
+  code: OAuthErrorCode
+): never {
+  throw new HTTPException(status, {
+    message,
+    cause: { error: { code } },
+  });
 }
 
 async function onLoginUrl(params: FromSchema<typeof OAuthUrlReq>) {
