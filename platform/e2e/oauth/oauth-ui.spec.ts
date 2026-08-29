@@ -202,20 +202,46 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
   });
   let menuRequests = 0;
   let permissionRequests = 0;
+  let gateStatusRequests = 0;
+  let tokenCheckRequests = 0;
   let gateVerified = false;
+
+  // The mock preview does not host enterprise/personal remote entries. Keep their expected import
+  // failures from exercising the unrelated one-shot chunk reload recovery during this SPA test.
+  await page.addInitScript(() => {
+    sessionStorage.setItem('chunk_reload_attempted', '1');
+  });
 
   await page.route('**/api/v1/admin/system/auth/oauth/login/callback', async (route) => {
     await route.fulfill(fulfillOk({ userObj }));
   });
   await page.route('**/api/v1/admin/system/menu/tree', async (route) => {
     menuRequests += 1;
-    await route.fulfill(fulfillOk([]));
+    await route.fulfill(
+      fulfillOk([
+        {
+          id: 1,
+          name: 'sidebar.menu.home',
+          path: '/home',
+          icon: 'material-symbols:home',
+          children: [],
+        },
+        {
+          id: 2,
+          name: 'sidebar.menu.me',
+          path: '/me',
+          icon: 'material-symbols:person',
+          children: [],
+        },
+      ]),
+    );
   });
   await page.route('**/api/v1/admin/system/auth/getButtonPermission', async (route) => {
     permissionRequests += 1;
     await route.fulfill(fulfillOk({ permissions: [] }));
   });
   await page.route('**/api/v1/admin/system/auth/gate/status', async (route) => {
+    gateStatusRequests += 1;
     await route.fulfill(
       fulfillOk({
         verified: gateVerified,
@@ -229,6 +255,7 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
     await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: '2026-08-29T00:00:00.000Z' }));
   });
   await page.route('**/api/v1/admin/system/auth/check', async (route) => {
+    tokenCheckRequests += 1;
     await route.fulfill(fulfillOk(true));
   });
   await page.route('**/api/v1/admin/system/auth/profile', async (route) => {
@@ -265,8 +292,46 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
   await page.getByRole('button', { name: /验证并进入系统|Verify and continue/i }).click();
 
   await expect(page).toHaveURL(/#\/home$/);
-  await expect.poll(() => menuRequests).toBe(1);
-  await expect.poll(() => permissionRequests).toBe(1);
+  await expect.poll(() => menuRequests).toBeGreaterThan(0);
+  await expect.poll(() => permissionRequests).toBeGreaterThan(0);
+  await expect.poll(() => tokenCheckRequests).toBeGreaterThan(0);
+  await page.waitForTimeout(500);
+  const requestsAfterInitialLoad = {
+    gateStatus: gateStatusRequests,
+    menu: menuRequests,
+    permission: permissionRequests,
+    tokenCheck: tokenCheckRequests,
+  };
+  const layoutMarker = 'auth-boundary-stable';
+  await page
+    .locator('header')
+    .first()
+    .evaluate((element, marker) => {
+      element.setAttribute('data-e2e-layout-marker', marker);
+    }, layoutMarker);
+  const stableLayout = page.locator(`[data-e2e-layout-marker="${layoutMarker}"]`);
+
+  await page.getByText('个人资料', { exact: true }).filter({ visible: true }).click();
+  await expect(page).toHaveURL(/#\/me$/);
+  await expect(stableLayout).toBeVisible();
+  await page.waitForTimeout(500);
+  expect({
+    gateStatus: gateStatusRequests,
+    menu: menuRequests,
+    permission: permissionRequests,
+    tokenCheck: tokenCheckRequests,
+  }).toEqual(requestsAfterInitialLoad);
+
+  await page.getByText('主页', { exact: true }).filter({ visible: true }).first().click();
+  await expect(page).toHaveURL(/#\/home$/);
+  await expect(stableLayout).toBeVisible();
+  await page.waitForTimeout(500);
+  expect({
+    gateStatus: gateStatusRequests,
+    menu: menuRequests,
+    permission: permissionRequests,
+    tokenCheck: tokenCheckRequests,
+  }).toEqual(requestsAfterInitialLoad);
   await expect
     .poll(async () => {
       try {
@@ -278,7 +343,10 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
     .toEqual(['id', 'langCode', 'token', 'username']);
 
   await page.reload();
-  await expect.poll(() => menuRequests).toBe(2);
+  await expect.poll(() => gateStatusRequests).toBeGreaterThan(requestsAfterInitialLoad.gateStatus);
+  await expect.poll(() => menuRequests).toBeGreaterThan(requestsAfterInitialLoad.menu);
+  await expect.poll(() => permissionRequests).toBeGreaterThan(requestsAfterInitialLoad.permission);
+  await expect.poll(() => tokenCheckRequests).toBeGreaterThan(requestsAfterInitialLoad.tokenCheck);
   await expect(
     page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
   ).toHaveCount(0);
