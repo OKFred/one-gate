@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -62,7 +62,14 @@ export function AuthenticationBoundary({
   const location = useLocation();
   const navigate = useNavigate();
   const evaluation = useRef(0);
+  const pathnameRef = useRef(location.pathname);
+  const navigateRef = useRef(navigate);
   const [phase, setPhase] = useState<AuthenticationPhase>('CHECKING');
+
+  useLayoutEffect(() => {
+    pathnameRef.current = location.pathname;
+    navigateRef.current = navigate;
+  }, [location.pathname, navigate]);
 
   const redirectToAdmin = useCallback(() => {
     const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
@@ -74,7 +81,8 @@ export function AuthenticationBoundary({
   const evaluate = useCallback(async () => {
     const currentEvaluation = evaluation.current + 1;
     evaluation.current = currentEvaluation;
-    const callback = isAuthenticationCallback(location.pathname);
+    const pathname = pathnameRef.current;
+    const callback = isAuthenticationCallback(pathname);
     if (scope === 'admin') rememberPrimaryAuthReturnTarget();
 
     let user = authUtils.getUserInfo();
@@ -101,8 +109,9 @@ export function AuthenticationBoundary({
         setPhase('TOTP_REQUIRED');
         return;
       }
-      if (scope === 'admin' && location.pathname === '/login') {
-        if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
+      if (scope === 'admin' && pathname === '/login') {
+        setPhase('READY');
+        if (!completePrimaryAuthReturn()) navigateRef.current('/home', { replace: true });
         return;
       }
       setPhase('READY');
@@ -114,7 +123,7 @@ export function AuthenticationBoundary({
         setPhase('TOTP_REQUIRED');
       }
     }
-  }, [location.pathname, navigate, redirectToAdmin, scope]);
+  }, [redirectToAdmin, scope]);
 
   useEffect(() => {
     void evaluate();
@@ -145,7 +154,7 @@ export function AuthenticationBoundary({
             return;
           }
           if (location.pathname === '/login') {
-            setPhase('CHECKING');
+            setPhase('READY');
             if (!completePrimaryAuthReturn()) navigate('/home', { replace: true });
             return;
           }
