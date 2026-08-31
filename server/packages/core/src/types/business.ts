@@ -41,6 +41,8 @@ export const BUSINESS = {
   "admin.system": "admin.system",
   /** 系统鉴权 */
   "admin.system.auth": "admin.system.auth",
+  /** 集中式 ABAC 授权连接 */
+  "admin.system.authorization": "admin.system.authorization",
   /** 系统部门 */
   "admin.system.department": "admin.system.department",
   /** 系统菜单 */

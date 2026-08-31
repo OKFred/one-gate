@@ -6,6 +6,7 @@ import role from "./role/index";
 import role_permission from "./role_permission/index";
 import user from "./user/index";
 import apiToken from "./api-token/index";
+import authorization from "./authorization/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import type { AuthAppOptions } from "./auth/index.js";
@@ -20,6 +21,7 @@ function createApp(options: AuthAppOptions): App {
   app.route("/role_permission", role_permission());
   app.route("/user", user());
   app.route("/api-token", apiToken());
+  app.route("/authorization", authorization());
   return app;
 }
 export default createApp;

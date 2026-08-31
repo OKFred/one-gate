@@ -32,3 +32,10 @@ export function createAuthorizationCenter(
       options.allowInsecureLocalhost ?? getEnv("NODE_ENV") !== "production",
   });
 }
+
+let defaultCenter: AuthorizationCenter | null = null;
+
+export function getAuthorizationCenter(): AuthorizationCenter {
+  defaultCenter ??= createAuthorizationCenter();
+  return defaultCenter;
+}
