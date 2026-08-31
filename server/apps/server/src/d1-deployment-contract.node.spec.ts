@@ -151,14 +151,14 @@ describe("D1 deployment contract", () => {
     expect(deployAt).toBeGreaterThan(contractAt);
   });
 
-  it("deploys required identity and TOTP settings while Feishu stays optional", () => {
+  it("deploys only Hodor root secrets and the temporary SSO bridge", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
     for (const secretName of [
       "MOBILE_SENSITIVE_DATA_KEY",
+      "HODOR_AUTH_MASTER_KEY",
       "OAUTH_SENSITIVE_DATA_KEY",
-      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
       "SSO_ISSUER",
       "SSO_CLIENT_ID",
       "SSO_AUDIENCE",
@@ -171,26 +171,33 @@ describe("D1 deployment contract", () => {
         `${secretName}: \${{ secrets.${secretName} }}`
       );
     }
-    expect(workflow).toContain("Configure Optional Feishu Secrets");
-    for (const secretName of [
+    expect(workflow).not.toContain("Configure Optional Feishu Secrets");
+    for (const retiredSecretName of [
+      "GH_CLIENT_ID",
+      "GH_CLIENT_SECRET",
+      "GH_ORG_NAME",
       "FEISHU_APP_ID",
       "FEISHU_APP_SECRET",
       "FEISHU_ALLOWED_TENANT_KEYS",
+      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
     ]) {
-      expect(workflow).toContain(
-        `${secretName}: \${{ secrets.${secretName} }}`
-      );
+      expect(workflow).not.toContain(retiredSecretName);
     }
 
     const config = readRepositoryFile("../wrangler.jsonc");
     expect(config).toContain('"secrets"');
+    expect(config).toContain('"HODOR_AUTH_MASTER_KEY"');
     expect(config).toContain('"OAUTH_SENSITIVE_DATA_KEY"');
-    for (const secretName of [
+    for (const retiredSecretName of [
+      "GH_CLIENT_ID",
+      "GH_CLIENT_SECRET",
+      "GH_ORG_NAME",
       "FEISHU_APP_ID",
       "FEISHU_APP_SECRET",
       "FEISHU_ALLOWED_TENANT_KEYS",
+      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
     ]) {
-      expect(config).not.toContain(`      "${secretName}",`);
+      expect(config).not.toContain(`      "${retiredSecretName}",`);
     }
   });
 });
