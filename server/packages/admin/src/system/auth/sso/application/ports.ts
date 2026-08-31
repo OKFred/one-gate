@@ -90,6 +90,13 @@ export interface SsoOidcProviderPort {
   }): Promise<VerifiedSsoPrincipal>;
 }
 
+export interface SsoConfigurationProbePort {
+  testConfiguration(input: {
+    requestId: string;
+    configuration: SsoClientConfiguration;
+  }): Promise<void>;
+}
+
 export interface SsoClockPort {
   now(): number;
 }
@@ -127,7 +134,7 @@ export type SsoCenterDependencies = {
   hash: SsoHashPort;
   cipher: SsoCipherPort;
   tokenIssuer: SsoTokenIssuerPort;
-  configuration: () => SsoClientConfiguration;
+  configuration: () => Promise<SsoClientConfiguration>;
 };
 
 export type CreateSsoAuthorizationInput = {

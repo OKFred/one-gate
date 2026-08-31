@@ -136,7 +136,8 @@ export class SsoCenter {
       params.userId,
       completed.principal,
       existingBySubject,
-      existingByUser
+      existingByUser,
+      completed.configuration
     );
 
     const binding = this.toNewBinding(
@@ -160,7 +161,7 @@ export class SsoCenter {
 
   async unbind(params: { userId: number }): Promise<{ message: string }> {
     await this.requireEnabledUser(params.userId);
-    const configuration = this.getConfiguration();
+    const configuration = await this.getConfiguration();
     const removed = await this.dependencies.repository.deleteBinding(
       params.userId,
       configuration.issuer
@@ -173,7 +174,7 @@ export class SsoCenter {
 
   async getBindingSummary(userId: number): Promise<SsoBinding | null> {
     await this.requireEnabledUser(userId);
-    const configuration = this.getConfiguration();
+    const configuration = await this.getConfiguration();
     return this.dependencies.repository.findBindingByUserAndIssuer(
       userId,
       configuration.issuer
@@ -189,7 +190,7 @@ export class SsoCenter {
     ) {
       throw new SsoError(SsoErrorCode.INVALID_REQUEST, "SSO 操作上下文无效");
     }
-    const configuration = this.getConfiguration();
+    const configuration = await this.getConfiguration();
     const redirectUri = validateSsoRedirectUri(
       input.redirectUri,
       configuration
@@ -270,7 +271,7 @@ export class SsoCenter {
         "SSO state 无效、已过期或已被使用"
       );
     }
-    const configuration = this.getConfiguration();
+    const configuration = await this.getConfiguration();
     if (
       transaction.issuer !== configuration.issuer ||
       transaction.clientId !== configuration.clientId ||
@@ -301,8 +302,8 @@ export class SsoCenter {
     return { principal, transaction, configuration };
   }
 
-  private getConfiguration(): SsoClientConfiguration {
-    const raw = this.dependencies.configuration();
+  private async getConfiguration(): Promise<SsoClientConfiguration> {
+    const raw = await this.dependencies.configuration();
     const issuer = normalizeSsoIssuer(raw.issuer, raw);
     if (!raw.clientId.trim() || !raw.audience.trim() || !raw.tenantId.trim()) {
       throw new SsoError(
@@ -328,7 +329,8 @@ export class SsoCenter {
     userId: number,
     principal: VerifiedSsoPrincipal,
     existingBySubject: SsoBinding | null,
-    existingByUser: SsoBinding | null
+    existingByUser: SsoBinding | null,
+    configuration: SsoClientConfiguration
   ): void {
     if (existingBySubject && existingBySubject.userId !== userId) {
       throw new SsoError(
@@ -345,7 +347,7 @@ export class SsoCenter {
     const existing = existingBySubject ?? existingByUser;
     if (existing) {
       assertPrincipalMatchesBinding(principal, existing, {
-        allowInsecureLocalhost: this.getConfiguration().allowInsecureLocalhost,
+        allowInsecureLocalhost: configuration.allowInsecureLocalhost,
       });
     }
   }

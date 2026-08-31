@@ -223,7 +223,7 @@ describe("SsoCenter", () => {
         issue: async ({ user, principal: verified }) =>
           `hodor-${user.id}-${verified.subject}`,
       },
-      configuration: () => configuration,
+      configuration: async () => configuration,
     });
   });
 

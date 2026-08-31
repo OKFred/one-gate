@@ -11,12 +11,22 @@ const mocks = vi.hoisted(() => ({
   bindCallback: vi.fn(),
   unbind: vi.fn(),
   getBindingSummary: vi.fn(),
+  configurationGet: vi.fn(),
+  configurationSaveDraft: vi.fn(),
+  configurationTest: vi.fn(),
+  configurationDisable: vi.fn(),
   recordLogin: vi.fn(),
 }));
 
 vi.mock("../../infrastructure/container.js", () => ({
   SsoConfigurationError: class SsoConfigurationError extends Error {},
   getSsoCenter: () => mocks,
+  getSsoConfigurationCenter: () => ({
+    get: mocks.configurationGet,
+    saveDraft: mocks.configurationSaveDraft,
+    test: mocks.configurationTest,
+    disable: mocks.configurationDisable,
+  }),
 }));
 
 vi.mock("../../../../../common/registry.js", () => ({
@@ -26,6 +36,8 @@ vi.mock("../../../../../common/registry.js", () => ({
 import ssoHttpService, {
   mapSsoHttpError,
   onSsoAccountUrl,
+  onSsoConfigurationGet,
+  onSsoConfigurationTest,
   onSsoLoginCallback,
   onSsoLoginUrl,
 } from "./service.js";
@@ -45,7 +57,7 @@ function createContextApp(
 describe("SSO HTTP interface", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("只暴露六个固定 POST 接口", () => {
+  it("只暴露十个固定 POST 接口", () => {
     expect(Object.keys(ssoHttpService)).toEqual([
       "ssoLoginUrl",
       "ssoLoginCallback",
@@ -53,6 +65,10 @@ describe("SSO HTTP interface", () => {
       "ssoAccountCallback",
       "ssoBindingUnbind",
       "ssoBindingSummary",
+      "ssoConfigurationGet",
+      "ssoConfigurationSave",
+      "ssoConfigurationTest",
+      "ssoConfigurationDisable",
     ]);
     expect(
       Object.values(ssoHttpService).map((api) => ({
@@ -67,6 +83,10 @@ describe("SSO HTTP interface", () => {
       { path: "/sso/account/callback", method: "post", permission: false },
       { path: "/sso/binding/unbind", method: "post", permission: false },
       { path: "/sso/binding/summary", method: "post", permission: false },
+      { path: "/sso/config/get", method: "post", permission: false },
+      { path: "/sso/config/save", method: "post", permission: false },
+      { path: "/sso/config/test", method: "post", permission: false },
+      { path: "/sso/config/disable", method: "post", permission: false },
     ]);
   });
 
@@ -141,5 +161,61 @@ describe("SSO HTTP interface", () => {
         error: { code: SsoErrorCode.ACCOUNT_NOT_BOUND },
       });
     }
+  });
+
+  it("配置接口要求超级管理员并向探测传播 requestId", async () => {
+    mocks.configurationTest.mockResolvedValue({
+      status: "ready",
+      issuer: "https://sso.example.com",
+      clientId: "hodor-client",
+      audience: "urn:hodor",
+      allowedTenantId: "tenant-1",
+      redirectUris: ["https://gate.example.com/sso/callback"],
+      configVersion: 2,
+      lastTestedAtUtc: 2_000,
+      updateTimeUtc: 2_000,
+    });
+    const ensureLoaded = vi.fn().mockResolvedValue(undefined);
+    const app = createContextApp(async (context) => {
+      const result = await onSsoConfigurationTest(
+        { expectedVersion: 1 },
+        { userId: 7, isSuperAdmin: true, ensureLoaded },
+        context
+      );
+      return context.json(result);
+    });
+
+    const response = await app.request("/", { method: "POST" });
+    expect(response.status).toBe(200);
+    expect(ensureLoaded).toHaveBeenCalledOnce();
+    expect(mocks.configurationTest).toHaveBeenCalledWith({
+      expectedVersion: 1,
+      updatedByUserId: 7,
+      requestId: "req-sso-123",
+    });
+  });
+
+  it("普通管理员不能读取 SSO 配置", async () => {
+    const app = createContextApp(async (context) => {
+      try {
+        await onSsoConfigurationGet(
+          {},
+          {
+            userId: 8,
+            isSuperAdmin: false,
+            ensureLoaded: vi.fn().mockResolvedValue(undefined),
+          },
+          context
+        );
+        return context.json({ unexpected: true });
+      } catch (error) {
+        if (!(error instanceof HTTPException)) throw error;
+        return context.json({ code: error.cause }, error.status);
+      }
+    });
+
+    const response = await app.request("/", { method: "POST" });
+    expect(response.status).toBe(403);
+    expect(mocks.configurationGet).not.toHaveBeenCalled();
   });
 });

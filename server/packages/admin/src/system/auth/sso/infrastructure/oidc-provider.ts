@@ -4,7 +4,10 @@ import {
   jwtVerify,
   type JWTPayload,
 } from "jose";
-import type { SsoOidcProviderPort } from "../application/ports.js";
+import type {
+  SsoConfigurationProbePort,
+  SsoOidcProviderPort,
+} from "../application/ports.js";
 import type { VerifiedSsoPrincipal } from "../domain/sso.js";
 import { webCryptoSsoHash } from "./crypto.js";
 
@@ -194,7 +197,7 @@ function parsePrincipal(payload: JWTPayload): VerifiedSsoPrincipal {
 
 export function createSsoOidcProvider(
   options: CreateSsoOidcProviderOptions
-): SsoOidcProviderPort {
+): SsoOidcProviderPort & SsoConfigurationProbePort {
   const scopes = options.scopes ?? DEFAULT_SCOPES;
   if (scopes.length === 0 || scopes.some((scope) => !scope.trim())) {
     throw new SsoOidcProviderError(
@@ -327,7 +330,46 @@ export function createSsoOidcProvider(
     };
   };
 
+  const fetchJwks = async (
+    jwksUri: string,
+    requestId: string
+  ): Promise<void> => {
+    const response = await auditedFetch("jwks", requestId, jwksUri, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+    let value: unknown;
+    try {
+      value = await response.json();
+    } catch {
+      throw new SsoOidcProviderError(
+        "DISCOVERY_FAILED",
+        "OIDC JWKS response is invalid"
+      );
+    }
+    const keys = isRecord(value) ? value["keys"] : null;
+    if (
+      !response.ok ||
+      !Array.isArray(keys) ||
+      keys.length === 0 ||
+      keys.some((key) => !isRecord(key) || typeof key["kty"] !== "string")
+    ) {
+      throw new SsoOidcProviderError(
+        "DISCOVERY_FAILED",
+        "OIDC JWKS response does not contain usable keys"
+      );
+    }
+  };
+
   return {
+    async testConfiguration(input) {
+      const discovery = await fetchDiscovery(
+        input.configuration.issuer,
+        input.requestId
+      );
+      await fetchJwks(discovery.jwksUri, input.requestId);
+    },
+
     async createAuthorizationUrl(input) {
       const discovery = await fetchDiscovery(input.issuer, input.requestId);
       const url = new URL(discovery.authorizationEndpoint);

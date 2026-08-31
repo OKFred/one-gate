@@ -7,15 +7,23 @@ import type { Context, UserObj } from "@hodor/core/types/app";
 import type { FromSchema } from "json-schema-to-ts";
 import { HTTPException } from "hono/http-exception";
 import { registry } from "../../../../../common/registry.js";
-import { SsoError, SsoErrorCode } from "../../domain/sso.js";
+import {
+  SsoError,
+  SsoErrorCode,
+  type SsoConnection,
+} from "../../domain/sso.js";
 import {
   getSsoCenter,
+  getSsoConfigurationCenter,
   SsoConfigurationError,
 } from "../../infrastructure/container.js";
 import { SsoOidcProviderError } from "../../infrastructure/oidc-provider.js";
 import {
   SsoBindingSummaryRes,
   SsoCallbackReq,
+  SsoConnectionSaveReq,
+  SsoConnectionSummaryRes,
+  SsoConnectionVersionReq,
   SsoEmptyReq,
   SsoLoginRes,
   SsoMessageRes,
@@ -24,6 +32,10 @@ import {
 } from "./model.js";
 
 type CurrentUser = Pick<UserObj, "userId">;
+type ConfigurationAdmin = Pick<
+  UserObj,
+  "userId" | "isSuperAdmin" | "ensureLoaded"
+>;
 
 function requestIdFrom(context: Context): string {
   return context.get("requestId");
@@ -74,6 +86,7 @@ export function mapSsoHttpError(error: unknown): never {
     SsoErrorCode.INVALID_REDIRECT_URI,
     SsoErrorCode.INVALID_PKCE,
     SsoErrorCode.INVALID_STATE,
+    SsoErrorCode.CONFIGURATION_INVALID,
   ] as const;
   if (invalidCodes.some((value) => value === error.code)) {
     return throwSsoHttpError(400, error.message, error.code);
@@ -87,10 +100,134 @@ export function mapSsoHttpError(error: unknown): never {
   if (error.code === SsoErrorCode.BINDING_CONFLICT) {
     return throwSsoHttpError(409, error.message, error.code);
   }
+  if (error.code === SsoErrorCode.CONFIGURATION_CONFLICT) {
+    return throwSsoHttpError(409, error.message, error.code);
+  }
+  if (error.code === SsoErrorCode.CONFIGURATION_NOT_READY) {
+    return throwSsoHttpError(
+      503,
+      "SSO 登录暂不可用，请联系管理员",
+      "SSO_CONFIGURATION_ERROR"
+    );
+  }
   if (error.code === SsoErrorCode.BINDING_NOT_FOUND) {
     return throwSsoHttpError(404, error.message, error.code);
   }
   return throwSsoHttpError(500, "errorHandler.unknownError", error.code);
+}
+
+async function requireConfigurationAdmin(userObj: ConfigurationAdmin) {
+  await userObj.ensureLoaded();
+  if (!userObj.isSuperAdmin) {
+    return throwSsoHttpError(
+      403,
+      "仅超级管理员可以管理 SSO 配置",
+      "SSO_CONFIGURATION_FORBIDDEN"
+    );
+  }
+  return userObj;
+}
+
+function toConnectionSummary(
+  connection: SsoConnection | null
+): FromSchema<typeof SsoConnectionSummaryRes> {
+  return connection
+    ? {
+        configured: true,
+        status: connection.status,
+        issuer: connection.issuer,
+        clientId: connection.clientId,
+        audience: connection.audience,
+        allowedTenantId: connection.allowedTenantId,
+        redirectUris: [...connection.redirectUris],
+        configVersion: connection.configVersion,
+        lastTestedAtUtc: connection.lastTestedAtUtc,
+        updateTimeUtc: connection.updateTimeUtc,
+      }
+    : {
+        configured: false,
+        status: null,
+        issuer: null,
+        clientId: null,
+        audience: null,
+        allowedTenantId: null,
+        redirectUris: [],
+        configVersion: 0,
+        lastTestedAtUtc: null,
+        updateTimeUtc: null,
+      };
+}
+
+export async function onSsoConfigurationGet(
+  _params: FromSchema<typeof SsoEmptyReq>,
+  userObj: ConfigurationAdmin,
+  _context: Context
+): Promise<FromSchema<typeof SsoConnectionSummaryRes>> {
+  try {
+    await requireConfigurationAdmin(userObj);
+    return toConnectionSummary(await getSsoConfigurationCenter().get());
+  } catch (error) {
+    return mapSsoHttpError(error);
+  }
+}
+
+export async function onSsoConfigurationSave(
+  params: FromSchema<typeof SsoConnectionSaveReq>,
+  userObj: ConfigurationAdmin,
+  _context: Context
+): Promise<FromSchema<typeof SsoConnectionSummaryRes>> {
+  try {
+    const admin = await requireConfigurationAdmin(userObj);
+    const connection = await getSsoConfigurationCenter().saveDraft({
+      values: {
+        issuer: params.issuer,
+        clientId: params.clientId,
+        audience: params.audience,
+        allowedTenantId: params.allowedTenantId,
+        redirectUris: params.redirectUris,
+      },
+      expectedVersion: params.expectedVersion,
+      updatedByUserId: admin.userId,
+    });
+    return toConnectionSummary(connection);
+  } catch (error) {
+    return mapSsoHttpError(error);
+  }
+}
+
+export async function onSsoConfigurationTest(
+  params: FromSchema<typeof SsoConnectionVersionReq>,
+  userObj: ConfigurationAdmin,
+  context: Context
+): Promise<FromSchema<typeof SsoConnectionSummaryRes>> {
+  try {
+    const admin = await requireConfigurationAdmin(userObj);
+    const connection = await getSsoConfigurationCenter().test({
+      expectedVersion: params.expectedVersion,
+      updatedByUserId: admin.userId,
+      requestId: requestIdFrom(context),
+    });
+    return toConnectionSummary(connection);
+  } catch (error) {
+    return mapSsoHttpError(error);
+  }
+}
+
+export async function onSsoConfigurationDisable(
+  params: FromSchema<typeof SsoConnectionVersionReq>,
+  userObj: ConfigurationAdmin,
+  _context: Context
+): Promise<FromSchema<typeof SsoConnectionSummaryRes>> {
+  try {
+    const admin = await requireConfigurationAdmin(userObj);
+    const connection = await getSsoConfigurationCenter().disable({
+      expectedVersion: params.expectedVersion,
+      updatedByUserId: admin.userId,
+    });
+    return toConnectionSummary(connection);
+  } catch (error) {
+    return mapSsoHttpError(error);
+  }
 }
 
 function throwSsoHttpError(
@@ -298,6 +435,58 @@ const bindingSummaryApi = {
   permission: false,
 } satisfies API;
 
+const configurationGetApi = {
+  req: SsoEmptyReq,
+  res: SsoConnectionSummaryRes,
+  pathInfo: {
+    path: "/sso/config/get",
+    method: "post",
+    summary: "读取 SSO 连接配置",
+  } as const,
+  adapter: bodyUserContextAdapter,
+  service: onSsoConfigurationGet,
+  permission: false,
+} satisfies API;
+
+const configurationSaveApi = {
+  req: SsoConnectionSaveReq,
+  res: SsoConnectionSummaryRes,
+  pathInfo: {
+    path: "/sso/config/save",
+    method: "post",
+    summary: "保存 SSO 连接草稿",
+  } as const,
+  adapter: bodyUserContextAdapter,
+  service: onSsoConfigurationSave,
+  permission: false,
+} satisfies API;
+
+const configurationTestApi = {
+  req: SsoConnectionVersionReq,
+  res: SsoConnectionSummaryRes,
+  pathInfo: {
+    path: "/sso/config/test",
+    method: "post",
+    summary: "测试并启用 SSO 连接",
+  } as const,
+  adapter: bodyUserContextAdapter,
+  service: onSsoConfigurationTest,
+  permission: false,
+} satisfies API;
+
+const configurationDisableApi = {
+  req: SsoConnectionVersionReq,
+  res: SsoConnectionSummaryRes,
+  pathInfo: {
+    path: "/sso/config/disable",
+    method: "post",
+    summary: "停用 SSO 连接",
+  } as const,
+  adapter: bodyUserContextAdapter,
+  service: onSsoConfigurationDisable,
+  permission: false,
+} satisfies API;
+
 export default {
   ssoLoginUrl: loginUrlApi,
   ssoLoginCallback: loginCallbackApi,
@@ -305,4 +494,8 @@ export default {
   ssoAccountCallback: accountCallbackApi,
   ssoBindingUnbind: bindingUnbindApi,
   ssoBindingSummary: bindingSummaryApi,
+  ssoConfigurationGet: configurationGetApi,
+  ssoConfigurationSave: configurationSaveApi,
+  ssoConfigurationTest: configurationTestApi,
+  ssoConfigurationDisable: configurationDisableApi,
 };

@@ -206,13 +206,20 @@ export function toSsoClientConfiguration(
       "SSO 连接尚未就绪"
     );
   }
-  const values = normalizeSsoConnectionValues(connection, policy);
+  return createSsoClientConfiguration(connection, policy);
+}
+
+export function createSsoClientConfiguration(
+  values: SsoConnectionValues,
+  policy: SsoIssuerPolicy
+): SsoClientConfiguration {
+  const normalized = normalizeSsoConnectionValues(values, policy);
   return {
-    issuer: values.issuer,
-    clientId: values.clientId,
-    audience: values.audience,
-    tenantId: values.allowedTenantId,
-    redirectUris: values.redirectUris,
+    issuer: normalized.issuer,
+    clientId: normalized.clientId,
+    audience: normalized.audience,
+    tenantId: normalized.allowedTenantId,
+    redirectUris: normalized.redirectUris,
     allowInsecureLocalhost: policy.allowInsecureLocalhost,
   };
 }

@@ -194,15 +194,16 @@ export class DrizzleSsoRepository implements SsoRepositoryPort {
   }
 
   async deleteBinding(userId: number, issuer: string): Promise<boolean> {
-    const result = await db
+    const rows = await db
       .delete(userSsoIdentityTable)
       .where(
         and(
           eq(userSsoIdentityTable.userId, userId),
           eq(userSsoIdentityTable.issuer, issuer)
         )
-      );
-    return result.rowsAffected > 0;
+      )
+      .returning({ id: userSsoIdentityTable.id });
+    return rows.length > 0;
   }
 
   async findLocalUser(userId: number) {
