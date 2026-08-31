@@ -29,6 +29,7 @@ type SaveConnectionCenter = Pick<AuthorizationCenter, "saveDraft">;
 type TestConnectionCenter = Pick<AuthorizationCenter, "testConnection">;
 type DisableConnectionCenter = Pick<AuthorizationCenter, "disableConnection">;
 type PilotDecisionCenter = Pick<AuthorizationCenter, "checkPilotDecision">;
+const MAX_PILOT_REQUEST_BYTES = 64 * 1024;
 
 export interface AuthorizationRequestContext {
   get(key: "requestId"): string;
@@ -36,6 +37,20 @@ export interface AuthorizationRequestContext {
 
 function requestIdFrom(context: AuthorizationRequestContext): string {
   return context.get("requestId");
+}
+
+function ensurePilotRequestSize(
+  params: FromSchema<typeof AuthorizationPilotDecisionReq>
+): void {
+  if (
+    new TextEncoder().encode(JSON.stringify(params)).byteLength >
+    MAX_PILOT_REQUEST_BYTES
+  ) {
+    throw new HodorAuthorizationError(
+      HodorAuthorizationErrorCode.CONFIGURATION_INVALID,
+      "Authorization 决策请求超过 64 KiB 限制"
+    );
+  }
 }
 
 function throwAuthorizationHttpError(
@@ -213,6 +228,7 @@ export async function onAuthorizationPilotCheck(
 ): Promise<FromSchema<typeof AuthorizationPilotDecisionRes>> {
   try {
     const admin = await requireConfigurationAdmin(user);
+    ensurePilotRequestSize(params);
     const result = await center.checkPilotDecision({
       requestId: requestIdFrom(context),
       actor: {
@@ -227,7 +243,7 @@ export async function onAuthorizationPilotCheck(
           id: params.resource.id,
           attributes: params.resource.attributes,
         },
-        context: params.context,
+        context: params.context ?? {},
       },
     });
     return {

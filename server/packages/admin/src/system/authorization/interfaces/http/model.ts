@@ -113,7 +113,7 @@ export const AuthorizationPilotDecisionReq = {
     },
     context: cedarPilotRecord,
   },
-  required: ["action", "resource", "context"],
+  required: ["action", "resource"],
   additionalProperties: false,
 } as const;
 

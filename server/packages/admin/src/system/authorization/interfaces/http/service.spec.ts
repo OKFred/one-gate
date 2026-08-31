@@ -99,4 +99,49 @@ describe("Authorization HTTP service", () => {
       })
     );
   });
+
+  it("accepts an omitted context and rejects requests above 64 KiB", async () => {
+    const checkPilotDecision = vi.fn().mockResolvedValue({
+      data: {
+        decisionId: "decision-1",
+        allowed: false,
+        reason: "POLICY_DENY",
+        policyRevision: 3,
+      },
+      requestId: "authorization-request-1",
+    });
+    await expect(
+      onAuthorizationPilotCheck(
+        {
+          action: "read",
+          resource: { type: "Document", id: "doc-1", attributes: {} },
+        },
+        admin(),
+        context(),
+        { checkPilotDecision }
+      )
+    ).resolves.toMatchObject({ allowed: false });
+    expect(checkPilotDecision).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        decision: expect.objectContaining({ context: {} }),
+      })
+    );
+
+    await expect(
+      onAuthorizationPilotCheck(
+        {
+          action: "read",
+          resource: {
+            type: "Document",
+            id: "doc-1",
+            attributes: { oversized: "x".repeat(65_536) },
+          },
+        },
+        admin(),
+        context(),
+        { checkPilotDecision }
+      )
+    ).rejects.toMatchObject({ status: 400 });
+    expect(checkPilotDecision).toHaveBeenCalledTimes(1);
+  });
 });
