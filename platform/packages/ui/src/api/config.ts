@@ -160,9 +160,7 @@ function setupInterceptors(service: AxiosInstance) {
         // 使用 hash 路由检查当前位置（因为项目使用了 HashRouter）
         const currentHash = window.location.hash.slice(1); // 移除 # 前缀
         const isAuthPage =
-          currentHash.startsWith(loginPath) ||
-          currentHash.startsWith('/oauth/callback') ||
-          currentHash.startsWith('/sso/callback');
+          currentHash.startsWith(loginPath) || currentHash.startsWith('/sso/callback');
         if (!isAuthPage) {
           // abort 队列中的所有其他请求
           requestQueueManager.abortAllRequests(requestId);

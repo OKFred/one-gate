@@ -14,7 +14,7 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   reporter: [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
-  webServer: e2eEnvironment.mockOAuth
+  webServer: e2eEnvironment.mockAuth
     ? {
         command: 'pnpm --filter @hodor/admin preview --host 127.0.0.1 --port 4173',
         url: e2eEnvironment.baseUrl,

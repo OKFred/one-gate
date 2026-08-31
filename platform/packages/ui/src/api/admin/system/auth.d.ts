@@ -5,12 +5,6 @@ export declare const loginFn: (
   Omit<import('axios').AxiosResponse<any, any, {}>, 'data' | 'headers'> &
     import('../../config').ResponseGeneric<'/api/v1/admin/system/auth/login', 'post'>
 >;
-export declare const wechatLoginFn: (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/wechat', 'post'>, 'url' | 'method'>,
-) => Promise<
-  Omit<import('axios').AxiosResponse<any, any, {}>, 'data' | 'headers'> &
-    import('../../config').ResponseGeneric<'/api/v1/admin/system/auth/wechat', 'post'>
->;
 export declare const refreshTokenFn: (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/refresh', 'post'>, 'url' | 'method'>,
 ) => Promise<

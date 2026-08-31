@@ -56,7 +56,6 @@ const childrenRoutes: RouteObject[] = [
       ([filePath]) =>
         !filePath.startsWith('./pages/error/') &&
         !filePath.startsWith('./pages/login/') &&
-        !filePath.startsWith('./pages/oauth-callback/') &&
         !filePath.startsWith('./pages/sso-callback/'),
     ),
   ),
@@ -72,7 +71,6 @@ const childrenRoutes: RouteObject[] = [
 
 const Layout = lazy(() => import('@/layout'));
 const Login = lazy(() => import('./pages/login'));
-const OAuthCallback = lazy(() => import('./pages/oauth-callback'));
 const SsoCallback = lazy(() => import('./pages/sso-callback'));
 const NotFound = lazy(() => import('@/components/NotFound'));
 const ProtectedRoute = lazy(() => import('@/components/ProtectedRoute'));
@@ -88,14 +86,6 @@ export default function AppRoutes() {
       element: (
         <Suspense fallback={<PageLoading />}>
           <Login />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/oauth/callback',
-      element: (
-        <Suspense fallback={<PageLoading />}>
-          <OAuthCallback />
         </Suspense>
       ),
     },

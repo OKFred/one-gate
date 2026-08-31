@@ -3,6 +3,11 @@ import { axiosPlus } from '../../config';
 
 type SsoBindingSummaryPath = '/api/v1/admin/system/auth/sso/binding/summary';
 export type SsoBindingSummary = ResponseGeneric<SsoBindingSummaryPath, 'post'>['data']['data'];
+type SsoConfigurationSummaryPath = '/api/v1/admin/system/auth/sso/config/get';
+export type SsoConfigurationSummary = ResponseGeneric<
+  SsoConfigurationSummaryPath,
+  'post'
+>['data']['data'];
 
 export const loginFn = (
   axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/login', 'post'>, 'url' | 'method'>,
@@ -40,94 +45,6 @@ export const totpGateLogoutFn = (
     method: 'post',
     ...axiosConfig,
   });
-
-export const wechatLoginFn = (
-  axiosConfig: Omit<AxiosConfig<'/api/v1/admin/system/auth/wechat', 'post'>, 'url' | 'method'>,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/wechat',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const oauthLoginUrlFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/admin/system/auth/oauth/login/url', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/oauth/login/url',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const oauthLoginCallbackFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/admin/system/auth/oauth/login/callback', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/oauth/login/callback',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const oauthAccountUrlFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/admin/system/auth/oauth/account/url', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/oauth/account/url',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const oauthAccountCallbackFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/admin/system/auth/oauth/account/callback', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/oauth/account/callback',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const oauthBindingUnbindFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/admin/system/auth/oauth/binding/unbind', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/oauth/binding/unbind',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
-
-export const oauthBindingProfileFn = (
-  axiosConfig: Omit<
-    AxiosConfig<'/api/v1/admin/system/auth/oauth/binding/profile', 'post'>,
-    'url' | 'method'
-  >,
-) => {
-  return axiosPlus({
-    url: '/api/v1/admin/system/auth/oauth/binding/profile',
-    method: 'post',
-    ...axiosConfig,
-  });
-};
 
 export const ssoLoginUrlFn = (
   axiosConfig: Omit<
@@ -194,6 +111,51 @@ export const ssoBindingSummaryFn = (
 ) =>
   axiosPlus({
     url: '/api/v1/admin/system/auth/sso/binding/summary',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoConfigurationGetFn = (
+  axiosConfig: Omit<AxiosConfig<SsoConfigurationSummaryPath, 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/config/get',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoConfigurationSaveFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/config/save', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/config/save',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoConfigurationTestFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/config/test', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/config/test',
+    method: 'post',
+    ...axiosConfig,
+  });
+
+export const ssoConfigurationDisableFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/auth/sso/config/disable', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    url: '/api/v1/admin/system/auth/sso/config/disable',
     method: 'post',
     ...axiosConfig,
   });

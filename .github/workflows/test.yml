@@ -70,7 +70,7 @@ jobs:
         run: pnpm run check:native-dialogs
         working-directory: ./platform
 
-      - name: Build Admin for Mock OAuth E2E
+      - name: Build Admin for Mock Auth E2E
         run: pnpm run build:admin
         working-directory: ./platform
 
@@ -78,13 +78,13 @@ jobs:
         run: pnpm exec playwright install --no-shell chromium
         working-directory: ./platform
 
-      - name: Run Mock OAuth E2E
-        run: pnpm run test:e2e:oauth
+      - name: Run Mock Auth E2E
+        run: pnpm run test:e2e:auth-flow
         working-directory: ./platform
         env:
           HODOR_E2E_BASE_URL: http://127.0.0.1:4173
           HODOR_E2E_ALLOWED_ORIGINS: http://127.0.0.1:4173
-          HODOR_E2E_MOCK_OAUTH: "true"
+          HODOR_E2E_MOCK_AUTH: "true"
 
   # Job 2：部署（仅在测试成功，且为 master/dev 分支时运行）
   deploy:

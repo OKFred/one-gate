@@ -5,7 +5,7 @@ import { showSnackbar } from '@/components/Notification';
 import { authUtils } from '@/utils/auth';
 import { ssoAccountCallbackFn, ssoLoginCallbackFn } from '@/api/admin/system/auth';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { SsoCallbackIntent } from '@/utils/oauthCallback';
+import type { SsoCallbackIntent } from '@/utils/ssoCallback';
 import { readApiErrorReference, type ApiErrorReference } from '@/api/config';
 
 function readCallbackParameters() {
