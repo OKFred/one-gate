@@ -381,6 +381,66 @@ describe("legacy D1 schema migrations", () => {
     ).rejects.toThrow();
   });
 
+  it("creates a versioned authorization connection without foreign keys", async () => {
+    const client = createMemoryClient();
+    const migration = readMigration(
+      "./20260901_02_authorization_connection_configuration.sql"
+    );
+
+    expect(migration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(migration).not.toMatch(/\bREFERENCES\b/i);
+    await executeSqlFile(client, migration);
+
+    const columns = await client.execute(
+      "PRAGMA table_info('system_authorization_connection')"
+    );
+    expect(columns.rows.map((row) => String(row.name))).toEqual([
+      "id",
+      "issuer",
+      "authorization_base_url",
+      "audience",
+      "client_id",
+      "encrypted_client_secret",
+      "status",
+      "config_version",
+      "last_tested_at_utc",
+      "updated_by_user_id",
+      "create_time_utc",
+      "update_time_utc",
+    ]);
+    const foreignKeys = await client.execute(
+      "PRAGMA foreign_key_list('system_authorization_connection')"
+    );
+    expect(foreignKeys.rows).toHaveLength(0);
+
+    await client.execute(`
+      INSERT INTO system_authorization_connection (
+        id, issuer, authorization_base_url, audience, client_id,
+        encrypted_client_secret, status, config_version,
+        updated_by_user_id, create_time_utc
+      ) VALUES (
+        'default', 'https://one.example.com',
+        'https://one.example.com/authorization/api/v1',
+        'https://one.example.com/authorization/api/v1', 'hodor-service',
+        'ciphertext', 'draft', 1, 1, 1
+      )
+    `);
+    await expect(
+      client.execute(`
+        INSERT INTO system_authorization_connection (
+          id, issuer, authorization_base_url, audience, client_id,
+          encrypted_client_secret, status, config_version,
+          updated_by_user_id, create_time_utc
+        ) VALUES (
+          'other', 'https://one.example.com',
+          'https://one.example.com/authorization/api/v1',
+          'https://one.example.com/authorization/api/v1', 'hodor-service',
+          'ciphertext', 'ready', 1, 1, 1
+        )
+      `)
+    ).rejects.toThrow();
+  });
+
   it("creates immutable client release, environment revision, and deployment tables", async () => {
     const client = createMemoryClient();
     await executeSqlFile(
