@@ -19,13 +19,7 @@ import {
   bodyClientInfoAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import {
-  BusinessError,
-  BusinessErrorCode,
-} from "@hodor/core/middleware/errorHandler/businessError/index";
 import { preventLoginFailure, preventWrongPassword } from "./prevention";
-import { getOAuthCenter, oauthHttpService } from "./oauth/index.js";
-import { OAuthBindingSummaryVO } from "./oauth/interfaces/http/model.js";
 import { ssoHttpService } from "./sso/index.js";
 
 // 普通登录
@@ -167,61 +161,6 @@ const loginApi = {
   service: onLogin,
 } satisfies API;
 
-// 微信登录
-const wechatLoginReq = {
-  type: "object",
-  properties: {
-    code: {
-      type: "string",
-      description: "微信授权码",
-      examples: ["061abc123"],
-      maxLength: 50,
-    },
-    state: {
-      type: "string",
-      description: "状态参数(可选)",
-      examples: ["STATE"],
-      maxLength: 100,
-    },
-  },
-  required: ["code"] as const,
-  additionalProperties: false,
-} as const satisfies JSONSchema;
-
-const wechatLoginRes = {
-  ...loginRes,
-} as const satisfies JSONSchema;
-
-async function onWechatLogin(
-  params: FromSchema<typeof wechatLoginReq>
-): Promise<FromSchema<typeof wechatLoginRes> | null> {
-  const { code, state } = params;
-
-  // TODO: 实现微信登录逻辑
-  // 1. 使用code换取access_token
-  // 2. 使用access_token获取用户信息
-  // 3. 根据微信用户信息查找或创建本地用户
-  // 4. 生成token
-
-  // 暂时返回null，需要配置微信开发者信息
-  console.log("微信登录暂未实现，需要配置微信AppID和AppSecret");
-  console.log("收到的参数:", { code, state });
-  throw new BusinessError(BusinessErrorCode.NOT_YET_IMPLEMENTED);
-}
-
-const wechatLoginApi = {
-  req: wechatLoginReq,
-  res: wechatLoginRes,
-  pathInfo: {
-    path: "/wechat",
-    method: "post",
-    summary: "微信登录",
-  } as const,
-  adapter: bodyAdapter,
-  service: onWechatLogin,
-  permission: false,
-} satisfies API;
-
 // 刷新token
 const refreshTokenReq = {
   type: "object",
@@ -299,19 +238,8 @@ const profileRes = {
   properties: {
     userObj: {
       type: "object",
-      properties: {
-        ...UserVO,
-        githubUsername: {
-          type: ["string", "null"],
-          description: "绑定的 GitHub 用户名",
-        },
-        oauthBindings: {
-          type: "array",
-          description: "已绑定的 OAuth 账号摘要",
-          items: OAuthBindingSummaryVO,
-        },
-      },
-      required: [...UserDetailKeys, "githubUsername", "oauthBindings"] as const,
+      properties: UserVO,
+      required: [...UserDetailKeys] as const,
       additionalProperties: false,
     },
   },
@@ -327,19 +255,8 @@ async function onProfile(
   const userDataObj = await userService.get.service({ id: userId });
   preventEmpty(userDataObj);
 
-  const githubOauth = await userUtils.findOauthByUserAndProvider(
-    userId,
-    "github"
-  );
-  const githubUsername = githubOauth?.providerUsername || null;
-  const oauthBindings = await getOAuthCenter().getBindingSummaries(userId);
-
   return {
-    userObj: {
-      ...userDataObj,
-      githubUsername,
-      oauthBindings,
-    },
+    userObj: userDataObj,
   };
 }
 const profileApi = {
@@ -529,7 +446,6 @@ const getButtonPermissionApi = {
 
 export default {
   login: loginApi,
-  wechat: wechatLoginApi,
   refresh: refreshTokenApi,
   check: checkTokenApi,
   profile: profileApi,
@@ -537,6 +453,5 @@ export default {
   updateLangCode: updateLangCodeApi,
   updatePassword: updatePasswordApi,
   getButtonPermission: getButtonPermissionApi,
-  ...oauthHttpService,
   ...ssoHttpService,
 };

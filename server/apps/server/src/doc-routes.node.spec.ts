@@ -1,5 +1,4 @@
 import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 
 import { afterEach, describe, expect, it } from "vitest";
 
@@ -55,6 +54,27 @@ describe("OpenAPI documentation routes", () => {
     expect(document.paths).toHaveProperty(
       "/api/v1/admin/system/auth/gate/logout"
     );
+    expect(document.paths).toHaveProperty(
+      "/api/v1/admin/system/auth/sso/config/get"
+    );
+    expect(document.paths).toHaveProperty(
+      "/api/v1/admin/system/auth/sso/config/save"
+    );
+    expect(document.paths).toHaveProperty(
+      "/api/v1/admin/system/auth/sso/config/test"
+    );
+    expect(document.paths).toHaveProperty(
+      "/api/v1/admin/system/auth/sso/config/disable"
+    );
+    expect(document.paths).not.toHaveProperty(
+      "/api/v1/admin/system/auth/oauth/login/url"
+    );
+    expect(document.paths).not.toHaveProperty(
+      "/api/v1/admin/system/auth/oauth/login/callback"
+    );
+    expect(document.paths).not.toHaveProperty(
+      "/api/v1/admin/system/auth/wechat"
+    );
   });
 
   it("keeps documentation routes unavailable in production", async () => {
@@ -70,10 +90,7 @@ describe("OpenAPI documentation routes", () => {
 
   it("forces Wrangler local development to use the development environment", () => {
     const packageJson = JSON.parse(
-      readFileSync(
-        fileURLToPath(new URL("../package.json", import.meta.url)),
-        "utf8"
-      )
+      readFileSync(new URL("../package.json", import.meta.url), "utf8")
     ) as { scripts?: Record<string, string> };
 
     expect(packageJson.scripts?.["worker:dev"]).toContain(

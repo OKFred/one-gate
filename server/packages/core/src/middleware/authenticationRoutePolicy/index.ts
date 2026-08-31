@@ -16,8 +16,6 @@ function freezeRoutePaths<const T extends readonly AuthenticationRoutePath[]>(
 /** Browser routes needed to establish the first-factor Hodor session. */
 export const primaryAuthAnonymous = freezeRoutePaths([
   "/admin/system/auth/login",
-  "/admin/system/auth/oauth/login/url",
-  "/admin/system/auth/oauth/login/callback",
   "/admin/system/auth/sso/login/url",
   "/admin/system/auth/sso/login/callback",
   "/admin/i18n/translation/listAll",

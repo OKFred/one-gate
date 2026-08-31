@@ -50,6 +50,9 @@ describe("authentication route policy", () => {
 
   it("only bypasses Hodor authentication where the route owns another credential", () => {
     expect(isHodorAuthBypassed("/admin/system/auth/login")).toBe(true);
+    expect(isHodorAuthBypassed("/admin/system/auth/oauth/login/callback")).toBe(
+      false
+    );
     expect(isHodorAuthBypassed("/admin/system/auth/gate/logout")).toBe(true);
     expect(isHodorAuthBypassed("/admin/system/auth/gate/status")).toBe(false);
     expect(isHodorAuthBypassed("/admin/system/menu/list")).toBe(false);
