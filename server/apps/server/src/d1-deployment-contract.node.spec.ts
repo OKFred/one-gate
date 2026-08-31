@@ -71,6 +71,14 @@ describe("D1 deployment contract", () => {
     expect(oauthStateMigration).toContain("system_oauth_state_expiry_idx");
     expect(oauthStateMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
     expect(oauthStateMigration).not.toMatch(/\bREFERENCES\b/i);
+
+    const ssoConnectionMigration = readRepositoryFile(
+      "../d1-migrations/0010_sso_connection_configuration.sql"
+    );
+    expect(ssoConnectionMigration).toContain("system_sso_connection");
+    expect(ssoConnectionMigration).toContain("config_version");
+    expect(ssoConnectionMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(ssoConnectionMigration).not.toMatch(/\bREFERENCES\b/i);
   });
 
   it("checks the critical production tables before Worker deployment", () => {
@@ -109,6 +117,8 @@ describe("D1 deployment contract", () => {
     expect(contract).toContain(
       "INDEXED BY `system_sso_oidc_transaction_expiry_idx`"
     );
+    expect(contract).toContain("FROM `system_sso_connection`");
+    expect(contract).toContain("`redirect_uris_json`");
     expect(contract).toContain("FROM `admin_mobile_device_ops_session`");
     expect(contract).toContain("FROM `admin_mobile_device_ops_audit`");
   });

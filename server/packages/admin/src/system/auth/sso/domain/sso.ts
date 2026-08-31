@@ -1,6 +1,9 @@
 export const SSO_INTENTS = ["login", "bind"] as const;
 export type SsoIntent = (typeof SSO_INTENTS)[number];
 
+export const SSO_CONNECTION_STATUSES = ["draft", "ready", "disabled"] as const;
+export type SsoConnectionStatus = (typeof SSO_CONNECTION_STATUSES)[number];
+
 export const SsoErrorCode = {
   INVALID_REQUEST: "INVALID_REQUEST",
   INVALID_ISSUER: "INVALID_ISSUER",
@@ -13,6 +16,9 @@ export const SsoErrorCode = {
   BINDING_CONFLICT: "BINDING_CONFLICT",
   BINDING_NOT_FOUND: "BINDING_NOT_FOUND",
   SENSITIVE_DATA_FAILURE: "SENSITIVE_DATA_FAILURE",
+  CONFIGURATION_INVALID: "CONFIGURATION_INVALID",
+  CONFIGURATION_NOT_READY: "CONFIGURATION_NOT_READY",
+  CONFIGURATION_CONFLICT: "CONFIGURATION_CONFLICT",
 } as const;
 
 export type SsoErrorCode = (typeof SsoErrorCode)[keyof typeof SsoErrorCode];
@@ -38,6 +44,26 @@ export type SsoClientConfiguration = SsoIssuerPolicy & {
   tenantId: string;
   redirectUris: readonly string[];
 };
+
+export type SsoConnection = {
+  id: "default";
+  issuer: string;
+  clientId: string;
+  audience: string;
+  allowedTenantId: string;
+  redirectUris: readonly string[];
+  status: SsoConnectionStatus;
+  configVersion: number;
+  lastTestedAtUtc: number | null;
+  updatedByUserId: number | null;
+  createTimeUtc: number;
+  updateTimeUtc: number | null;
+};
+
+export type SsoConnectionValues = Pick<
+  SsoConnection,
+  "issuer" | "clientId" | "audience" | "allowedTenantId" | "redirectUris"
+>;
 
 export type S256PkceInput = {
   codeVerifier: string;
@@ -134,6 +160,61 @@ export function normalizeSsoIssuer(
 
   const normalizedPath = url.pathname.replace(/\/+$/, "");
   return `${url.origin}${normalizedPath}`;
+}
+
+export function normalizeSsoConnectionValues(
+  values: SsoConnectionValues,
+  policy: SsoIssuerPolicy
+): SsoConnectionValues {
+  const clientId = requireConfigurationValue(values.clientId, "clientId");
+  const audience = requireConfigurationValue(values.audience, "audience");
+  const allowedTenantId = requireConfigurationValue(
+    values.allowedTenantId,
+    "allowedTenantId"
+  );
+  if (values.redirectUris.length === 0 || values.redirectUris.length > 10) {
+    throw new SsoError(
+      SsoErrorCode.CONFIGURATION_INVALID,
+      "SSO 回调地址数量无效"
+    );
+  }
+  const redirectUris = values.redirectUris.map((value) =>
+    normalizeConfiguredRedirectUri(value, policy)
+  );
+  if (new Set(redirectUris).size !== redirectUris.length) {
+    throw new SsoError(
+      SsoErrorCode.CONFIGURATION_INVALID,
+      "SSO 回调地址不能重复"
+    );
+  }
+  return {
+    issuer: normalizeSsoIssuer(values.issuer, policy),
+    clientId,
+    audience,
+    allowedTenantId,
+    redirectUris,
+  };
+}
+
+export function toSsoClientConfiguration(
+  connection: SsoConnection,
+  policy: SsoIssuerPolicy
+): SsoClientConfiguration {
+  if (connection.status !== "ready") {
+    throw new SsoError(
+      SsoErrorCode.CONFIGURATION_NOT_READY,
+      "SSO 连接尚未就绪"
+    );
+  }
+  const values = normalizeSsoConnectionValues(connection, policy);
+  return {
+    issuer: values.issuer,
+    clientId: values.clientId,
+    audience: values.audience,
+    tenantId: values.allowedTenantId,
+    redirectUris: values.redirectUris,
+    allowInsecureLocalhost: policy.allowInsecureLocalhost,
+  };
 }
 
 export function validateSsoRedirectUri(
@@ -233,6 +314,45 @@ function isLoopbackHostname(hostname: string): boolean {
   return (
     hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]"
   );
+}
+
+function normalizeConfiguredRedirectUri(
+  value: string,
+  policy: SsoIssuerPolicy
+): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new SsoError(SsoErrorCode.CONFIGURATION_INVALID, "SSO 回调地址无效");
+  }
+  const allowedLocalDevelopment =
+    url.protocol === "http:" &&
+    isLoopbackHostname(url.hostname) &&
+    policy.allowInsecureLocalhost;
+  if (
+    (url.protocol !== "https:" && !allowedLocalDevelopment) ||
+    url.username ||
+    url.password ||
+    url.hash
+  ) {
+    throw new SsoError(
+      SsoErrorCode.CONFIGURATION_INVALID,
+      "SSO 回调地址格式不安全"
+    );
+  }
+  return url.toString();
+}
+
+function requireConfigurationValue(value: string, field: string): string {
+  const normalized = value.trim();
+  if (!normalized || normalized.length > 512) {
+    throw new SsoError(
+      SsoErrorCode.CONFIGURATION_INVALID,
+      `SSO ${field} 配置无效`
+    );
+  }
+  return normalized;
 }
 
 function isBase64Url(value: string): boolean {

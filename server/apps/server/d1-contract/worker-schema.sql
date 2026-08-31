@@ -224,6 +224,22 @@ FROM `system_sso_oidc_transaction`
 INDEXED BY `system_sso_oidc_transaction_expiry_idx`
 LIMIT 0;
 
+SELECT
+  `id`,
+  `issuer`,
+  `client_id`,
+  `audience`,
+  `allowed_tenant_id`,
+  `redirect_uris_json`,
+  `status`,
+  `config_version`,
+  `last_tested_at_utc`,
+  `updated_by_user_id`,
+  `create_time_utc`,
+  `update_time_utc`
+FROM `system_sso_connection`
+LIMIT 0;
+
 SELECT `id`, `release_version`, `artifact_key`, `artifact_sha256`, `artifact_size`, `manifest_json`, `status`
 FROM `admin_mobile_client_release`
 LIMIT 0;

@@ -3,6 +3,8 @@ import type {
   S256PkceInput,
   SsoBinding,
   SsoClientConfiguration,
+  SsoConnection,
+  SsoConnectionValues,
   SsoIntent,
   SsoTransaction,
   VerifiedSsoPrincipal,
@@ -44,6 +46,26 @@ export interface SsoRepositoryPort {
   ): Promise<void>;
   deleteBinding(userId: number, issuer: string): Promise<boolean>;
   findLocalUser(userId: number): Promise<LocalSsoUser | null>;
+}
+
+export interface SsoConfigurationRepositoryPort {
+  findConnection(): Promise<SsoConnection | null>;
+  saveDraft(input: {
+    values: SsoConnectionValues;
+    expectedVersion: number;
+    updatedByUserId: number;
+    nowUtc: number;
+  }): Promise<SsoConnection | null>;
+  markReady(input: {
+    expectedVersion: number;
+    updatedByUserId: number;
+    testedAtUtc: number;
+  }): Promise<SsoConnection | null>;
+  disable(input: {
+    expectedVersion: number;
+    updatedByUserId: number;
+    nowUtc: number;
+  }): Promise<SsoConnection | null>;
 }
 
 export interface SsoOidcProviderPort {

@@ -327,6 +327,60 @@ describe("legacy D1 schema migrations", () => {
     expect(indexes.rows).toHaveLength(1);
   });
 
+  it("creates a versioned SSO connection configuration without foreign keys", async () => {
+    const client = createMemoryClient();
+    const migration = readMigration(
+      "./20260901_01_sso_connection_configuration.sql"
+    );
+
+    expect(migration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(migration).not.toMatch(/\bREFERENCES\b/i);
+    await executeSqlFile(client, migration);
+
+    const columns = await client.execute(
+      "PRAGMA table_info('system_sso_connection')"
+    );
+    expect(columns.rows.map((row) => String(row.name))).toEqual([
+      "id",
+      "issuer",
+      "client_id",
+      "audience",
+      "allowed_tenant_id",
+      "redirect_uris_json",
+      "status",
+      "config_version",
+      "last_tested_at_utc",
+      "updated_by_user_id",
+      "create_time_utc",
+      "update_time_utc",
+    ]);
+    const foreignKeys = await client.execute(
+      "PRAGMA foreign_key_list('system_sso_connection')"
+    );
+    expect(foreignKeys.rows).toHaveLength(0);
+
+    await client.execute(`
+      INSERT INTO system_sso_connection (
+        id, issuer, client_id, audience, allowed_tenant_id,
+        redirect_uris_json, status, config_version, create_time_utc
+      ) VALUES (
+        'default', 'https://sso.example.com', 'hodor', 'urn:hodor', 'tenant-1',
+        '["https://gate.example.com/sso/callback"]', 'draft', 1, 1
+      )
+    `);
+    await expect(
+      client.execute(`
+        INSERT INTO system_sso_connection (
+          id, issuer, client_id, audience, allowed_tenant_id,
+          redirect_uris_json, status, config_version, create_time_utc
+        ) VALUES (
+          'other', 'https://sso.example.com', 'hodor', 'urn:hodor', 'tenant-1',
+          '[]', 'ready', 1, 1
+        )
+      `)
+    ).rejects.toThrow();
+  });
+
   it("creates immutable client release, environment revision, and deployment tables", async () => {
     const client = createMemoryClient();
     await executeSqlFile(

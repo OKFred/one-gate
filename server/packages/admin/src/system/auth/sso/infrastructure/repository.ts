@@ -13,19 +13,26 @@ import { userTable } from "../../../user/model.js";
 import type {
   NewSsoBinding,
   SsoBindingCreateResult,
+  SsoConfigurationRepositoryPort,
   SsoRepositoryPort,
 } from "../application/ports.js";
 import {
   SsoError,
   SsoErrorCode,
   type SsoBinding,
+  type SsoConnection,
   type SsoTransaction,
   type VerifiedSsoPrincipal,
 } from "../domain/sso.js";
-import { ssoOidcTransactionTable, userSsoIdentityTable } from "../model.js";
+import {
+  ssoConnectionTable,
+  ssoOidcTransactionTable,
+  userSsoIdentityTable,
+} from "../model.js";
 
 type SsoBindingRow = typeof userSsoIdentityTable.$inferSelect;
 type SsoTransactionRow = typeof ssoOidcTransactionTable.$inferSelect;
+type SsoConnectionRow = typeof ssoConnectionTable.$inferSelect;
 
 function toBinding(row: SsoBindingRow): SsoBinding {
   return {
@@ -37,6 +44,23 @@ function toBinding(row: SsoBindingRow): SsoBinding {
 
 function toTransaction(row: SsoTransactionRow): SsoTransaction {
   return { ...row };
+}
+
+function toConnection(row: SsoConnectionRow): SsoConnection {
+  return {
+    id: row.id,
+    issuer: row.issuer,
+    clientId: row.clientId,
+    audience: row.audience,
+    allowedTenantId: row.allowedTenantId,
+    redirectUris: [...row.redirectUrisJson],
+    status: row.status,
+    configVersion: row.configVersion,
+    lastTestedAtUtc: row.lastTestedAtUtc,
+    updatedByUserId: row.updatedByUserId,
+    createTimeUtc: row.createTimeUtc,
+    updateTimeUtc: row.updateTimeUtc,
+  };
 }
 
 function toBindingInsert(binding: NewSsoBinding) {
@@ -212,4 +236,111 @@ export class DrizzleSsoRepository implements SsoRepositoryPort {
   }
 }
 
+export class DrizzleSsoConfigurationRepository implements SsoConfigurationRepositoryPort {
+  async findConnection(): Promise<SsoConnection | null> {
+    const rows = await db
+      .select()
+      .from(ssoConnectionTable)
+      .where(eq(ssoConnectionTable.id, "default"))
+      .limit(1);
+    return rows[0] ? toConnection(rows[0]) : null;
+  }
+
+  async saveDraft(
+    input: Parameters<SsoConfigurationRepositoryPort["saveDraft"]>[0]
+  ): Promise<SsoConnection | null> {
+    const nextVersion = input.expectedVersion + 1;
+    if (input.expectedVersion === 0) {
+      const rows = await db
+        .insert(ssoConnectionTable)
+        .values({
+          id: "default",
+          issuer: input.values.issuer,
+          clientId: input.values.clientId,
+          audience: input.values.audience,
+          allowedTenantId: input.values.allowedTenantId,
+          redirectUrisJson: [...input.values.redirectUris],
+          status: "draft",
+          configVersion: nextVersion,
+          lastTestedAtUtc: null,
+          updatedByUserId: input.updatedByUserId,
+          createTimeUtc: input.nowUtc,
+          updateTimeUtc: null,
+        })
+        .onConflictDoNothing({ target: ssoConnectionTable.id })
+        .returning();
+      return rows[0] ? toConnection(rows[0]) : null;
+    }
+
+    const rows = await db
+      .update(ssoConnectionTable)
+      .set({
+        issuer: input.values.issuer,
+        clientId: input.values.clientId,
+        audience: input.values.audience,
+        allowedTenantId: input.values.allowedTenantId,
+        redirectUrisJson: [...input.values.redirectUris],
+        status: "draft",
+        configVersion: nextVersion,
+        lastTestedAtUtc: null,
+        updatedByUserId: input.updatedByUserId,
+        updateTimeUtc: input.nowUtc,
+      })
+      .where(
+        and(
+          eq(ssoConnectionTable.id, "default"),
+          eq(ssoConnectionTable.configVersion, input.expectedVersion)
+        )
+      )
+      .returning();
+    return rows[0] ? toConnection(rows[0]) : null;
+  }
+
+  async markReady(
+    input: Parameters<SsoConfigurationRepositoryPort["markReady"]>[0]
+  ): Promise<SsoConnection | null> {
+    const rows = await db
+      .update(ssoConnectionTable)
+      .set({
+        status: "ready",
+        configVersion: input.expectedVersion + 1,
+        lastTestedAtUtc: input.testedAtUtc,
+        updatedByUserId: input.updatedByUserId,
+        updateTimeUtc: input.testedAtUtc,
+      })
+      .where(
+        and(
+          eq(ssoConnectionTable.id, "default"),
+          eq(ssoConnectionTable.configVersion, input.expectedVersion),
+          eq(ssoConnectionTable.status, "draft")
+        )
+      )
+      .returning();
+    return rows[0] ? toConnection(rows[0]) : null;
+  }
+
+  async disable(
+    input: Parameters<SsoConfigurationRepositoryPort["disable"]>[0]
+  ): Promise<SsoConnection | null> {
+    const rows = await db
+      .update(ssoConnectionTable)
+      .set({
+        status: "disabled",
+        configVersion: input.expectedVersion + 1,
+        updatedByUserId: input.updatedByUserId,
+        updateTimeUtc: input.nowUtc,
+      })
+      .where(
+        and(
+          eq(ssoConnectionTable.id, "default"),
+          eq(ssoConnectionTable.configVersion, input.expectedVersion)
+        )
+      )
+      .returning();
+    return rows[0] ? toConnection(rows[0]) : null;
+  }
+}
+
 export const drizzleSsoRepository = new DrizzleSsoRepository();
+export const drizzleSsoConfigurationRepository =
+  new DrizzleSsoConfigurationRepository();
