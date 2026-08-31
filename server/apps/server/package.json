@@ -19,6 +19,7 @@
     "db:migrate:worker:remote": "wrangler d1 migrations apply hodor_db --remote",
     "db:check:worker:local": "wrangler d1 execute hodor_db --local --file=./d1-contract/worker-schema.sql --yes",
     "db:check:worker:remote": "wrangler d1 execute hodor_db --remote --file=./d1-contract/worker-schema.sql --yes",
+    "deployment:secrets:check": "tsx scripts/verify-deployment-secrets.ts",
     "sync:permissions": "tsx ../../scripts/sync-permissions.ts",
     "format": "prettier --write .",
     "lint": "eslint . --fix"

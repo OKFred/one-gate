@@ -2,8 +2,59 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
+import {
+  findMissingDeploymentSecretNames,
+  REQUIRED_DEPLOYMENT_SECRET_NAMES,
+  REQUIRED_WORKER_SECRET_NAMES,
+} from "../scripts/verify-deployment-secrets.js";
+
 function readRepositoryFile(relativeUrl: string): string {
   return readFileSync(new URL(relativeUrl, import.meta.url), "utf8");
+}
+
+function readWorkflowStep(workflow: string, name: string): string {
+  const startMarker = `      - name: ${name}`;
+  const start = workflow.indexOf(startMarker);
+  if (start < 0) {
+    return "";
+  }
+
+  const nextStep = workflow.indexOf(
+    "\n      - name:",
+    start + startMarker.length
+  );
+  return workflow.slice(start, nextStep < 0 ? undefined : nextStep);
+}
+
+function extractSecretReferences(step: string): string[] {
+  return [
+    ...step.matchAll(
+      /^\s+([A-Z0-9_]+):\s+\$\{\{\s*secrets\.([A-Z0-9_]+)\s*\}\}\s*$/gm
+    ),
+  ]
+    .filter((match) => match[1] === match[2])
+    .map((match) => match[1] ?? "")
+    .filter(Boolean)
+    .sort();
+}
+
+function extractUploadedSecretNames(step: string): string[] {
+  const match = step.match(/secrets:\s*\|\r?\n([\s\S]*?)\r?\n\s+env:/);
+  return (match?.[1] ?? "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => /^[A-Z0-9_]+$/.test(line))
+    .sort();
+}
+
+function extractWranglerRequiredSecretNames(config: string): string[] {
+  const match = config.match(
+    /"secrets"\s*:\s*\{\s*"required"\s*:\s*\[([\s\S]*?)\]/
+  );
+  return [...(match?.[1] ?? "").matchAll(/"([A-Z0-9_]+)"/g)]
+    .map((secretMatch) => secretMatch[1] ?? "")
+    .filter(Boolean)
+    .sort();
 }
 
 describe("D1 deployment contract", () => {
@@ -142,11 +193,13 @@ describe("D1 deployment contract", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
+    const preflightAt = workflow.indexOf("Verify Deployment Secret Inputs");
     const migrateAt = workflow.indexOf("Apply Remote D1 Migrations");
     const contractAt = workflow.indexOf("Verify Remote D1 Schema Contract");
     const deployAt = workflow.indexOf("Deploy Workers Backend");
 
-    expect(migrateAt).toBeGreaterThan(-1);
+    expect(preflightAt).toBeGreaterThan(-1);
+    expect(migrateAt).toBeGreaterThan(preflightAt);
     expect(contractAt).toBeGreaterThan(migrateAt);
     expect(deployAt).toBeGreaterThan(contractAt);
   });
@@ -155,22 +208,22 @@ describe("D1 deployment contract", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
-    for (const secretName of [
-      "MOBILE_SENSITIVE_DATA_KEY",
-      "HODOR_AUTH_MASTER_KEY",
-      "OAUTH_SENSITIVE_DATA_KEY",
-      "SSO_ISSUER",
-      "SSO_CLIENT_ID",
-      "SSO_AUDIENCE",
-      "SSO_ALLOWED_TENANT_ID",
-      "SSO_ALLOWED_REDIRECT_URIS",
-      "HODOR_TOTP_GATE_SECRET",
-      "HODOR_ALLOWED_WEB_ORIGINS",
-    ]) {
-      expect(workflow).toContain(
-        `${secretName}: \${{ secrets.${secretName} }}`
-      );
-    }
+    const preflightStep = readWorkflowStep(
+      workflow,
+      "Verify Deployment Secret Inputs"
+    );
+    const deployStep = readWorkflowStep(workflow, "Deploy Workers Backend");
+    const expectedWorkerSecrets = [...REQUIRED_WORKER_SECRET_NAMES].sort();
+    const expectedDeploymentSecrets = [
+      ...REQUIRED_DEPLOYMENT_SECRET_NAMES,
+    ].sort();
+    expect(extractSecretReferences(preflightStep)).toEqual(
+      expectedDeploymentSecrets
+    );
+    expect(extractUploadedSecretNames(deployStep)).toEqual(
+      expectedWorkerSecrets
+    );
+    expect(extractSecretReferences(deployStep)).toEqual(expectedWorkerSecrets);
     expect(workflow).not.toContain("Configure Optional Feishu Secrets");
     for (const retiredSecretName of [
       "GH_CLIENT_ID",
@@ -185,9 +238,9 @@ describe("D1 deployment contract", () => {
     }
 
     const config = readRepositoryFile("../wrangler.jsonc");
-    expect(config).toContain('"secrets"');
-    expect(config).toContain('"HODOR_AUTH_MASTER_KEY"');
-    expect(config).toContain('"OAUTH_SENSITIVE_DATA_KEY"');
+    expect(extractWranglerRequiredSecretNames(config)).toEqual(
+      expectedWorkerSecrets
+    );
     for (const retiredSecretName of [
       "GH_CLIENT_ID",
       "GH_CLIENT_SECRET",
@@ -199,5 +252,18 @@ describe("D1 deployment contract", () => {
     ]) {
       expect(config).not.toContain(`      "${retiredSecretName}",`);
     }
+  });
+
+  it("fails the deployment preflight without revealing secret values", () => {
+    const environment = Object.fromEntries(
+      REQUIRED_DEPLOYMENT_SECRET_NAMES.map((name) => [name, `${name}-value`])
+    );
+    environment.HODOR_AUTH_MASTER_KEY = "  ";
+    environment.SSO_CLIENT_ID = "";
+
+    expect(findMissingDeploymentSecretNames(environment)).toEqual([
+      "HODOR_AUTH_MASTER_KEY",
+      "SSO_CLIENT_ID",
+    ]);
   });
 });

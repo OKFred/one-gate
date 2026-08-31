@@ -106,6 +106,26 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: ./server
 
+      # 所有部署输入必须在任何远程 D1 写入前就绪，且只报告缺失名称，不输出 Secret 值。
+      - name: Verify Deployment Secret Inputs
+        run: pnpm run deployment:secrets:check
+        working-directory: ./server/apps/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          HODOR_AUTH_MASTER_KEY: ${{ secrets.HODOR_AUTH_MASTER_KEY }}
+          OAUTH_SENSITIVE_DATA_KEY: ${{ secrets.OAUTH_SENSITIVE_DATA_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
+          MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
+          SSO_ISSUER: ${{ secrets.SSO_ISSUER }}
+          SSO_CLIENT_ID: ${{ secrets.SSO_CLIENT_ID }}
+          SSO_AUDIENCE: ${{ secrets.SSO_AUDIENCE }}
+          SSO_ALLOWED_TENANT_ID: ${{ secrets.SSO_ALLOWED_TENANT_ID }}
+          SSO_ALLOWED_REDIRECT_URIS: ${{ secrets.SSO_ALLOWED_REDIRECT_URIS }}
+          HODOR_TOTP_GATE_SECRET: ${{ secrets.HODOR_TOTP_GATE_SECRET }}
+          HODOR_ALLOWED_WEB_ORIGINS: ${{ secrets.HODOR_ALLOWED_WEB_ORIGINS }}
+
       # D1 结构是 Worker 发布前置条件；迁移或合约失败必须阻断新代码上线。
       - name: Apply Remote D1 Migrations
         run: pnpm run db:migrate:worker:remote
