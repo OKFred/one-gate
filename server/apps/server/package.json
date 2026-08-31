@@ -12,6 +12,7 @@
     "visualize": "tsx scripts/dependency-visualize.ts",
     "worker:dev": "npx wrangler dev --ip 0.0.0.0 --var NODE_ENV:development",
     "worker:types": "npx wrangler types",
+    "openapi:export": "tsx scripts/export-openapi.ts",
     "totp:enroll": "tsx scripts/create-totp-enrollment.ts",
     "db:init": "tsx -r dotenv/config ../../packages/core/src/db/initTable.ts",
     "db:migrate:worker:local": "wrangler d1 migrations apply hodor_db --local",
