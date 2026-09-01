@@ -386,10 +386,16 @@ describe("legacy D1 schema migrations", () => {
     const migration = readMigration(
       "./20260901_02_authorization_connection_configuration.sql"
     );
+    const accessMigration = readMigration(
+      "./20260901_03_authorization_access_credentials.sql"
+    );
 
     expect(migration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
     expect(migration).not.toMatch(/\bREFERENCES\b/i);
+    expect(accessMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(accessMigration).not.toMatch(/\bREFERENCES\b/i);
     await executeSqlFile(client, migration);
+    await executeSqlFile(client, accessMigration);
 
     const columns = await client.execute(
       "PRAGMA table_info('system_authorization_connection')"
@@ -407,6 +413,8 @@ describe("legacy D1 schema migrations", () => {
       "updated_by_user_id",
       "create_time_utc",
       "update_time_utc",
+      "cloudflare_access_client_id",
+      "encrypted_cloudflare_access_client_secret",
     ]);
     const foreignKeys = await client.execute(
       "PRAGMA foreign_key_list('system_authorization_connection')"

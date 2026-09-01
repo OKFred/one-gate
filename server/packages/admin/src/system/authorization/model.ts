@@ -12,6 +12,10 @@ export const authorizationConnectionTable = sqliteTable(
     audience: text("audience").notNull(),
     clientId: text("client_id").notNull(),
     encryptedClientSecret: text("encrypted_client_secret").notNull(),
+    cloudflareAccessClientId: text("cloudflare_access_client_id"),
+    encryptedCloudflareAccessClientSecret: text(
+      "encrypted_cloudflare_access_client_secret"
+    ),
     status: text("status").$type<AuthorizationConnectionStatus>().notNull(),
     configVersion: integer("config_version").notNull(),
     lastTestedAtUtc: integer("last_tested_at_utc"),

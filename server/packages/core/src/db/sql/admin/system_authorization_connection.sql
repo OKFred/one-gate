@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS `system_authorization_connection` (
   `audience` text NOT NULL,
   `client_id` text NOT NULL,
   `encrypted_client_secret` text NOT NULL,
+  `cloudflare_access_client_id` text,
+  `encrypted_cloudflare_access_client_secret` text,
   `status` text NOT NULL,
   `config_version` integer NOT NULL,
   `last_tested_at_utc` integer,

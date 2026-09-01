@@ -15,7 +15,9 @@ const connection: AuthorizationConnection = {
   authorizationBaseUrl: "https://one.example.com/authorization/api/v1",
   audience: "https://one.example.com/authorization/api/v1",
   clientId: "hodor-service",
+  cloudflareAccessClientId: "access-client-id",
   encryptedClientSecret: "ciphertext-secret-sentinel",
+  encryptedCloudflareAccessClientSecret: "access-ciphertext-sentinel",
   status: "ready",
   configVersion: 2,
   lastTestedAtUtc: 2_000,
@@ -48,9 +50,13 @@ describe("Authorization HTTP service", () => {
     expect(summary).toMatchObject({
       configured: true,
       hasClientSecret: true,
+      usesCloudflareAccess: true,
+      cloudflareAccessClientId: "access-client-id",
+      hasCloudflareAccessClientSecret: true,
       status: "ready",
     });
     expect(JSON.stringify(summary)).not.toContain("ciphertext-secret-sentinel");
+    expect(JSON.stringify(summary)).not.toContain("access-ciphertext-sentinel");
   });
 
   it("requires a Hodor super administrator", async () => {

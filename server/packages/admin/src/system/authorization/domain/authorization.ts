@@ -28,11 +28,13 @@ export interface AuthorizationConnectionValues {
   readonly authorizationBaseUrl: string;
   readonly audience: string;
   readonly clientId: string;
+  readonly cloudflareAccessClientId: string | null;
 }
 
 export interface AuthorizationConnection extends AuthorizationConnectionValues {
   readonly id: "default";
   readonly encryptedClientSecret: string;
+  readonly encryptedCloudflareAccessClientSecret: string | null;
   readonly status: AuthorizationConnectionStatus;
   readonly configVersion: number;
   readonly lastTestedAtUtc: number | null;
@@ -133,6 +135,14 @@ export function createAuthorizationConnectionValues(
   if (!CLIENT_ID.test(clientId)) {
     return invalidConfiguration("Client ID 格式无效");
   }
+  const cloudflareAccessClientId =
+    input.cloudflareAccessClientId?.trim() ?? null;
+  if (
+    cloudflareAccessClientId !== null &&
+    !CLIENT_ID.test(cloudflareAccessClientId)
+  ) {
+    return invalidConfiguration("Cloudflare Access Client ID 格式无效");
+  }
   return {
     issuer: normalizeSecureUrl(input.issuer.trim(), "Issuer", policy),
     authorizationBaseUrl: normalizeSecureUrl(
@@ -142,6 +152,7 @@ export function createAuthorizationConnectionValues(
     ),
     audience: normalizeSecureUrl(input.audience.trim(), "Audience", policy),
     clientId,
+    cloudflareAccessClientId,
   };
 }
 

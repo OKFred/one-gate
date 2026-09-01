@@ -10,6 +10,7 @@ export interface AuthorizationConnectionRepositoryPort {
   saveDraft(input: {
     readonly values: AuthorizationConnectionValues;
     readonly encryptedClientSecret: string;
+    readonly encryptedCloudflareAccessClientSecret: string | null;
     readonly expectedVersion: number;
     readonly updatedByUserId: number;
     readonly nowUtc: number;
@@ -31,15 +32,22 @@ export interface AuthorizationCredentialCipherPort {
   decrypt(ciphertext: string, aad: string): Promise<string>;
 }
 
+export interface AuthorizationGatewayAccessCredentials {
+  readonly clientId: string;
+  readonly clientSecret: string;
+}
+
 export interface AuthorizationGatewayPort {
   testConnection(input: {
     readonly connection: AuthorizationConnectionValues;
     readonly clientSecret: string;
+    readonly cloudflareAccess: AuthorizationGatewayAccessCredentials | null;
     readonly requestId: string;
   }): Promise<void>;
   checkDecision(input: {
     readonly connection: AuthorizationConnectionValues;
     readonly clientSecret: string;
+    readonly cloudflareAccess: AuthorizationGatewayAccessCredentials | null;
     readonly requestId: string;
     readonly decision: AuthorizationDecisionInput;
   }): Promise<AuthorizationDecisionResult>;

@@ -124,6 +124,9 @@ export function toAuthorizationConnectionSummary(
         audience: null,
         clientId: null,
         hasClientSecret: false,
+        cloudflareAccessClientId: null,
+        hasCloudflareAccessClientSecret: false,
+        usesCloudflareAccess: false,
         configVersion: 0,
         lastTestedAtUtc: null,
         updateTimeUtc: null,
@@ -136,6 +139,12 @@ export function toAuthorizationConnectionSummary(
         audience: connection.audience,
         clientId: connection.clientId,
         hasClientSecret: connection.encryptedClientSecret.length > 0,
+        cloudflareAccessClientId: connection.cloudflareAccessClientId,
+        hasCloudflareAccessClientSecret:
+          connection.encryptedCloudflareAccessClientSecret !== null,
+        usesCloudflareAccess:
+          connection.cloudflareAccessClientId !== null &&
+          connection.encryptedCloudflareAccessClientSecret !== null,
         configVersion: connection.configVersion,
         lastTestedAtUtc: connection.lastTestedAtUtc,
         updateTimeUtc: connection.updateTimeUtc,
@@ -170,10 +179,16 @@ export async function onAuthorizationConfigurationSave(
         authorizationBaseUrl: params.authorizationBaseUrl,
         audience: params.audience,
         clientId: params.clientId,
+        cloudflareAccessClientId: params.cloudflareAccess?.clientId ?? null,
       },
       ...(params.clientSecret === undefined
         ? {}
         : { clientSecret: params.clientSecret }),
+      ...(params.cloudflareAccess?.clientSecret === undefined
+        ? {}
+        : {
+            cloudflareAccessClientSecret: params.cloudflareAccess.clientSecret,
+          }),
       expectedVersion: params.expectedVersion,
       updatedByUserId: admin.userId,
     });

@@ -1,4 +1,7 @@
-import type { AuthorizationGatewayPort } from "../application/ports.js";
+import type {
+  AuthorizationGatewayAccessCredentials,
+  AuthorizationGatewayPort,
+} from "../application/ports.js";
 import type {
   AuthorizationDecisionResult,
   AuthorizationConnectionValues,
@@ -167,25 +170,42 @@ export function createOneAuthorizationGateway(
     operation: AuthorizationOutboundLogEvent["operation"],
     requestId: string,
     input: RequestInfo | URL,
-    init?: RequestInit
+    init?: RequestInit,
+    cloudflareAccess?: AuthorizationGatewayAccessCredentials | null
   ): Promise<Response> => {
-    const request = new Request(input, {
-      ...init,
-      redirect: "error",
-      signal: init?.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
-    const url = new URL(request.url);
-    const headers = new Headers(request.headers);
-    headers.set("x-request-id", requestId);
+    const sourceUrl =
+      input instanceof Request
+        ? input.url
+        : input instanceof URL
+          ? input.href
+          : input;
+    const url = new URL(sourceUrl);
+    const method =
+      (
+        init?.method ?? (input instanceof Request ? input.method : "GET")
+      ).toUpperCase() === "POST"
+        ? "POST"
+        : "GET";
     const startedAt = Date.now();
     try {
+      const request = new Request(input, {
+        ...init,
+        redirect: "manual",
+        signal: init?.signal ?? AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      const headers = new Headers(request.headers);
+      headers.set("x-request-id", requestId);
+      if (cloudflareAccess !== undefined && cloudflareAccess !== null) {
+        headers.set("cf-access-client-id", cloudflareAccess.clientId);
+        headers.set("cf-access-client-secret", cloudflareAccess.clientSecret);
+      }
       const response = await fetchImplementation(
         new Request(request, { headers })
       );
       emitLog({
         requestId,
         operation,
-        method: request.method === "POST" ? "POST" : "GET",
+        method,
         upstreamHost: url.host,
         upstreamPath: url.pathname,
         status: response.status,
@@ -197,7 +217,7 @@ export function createOneAuthorizationGateway(
       emitLog({
         requestId,
         operation,
-        method: request.method === "POST" ? "POST" : "GET",
+        method,
         upstreamHost: url.host,
         upstreamPath: url.pathname,
         durationMs: Date.now() - startedAt,
@@ -212,13 +232,15 @@ export function createOneAuthorizationGateway(
 
   const discover = async (
     connection: AuthorizationConnectionValues,
-    requestId: string
+    requestId: string,
+    cloudflareAccess: AuthorizationGatewayAccessCredentials | null
   ): Promise<OidcDiscovery> => {
     const response = await auditedFetch(
       "discovery",
       requestId,
       `${connection.issuer}/.well-known/openid-configuration`,
-      { headers: { accept: "application/json" } }
+      { headers: { accept: "application/json" } },
+      cloudflareAccess
     );
     const payload = await requireJsonResponse(response);
     if (!response.ok) {
@@ -244,9 +266,10 @@ export function createOneAuthorizationGateway(
   const obtainServiceToken = async (
     connection: AuthorizationConnectionValues,
     clientSecret: string,
-    requestId: string
+    requestId: string,
+    cloudflareAccess: AuthorizationGatewayAccessCredentials | null
   ): Promise<string> => {
-    const discovery = await discover(connection, requestId);
+    const discovery = await discover(connection, requestId, cloudflareAccess);
     const response = await auditedFetch(
       "token",
       requestId,
@@ -264,7 +287,8 @@ export function createOneAuthorizationGateway(
           scope: DECISION_SCOPE,
           resource: connection.audience,
         }),
-      }
+      },
+      cloudflareAccess
     );
     const payload = await requireJsonResponse(response);
     if (!response.ok) {
@@ -295,13 +319,15 @@ export function createOneAuthorizationGateway(
       await obtainServiceToken(
         input.connection,
         input.clientSecret,
-        input.requestId
+        input.requestId,
+        input.cloudflareAccess
       );
       const response = await auditedFetch(
         "readiness",
         input.requestId,
         `${input.connection.authorizationBaseUrl}/readyz`,
-        { headers: { accept: "application/json" } }
+        { headers: { accept: "application/json" } },
+        input.cloudflareAccess
       );
       const payload = await requireJsonResponse(response);
       if (!response.ok) {
@@ -326,7 +352,8 @@ export function createOneAuthorizationGateway(
       const accessToken = await obtainServiceToken(
         input.connection,
         input.clientSecret,
-        input.requestId
+        input.requestId,
+        input.cloudflareAccess
       );
       const response = await auditedFetch(
         "decision",
@@ -340,7 +367,8 @@ export function createOneAuthorizationGateway(
             "content-type": "application/json",
           },
           body: JSON.stringify(input.decision),
-        }
+        },
+        input.cloudflareAccess
       );
       const payload = await requireJsonResponse(response);
       if (!response.ok) {

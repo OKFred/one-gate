@@ -17,6 +17,7 @@ const values: AuthorizationConnectionValues = {
   authorizationBaseUrl: "https://one.example.com/authorization/api/v1",
   audience: "https://one.example.com/authorization/api/v1",
   clientId: "hodor-service",
+  cloudflareAccessClientId: null,
 };
 
 function connection(
@@ -26,6 +27,7 @@ function connection(
     id: "default",
     ...values,
     encryptedClientSecret: "encrypted:client-secret-1234",
+    encryptedCloudflareAccessClientSecret: null,
     status: "draft",
     configVersion: 1,
     lastTestedAtUtc: null,
@@ -56,6 +58,8 @@ class FakeRepository implements AuthorizationConnectionRepositoryPort {
     this.current = connection({
       ...input.values,
       encryptedClientSecret: input.encryptedClientSecret,
+      encryptedCloudflareAccessClientSecret:
+        input.encryptedCloudflareAccessClientSecret,
       status: "draft",
       configVersion: input.expectedVersion + 1,
       updatedByUserId: input.updatedByUserId,
@@ -103,6 +107,10 @@ class FakeRepository implements AuthorizationConnectionRepositoryPort {
 class FakeGateway implements AuthorizationGatewayPort {
   testCalls = 0;
   decisionCalls = 0;
+  lastCloudflareAccess: {
+    readonly clientId: string;
+    readonly clientSecret: string;
+  } | null = null;
   decisionResult: AuthorizationDecisionResult = {
     data: {
       decisionId: "decision-1",
@@ -113,12 +121,18 @@ class FakeGateway implements AuthorizationGatewayPort {
     requestId: "request-1",
   };
 
-  async testConnection() {
+  async testConnection(
+    input: Parameters<AuthorizationGatewayPort["testConnection"]>[0]
+  ) {
     this.testCalls += 1;
+    this.lastCloudflareAccess = input.cloudflareAccess;
   }
 
-  async checkDecision() {
+  async checkDecision(
+    input: Parameters<AuthorizationGatewayPort["checkDecision"]>[0]
+  ) {
     this.decisionCalls += 1;
+    this.lastCloudflareAccess = input.cloudflareAccess;
     return this.decisionResult;
   }
 }
@@ -187,6 +201,50 @@ describe("AuthorizationCenter", () => {
     });
     expect(saved.encryptedClientSecret).toBe("encrypted:client-secret-1234");
     expect(saved.clientId).toBe("hodor-service-v2");
+  });
+
+  it("encrypts optional Access credentials and decrypts them only for the gateway", async () => {
+    const fixture = createFixture();
+    const saved = await fixture.center.saveDraft({
+      values: {
+        ...values,
+        cloudflareAccessClientId: "access-client-id",
+      },
+      clientSecret: "client-secret-1234",
+      cloudflareAccessClientSecret: "access-client-secret-1234",
+      expectedVersion: 0,
+      updatedByUserId: 7,
+    });
+    expect(saved.encryptedCloudflareAccessClientSecret).not.toContain(
+      "access-client-secret-1234"
+    );
+
+    await fixture.center.testConnection({
+      expectedVersion: 1,
+      updatedByUserId: 7,
+      requestId: "request-1",
+    });
+    expect(fixture.gateway.lastCloudflareAccess).toEqual({
+      clientId: "access-client-id",
+      clientSecret: "access-client-secret-1234",
+    });
+  });
+
+  it("requires an Access secret when first enabling or changing its Client ID", async () => {
+    const fixture = createFixture();
+    await expect(
+      fixture.center.saveDraft({
+        values: {
+          ...values,
+          cloudflareAccessClientId: "access-client-id",
+        },
+        clientSecret: "client-secret-1234",
+        expectedVersion: 0,
+        updatedByUserId: 7,
+      })
+    ).rejects.toMatchObject({
+      code: HodorAuthorizationErrorCode.CONFIGURATION_INVALID,
+    });
   });
 
   it("marks a tested draft ready with optimistic versioning", async () => {

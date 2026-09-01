@@ -11,6 +11,7 @@ const values: AuthorizationConnectionValues = {
   authorizationBaseUrl: "https://one.example.com/authorization/api/v1",
   audience: "https://one.example.com/authorization/api/v1",
   clientId: "hodor-service",
+  cloudflareAccessClientId: null,
 };
 
 beforeAll(async () => {
@@ -26,6 +27,7 @@ describe("DrizzleAuthorizationConnectionRepository", () => {
     const input = {
       values,
       encryptedClientSecret: "ciphertext-1",
+      encryptedCloudflareAccessClientSecret: null,
       expectedVersion: 0,
       updatedByUserId: 7,
       nowUtc: 1_000,
@@ -34,6 +36,7 @@ describe("DrizzleAuthorizationConnectionRepository", () => {
       status: "draft",
       configVersion: 1,
       encryptedClientSecret: "ciphertext-1",
+      encryptedCloudflareAccessClientSecret: null,
     });
     await expect(repository.saveDraft(input)).resolves.toBeNull();
   });
@@ -42,6 +45,7 @@ describe("DrizzleAuthorizationConnectionRepository", () => {
     await repository.saveDraft({
       values,
       encryptedClientSecret: "ciphertext-1",
+      encryptedCloudflareAccessClientSecret: null,
       expectedVersion: 0,
       updatedByUserId: 7,
       nowUtc: 1_000,
@@ -81,6 +85,7 @@ describe("DrizzleAuthorizationConnectionRepository", () => {
     await repository.saveDraft({
       values,
       encryptedClientSecret: "ciphertext-1",
+      encryptedCloudflareAccessClientSecret: null,
       expectedVersion: 0,
       updatedByUserId: 7,
       nowUtc: 1_000,
@@ -92,8 +97,13 @@ describe("DrizzleAuthorizationConnectionRepository", () => {
     });
     await expect(
       repository.saveDraft({
-        values: { ...values, clientId: "hodor-service-v2" },
         encryptedClientSecret: "ciphertext-2",
+        encryptedCloudflareAccessClientSecret: "access-ciphertext-2",
+        values: {
+          ...values,
+          clientId: "hodor-service-v2",
+          cloudflareAccessClientId: "access-client-id",
+        },
         expectedVersion: 2,
         updatedByUserId: 8,
         nowUtc: 3_000,
@@ -103,6 +113,8 @@ describe("DrizzleAuthorizationConnectionRepository", () => {
       configVersion: 3,
       clientId: "hodor-service-v2",
       encryptedClientSecret: "ciphertext-2",
+      cloudflareAccessClientId: "access-client-id",
+      encryptedCloudflareAccessClientSecret: "access-ciphertext-2",
       lastTestedAtUtc: null,
     });
   });

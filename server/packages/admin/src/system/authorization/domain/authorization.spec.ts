@@ -15,6 +15,7 @@ describe("Hodor authorization domain", () => {
           authorizationBaseUrl: "https://one.example.com/authorization/api/v1/",
           audience: "https://one.example.com/authorization/api/v1/",
           clientId: "hodor-service",
+          cloudflareAccessClientId: " access-client-id ",
         },
         { allowInsecureLocalhost: false }
       )
@@ -23,6 +24,7 @@ describe("Hodor authorization domain", () => {
       authorizationBaseUrl: "https://one.example.com/authorization/api/v1",
       audience: "https://one.example.com/authorization/api/v1",
       clientId: "hodor-service",
+      cloudflareAccessClientId: "access-client-id",
     });
   });
 
@@ -32,6 +34,7 @@ describe("Hodor authorization domain", () => {
       authorizationBaseUrl: "http://127.0.0.1:8790/authorization/api/v1",
       audience: "http://localhost:8790/authorization/api/v1",
       clientId: "hodor-service",
+      cloudflareAccessClientId: null,
     };
     expect(() =>
       createAuthorizationConnectionValues(values, {

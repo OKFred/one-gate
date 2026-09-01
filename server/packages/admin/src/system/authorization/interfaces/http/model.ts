@@ -15,6 +15,24 @@ export const AuthorizationConnectionSaveReq = {
     audience: { type: "string", minLength: 1, maxLength: 2048 },
     clientId: { type: "string", minLength: 1, maxLength: 128 },
     clientSecret: { type: "string", minLength: 16, maxLength: 4096 },
+    cloudflareAccess: {
+      anyOf: [
+        {
+          type: "object",
+          properties: {
+            clientId: { type: "string", minLength: 1, maxLength: 128 },
+            clientSecret: {
+              type: "string",
+              minLength: 16,
+              maxLength: 4096,
+            },
+          },
+          required: ["clientId"],
+          additionalProperties: false,
+        },
+        { type: "null" },
+      ],
+    },
     expectedVersion: { type: "integer", minimum: 0 },
   },
   required: [
@@ -22,6 +40,7 @@ export const AuthorizationConnectionSaveReq = {
     "authorizationBaseUrl",
     "audience",
     "clientId",
+    "cloudflareAccess",
     "expectedVersion",
   ],
   additionalProperties: false,
@@ -51,6 +70,9 @@ export const AuthorizationConnectionSummaryRes = {
     audience: nullableString,
     clientId: nullableString,
     hasClientSecret: { type: "boolean" },
+    cloudflareAccessClientId: nullableString,
+    hasCloudflareAccessClientSecret: { type: "boolean" },
+    usesCloudflareAccess: { type: "boolean" },
     configVersion: { type: "integer", minimum: 0 },
     lastTestedAtUtc: nullableInteger,
     updateTimeUtc: nullableInteger,
@@ -63,6 +85,9 @@ export const AuthorizationConnectionSummaryRes = {
     "audience",
     "clientId",
     "hasClientSecret",
+    "cloudflareAccessClientId",
+    "hasCloudflareAccessClientSecret",
+    "usesCloudflareAccess",
     "configVersion",
     "lastTestedAtUtc",
     "updateTimeUtc",

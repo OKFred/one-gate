@@ -247,6 +247,8 @@ SELECT
   `audience`,
   `client_id`,
   `encrypted_client_secret`,
+  `cloudflare_access_client_id`,
+  `encrypted_cloudflare_access_client_secret`,
   `status`,
   `config_version`,
   `last_tested_at_utc`,

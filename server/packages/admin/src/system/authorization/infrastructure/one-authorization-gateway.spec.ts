@@ -11,6 +11,7 @@ const connection: AuthorizationConnectionValues = {
   authorizationBaseUrl: "https://one.example.com/authorization/api/v1",
   audience: "https://one.example.com/authorization/api/v1",
   clientId: "hodor-service",
+  cloudflareAccessClientId: null,
 };
 
 const json = (value: unknown, status = 200): Response =>
@@ -62,6 +63,7 @@ describe("one authorization gateway", () => {
       gateway.testConnection({
         connection,
         clientSecret: "client-secret-sentinel",
+        cloudflareAccess: null,
         requestId: "request-1",
       })
     ).resolves.toBeUndefined();
@@ -70,6 +72,9 @@ describe("one authorization gateway", () => {
       "/token",
       "/authorization/api/v1/readyz",
     ]);
+    expect(requests.every((request) => request.redirect === "manual")).toBe(
+      true
+    );
     expect(await requests[1].clone().text()).toContain(
       "scope=authorization%3Adecide"
     );
@@ -83,6 +88,7 @@ describe("one authorization gateway", () => {
     const result = await gateway.checkDecision({
       connection,
       clientSecret: "client-secret-sentinel",
+      cloudflareAccess: null,
       requestId: "request-1",
       decision: {
         action: "read",
@@ -114,6 +120,7 @@ describe("one authorization gateway", () => {
       gateway.testConnection({
         connection,
         clientSecret: "client-secret-sentinel",
+        cloudflareAccess: null,
         requestId: "request-1",
       })
     ).rejects.toMatchObject({
@@ -131,6 +138,10 @@ describe("one authorization gateway", () => {
     await gateway.checkDecision({
       connection,
       clientSecret: "client-secret-sentinel",
+      cloudflareAccess: {
+        clientId: "access-client-id",
+        clientSecret: "access-client-secret-sentinel",
+      },
       requestId: "request-1",
       decision: {
         action: "read",
@@ -145,6 +156,7 @@ describe("one authorization gateway", () => {
 
     const serialized = JSON.stringify(logs);
     expect(serialized).not.toContain("client-secret-sentinel");
+    expect(serialized).not.toContain("access-client-secret-sentinel");
     expect(serialized).not.toContain("service-access-token");
     expect(serialized).not.toContain("sensitive-resource-id");
     expect(serialized).not.toContain("sensitive-phone-sentinel");
@@ -153,5 +165,13 @@ describe("one authorization gateway", () => {
       "token",
       "decision",
     ]);
+    expect(
+      requests.every(
+        (request) =>
+          request.headers.get("cf-access-client-id") === "access-client-id" &&
+          request.headers.get("cf-access-client-secret") ===
+            "access-client-secret-sentinel"
+      )
+    ).toBe(true);
   });
 });

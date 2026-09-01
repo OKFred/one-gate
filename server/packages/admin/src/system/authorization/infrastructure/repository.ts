@@ -17,6 +17,9 @@ function toConnection(
     audience: row.audience,
     clientId: row.clientId,
     encryptedClientSecret: row.encryptedClientSecret,
+    cloudflareAccessClientId: row.cloudflareAccessClientId,
+    encryptedCloudflareAccessClientSecret:
+      row.encryptedCloudflareAccessClientSecret,
     status: row.status,
     configVersion: row.configVersion,
     lastTestedAtUtc: row.lastTestedAtUtc,
@@ -50,6 +53,9 @@ export class DrizzleAuthorizationConnectionRepository implements AuthorizationCo
           audience: input.values.audience,
           clientId: input.values.clientId,
           encryptedClientSecret: input.encryptedClientSecret,
+          cloudflareAccessClientId: input.values.cloudflareAccessClientId,
+          encryptedCloudflareAccessClientSecret:
+            input.encryptedCloudflareAccessClientSecret,
           status: "draft",
           configVersion: nextVersion,
           lastTestedAtUtc: null,
@@ -70,6 +76,9 @@ export class DrizzleAuthorizationConnectionRepository implements AuthorizationCo
         audience: input.values.audience,
         clientId: input.values.clientId,
         encryptedClientSecret: input.encryptedClientSecret,
+        cloudflareAccessClientId: input.values.cloudflareAccessClientId,
+        encryptedCloudflareAccessClientSecret:
+          input.encryptedCloudflareAccessClientSecret,
         status: "draft",
         configVersion: nextVersion,
         lastTestedAtUtc: null,
