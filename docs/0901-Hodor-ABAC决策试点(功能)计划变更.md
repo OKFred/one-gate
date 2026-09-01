@@ -94,3 +94,19 @@ TOTP；服务层再校验超级管理员身份。
 3. 将一次性 Client Secret 通过 Hodor 管理 API 加密入库。
 4. 探测配置并运行 permit/default deny/forbid 试决策。
 5. 再决定是否增加 staging Service Binding 及真实业务路由的 opt-in ABAC。
+
+## 8. 2026-09-01 计划调整
+
+staging 首次真实探测在 Access 边界失败，因此在继续验收前追加以下小切片：
+
+1. 扩展 AuthorizationConnection，增加可选 Access 服务凭证及成对校验。
+2. 追加本地 `20260901_03` 与 D1 `0012` migration；同步 Drizzle、初始化 SQL 和 Schema Contract。
+3. 使用独立 AAD 加密 Access Client Secret，并在 Gateway 的全部同源请求中注入服务凭证 Header。
+4. 增加 domain/application/repository/gateway/HTTP 脱敏测试。
+5. 重新应用本地 migration，完成 `config/test` 和 permit/default deny/forbid 验收。
+
+提交边界保持独立：
+
+- `docs(authz): record Access-protected staging adjustment`
+- `feat(authz): support database-backed Access service credentials`
+- `docs(authz): close staging authorization acceptance`

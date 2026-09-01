@@ -186,3 +186,21 @@ Binding 属于部署资源绑定，待 staging 应用、Policy 和 Client 准备
 3. 密码登录也迁移为 one 身份，使业务请求直接持有可验证的 one 用户 Token。
 
 在方案落地前，现有 RBAC 继续是生产权限事实源，ABAC 仅用于显式试点接口。
+
+## 10. 2026-09-01 计划调整：受 Access 保护的 staging 出站认证
+
+真实 staging 验收发现，`one` staging 整站由 Cloudflare Access 保护。Hodor 通过公网 HTTPS
+调用 discovery、token、readyz 和 decision 时，除了 one OIDC Client Credentials，还必须先通过
+Access 服务身份。Access Client ID/Secret 不是租户业务环境变量，也不能写入日志或源码；本迭代把它
+作为可选的连接配置持久化到 Hodor 数据库：
+
+- `accessClientId` 明文保存，`accessClientSecret` 使用同一根密钥但独立 AAD 加密。
+- 两者必须同时启用或同时关闭；首次启用或更换 Client ID 时必须提交 Secret。
+- Gateway 仅在配置启用时为同源出站请求增加 `CF-Access-Client-Id` 与
+  `CF-Access-Client-Secret`，不影响未使用 Access 的独立部署。
+- 追加 migration 扩展现有单例表，不修改已经推送的 `0011`。
+- 管理 API 只返回 `usesCloudflareAccess`、Access Client ID 和是否存在 Secret，不返回密文或明文。
+
+该调整不把 Cloudflare Access 视为 one 用户身份，也不改变 Cedar principal；它只解决服务到服务的
+网络入口认证。后续若改用同账户 Service Binding，可把 Access 配置设为 `null`，无需改变领域或决策
+协议。
