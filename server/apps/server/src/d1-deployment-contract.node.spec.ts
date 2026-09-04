@@ -57,6 +57,22 @@ function extractWranglerRequiredSecretNames(config: string): string[] {
     .sort();
 }
 
+const RETIRED_AUTHENTICATION_SECRET_NAMES = [
+  "GH_CLIENT_ID",
+  "GH_CLIENT_SECRET",
+  "GH_ORG_NAME",
+  "FEISHU_APP_ID",
+  "FEISHU_APP_SECRET",
+  "FEISHU_ALLOWED_TENANT_KEYS",
+  "OAUTH_ALLOWED_REDIRECT_ORIGINS",
+  "OAUTH_SENSITIVE_DATA_KEY",
+  "SSO_ISSUER",
+  "SSO_CLIENT_ID",
+  "SSO_AUDIENCE",
+  "SSO_ALLOWED_TENANT_ID",
+  "SSO_ALLOWED_REDIRECT_URIS",
+] as const;
+
 describe("D1 deployment contract", () => {
   it("configures the official Wrangler migration ledger", () => {
     const config = readRepositoryFile("../wrangler.jsonc");
@@ -231,7 +247,7 @@ describe("D1 deployment contract", () => {
     expect(deployAt).toBeGreaterThan(contractAt);
   });
 
-  it("deploys only Hodor root secrets and the temporary SSO bridge", () => {
+  it("deploys only active Hodor root secrets", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
@@ -252,15 +268,7 @@ describe("D1 deployment contract", () => {
     );
     expect(extractSecretReferences(deployStep)).toEqual(expectedWorkerSecrets);
     expect(workflow).not.toContain("Configure Optional Feishu Secrets");
-    for (const retiredSecretName of [
-      "GH_CLIENT_ID",
-      "GH_CLIENT_SECRET",
-      "GH_ORG_NAME",
-      "FEISHU_APP_ID",
-      "FEISHU_APP_SECRET",
-      "FEISHU_ALLOWED_TENANT_KEYS",
-      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
-    ]) {
+    for (const retiredSecretName of RETIRED_AUTHENTICATION_SECRET_NAMES) {
       expect(workflow).not.toContain(retiredSecretName);
     }
 
@@ -268,16 +276,10 @@ describe("D1 deployment contract", () => {
     expect(extractWranglerRequiredSecretNames(config)).toEqual(
       expectedWorkerSecrets
     );
-    for (const retiredSecretName of [
-      "GH_CLIENT_ID",
-      "GH_CLIENT_SECRET",
-      "GH_ORG_NAME",
-      "FEISHU_APP_ID",
-      "FEISHU_APP_SECRET",
-      "FEISHU_ALLOWED_TENANT_KEYS",
-      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
-    ]) {
+    const example = readRepositoryFile("../.env.example");
+    for (const retiredSecretName of RETIRED_AUTHENTICATION_SECRET_NAMES) {
       expect(config).not.toContain(`      "${retiredSecretName}",`);
+      expect(example).not.toContain(`${retiredSecretName}=`);
     }
   });
 
@@ -286,11 +288,11 @@ describe("D1 deployment contract", () => {
       REQUIRED_DEPLOYMENT_SECRET_NAMES.map((name) => [name, `${name}-value`])
     );
     environment.HODOR_AUTH_MASTER_KEY = "  ";
-    environment.SSO_CLIENT_ID = "";
+    environment.JWT_SECRET = "";
 
     expect(findMissingDeploymentSecretNames(environment)).toEqual([
       "HODOR_AUTH_MASTER_KEY",
-      "SSO_CLIENT_ID",
+      "JWT_SECRET",
     ]);
   });
 });
