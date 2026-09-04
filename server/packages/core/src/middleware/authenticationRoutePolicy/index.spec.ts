@@ -6,6 +6,7 @@ import {
   machineCredentialBypass,
   matchesAuthenticationRoute,
   primaryAuthAnonymous,
+  retiredAuthenticationRoutes,
   totpGateAnonymousControl,
   totpGateAuthenticatedControl,
   websocketCredentialBypass,
@@ -26,6 +27,22 @@ describe("authentication route policy", () => {
     ]);
     expect(Object.isFrozen(primaryAuthAnonymous)).toBe(true);
     expect(Object.isFrozen(totpGateAuthenticatedControl)).toBe(true);
+  });
+
+  it("classifies retired provider endpoints only for the TOTP 404 pass-through", () => {
+    expect(retiredAuthenticationRoutes).toContain(
+      "/admin/system/auth/oauth/login/url"
+    );
+    expect(retiredAuthenticationRoutes).toContain(
+      "/admin/system/auth/oauth/binding/profile"
+    );
+    expect(retiredAuthenticationRoutes).toContain("/admin/system/auth/wechat");
+    expect(
+      classifyAuthenticationRoute("/admin/system/auth/oauth/login/url")
+    ).toBe("retiredAuthenticationRoute");
+    expect(isHodorAuthBypassed("/admin/system/auth/oauth/login/url")).toBe(
+      false
+    );
   });
 
   it("matches only exact routes and real child paths", () => {
