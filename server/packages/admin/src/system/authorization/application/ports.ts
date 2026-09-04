@@ -57,10 +57,26 @@ export interface AuthorizationClockPort {
   now(): number;
 }
 
+export interface AuthorizationShadowObservation {
+  readonly requestId: string;
+  readonly rbacAllowed: boolean;
+  readonly abacAllowed: boolean | null;
+  readonly comparison: "match" | "mismatch" | "unavailable";
+  readonly outcome: "evaluated" | "unavailable";
+  readonly decisionId: string | null;
+  readonly policyRevision: number | null;
+  readonly durationMs: number;
+}
+
+export interface AuthorizationShadowLogPort {
+  record(observation: AuthorizationShadowObservation): Promise<void> | void;
+}
+
 export interface AuthorizationCenterDependencies {
   readonly repository: AuthorizationConnectionRepositoryPort;
   readonly cipher: AuthorizationCredentialCipherPort;
   readonly gateway: AuthorizationGatewayPort;
   readonly clock: AuthorizationClockPort;
+  readonly shadowLog: AuthorizationShadowLogPort;
   readonly allowInsecureLocalhost: boolean;
 }

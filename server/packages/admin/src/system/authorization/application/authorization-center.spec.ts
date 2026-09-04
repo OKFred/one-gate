@@ -10,6 +10,7 @@ import type {
   AuthorizationCenterDependencies,
   AuthorizationConnectionRepositoryPort,
   AuthorizationGatewayPort,
+  AuthorizationShadowObservation,
 } from "./ports.js";
 
 const values: AuthorizationConnectionValues = {
@@ -120,6 +121,7 @@ class FakeGateway implements AuthorizationGatewayPort {
     },
     requestId: "request-1",
   };
+  decisionError: Error | null = null;
 
   async testConnection(
     input: Parameters<AuthorizationGatewayPort["testConnection"]>[0]
@@ -133,7 +135,18 @@ class FakeGateway implements AuthorizationGatewayPort {
   ) {
     this.decisionCalls += 1;
     this.lastCloudflareAccess = input.cloudflareAccess;
+    if (this.decisionError) throw this.decisionError;
     return this.decisionResult;
+  }
+}
+
+class FakeShadowLog {
+  readonly observations: AuthorizationShadowObservation[] = [];
+  error: Error | null = null;
+
+  record(observation: AuthorizationShadowObservation): void {
+    if (this.error) throw this.error;
+    this.observations.push(observation);
   }
 }
 
@@ -143,6 +156,7 @@ function createFixture() {
   const plaintextByCiphertext = new Map<string, string>([
     ["encrypted:client-secret-1234", "client-secret-1234"],
   ]);
+  const shadowLog = new FakeShadowLog();
   const dependencies: AuthorizationCenterDependencies = {
     repository,
     gateway,
@@ -159,11 +173,13 @@ function createFixture() {
       },
     },
     clock: { now: () => 1_000 },
+    shadowLog,
     allowInsecureLocalhost: false,
   };
   return {
     repository,
     gateway,
+    shadowLog,
     center: new AuthorizationCenter(dependencies),
   };
 }
@@ -296,5 +312,87 @@ describe("AuthorizationCenter", () => {
         },
       })
     ).resolves.toEqual(fixture.gateway.decisionResult);
+  });
+
+  it("records match and mismatch without exposing the decision input", async () => {
+    const fixture = createFixture();
+    fixture.repository.current = connection({ status: "ready" });
+    const input = {
+      requestId: "request-shadow",
+      actor: { userId: 7, roleIds: [1], isSuperAdmin: true },
+      rbacAllowed: true,
+      decision: {
+        action: "read",
+        resource: {
+          type: "MobileDevice",
+          id: "sensitive-device-id",
+          attributes: { sensitiveSentinel: "never-log-me" },
+        },
+        context: {},
+      },
+    } as const;
+
+    await expect(fixture.center.observeShadowDecision(input)).resolves.toEqual(
+      expect.objectContaining({
+        comparison: "match",
+        outcome: "evaluated",
+        abacAllowed: true,
+      })
+    );
+    fixture.gateway.decisionResult = {
+      ...fixture.gateway.decisionResult,
+      data: {
+        ...fixture.gateway.decisionResult.data,
+        allowed: false,
+        reason: "POLICY_DENY",
+      },
+    };
+    await expect(fixture.center.observeShadowDecision(input)).resolves.toEqual(
+      expect.objectContaining({
+        comparison: "mismatch",
+        outcome: "evaluated",
+        abacAllowed: false,
+      })
+    );
+    expect(JSON.stringify(fixture.shadowLog.observations)).not.toContain(
+      "sensitive-device-id"
+    );
+    expect(JSON.stringify(fixture.shadowLog.observations)).not.toContain(
+      "never-log-me"
+    );
+  });
+
+  it("converts unavailable authorization and log failures into observations", async () => {
+    const fixture = createFixture();
+    const input = {
+      requestId: "request-unavailable",
+      actor: { userId: 7, roleIds: [1], isSuperAdmin: true },
+      rbacAllowed: true,
+      decision: {
+        action: "read",
+        resource: { type: "MobileDevice", id: "1", attributes: {} },
+        context: {},
+      },
+    } as const;
+
+    await expect(fixture.center.observeShadowDecision(input)).resolves.toEqual(
+      expect.objectContaining({
+        comparison: "unavailable",
+        outcome: "unavailable",
+        abacAllowed: null,
+      })
+    );
+    expect(fixture.shadowLog.observations).toHaveLength(1);
+
+    fixture.repository.current = connection({ status: "ready" });
+    fixture.shadowLog.error = new Error("log sentinel");
+    await expect(fixture.center.observeShadowDecision(input)).resolves.toEqual(
+      expect.objectContaining({ comparison: "match", outcome: "evaluated" })
+    );
+
+    fixture.gateway.decisionError = new Error("upstream sentinel");
+    await expect(fixture.center.observeShadowDecision(input)).resolves.toEqual(
+      expect.objectContaining({ comparison: "unavailable" })
+    );
   });
 });
