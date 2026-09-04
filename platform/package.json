@@ -17,7 +17,6 @@
     "test:e2e": "playwright test --project=chromium",
     "test:e2e:headed": "playwright test --project=chromium --headed",
     "test:e2e:auth-flow": "playwright test auth/auth-ui.spec.ts --project=chromium",
-    "feishu:profile": "node ./scripts/open-feishu-provider-profile.mjs",
     "typecheck:e2e": "tsc --noEmit -p tsconfig.node.json",
     "i18n:scan": "node ./scripts/scan-i18n-enhanced.js",
     "i18n:scan:json": "node ./scripts/scan-i18n-enhanced.js --json",

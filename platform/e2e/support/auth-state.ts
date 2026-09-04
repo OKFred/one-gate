@@ -22,12 +22,6 @@ export const HODOR_AUTH_STATE_PATH = path.join(
   'playwright/.auth/hodor.auth-state.json',
 );
 
-/** Provider login state lives in a dedicated persistent profile and is never copied into Hodor state. */
-export const FEISHU_PROVIDER_PROFILE_PATH = path.join(
-  PLATFORM_ROOT,
-  'playwright/.auth/feishu-provider-profile',
-);
-
 /** 判断未知值是否为普通对象。 */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
