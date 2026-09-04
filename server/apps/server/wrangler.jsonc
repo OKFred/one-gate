@@ -49,10 +49,7 @@
 
   "secrets": {
     "required": [
-      "GH_CLIENT_ID",
-      "GH_CLIENT_SECRET",
-      "GH_ORG_NAME",
-      "OAUTH_ALLOWED_REDIRECT_ORIGINS",
+      "HODOR_AUTH_MASTER_KEY",
       "OAUTH_SENSITIVE_DATA_KEY",
       "JWT_SECRET",
       "MOBILE_SENSITIVE_DATA_KEY",

@@ -31,7 +31,7 @@ interface AuthenticationBoundaryProps {
 }
 
 function isAuthenticationCallback(pathname: string): boolean {
-  return pathname === '/oauth/callback' || pathname === '/sso/callback';
+  return pathname === '/sso/callback';
 }
 
 function transferredUser(token: string): UserInfo {

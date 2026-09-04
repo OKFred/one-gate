@@ -2,6 +2,7 @@ export type AuthenticationRoutePath = `/${string}`;
 
 export type AuthenticationRouteClassification =
   | "primaryAuthAnonymous"
+  | "retiredAuthenticationRoute"
   | "totpGateAuthenticatedControl"
   | "totpGateAnonymousControl"
   | "machineCredentialBypass"
@@ -16,11 +17,20 @@ function freezeRoutePaths<const T extends readonly AuthenticationRoutePath[]>(
 /** Browser routes needed to establish the first-factor Hodor session. */
 export const primaryAuthAnonymous = freezeRoutePaths([
   "/admin/system/auth/login",
-  "/admin/system/auth/oauth/login/url",
-  "/admin/system/auth/oauth/login/callback",
   "/admin/system/auth/sso/login/url",
   "/admin/system/auth/sso/login/callback",
   "/admin/i18n/translation/listAll",
+] as const);
+
+/** Retired authentication endpoints bypass only the TOTP preflight so the shared 404 handler can respond. */
+export const retiredAuthenticationRoutes = freezeRoutePaths([
+  "/admin/system/auth/oauth/login/url",
+  "/admin/system/auth/oauth/login/callback",
+  "/admin/system/auth/oauth/account/url",
+  "/admin/system/auth/oauth/account/callback",
+  "/admin/system/auth/oauth/binding/unbind",
+  "/admin/system/auth/oauth/binding/profile",
+  "/admin/system/auth/wechat",
 ] as const);
 
 /** TOTP control routes own their authentication and deliberately bypass the gate middleware. */
@@ -73,6 +83,9 @@ export function classifyAuthenticationRoute(
 ): AuthenticationRouteClassification | undefined {
   if (matchesAnyAuthenticationRoute(requestPath, primaryAuthAnonymous)) {
     return "primaryAuthAnonymous";
+  }
+  if (matchesAnyAuthenticationRoute(requestPath, retiredAuthenticationRoutes)) {
+    return "retiredAuthenticationRoute";
   }
   if (
     matchesAnyAuthenticationRoute(requestPath, totpGateAuthenticatedControl)

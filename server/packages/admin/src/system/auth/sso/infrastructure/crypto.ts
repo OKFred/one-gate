@@ -32,7 +32,7 @@ function fromBase64Url(value: string): Uint8Array {
 
 function decodeSensitiveKey(value: string): Uint8Array {
   if (!/^[A-Za-z0-9+/_-]+={0,2}$/u.test(value)) {
-    throw new Error("OAUTH_SENSITIVE_DATA_KEY is not valid base64");
+    throw new Error("HODOR_AUTH_MASTER_KEY is not valid base64");
   }
   const normalized = value.replaceAll("-", "+").replaceAll("_", "/");
   const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
@@ -41,11 +41,13 @@ function decodeSensitiveKey(value: string): Uint8Array {
 }
 
 async function importSensitiveKey(): Promise<CryptoKey> {
-  const raw = getEnv("OAUTH_SENSITIVE_DATA_KEY")?.trim();
-  if (!raw) throw new Error("OAUTH_SENSITIVE_DATA_KEY is required");
+  const raw =
+    getEnv("HODOR_AUTH_MASTER_KEY")?.trim() ||
+    getEnv("OAUTH_SENSITIVE_DATA_KEY")?.trim();
+  if (!raw) throw new Error("HODOR_AUTH_MASTER_KEY is required");
   const keyBytes = decodeSensitiveKey(raw);
   if (keyBytes.byteLength !== 32) {
-    throw new Error("OAUTH_SENSITIVE_DATA_KEY must decode to 32 bytes");
+    throw new Error("HODOR_AUTH_MASTER_KEY must decode to 32 bytes");
   }
   return crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, [
     "encrypt",

@@ -1,5 +1,6 @@
 import db from "@hodor/core/db/index";
 import { clearTestData, setupTestDb } from "@hodor/core/db/testHelper";
+import ssoConnectionSql from "@hodor/core/db/sql/admin/system_sso_connection.sql?raw";
 import ssoTransactionSql from "@hodor/core/db/sql/admin/system_sso_oidc_transaction.sql?raw";
 import userSql from "@hodor/core/db/sql/admin/system_user.sql?raw";
 import ssoIdentitySql from "@hodor/core/db/sql/admin/system_user_sso_identity.sql?raw";
@@ -8,14 +9,19 @@ import { userTable } from "../../../user/model.js";
 import type { NewSsoBinding, SsoRepositoryPort } from "../application/ports.js";
 import {
   SsoErrorCode,
+  type SsoConnectionValues,
   type SsoTransaction,
   type VerifiedSsoPrincipal,
 } from "../domain/sso.js";
 import { ssoOidcTransactionTable } from "../model.js";
-import { DrizzleSsoRepository } from "./repository.js";
+import {
+  DrizzleSsoConfigurationRepository,
+  DrizzleSsoRepository,
+} from "./repository.js";
 
 const ISSUER = "https://sso.example.com";
 const repository = new DrizzleSsoRepository();
+const configurationRepository = new DrizzleSsoConfigurationRepository();
 
 function createBinding(overrides: Partial<NewSsoBinding> = {}): NewSsoBinding {
   return {
@@ -78,11 +84,17 @@ async function insertUser(input: {
 }
 
 beforeAll(async () => {
-  await setupTestDb(db, [userSql, ssoIdentitySql, ssoTransactionSql]);
+  await setupTestDb(db, [
+    userSql,
+    ssoIdentitySql,
+    ssoTransactionSql,
+    ssoConnectionSql,
+  ]);
 });
 
 beforeEach(async () => {
   await clearTestData(db, [
+    "system_sso_connection",
     "system_sso_oidc_transaction",
     "system_user_sso_identity",
     "system_user",
@@ -90,6 +102,83 @@ beforeEach(async () => {
   await insertUser({ id: 1, username: "enabled-user", isEnabled: true });
   await insertUser({ id: 2, username: "second-user", isEnabled: true });
   await insertUser({ id: 3, username: "disabled-user", isEnabled: false });
+});
+
+const connectionValues: SsoConnectionValues = {
+  issuer: ISSUER,
+  clientId: "hodor-client",
+  audience: "urn:hodor",
+  allowedTenantId: "tenant-1",
+  redirectUris: ["https://gate.example.com/sso/callback?intent=login"],
+};
+
+describe("DrizzleSsoConfigurationRepository", () => {
+  it("creates one draft and rejects a stale create", async () => {
+    await expect(
+      configurationRepository.saveDraft({
+        values: connectionValues,
+        expectedVersion: 0,
+        updatedByUserId: 1,
+        nowUtc: 1_000,
+      })
+    ).resolves.toMatchObject({ status: "draft", configVersion: 1 });
+    await expect(
+      configurationRepository.saveDraft({
+        values: connectionValues,
+        expectedVersion: 0,
+        updatedByUserId: 1,
+        nowUtc: 1_001,
+      })
+    ).resolves.toBeNull();
+  });
+
+  it("uses versions while saving, testing and disabling", async () => {
+    await configurationRepository.saveDraft({
+      values: connectionValues,
+      expectedVersion: 0,
+      updatedByUserId: 1,
+      nowUtc: 1_000,
+    });
+    await expect(
+      configurationRepository.markReady({
+        expectedVersion: 1,
+        updatedByUserId: 1,
+        testedAtUtc: 2_000,
+      })
+    ).resolves.toMatchObject({
+      status: "ready",
+      configVersion: 2,
+      lastTestedAtUtc: 2_000,
+    });
+    await expect(
+      configurationRepository.markReady({
+        expectedVersion: 1,
+        updatedByUserId: 1,
+        testedAtUtc: 2_001,
+      })
+    ).resolves.toBeNull();
+    await expect(
+      configurationRepository.disable({
+        expectedVersion: 2,
+        updatedByUserId: 2,
+        nowUtc: 3_000,
+      })
+    ).resolves.toMatchObject({ status: "disabled", configVersion: 3 });
+  });
+
+  it("returns an immutable copy of redirect URIs", async () => {
+    await configurationRepository.saveDraft({
+      values: connectionValues,
+      expectedVersion: 0,
+      updatedByUserId: 1,
+      nowUtc: 1_000,
+    });
+
+    const connection = await configurationRepository.findConnection();
+
+    expect(connection?.redirectUris).toEqual(connectionValues.redirectUris);
+    expect(connection?.redirectUris).not.toBe(connectionValues.redirectUris);
+  });
 });
 
 describe("DrizzleSsoRepository transactions", () => {

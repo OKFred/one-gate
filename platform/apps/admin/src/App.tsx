@@ -19,10 +19,8 @@ import { lazy, Suspense, useEffect, useState } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { AuthenticationBoundary } from '@/components/AuthenticationBoundary';
 import { CircularProgress } from '@mui/material';
-import { useLocation } from 'react-router-dom';
 
 const Login = lazy(() => import('./pages/login'));
-const OAuthCallback = lazy(() => import('./pages/oauth-callback'));
 const SsoCallback = lazy(() => import('./pages/sso-callback'));
 
 function AuthPageLoading() {
@@ -38,11 +36,9 @@ function renderPrimaryAuth() {
 }
 
 function PrimaryAuthCallback() {
-  const location = useLocation();
-  const Callback = location.pathname === '/sso/callback' ? SsoCallback : OAuthCallback;
   return (
     <Suspense fallback={<AuthPageLoading />}>
-      <Callback />
+      <SsoCallback />
     </Suspense>
   );
 }

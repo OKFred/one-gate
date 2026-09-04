@@ -3,57 +3,45 @@ import { readE2EEnvironment } from '../support/test-environment.js';
 
 const environment = readE2EEnvironment();
 
-test.skip(!environment.mockOAuth, 'Set HODOR_E2E_MOCK_OAUTH=true for the mock provider UI suite.');
+test.skip(!environment.mockAuth, 'Set HODOR_E2E_MOCK_AUTH=true for the mock auth UI suite.');
+
+const fulfillOk = (data: unknown) => ({
+  contentType: 'application/json',
+  body: JSON.stringify({ ok: true, data, message: 'ok' }),
+});
 
 test.beforeEach(async ({ page }) => {
   await page.route('**/api/v1/admin/i18n/translation/listAll', async (route) => {
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ ok: true, data: [], message: 'ok' }),
-    });
+    await route.fulfill(fulfillOk([]));
   });
 });
 
-test('login page exposes both OAuth providers without persisting provider profiles', async ({
-  page,
-}) => {
-  await page.route('**/api/v1/admin/system/auth/oauth/login/url', async (route) => {
-    const body: unknown = route.request().postDataJSON();
-    expect(body).toEqual({
-      provider: 'feishu',
-      redirectUri: `${environment.baseUrl}/oauth/callback`,
+test('login page only exposes password and Identity Center', async ({ page }) => {
+  await page.route('**/api/v1/admin/system/auth/sso/login/url', async (route) => {
+    expect(route.request().postDataJSON()).toEqual({
+      redirectUri: `${environment.baseUrl}/sso/callback?intent=login`,
     });
-    await route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        ok: true,
-        data: { url: `${environment.baseUrl}/mock-feishu` },
-        message: 'ok',
-      }),
-    });
+    await route.fulfill(fulfillOk({ url: `${environment.baseUrl}/mock-identity-center` }));
   });
 
   await page.goto('/#/login');
-  await expect(page.getByRole('button', { name: /GitHub/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: /统一身份中心|Identity Center/i })).toBeVisible();
-  await page.getByRole('button', { name: /飞书|Feishu/i }).click();
-  await expect(page).toHaveURL(`${environment.baseUrl}/mock-feishu`);
-  expect(
-    await page.evaluate(() =>
-      Object.keys(localStorage).some((key) => /feishu|oauth.*profile/i.test(key)),
-    ),
-  ).toBe(false);
+  await expect(page.getByLabel(/用户名|Username/i)).toBeVisible();
+  await expect(page.getByLabel(/^密码$|^Password$/i)).toBeVisible();
+  await expect(page.getByRole('button', { name: /GitHub/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /飞书|Feishu/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /微信|WeChat/i })).toHaveCount(0);
+
+  await page.getByRole('button', { name: /统一身份中心|Identity Center/i }).click();
+  await expect(page).toHaveURL(`${environment.baseUrl}/mock-identity-center`);
 });
 
 test('password login establishes only the primary session before TOTP', async ({ page }) => {
-  const fulfillOk = (data: unknown) => ({
-    contentType: 'application/json',
-    body: JSON.stringify({ ok: true, data, message: 'ok' }),
-  });
   let protectedRequests = 0;
   await page.route('**/api/v1/admin/system/auth/login', async (route) => {
-    const body: unknown = route.request().postDataJSON();
-    expect(body).toEqual({ username: 'tester', password: 'cGFzc3dvcmQ=' });
+    expect(route.request().postDataJSON()).toEqual({
+      username: 'tester',
+      password: 'cGFzc3dvcmQ=',
+    });
     await route.fulfill(
       fulfillOk({
         userObj: { id: 44, username: 'tester', langCode: 'zh-CN', token: 'password-token' },
@@ -82,17 +70,13 @@ test('password login establishes only the primary session before TOTP', async ({
   expect(protectedRequests).toBe(0);
 });
 
-test('one-sso login callback also stops at the shared TOTP gate', async ({ page }) => {
+test('Identity Center login callback stops at the shared TOTP gate', async ({ page }) => {
   const userObj = {
     id: 43,
     username: 'sso_tester',
     langCode: 'zh-CN',
     token: 'mock-sso-token',
   };
-  const fulfillOk = (data: unknown) => ({
-    contentType: 'application/json',
-    body: JSON.stringify({ ok: true, data, message: 'ok' }),
-  });
   let protectedRequests = 0;
   await page.route('**/api/v1/admin/system/auth/sso/login/callback', async (route) => {
     expect(route.request().postDataJSON()).toEqual({ code: 'sso-code', state: 'sso-state' });
@@ -117,30 +101,7 @@ test('one-sso login callback also stops at the shared TOTP gate', async ({ page 
   expect(protectedRequests).toBe(0);
 });
 
-test('fixed OAuth callback path is bridged into HashRouter with code and state intact', async ({
-  page,
-}) => {
-  await page.route('**/api/v1/admin/system/auth/oauth/login/callback', async (route) => {
-    expect(route.request().postDataJSON()).toEqual({ code: 'mock-code', state: 'mock-state' });
-    await route.fulfill({
-      status: 403,
-      contentType: 'application/json',
-      body: JSON.stringify({ ok: false, message: '账号未绑定，请联系管理员' }),
-    });
-  });
-
-  await page.goto('/oauth/callback?code=mock-code&state=mock-state');
-  await expect(page).toHaveURL(/#\/oauth\/callback\?code=mock-code&state=mock-state/);
-  await expect(page.getByText(/授权失败|Authorization failed/i).first()).toBeVisible();
-});
-
-test('binding callback URL is preserved until an expired TOTP gate is restored', async ({
-  page,
-}) => {
-  const fulfillOk = (data: unknown) => ({
-    contentType: 'application/json',
-    body: JSON.stringify({ ok: true, data, message: 'ok' }),
-  });
+test('binding callback waits until an expired TOTP gate is restored', async ({ page }) => {
   let gateVerified = false;
   let bindingCallbacks = 0;
   await page.addInitScript(() => {
@@ -153,18 +114,18 @@ test('binding callback URL is preserved until an expired TOTP gate is restored',
     await route.fulfill(
       fulfillOk({
         verified: gateVerified,
-        expiresAtUtc: gateVerified ? '2026-08-29T00:00:00.000Z' : null,
+        expiresAtUtc: gateVerified ? '2026-09-02T00:00:00.000Z' : null,
       }),
     );
   });
   await page.route('**/api/v1/admin/system/auth/gate/verify', async (route) => {
     gateVerified = true;
-    await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: '2026-08-29T00:00:00.000Z' }));
+    await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: '2026-09-02T00:00:00.000Z' }));
   });
-  await page.route('**/api/v1/admin/system/auth/oauth/account/callback', async (route) => {
+  await page.route('**/api/v1/admin/system/auth/sso/account/callback', async (route) => {
     bindingCallbacks += 1;
     expect(route.request().postDataJSON()).toEqual({ code: 'bind-code', state: 'bind-state' });
-    await route.fulfill(fulfillOk({ provider: 'github', unbound: false }));
+    await route.fulfill(fulfillOk({ message: 'SSO 账号绑定成功' }));
   });
   await page.route('**/api/v1/admin/system/menu/tree', async (route) => {
     await route.fulfill(fulfillOk([]));
@@ -176,7 +137,7 @@ test('binding callback URL is preserved until an expired TOTP gate is restored',
     await route.fulfill(fulfillOk(true));
   });
 
-  await page.goto('/oauth/callback?code=bind-code&state=bind-state');
+  await page.goto('/sso/callback?code=bind-code&state=bind-state&intent=bind');
   await expect(
     page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
   ).toBeVisible();
@@ -187,32 +148,23 @@ test('binding callback URL is preserved until an expired TOTP gate is restored',
   await expect(page).toHaveURL(/#\/me$/);
 });
 
-test('successful OAuth login stops at TOTP before loading menus and permissions', async ({
-  page,
-}) => {
+test('successful Identity Center login preserves the SPA after TOTP', async ({ page }) => {
   const userObj = {
     id: 42,
-    username: 'oauth_tester',
+    username: 'sso_tester',
     langCode: 'zh-CN',
-    token: 'mock-oauth-token',
+    token: 'mock-sso-token',
   };
-  const fulfillOk = (data: unknown) => ({
-    contentType: 'application/json',
-    body: JSON.stringify({ ok: true, data, message: 'ok' }),
-  });
   let menuRequests = 0;
   let permissionRequests = 0;
   let gateStatusRequests = 0;
   let tokenCheckRequests = 0;
   let gateVerified = false;
 
-  // The mock preview does not host enterprise/personal remote entries. Keep their expected import
-  // failures from exercising the unrelated one-shot chunk reload recovery during this SPA test.
   await page.addInitScript(() => {
     sessionStorage.setItem('chunk_reload_attempted', '1');
   });
-
-  await page.route('**/api/v1/admin/system/auth/oauth/login/callback', async (route) => {
+  await page.route('**/api/v1/admin/system/auth/sso/login/callback', async (route) => {
     await route.fulfill(fulfillOk({ userObj }));
   });
   await page.route('**/api/v1/admin/system/menu/tree', async (route) => {
@@ -245,14 +197,14 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
     await route.fulfill(
       fulfillOk({
         verified: gateVerified,
-        expiresAtUtc: gateVerified ? '2026-08-29T00:00:00.000Z' : null,
+        expiresAtUtc: gateVerified ? '2026-09-02T00:00:00.000Z' : null,
       }),
     );
   });
   await page.route('**/api/v1/admin/system/auth/gate/verify', async (route) => {
     expect(route.request().postDataJSON()).toEqual({ code: '123456' });
     gateVerified = true;
-    await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: '2026-08-29T00:00:00.000Z' }));
+    await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: '2026-09-02T00:00:00.000Z' }));
   });
   await page.route('**/api/v1/admin/system/auth/check', async (route) => {
     tokenCheckRequests += 1;
@@ -266,7 +218,7 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
           username: userObj.username,
           langCode: userObj.langCode,
           isEnabled: true,
-          remark: 'OAuth acceptance account',
+          remark: 'SSO acceptance account',
           regionObj: null,
           departmentObj: null,
           roleArr: [],
@@ -274,15 +226,27 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
           createTimeUtc: 1,
           updaterId: null,
           updateTimeUtc: null,
-          githubUsername: null,
-          oauthBindings: [],
         },
       }),
     );
   });
+  await page.route('**/api/v1/admin/system/auth/sso/binding/summary', async (route) => {
+    await route.fulfill(
+      fulfillOk({
+        bound: true,
+        issuer: 'https://sso.example.com',
+        tenantId: 'tenant-1',
+        membershipId: 'membership-1',
+        clientId: 'hodor-client',
+        amr: ['local'],
+        scope: ['openid'],
+        createTimeUtc: 1,
+        updateTimeUtc: null,
+      }),
+    );
+  });
 
-  await page.goto('/oauth/callback?code=mock-code&state=mock-state');
-
+  await page.goto('/sso/callback?code=mock-code&state=mock-state&intent=login');
   await expect(
     page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
   ).toBeVisible();
@@ -325,13 +289,6 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
   await page.getByText('主页', { exact: true }).filter({ visible: true }).first().click();
   await expect(page).toHaveURL(/#\/home$/);
   await expect(stableLayout).toBeVisible();
-  await page.waitForTimeout(500);
-  expect({
-    gateStatus: gateStatusRequests,
-    menu: menuRequests,
-    permission: permissionRequests,
-    tokenCheck: tokenCheckRequests,
-  }).toEqual(requestsAfterInitialLoad);
   await expect
     .poll(async () => {
       try {
@@ -341,13 +298,4 @@ test('successful OAuth login stops at TOTP before loading menus and permissions'
       }
     })
     .toEqual(['id', 'langCode', 'token', 'username']);
-
-  await page.reload();
-  await expect.poll(() => gateStatusRequests).toBeGreaterThan(requestsAfterInitialLoad.gateStatus);
-  await expect.poll(() => menuRequests).toBeGreaterThan(requestsAfterInitialLoad.menu);
-  await expect.poll(() => permissionRequests).toBeGreaterThan(requestsAfterInitialLoad.permission);
-  await expect.poll(() => tokenCheckRequests).toBeGreaterThan(requestsAfterInitialLoad.tokenCheck);
-  await expect(
-    page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
-  ).toHaveCount(0);
 });

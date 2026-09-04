@@ -1,7 +1,6 @@
 import {
   IndexVO,
   UserUniqueVO,
-  UserBaseVO,
   UserVO,
   UserListVO,
   UserAddVO,
@@ -25,7 +24,6 @@ import {
 import { utils as departmentUtils } from "../department/service";
 import { utils as roleUtils } from "../role/service";
 import { registry } from "../../common/registry.js";
-import type { PermissionInfo } from "../permission/service";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { hashPassword, verifyPassword } from "@hodor/core/utils/crypto";
 import type { RequiredKeys, UserObj } from "@hodor/core/types/app";
@@ -531,22 +529,6 @@ async function getUserNameMapByIds(userIds: number[]) {
   return await userRepository.getUserNameMapByIds(userIds);
 }
 
-async function findOauthByProviderId(provider: string, providerId: string) {
-  return await userRepository.findOauthByProviderId(provider, providerId);
-}
-
-async function findOauthByUserAndProvider(userId: number, provider: string) {
-  return await userRepository.findOauthByUserAndProvider(userId, provider);
-}
-
-async function deleteOauthByUserAndProvider(userId: number, provider: string) {
-  return await userRepository.deleteOauthByUserAndProvider(userId, provider);
-}
-
-async function onInsertOauth(data: Parameters<typeof userRepository.onInsertOauth>[0]) {
-  return await userRepository.onInsertOauth(data);
-}
-
 async function onInsert(data: Parameters<typeof userRepository.onInsert>[0]) {
   return await userRepository.onInsert(data);
 }
@@ -561,10 +543,6 @@ export const utils = {
   getUserNameById,
   getUserNameMapByIds,
   getUser,
-  findOauthByProviderId,
-  findOauthByUserAndProvider,
-  deleteOauthByUserAndProvider,
-  onInsertOauth,
   onInsert,
 };
 

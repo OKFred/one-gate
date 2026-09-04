@@ -1,12 +1,50 @@
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
+import { sql } from "drizzle-orm";
 import {
+  check,
   index,
   integer,
   sqliteTable,
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import type { SsoIntent } from "./domain/sso.js";
+import type { SsoConnectionStatus, SsoIntent } from "./domain/sso.js";
+
+export const ssoConnectionTable = sqliteTable(
+  "system_sso_connection",
+  {
+    id: text("id").$type<"default">().primaryKey(),
+    issuer: text("issuer").notNull(),
+    clientId: text("client_id").notNull(),
+    audience: text("audience").notNull(),
+    allowedTenantId: text("allowed_tenant_id").notNull(),
+    redirectUrisJson: text("redirect_uris_json", { mode: "json" })
+      .$type<string[]>()
+      .notNull(),
+    status: text("status").$type<SsoConnectionStatus>().notNull(),
+    configVersion: integer("config_version").notNull(),
+    lastTestedAtUtc: integer("last_tested_at_utc"),
+    updatedByUserId: integer("updated_by_user_id"),
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+  },
+  (table) => [
+    check(
+      "system_sso_connection_singleton_check",
+      sql`${table.id} = 'default'`
+    ),
+    check(
+      "system_sso_connection_status_check",
+      sql`${table.status} IN ('draft', 'ready', 'disabled')`
+    ),
+    check(
+      "system_sso_connection_version_check",
+      sql`${table.configVersion} > 0`
+    ),
+  ]
+);
 
 export const userSsoIdentityTable = sqliteTable(
   "system_user_sso_identity",

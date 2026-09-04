@@ -1,14 +1,15 @@
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-import type { OAuthIntent, OAuthProvider } from "./domain/oauth.js";
+type LegacyOAuthProvider = "github" | "feishu";
+type LegacyOAuthIntent = "login" | "bind" | "unbind";
 
 export const oauthStateTable = sqliteTable(
   "system_oauth_state",
   {
     stateDigest: text("state_digest").primaryKey(),
-    provider: text("provider").$type<OAuthProvider>().notNull(),
-    intent: text("intent").$type<OAuthIntent>().notNull(),
+    provider: text("provider").$type<LegacyOAuthProvider>().notNull(),
+    intent: text("intent").$type<LegacyOAuthIntent>().notNull(),
     redirectUri: text("redirect_uri").notNull(),
     userId: integer("user_id"),
     expiresAtUtc: integer("expires_at_utc").notNull(),

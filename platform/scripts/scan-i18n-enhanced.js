@@ -124,7 +124,6 @@ const IGNORED_BUSINESS_KEYS = new Set([
   'voice.meeting.create',
   'voice.meeting.join',
   'voice.meeting.end',
-  'system.auth.github',
   'system',
   'system.auth',
   'system.department',

@@ -2,7 +2,7 @@ import { useRef, useMemo, useCallback, useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { PageLayout } from '@/components/Responsive/index';
 import { useTranslation } from '@/hooks/useTranslation';
-import TheProfile, { type TheProfileRef, type UserWithOAuth } from './components/TheProfile';
+import TheProfile, { type CurrentUser, type TheProfileRef } from './components/TheProfile';
 import TheDetails, { type TheDetailsRef } from './components/TheDetails';
 import * as AuthApi from '@/api/admin/system/auth';
 export interface Props {
@@ -19,7 +19,7 @@ export default function Page() {
   const t = useTranslation();
   const profileRef = useRef<TheProfileRef>(null);
   const detailsRef = useRef<TheDetailsRef>(null);
-  const [currentUser, setCurrentUser] = useState<UserWithOAuth | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   // 获取当前用户信息
   const fetchCurrentUser = useCallback(async () => {

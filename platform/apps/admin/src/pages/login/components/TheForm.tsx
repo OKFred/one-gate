@@ -4,13 +4,13 @@ import {
   VisibilityOff as VisibilityOffIcon,
 } from '@mui/icons-material';
 import { useState } from 'react';
-import { loginFn, oauthLoginUrlFn, ssoLoginUrlFn } from '@/api/admin/system/auth';
+import { loginFn, ssoLoginUrlFn } from '@/api/admin/system/auth';
 import type { LoginReq } from '@/api/admin/system/type';
 import { authUtils } from '@/utils/auth';
 import { useResponsive } from '@/hooks/useResponsive';
 import { showSnackbar } from '@/components/Notification';
 import { useTranslation } from '@/hooks/useTranslation';
-import { getSsoCallbackUrl } from '@/utils/oauthCallback';
+import { getSsoCallbackUrl } from '@/utils/ssoCallback';
 
 export default function TheForm() {
   const { isMobile } = useResponsive();
@@ -48,27 +48,6 @@ export default function TheForm() {
       const loginData = response.data.data;
       const { userObj } = loginData;
       authUtils.setUserInfo(userObj);
-    } catch {
-      // Global HTTP interception presents the error.
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 处理微信登录
-  const handleWechatLogin = async () => {
-    showSnackbar({ message: t('login.wechatWIP'), type: 'info' });
-  };
-
-  const handleOAuthLogin = async (provider: 'github' | 'feishu') => {
-    try {
-      setLoading(true);
-      const response = await oauthLoginUrlFn({
-        data: { provider, redirectUri: `${window.location.origin}/oauth/callback` },
-      });
-      if (response.data.data.url) {
-        window.location.href = response.data.data.url;
-      }
     } catch {
       // Global HTTP interception presents the error.
     } finally {
@@ -155,42 +134,6 @@ export default function TheForm() {
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
           {t('login.signIn')}
-        </Button>
-
-        <Button
-          variant="outlined"
-          color="success"
-          fullWidth
-          size={isMobile ? 'large' : 'medium'}
-          sx={{ py: isMobile ? 1.5 : 1 }}
-          onClick={handleWechatLogin}
-          disabled={loading}
-        >
-          {t('login.wechatSignIn')}
-        </Button>
-
-        <Button
-          variant="outlined"
-          color="secondary"
-          fullWidth
-          size={isMobile ? 'large' : 'medium'}
-          sx={{ py: isMobile ? 1.5 : 1 }}
-          onClick={() => handleOAuthLogin('github')}
-          disabled={loading}
-        >
-          {t('github.signIn')}
-        </Button>
-
-        <Button
-          variant="outlined"
-          color="primary"
-          fullWidth
-          size={isMobile ? 'large' : 'medium'}
-          sx={{ py: isMobile ? 1.5 : 1 }}
-          onClick={() => handleOAuthLogin('feishu')}
-          disabled={loading}
-        >
-          {t('feishu.signIn')}
         </Button>
 
         <Button

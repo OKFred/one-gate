@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   assertPrincipalMatches,
   createS256PkceInput,
+  normalizeSsoConnectionValues,
   normalizeSsoIssuer,
   parseSsoIntent,
   SsoErrorCode,
+  toSsoClientConfiguration,
   validateSsoRedirectUri,
   type SsoClientConfiguration,
   type VerifiedSsoPrincipal,
@@ -31,6 +33,77 @@ const principal: VerifiedSsoPrincipal = {
 };
 
 describe("SSO domain rules", () => {
+  it("标准化持久化连接并要求 ready 状态", () => {
+    const values = normalizeSsoConnectionValues(
+      {
+        issuer: "https://sso.example.com/",
+        clientId: " hodor-client ",
+        audience: " urn:hodor ",
+        allowedTenantId: " tenant-1 ",
+        redirectUris: ["https://gate.example.com/sso/callback?intent=login"],
+      },
+      { allowInsecureLocalhost: false }
+    );
+    expect(values).toEqual({
+      issuer: "https://sso.example.com",
+      clientId: "hodor-client",
+      audience: "urn:hodor",
+      allowedTenantId: "tenant-1",
+      redirectUris: ["https://gate.example.com/sso/callback?intent=login"],
+    });
+    expect(() =>
+      toSsoClientConfiguration(
+        {
+          id: "default",
+          ...values,
+          status: "draft",
+          configVersion: 1,
+          lastTestedAtUtc: null,
+          updatedByUserId: 1,
+          createTimeUtc: 1,
+          updateTimeUtc: null,
+        },
+        { allowInsecureLocalhost: false }
+      )
+    ).toThrowError(
+      expect.objectContaining({ code: SsoErrorCode.CONFIGURATION_NOT_READY })
+    );
+  });
+
+  it("拒绝重复和不安全的持久化回调地址", () => {
+    expect(() =>
+      normalizeSsoConnectionValues(
+        {
+          issuer: "https://sso.example.com",
+          clientId: "hodor-client",
+          audience: "urn:hodor",
+          allowedTenantId: "tenant-1",
+          redirectUris: [
+            "https://gate.example.com/sso/callback",
+            "https://gate.example.com/sso/callback",
+          ],
+        },
+        { allowInsecureLocalhost: false }
+      )
+    ).toThrowError(
+      expect.objectContaining({ code: SsoErrorCode.CONFIGURATION_INVALID })
+    );
+    expect(() =>
+      normalizeSsoConnectionValues(
+        {
+          issuer: "https://sso.example.com",
+          clientId: "hodor-client",
+          audience: "urn:hodor",
+          allowedTenantId: "tenant-1",
+          redirectUris: ["http://gate.example.com/sso/callback"],
+        },
+        { allowInsecureLocalhost: true }
+      )
+    ).toThrowError(
+      expect.objectContaining({ code: SsoErrorCode.CONFIGURATION_INVALID })
+    );
+  });
+
   it("标准化 HTTPS issuer 并拒绝不安全或带查询参数的 issuer", () => {
     expect(
       normalizeSsoIssuer("https://SSO.example.com/identity/", {

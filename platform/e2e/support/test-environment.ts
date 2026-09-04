@@ -11,7 +11,7 @@ export interface HodorE2EEnvironment {
   baseUrl: string;
   allowedOrigins: readonly string[];
   expectedDeviceClientId?: string;
-  mockOAuth: boolean;
+  mockAuth: boolean;
 }
 
 /** 将部署地址归一化为不包含路径、查询或凭证的 HTTP(S) Origin。 */
@@ -57,12 +57,12 @@ export function readE2EEnvironment(): HodorE2EEnvironment {
     .map((value) => parseHttpOrigin(value, 'HODOR_E2E_ALLOWED_ORIGINS'));
   const allowedOrigins = [...new Set([baseUrl, ...configuredOrigins])];
   const expectedDeviceClientId = resolveValue(loadedEnv, 'HODOR_E2E_DEVICE_CLIENT_ID').trim();
-  const mockOAuth = resolveValue(loadedEnv, 'HODOR_E2E_MOCK_OAUTH').trim() === 'true';
+  const mockAuth = resolveValue(loadedEnv, 'HODOR_E2E_MOCK_AUTH').trim() === 'true';
 
   return {
     baseUrl,
     allowedOrigins,
-    mockOAuth,
+    mockAuth,
     ...(expectedDeviceClientId ? { expectedDeviceClientId } : {}),
   };
 }

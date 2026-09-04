@@ -1,8 +1,10 @@
 import { getEnv } from "@hodor/core/utils/env";
 import { tokenUtils } from "@hodor/core/utils/token";
 import { SsoCenter } from "../application/sso-center.js";
+import { SsoConfigurationCenter } from "../application/sso-configuration-center.js";
 import type { SsoClientConfiguration } from "../domain/sso.js";
-import { normalizeSsoIssuer } from "../domain/sso.js";
+import { createSsoClientConfiguration } from "../domain/sso.js";
+import { createDatabaseFirstSsoConfigurationResolver } from "./configuration.js";
 import {
   webCryptoSsoCipher,
   webCryptoSsoHash,
@@ -12,7 +14,10 @@ import {
   createSsoOidcProvider,
   type SsoOidcOutboundLogEvent,
 } from "./oidc-provider.js";
-import { drizzleSsoRepository } from "./repository.js";
+import {
+  drizzleSsoConfigurationRepository,
+  drizzleSsoRepository,
+} from "./repository.js";
 
 export class SsoConfigurationError extends Error {
   constructor(message: string) {
@@ -27,54 +32,11 @@ function requireEnvironmentValue(name: string): string {
   return value;
 }
 
-function parseRedirectUris(
-  raw: string,
-  allowInsecureLocalhost: boolean
-): readonly string[] {
-  const values = raw
+function parseRedirectUris(raw: string): readonly string[] {
+  return raw
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
-  if (values.length === 0) {
-    throw new SsoConfigurationError(
-      "SSO_ALLOWED_REDIRECT_URIS must contain at least one URI"
-    );
-  }
-
-  const normalized = values.map((value) => {
-    let url: URL;
-    try {
-      url = new URL(value);
-    } catch {
-      throw new SsoConfigurationError(
-        "SSO_ALLOWED_REDIRECT_URIS contains an invalid URI"
-      );
-    }
-    const isLoopback =
-      url.hostname === "localhost" ||
-      url.hostname === "127.0.0.1" ||
-      url.hostname === "[::1]";
-    const allowsDevelopmentHttp =
-      allowInsecureLocalhost && url.protocol === "http:" && isLoopback;
-    if (
-      (url.protocol !== "https:" && !allowsDevelopmentHttp) ||
-      url.username ||
-      url.password ||
-      url.hash
-    ) {
-      throw new SsoConfigurationError(
-        "SSO_ALLOWED_REDIRECT_URIS contains an unsafe URI"
-      );
-    }
-    return url.toString();
-  });
-
-  if (new Set(normalized).size !== normalized.length) {
-    throw new SsoConfigurationError(
-      "SSO_ALLOWED_REDIRECT_URIS contains duplicate URIs"
-    );
-  }
-  return normalized;
 }
 
 export function resolveSsoConfiguration(): SsoClientConfiguration {
@@ -84,22 +46,22 @@ export function resolveSsoConfiguration(): SsoClientConfiguration {
   const audience = requireEnvironmentValue("SSO_AUDIENCE");
   const tenantId = requireEnvironmentValue("SSO_ALLOWED_TENANT_ID");
   const redirectUris = parseRedirectUris(
-    requireEnvironmentValue("SSO_ALLOWED_REDIRECT_URIS"),
-    allowInsecureLocalhost
+    requireEnvironmentValue("SSO_ALLOWED_REDIRECT_URIS")
   );
-  requireEnvironmentValue("OAUTH_SENSITIVE_DATA_KEY");
 
   try {
-    return {
-      issuer: normalizeSsoIssuer(issuer, { allowInsecureLocalhost }),
-      clientId,
-      audience,
-      tenantId,
-      redirectUris,
-      allowInsecureLocalhost,
-    };
+    return createSsoClientConfiguration(
+      {
+        issuer,
+        clientId,
+        audience,
+        allowedTenantId: tenantId,
+        redirectUris,
+      },
+      { allowInsecureLocalhost }
+    );
   } catch {
-    throw new SsoConfigurationError("SSO_ISSUER is invalid or unsafe");
+    throw new SsoConfigurationError("Legacy SSO configuration is invalid");
   }
 }
 
@@ -108,12 +70,20 @@ function logOidcOutbound(event: SsoOidcOutboundLogEvent): void {
 }
 
 let center: SsoCenter | null = null;
+let configurationCenter: SsoConfigurationCenter | null = null;
+
+function allowInsecureLocalhost(): boolean {
+  return getEnv("NODE_ENV") !== "production";
+}
+
+const oidcProvider = createSsoOidcProvider({ log: logOidcOutbound });
 
 export function getSsoCenter(): SsoCenter {
   if (!center) {
+    const policy = { allowInsecureLocalhost: allowInsecureLocalhost() };
     center = new SsoCenter({
       repository: drizzleSsoRepository,
-      provider: createSsoOidcProvider({ log: logOidcOutbound }),
+      provider: oidcProvider,
       clock: { now: () => Date.now() },
       idGenerator: { nextId: () => crypto.randomUUID() },
       random: webCryptoSsoRandom,
@@ -126,8 +96,24 @@ export function getSsoCenter(): SsoCenter {
             username: user.username,
           }),
       },
-      configuration: resolveSsoConfiguration,
+      configuration: createDatabaseFirstSsoConfigurationResolver({
+        repository: drizzleSsoConfigurationRepository,
+        policy,
+        legacyConfiguration: resolveSsoConfiguration,
+      }),
     });
   }
   return center;
+}
+
+export function getSsoConfigurationCenter(): SsoConfigurationCenter {
+  if (!configurationCenter) {
+    configurationCenter = new SsoConfigurationCenter({
+      repository: drizzleSsoConfigurationRepository,
+      probe: oidcProvider,
+      clock: { now: () => Date.now() },
+      policy: { allowInsecureLocalhost: allowInsecureLocalhost() },
+    });
+  }
+  return configurationCenter;
 }

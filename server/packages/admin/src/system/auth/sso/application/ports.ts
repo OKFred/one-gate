@@ -3,6 +3,8 @@ import type {
   S256PkceInput,
   SsoBinding,
   SsoClientConfiguration,
+  SsoConnection,
+  SsoConnectionValues,
   SsoIntent,
   SsoTransaction,
   VerifiedSsoPrincipal,
@@ -46,6 +48,26 @@ export interface SsoRepositoryPort {
   findLocalUser(userId: number): Promise<LocalSsoUser | null>;
 }
 
+export interface SsoConfigurationRepositoryPort {
+  findConnection(): Promise<SsoConnection | null>;
+  saveDraft(input: {
+    values: SsoConnectionValues;
+    expectedVersion: number;
+    updatedByUserId: number;
+    nowUtc: number;
+  }): Promise<SsoConnection | null>;
+  markReady(input: {
+    expectedVersion: number;
+    updatedByUserId: number;
+    testedAtUtc: number;
+  }): Promise<SsoConnection | null>;
+  disable(input: {
+    expectedVersion: number;
+    updatedByUserId: number;
+    nowUtc: number;
+  }): Promise<SsoConnection | null>;
+}
+
 export interface SsoOidcProviderPort {
   createAuthorizationUrl(input: {
     requestId: string;
@@ -66,6 +88,13 @@ export interface SsoOidcProviderPort {
     codeVerifier: string;
     expectedNonceDigest: string;
   }): Promise<VerifiedSsoPrincipal>;
+}
+
+export interface SsoConfigurationProbePort {
+  testConfiguration(input: {
+    requestId: string;
+    configuration: SsoClientConfiguration;
+  }): Promise<void>;
 }
 
 export interface SsoClockPort {
@@ -105,7 +134,7 @@ export type SsoCenterDependencies = {
   hash: SsoHashPort;
   cipher: SsoCipherPort;
   tokenIssuer: SsoTokenIssuerPort;
-  configuration: () => SsoClientConfiguration;
+  configuration: () => Promise<SsoClientConfiguration>;
 };
 
 export type CreateSsoAuthorizationInput = {

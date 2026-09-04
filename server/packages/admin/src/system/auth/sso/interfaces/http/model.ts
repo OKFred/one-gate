@@ -94,3 +94,83 @@ export const SsoBindingSummaryRes = {
   ] as const,
   additionalProperties: false,
 } as const satisfies JSONSchema;
+
+const SsoConnectionStatusVO = {
+  type: ["string", "null"],
+  enum: ["draft", "ready", "disabled", null],
+  description: "SSO 连接状态",
+} as const satisfies JSONSchema;
+
+export const SsoConnectionSummaryRes = {
+  type: "object",
+  properties: {
+    configured: { type: "boolean" },
+    status: SsoConnectionStatusVO,
+    issuer: { type: ["string", "null"] },
+    clientId: { type: ["string", "null"] },
+    audience: { type: ["string", "null"] },
+    allowedTenantId: { type: ["string", "null"] },
+    redirectUris: {
+      type: "array",
+      items: { type: "string", format: "uri", maxLength: 2048 },
+      maxItems: 10,
+    },
+    configVersion: { type: "integer", minimum: 0 },
+    lastTestedAtUtc: { type: ["number", "null"] },
+    updateTimeUtc: { type: ["number", "null"] },
+  },
+  required: [
+    "configured",
+    "status",
+    "issuer",
+    "clientId",
+    "audience",
+    "allowedTenantId",
+    "redirectUris",
+    "configVersion",
+    "lastTestedAtUtc",
+    "updateTimeUtc",
+  ] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+export const SsoConnectionSaveReq = {
+  type: "object",
+  properties: {
+    issuer: {
+      type: "string",
+      format: "uri",
+      minLength: 1,
+      maxLength: 2048,
+    },
+    clientId: { type: "string", minLength: 1, maxLength: 512 },
+    audience: { type: "string", minLength: 1, maxLength: 512 },
+    allowedTenantId: { type: "string", minLength: 1, maxLength: 512 },
+    redirectUris: {
+      type: "array",
+      items: { type: "string", format: "uri", maxLength: 2048 },
+      minItems: 1,
+      maxItems: 10,
+      uniqueItems: true,
+    },
+    expectedVersion: { type: "integer", minimum: 0 },
+  },
+  required: [
+    "issuer",
+    "clientId",
+    "audience",
+    "allowedTenantId",
+    "redirectUris",
+    "expectedVersion",
+  ] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+export const SsoConnectionVersionReq = {
+  type: "object",
+  properties: {
+    expectedVersion: { type: "integer", minimum: 1 },
+  },
+  required: ["expectedVersion"] as const,
+  additionalProperties: false,
+} as const satisfies JSONSchema;
