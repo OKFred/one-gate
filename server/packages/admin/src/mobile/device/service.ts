@@ -2,6 +2,7 @@ import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 
 import {
   bodyAdapter,
+  bodyUserContextAdapter,
   bodyUserAdapter,
   rawAdapter,
 } from "@hodor/core/middleware/encapsulation/adapter";
@@ -43,6 +44,7 @@ import { NetworkRoutingStatusReportVO } from "../network-routing/model.js";
 import { DeviceApplicationError } from "./application/error.js";
 import { adaptDeviceHttpError } from "./interfaces/http/error.js";
 import { reportTokenFromContext } from "./interfaces/http/report-token.js";
+import { scheduleDeviceDetailAuthorizationShadow } from "./interfaces/http/authorization-shadow.js";
 import {
   CustomMetadataValueVO,
   DEVICE_EVENT_TYPES,
@@ -148,9 +150,31 @@ const getApi = {
     additionalProperties: false,
   } as const,
   pathInfo: { path: "/get", method: "post", summary: "获取设备详情" },
-  adapter: bodyAdapter,
-  service: (params: FromSchema<typeof getReq>) =>
-    adaptDeviceHttpError(() => getDevice(params.id)),
+  adapter: bodyUserContextAdapter,
+  service: (
+    params: FromSchema<typeof getReq>,
+    userObj: UserObj,
+    context: Context
+  ) =>
+    adaptDeviceHttpError(async () => {
+      const device = await getDevice(params.id);
+      void scheduleDeviceDetailAuthorizationShadow(
+        {
+          deviceId: params.id,
+          isEnabled: device.isEnabled,
+          requestId: context.get("requestId"),
+          actor: {
+            userId: userObj.userId,
+            roleIds: userObj.roleIds,
+            isSuperAdmin: userObj.isSuperAdmin,
+          },
+        },
+        {
+          waitUntil: (promise) => context.executionCtx.waitUntil(promise),
+        }
+      );
+      return device;
+    }),
   permission: { action: "read" },
 } satisfies API;
 const deleteApi = {
