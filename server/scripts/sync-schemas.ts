@@ -93,7 +93,8 @@ async function main() {
 
     const BATCH_SIZE = 30;
     const totalBatches = Math.ceil(sqlStatements.length / BATCH_SIZE);
-    const { execSync } = await import("node:child_process");
+    const { execFileSync } = await import("node:child_process");
+    const pnpmExecutable = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
     for (let i = 0; i < totalBatches; i++) {
       const batchSqls = sqlStatements.slice(
@@ -110,8 +111,18 @@ async function main() {
         console.log(
           `🚀 [批次 ${i + 1}/${totalBatches}] 正在推送 ${batchSqls.length} 条 Schema 语句...`
         );
-        execSync(
-          `npx wrangler d1 execute hodor_db ${targetFlag} --file=${tempSqlFile} --yes`,
+        execFileSync(
+          pnpmExecutable,
+          [
+            "exec",
+            "wrangler",
+            "d1",
+            "execute",
+            "hodor_db",
+            targetFlag,
+            `--file=${tempSqlFile}`,
+            "--yes",
+          ],
           {
             stdio: "inherit",
             cwd: path.resolve(process.cwd(), "apps/server"),
@@ -139,7 +150,7 @@ async function main() {
     console.log(`\n💡 [导入指引] 您可以直接通过以下命令完成导入：`);
     console.log(`\n  - 本地 D1 数据库：`);
     console.log(
-      "    npx wrangler d1 execute hodor_db --local --file=./schemas.sql --yes"
+      "    pnpm --filter @hodor/server exec wrangler d1 execute hodor_db --local --file=./schemas.sql --yes"
     );
     console.log(
       `\n  - 线上生产 D1 数据库 (若因大小限制报错，请带上 --remote 参数运行本脚本进行自动分批推送)：`
