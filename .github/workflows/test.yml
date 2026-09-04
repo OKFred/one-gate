@@ -51,7 +51,6 @@ jobs:
           TEST_MAIL_PORT: ${{ secrets.TEST_MAIL_PORT }}
           TEST_MAIL_RECEIVER: ${{ secrets.TEST_MAIL_RECEIVER }}
           HODOR_AUTH_MASTER_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-          OAUTH_SENSITIVE_DATA_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
           JWT_SECRET: "test-secret-key-for-ci-runs"
           BASE_API_PATH: "/api/v1"
           LOCALE: "zh-CN"
@@ -114,15 +113,9 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           HODOR_AUTH_MASTER_KEY: ${{ secrets.HODOR_AUTH_MASTER_KEY }}
-          OAUTH_SENSITIVE_DATA_KEY: ${{ secrets.OAUTH_SENSITIVE_DATA_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
           MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
-          SSO_ISSUER: ${{ secrets.SSO_ISSUER }}
-          SSO_CLIENT_ID: ${{ secrets.SSO_CLIENT_ID }}
-          SSO_AUDIENCE: ${{ secrets.SSO_AUDIENCE }}
-          SSO_ALLOWED_TENANT_ID: ${{ secrets.SSO_ALLOWED_TENANT_ID }}
-          SSO_ALLOWED_REDIRECT_URIS: ${{ secrets.SSO_ALLOWED_REDIRECT_URIS }}
           HODOR_TOTP_GATE_SECRET: ${{ secrets.HODOR_TOTP_GATE_SECRET }}
           HODOR_ALLOWED_WEB_ORIGINS: ${{ secrets.HODOR_ALLOWED_WEB_ORIGINS }}
 
@@ -159,28 +152,16 @@ jobs:
           command: deploy
           secrets: |
             HODOR_AUTH_MASTER_KEY
-            OAUTH_SENSITIVE_DATA_KEY
             JWT_SECRET
             MOBILE_SENSITIVE_DATA_KEY
             MOBILE_RELEASE_PUBLISH_TOKEN
-            SSO_ISSUER
-            SSO_CLIENT_ID
-            SSO_AUDIENCE
-            SSO_ALLOWED_TENANT_ID
-            SSO_ALLOWED_REDIRECT_URIS
             HODOR_TOTP_GATE_SECRET
             HODOR_ALLOWED_WEB_ORIGINS
         env:
           HODOR_AUTH_MASTER_KEY: ${{ secrets.HODOR_AUTH_MASTER_KEY }}
-          OAUTH_SENSITIVE_DATA_KEY: ${{ secrets.OAUTH_SENSITIVE_DATA_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
           MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
-          SSO_ISSUER: ${{ secrets.SSO_ISSUER }}
-          SSO_CLIENT_ID: ${{ secrets.SSO_CLIENT_ID }}
-          SSO_AUDIENCE: ${{ secrets.SSO_AUDIENCE }}
-          SSO_ALLOWED_TENANT_ID: ${{ secrets.SSO_ALLOWED_TENANT_ID }}
-          SSO_ALLOWED_REDIRECT_URIS: ${{ secrets.SSO_ALLOWED_REDIRECT_URIS }}
           HODOR_TOTP_GATE_SECRET: ${{ secrets.HODOR_TOTP_GATE_SECRET }}
           HODOR_ALLOWED_WEB_ORIGINS: ${{ secrets.HODOR_ALLOWED_WEB_ORIGINS }}
 
