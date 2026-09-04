@@ -130,6 +130,30 @@ describe("D1 deployment contract", () => {
     expect(ssoConnectionMigration).toContain("config_version");
     expect(ssoConnectionMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
     expect(ssoConnectionMigration).not.toMatch(/\bREFERENCES\b/i);
+
+    const authorizationConnectionMigration = readRepositoryFile(
+      "../d1-migrations/0011_authorization_connection_configuration.sql"
+    );
+    expect(authorizationConnectionMigration).toContain(
+      "system_authorization_connection"
+    );
+    expect(authorizationConnectionMigration).toContain(
+      "encrypted_client_secret"
+    );
+    expect(authorizationConnectionMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(authorizationConnectionMigration).not.toMatch(/\bREFERENCES\b/i);
+
+    const authorizationAccessMigration = readRepositoryFile(
+      "../d1-migrations/0012_authorization_access_credentials.sql"
+    );
+    expect(authorizationAccessMigration).toContain(
+      "cloudflare_access_client_id"
+    );
+    expect(authorizationAccessMigration).toContain(
+      "encrypted_cloudflare_access_client_secret"
+    );
+    expect(authorizationAccessMigration).not.toMatch(/\bFOREIGN\s+KEY\b/i);
+    expect(authorizationAccessMigration).not.toMatch(/\bREFERENCES\b/i);
   });
 
   it("checks the critical production tables before Worker deployment", () => {
@@ -146,6 +170,7 @@ describe("D1 deployment contract", () => {
     );
     expect(contract).toContain("FROM `system_user_oauth`");
     expect(contract).toContain("`encrypted_access_token`");
+    expect(contract).toContain("`encrypted_cloudflare_access_client_secret`");
     expect(contract).toContain(
       "INDEXED BY `system_user_oauth_provider_identity_unique`"
     );
@@ -170,6 +195,8 @@ describe("D1 deployment contract", () => {
     );
     expect(contract).toContain("FROM `system_sso_connection`");
     expect(contract).toContain("`redirect_uris_json`");
+    expect(contract).toContain("FROM `system_authorization_connection`");
+    expect(contract).toContain("`encrypted_client_secret`");
     expect(contract).toContain("FROM `admin_mobile_device_ops_session`");
     expect(contract).toContain("FROM `admin_mobile_device_ops_audit`");
   });
