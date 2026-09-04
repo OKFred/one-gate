@@ -12,7 +12,6 @@ export const auth = {
   'login.username': '用户名',
   'login.password': '密码',
   'login.signIn': '登录',
-  'login.forgotPassword': '忘记密码？',
   'login.title': 'Open The Gate',
   'login.subtitle': '通用企业级权限管理后台',
   'auth.errorCode': '错误码',

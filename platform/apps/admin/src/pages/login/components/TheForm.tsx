@@ -117,12 +117,6 @@ export default function TheForm() {
           }}
         />
 
-        <Box sx={{ textAlign: 'right' }}>
-          <Button variant="text" color="primary" size="small">
-            {t('login.forgotPassword')}
-          </Button>
-        </Box>
-
         <Button
           variant="contained"
           color="primary"
