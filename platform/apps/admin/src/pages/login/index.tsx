@@ -1,5 +1,4 @@
 import { Box, Container } from '@mui/material';
-import TheFooter from './components/TheFooter';
 import TheForm from './components/TheForm';
 import TheHeader from './components/TheHeader';
 
@@ -28,7 +27,6 @@ export default function Login() {
         >
           <TheHeader />
           <TheForm />
-          <TheFooter />
         </Box>
       </Box>
     </Container>

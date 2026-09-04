@@ -7,7 +7,6 @@ export const auth = {
   'login.username': 'Username',
   'login.password': 'Password',
   'login.signIn': 'Sign in',
-  'login.forgotPassword': 'Forgot password?',
   'login.title': 'Open The Gate',
   'login.subtitle': 'General Enterprise Permission Management Platform',
   'auth.errorCode': 'Error code',

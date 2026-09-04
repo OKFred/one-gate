@@ -30,6 +30,8 @@ test('login page only exposes password and Identity Center', async ({ page }) =>
   await expect(page.getByRole('button', { name: /GitHub/i })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /飞书|Feishu/i })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /微信|WeChat/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /忘记密码|Forgot password/i })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /注册|Sign up/i })).toHaveCount(0);
 
   await page.getByRole('button', { name: /统一身份中心|Identity Center/i }).click();
   await expect(page).toHaveURL(`${environment.baseUrl}/mock-identity-center`);
