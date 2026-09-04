@@ -15,7 +15,6 @@ import {
 import {
   getSsoCenter,
   getSsoConfigurationCenter,
-  SsoConfigurationError,
 } from "../../infrastructure/container.js";
 import { SsoOidcProviderError } from "../../infrastructure/oidc-provider.js";
 import {
@@ -56,13 +55,6 @@ function clientInfoFrom(context: Context): { ip: string; userAgent: string } {
 }
 
 export function mapSsoHttpError(error: unknown): never {
-  if (error instanceof SsoConfigurationError) {
-    return throwSsoHttpError(
-      503,
-      "SSO 登录暂不可用，请联系管理员",
-      "SSO_CONFIGURATION_ERROR"
-    );
-  }
   if (error instanceof SsoOidcProviderError) {
     return throwSsoHttpError(
       error.code === "INVALID_CONFIGURATION" ? 503 : 502,

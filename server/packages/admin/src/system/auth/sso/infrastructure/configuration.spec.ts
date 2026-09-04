@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SsoConfigurationRepositoryPort } from "../application/ports.js";
 import type { SsoConnection } from "../domain/sso.js";
-import { createDatabaseFirstSsoConfigurationResolver } from "./configuration.js";
+import { createDatabaseSsoConfigurationResolver } from "./configuration.js";
 
 const readyConnection: SsoConnection = {
   id: "default",
@@ -29,13 +29,11 @@ function repositoryWith(
   };
 }
 
-describe("database-first SSO configuration", () => {
-  it("uses a ready database connection without reading legacy values", async () => {
-    const legacyConfiguration = vi.fn();
-    const resolve = createDatabaseFirstSsoConfigurationResolver({
+describe("database-backed SSO configuration", () => {
+  it("uses a ready database connection", async () => {
+    const resolve = createDatabaseSsoConfigurationResolver({
       repository: repositoryWith(readyConnection),
       policy: { allowInsecureLocalhost: false },
-      legacyConfiguration,
     });
 
     await expect(resolve()).resolves.toMatchObject({
@@ -43,44 +41,30 @@ describe("database-first SSO configuration", () => {
       clientId: "database-client",
       tenantId: "database-tenant",
     });
-    expect(legacyConfiguration).not.toHaveBeenCalled();
   });
 
-  it("falls back only when the database has no connection row", async () => {
-    const legacyConfiguration = vi.fn().mockReturnValue({
-      issuer: "https://legacy-sso.example.com",
-      clientId: "legacy-client",
-      audience: "urn:legacy",
-      tenantId: "legacy-tenant",
-      redirectUris: ["https://legacy.example.com/sso/callback"],
-      allowInsecureLocalhost: false,
-    });
-    const resolve = createDatabaseFirstSsoConfigurationResolver({
+  it("fails closed when the database has no connection row", async () => {
+    const resolve = createDatabaseSsoConfigurationResolver({
       repository: repositoryWith(null),
       policy: { allowInsecureLocalhost: false },
-      legacyConfiguration,
     });
 
-    await expect(resolve()).resolves.toMatchObject({
-      issuer: "https://legacy-sso.example.com",
+    await expect(resolve()).rejects.toMatchObject({
+      code: "CONFIGURATION_NOT_READY",
     });
-    expect(legacyConfiguration).toHaveBeenCalledOnce();
   });
 
   it.each(["draft", "disabled"] as const)(
-    "fails closed for a %s row instead of using legacy values",
+    "fails closed for a %s row",
     async (status) => {
-      const legacyConfiguration = vi.fn();
-      const resolve = createDatabaseFirstSsoConfigurationResolver({
+      const resolve = createDatabaseSsoConfigurationResolver({
         repository: repositoryWith({ ...readyConnection, status }),
         policy: { allowInsecureLocalhost: false },
-        legacyConfiguration,
       });
 
       await expect(resolve()).rejects.toMatchObject({
         code: "CONFIGURATION_NOT_READY",
       });
-      expect(legacyConfiguration).not.toHaveBeenCalled();
     }
   );
 });

@@ -19,7 +19,6 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock("../../infrastructure/container.js", () => ({
-  SsoConfigurationError: class SsoConfigurationError extends Error {},
   getSsoCenter: () => mocks,
   getSsoConfigurationCenter: () => ({
     get: mocks.configurationGet,
@@ -159,6 +158,23 @@ describe("SSO HTTP interface", () => {
       expect(error.message).toBe("账号未绑定，请联系管理员");
       expect(error.cause).toEqual({
         error: { code: SsoErrorCode.ACCOUNT_NOT_BOUND },
+      });
+    }
+  });
+
+  it("数据库 SSO 配置缺失时映射为 503 安全错误", () => {
+    try {
+      mapSsoHttpError(
+        new SsoError(SsoErrorCode.CONFIGURATION_NOT_READY, "SSO 连接尚未配置")
+      );
+      throw new Error("expected mapSsoHttpError to throw");
+    } catch (error) {
+      expect(error).toBeInstanceOf(HTTPException);
+      if (!(error instanceof HTTPException)) throw error;
+      expect(error.status).toBe(503);
+      expect(error.message).toBe("SSO 登录暂不可用，请联系管理员");
+      expect(error.cause).toEqual({
+        error: { code: "SSO_CONFIGURATION_ERROR" },
       });
     }
   });

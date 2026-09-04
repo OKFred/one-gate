@@ -41,9 +41,7 @@ function decodeSensitiveKey(value: string): Uint8Array {
 }
 
 async function importSensitiveKey(): Promise<CryptoKey> {
-  const raw =
-    getEnv("HODOR_AUTH_MASTER_KEY")?.trim() ||
-    getEnv("OAUTH_SENSITIVE_DATA_KEY")?.trim();
+  const raw = getEnv("HODOR_AUTH_MASTER_KEY")?.trim();
   if (!raw) throw new Error("HODOR_AUTH_MASTER_KEY is required");
   const keyBytes = decodeSensitiveKey(raw);
   if (keyBytes.byteLength !== 32) {

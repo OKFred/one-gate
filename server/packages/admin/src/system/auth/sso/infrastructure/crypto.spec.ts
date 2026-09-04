@@ -10,7 +10,6 @@ describe("SSO Web Crypto infrastructure", () => {
   beforeEach(() => {
     setEnv({
       HODOR_AUTH_MASTER_KEY: Buffer.alloc(32, 11).toString("base64"),
-      OAUTH_SENSITIVE_DATA_KEY: Buffer.alloc(32, 11).toString("base64"),
     });
   });
 
@@ -59,14 +58,13 @@ describe("SSO Web Crypto infrastructure", () => {
     await expect(webCryptoSsoCipher.decrypt(tampered, "aad")).rejects.toThrow();
   });
 
-  it("迁移期仅在新根密钥缺失时回退旧名称", async () => {
+  it("新根密钥缺失时失败关闭且不读取旧名称", async () => {
     setEnv({
       HODOR_AUTH_MASTER_KEY: "",
       OAUTH_SENSITIVE_DATA_KEY: Buffer.alloc(32, 12).toString("base64"),
     });
-    const encrypted = await webCryptoSsoCipher.encrypt("verifier", "aad");
-    await expect(webCryptoSsoCipher.decrypt(encrypted, "aad")).resolves.toBe(
-      "verifier"
+    await expect(webCryptoSsoCipher.encrypt("verifier", "aad")).rejects.toThrow(
+      "HODOR_AUTH_MASTER_KEY is required"
     );
 
     setEnv({
