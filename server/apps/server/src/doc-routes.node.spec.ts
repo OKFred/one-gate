@@ -88,6 +88,39 @@ describe("OpenAPI documentation routes", () => {
     );
   });
 
+  it("returns the shared JSON 404 envelope for retired direct-provider routes", async () => {
+    setEnv({ BASE_API_PATH: "/api/v1", NODE_ENV: "development" });
+    const app = createTestApp();
+
+    await Promise.all(
+      [
+        "/api/v1/admin/system/auth/oauth/login/url",
+        "/api/v1/admin/system/auth/oauth/login/callback",
+        "/api/v1/admin/system/auth/oauth/account/url",
+        "/api/v1/admin/system/auth/oauth/account/callback",
+        "/api/v1/admin/system/auth/oauth/binding/unbind",
+        "/api/v1/admin/system/auth/oauth/binding/profile",
+        "/api/v1/admin/system/auth/wechat",
+      ].map(async (path) => {
+        const response = await app.request(path, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: "{}",
+        });
+        expect(response.status).toBe(404);
+        expect(response.headers.get("content-type")).toContain(
+          "application/json"
+        );
+        const payload = (await response.json()) as {
+          readonly ok?: boolean;
+          readonly data?: Readonly<Record<string, unknown>>;
+        };
+        expect(payload.ok).toBe(false);
+        expect(payload.data).toEqual({});
+      })
+    );
+  });
+
   it("forces Wrangler local development to use the development environment", () => {
     const packageJson = JSON.parse(
       readFileSync(new URL("../package.json", import.meta.url), "utf8")

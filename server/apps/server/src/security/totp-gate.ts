@@ -41,6 +41,7 @@ export function registerTotpGateMiddleware(
     const classification = classifyAuthenticationRoute(apiPath);
     if (
       classification === "primaryAuthAnonymous" ||
+      classification === "retiredAuthenticationRoute" ||
       classification === "totpGateAuthenticatedControl" ||
       classification === "totpGateAnonymousControl" ||
       classification === "machineCredentialBypass" ||
