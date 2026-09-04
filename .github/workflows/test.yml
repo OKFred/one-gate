@@ -207,30 +207,24 @@ jobs:
 
       # ─── 步骤 2a: 部署主系统 Admin (gate) ───
       - name: Deploy Admin Pages
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "server/apps/server"
-          wranglerVersion: "4.100.0"
-          command: pages deploy ../../../platform/apps/admin/dist --project-name=gate
+        run: pnpm exec wrangler pages deploy ../../../platform/apps/admin/dist --project-name=gate
+        working-directory: ./server/apps/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       # ─── 步骤 2b: 部署企业系统 Enterprise (gate-enterprise) ───
       - name: Deploy Enterprise Pages
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "server/apps/server"
-          wranglerVersion: "4.100.0"
-          command: pages deploy ../../../platform/apps/enterprise/dist --project-name=gate-enterprise --branch=dev # 强制指定为 production 分支
+        run: pnpm exec wrangler pages deploy ../../../platform/apps/enterprise/dist --project-name=gate-enterprise --branch=dev
+        working-directory: ./server/apps/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       # ─── 步骤 2c: 部署个人系统 Personal (gate-personal) ───
       - name: Deploy Personal Pages
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "server/apps/server"
-          wranglerVersion: "4.100.0"
-          command: pages deploy ../../../platform/apps/personal/dist --project-name=gate-personal --branch=dev # 强制指定为 production 分支
+        run: pnpm exec wrangler pages deploy ../../../platform/apps/personal/dist --project-name=gate-personal --branch=dev
+        working-directory: ./server/apps/server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
