@@ -12,7 +12,10 @@ import {
   HodorAuthorizationErrorCode,
   validateAuthorizationClientSecret,
 } from "../domain/authorization.js";
-import type { AuthorizationCenterDependencies } from "./ports.js";
+import type {
+  AuthorizationCenterDependencies,
+  AuthorizationShadowObservation,
+} from "./ports.js";
 
 const CLIENT_SECRET_AAD =
   "system_authorization_connection:default:client_secret:v1";
@@ -170,6 +173,48 @@ export class AuthorizationCenter {
     });
   }
 
+  /**
+   * Best-effort policy comparison used during migrations. Every failure is
+   * converted into an unavailable observation so the protected business path
+   * keeps its existing RBAC result.
+   */
+  async observeShadowDecision(input: {
+    readonly decision: AuthorizationDecisionInput;
+    readonly actor: HodorAuthorizationActor;
+    readonly requestId: string;
+    readonly rbacAllowed: boolean;
+  }): Promise<AuthorizationShadowObservation> {
+    const startedAt = this.dependencies.clock.now();
+    let observation: AuthorizationShadowObservation;
+    try {
+      const result = await this.checkPilotDecision(input);
+      observation = {
+        requestId: input.requestId,
+        rbacAllowed: input.rbacAllowed,
+        abacAllowed: result.data.allowed,
+        comparison:
+          input.rbacAllowed === result.data.allowed ? "match" : "mismatch",
+        outcome: "evaluated",
+        decisionId: result.data.decisionId,
+        policyRevision: result.data.policyRevision,
+        durationMs: Math.max(0, this.dependencies.clock.now() - startedAt),
+      };
+    } catch {
+      observation = {
+        requestId: input.requestId,
+        rbacAllowed: input.rbacAllowed,
+        abacAllowed: null,
+        comparison: "unavailable",
+        outcome: "unavailable",
+        decisionId: null,
+        policyRevision: null,
+        durationMs: Math.max(0, this.dependencies.clock.now() - startedAt),
+      };
+    }
+    await this.recordShadowObservation(observation);
+    return observation;
+  }
+
   private async requireConnection(
     expectedVersion: number,
     expectedStatus?: AuthorizationConnection["status"]
@@ -250,5 +295,15 @@ export class AuthorizationCenter {
       HodorAuthorizationErrorCode.CONFIGURATION_CONFLICT,
       "Authorization 配置版本或状态已变化"
     );
+  }
+
+  private async recordShadowObservation(
+    observation: AuthorizationShadowObservation
+  ): Promise<void> {
+    try {
+      await this.dependencies.shadowLog.record(observation);
+    } catch {
+      // Shadow logging must never affect the protected business operation.
+    }
   }
 }
