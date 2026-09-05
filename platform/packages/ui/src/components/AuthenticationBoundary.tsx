@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNo
 import { Box, CircularProgress } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { totpGateStatusFn } from '@/api/admin/system/auth';
+import { totpGateLogoutFn, totpGateStatusFn } from '@/api/admin/system/auth';
 import { TotpGateForm } from '@/components/TotpGateForm';
 import {
   AUTH_CHANGED_EVENT,
@@ -11,6 +11,7 @@ import {
   type UserInfo,
 } from '@/utils/auth';
 import {
+  clearPrimaryAuthReturnTarget,
   completePrimaryAuthReturn,
   readTransferredToken,
   rememberPrimaryAuthReturnTarget,
@@ -141,6 +142,23 @@ export function AuthenticationBoundary({
     if (phase === 'TOTP_REQUIRED' && scope !== 'admin') redirectToAdmin();
   }, [phase, redirectToAdmin, scope]);
 
+  const logout = async () => {
+    try {
+      await totpGateLogoutFn({ data: {}, timeout: 5_000 });
+    } catch {
+      // Clear local auth even if the cookie cleanup service is unavailable.
+    }
+    clearPrimaryAuthReturnTarget();
+    const loginUrl = new URL(window.location.href);
+    loginUrl.search = '';
+    loginUrl.hash = '/login';
+    window.history.replaceState(window.history.state, '', loginUrl);
+    // logout emits synchronously: it must not re-enter the abandoned SSO callback.
+    pathnameRef.current = '/login';
+    navigateRef.current('/login', { replace: true });
+    authUtils.logout();
+  };
+
   if (phase === 'CHECKING') return <LoadingScreen />;
   if (phase === 'PRIMARY_AUTH_CALLBACK') return <>{renderPrimaryAuthCallback()}</>;
   if (phase === 'PRIMARY_AUTH_REQUIRED') return <>{renderPrimaryAuth()}</>;
@@ -148,6 +166,7 @@ export function AuthenticationBoundary({
     if (scope !== 'admin') return <LoadingScreen />;
     return (
       <TotpGateForm
+        onLogout={logout}
         onVerified={() => {
           if (isAuthenticationCallback(location.pathname)) {
             setPhase('READY');

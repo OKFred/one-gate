@@ -7,26 +7,39 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 interface TotpGateFormProps {
   readonly onVerified: () => void;
+  readonly onLogout: () => Promise<void>;
 }
 
-export function TotpGateForm({ onVerified }: TotpGateFormProps) {
+export function TotpGateForm({ onVerified, onLogout }: TotpGateFormProps) {
   const t = useTranslation();
   const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'verify' | 'logout' | null>(null);
+  const loading = pendingAction !== null;
 
   const verify = async () => {
+    if (loading) return;
     if (!/^\d{6}$/u.test(code)) {
       showSnackbar({ message: t('totpGate.sixDigitRequired'), type: 'error' });
       return;
     }
-    setLoading(true);
+    setPendingAction('verify');
     try {
       const response = await totpGateVerifyFn({ data: { code } });
       if (response.data.data.verified) onVerified();
     } catch {
       setCode('');
     } finally {
-      setLoading(false);
+      setPendingAction(null);
+    }
+  };
+
+  const logout = async () => {
+    if (loading) return;
+    setPendingAction('logout');
+    try {
+      await onLogout();
+    } finally {
+      setPendingAction(null);
     }
   };
 
@@ -67,10 +80,19 @@ export function TotpGateForm({ onVerified }: TotpGateFormProps) {
             variant="contained"
             size="large"
             disabled={loading || code.length !== 6}
-            startIcon={loading ? <CircularProgress size={18} /> : undefined}
+            startIcon={pendingAction === 'verify' ? <CircularProgress size={18} /> : undefined}
             onClick={() => void verify()}
           >
             {t('totpGate.verify')}
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            disabled={loading}
+            startIcon={pendingAction === 'logout' ? <CircularProgress size={18} /> : undefined}
+            onClick={() => void logout()}
+          >
+            {t('topbar.logout')}
           </Button>
         </Stack>
       </Paper>
