@@ -16,6 +16,106 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+for (const logoutOutcome of ['success', 'failure'] as const) {
+  test(`TOTP gate can log out without a code when cookie cleanup ${logoutOutcome}`, async ({
+    page,
+    context,
+  }) => {
+    let logoutRequests = 0;
+    let protectedRequests = 0;
+    await page.addInitScript(() => {
+      if (sessionStorage.getItem('logout-fixture-created')) return;
+      sessionStorage.setItem('logout-fixture-created', 'true');
+      sessionStorage.setItem('hodor:primary-auth-return-target', `${location.origin}/enterprise/`);
+      localStorage.setItem(
+        'userInfo',
+        JSON.stringify({ id: 46, username: 'gate_user', langCode: 'zh-CN', token: 'gate-token' }),
+      );
+    });
+    await context.addCookies([
+      { name: 'test-gate-cookie', value: 'old-session', url: environment.baseUrl },
+    ]);
+    await page.route('**/api/v1/admin/system/auth/gate/status', (route) =>
+      route.fulfill(fulfillOk({ verified: false, expiresAtUtc: null })),
+    );
+    await page.route('**/api/v1/admin/system/auth/gate/logout', async (route) => {
+      logoutRequests += 1;
+      expect(route.request().postDataJSON()).toEqual({});
+      expect(route.request().headers().authorization).toBe('Bearer gate-token');
+      if (logoutOutcome === 'failure') {
+        await route.fulfill({ status: 503, ...fulfillOk(null) });
+      } else {
+        await route.fulfill({
+          ...fulfillOk({ verified: false, expiresAtUtc: null }),
+          headers: { 'set-cookie': 'test-gate-cookie=; Max-Age=0; Path=/' },
+        });
+      }
+    });
+    await page.route(
+      /\/api\/v1\/admin\/system\/(menu\/tree|auth\/getButtonPermission|auth\/sso\/account\/callback)$/,
+      async (route) => {
+        protectedRequests += 1;
+        await route.fulfill(fulfillOk([]));
+      },
+    );
+
+    await page.goto('/#/sso/callback?code=abandoned-code&state=abandoned-state&intent=bind');
+    await expect(
+      page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: /退出登录|Log out/i }).click();
+    await expect(page).toHaveURL(`${environment.baseUrl}/#/login`);
+    await expect(page.getByLabel(/用户名|Username/i)).toBeVisible();
+    expect(logoutRequests).toBe(1);
+    expect(protectedRequests).toBe(0);
+    expect(await page.evaluate(() => localStorage.getItem('userInfo'))).toBeNull();
+    expect(
+      await page.evaluate(() => sessionStorage.getItem('hodor:primary-auth-return-target')),
+    ).toBeNull();
+    if (logoutOutcome === 'success') {
+      expect((await context.cookies()).some((cookie) => cookie.name === 'test-gate-cookie')).toBe(
+        false,
+      );
+    }
+    await page.reload();
+    await expect(page.getByLabel(/用户名|Username/i)).toBeVisible();
+    expect(protectedRequests).toBe(0);
+  });
+}
+
+test('TOTP logout discards a transferred token and prevents verification while signing out', async ({
+  page,
+}) => {
+  let verifyRequests = 0;
+  let releaseLogout: (() => void) | undefined;
+  const logoutPending = new Promise<void>((resolve) => {
+    releaseLogout = resolve;
+  });
+  await page.route('**/api/v1/admin/system/auth/gate/status', (route) =>
+    route.fulfill(fulfillOk({ verified: false, expiresAtUtc: null })),
+  );
+  await page.route('**/api/v1/admin/system/auth/gate/logout', async (route) => {
+    await logoutPending;
+    await route.fulfill(fulfillOk({ verified: false, expiresAtUtc: null }));
+  });
+  await page.route('**/api/v1/admin/system/auth/gate/verify', async (route) => {
+    verifyRequests += 1;
+    await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: null }));
+  });
+  await page.goto('/?token=transferred-token#/login');
+  await page.getByLabel(/动态验证码|Authenticator code/i).fill('123456');
+  await page.getByRole('button', { name: /退出登录|Log out/i }).click();
+  await expect(
+    page.getByRole('button', { name: /验证并进入系统|Verify and continue/i }),
+  ).toBeDisabled();
+  await expect(page.getByRole('button', { name: /退出登录|Log out/i })).toBeDisabled();
+  releaseLogout?.();
+  await expect(page).toHaveURL(`${environment.baseUrl}/#/login`);
+  await expect(page.getByLabel(/用户名|Username/i)).toBeVisible();
+  expect(verifyRequests).toBe(0);
+  expect(await page.evaluate(() => localStorage.getItem('userInfo'))).toBeNull();
+});
+
 test('login page only exposes password and Identity Center', async ({ page }) => {
   await page.route('**/api/v1/admin/system/auth/sso/login/url', async (route) => {
     expect(route.request().postDataJSON()).toEqual({

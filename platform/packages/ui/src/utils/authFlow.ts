@@ -60,6 +60,10 @@ export function completePrimaryAuthReturn(): boolean {
   }
 }
 
+export function clearPrimaryAuthReturnTarget(): void {
+  sessionStorage.removeItem(RETURN_TARGET_KEY);
+}
+
 export function readTransferredToken(): string | null {
   return readLocationParameter('token');
 }
