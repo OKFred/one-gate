@@ -4009,6 +4009,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/maintenance/recycle-bin/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询可用回收站资源 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.recycle_bin.resources.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.recycle_bin.resources.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/maintenance/recycle-bin/list": {
         parameters: {
             query?: never;
@@ -22793,9 +22851,21 @@ export interface components {
             };
             message: string;
         };
+        "admin.maintenance.recycle_bin.resources.req": Record<string, never>;
+        "admin.maintenance.recycle_bin.resources.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    resourceType: string;
+                    labelKey: string;
+                    canRestore: boolean;
+                    canPurge: boolean;
+                }[];
+            };
+            message: string;
+        };
         "admin.maintenance.recycle_bin.list.req": {
-            /** @enum {string} */
-            resourceType: "department";
+            resourceType: string;
             keyword?: string;
             pageNo?: number;
             pageSize?: number;
@@ -22811,11 +22881,11 @@ export interface components {
                 currentPage: number;
                 /** @description 每页记录数 */
                 pageSize: number;
+                canRestore: boolean;
                 canPurge: boolean;
                 list: {
-                    /** @enum {string} */
-                    resourceType: "department";
-                    id: number;
+                    resourceType: string;
+                    id: number | string;
                     name: string;
                     deleterId: number | null;
                     deleterName: string | null;
@@ -22827,25 +22897,23 @@ export interface components {
             message: string;
         };
         "admin.maintenance.recycle_bin.restore.req": {
-            /** @enum {string} */
-            resourceType: "department";
-            id: number;
+            resourceType: string;
+            id: number | string;
             expectedDeletedTimeUtc: number;
         };
         "admin.maintenance.recycle_bin.restore.res": {
             ok: boolean;
-            data: number;
+            data: number | string;
             message: string;
         };
         "admin.maintenance.recycle_bin.purge.req": {
-            /** @enum {string} */
-            resourceType: "department";
-            id: number;
+            resourceType: string;
+            id: number | string;
             expectedDeletedTimeUtc: number;
         };
         "admin.maintenance.recycle_bin.purge.res": {
             ok: boolean;
-            data: number;
+            data: number | string;
             message: string;
         };
         "admin.data.schema_form_data.list.req": {

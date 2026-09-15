@@ -9,9 +9,16 @@ export const recycleBinPermissions = [
   'admin.system.department:delete',
 ];
 
-export interface DeletedDepartment {
-  resourceType: 'department';
-  id: number;
+export interface RecycleBinResource {
+  resourceType: string;
+  labelKey: string;
+  canRestore: boolean;
+  canPurge: boolean;
+}
+
+export interface DeletedRecord {
+  resourceType: string;
+  id: number | string;
   name: string;
   deleterId: number | null;
   deleterName: string | null;
@@ -20,15 +27,16 @@ export interface DeletedDepartment {
   canRestore: boolean;
 }
 
-export function deletedDepartment(
-  id: number,
-  overrides: Partial<DeletedDepartment> = {},
-): DeletedDepartment {
+export function deletedRecord(
+  resourceType: string,
+  id: number | string,
+  overrides: Partial<DeletedRecord> = {},
+): DeletedRecord {
   const deletedTimeUtc = Date.now() - 24 * 60 * 60 * 1000;
   return {
-    resourceType: 'department',
+    resourceType,
     id,
-    name: `Department ${id}`,
+    name: `Record ${id}`,
     deleterId: 42,
     deleterName: 'Fixture administrator',
     deletedTimeUtc,
@@ -37,6 +45,25 @@ export function deletedDepartment(
     ...overrides,
   };
 }
+
+export function deletedDepartment(id: number, overrides: Partial<DeletedRecord> = {}) {
+  return deletedRecord('department', id, { name: `Department ${id}`, ...overrides });
+}
+
+export const departmentResource: RecycleBinResource = {
+  resourceType: 'department',
+  labelKey: 'businessType.admin.system.department',
+  canRestore: true,
+  canPurge: false,
+};
+
+/** Only registered by isolated UI tests; no corresponding production business exists. */
+export const reportResource: RecycleBinResource = {
+  resourceType: 'fixture-report',
+  labelKey: 'fixture.recycleBin.report',
+  canRestore: true,
+  canPurge: true,
+};
 
 export const fulfillOk = (data: unknown) => ({
   contentType: 'application/json',
@@ -48,12 +75,29 @@ export async function installRecycleBinFixture(
   options: {
     canPurge?: boolean;
     permissions?: string[];
-    rows?: DeletedDepartment[];
+    rows?: DeletedRecord[];
+    resources?: RecycleBinResource[];
     langCode?: 'en-US' | 'zh-CN';
   } = {},
 ) {
+  const grantedPermissions = options.permissions ?? recycleBinPermissions;
+  const departmentReadable = grantedPermissions.includes('admin.system.department:read');
   const state = {
     rows: options.rows ?? [deletedDepartment(1)],
+    resources:
+      options.resources ??
+      (departmentReadable
+        ? [
+            {
+              ...departmentResource,
+              canRestore:
+                grantedPermissions.includes('admin.maintenance.recycle_bin:restore') &&
+                grantedPermissions.includes('admin.system.department:edit'),
+              canPurge: options.canPurge ?? false,
+            },
+          ]
+        : []),
+    resourcesRequests: [] as unknown[],
     listRequests: [] as unknown[],
     unexpectedRequests: [] as string[],
   };
@@ -80,7 +124,12 @@ export async function installRecycleBinFixture(
     });
   });
   await page.route('**/api/v1/admin/i18n/translation/listAll', (route) =>
-    route.fulfill(fulfillOk([])),
+    route.fulfill(
+      fulfillOk([
+        { langCode: 'en-US', tKey: reportResource.labelKey, tValue: 'Reports' },
+        { langCode: 'zh-CN', tKey: reportResource.labelKey, tValue: '报告' },
+      ]),
+    ),
   );
   await page.route('**/api/v1/admin/system/auth/gate/status', (route) =>
     route.fulfill(fulfillOk({ verified: true, expiresAtUtc: null })),
@@ -89,7 +138,7 @@ export async function installRecycleBinFixture(
   await page.route('**/api/v1/admin/system/auth/getButtonPermission', (route) =>
     route.fulfill(
       fulfillOk({
-        permissions: (options.permissions ?? recycleBinPermissions).map((code, index) => ({
+        permissions: grantedPermissions.map((code, index) => ({
           id: index + 1,
           code,
           isEnabled: true,
@@ -115,8 +164,13 @@ export async function installRecycleBinFixture(
       ]),
     ),
   );
+  await page.route('**/api/v1/admin/maintenance/recycle-bin/resources', async (route) => {
+    state.resourcesRequests.push(route.request().postDataJSON());
+    await route.fulfill(fulfillOk({ list: state.resources }));
+  });
   await page.route('**/api/v1/admin/maintenance/recycle-bin/list', async (route) => {
     const request = route.request().postDataJSON() as {
+      resourceType: string;
       keyword?: string;
       pageNo?: number;
       pageSize?: number;
@@ -124,8 +178,11 @@ export async function installRecycleBinFixture(
     state.listRequests.push(request);
     const pageNo = request.pageNo ?? 1;
     const pageSize = request.pageSize ?? 10;
-    const filtered = state.rows.filter((row) =>
-      row.name.toLowerCase().includes(request.keyword?.toLowerCase() ?? ''),
+    const resource = state.resources.find((item) => item.resourceType === request.resourceType);
+    const filtered = state.rows.filter(
+      (row) =>
+        row.resourceType === request.resourceType &&
+        row.name.toLowerCase().includes(request.keyword?.toLowerCase() ?? ''),
     );
     await route.fulfill(
       fulfillOk({
@@ -134,7 +191,8 @@ export async function installRecycleBinFixture(
         totalPage: Math.ceil(filtered.length / pageSize),
         currentPage: pageNo,
         pageSize,
-        canPurge: options.canPurge ?? false,
+        canRestore: resource?.canRestore ?? false,
+        canPurge: resource?.canPurge ?? false,
       }),
     );
   });

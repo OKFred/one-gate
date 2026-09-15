@@ -1,10 +1,20 @@
 import { describe, expect, it, vi } from "vitest";
+import type { RecycleBinResourceAdapter } from "@hodor/core/db/recycle-bin.js";
 
 const mocks = vi.hoisted(() => ({
   createApp: vi.fn(() => ({ fetch: vi.fn() })),
   schedule: vi.fn(),
   cron: vi.fn(async () => undefined),
-  retention: vi.fn(async () => undefined),
+  departmentCleanup: vi.fn(async () => ({
+    deletedCount: 0,
+    remainingExpired: 0,
+    oldestExpiredTimeUtc: null,
+  })),
+  archiveCleanup: vi.fn(async () => ({
+    deletedCount: 0,
+    remainingExpired: 0,
+    oldestExpiredTimeUtc: null,
+  })),
 }));
 vi.mock("./index.js", () => ({ default: mocks.createApp }));
 vi.mock("@hodor/core/utils/env.js", () => ({ getEnv: () => "8787" }));
@@ -20,11 +30,19 @@ vi.mock("@hodor/admin/system/auth/totp-gate/index.js", () => ({
   InMemoryTotpAttemptCoordinator: class {},
   createTotpGateCenter: vi.fn(),
 }));
-vi.mock("./soft-delete-cleanup.js", () => ({
-  runRetentionMaintenance: mocks.retention,
-  runScheduledMaintenance: async (tasks: (() => Promise<unknown>)[]) => {
-    await Promise.all(tasks.map((task) => task()));
-  },
+vi.mock("@hodor/admin/system/department/facade.js", () => ({
+  departmentRecycleBinAdapter: {
+    resourceType: "department",
+    labelKey: "business.department",
+    can: async () => true,
+    list: async () => ({ total: 0, list: [] }),
+    restore: async ({ id }) => id,
+    purge: async ({ id }) => id,
+    purgeExpired: mocks.departmentCleanup,
+  } satisfies RecycleBinResourceAdapter,
+}));
+vi.mock("@hodor/admin/maintenance/compliance/department-cleanup.js", () => ({
+  purgeExpiredDepartmentArchives: mocks.archiveCleanup,
 }));
 
 describe("Node scheduled bootstrap", () => {
@@ -37,9 +55,16 @@ describe("Node scheduled bootstrap", () => {
     const tick: () => Promise<void> = mocks.schedule.mock.calls[0][1];
     await tick();
     expect(mocks.cron).toHaveBeenCalledTimes(1);
-    expect(mocks.retention).toHaveBeenCalledTimes(1);
+    expect(mocks.departmentCleanup).toHaveBeenCalledExactlyOnceWith({
+      now: expect.any(Number),
+      batchSize: 100,
+    });
+    expect(mocks.archiveCleanup).toHaveBeenCalledExactlyOnceWith({
+      now: expect.any(Number),
+      batchSize: 100,
+    });
     expect(mocks.createApp.mock.invocationCallOrder[0]).toBeLessThan(
-      mocks.retention.mock.invocationCallOrder[0]
+      mocks.departmentCleanup.mock.invocationCallOrder[0]
     );
   });
 });

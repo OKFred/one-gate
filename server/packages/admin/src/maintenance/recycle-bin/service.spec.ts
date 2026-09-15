@@ -12,13 +12,25 @@ const departments = vi.hoisted(() => ({
   purgeDeletedDepartment: vi.fn(),
 }));
 vi.mock("../../system/department/service", () => departments);
+vi.mock("../../system/department/repository", () => ({
+  purgeExpiredDepartments: vi.fn(),
+}));
+vi.mock("@hodor/core/middleware/auth/cache-invalidation", () => ({
+  invalidateAuthCache: vi.fn(),
+}));
 
-import { onList, onRestore, onPurge } from "./service";
+import { RecycleBinRegistry } from "@hodor/core/db/recycle-bin";
+import { departmentRecycleBinAdapter } from "../../system/department/recycle-bin";
+import { createRecycleBinHandlers } from "./service";
 import {
   RecycleBinListReq,
   RecycleBinListRes,
   RecycleBinMutationReq,
 } from "./model";
+
+const registry = new RecycleBinRegistry();
+registry.register(departmentRecycleBinAdapter);
+const { onList, onRestore, onPurge } = createRecycleBinHandlers(registry);
 
 function actor(codes: string[] = [], superAdmin = false): UserObj {
   return {
@@ -189,9 +201,22 @@ describe("recycle bin access and public contract", () => {
     );
   });
 
-  it("rejects arbitrary tables, deletion field injection and missing version", () => {
+  it.each(["9", "record:9", 0, 1.5, Number.MAX_SAFE_INTEGER + 1])(
+    "rejects a non-department ID before business mutation: %s",
+    async (id) => {
+      await expect(
+        onRestore({ ...mutation, id }, actor(restoreCodes))
+      ).rejects.toThrow("INVALID_PARAMS");
+      await expect(
+        onPurge({ ...mutation, id }, actor([], true))
+      ).rejects.toThrow("INVALID_PARAMS");
+      expect(departments.restoreDeletedDepartment).not.toHaveBeenCalled();
+      expect(departments.purgeDeletedDepartment).not.toHaveBeenCalled();
+    }
+  );
+
+  it("rejects deletion field injection and missing version", () => {
     for (const body of [
-      { ...mutation, resourceType: "system_user" },
       { ...mutation, isDeleted: false },
       { resourceType: "department", id: 9 },
       { ...mutation, expectedDeletedTimeUtc: -1 },

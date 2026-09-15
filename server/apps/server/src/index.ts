@@ -1,3 +1,4 @@
+import "./recycle-bin-resources.js";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import logHandler from "@hodor/core/middleware/logger/index.js";
 import errorHandler from "@hodor/core/middleware/errorHandler/index.js";
