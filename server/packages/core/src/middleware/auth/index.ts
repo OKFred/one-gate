@@ -1,6 +1,5 @@
 import { tokenUtils } from "../../utils/token";
-import { Context } from "../../types/app";
-import type { UserObj } from "../../../../admin/src/system/user/service";
+import type { Context, UserObj } from "../../types/app";
 import { SUPER_ADMIN_ROLE_ID } from "../../db/init";
 import { registry } from "../../../../admin/src/common/registry";
 import {
@@ -8,8 +7,6 @@ import {
   SCOPE_PRIORITY,
   type DataScopeValue,
 } from "../../types/dataScope";
-import db from "../../db/index";
-import { inArray } from "drizzle-orm";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -17,6 +14,29 @@ import {
 import { kv } from "../cache";
 import crypto from "crypto";
 import { apiTokenRepository } from "../../../../admin/src/system/api-token/repository";
+
+interface AuthBundle {
+  schemaVersion: 2;
+  roleFingerprint: string;
+  version: string;
+  permissions: UserObj["permissions"];
+  dataScope: DataScopeValue;
+  customDeptIds: number[];
+}
+
+function isDataScope(value: unknown): value is DataScopeValue {
+  return typeof value === "string" && Object.hasOwn(SCOPE_PRIORITY, value);
+}
+
+function isDepartmentIds(value: unknown): value is number[] {
+  return (
+    Array.isArray(value) &&
+    value.every(
+      (id: unknown) =>
+        typeof id === "number" && Number.isSafeInteger(id) && id > 0
+    )
+  );
+}
 
 export const authMiddleware = async (c: Context) => {
   if (c.get("userObj")) return;
@@ -123,7 +143,19 @@ export const authMiddleware = async (c: Context) => {
     throw new BusinessError(BusinessErrorCode.NOT_EXIST_OR_DISABLED);
   }
   const { id: userId, ...rest } = user;
-  const roleIds = user.roleArr?.map((r) => r.value) || [];
+  const boundRoleIds = user.roleArr?.map((r) => r.value) || [];
+  const authorizationRoles = (
+    await registry.system.getAuthorizationRoles(boundRoleIds)
+  )
+    .map((role) => ({
+      id: role.id,
+      dataScope: role.dataScope,
+      customDeptIds: role.customDeptIds,
+      updateTimeUtc: role.updateTimeUtc,
+    }))
+    .sort((left, right) => left.id - right.id);
+  const roleIds = authorizationRoles.map((role) => role.id);
+  const roleFingerprint = JSON.stringify(authorizationRoles);
   const isSuperAdmin = roleIds.includes(SUPER_ADMIN_ROLE_ID);
 
   // 构建初始 userObj（此时 permissions 和 dataScope 尚未计算）
@@ -132,7 +164,7 @@ export const authMiddleware = async (c: Context) => {
     userId,
     id: userId,
     isSuperAdmin,
-    roleIds,
+    roleIds: [...roleIds],
     ...rest,
     remark: rest.remark ?? undefined,
     updaterId: rest.updaterId ?? undefined,
@@ -145,90 +177,90 @@ export const authMiddleware = async (c: Context) => {
     async ensureLoaded() {
       if (this._isLoaded) return;
 
-      const cacheKey = `system.auth.bundle:${this.userId}`;
+      const cacheKey = `system.auth.bundle:${userId}`;
       const versionKey = "system.auth:global_version";
+      let version: string | undefined;
 
-      // 1. 尝试从缓存获取权限和数据范围包
+      // Capture the version before permission queries; late writes keep their
+      // original role snapshot and cannot masquerade as a newer authority.
       try {
-        // 同时获取全局版本号和用户缓存包
         const [globalVersion, cached] = await Promise.all([
           kv.get(versionKey, "text"),
-          kv.get<{
-            permissions: any[];
-            dataScope: DataScopeValue;
-            customDeptIds: number[];
-            version?: string;
-          }>(cacheKey, "json"),
+          kv.get<Partial<AuthBundle>>(cacheKey, "json"),
         ]);
+        version = globalVersion || "1";
 
-        // 校验版本号：只有当版本号一致时才使用缓存
-        if (cached && cached.version === (globalVersion || "1")) {
+        if (
+          cached?.schemaVersion === 2 &&
+          cached.roleFingerprint === roleFingerprint &&
+          cached.version === version &&
+          Array.isArray(cached.permissions) &&
+          isDataScope(cached.dataScope) &&
+          isDepartmentIds(cached.customDeptIds)
+        ) {
           this.permissions = cached.permissions;
           this.dataScope = cached.dataScope;
           this.customDeptIds = cached.customDeptIds;
           this._isLoaded = true;
           return;
         }
-      } catch (error) {
-        console.error("Auth Cache Read Error:", error);
+      } catch {
+        console.error(
+          JSON.stringify({ event: "auth.cache.read_failed", level: "error" })
+        );
       }
 
-      // 2. 缓存未命中、报错或版本过旧，回退到数据库加载逻辑
-      const [permissions, globalVersion] = await Promise.all([
-        registry.system.getPermissionsByRoleIds(this.roleIds),
-        kv.get(versionKey, "text").catch(() => "1"),
-      ]);
-
-      this.permissions = permissions;
+      const permissions =
+        await registry.system.getPermissionsByRoleIds(roleIds);
 
       let effectiveDataScope: DataScopeValue = DataScope.SELF_ONLY;
       const mergedCustomDeptIds: number[] = [];
 
-      if (this.roleIds.length > 0) {
-        const roles = await registry.system.getRoleDataScopes(this.roleIds);
-
-        for (const role of roles) {
-          const scopeVal = (role.dataScope ??
-            DataScope.SELF_ONLY) as DataScopeValue;
-          if (SCOPE_PRIORITY[scopeVal] > SCOPE_PRIORITY[effectiveDataScope]) {
-            effectiveDataScope = scopeVal;
-          }
-          if (scopeVal === DataScope.CUSTOM && role.customDeptIds) {
-            try {
-              const ids: number[] = JSON.parse(role.customDeptIds);
-              mergedCustomDeptIds.push(...ids);
-            } catch {
-              // Ignore malformed legacy role scope values and keep the safe default.
-            }
+      for (const role of authorizationRoles) {
+        const scopeVal = isDataScope(role.dataScope)
+          ? role.dataScope
+          : DataScope.SELF_ONLY;
+        if (SCOPE_PRIORITY[scopeVal] > SCOPE_PRIORITY[effectiveDataScope]) {
+          effectiveDataScope = scopeVal;
+        }
+        if (scopeVal === DataScope.CUSTOM && role.customDeptIds) {
+          try {
+            const ids: unknown = JSON.parse(role.customDeptIds);
+            if (isDepartmentIds(ids)) mergedCustomDeptIds.push(...ids);
+          } catch {
+            // Ignore malformed legacy role scope values and keep the safe default.
           }
         }
       }
+      const customDeptIds = [...new Set(mergedCustomDeptIds)];
+      this.permissions = permissions;
       this.dataScope = effectiveDataScope;
-      this.customDeptIds = [...new Set(mergedCustomDeptIds)];
+      this.customDeptIds = customDeptIds;
+      this._isLoaded = true;
 
-      // 3. 异步回写缓存 (包含当前版本号)
+      // A failed KV read does not establish a version suitable for cache writes.
+      if (version === undefined) return;
+      const bundle: AuthBundle = {
+        schemaVersion: 2,
+        roleFingerprint,
+        permissions,
+        dataScope: effectiveDataScope,
+        customDeptIds,
+        version,
+      };
       const putTask = kv
-        .put(
-          cacheKey,
-          {
-            permissions: this.permissions,
-            dataScope: this.dataScope,
-            customDeptIds: this.customDeptIds,
-            version: globalVersion || "1",
-          },
-          { expirationTtl: 3600 }
-        )
-        .catch((err) => {
-          console.error("Auth Cache Write Error:", err);
+        .put(cacheKey, bundle, { expirationTtl: 3600 })
+        .catch(() => {
+          console.error(
+            JSON.stringify({ event: "auth.cache.write_failed", level: "error" })
+          );
         });
 
       try {
         c.executionCtx.waitUntil(putTask);
-      } catch (e) {
-        // 环境不支持 executionCtx (如本地 Node.js 开发环境)
+      } catch {
+        await putTask;
       }
-
-      this._isLoaded = true;
     },
   };
 

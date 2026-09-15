@@ -21,6 +21,11 @@ import {
 import { DepartmentDeletionError } from "../department/errors";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 
+export type AuthorizationRole = Pick<
+  typeof roleTable.$inferSelect,
+  "id" | "dataScope" | "customDeptIds" | "updateTimeUtc"
+>;
+
 export const buildWhereCondition = (condition?: {
   keyword?: string;
   isEnabled?: boolean;
@@ -135,8 +140,24 @@ export class RoleRepository {
         customDeptIds: roleTable.customDeptIds,
       })
       .from(roleTable)
-      .where(inArray(roleTable.id, roleIds));
+      .where(
+        and(inArray(roleTable.id, roleIds), eq(roleTable.isEnabled, true))
+      );
     return rows;
+  }
+
+  async getAuthorizationRoles(ids: number[]): Promise<AuthorizationRole[]> {
+    if (ids.length === 0) return [];
+    return await db
+      .select({
+        id: roleTable.id,
+        dataScope: roleTable.dataScope,
+        customDeptIds: roleTable.customDeptIds,
+        updateTimeUtc: roleTable.updateTimeUtc,
+      })
+      .from(roleTable)
+      .where(and(inArray(roleTable.id, ids), eq(roleTable.isEnabled, true)))
+      .orderBy(asc(roleTable.id));
   }
 
   async verifyRoleExists(roleId: number): Promise<boolean> {
@@ -197,7 +218,7 @@ export class RoleRepository {
       .set({
         ...data,
         customDeptIds,
-        updateTimeUtc: Date.now(),
+        updateTimeUtc: sql`MAX(${Date.now()}, COALESCE(${roleTable.updateTimeUtc}, 0) + 1)`,
       })
       .where(
         and(
