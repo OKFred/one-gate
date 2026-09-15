@@ -77,6 +77,9 @@ describe("production recycle-bin composition", () => {
           deletedCount: 100,
           remainingExpired: 1,
           oldestExpiredTimeUtc: now,
+          checkedTimeUtc: now,
+          cutoffTimeUtc: cutoff,
+          overdueMs: 0,
         })
       );
     }
@@ -99,7 +102,20 @@ describe("production recycle-bin composition", () => {
     info.mockClear();
     warn.mockClear();
     await runRetentionMaintenance();
-    expect(info).not.toHaveBeenCalled();
+    expect(info).toHaveBeenCalledTimes(2);
+    for (const module of ["department", "legacy_department_archive"]) {
+      expect(info).toHaveBeenCalledWith({
+        event: "soft_delete_cleanup",
+        module,
+        checkedTimeUtc: now,
+        cutoffTimeUtc: cutoff,
+        deletedCount: 0,
+        remainingExpired: 0,
+        oldestExpiredTimeUtc: null,
+        overdueMs: 0,
+        durationMs: 0,
+      });
+    }
     expect(warn).not.toHaveBeenCalled();
   });
 });

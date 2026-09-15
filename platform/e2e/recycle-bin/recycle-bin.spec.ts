@@ -279,6 +279,167 @@ test('a failed resource list shows a retry action without claiming there are no 
   expect(attempts).toBe(2);
 });
 
+for (const queryChange of ['pagination', 'search'] as const) {
+  test(`failed ${queryChange} clears previous results and retries the current query`, async ({
+    page,
+  }, testInfo) => {
+    const fixture = await installRecycleBinFixture(page, {
+      resources: [reportResource],
+      rows: Array.from({ length: 12 }, (_, index) =>
+        deletedRecord(reportResource.resourceType, `report/${index + 1}`, {
+          name: `Report ${index + 1}`,
+        }),
+      ),
+    });
+    const paginationWarnings: string[] = [];
+    page.on('console', (message) => {
+      if (/TablePagination|out of range/i.test(message.text())) {
+        paginationWarnings.push(message.text());
+      }
+    });
+    await page.goto('/#/admin/recycle-bin');
+    const table = page.getByRole('table', { name: 'Recycle Bin' });
+    await expect(table.getByRole('cell', { name: 'Report 1', exact: true })).toBeVisible();
+    if (queryChange === 'search') {
+      await page.getByRole('button', { name: 'Next', exact: true }).click();
+      await expect(table.getByRole('cell', { name: 'Report 12', exact: true })).toBeVisible();
+    }
+    const requests: unknown[] = [];
+    let releaseFailure: (() => void) | undefined;
+    const failureGate = new Promise<void>((resolve) => {
+      releaseFailure = resolve;
+    });
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/list', async (route) => {
+      requests.push(route.request().postDataJSON());
+      if (requests.length === 1) {
+        await failureGate;
+        await route.fulfill({
+          status: 503,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: false, message: 'Changed query unavailable' }),
+        });
+      } else {
+        await route.fallback();
+      }
+    });
+    if (queryChange === 'pagination') {
+      await page.getByRole('button', { name: 'Next', exact: true }).click();
+    } else {
+      await page.getByLabel('Search name').fill('Report 2');
+      await page.getByRole('button', { name: 'Search', exact: true }).click();
+    }
+    try {
+      await expect.poll(() => requests.length).toBe(1);
+      await expect(table.getByRole('row')).toHaveCount(1);
+      await expect(table.getByRole('button')).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Next', exact: true })).toHaveCount(0);
+      await expect(page.getByText(/of 12$/, { exact: false })).toHaveCount(0);
+    } finally {
+      releaseFailure?.();
+    }
+    const alert = page.getByRole('alert').filter({ hasText: 'Records could not be loaded.' });
+    await expect(alert).toBeVisible();
+    await expect(page.getByText('Changed query unavailable', { exact: true })).toBeVisible();
+    await expect(table.getByRole('row')).toHaveCount(1);
+    await expect(table.getByRole('button')).toHaveCount(0);
+    await expect(page.getByRole('cell', { name: 'No data', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toHaveCount(0);
+    if (queryChange === 'pagination') {
+      await page.screenshot({
+        path: testInfo.outputPath('recycle-bin-query-failed.png'),
+        fullPage: true,
+      });
+    }
+    await alert.getByRole('button', { name: 'Refresh', exact: true }).click();
+    const expectedQuery = {
+      resourceType: reportResource.resourceType,
+      keyword: queryChange === 'search' ? 'Report 2' : '',
+      pageNo: queryChange === 'search' ? 1 : 2,
+      pageSize: 10,
+    };
+    await expect(
+      table.getByRole('cell', {
+        name: queryChange === 'search' ? 'Report 2' : 'Report 12',
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(queryChange === 'search' ? '1–1 of 1' : '11–12 of 12', { exact: true }),
+    ).toBeVisible();
+    expect(requests).toEqual([expectedQuery, expectedQuery]);
+    expect(fixture.listRequests.at(-1)).toEqual(expectedQuery);
+    expect(fixture.unexpectedRequests).toEqual([]);
+    expect(paginationWarnings).toEqual([]);
+  });
+}
+
+for (const action of ['restore', 'purge'] as const) {
+  test(`successful ${action} followed by a failed refresh hides stale rows and only retries the list`, async ({
+    page,
+  }) => {
+    const row = deletedRecord(reportResource.resourceType, 'report/001', {
+      name: 'Processed report',
+    });
+    const remaining = deletedRecord(reportResource.resourceType, 'report/002', {
+      name: 'Remaining report',
+    });
+    const fixture = await installRecycleBinFixture(page, {
+      resources: [reportResource],
+      rows: [row, remaining],
+    });
+    const mutationRequests: unknown[] = [];
+    await page.route(`**/api/v1/admin/maintenance/recycle-bin/${action}`, async (route) => {
+      mutationRequests.push(route.request().postDataJSON());
+      fixture.rows = [remaining];
+      await route.fulfill(fulfillOk(1));
+    });
+    let listAttempts = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/list', async (route) => {
+      listAttempts += 1;
+      if (listAttempts === 2) {
+        await route.fulfill({
+          status: 503,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: false, message: 'Refresh temporarily unavailable' }),
+        });
+      } else {
+        await route.fallback();
+      }
+    });
+    await page.goto('/#/admin/recycle-bin');
+    const table = page.getByRole('table', { name: 'Recycle Bin' });
+    await table
+      .getByRole('row')
+      .filter({ hasText: row.name })
+      .getByRole('button', {
+        name: action === 'restore' ? 'Restore' : 'Permanently delete',
+        exact: true,
+      })
+      .click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+    const alert = page.getByRole('alert').filter({ hasText: 'Records could not be loaded.' });
+    await expect(alert).toBeVisible();
+    await expect(page.getByText('Refresh temporarily unavailable', { exact: true })).toBeVisible();
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(table.getByRole('row')).toHaveCount(1);
+    await expect(table.getByRole('button')).toHaveCount(0);
+    await expect(page.getByRole('cell', { name: 'No data', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Next', exact: true })).toHaveCount(0);
+    await alert.getByRole('button', { name: 'Refresh', exact: true }).click();
+    await expect(table.getByRole('cell', { name: remaining.name, exact: true })).toBeVisible();
+    await expect(table.getByRole('cell', { name: row.name, exact: true })).toHaveCount(0);
+    expect(listAttempts).toBe(3);
+    expect(mutationRequests).toEqual([
+      { resourceType: row.resourceType, id: row.id, expectedDeletedTimeUtc: row.deletedTimeUtc },
+    ]);
+    expect(fixture.listRequests).toEqual([
+      { resourceType: row.resourceType, keyword: '', pageNo: 1, pageSize: 10 },
+      { resourceType: row.resourceType, keyword: '', pageNo: 1, pageSize: 10 },
+    ]);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+}
+
 for (const missing of ['admin.maintenance.recycle_bin:read', 'admin.system.department:read']) {
   test(`does not request deleted records without ${missing}`, async ({ page }) => {
     const fixture = await installRecycleBinFixture(page, {

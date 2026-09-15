@@ -604,6 +604,68 @@ describe("department soft deletion and guarded references", () => {
     ).rejects.toMatchObject({ code: ErrorCode.HAS_REFERENCES });
   });
 
+  it("fills cleanup batches past 100 older referenced rows and drains the backlog after detaching references", async () => {
+    const blockedIds: number[] = [];
+    for (let index = 0; index < 100; index += 1) {
+      const id = await addDepartment(`blocked cleanup ${index}`);
+      await departmentRepository.onDelete(
+        id,
+        actor.userId,
+        deletionTime + index
+      );
+      blockedIds.push(id);
+      // Legacy imports can leave references that guarded application writes reject.
+      await db.insert(userTable).values({
+        username: `legacy cleanup ${index}`,
+        password: "test-hash",
+        langCode: "zh-CN",
+        departmentId: id,
+        roleIdArr: [],
+        isEnabled: false,
+        creatorId: actor.userId,
+      });
+    }
+    const eligibleIds: number[] = [];
+    for (let index = 0; index < 3; index += 1) {
+      const id = await addDepartment(`eligible cleanup ${index}`);
+      await departmentRepository.onDelete(
+        id,
+        actor.userId,
+        deletionTime + 100 + index
+      );
+      eligibleIds.push(id);
+    }
+    const now = deletionTime + SOFT_DELETE_RETENTION_MS + 200;
+    expect(await purgeExpiredDepartments({ now, batchSize: 2 })).toEqual({
+      deletedCount: 2,
+      remainingExpired: 101,
+      oldestExpiredTimeUtc: deletionTime + SOFT_DELETE_RETENTION_MS,
+    });
+    expect(
+      (
+        await db
+          .select({ id: departmentTable.id })
+          .from(departmentTable)
+          .orderBy(departmentTable.id)
+      ).map(({ id }) => id)
+    ).toEqual([...blockedIds, eligibleIds[2]]);
+    expect(await purgeExpiredDepartments({ now, batchSize: 2 })).toEqual({
+      deletedCount: 1,
+      remainingExpired: 100,
+      oldestExpiredTimeUtc: deletionTime + SOFT_DELETE_RETENTION_MS,
+    });
+
+    await db.update(userTable).set({ departmentId: null });
+    expect(await purgeExpiredDepartments({ now, batchSize: 100 })).toEqual({
+      deletedCount: 100,
+      remainingExpired: 0,
+      oldestExpiredTimeUtc: null,
+    });
+    expect(
+      await db.select({ id: departmentTable.id }).from(departmentTable)
+    ).toEqual([]);
+  });
+
   it("a parent deleted between restore precheck and mutation cannot produce an active orphan", async () => {
     const parent = await addDepartment("restore race parent");
     const child = await addDepartment("restore race child", parent);

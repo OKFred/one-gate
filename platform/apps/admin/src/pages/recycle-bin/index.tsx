@@ -105,6 +105,8 @@ export default function RecycleBinPage() {
     const version = ++requestVersion.current;
     setLoading(true);
     setListFailed(false);
+    setResult(null);
+    setSelection(null);
     try {
       const response = await RecycleBinAPI.listFn({
         data: query,
@@ -145,6 +147,8 @@ export default function RecycleBinPage() {
   const submit = async () => {
     if (
       !selection ||
+      loading ||
+      listFailed ||
       mutationInFlight.current ||
       selection.item.resourceType !== query.resourceType
     )
@@ -312,7 +316,7 @@ export default function RecycleBinPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {!loading && !listFailed && !result?.list.length && (
+                  {!loading && !listFailed && result?.list.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={6} align="center">
                         {t('column.noData')}
@@ -322,29 +326,33 @@ export default function RecycleBinPage() {
                 </TableBody>
               </Table>
             </TableContainer>
-            <TablePagination
-              component="div"
-              count={result?.total ?? 0}
-              page={query.pageNo - 1}
-              rowsPerPage={query.pageSize}
-              rowsPerPageOptions={[10, 25, 50]}
-              labelRowsPerPage={t('table.pageSizeLabel')}
-              labelDisplayedRows={({ from, to, count }) =>
-                t('recycleBin.pagination', { from, to, count })
-              }
-              getItemAriaLabel={(type) =>
-                t(type === 'next' ? 'pagination.next' : 'pagination.prev')
-              }
-              disabled={loading || submitting}
-              onPageChange={(_, page) => setQuery((current) => ({ ...current, pageNo: page + 1 }))}
-              onRowsPerPageChange={(event) =>
-                setQuery((current) => ({
-                  ...current,
-                  pageNo: 1,
-                  pageSize: Number(event.target.value),
-                }))
-              }
-            />
+            {result && (
+              <TablePagination
+                component="div"
+                count={result.total}
+                page={result.currentPage - 1}
+                rowsPerPage={result.pageSize}
+                rowsPerPageOptions={[10, 25, 50]}
+                labelRowsPerPage={t('table.pageSizeLabel')}
+                labelDisplayedRows={({ from, to, count }) =>
+                  t('recycleBin.pagination', { from, to, count })
+                }
+                getItemAriaLabel={(type) =>
+                  t(type === 'next' ? 'pagination.next' : 'pagination.prev')
+                }
+                disabled={loading || submitting}
+                onPageChange={(_, page) =>
+                  setQuery((current) => ({ ...current, pageNo: page + 1 }))
+                }
+                onRowsPerPageChange={(event) =>
+                  setQuery((current) => ({
+                    ...current,
+                    pageNo: 1,
+                    pageSize: Number(event.target.value),
+                  }))
+                }
+              />
+            )}
           </Paper>
         </>
       )}
