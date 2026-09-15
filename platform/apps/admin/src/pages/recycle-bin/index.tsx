@@ -35,6 +35,22 @@ type Selection = {
   item: RecycleBinAPI.RecycleBinItem;
 };
 
+type ClockAnchor = {
+  serverTimeUtc: number;
+  monotonicTime: number;
+  wallTime: number;
+};
+
+const CLOCK_DRIFT_TOLERANCE_MS = 5000;
+
+function readServerTime(anchor: ClockAnchor | null): number | null {
+  if (!anchor) return null;
+  const elapsed = performance.now() - anchor.monotonicTime;
+  const wallElapsed = Date.now() - anchor.wallTime;
+  if (elapsed < 0 || Math.abs(wallElapsed - elapsed) > CLOCK_DRIFT_TOLERANCE_MS) return null;
+  return anchor.serverTimeUtc + elapsed;
+}
+
 export default function RecycleBinPage() {
   const t = useTranslation();
   const { hasAllPermissions, loading: permissionLoading } = usePermission();
@@ -49,7 +65,9 @@ export default function RecycleBinPage() {
   const [listFailed, setListFailed] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [now, setNow] = useState(Date.now);
+  const [now, setNow] = useState<number | null>(null);
+  const clockAnchor = useRef<ClockAnchor | null>(null);
+  const needsRefresh = useRef(false);
   const requestVersion = useRef(0);
   const directoryVersion = useRef(0);
   const mutationInFlight = useRef(false);
@@ -59,6 +77,8 @@ export default function RecycleBinPage() {
 
   const selectResource = (resourceType: string) => {
     requestVersion.current += 1;
+    clockAnchor.current = null;
+    setNow(null);
     setSelection(null);
     setResult(null);
     setListFailed(false);
@@ -73,6 +93,8 @@ export default function RecycleBinPage() {
     setResourceLoading(true);
     setResourcesFailed(false);
     setResources(null);
+    clockAnchor.current = null;
+    setNow(null);
     setResult(null);
     setSelection(null);
     setListFailed(false);
@@ -102,7 +124,14 @@ export default function RecycleBinPage() {
 
   const refresh = useCallback(async () => {
     if (permissionLoading || !canRead || resourceLoading || !query.resourceType) return;
+    if (mutationInFlight.current || document.visibilityState === 'hidden') {
+      needsRefresh.current = true;
+      return;
+    }
+    needsRefresh.current = false;
     const version = ++requestVersion.current;
+    clockAnchor.current = null;
+    setNow(null);
     setLoading(true);
     setListFailed(false);
     setResult(null);
@@ -113,12 +142,21 @@ export default function RecycleBinPage() {
       });
       if (version === requestVersion.current) {
         const data = response.data.data;
+        if (!Number.isSafeInteger(data.serverTimeUtc) || data.serverTimeUtc < 0) {
+          setListFailed(true);
+          return;
+        }
         const lastPage = Math.max(1, data.totalPage);
         if (query.pageNo > lastPage) {
           setQuery((current) => ({ ...current, pageNo: lastPage }));
         } else {
+          clockAnchor.current = {
+            serverTimeUtc: data.serverTimeUtc,
+            monotonicTime: performance.now(),
+            wallTime: Date.now(),
+          };
           setResult(data);
-          setNow(Date.now());
+          setNow(data.serverTimeUtc);
         }
       }
     } catch {
@@ -128,6 +166,19 @@ export default function RecycleBinPage() {
     }
   }, [canRead, permissionLoading, query, resourceLoading]);
 
+  const resyncClock = useCallback(() => {
+    // A second lifecycle event must not invalidate an already-started synchronization.
+    if (!clockAnchor.current && !needsRefresh.current) return;
+    needsRefresh.current = true;
+    clockAnchor.current = null;
+    requestVersion.current += 1;
+    setNow(null);
+    setSelection(null);
+    setResult(null);
+    setLoading(false);
+    if (document.visibilityState === 'visible' && !mutationInFlight.current) void refresh();
+  }, [refresh]);
+
   useEffect(() => {
     void refresh();
     return () => {
@@ -136,13 +187,33 @@ export default function RecycleBinPage() {
   }, [refresh]);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+    const timer = window.setInterval(() => {
+      const time = readServerTime(clockAnchor.current);
+      if (time === null && clockAnchor.current) resyncClock();
+      else setNow(time);
+    }, 1000);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') needsRefresh.current = true;
+      if (needsRefresh.current) resyncClock();
+    };
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) resyncClock();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    document.addEventListener('resume', resyncClock);
+    window.addEventListener('pageshow', onPageShow);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.removeEventListener('resume', resyncClock);
+      window.removeEventListener('pageshow', onPageShow);
+    };
+  }, [resyncClock]);
 
   const isRestorable = (item: RecycleBinAPI.RecycleBinItem) =>
-    item.canRestore && now < item.expiresTimeUtc;
-  const isExpired = (item: RecycleBinAPI.RecycleBinItem) => now >= item.expiresTimeUtc;
+    item.canRestore && now !== null && now < item.expiresTimeUtc;
+  const isExpired = (item: RecycleBinAPI.RecycleBinItem) =>
+    now !== null && now >= item.expiresTimeUtc;
 
   const submit = async () => {
     if (
@@ -153,7 +224,17 @@ export default function RecycleBinPage() {
       selection.item.resourceType !== query.resourceType
     )
       return;
-    if (selection.action === 'restore' && (!canRestore || !isRestorable(selection.item))) return;
+    const currentTime = readServerTime(clockAnchor.current);
+    if (currentTime === null) {
+      resyncClock();
+      return;
+    }
+    setNow(currentTime);
+    if (
+      selection.action === 'restore' &&
+      (!canRestore || !selection.item.canRestore || currentTime >= selection.item.expiresTimeUtc)
+    )
+      return;
     if (selection.action === 'purge' && !canPurge) return;
     mutationInFlight.current = true;
     setSubmitting(true);
@@ -169,13 +250,14 @@ export default function RecycleBinPage() {
       });
       setSelection(null);
       showSnackbar({ message: t('common.operateSuccess'), type: 'success' });
-      await refresh();
+      needsRefresh.current = true;
     } catch {
       // A conflict or failed request must leave the row and selected deletion version intact.
     } finally {
       mutationInFlight.current = false;
       setSubmitting(false);
     }
+    if (needsRefresh.current) await refresh();
   };
 
   if (permissionLoading) return <CircularProgress aria-label={t('common.loading')} />;

@@ -73,6 +73,7 @@ export const RecycleBinListRes = {
   type: "object",
   properties: {
     ...listResBase,
+    serverTimeUtc: timestamp,
     canRestore: { type: "boolean" },
     canPurge: { type: "boolean" },
     list: {
@@ -100,6 +101,7 @@ export const RecycleBinListRes = {
     "totalPage",
     "currentPage",
     "pageSize",
+    "serverTimeUtc",
     "canRestore",
     "canPurge",
   ],

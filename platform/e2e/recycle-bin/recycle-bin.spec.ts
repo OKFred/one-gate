@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { readE2EEnvironment } from '../support/test-environment.js';
 import {
   deletedDepartment,
@@ -14,6 +14,13 @@ test.skip(
   !readE2EEnvironment().mockAuth,
   'Set HODOR_E2E_MOCK_AUTH=true for the isolated recycle bin UI suite.',
 );
+
+async function setPageVisibility(page: Page, visibility: 'visible' | 'hidden') {
+  await page.evaluate((value) => {
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => value });
+    document.dispatchEvent(new Event('visibilitychange'));
+  }, visibility);
+}
 
 test('lists deletion details, pages and searches the selected resource', async ({
   page,
@@ -162,6 +169,7 @@ test('switching resources clears search and page and ignores the previous delaye
     await oldResponseGate;
     await route.fulfill(
       fulfillOk({
+        serverTimeUtc: Date.now() + 60 * 24 * 60 * 60 * 1000,
         list: [deletedDepartment(12, { name: 'Stale department' })],
         total: 12,
         totalPage: 2,
@@ -568,8 +576,9 @@ test('disables expired rows and rechecks the deadline while confirmation stays o
   page,
 }) => {
   const now = Date.now();
-  await page.clock.setFixedTime(now);
+  await page.clock.install({ time: now });
   await installRecycleBinFixture(page, {
+    serverTimeUtc: now,
     rows: [
       deletedDepartment(1, { expiresTimeUtc: now + 10_000 }),
       deletedDepartment(2, { expiresTimeUtc: now - 1, canRestore: false }),
@@ -583,11 +592,272 @@ test('disables expired rows and rechecks the deadline while confirmation stays o
     .filter({ hasText: 'Department 1' })
     .getByRole('button', { name: 'Restore', exact: true })
     .click();
-  await page.clock.setFixedTime(now + 10_000);
+  await page.clock.runFor(10_000);
   await expect(
     page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }),
   ).toBeDisabled();
   await expect(page.getByRole('dialog')).toContainText('Expired, awaiting purge');
+});
+
+test.describe('server clock', () => {
+  test('reports the server expiry rejection without replaying the restore or reporting success', async ({
+    page,
+  }) => {
+    const fixture = await installRecycleBinFixture(page);
+    let mutations = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+      mutations += 1;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: false,
+          message: 'The restore deadline has passed.',
+          data: { code: 'errorHandler.department.restoreExpired' },
+        }),
+      });
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+    await expect(page.getByText('The restore deadline has passed.', { exact: true })).toBeVisible();
+    await expect(page.getByText('Operation successful', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(page.getByRole('cell', { name: 'Department 1', exact: true })).toBeVisible();
+    expect(mutations).toBe(1);
+    expect(fixture.listRequests).toHaveLength(1);
+  });
+
+  for (const offset of [-2, 2]) {
+    test(`uses server time when the device clock differs by ${offset} days`, async ({ page }) => {
+      const serverTimeUtc = Date.now();
+      await page.clock.install({ time: serverTimeUtc + offset * 24 * 60 * 60 * 1000 });
+      await installRecycleBinFixture(page, {
+        serverTimeUtc,
+        rows: [
+          deletedDepartment(1, { expiresTimeUtc: serverTimeUtc + 60_000 }),
+          deletedDepartment(2, { expiresTimeUtc: serverTimeUtc }),
+        ],
+      });
+      await page.goto('/#/admin/recycle-bin');
+      const retained = page.getByRole('row').filter({ hasText: 'Department 1' });
+      const expired = page.getByRole('row').filter({ hasText: 'Department 2' });
+      await expect(retained.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+      await expect(retained).toContainText('Within retention period');
+      await expect(expired.getByRole('button', { name: 'Restore', exact: true })).toBeDisabled();
+      await expect(expired).toContainText('Expired, awaiting purge');
+    });
+  }
+
+  test('clock jumps resynchronize without expiring or reviving records from the device time', async ({
+    page,
+  }) => {
+    const serverTimeUtc = Date.now();
+    await page.clock.install({ time: serverTimeUtc });
+    const fixture = await installRecycleBinFixture(page, {
+      serverTimeUtc,
+      rows: [
+        deletedDepartment(1, { expiresTimeUtc: serverTimeUtc + 60_000 }),
+        deletedDepartment(2, { expiresTimeUtc: serverTimeUtc }),
+      ],
+    });
+    await page.goto('/#/admin/recycle-bin');
+    const retained = page.getByRole('row').filter({ hasText: 'Department 1' });
+    await expect(retained.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+    for (const offset of [2, -2]) {
+      const previous = fixture.listRequests.length;
+      // Date changes without advancing performance: also models a paused monotonic clock on wake.
+      await page.clock.setSystemTime(serverTimeUtc + offset * 24 * 60 * 60 * 1000);
+      await page.clock.runFor(1000);
+      await expect.poll(() => fixture.listRequests.length).toBe(previous + 1);
+      await expect(retained.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+      await expect(retained).toContainText('Within retention period');
+      await expect(page.getByRole('row').filter({ hasText: 'Department 2' })).toContainText(
+        'Expired, awaiting purge',
+      );
+    }
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('confirmation recalculates the deadline between display ticks', async ({ page }) => {
+    const serverTimeUtc = Date.now();
+    await page.clock.install({ time: serverTimeUtc });
+    const fixture = await installRecycleBinFixture(page, { serverTimeUtc });
+    const mutations: unknown[] = [];
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+      mutations.push(route.request().postDataJSON());
+      await route.fulfill(fulfillOk(1));
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await expect(page.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+    await page.clock.pauseAt(serverTimeUtc + 60_000);
+    fixture.rows = [deletedDepartment(1, { expiresTimeUtc: serverTimeUtc + 500 })];
+    await page.getByRole('button', { name: 'Refresh', exact: true }).click();
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    // Move only the sampled monotonic time; keep the rendering timer paused until the click.
+    await page.evaluate(() => {
+      const nextTime = performance.now() + 500;
+      Object.defineProperty(performance, 'now', { configurable: true, value: () => nextTime });
+    });
+    const confirm = page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true });
+    await expect(confirm).toBeEnabled();
+    await confirm.click();
+    await expect(confirm).toBeDisabled();
+    await expect(page.getByRole('dialog')).toContainText('Expired, awaiting purge');
+    expect(mutations).toEqual([]);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  for (const invalidTime of [undefined, -1, 1.5]) {
+    test(`rejects a missing or invalid time anchor (${String(invalidTime)}) and can retry`, async ({
+      page,
+    }) => {
+      const fixture = await installRecycleBinFixture(page);
+      let attempts = 0;
+      await page.route('**/api/v1/admin/maintenance/recycle-bin/list', async (route) => {
+        attempts += 1;
+        if (attempts === 1) {
+          await route.fulfill(
+            fulfillOk({
+              serverTimeUtc: invalidTime,
+              list: fixture.rows,
+              total: 1,
+              totalPage: 1,
+              currentPage: 1,
+              pageSize: 10,
+              canRestore: true,
+              canPurge: true,
+            }),
+          );
+        } else await route.fallback();
+      });
+      await page.goto('/#/admin/recycle-bin');
+      const alert = page.getByRole('alert').filter({ hasText: 'Records could not be loaded.' });
+      await expect(alert).toBeVisible();
+      await expect(page.getByRole('table').getByRole('row')).toHaveCount(1);
+      await expect(page.getByRole('table').getByRole('button')).toHaveCount(0);
+      await alert.getByRole('button', { name: 'Refresh', exact: true }).click();
+      await expect(page.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+      expect(attempts).toBe(2);
+    });
+  }
+
+  test('returning from the background invalidates confirmation and retries the same query after failure', async ({
+    page,
+  }) => {
+    const serverTimeUtc = Date.now();
+    const fixture = await installRecycleBinFixture(page, {
+      serverTimeUtc,
+      rows: [deletedDepartment(1, { expiresTimeUtc: serverTimeUtc + 60_000 })],
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await page.getByLabel('Search name').fill('Department 1');
+    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await expect.poll(() => fixture.listRequests.length).toBe(2);
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    let attempts = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/list', async (route) => {
+      attempts += 1;
+      if (attempts === 1)
+        await route.fulfill({
+          status: 503,
+          contentType: 'application/json',
+          body: JSON.stringify({ ok: false, message: 'Wake synchronization unavailable' }),
+        });
+      else await route.fallback();
+    });
+    await setPageVisibility(page, 'hidden');
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    expect(attempts).toBe(0);
+    fixture.serverTimeUtc = serverTimeUtc + 60_000;
+    await setPageVisibility(page, 'visible');
+    const alert = page.getByRole('alert').filter({ hasText: 'Records could not be loaded.' });
+    await expect(alert).toBeVisible();
+    await expect(page.getByRole('table').getByRole('button')).toHaveCount(0);
+    await alert.getByRole('button', { name: 'Refresh', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Restore', exact: true })).toBeDisabled();
+    await expect(page.getByText('Expired, awaiting purge', { exact: true })).toBeVisible();
+    expect(attempts).toBe(2);
+    expect(fixture.listRequests.at(-1)).toEqual({
+      resourceType: 'department',
+      keyword: 'Department 1',
+      pageNo: 1,
+      pageSize: 10,
+    });
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('BFCache and resume events share a single synchronization', async ({ page }) => {
+    const fixture = await installRecycleBinFixture(page);
+    await page.goto('/#/admin/recycle-bin');
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    let attempts = 0;
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/list', async (route) => {
+      attempts += 1;
+      await gate;
+      await route.fallback();
+    });
+    await page.evaluate(() => {
+      window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true }));
+      document.dispatchEvent(new Event('resume'));
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await expect.poll(() => attempts).toBe(1);
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(page.getByRole('table').getByRole('button')).toHaveCount(0);
+    release?.();
+    await expect(page.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+    expect(attempts).toBe(1);
+    expect(fixture.listRequests).toHaveLength(2);
+  });
+
+  for (const succeeds of [true, false]) {
+    test(`defers wake synchronization until the in-flight mutation settles (${succeeds ? 'success' : 'failure'})`, async ({
+      page,
+    }) => {
+      const fixture = await installRecycleBinFixture(page);
+      let mutations = 0;
+      let release: (() => void) | undefined;
+      const gate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+        mutations += 1;
+        await gate;
+        if (succeeds) {
+          fixture.rows = [];
+          await route.fulfill(fulfillOk(1));
+        } else
+          await route.fulfill({
+            status: 503,
+            contentType: 'application/json',
+            body: JSON.stringify({ ok: false, message: 'Pending restore failed' }),
+          });
+      });
+      await page.goto('/#/admin/recycle-bin');
+      await page.getByRole('button', { name: 'Restore', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+      await expect.poll(() => mutations).toBe(1);
+      await setPageVisibility(page, 'hidden');
+      await setPageVisibility(page, 'visible');
+      expect(fixture.listRequests).toHaveLength(1);
+      release?.();
+      await expect.poll(() => fixture.listRequests.length).toBe(2);
+      if (succeeds)
+        await expect(page.getByRole('cell', { name: 'No data', exact: true })).toBeVisible();
+      else {
+        await expect(page.getByText('Pending restore failed', { exact: true })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Restore', exact: true })).toBeEnabled();
+      }
+      expect(mutations).toBe(1);
+      expect(fixture.unexpectedRequests).toEqual([]);
+    });
+  }
 });
 
 test('department deletion describes the 30 day recycle bin and keeps the existing request shape', async ({

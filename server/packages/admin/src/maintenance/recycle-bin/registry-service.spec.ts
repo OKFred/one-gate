@@ -1,5 +1,5 @@
 import { validate } from "@cfworker/json-schema";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   RecycleBinRegistry,
   type RecycleBinAction,
@@ -21,6 +21,7 @@ import {
 } from "./model";
 
 const entry = "admin.maintenance.recycle_bin:";
+const serverTimeUtc = 1_000;
 const mutation = {
   resourceType: "documents",
   id: "doc:alpha-7",
@@ -57,6 +58,21 @@ function actor(codes: string[] = [], superAdmin = false): UserObj {
   };
 }
 
+function deletedItem(id: RecycleBinRecordId) {
+  return {
+    resourceType: "injected-resource",
+    id,
+    name: "A deleted item",
+    deleterId: 27,
+    deleterName: null,
+    deletedTimeUtc: 100,
+    expiresTimeUtc: 2_592_000_100,
+    canRestore: true,
+    payload: "private business data",
+    secretToken: "private token",
+  };
+}
+
 function resource(resourceType: string, id: RecycleBinRecordId) {
   return {
     resourceType,
@@ -67,20 +83,7 @@ function resource(resourceType: string, id: RecycleBinRecordId) {
     ),
     list: vi.fn(async (_query: RecycleBinListQuery, _user: UserObj) => ({
       total: 1,
-      list: [
-        {
-          resourceType: "injected-resource",
-          id,
-          name: "A deleted item",
-          deleterId: 27,
-          deleterName: null,
-          deletedTimeUtc: 100,
-          expiresTimeUtc: 2_592_000_100,
-          canRestore: true,
-          payload: "private business data",
-          secretToken: "private token",
-        },
-      ],
+      list: [deletedItem(id)],
     })),
     restore: vi.fn(
       async (input: RecycleBinMutation, _user: UserObj) => input.id
@@ -100,12 +103,17 @@ describe("registered recycle-bin resources", () => {
   let handlers: ReturnType<typeof createRecycleBinHandlers>;
 
   beforeEach(() => {
+    vi.spyOn(Date, "now").mockReturnValue(serverTimeUtc);
     const registry = new RecycleBinRegistry();
     departments = resource("department", 7);
     documents = resource("documents", "doc:alpha-7");
     registry.register(departments);
     registry.register(documents);
     handlers = createRecycleBinHandlers(registry);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("distinguishes denied entry permission from an empty visible catalog", async () => {
@@ -162,6 +170,7 @@ describe("registered recycle-bin resources", () => {
     );
     expect(documents.list.mock.calls[0][1]).toBe(user);
     expect(result).toMatchObject({
+      serverTimeUtc,
       canRestore: true,
       canPurge: false,
       currentPage: 2,
@@ -189,6 +198,92 @@ describe("registered recycle-bin resources", () => {
     );
     expect(result.canRestore).toBe(false);
     expect(result.list[0].canRestore).toBe(true);
+  });
+
+  it("uses one response time for expiry boundaries without overriding business vetoes", async () => {
+    const item = deletedItem(mutation.id);
+    documents.list.mockResolvedValue({
+      total: 4,
+      list: [
+        { ...item, id: "before", expiresTimeUtc: serverTimeUtc + 1 },
+        { ...item, id: "at", expiresTimeUtc: serverTimeUtc },
+        { ...item, id: "after", expiresTimeUtc: serverTimeUtc - 1 },
+        { ...item, id: "veto", canRestore: false },
+      ],
+    });
+    const result = await handlers.onList(
+      { resourceType: "documents" },
+      actor([], true)
+    );
+    expect(result.serverTimeUtc).toBe(serverTimeUtc);
+    expect(result.canRestore).toBe(true);
+    expect(
+      result.list.map(({ id, canRestore }) => ({ id, canRestore }))
+    ).toEqual([
+      { id: "before", canRestore: true },
+      { id: "at", canRestore: false },
+      { id: "after", canRestore: false },
+      { id: "veto", canRestore: false },
+    ]);
+  });
+
+  it("expires a row when the list query crosses its deadline", async () => {
+    const item = deletedItem(mutation.id);
+    documents.list.mockImplementation(async () => {
+      await Promise.resolve();
+      vi.mocked(Date.now).mockReturnValue(item.expiresTimeUtc);
+      return { total: 1, list: [item] };
+    });
+    const result = await handlers.onList(
+      { resourceType: "documents" },
+      actor([], true)
+    );
+    expect(result.serverTimeUtc).toBe(item.expiresTimeUtc);
+    expect(result.list[0].canRestore).toBe(false);
+  });
+
+  it.each(["restore", "purge"] as const)(
+    "samples response time after asynchronous %s permission checks",
+    async (delayedAction) => {
+      const item = deletedItem(mutation.id);
+      documents.can.mockImplementation(async (action, user) => {
+        if (action === delayedAction) {
+          await Promise.resolve();
+          vi.mocked(Date.now).mockReturnValue(item.expiresTimeUtc);
+        }
+        return can(user, action, "test.documents");
+      });
+      const result = await handlers.onList(
+        { resourceType: "documents" },
+        actor([], true)
+      );
+      expect(result.serverTimeUtc).toBe(item.expiresTimeUtc);
+      expect(result.canRestore).toBe(true);
+      expect(result.canPurge).toBe(true);
+      expect(result.list[0].canRestore).toBe(false);
+    }
+  );
+
+  it("includes the final current-superadmin reload in the response-time boundary", async () => {
+    const item = deletedItem(mutation.id);
+    const user = actor([], true);
+    let purgePermissionChecked = false;
+    documents.can.mockImplementation(async (action, currentUser) => {
+      const allowed = await can(currentUser, action, "test.documents");
+      if (action === "purge") purgePermissionChecked = true;
+      return allowed;
+    });
+    user.ensureLoaded = async () => {
+      if (purgePermissionChecked) {
+        await Promise.resolve();
+        vi.mocked(Date.now).mockReturnValue(item.expiresTimeUtc);
+        user.isSuperAdmin = false;
+      }
+    };
+    const result = await handlers.onList({ resourceType: "documents" }, user);
+    expect(result.serverTimeUtc).toBe(item.expiresTimeUtc);
+    expect(result.canPurge).toBe(false);
+    expect(result.list[0].canRestore).toBe(false);
   });
 
   it.each(["read", "restore", "purge"] as const)(

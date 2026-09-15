@@ -1,5 +1,5 @@
 import { validate } from "@cfworker/json-schema";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { UserObj } from "@hodor/core/types/app";
 import {
   toHttpException,
@@ -75,16 +75,22 @@ const restoreCodes = [
   "admin.maintenance.recycle_bin:restore",
   "admin.system.department:edit",
 ];
+const serverTimeUtc = 300;
 
 describe("recycle bin access and public contract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(Date, "now").mockReturnValue(serverTimeUtc);
     departments.listDeletedDepartments.mockResolvedValue({
       total: 0,
       list: [],
     });
     departments.restoreDeletedDepartment.mockResolvedValue(9);
     departments.purgeDeletedDepartment.mockResolvedValue(9);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it.each([[], [readCodes[0]], [readCodes[1]]])(
@@ -124,6 +130,7 @@ describe("recycle bin access and public contract", () => {
       actor(readCodes)
     );
     expect(result).toMatchObject({
+      serverTimeUtc,
       total: 21,
       totalPage: 3,
       currentPage: 2,
@@ -138,6 +145,53 @@ describe("recycle bin access and public contract", () => {
       pageNo: 2,
       pageSize: 10,
     });
+  });
+
+  it("requires a nonnegative integer server time even for an empty list", async () => {
+    const result = await onList(
+      { resourceType: "department" },
+      actor(readCodes)
+    );
+    expect(result.serverTimeUtc).toBe(serverTimeUtc);
+    expect(result.list).toEqual([]);
+    const { serverTimeUtc: _serverTimeUtc, ...withoutTime } = result;
+    expect(validate(withoutTime, RecycleBinListRes).valid).toBe(false);
+    for (const invalidTime of [null, -1, 1.5, "300"]) {
+      expect(
+        validate({ ...result, serverTimeUtc: invalidTime }, RecycleBinListRes)
+          .valid
+      ).toBe(false);
+    }
+  });
+
+  it("allows unknown deleters but requires both record timestamps", async () => {
+    departments.listDeletedDepartments.mockResolvedValue({
+      total: 1,
+      list: [
+        {
+          id: 9,
+          name: "Archived department",
+          deleterId: null,
+          deleterName: null,
+          deletedTimeUtc: 123,
+          expiresTimeUtc: 456,
+          canRestore: true,
+        },
+      ],
+    });
+    const result = await onList(
+      { resourceType: "department" },
+      actor(readCodes)
+    );
+    expect(validate(result, RecycleBinListRes).valid).toBe(true);
+    for (const timestamp of ["deletedTimeUtc", "expiresTimeUtc"] as const) {
+      expect(
+        validate(
+          { ...result, list: [{ ...result.list[0], [timestamp]: null }] },
+          RecycleBinListRes
+        ).valid
+      ).toBe(false);
+    }
   });
 
   it.each([[], [restoreCodes[0]], [restoreCodes[1]]])(
