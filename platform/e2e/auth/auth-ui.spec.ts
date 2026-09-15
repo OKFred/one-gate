@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { readE2EEnvironment } from '../support/test-environment.js';
 
 const environment = readE2EEnvironment();
@@ -9,6 +9,86 @@ const fulfillOk = (data: unknown) => ({
   contentType: 'application/json',
   body: JSON.stringify({ ok: true, data, message: 'ok' }),
 });
+
+const sessionA = { id: 101, username: 'session_a', langCode: 'zh-CN', token: 'session-a-token' };
+const sessionB = { id: 102, username: 'session_b', langCode: 'zh-CN', token: 'session-b-token' };
+
+async function installSessionFixture(page: Page) {
+  await page.addInitScript((user) => {
+    if (sessionStorage.getItem('auth-session-fixture-initialized')) return;
+    sessionStorage.setItem('auth-session-fixture-initialized', 'true');
+    sessionStorage.setItem('chunk_reload_attempted', '1');
+    localStorage.setItem('userInfo', JSON.stringify(user));
+  }, sessionA);
+  await page.route(/\/(enterprise|personal)\/remoteEntry\.js$/, (route) =>
+    route.fulfill({
+      contentType: 'application/javascript',
+      body: 'export const init = () => {}; export const get = async () => () => ({ default: () => null });',
+    }),
+  );
+  await page.route('**/api/**', async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith('/auth/gate/status')) {
+      await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: null }));
+    } else if (pathname.endsWith('/auth/getButtonPermission')) {
+      await route.fulfill(
+        fulfillOk({ permissions: [{ id: 1, code: 'admin.system.auth:read', isEnabled: true }] }),
+      );
+    } else if (pathname.endsWith('/menu/tree')) {
+      await route.fulfill(
+        fulfillOk([
+          { id: 1, name: 'sidebar.menu.home', path: '/home', children: [] },
+          { id: 2, name: 'sidebar.menu.me', path: '/me', children: [] },
+        ]),
+      );
+    } else if (pathname.endsWith('/auth/check')) {
+      await route.fulfill(fulfillOk(true));
+    } else {
+      await route.fulfill(fulfillOk([]));
+    }
+  });
+}
+
+async function openSessionSwitcher(context: BrowserContext): Promise<Page> {
+  const switcher = await context.newPage();
+  await switcher.route('**/*', (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<title>Session switch fixture</title>' }),
+  );
+  await switcher.goto(environment.baseUrl);
+  return switcher;
+}
+
+async function switchToSessionB(switcher: Page, page: Page) {
+  const replacementCheck = page.waitForResponse(
+    (response) =>
+      response.url().endsWith('/auth/check') &&
+      response.request().headers().authorization === `Bearer ${sessionB.token}`,
+  );
+  await switcher.evaluate((user) => {
+    localStorage.setItem('userInfo', JSON.stringify(user));
+  }, sessionB);
+  await (await replacementCheck).finished();
+}
+
+async function expectSessionBReady(page: Page) {
+  await expect(page.locator('header').first()).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('userInfo') || 'null')?.id))
+    .toBe(sessionB.id);
+  await expect(page.getByLabel(/用户名|Username/i)).toHaveCount(0);
+  await expect(
+    page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
+  ).toHaveCount(0);
+}
+
+async function finishBrowserUpdate(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+}
 
 test.beforeEach(async ({ page }) => {
   await page.route('**/api/v1/admin/i18n/translation/listAll', async (route) => {
@@ -400,4 +480,178 @@ test('successful Identity Center login preserves the SPA after TOTP', async ({ p
       }
     })
     .toEqual(['id', 'langCode', 'token', 'username']);
+});
+
+test('a late route token-check failure cannot sign out the replacement session', async ({
+  page,
+  context,
+}) => {
+  await installSessionFixture(page);
+  let oldChecks = 0;
+  let releaseCheck: (() => void) | undefined;
+  const pendingCheck = new Promise<void>((resolve) => {
+    releaseCheck = resolve;
+  });
+  await page.route('**/api/v1/admin/system/auth/check', async (route) => {
+    if (route.request().headers().authorization === `Bearer ${sessionA.token}`) {
+      oldChecks += 1;
+      await pendingCheck;
+      await route.fulfill({ status: 503, ...fulfillOk(null) });
+      return;
+    }
+    await route.fulfill(fulfillOk(true));
+  });
+  await page.goto('/#/home');
+  await expect.poll(() => oldChecks).toBeGreaterThan(0);
+  const switcher = await openSessionSwitcher(context);
+  await switchToSessionB(switcher, page);
+  await expectSessionBReady(page);
+
+  const oldResponse = page.waitForResponse(
+    (response) => response.url().endsWith('/auth/check') && response.status() === 503,
+  );
+  releaseCheck?.();
+  await (await oldResponse).finished();
+  await finishBrowserUpdate(page);
+  await expectSessionBReady(page);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.locator('#global-snackbar-container')).toHaveCount(0);
+});
+
+test('a late transferred-token profile cannot overwrite the replacement session or its URL', async ({
+  page,
+  context,
+}) => {
+  await installSessionFixture(page);
+  let oldProfiles = 0;
+  let releaseProfile: (() => void) | undefined;
+  const pendingProfile = new Promise<void>((resolve) => {
+    releaseProfile = resolve;
+  });
+  await page.route('**/api/v1/admin/system/auth/profile', async (route) => {
+    oldProfiles += 1;
+    await pendingProfile;
+    await route.fulfill(fulfillOk({ userObj: sessionA }));
+  });
+  await page.goto(`/?token=${sessionA.token}#/home`);
+  await expect.poll(() => oldProfiles).toBeGreaterThan(0);
+  const switcher = await openSessionSwitcher(context);
+  await switchToSessionB(switcher, page);
+  await expectSessionBReady(page);
+  const replacementUrl = page.url();
+
+  const oldResponse = page.waitForResponse('**/api/v1/admin/system/auth/profile');
+  releaseProfile?.();
+  await (await oldResponse).finished();
+  await finishBrowserUpdate(page);
+  await expectSessionBReady(page);
+  expect(page.url()).toBe(replacementUrl);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+});
+
+for (const logoutEntry of ['TOTP', 'Topbar'] as const) {
+  test(`a pending ${logoutEntry} logout cannot clear the replacement local session`, async ({
+    page,
+    context,
+  }) => {
+    await installSessionFixture(page);
+    let logoutStarted = false;
+    let releaseLogout: (() => void) | undefined;
+    const pendingLogout = new Promise<void>((resolve) => {
+      releaseLogout = resolve;
+    });
+    await page.route('**/api/v1/admin/system/auth/gate/status', async (route) => {
+      const verified =
+        logoutEntry === 'Topbar' ||
+        route.request().headers().authorization === `Bearer ${sessionB.token}`;
+      await route.fulfill(fulfillOk({ verified, expiresAtUtc: null }));
+    });
+    await page.route('**/api/v1/admin/system/auth/gate/logout', async (route) => {
+      logoutStarted = true;
+      await pendingLogout;
+      await route.fulfill(fulfillOk({ verified: false, expiresAtUtc: null }));
+    });
+    await page.goto('/#/home');
+    if (logoutEntry === 'Topbar') {
+      await page.locator('header').getByRole('button', { name: 'S', exact: true }).click();
+      await page.getByRole('menuitem', { name: /退出登录|Log out/i }).click();
+    } else {
+      await page.getByRole('button', { name: /退出登录|Log out/i }).click();
+    }
+    await expect.poll(() => logoutStarted).toBe(true);
+    const switcher = await openSessionSwitcher(context);
+    await switchToSessionB(switcher, page);
+    await expectSessionBReady(page);
+
+    const oldResponse = page.waitForResponse('**/api/v1/admin/system/auth/gate/logout');
+    releaseLogout?.();
+    await (await oldResponse).finished();
+    await finishBrowserUpdate(page);
+    await expectSessionBReady(page);
+    await expect(page).toHaveURL(`${environment.baseUrl}/#/home`);
+  });
+}
+
+test('the current session still expires through its own unauthorized notification', async ({
+  page,
+}) => {
+  await installSessionFixture(page);
+  await page.route('**/api/v1/admin/ai/chat/ask', (route) =>
+    route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({ ok: false, data: { code: 'UNAUTHORIZED' }, message: 'Unauthorized' }),
+    }),
+  );
+  await page.goto('/#/home');
+  const question = page.getByPlaceholder(/输入您的提问内容|Enter your question/i);
+  await question.fill('current session authorization check');
+  await question.press('Enter');
+  const notification = page.getByRole('dialog');
+  await expect(notification.getByText(/登录已过期|session.*expired/i)).toBeVisible();
+  await notification.getByRole('button', { name: /确定|OK|Confirm/i }).click();
+  await expect(page.getByLabel(/用户名|Username/i)).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('userInfo'))).toBeNull();
+});
+
+test('a current TOTP challenge cancels a pending route check without logout or cancellation errors', async ({
+  page,
+}) => {
+  await installSessionFixture(page);
+  let checkStarted = false;
+  let releasePermission: (() => void) | undefined;
+  const pendingPermission = new Promise<void>((resolve) => {
+    releasePermission = resolve;
+  });
+  await page.route('**/api/v1/admin/system/auth/check', () => {
+    checkStarted = true;
+  });
+  await page.route('**/api/v1/admin/system/auth/getButtonPermission', async (route) => {
+    await pendingPermission;
+    await route.fulfill({
+      status: 401,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok: false,
+        data: { code: 'TOTP_GATE_REQUIRED' },
+        message: 'Gate required',
+      }),
+    });
+  });
+  await page.goto('/#/home');
+  await expect.poll(() => checkStarted).toBe(true);
+  const canceledCheck = page.waitForEvent('requestfailed', (request) =>
+    request.url().endsWith('/auth/check'),
+  );
+  releasePermission?.();
+  await canceledCheck;
+  await expect(
+    page.getByRole('heading', { name: /二次安全验证|Security verification/i }),
+  ).toBeVisible();
+  await finishBrowserUpdate(page);
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('userInfo') || 'null')?.id),
+  ).toBe(sessionA.id);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.locator('#global-snackbar-container')).toHaveCount(0);
 });

@@ -9,6 +9,30 @@ export const recycleBinPermissions = [
   'admin.system.department:delete',
 ];
 
+export const recycleBinFixtureUser = {
+  id: 42,
+  username: 'fixture_admin',
+  token: 'mock-token',
+  langCode: 'en-US',
+};
+
+/** An inert same-origin window: only localStorage changes cross into the application page. */
+export async function openRecycleBinAccountWindow(page: Page) {
+  const accountWindow = await page.context().newPage();
+  const url = new URL('/recycle-bin-account-fixture.html', page.url()).href;
+  await accountWindow.route('**/*', (route) =>
+    route.request().url() === url
+      ? route.fulfill({
+          contentType: 'text/html',
+          body: '<!doctype html><title>Isolated account fixture</title>',
+        })
+      : route.abort('blockedbyclient'),
+  );
+  await accountWindow.goto(url);
+  await page.bringToFront();
+  return accountWindow;
+}
+
 export interface RecycleBinResource {
   resourceType: string;
   labelKey: string;
@@ -85,6 +109,7 @@ export async function installRecycleBinFixture(
   const departmentReadable = grantedPermissions.includes('admin.system.department:read');
   const state = {
     serverTimeUtc: options.serverTimeUtc ?? Date.now(),
+    permissions: grantedPermissions,
     rows: options.rows ?? [deletedDepartment(1)],
     resources:
       options.resources ??
@@ -101,15 +126,16 @@ export async function installRecycleBinFixture(
         : []),
     resourcesRequests: [] as unknown[],
     listRequests: [] as unknown[],
+    permissionRequests: [] as unknown[],
     unexpectedRequests: [] as string[],
   };
-  await page.addInitScript((langCode) => {
-    localStorage.setItem(
-      'userInfo',
-      JSON.stringify({ id: 42, username: 'fixture_admin', token: 'mock-token', langCode }),
-    );
-    sessionStorage.setItem('chunk_reload_attempted', '1');
-  }, options.langCode ?? 'en-US');
+  await page.addInitScript(
+    (user) => {
+      localStorage.setItem('userInfo', JSON.stringify(user));
+      sessionStorage.setItem('chunk_reload_attempted', '1');
+    },
+    { ...recycleBinFixtureUser, langCode: options.langCode ?? 'en-US' },
+  );
   await page.route(/\/(enterprise|personal)\/remoteEntry\.js$/, (route) =>
     route.fulfill({
       contentType: 'application/javascript',
@@ -137,17 +163,18 @@ export async function installRecycleBinFixture(
     route.fulfill(fulfillOk({ verified: true, expiresAtUtc: null })),
   );
   await page.route('**/api/v1/admin/system/auth/check', (route) => route.fulfill(fulfillOk(true)));
-  await page.route('**/api/v1/admin/system/auth/getButtonPermission', (route) =>
-    route.fulfill(
+  await page.route('**/api/v1/admin/system/auth/getButtonPermission', (route) => {
+    state.permissionRequests.push(route.request().postDataJSON());
+    return route.fulfill(
       fulfillOk({
-        permissions: grantedPermissions.map((code, index) => ({
+        permissions: state.permissions.map((code, index) => ({
           id: index + 1,
           code,
           isEnabled: true,
         })),
       }),
-    ),
-  );
+    );
+  });
   await page.route('**/api/v1/admin/system/menu/tree', (route) =>
     route.fulfill(
       fulfillOk([

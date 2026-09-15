@@ -9,13 +9,32 @@ import type { paths } from '@/types/openapi'; //由openapi-typescript自动生�
 import { showGlobalNotification, showSnackbar } from '@/components/Notification';
 
 // 导入认证工具
-import { authUtils, TOTP_GATE_REQUIRED_EVENT } from '@/utils/auth';
+import {
+  authUtils,
+  captureRequestAuthSession,
+  isCurrentAuthSession,
+  TOTP_GATE_REQUIRED_EVENT,
+  type AuthSessionSnapshot,
+} from '@/utils/auth';
 // 导入翻译函数创建器（非Hook版本，可在拦截器中使用）
 import { createTranslator } from '@/hooks/useTranslation';
 import { loginPath } from '@/routes';
 import { RequestQueueManager } from './queue';
 
 const requestQueueManager = new RequestQueueManager();
+
+type SessionRequestConfig = InternalAxiosRequestConfig & {
+  path?: Record<string, unknown>;
+  requestId?: string;
+  ignoreAbort?: boolean;
+  authSession?: AuthSessionSnapshot;
+};
+
+function assertCurrentRequestSession(config: SessionRequestConfig): void {
+  if (!config.authSession || !isCurrentAuthSession(config.authSession)) {
+    throw new axios.CanceledError('Authentication session changed');
+  }
+}
 
 export type UrlGeneric<U> = U extends keyof paths ? paths[U] : never;
 
@@ -65,13 +84,8 @@ const service = axios.create({
 function setupInterceptors(service: AxiosInstance) {
   /** @description 添加请求拦截器 */
   service.interceptors.request.use(
-    (
-      config: InternalAxiosRequestConfig & {
-        path?: Record<string, unknown>;
-        requestId?: string;
-        ignoreAbort?: boolean;
-      },
-    ) => {
+    (config: SessionRequestConfig) => {
+      assertCurrentRequestSession(config);
       // 如果没有标记忽略 abort，才创建 AbortController 并添加到队列
       if (!config.ignoreAbort) {
         const controller = new AbortController();
@@ -84,7 +98,7 @@ function setupInterceptors(service: AxiosInstance) {
       config.headers['X-Request-Id'] = correlationId;
 
       // 自动添加认证token
-      const token = authUtils.getUserInfo()?.token;
+      const token = config.authSession?.token;
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -117,11 +131,12 @@ function setupInterceptors(service: AxiosInstance) {
   service.interceptors.response.use(
     function (response) {
       // 从队列中移除已完成的请求
-      const requestId = (response.config as InternalAxiosRequestConfig & { requestId?: string })
-        .requestId;
+      const config = response.config as SessionRequestConfig;
+      const requestId = config.requestId;
       if (requestId) {
         requestQueueManager.removeRequest(requestId);
       }
+      assertCurrentRequestSession(config);
 
       if (response.status === 200) {
         // 检查响应数据中的 ok 字段
@@ -135,22 +150,27 @@ function setupInterceptors(service: AxiosInstance) {
       }
       return response;
     },
-    function (error) {
+    function (error: unknown) {
+      const axiosError = axios.isAxiosError(error) ? error : undefined;
+      const config = axiosError?.config as SessionRequestConfig | undefined;
+      const requestId = config?.requestId;
+      if (requestId) requestQueueManager.removeRequest(requestId);
+      if (axios.isCancel(error)) return Promise.reject(error);
+      if (config) assertCurrentRequestSession(config);
+
       // 获取用户语言创建翻译函数
       const langCode = authUtils.getUserInfo()?.langCode;
       const t = createTranslator(langCode);
-      const status = error.response?.status;
-      const errorCode = readErrorCode(error.response?.data);
-      const requestId = (error.config as InternalAxiosRequestConfig & { requestId?: string })
-        ?.requestId;
+      const status = axiosError?.response?.status;
+      const errorCode = readErrorCode(axiosError?.response?.data);
+      const errorMessage = error instanceof Error ? error.message : '';
 
       if (status === 401 && errorCode?.startsWith('TOTP_')) {
-        if (requestId) requestQueueManager.removeRequest(requestId);
         if (errorCode === 'TOTP_GATE_REQUIRED') {
-          requestQueueManager.abortAllRequests(requestId);
+          requestQueueManager.abortAllRequests();
           window.dispatchEvent(new Event(TOTP_GATE_REQUIRED_EVENT));
         } else {
-          handleErrorResponse(error.response?.data, error.message || t('error.requestFailed'));
+          handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.requestFailed'));
         }
         return Promise.reject(error);
       }
@@ -163,34 +183,25 @@ function setupInterceptors(service: AxiosInstance) {
           currentHash.startsWith(loginPath) || currentHash.startsWith('/sso/callback');
         if (!isAuthPage) {
           // abort 队列中的所有其他请求
-          requestQueueManager.abortAllRequests(requestId);
+          requestQueueManager.abortAllRequests();
 
           showGlobalNotification({
             message: t('error.sessionExpired'),
             type: 'warning',
             beforeClose: (_, __, done) => {
-              authUtils.logout();
-              window.location.hash = loginPath;
+              if (config?.authSession && isCurrentAuthSession(config.authSession)) {
+                authUtils.logout();
+                window.location.hash = loginPath;
+              }
               done();
             },
           });
-        } else {
-          console.log('当前已在登录页，无需重复跳转');
-          // 移除当前请求
-          if (requestId) {
-            requestQueueManager.removeRequest(requestId);
-          }
         }
         return Promise.reject(error);
       }
 
-      // 移除当前请求
-      if (requestId) {
-        requestQueueManager.removeRequest(requestId);
-      }
-
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(error.response?.data, error.message || t('error.networkError'));
+      handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.networkError'));
       return Promise.reject(error);
     },
   );
@@ -243,7 +254,11 @@ setupInterceptors(service);
 const axiosPlus = async <U extends keyof paths, M extends keyof UrlGeneric<U>>(
   axiosConfig: AxiosConfig<U, M>,
 ): Promise<Omit<AxiosResponse, 'data' | 'headers'> & ResponseGeneric<U, M>> => {
-  return await service(axiosConfig as AxiosRequestConfig);
+  const config: AxiosRequestConfig & { authSession: AuthSessionSnapshot } = {
+    ...(axiosConfig as AxiosRequestConfig),
+    authSession: captureRequestAuthSession(),
+  };
+  return await service(config);
 };
 
 export { axiosPlus };
