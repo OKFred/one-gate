@@ -345,9 +345,14 @@ async function getRoleDataScopes(roleIds: number[]) {
   return await roleRepository.getRoleDataScopes(roleIds);
 }
 
+async function getAuthorizationRoles(roleIds: number[]) {
+  return await roleRepository.getAuthorizationRoles(roleIds);
+}
+
 export const utils = {
   getRolesByIds,
   getRoleDataScopes,
+  getAuthorizationRoles,
   verifyRoles,
   verifyRoleExists,
   updatePermissionCount,

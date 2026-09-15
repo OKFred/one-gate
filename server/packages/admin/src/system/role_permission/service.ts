@@ -20,7 +20,7 @@ import {
   RolePermissionBaseVO,
 } from "./model";
 import { preventMissingRecord, preventMissingRole } from "./prevention";
-import roleService, { utils as roleUtils } from "../role/service";
+import { utils as roleUtils } from "../role/service";
 import permissionService from "../permission/service";
 import { permissionRepository } from "../permission/repository";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
@@ -498,20 +498,17 @@ export async function getPermissionsByRoleIds(roleIds: number[]) {
   if (roleIds.length === 0) {
     return [];
   }
-  // 如果是超管，给到所有权限（无视启用状态）
-  if (roleIds.includes(SUPER_ADMIN_ROLE_ID)) {
+  // The shortcut requires an existing, enabled super-administrator role.
+  if (
+    roleIds.includes(SUPER_ADMIN_ROLE_ID) &&
+    (await roleUtils.getAuthorizationRoles([SUPER_ADMIN_ROLE_ID])).some(
+      (role) => role.id === SUPER_ADMIN_ROLE_ID
+    )
+  ) {
     const rows = await permissionRepository.getAllPermissions();
     return permissionUtils.filterEffectivePermissions(rows as PermissionInfo[]);
   }
-  // 仅允许已启用的角色
-  const enabledRoles = await roleService.listAll.service({ isEnabled: true });
-  const enabledRoleIds = new Set(enabledRoles.map((role) => role.id));
-  const filteredRoleIds = roleIds.filter((id) => enabledRoleIds.has(id));
-  if (filteredRoleIds.length === 0) {
-    return [];
-  }
-  const rows =
-    await rolePermissionRepository.getPermissionsByRoleIds(filteredRoleIds);
+  const rows = await rolePermissionRepository.getPermissionsByRoleIds(roleIds);
   const permissions = permissionUtils.filterEffectivePermissions(
     rows as PermissionInfo[]
   );

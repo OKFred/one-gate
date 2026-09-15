@@ -1,6 +1,7 @@
 import db from "@hodor/core/db/index";
 import { rolePermissionTable, type RolePermissionPOLike } from "./model";
 import { permissionTable, type PermissionPOLike } from "../permission/model";
+import { roleTable } from "../role/model";
 import {
   asc,
   count,
@@ -142,8 +143,9 @@ export class RolePermissionRepository {
   }
 
   async getPermissionsByRoleIds(
-    filteredRoleIds: number[]
+    roleIds: number[]
   ): Promise<PermissionPOLike[]> {
+    if (roleIds.length === 0) return [];
     const rows = await db
       .select({
         id: permissionTable.id,
@@ -164,9 +166,11 @@ export class RolePermissionRepository {
         permissionTable,
         eq(rolePermissionTable.permissionId, permissionTable.id)
       )
+      .innerJoin(roleTable, eq(rolePermissionTable.roleId, roleTable.id))
       .where(
         and(
-          inArray(rolePermissionTable.roleId, filteredRoleIds),
+          inArray(rolePermissionTable.roleId, roleIds),
+          eq(roleTable.isEnabled, true),
           eq(permissionTable.isEnabled, true)
         )
       );
