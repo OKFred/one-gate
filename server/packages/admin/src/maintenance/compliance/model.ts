@@ -198,27 +198,38 @@ export const ComplianceArchiveSortableKeys = [
   "restoredTimeUtc",
 ] as const satisfies RequiredKeys<ComplianceArchivePOLike>[];
 
-export const complianceArchiveTable = sqliteTable("compliance_archives", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  sourceSystem: text("source_system", { length: 100 }).notNull(),
-  sourceDatabase: text("source_database", { length: 100 }).notNull(),
-  sourceTable: text("source_table", { length: 100 }).notNull(),
-  sourcePrimaryKey: text("source_primary_key", { length: 100 }).notNull(),
-  deleteReason: text("delete_reason", { length: 200 }),
-  deleteType: text("delete_type", { length: 100 }),
-  recordSnapshot: text("record_snapshot"),
-  remark: text("remark", { length: 500 }),
-  restorable: integer("restorable", { mode: "boolean" }).notNull(),
-  restoreUntilTimeUtc: integer("restore_until_time_utc"),
-  restoredTimeUtc: integer("restored_time_utc"),
-  restorerId: integer("restorer_id"),
-  complianceNote: text("compliance_note", { length: 500 }),
-  creatorId: integer("creator_id").notNull(),
-  updaterId: integer("updater_id"),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-});
+export const complianceArchiveTable = sqliteTable(
+  "compliance_archives",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    sourceSystem: text("source_system", { length: 100 }).notNull(),
+    sourceDatabase: text("source_database", { length: 100 }).notNull(),
+    sourceTable: text("source_table", { length: 100 }).notNull(),
+    sourcePrimaryKey: text("source_primary_key", { length: 100 }).notNull(),
+    deleteReason: text("delete_reason", { length: 200 }),
+    deleteType: text("delete_type", { length: 100 }),
+    recordSnapshot: text("record_snapshot"),
+    remark: text("remark", { length: 500 }),
+    restorable: integer("restorable", { mode: "boolean" }).notNull(),
+    restoreUntilTimeUtc: integer("restore_until_time_utc"),
+    restoredTimeUtc: integer("restored_time_utc"),
+    restorerId: integer("restorer_id"),
+    complianceNote: text("compliance_note", { length: 500 }),
+    creatorId: integer("creator_id").notNull(),
+    updaterId: integer("updater_id"),
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+  },
+  (table) => [
+    index("compliance_archives_department_retention_idx").on(
+      table.sourceSystem,
+      table.sourceDatabase,
+      table.sourceTable,
+      table.createTimeUtc
+    ),
+  ]
+);
 
 export default complianceArchiveTable;

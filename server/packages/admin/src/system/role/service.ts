@@ -22,6 +22,7 @@ import {
   RoleUniqueVO,
 } from "./model";
 import { DataScope, DataScopeValues } from "@hodor/core/types/dataScope";
+import { invalidateAuthCache } from "@hodor/core/middleware/auth/cache-invalidation";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
 import {
@@ -173,7 +174,7 @@ async function onAdd(
     ...obj,
     creatorId,
   });
-
+  await invalidateAuthCache();
   return insertedId;
 }
 const addApi = {
@@ -228,6 +229,7 @@ async function onUpdate(
   };
 
   const updatedId = await roleRepository.onUpdate(id, updateData);
+  await invalidateAuthCache();
   return updatedId;
 }
 const updateApi = {

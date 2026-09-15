@@ -29,6 +29,8 @@ export const BUSINESS = {
   "admin.maintenance.api_docs": "admin.maintenance.api_docs",
   /** 运维合规 */
   "admin.maintenance.compliance": "admin.maintenance.compliance",
+  /** 运维回收站 */
+  "admin.maintenance.recycle_bin": "admin.maintenance.recycle_bin",
   /** 运维定时任务 */
   "admin.maintenance.cron": "admin.maintenance.cron",
   /** 运维 API Task */

@@ -3,6 +3,26 @@
  * 仅包含 frontend 条目；backend 条目（cron.frequency.*）保留在数据库
  */
 export const maintenance = {
+  // 回收站
+  'sidebar.menu.maintenance.recycleBin': '回收站',
+  'recycleBin.title': '部门回收站',
+  'recycleBin.retentionHelp':
+    '已删除部门保留 30 天，到期后将自动彻底清除。保留期内可恢复，超级管理员可提前彻底清除。',
+  'recycleBin.noReadPermission': '查看回收站需要回收站读取权限和部门读取权限。',
+  'recycleBin.searchName': '搜索部门名称',
+  'recycleBin.deletedBy': '删除人',
+  'recycleBin.deletedTime': '删除时间',
+  'recycleBin.expiresTime': '到期时间',
+  'recycleBin.unknownDeleter': '未知用户',
+  'recycleBin.retained': '保留期内',
+  'recycleBin.expired': '已到期，等待清除',
+  'recycleBin.restore': '恢复',
+  'recycleBin.purge': '彻底清除',
+  'recycleBin.restoreConfirm':
+    '确定恢复部门「{{name}}」吗？恢复将保留原启用状态。若存在同名部门或上级部门已删除，需先解决冲突。',
+  'recycleBin.purgeConfirm': '确定彻底清除部门「{{name}}」吗？记录将永久删除，此操作不可恢复。',
+  'recycleBin.pagination': '{{from}}–{{to}} / 共 {{count}} 条',
+
   // 接口文档
   'openapi.title': '接口文档',
   'apiDocs.button.upload': '上传/导入文档',

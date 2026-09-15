@@ -252,6 +252,14 @@ export const actionTranslations = {
     "zh-CN": "下发",
     "en-US": "Dispatch",
   },
+  restore: {
+    "zh-CN": "恢复",
+    "en-US": "Restore",
+  },
+  purge: {
+    "zh-CN": "彻底删除",
+    "en-US": "Permanently delete",
+  },
   unknown: {
     "zh-CN": "未知动作",
     "en-US": "Unknown Action",

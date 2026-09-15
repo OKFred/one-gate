@@ -95,6 +95,7 @@ describe("System Auth 模块全链路集成测试", () => {
       name: "研发部",
       isEnabled: true,
       creatorId: 1,
+      isDeleted: false,
     });
 
     const base64Password = Buffer.from("admin123").toString("base64");

@@ -202,6 +202,12 @@ export const permissions = {
       compliance: {
         read: 'admin.maintenance.compliance:read',
       },
+      /** 回收站 */
+      recycle_bin: {
+        read: 'admin.maintenance.recycle_bin:read',
+        restore: 'admin.maintenance.recycle_bin:restore',
+        purge: 'admin.maintenance.recycle_bin:purge',
+      },
       /** 初始化数据 */
       init: {
         read: 'admin.maintenance.init:read',

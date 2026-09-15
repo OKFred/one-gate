@@ -1,5 +1,13 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
-import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import {
+  sqliteTable,
+  integer,
+  text,
+  uniqueIndex,
+  index,
+  check,
+} from "drizzle-orm/sqlite-core";
+import { sql, type InferSelectModel, type InferInsertModel } from "drizzle-orm";
+import { softDeleteColumns } from "@hodor/core/db/soft-delete";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
@@ -45,8 +53,15 @@ const DepartmentPO = {
   ...DepartmentBasePO,
   ...AuditPO,
 } as const satisfies Record<keyof DepartmentPOLike, JSONSchema>;
-export type DepartmentPOLike = InferSelectModel<typeof departmentTable>; // 列表
-type DepartmentSelectPOLike = InferInsertModel<typeof departmentTable>;
+export type DepartmentRecord = InferSelectModel<typeof departmentTable>;
+export type DepartmentPOLike = Omit<
+  DepartmentRecord,
+  "isDeleted" | "deletedTimeUtc" | "deleterId"
+>;
+type DepartmentSelectPOLike = Omit<
+  InferInsertModel<typeof departmentTable>,
+  "isDeleted" | "deletedTimeUtc" | "deleterId"
+>;
 type DepartmentAddPOLike = Omit<
   DepartmentPOLike,
   IndexKeyLike | AuditAddOmitKeyLike
@@ -109,18 +124,36 @@ export const DepartmentSortableKeys = [
   "createTimeUtc",
 ] as const satisfies RequiredKeys<DepartmentPOLike>[];
 
-export const departmentTable = sqliteTable("system_department", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull().unique(),
-  parentId: integer("parent_id"),
-  remark: text("remark"),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-  creatorId: integer("creator_id").notNull(),
-  updaterId: integer("updater_id"),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-});
+export const departmentTable = sqliteTable(
+  "system_department",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    parentId: integer("parent_id"),
+    remark: text("remark"),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+    creatorId: integer("creator_id").notNull(),
+    updaterId: integer("updater_id"),
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+    ...softDeleteColumns(),
+  },
+  (table) => [
+    uniqueIndex("system_department_name_active_unique")
+      .on(table.name)
+      .where(sql`${table.isDeleted} = 0`),
+    index("system_department_deleted_time_idx").on(
+      table.isDeleted,
+      table.deletedTimeUtc
+    ),
+    index("system_department_parent_id_idx").on(table.parentId),
+    check(
+      "system_department_soft_delete_state_check",
+      sql`(${table.isDeleted} = 0 AND ${table.deletedTimeUtc} IS NULL AND ${table.deleterId} IS NULL) OR (${table.isDeleted} = 1 AND ${table.deletedTimeUtc} IS NOT NULL AND ${table.deleterId} IS NOT NULL)`
+    ),
+  ]
+);
 
 export default departmentTable;

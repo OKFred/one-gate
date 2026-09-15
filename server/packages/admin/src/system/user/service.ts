@@ -252,7 +252,8 @@ async function onUpdate(
   const updateData = {
     ...rest,
     updaterId,
-    departmentId: departmentObj?.value,
+    departmentId:
+      departmentObj === undefined ? undefined : (departmentObj?.value ?? null),
     regionId: regionObj?.value,
     roleIdArr: roleArr?.map((o) => o.value),
     isEnabled: params.isEnabled,

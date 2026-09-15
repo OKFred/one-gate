@@ -40,6 +40,8 @@ export const system = {
   'department.table.parentDepartment': '上级部门',
   'department.table.topLevelDepartment': '无（顶级部门）',
   'department.dialog.addChild': '添加子部门',
+  'department.dialog.softDeleteConfirm':
+    '确定删除此部门吗？部门将进入回收站，保留 30 天。期间可由有权限的管理员恢复，到期后自动彻底清除。',
 
   // 角色管理
   'role.table.roleName': '角色名称',

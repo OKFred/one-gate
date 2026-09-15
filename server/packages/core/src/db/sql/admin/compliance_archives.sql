@@ -18,3 +18,5 @@ CREATE TABLE IF NOT EXISTS `compliance_archives` (
 	`create_time_utc` integer DEFAULT (CAST(strftime('%s', 'now') AS INTEGER) * 1000 + CAST(substr(strftime('%f', 'now'), 4, 3) AS INTEGER)) NOT NULL,
 	`update_time_utc` integer
 );
+
+CREATE INDEX IF NOT EXISTS `compliance_archives_department_retention_idx` ON `compliance_archives` (`source_system`,`source_database`,`source_table`,`create_time_utc`);

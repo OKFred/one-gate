@@ -29,7 +29,9 @@ import {
 } from "@hodor/core/middleware/encapsulation/common.schema";
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
-import { registry } from "../../common/registry.js";
+import { invalidateAuthCache } from "@hodor/core/middleware/auth/cache-invalidation";
+import { SOFT_DELETE_RETENTION_MS } from "@hodor/core/db/soft-delete";
+import { DepartmentDeletionError } from "./errors";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -39,8 +41,6 @@ import {
   preventSelfParent,
   preventCircularParent,
   preventDisable,
-  preventHasEnabledUsers,
-  preventHasChildren,
 } from "./prevention";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { departmentRepository } from "./repository";
@@ -172,8 +172,11 @@ async function onAdd(
     parentId,
     isEnabled,
     creatorId,
+    isDeleted: false,
+    deletedTimeUtc: null,
+    deleterId: null,
   });
-
+  await invalidateAuthCache();
   return insertedId;
 }
 const addApi = {
@@ -226,6 +229,7 @@ async function onUpdate(
   };
 
   const updatedId = await departmentRepository.onUpdate(id, updateData);
+  await invalidateAuthCache();
   return updatedId;
 }
 const updateApi = {
@@ -268,35 +272,9 @@ async function onDelete(
   const row = await onGet({ id }, userObj);
   preventEmpty(row);
 
-  await preventHasEnabledUsers(id);
-  await preventHasChildren(id);
-
-  // 执行删除操作
-  const deletedId = await departmentRepository.onDelete(id);
-
-  // 归档删除记录
-  try {
-    await registry.maintenance.exportDeletionRecord(
-      {
-        sourceTable: "department",
-        sourcePrimaryKey: String(id),
-        deleteReason: "system",
-        deleteType: "purge",
-        recordSnapshot: JSON.stringify(row),
-        remark: `部门"${row.name}"被删除`,
-        restorable: true,
-        restoreUntilTimeUtc: new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000
-        ).getTime(), // 30天后不可恢复
-        complianceNote: undefined,
-      },
-      userObj.userId
-    );
-  } catch (error) {
-    console.error("归档删除记录失败:", error);
-    // 归档失败不影响删除操作
-  }
-
+  // 引用与状态由同一条 UPDATE 校验，不能依赖前置查询保护并发。
+  const deletedId = await departmentRepository.onDelete(id, userObj.userId);
+  await invalidateAuthCache();
   return deletedId;
 }
 const deleteApi = {
@@ -559,6 +537,83 @@ export const utils = {
   getSiblingDepartments,
   getParentAndItsDescendants,
 };
+
+export async function listDeletedDepartments(params: {
+  keyword?: string;
+  pageNo: number;
+  pageSize: number;
+  now?: number;
+}) {
+  return departmentRepository.listDeleted({
+    ...params,
+    pageNo: Math.max(1, params.pageNo),
+    pageSize: Math.min(100, Math.max(1, params.pageSize)),
+  });
+}
+
+async function requireDeletedVersion(
+  id: number,
+  expectedDeletedTimeUtc: number
+) {
+  const row = await departmentRepository.findDeletedById(id);
+  if (!row) throw new BusinessError(DepartmentDeletionError.NOT_DELETED);
+  if (row.deletedTimeUtc !== expectedDeletedTimeUtc) {
+    throw new BusinessError(DepartmentDeletionError.STALE_DELETION);
+  }
+  return row;
+}
+
+export async function restoreDeletedDepartment(
+  id: number,
+  expectedDeletedTimeUtc: number,
+  actorId: number,
+  now = Date.now()
+): Promise<number> {
+  if (!Number.isSafeInteger(actorId) || actorId <= 0)
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  const row = await requireDeletedVersion(id, expectedDeletedTimeUtc);
+  if (expectedDeletedTimeUtc + SOFT_DELETE_RETENTION_MS <= now)
+    throw new BusinessError(DepartmentDeletionError.EXPIRED);
+  if (
+    row.parentId !== null &&
+    !(await departmentRepository.findById(row.parentId))
+  )
+    throw new BusinessError(DepartmentDeletionError.INVALID_PARENT);
+  const restoredId = await departmentRepository.restore(
+    id,
+    expectedDeletedTimeUtc,
+    actorId,
+    now
+  );
+  if (restoredId === null) {
+    await requireDeletedVersion(id, expectedDeletedTimeUtc);
+    throw new BusinessError(DepartmentDeletionError.STATE_CONFLICT);
+  }
+  await invalidateAuthCache();
+  return restoredId;
+}
+
+/** Authorization is checked by the recycle-bin API before entering this domain operation. */
+export async function purgeDeletedDepartment(
+  id: number,
+  expectedDeletedTimeUtc: number,
+  actorId: number,
+  now = Date.now()
+): Promise<number> {
+  if (!Number.isSafeInteger(actorId) || actorId <= 0)
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  await requireDeletedVersion(id, expectedDeletedTimeUtc);
+  const purgedId = await departmentRepository.purge(id, expectedDeletedTimeUtc);
+  if (purgedId === null) {
+    await requireDeletedVersion(id, expectedDeletedTimeUtc);
+    throw new BusinessError(DepartmentDeletionError.HAS_REFERENCES);
+  }
+  await invalidateAuthCache();
+  console.log(
+    JSON.stringify({ event: "department.purged", id, actorId, time: now })
+  );
+  return purgedId;
+}
 
 export default {
   listAll: listAllApi,

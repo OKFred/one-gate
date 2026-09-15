@@ -75,6 +75,102 @@ export const systemTranslations = {
   "admin.system.department": [
     {
       application: "backend",
+      tKey: "errorHandler.department.clockConflict",
+      langCodes: {
+        "zh-CN": "部门更新时间晚于服务器时间，请检查时间后重试",
+        "en-US":
+          "The department update time is ahead of server time; check the clock and try again",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.notActive",
+      langCodes: {
+        "zh-CN": "部门不存在或已删除",
+        "en-US": "Department does not exist or has been deleted",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.hasReferences",
+      langCodes: {
+        "zh-CN": "部门仍被子部门、用户或角色引用，请先解除引用",
+        "en-US":
+          "The department is still referenced by a child department, user, or role",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.invalidParent",
+      langCodes: {
+        "zh-CN": "父部门不存在、已删除或层级无效，请先恢复父部门",
+        "en-US":
+          "The parent department is missing, deleted, or invalid; restore the parent first",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.invalidDepartmentIds",
+      langCodes: {
+        "zh-CN": "部门范围必须是正整数 ID 数组",
+        "en-US": "Department scopes must be an array of positive integer IDs",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.referenceUnavailable",
+      langCodes: {
+        "zh-CN": "关联部门不存在或已删除，请刷新后重试",
+        "en-US":
+          "A referenced department is missing or deleted; refresh and try again",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.nameConflict",
+      langCodes: {
+        "zh-CN": "已存在同名部门，请先处理名称冲突",
+        "en-US": "An active department already uses this name",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.notDeleted",
+      langCodes: {
+        "zh-CN": "回收站记录不存在或已恢复，请刷新列表",
+        "en-US":
+          "The recycle-bin record is missing or already restored; refresh the list",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.staleDeletion",
+      langCodes: {
+        "zh-CN": "删除记录已发生变化，请刷新回收站后重试",
+        "en-US":
+          "This deletion has changed; refresh the recycle bin and try again",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.restoreExpired",
+      langCodes: {
+        "zh-CN": "记录已满 30 天，无法恢复",
+        "en-US":
+          "The 30-day retention period has ended; this record cannot be restored",
+      },
+    },
+    {
+      application: "backend",
+      tKey: "errorHandler.department.stateConflict",
+      langCodes: {
+        "zh-CN": "部门状态或关联关系已变化，请刷新后重试",
+        "en-US":
+          "The department state or references changed; refresh and try again",
+      },
+    },
+    {
+      application: "backend",
       tKey: "errorHandler.departmentNotExist",
       langCodes: {
         "zh-CN": "部门不存在或已被禁用",
