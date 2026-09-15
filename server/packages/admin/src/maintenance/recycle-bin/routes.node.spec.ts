@@ -1,6 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Context, UserObj } from "@hodor/core/types/app";
-import { recycleBinRegistry } from "@hodor/core/db/recycle-bin";
+import {
+  recycleBinRegistry,
+  type RecycleBinItem,
+} from "@hodor/core/db/recycle-bin";
 import {
   BusinessError,
   toHttpException,
@@ -9,7 +12,12 @@ import createApp from "./index";
 
 const state = vi.hoisted(() => ({
   resourceReadable: true,
-  list: vi.fn(async () => ({ total: 0, list: [] })),
+  list: vi.fn(
+    async (): Promise<{ total: number; list: RecycleBinItem[] }> => ({
+      total: 0,
+      list: [],
+    })
+  ),
   restore: vi.fn(async () => "document/1"),
   purge: vi.fn(async () => "document/1"),
 }));
@@ -69,6 +77,8 @@ function request(path: string, body: object) {
 describe("recycle-bin HTTP contract", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.spyOn(Date, "now").mockReturnValue(1_000);
+    state.list.mockResolvedValue({ total: 0, list: [] });
     state.resourceReadable = true;
     actor.isSuperAdmin = false;
     actor.permissions = ["read", "restore", "purge"].map((action, index) => ({
@@ -85,6 +95,55 @@ describe("recycle-bin HTTP contract", () => {
       createTimeUtc: 1,
       updateTimeUtc: null,
     }));
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("returns the server-time anchor and expires rows through the actual HTTP list route", async () => {
+    const item = {
+      id: "document/1",
+      name: "Deleted document",
+      deleterId: null,
+      deleterName: null,
+      deletedTimeUtc: 500,
+      expiresTimeUtc: 1_000,
+      canRestore: true,
+      payload: "private business data",
+    };
+    state.list.mockResolvedValue({ total: 1, list: [item] });
+    const response = await request("/list", { resourceType: "route_document" });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      ok: true,
+      message: "OK",
+      data: {
+        serverTimeUtc: 1_000,
+        canRestore: true,
+        canPurge: false,
+        list: [
+          {
+            resourceType: "route_document",
+            id: "document/1",
+            name: "Deleted document",
+            deleterId: null,
+            deleterName: null,
+            deletedTimeUtc: 500,
+            expiresTimeUtc: 1_000,
+            canRestore: false,
+          },
+        ],
+        total: 1,
+        totalPage: 1,
+        currentPage: 1,
+        pageSize: 10,
+      },
+    });
+    expect(state.list).toHaveBeenCalledExactlyOnceWith(
+      { keyword: undefined, pageNo: 1, pageSize: 10 },
+      actor
+    );
   });
 
   it("protects the catalogue with route permissions and filters unreadable resources", async () => {

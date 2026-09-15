@@ -567,23 +567,28 @@ export async function restoreDeletedDepartment(
   id: number,
   expectedDeletedTimeUtc: number,
   actorId: number,
-  now = Date.now()
+  now?: number
 ): Promise<number> {
   if (!Number.isSafeInteger(actorId) || actorId <= 0)
     throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  const initialTimeUtc = now ?? Date.now();
   const row = await requireDeletedVersion(id, expectedDeletedTimeUtc);
-  if (expectedDeletedTimeUtc + SOFT_DELETE_RETENTION_MS <= now)
+  const expiresTimeUtc = expectedDeletedTimeUtc + SOFT_DELETE_RETENTION_MS;
+  if (expiresTimeUtc <= initialTimeUtc)
     throw new BusinessError(DepartmentDeletionError.EXPIRED);
   if (
     row.parentId !== null &&
     !(await departmentRepository.findById(row.parentId))
   )
     throw new BusinessError(DepartmentDeletionError.INVALID_PARENT);
+  const restoreTimeUtc = now ?? Date.now();
+  if (expiresTimeUtc <= restoreTimeUtc)
+    throw new BusinessError(DepartmentDeletionError.EXPIRED);
   const restoredId = await departmentRepository.restore(
     id,
     expectedDeletedTimeUtc,
     actorId,
-    now
+    restoreTimeUtc
   );
   if (restoredId === null) {
     await requireDeletedVersion(id, expectedDeletedTimeUtc);

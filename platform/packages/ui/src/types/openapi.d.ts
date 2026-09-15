@@ -22881,6 +22881,7 @@ export interface components {
                 currentPage: number;
                 /** @description 每页记录数 */
                 pageSize: number;
+                serverTimeUtc: number;
                 canRestore: boolean;
                 canPurge: boolean;
                 list: {

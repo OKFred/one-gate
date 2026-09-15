@@ -540,6 +540,54 @@ describe("department soft deletion and guarded references", () => {
     });
   });
 
+  it.each(["deletion lookup", "parent lookup"] as const)(
+    "rejects restoration when the deadline passes during the %s",
+    async (lookup) => {
+      const parentId =
+        lookup === "parent lookup"
+          ? await addDepartment("expiry parent")
+          : null;
+      const id = await addDepartment("expiry during lookup", parentId);
+      await departmentRepository.onDelete(id, actor.userId, deletionTime);
+      const expiresTimeUtc = deletionTime + SOFT_DELETE_RETENTION_MS;
+      let currentTimeUtc = expiresTimeUtc - 1;
+      vi.spyOn(Date, "now").mockImplementation(() => currentTimeUtc);
+      if (lookup === "deletion lookup") {
+        const findDeletedById =
+          departmentRepository.findDeletedById.bind(departmentRepository);
+        vi.spyOn(
+          departmentRepository,
+          "findDeletedById"
+        ).mockImplementationOnce(async (departmentId) => {
+          const row = await findDeletedById(departmentId);
+          currentTimeUtc = expiresTimeUtc;
+          return row;
+        });
+      } else {
+        const findById =
+          departmentRepository.findById.bind(departmentRepository);
+        vi.spyOn(departmentRepository, "findById").mockImplementationOnce(
+          async (departmentId) => {
+            const row = await findById(departmentId);
+            currentTimeUtc = expiresTimeUtc;
+            return row;
+          }
+        );
+      }
+      const restore = vi.spyOn(departmentRepository, "restore");
+      await expect(
+        restoreDeletedDepartment(id, deletionTime, actor.userId)
+      ).rejects.toMatchObject({ code: ErrorCode.EXPIRED });
+      expect(restore).not.toHaveBeenCalled();
+      expect(await departmentRepository.findDeletedById(id)).toMatchObject({
+        id,
+        isDeleted: true,
+        deletedTimeUtc: deletionTime,
+        deleterId: actor.userId,
+      });
+    }
+  );
+
   it("keeps not-yet-due and restored rows, limits batches, and reports overdue backlog", async () => {
     for (let index = 0; index < 3; index += 1) {
       const id = await addDepartment(`due ${index}`);

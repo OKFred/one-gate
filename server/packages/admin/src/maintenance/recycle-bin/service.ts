@@ -92,9 +92,13 @@ export function createRecycleBinHandlers(registry: RecycleBinRegistry) {
       { keyword, pageNo, pageSize },
       user
     );
+    const canRestore = await allows(adapter, "restore", user);
+    const canPurge = await allows(adapter, "purge", user);
+    const serverTimeUtc = Date.now();
     return {
-      canRestore: await allows(adapter, "restore", user),
-      canPurge: await allows(adapter, "purge", user),
+      serverTimeUtc,
+      canRestore,
+      canPurge,
       list: list.map((row) => ({
         resourceType: adapter.resourceType,
         id: row.id,
@@ -103,7 +107,7 @@ export function createRecycleBinHandlers(registry: RecycleBinRegistry) {
         deleterName: row.deleterName,
         deletedTimeUtc: row.deletedTimeUtc,
         expiresTimeUtc: row.expiresTimeUtc,
-        canRestore: row.canRestore,
+        canRestore: row.canRestore && row.expiresTimeUtc > serverTimeUtc,
       })),
       total,
       totalPage: Math.ceil(total / pageSize),

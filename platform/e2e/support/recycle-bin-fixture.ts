@@ -78,11 +78,13 @@ export async function installRecycleBinFixture(
     rows?: DeletedRecord[];
     resources?: RecycleBinResource[];
     langCode?: 'en-US' | 'zh-CN';
+    serverTimeUtc?: number;
   } = {},
 ) {
   const grantedPermissions = options.permissions ?? recycleBinPermissions;
   const departmentReadable = grantedPermissions.includes('admin.system.department:read');
   const state = {
+    serverTimeUtc: options.serverTimeUtc ?? Date.now(),
     rows: options.rows ?? [deletedDepartment(1)],
     resources:
       options.resources ??
@@ -186,7 +188,11 @@ export async function installRecycleBinFixture(
     );
     await route.fulfill(
       fulfillOk({
-        list: filtered.slice((pageNo - 1) * pageSize, pageNo * pageSize),
+        serverTimeUtc: state.serverTimeUtc,
+        list: filtered.slice((pageNo - 1) * pageSize, pageNo * pageSize).map((row) => ({
+          ...row,
+          canRestore: row.canRestore && row.expiresTimeUtc > state.serverTimeUtc,
+        })),
         total: filtered.length,
         totalPage: Math.ceil(filtered.length / pageSize),
         currentPage: pageNo,
