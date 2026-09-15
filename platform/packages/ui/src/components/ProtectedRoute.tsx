@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Navigate, useLocation } from 'react-router-dom';
-import { authUtils } from '@/utils/auth';
+import { authUtils, captureAuthSession, isCurrentAuthSession } from '@/utils/auth';
 import { checkTokenFn, getProfileFn } from '@/api/admin/system/auth';
 import { CircularProgress, Box } from '@mui/material';
 import { useMenu } from '@/hooks/useMenu';
@@ -32,43 +33,50 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return null;
   };
 
-  function failedLogin() {
-    // token无效，清理本地存储
-    authUtils.logout();
-    setIsAuthenticated(false);
-  }
-
-  function successfulLogin() {
-    setIsAuthenticated(true);
-  }
-
   useEffect(() => {
+    let active = true;
+    setIsLoading(true);
+    setIsAuthenticated(null);
+
     const checkAuth = async () => {
       const urlToken = getQueryParam('token');
-      let tokenToUse = userInfo?.token;
+      let authSession = captureAuthSession();
 
-      if (urlToken) {
-        tokenToUse = urlToken;
-        if (userInfo?.token !== urlToken) {
-          authUtils.setUserInfo({
-            id: 0,
-            username: 'Loading...',
-            langCode: 'zh-CN',
-            token: urlToken,
-          });
-        }
+      if (!authSession.token && urlToken) {
+        authUtils.setUserInfo({
+          id: 0,
+          username: 'Loading...',
+          langCode: 'zh-CN',
+          token: urlToken,
+        });
+        authSession = captureAuthSession();
       }
 
-      if (!tokenToUse) {
-        failedLogin();
+      const isCurrent = () => active && isCurrentAuthSession(authSession);
+      if (!authSession.token) {
+        if (!isCurrent()) return;
+        setIsAuthenticated(false);
         setIsLoading(false);
         return;
       }
+
+      let canceled = false;
+      const awaitAuthRequest = <T,>(request: Promise<T>): Promise<T | undefined> =>
+        request.then(undefined, (error: unknown) => {
+          if (axios.isCancel(error)) {
+            canceled = true;
+            return undefined;
+          }
+          throw error;
+        });
+
       try {
-        if (urlToken) {
-          const profileRes = await getProfileFn({ data: {} });
+        if (urlToken === authSession.token) {
+          const profileRes = await awaitAuthRequest(getProfileFn({ data: {} }));
+          if (!profileRes || !isCurrent()) return;
           const realUser = profileRes.data.data.userObj;
           authUtils.setUserInfo({ ...realUser, token: urlToken });
+          if (!isCurrent()) return;
 
           const url = new URL(window.location.href);
           url.searchParams.delete('token');
@@ -82,18 +90,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           }
           window.history.replaceState(null, '', `${url.pathname}${url.search}${newHash}`);
         } else {
-          await checkTokenFn({ data: {} });
+          const response = await awaitAuthRequest(checkTokenFn({ data: {} }));
+          if (!response || !isCurrent()) return;
         }
-        successfulLogin();
-        return;
-      } catch (e) {
-        console.error('Token authentication failed:', e);
-        failedLogin();
+        if (isCurrent()) setIsAuthenticated(true);
+      } catch {
+        if (!isCurrent()) return;
+        authUtils.logout();
+        setIsAuthenticated(false);
       } finally {
-        setIsLoading(false);
+        if (!canceled && isCurrent()) setIsLoading(false);
       }
     };
-    checkAuth();
+    void checkAuth();
+    return () => {
+      active = false;
+    };
   }, [userInfo?.token]);
 
   // 正在验证token或加载菜单

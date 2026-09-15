@@ -16,7 +16,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { getThemeMode } from '@/hooks/useThemeMode';
-import { authUtils } from '@/utils/auth';
+import { authUtils, captureRequestAuthSession, isCurrentAuthSession } from '@/utils/auth';
 import { useNavigate } from 'react-router-dom';
 import * as LanguageAPI from '@/api/admin/i18n/language';
 import * as AuthAPI from '@/api/admin/system/auth';
@@ -60,8 +60,8 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
       });
       setLanguages(response.data.data);
       setLanguagesLoaded(true);
-    } catch (error) {
-      console.error('Failed to load languages:', error);
+    } catch {
+      // The shared request layer reports failures; cancellation stays silent.
     }
   };
 
@@ -88,34 +88,39 @@ const Topbar: React.FC<TopbarProps> = ({ setSidebarOpen }) => {
 
   // 处理语言切换
   const handleChangeLanguage = async (langCode: string) => {
+    const session = captureRequestAuthSession();
+    if (!isCurrentAuthSession(session)) return;
     if (!userInfo || userInfo.langCode === langCode) {
       handleClose();
       return;
     }
     try {
       await AuthAPI.updateLangCodeFn({ data: { langCode } });
+      if (!isCurrentAuthSession(session)) return;
       authUtils.setUserInfo({ ...userInfo, langCode }); // 更新本地存储的语言代码，否则前后端会不一致
       // 刷新页面以应用新语言
       window.location.reload();
-    } catch (error) {
-      console.error('Failed to update language:', error);
+    } catch {
+      // Keep the current profile when the request fails or its session changes.
     }
   };
   // 处理登出
   const handleLogout = async () => {
+    const session = captureRequestAuthSession();
+    if (!isCurrentAuthSession(session)) return;
     handleClose();
     try {
       await AuthAPI.totpGateLogoutFn({ data: {} });
     } catch {
-      // Local auth is still cleared; a stale cookie cannot pass with a new token.
-    } finally {
-      authUtils.logout();
-      if (import.meta.env.VITE_APP_SCOPE !== 'admin') {
-        const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
-        window.location.href = `${adminUrl}/#/login`;
-      } else {
-        navigate(loginPath);
-      }
+      // Clear this session locally even when the cookie cleanup service fails.
+    }
+    if (!isCurrentAuthSession(session)) return;
+    authUtils.logout();
+    if (import.meta.env.VITE_APP_SCOPE !== 'admin') {
+      const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
+      window.location.href = `${adminUrl}/#/login`;
+    } else {
+      navigate(loginPath);
     }
   };
 

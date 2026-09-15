@@ -6,6 +6,8 @@ import {
   departmentResource,
   fulfillOk,
   installRecycleBinFixture,
+  openRecycleBinAccountWindow,
+  recycleBinFixtureUser,
   recycleBinPermissions,
   reportResource,
 } from '../support/recycle-bin-fixture.js';
@@ -858,6 +860,426 @@ test.describe('server clock', () => {
       expect(fixture.unexpectedRequests).toEqual([]);
     });
   }
+});
+
+test.describe('session isolation', () => {
+  const nextUser = {
+    id: 84,
+    username: 'fixture_account_b',
+    token: 'mock-account-b',
+    langCode: 'en-US',
+  };
+
+  async function storeUser(accountWindow: Page, user: typeof recycleBinFixtureUser) {
+    await accountWindow.evaluate((value) => {
+      const stored = localStorage.getItem('userInfo');
+      const previous = stored ? (JSON.parse(stored) as { token?: string }) : null;
+      if (previous?.token !== value.token) {
+        localStorage.setItem('hodor:auth-session', crypto.randomUUID());
+      }
+      localStorage.setItem('userInfo', JSON.stringify(value));
+    }, user);
+  }
+
+  async function currentUsername(page: Page) {
+    return page.evaluate(() => {
+      const raw = localStorage.getItem('userInfo');
+      return raw ? (JSON.parse(raw) as { username: string }).username : null;
+    });
+  }
+
+  async function settleResponse(page: Page) {
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+        }),
+    );
+  }
+
+  test('another account replaces the old confirmation, permissions and resource catalogue', async ({
+    page,
+  }, testInfo) => {
+    const oldRow = deletedDepartment(1, { name: 'Previous account department' });
+    const nextRow = deletedRecord(reportResource.resourceType, 'account-b-report', {
+      name: 'Current account report',
+    });
+    const fixture = await installRecycleBinFixture(page, { canPurge: true, rows: [oldRow] });
+    let mutations = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/purge', async (route) => {
+      mutations += 1;
+      await route.fulfill(fulfillOk(1));
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await expect(page.getByRole('cell', { name: oldRow.name, exact: true })).toBeVisible();
+    const accountWindow = await openRecycleBinAccountWindow(page);
+    await page.getByRole('button', { name: 'Permanently delete', exact: true }).click();
+    await expect(page.getByRole('dialog')).toContainText(oldRow.name);
+    const previousPermissionRequests = fixture.permissionRequests.length;
+    const previousCatalogueRequests = fixture.resourcesRequests.length;
+    fixture.permissions = ['admin.maintenance.recycle_bin:read'];
+    fixture.resources = [{ ...reportResource, canRestore: false, canPurge: false }];
+    fixture.rows = [nextRow];
+    await storeUser(accountWindow, nextUser);
+    await expect(page.getByRole('cell', { name: nextRow.name, exact: true })).toBeVisible();
+    await expect(page.getByRole('banner')).toContainText(nextUser.username);
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page.getByRole('cell', { name: oldRow.name, exact: true })).toHaveCount(0);
+    await expect(page.getByRole('combobox', { name: 'Resource type' })).toHaveText('Reports');
+    await expect(page.getByRole('button', { name: 'Restore', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Permanently delete', exact: true })).toHaveCount(
+      0,
+    );
+    expect(fixture.permissionRequests.length).toBeGreaterThan(previousPermissionRequests);
+    expect(fixture.resourcesRequests.length).toBeGreaterThan(previousCatalogueRequests);
+    expect(mutations).toBe(0);
+    expect(fixture.unexpectedRequests).toEqual([]);
+    await page.screenshot({
+      path: testInfo.outputPath('recycle-bin-account-replaced.png'),
+      fullPage: true,
+      animations: 'disabled',
+    });
+  });
+
+  for (const logout of ['remove', 'clear'] as const) {
+    test(`cross-window ${logout} removes protected rows and an unsubmitted confirmation`, async ({
+      page,
+    }) => {
+      const fixture = await installRecycleBinFixture(page, { canPurge: true });
+      let mutations = 0;
+      await page.route('**/api/v1/admin/maintenance/recycle-bin/purge', async (route) => {
+        mutations += 1;
+        await route.fulfill(fulfillOk(1));
+      });
+      await page.goto('/#/admin/recycle-bin');
+      await expect(page.getByRole('cell', { name: 'Department 1', exact: true })).toBeVisible();
+      const accountWindow = await openRecycleBinAccountWindow(page);
+      await page.getByRole('button', { name: 'Permanently delete', exact: true }).click();
+      await accountWindow.evaluate((method) => {
+        if (method === 'remove') localStorage.removeItem('userInfo');
+        else localStorage.clear();
+      }, logout);
+      await expect(page.getByLabel(/Username|用户名/i)).toBeVisible();
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+      await expect(page.getByRole('table', { name: 'Recycle Bin' })).toHaveCount(0);
+      expect(await currentUsername(page)).toBeNull();
+      expect(mutations).toBe(0);
+      expect(fixture.unexpectedRequests).toEqual([]);
+    });
+  }
+
+  for (const outcome of ['success', 'unauthorized', 'totp-required'] as const) {
+    test(`a previous account's delayed ${outcome} response cannot affect the current account`, async ({
+      page,
+    }) => {
+      const fixture = await installRecycleBinFixture(page);
+      let mutations = 0;
+      let release: (() => void) | undefined;
+      const responseGate = new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+        mutations += 1;
+        expect(route.request().headers().authorization).toBe(
+          `Bearer ${recycleBinFixtureUser.token}`,
+        );
+        await responseGate;
+        await route.fulfill(
+          outcome === 'success'
+            ? fulfillOk(1)
+            : {
+                status: 401,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                  ok: false,
+                  message: 'Previous account request expired',
+                  data: outcome === 'totp-required' ? { code: 'TOTP_GATE_REQUIRED' } : null,
+                }),
+              },
+        );
+      });
+      await page.goto('/#/admin/recycle-bin');
+      const accountWindow = await openRecycleBinAccountWindow(page);
+      await page.getByRole('button', { name: 'Restore', exact: true }).click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+      await expect.poll(() => mutations).toBe(1);
+      fixture.rows = [deletedDepartment(2, { name: 'Current account record' })];
+      await storeUser(accountWindow, nextUser);
+      await expect(
+        page.getByRole('cell', { name: 'Current account record', exact: true }),
+      ).toBeVisible();
+      const currentListRequests = fixture.listRequests.length;
+      const completed = page.waitForEvent('requestfinished', {
+        predicate: (request) => request.url().endsWith('/recycle-bin/restore'),
+      });
+      release?.();
+      await completed;
+      await settleResponse(page);
+      await expect(
+        page.getByRole('cell', { name: 'Current account record', exact: true }),
+      ).toBeVisible();
+      await expect(page.getByRole('banner')).toContainText(nextUser.username);
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+      await expect(
+        page.getByRole('heading', { name: /Security verification|二次安全验证/i }),
+      ).toHaveCount(0);
+      await expect(page.getByText('Operation successful', { exact: true })).toHaveCount(0);
+      await expect(page.getByText('Previous account request expired', { exact: true })).toHaveCount(
+        0,
+      );
+      expect(await currentUsername(page)).toBe(nextUser.username);
+      expect(fixture.listRequests).toHaveLength(currentListRequests);
+      expect(mutations).toBe(1);
+      expect(fixture.unexpectedRequests).toEqual([]);
+    });
+  }
+
+  test('closing an earlier session-expired notice cannot log out a newly validated account', async ({
+    page,
+  }) => {
+    const fixture = await installRecycleBinFixture(page);
+    let mutations = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+      mutations += 1;
+      await route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: false, message: 'Previous account request expired' }),
+      });
+    });
+    await page.goto('/#/admin/recycle-bin');
+    const accountWindow = await openRecycleBinAccountWindow(page);
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+    const notice = page
+      .getByRole('dialog')
+      .filter({ hasText: 'Session expired, please login again' });
+    await expect(notice).toBeVisible();
+    fixture.rows = [deletedDepartment(2, { name: 'Newly validated account record' })];
+    await storeUser(accountWindow, nextUser);
+    await expect(
+      page.getByRole('cell', {
+        name: 'Newly validated account record',
+        exact: true,
+        includeHidden: true,
+      }),
+    ).toBeVisible();
+    await notice.getByRole('button', { name: 'Confirm', exact: true }).click();
+    await settleResponse(page);
+    await expect(
+      page.getByRole('cell', { name: 'Newly validated account record', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('banner')).toContainText(nextUser.username);
+    expect(await currentUsername(page)).toBe(nextUser.username);
+    expect(mutations).toBe(1);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('a rapid A to B to A switch does not revive the first A request', async ({ page }) => {
+    const fixture = await installRecycleBinFixture(page);
+    let mutations = 0;
+    let release: (() => void) | undefined;
+    const responseGate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+      mutations += 1;
+      await responseGate;
+      await route.fulfill(fulfillOk(1));
+    });
+    await page.goto('/#/admin/recycle-bin');
+    const accountWindow = await openRecycleBinAccountWindow(page);
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+    await expect.poll(() => mutations).toBe(1);
+    const oldPermissionRequests = fixture.permissionRequests.length;
+    fixture.rows = [deletedDepartment(2, { name: 'Revalidated account A record' })];
+    await accountWindow.evaluate(
+      ({ first, second }) => {
+        localStorage.setItem('userInfo', JSON.stringify(second));
+        localStorage.setItem('userInfo', JSON.stringify(first));
+      },
+      { first: recycleBinFixtureUser, second: nextUser },
+    );
+    await expect(
+      page.getByRole('cell', { name: 'Revalidated account A record', exact: true }),
+    ).toBeVisible();
+    expect(fixture.permissionRequests.length).toBeGreaterThan(oldPermissionRequests);
+    const currentListRequests = fixture.listRequests.length;
+    const completed = page.waitForEvent('requestfinished', {
+      predicate: (request) => request.url().endsWith('/recycle-bin/restore'),
+    });
+    release?.();
+    await completed;
+    await settleResponse(page);
+    await expect(
+      page.getByRole('cell', { name: 'Revalidated account A record', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText('Operation successful', { exact: true })).toHaveCount(0);
+    expect(await currentUsername(page)).toBe(recycleBinFixtureUser.username);
+    expect(fixture.listRequests).toHaveLength(currentListRequests);
+    expect(mutations).toBe(1);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('same-token profile changes update the header without resetting the query or confirmation', async ({
+    page,
+  }) => {
+    const fixture = await installRecycleBinFixture(page);
+    let mutations = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+      mutations += 1;
+      fixture.rows = [];
+      await route.fulfill(fulfillOk(1));
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await expect(page.getByRole('cell', { name: 'Department 1', exact: true })).toBeVisible();
+    const accountWindow = await openRecycleBinAccountWindow(page);
+    await page.getByLabel('Search name').fill('Department 1');
+    await page.getByRole('button', { name: 'Search', exact: true }).click();
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    const requestsBefore = {
+      permissions: fixture.permissionRequests.length,
+      resources: fixture.resourcesRequests.length,
+      list: fixture.listRequests.length,
+    };
+    const updatedUser = { ...recycleBinFixtureUser, username: 'Updated fixture name' };
+    await storeUser(accountWindow, updatedUser);
+    await expect(page.getByRole('banner', { includeHidden: true })).toContainText(
+      updatedUser.username,
+    );
+    await expect(page.getByRole('dialog')).toContainText('Department 1');
+    await expect(page.getByLabel('Search name')).toHaveValue('Department 1');
+    expect({
+      permissions: fixture.permissionRequests.length,
+      resources: fixture.resourcesRequests.length,
+      list: fixture.listRequests.length,
+    }).toEqual(requestsBefore);
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+    await expect(page.getByText('Operation successful', { exact: true })).toBeVisible();
+    expect(mutations).toBe(1);
+    expect(await currentUsername(page)).toBe(updatedUser.username);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('a confirmation cannot send under changed credentials before the auth event is delivered', async ({
+    page,
+  }) => {
+    const fixture = await installRecycleBinFixture(page, { canPurge: true });
+    let mutations = 0;
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/purge', async (route) => {
+      mutations += 1;
+      await route.fulfill(fulfillOk(1));
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await page.getByRole('button', { name: 'Permanently delete', exact: true }).click();
+    const confirm = page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true });
+    await expect(confirm).toBeEnabled();
+    fixture.rows = [deletedDepartment(2, { name: 'Account B after deferred notification' })];
+    await confirm.evaluate((button, user) => {
+      if (!(button instanceof HTMLButtonElement)) throw new Error('Expected confirmation button');
+      localStorage.setItem('userInfo', JSON.stringify(user));
+      // The click shares the storage write's task: React has not received an identity event.
+      button.click();
+    }, nextUser);
+    await settleResponse(page);
+    expect(mutations).toBe(0);
+    await expect(page.getByText('Operation successful', { exact: true })).toHaveCount(0);
+    await page.evaluate(() => window.dispatchEvent(new Event('hodor:auth-changed')));
+    await expect(
+      page.getByRole('cell', { name: 'Account B after deferred notification', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page.getByRole('banner')).toContainText(nextUser.username);
+    expect(mutations).toBe(0);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('a rotated session marker rejects old A work before an A to B to A event is delivered', async ({
+    page,
+  }) => {
+    const fixture = await installRecycleBinFixture(page);
+    let mutations = 0;
+    let release: (() => void) | undefined;
+    const responseGate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route('**/api/v1/admin/maintenance/recycle-bin/restore', async (route) => {
+      mutations += 1;
+      await responseGate;
+      await route.fulfill(fulfillOk(1));
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await page.getByRole('button', { name: 'Restore', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm', exact: true }).click();
+    await expect.poll(() => mutations).toBe(1);
+    fixture.rows = [deletedDepartment(2, { name: 'Account A with a new session marker' })];
+    await page.evaluate(
+      ({ first, second }) => {
+        localStorage.setItem('hodor:auth-session', 'fixture-session-b');
+        localStorage.setItem('userInfo', JSON.stringify(second));
+        localStorage.setItem('hodor:auth-session', 'fixture-session-a-next');
+        localStorage.setItem('userInfo', JSON.stringify(first));
+      },
+      { first: recycleBinFixtureUser, second: nextUser },
+    );
+    const completed = page.waitForEvent('requestfinished', {
+      predicate: (request) => request.url().endsWith('/recycle-bin/restore'),
+    });
+    release?.();
+    await completed;
+    await settleResponse(page);
+    await expect(page.getByText('Operation successful', { exact: true })).toHaveCount(0);
+    expect(mutations).toBe(1);
+    await page.evaluate(() => window.dispatchEvent(new Event('hodor:auth-changed')));
+    await expect(
+      page.getByRole('cell', { name: 'Account A with a new session marker', exact: true }),
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    expect(await currentUsername(page)).toBe(recycleBinFixtureUser.username);
+    expect(mutations).toBe(1);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
+
+  test('an ignoreAbort translation response from the old session cannot overwrite the current page', async ({
+    page,
+  }) => {
+    const fixture = await installRecycleBinFixture(page);
+    let translationRequests = 0;
+    let release: (() => void) | undefined;
+    const responseGate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route('**/api/v1/admin/i18n/translation/listAll', async (route) => {
+      translationRequests += 1;
+      expect(route.request().headers().authorization).toBe(`Bearer ${recycleBinFixtureUser.token}`);
+      await responseGate;
+      await route.fulfill(
+        fulfillOk([
+          { langCode: 'en-US', tKey: 'recycleBin.title', tValue: 'Previous session translation' },
+        ]),
+      );
+    });
+    await page.goto('/#/admin/recycle-bin');
+    await expect(page.getByRole('cell', { name: 'Department 1', exact: true })).toBeVisible();
+    const accountWindow = await openRecycleBinAccountWindow(page);
+    fixture.rows = [deletedDepartment(2, { name: 'Account B keeps its current translations' })];
+    await storeUser(accountWindow, nextUser);
+    await expect(
+      page.getByRole('cell', { name: 'Account B keeps its current translations', exact: true }),
+    ).toBeVisible();
+    const completed = page.waitForEvent('requestfinished', {
+      predicate: (request) => request.url().endsWith('/translation/listAll'),
+    });
+    release?.();
+    await completed;
+    await settleResponse(page);
+    await expect(page.getByRole('heading', { name: 'Recycle Bin', exact: true })).toBeVisible();
+    await expect(page.getByText('Previous session translation', { exact: true })).toHaveCount(0);
+    await expect(page.getByRole('banner')).toContainText(nextUser.username);
+    expect(translationRequests).toBe(1);
+    expect(fixture.unexpectedRequests).toEqual([]);
+  });
 });
 
 test('department deletion describes the 30 day recycle bin and keeps the existing request shape', async ({

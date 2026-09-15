@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { authUtils, type UserInfo } from '@/utils/auth';
+import { authUtils, subscribeAuthChanges, type UserInfo } from '@/utils/auth';
 
 interface UseUserInfoReturn {
   /** 用户信息对象 */
@@ -20,16 +20,10 @@ export const useUserInfo = (): UseUserInfoReturn => {
   });
 
   useEffect(() => {
-    // 监听 storage 事件，支持多标签页同步
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'userInfo') {
-        setUserInfo(authUtils.getUserInfo());
-      }
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    const refresh = () => setUserInfo(authUtils.getUserInfo());
+    const unsubscribe = subscribeAuthChanges(refresh);
+    refresh();
+    return unsubscribe;
   }, []);
 
   const helpers = useMemo(

@@ -1,13 +1,25 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react';
 import { Box, CircularProgress } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { totpGateLogoutFn, totpGateStatusFn } from '@/api/admin/system/auth';
 import { TotpGateForm } from '@/components/TotpGateForm';
 import {
-  AUTH_CHANGED_EVENT,
   TOTP_GATE_REQUIRED_EVENT,
   authUtils,
+  captureAuthSession,
+  commitAuthViewSession,
+  isCurrentAuthSession,
+  subscribeAuthChanges,
   type UserInfo,
 } from '@/utils/auth';
 import {
@@ -62,15 +74,30 @@ export function AuthenticationBoundary({
 }: AuthenticationBoundaryProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const session = useSyncExternalStore(subscribeAuthChanges, captureAuthSession);
   const evaluation = useRef(0);
+  const transferredTokenHandled = useRef(false);
   const pathnameRef = useRef(location.pathname);
   const navigateRef = useRef(navigate);
-  const [phase, setPhase] = useState<AuthenticationPhase>('CHECKING');
+  const [state, setState] = useState<{ phase: AuthenticationPhase; revision: number }>({
+    phase: 'CHECKING',
+    revision: session.revision,
+  });
+  const phase = state.revision === session.revision ? state.phase : 'CHECKING';
+
+  const setPhase = useCallback(
+    (next: AuthenticationPhase) => setState({ phase: next, revision: session.revision }),
+    [session.revision],
+  );
 
   useLayoutEffect(() => {
     pathnameRef.current = location.pathname;
     navigateRef.current = navigate;
   }, [location.pathname, navigate]);
+
+  useLayoutEffect(() => {
+    commitAuthViewSession(session);
+  }, [session]);
 
   const redirectToAdmin = useCallback(() => {
     const adminUrl = import.meta.env.VITE_ADMIN_URL || '/admin';
@@ -86,14 +113,16 @@ export function AuthenticationBoundary({
     const callback = isAuthenticationCallback(pathname);
     if (scope === 'admin') rememberPrimaryAuthReturnTarget();
 
-    let user = authUtils.getUserInfo();
-    const urlToken = readTransferredToken();
-    if (!user?.token && urlToken) {
-      user = transferredUser(urlToken);
-      authUtils.setUserInfo(user);
+    if (!transferredTokenHandled.current) {
+      transferredTokenHandled.current = true;
+      const urlToken = readTransferredToken();
+      if (!session.token && urlToken) {
+        authUtils.setUserInfo(transferredUser(urlToken));
+        return;
+      }
     }
 
-    if (!user?.token) {
+    if (!session.token) {
       if (scope !== 'admin') {
         redirectToAdmin();
         return;
@@ -105,7 +134,7 @@ export function AuthenticationBoundary({
     setPhase('CHECKING');
     try {
       const response = await totpGateStatusFn({ data: {} });
-      if (evaluation.current !== currentEvaluation) return;
+      if (evaluation.current !== currentEvaluation || !isCurrentAuthSession(session)) return;
       if (!response.data.data.verified) {
         setPhase('TOTP_REQUIRED');
         return;
@@ -117,37 +146,47 @@ export function AuthenticationBoundary({
       }
       setPhase('READY');
     } catch {
-      if (evaluation.current !== currentEvaluation) return;
+      if (evaluation.current !== currentEvaluation || !isCurrentAuthSession(session)) return;
       if (!authUtils.isAuthenticated()) {
         setPhase(callback ? 'PRIMARY_AUTH_CALLBACK' : 'PRIMARY_AUTH_REQUIRED');
       } else {
         setPhase('TOTP_REQUIRED');
       }
     }
-  }, [redirectToAdmin, scope]);
+  }, [redirectToAdmin, scope, session, setPhase]);
 
   useEffect(() => {
     void evaluate();
-    const handleAuthChanged = () => void evaluate();
-    const handleGateRequired = () => setPhase('TOTP_REQUIRED');
-    window.addEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
-    window.addEventListener(TOTP_GATE_REQUIRED_EVENT, handleGateRequired);
     return () => {
-      window.removeEventListener(AUTH_CHANGED_EVENT, handleAuthChanged);
-      window.removeEventListener(TOTP_GATE_REQUIRED_EVENT, handleGateRequired);
+      evaluation.current += 1;
     };
   }, [evaluate]);
+
+  useEffect(() => {
+    const handleGateRequired = () => {
+      if (!isCurrentAuthSession(session)) return;
+      evaluation.current += 1;
+      setPhase('TOTP_REQUIRED');
+    };
+    window.addEventListener(TOTP_GATE_REQUIRED_EVENT, handleGateRequired);
+    return () => {
+      window.removeEventListener(TOTP_GATE_REQUIRED_EVENT, handleGateRequired);
+    };
+  }, [session, setPhase]);
 
   useEffect(() => {
     if (phase === 'TOTP_REQUIRED' && scope !== 'admin') redirectToAdmin();
   }, [phase, redirectToAdmin, scope]);
 
   const logout = async () => {
+    const currentEvaluation = evaluation.current;
+    if (!isCurrentAuthSession(session)) return;
     try {
       await totpGateLogoutFn({ data: {}, timeout: 5_000 });
     } catch {
       // Clear local auth even if the cookie cleanup service is unavailable.
     }
+    if (evaluation.current !== currentEvaluation || !isCurrentAuthSession(session)) return;
     clearPrimaryAuthReturnTarget();
     const loginUrl = new URL(window.location.href);
     loginUrl.search = '';
@@ -164,10 +203,13 @@ export function AuthenticationBoundary({
   if (phase === 'PRIMARY_AUTH_REQUIRED') return <>{renderPrimaryAuth()}</>;
   if (phase === 'TOTP_REQUIRED') {
     if (scope !== 'admin') return <LoadingScreen />;
+    const formEvaluation = evaluation.current;
     return (
       <TotpGateForm
+        key={`${session.revision}:${formEvaluation}`}
         onLogout={logout}
         onVerified={() => {
+          if (evaluation.current !== formEvaluation || !isCurrentAuthSession(session)) return;
           if (isAuthenticationCallback(location.pathname)) {
             setPhase('READY');
             return;
@@ -182,5 +224,5 @@ export function AuthenticationBoundary({
       />
     );
   }
-  return <>{children}</>;
+  return <Fragment key={session.revision}>{children}</Fragment>;
 }
