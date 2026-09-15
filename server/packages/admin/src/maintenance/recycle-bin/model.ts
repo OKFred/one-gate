@@ -1,9 +1,50 @@
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import { listResBase } from "@hodor/core/middleware/encapsulation/common.schema";
+import {
+  RECYCLE_BIN_RESOURCE_TYPE_MAX_LENGTH,
+  RECYCLE_BIN_RESOURCE_TYPE_PATTERN,
+} from "@hodor/core/db/recycle-bin";
 
-const resourceType = { type: "string", enum: ["department"] } as const;
-const id = { type: "integer", minimum: 1 } as const;
+const resourceType = {
+  type: "string",
+  pattern: RECYCLE_BIN_RESOURCE_TYPE_PATTERN,
+  maxLength: RECYCLE_BIN_RESOURCE_TYPE_MAX_LENGTH,
+} as const;
+const id = {
+  anyOf: [
+    { type: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER },
+    { type: "string", minLength: 1, maxLength: 256, pattern: "\\S" },
+  ],
+} as const;
 const timestamp = { type: "integer", minimum: 0 } as const;
+
+export const RecycleBinResourcesReq = {
+  type: "object",
+  properties: {},
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+export const RecycleBinResourcesRes = {
+  type: "object",
+  properties: {
+    list: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          resourceType,
+          labelKey: { type: "string" },
+          canRestore: { type: "boolean" },
+          canPurge: { type: "boolean" },
+        },
+        required: ["resourceType", "labelKey", "canRestore", "canPurge"],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ["list"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
 
 export const RecycleBinItemVO = {
   resourceType,
@@ -32,6 +73,7 @@ export const RecycleBinListRes = {
   type: "object",
   properties: {
     ...listResBase,
+    canRestore: { type: "boolean" },
     canPurge: { type: "boolean" },
     list: {
       type: "array",
@@ -58,6 +100,7 @@ export const RecycleBinListRes = {
     "totalPage",
     "currentPage",
     "pageSize",
+    "canRestore",
     "canPurge",
   ],
   additionalProperties: false,
@@ -75,6 +118,12 @@ export const RecycleBinMutationReq = {
 } as const satisfies JSONSchema;
 
 export const RecycleBinMutationRes = id;
+export type RecycleBinResourcesInput = FromSchema<
+  typeof RecycleBinResourcesReq
+>;
+export type RecycleBinResourcesOutput = FromSchema<
+  typeof RecycleBinResourcesRes
+>;
 export type RecycleBinListInput = FromSchema<typeof RecycleBinListReq>;
 export type RecycleBinListOutput = FromSchema<typeof RecycleBinListRes>;
 export type RecycleBinMutationInput = FromSchema<typeof RecycleBinMutationReq>;

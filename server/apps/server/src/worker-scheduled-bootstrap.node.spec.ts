@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import type { RecycleBinResourceAdapter } from "@hodor/core/db/recycle-bin.js";
 
 const mocks = vi.hoisted(() => ({
   cleanupDeviceOpsAudits: vi.fn(async () => undefined),
@@ -8,7 +9,16 @@ const mocks = vi.hoisted(() => ({
   getEnv: vi.fn(() => ""),
   markTimedOutDevicesOffline: vi.fn(async () => undefined),
   runPendingJobs: vi.fn(async () => undefined),
-  runRetentionMaintenance: vi.fn(async () => undefined),
+  departmentCleanup: vi.fn(async () => ({
+    deletedCount: 0,
+    remainingExpired: 0,
+    oldestExpiredTimeUtc: null,
+  })),
+  archiveCleanup: vi.fn(async () => ({
+    deletedCount: 0,
+    remainingExpired: 0,
+    oldestExpiredTimeUtc: null,
+  })),
   setD1Binding: vi.fn(),
   setEnv: vi.fn(),
   setKVBinding: vi.fn(),
@@ -38,11 +48,19 @@ vi.mock("@hodor/core/utils/env.js", () => ({
 vi.mock("@hodor/admin/maintenance/cron/scheduler.js", () => ({
   runPendingJobs: mocks.runPendingJobs,
 }));
-vi.mock("./soft-delete-cleanup.js", () => ({
-  runRetentionMaintenance: mocks.runRetentionMaintenance,
-  runScheduledMaintenance: async (tasks: (() => Promise<unknown>)[]) => {
-    await Promise.all(tasks.map((task) => task()));
-  },
+vi.mock("@hodor/admin/system/department/facade.js", () => ({
+  departmentRecycleBinAdapter: {
+    resourceType: "department",
+    labelKey: "business.department",
+    can: async () => true,
+    list: async () => ({ total: 0, list: [] }),
+    restore: async ({ id }) => id,
+    purge: async ({ id }) => id,
+    purgeExpired: mocks.departmentCleanup,
+  } satisfies RecycleBinResourceAdapter,
+}));
+vi.mock("@hodor/admin/maintenance/compliance/department-cleanup.js", () => ({
+  purgeExpiredDepartmentArchives: mocks.archiveCleanup,
 }));
 vi.mock("@hodor/admin/mobile/async-task/facade.js", () => ({
   timeoutExpiredDeviceTasks: mocks.timeoutExpiredDeviceTasks,
@@ -85,9 +103,16 @@ describe("Worker scheduled bootstrap", () => {
     expect(mocks.setEnv).toHaveBeenCalledWith(env);
     expect(mocks.createApp).toHaveBeenCalledTimes(1);
     expect(mocks.runPendingJobs).toHaveBeenCalledTimes(1);
-    expect(mocks.runRetentionMaintenance).toHaveBeenCalledTimes(1);
+    expect(mocks.departmentCleanup).toHaveBeenCalledExactlyOnceWith({
+      now: expect.any(Number),
+      batchSize: 100,
+    });
+    expect(mocks.archiveCleanup).toHaveBeenCalledExactlyOnceWith({
+      now: expect.any(Number),
+      batchSize: 100,
+    });
     expect(mocks.createApp.mock.invocationCallOrder[0]).toBeLessThan(
-      mocks.runRetentionMaintenance.mock.invocationCallOrder[0]
+      mocks.departmentCleanup.mock.invocationCallOrder[0]
     );
     expect(mocks.createApp.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.runPendingJobs.mock.invocationCallOrder[0]

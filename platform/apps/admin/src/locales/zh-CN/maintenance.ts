@@ -5,11 +5,16 @@
 export const maintenance = {
   // 回收站
   'sidebar.menu.maintenance.recycleBin': '回收站',
-  'recycleBin.title': '部门回收站',
+  'recycleBin.title': '回收站',
   'recycleBin.retentionHelp':
-    '已删除部门保留 30 天，到期后将自动彻底清除。保留期内可恢复，超级管理员可提前彻底清除。',
-  'recycleBin.noReadPermission': '查看回收站需要回收站读取权限和部门读取权限。',
-  'recycleBin.searchName': '搜索部门名称',
+    '已删除记录保留 30 天，到期后将自动彻底清除。有权限的用户可在保留期内恢复，超级管理员可提前彻底清除。',
+  'recycleBin.noReadPermission': '查看回收站需要回收站读取权限。',
+  'recycleBin.resourceType': '资源类型',
+  'recycleBin.refreshResources': '刷新资源类型',
+  'recycleBin.noResources': '当前账号没有可查看的回收站资源。',
+  'recycleBin.resourcesFailed': '资源类型加载失败，请刷新重试。',
+  'recycleBin.listFailed': '记录加载失败，请刷新重试。',
+  'recycleBin.searchName': '搜索名称',
   'recycleBin.deletedBy': '删除人',
   'recycleBin.deletedTime': '删除时间',
   'recycleBin.expiresTime': '到期时间',
@@ -19,8 +24,9 @@ export const maintenance = {
   'recycleBin.restore': '恢复',
   'recycleBin.purge': '彻底清除',
   'recycleBin.restoreConfirm':
-    '确定恢复部门「{{name}}」吗？恢复将保留原启用状态。若存在同名部门或上级部门已删除，需先解决冲突。',
-  'recycleBin.purgeConfirm': '确定彻底清除部门「{{name}}」吗？记录将永久删除，此操作不可恢复。',
+    '确定恢复「{{name}}」（{{resource}}）吗？若存在冲突，需先解决后再恢复。',
+  'recycleBin.purgeConfirm':
+    '确定彻底清除「{{name}}」（{{resource}}）吗？记录将永久删除，此操作不可恢复。',
   'recycleBin.pagination': '{{from}}–{{to}} / 共 {{count}} 条',
 
   // 接口文档

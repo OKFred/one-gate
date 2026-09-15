@@ -1,11 +1,15 @@
 export const maintenance = {
   'sidebar.menu.maintenance.recycleBin': 'Recycle Bin',
-  'recycleBin.title': 'Department Recycle Bin',
+  'recycleBin.title': 'Recycle Bin',
   'recycleBin.retentionHelp':
-    'Deleted departments are retained for 30 days, then automatically purged. Restore them during this window, or a super administrator can permanently delete them earlier.',
-  'recycleBin.noReadPermission':
-    'Viewing the recycle bin requires both recycle bin and department read permissions.',
-  'recycleBin.searchName': 'Search department name',
+    'Deleted records are retained for 30 days, then automatically purged. Authorized users can restore them during this window, or a super administrator can permanently delete them earlier.',
+  'recycleBin.noReadPermission': 'Viewing the recycle bin requires recycle bin read permission.',
+  'recycleBin.resourceType': 'Resource type',
+  'recycleBin.refreshResources': 'Refresh resource types',
+  'recycleBin.noResources': 'No resource types are available to your account.',
+  'recycleBin.resourcesFailed': 'Resource types could not be loaded. Refresh to try again.',
+  'recycleBin.listFailed': 'Records could not be loaded. Refresh to try again.',
+  'recycleBin.searchName': 'Search name',
   'recycleBin.deletedBy': 'Deleted by',
   'recycleBin.deletedTime': 'Deleted at',
   'recycleBin.expiresTime': 'Expires at',
@@ -15,9 +19,9 @@ export const maintenance = {
   'recycleBin.restore': 'Restore',
   'recycleBin.purge': 'Permanently delete',
   'recycleBin.restoreConfirm':
-    'Restore department "{{name}}" with its previous enabled status? A duplicate name or deleted parent department must be resolved first.',
+    'Restore "{{name}}" ({{resource}})? Any conflicts must be resolved before restoration.',
   'recycleBin.purgeConfirm':
-    'Permanently delete department "{{name}}"? Its record will be removed permanently. This cannot be undone.',
+    'Permanently delete "{{name}}" ({{resource}})? Its record will be removed permanently. This cannot be undone.',
   'recycleBin.pagination': '{{from}}–{{to}} of {{count}}',
 
   'openapi.title': 'API Documentation',

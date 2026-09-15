@@ -1,5 +1,17 @@
 import { axiosPlus, type AxiosConfig } from '@/api/config';
 
+export const resourcesFn = (
+  config: Omit<
+    AxiosConfig<'/api/v1/admin/maintenance/recycle-bin/resources', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    ...config,
+    url: '/api/v1/admin/maintenance/recycle-bin/resources',
+    method: 'post',
+  });
+
 export const listFn = (
   config: Omit<AxiosConfig<'/api/v1/admin/maintenance/recycle-bin/list', 'post'>, 'url' | 'method'>,
 ) =>
@@ -35,3 +47,5 @@ export const purgeFn = (
 
 export type ListRes = NonNullable<Awaited<ReturnType<typeof listFn>>['data']['data']>;
 export type RecycleBinItem = ListRes['list'][number];
+export type ResourcesRes = NonNullable<Awaited<ReturnType<typeof resourcesFn>>['data']['data']>;
+export type ResourceDescriptor = ResourcesRes['list'][number];

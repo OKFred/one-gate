@@ -1,20 +1,25 @@
 import {
   runSoftDeleteCleanup,
   type SoftDeleteCleanupAdapter,
+  type SoftDeleteCleanupInput,
 } from "@hodor/core/db/soft-delete.js";
-import { purgeExpiredDepartments } from "@hodor/admin/system/department/facade.js";
 import { purgeExpiredDepartmentArchives } from "@hodor/admin/maintenance/compliance/department-cleanup.js";
+import { recycleBinRegistry } from "./recycle-bin-resources.js";
 
-const cleanupAdapters = [
-  { module: "department", purgeExpired: purgeExpiredDepartments },
-  {
-    module: "legacy_department_archive",
-    purgeExpired: purgeExpiredDepartmentArchives,
-  },
-] as const satisfies readonly SoftDeleteCleanupAdapter[];
+const legacyDepartmentArchiveCleanup: SoftDeleteCleanupAdapter = {
+  module: "legacy_department_archive",
+  purgeExpired: purgeExpiredDepartmentArchives,
+};
 
 export const runRetentionMaintenance = () =>
-  runSoftDeleteCleanup(cleanupAdapters);
+  runSoftDeleteCleanup([
+    ...recycleBinRegistry.list().map((adapter) => ({
+      module: adapter.resourceType,
+      purgeExpired: (input: SoftDeleteCleanupInput) =>
+        adapter.purgeExpired(input),
+    })),
+    legacyDepartmentArchiveCleanup,
+  ]);
 
 /** Await every task even when a user-editable Cron or an unrelated maintenance task fails. */
 export async function runScheduledMaintenance(
