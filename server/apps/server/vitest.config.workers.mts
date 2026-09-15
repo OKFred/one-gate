@@ -6,6 +6,7 @@ import fs from "fs";
 export default defineConfig({
   plugins: [
     cloudflareTest({
+      remoteBindings: false,
       wrangler: { configPath: "./wrangler.jsonc" },
     }),
   ],
@@ -146,6 +147,7 @@ export default defineConfig({
     setupFiles: ["./test/setup.workers.ts"],
     exclude: [
       "**/node_modules/**",
+      "../../packages/**/node_modules/**",
       "**/*.node.spec.ts",
       "../../packages/*/src/**/*.node.spec.ts",
     ],

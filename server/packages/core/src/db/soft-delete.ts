@@ -35,6 +35,33 @@ export interface SoftDeleteCleanupLogger {
   error(event: Record<string, string | number | null>): void;
 }
 
+function isNonNegativeInteger(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+/** Validate only the post-cleanup observation; concurrent writers may change totals. */
+function isCleanupResult(
+  value: unknown,
+  now: number
+): value is SoftDeleteCleanupResult {
+  if (
+    typeof value !== "object" ||
+    value === null ||
+    !("deletedCount" in value) ||
+    !("remainingExpired" in value) ||
+    !("oldestExpiredTimeUtc" in value) ||
+    !isNonNegativeInteger(value.deletedCount) ||
+    value.deletedCount > SOFT_DELETE_BATCH_SIZE ||
+    !isNonNegativeInteger(value.remainingExpired)
+  ) {
+    return false;
+  }
+  return value.remainingExpired === 0
+    ? value.oldestExpiredTimeUtc === null
+    : isNonNegativeInteger(value.oldestExpiredTimeUtc) &&
+        value.oldestExpiredTimeUtc <= now;
+}
+
 /** Run only the explicitly supplied adapters; a failure never skips another one. */
 export async function runSoftDeleteCleanup(
   adapters: readonly SoftDeleteCleanupAdapter[],
@@ -44,27 +71,49 @@ export async function runSoftDeleteCleanup(
   let failed = false;
   for (const adapter of adapters) {
     const startedAt = Date.now();
+    const context = {
+      module: adapter.module,
+      checkedTimeUtc: now,
+      cutoffTimeUtc: now - SOFT_DELETE_RETENTION_MS,
+    };
     try {
       const result = await adapter.purgeExpired({
         now,
         batchSize: SOFT_DELETE_BATCH_SIZE,
       });
+      if (!isCleanupResult(result, now)) {
+        failed = true;
+        logger.error({
+          event: "soft_delete_cleanup_failed",
+          ...context,
+          errorCode: "CLEANUP_INVALID_RESULT",
+          durationMs: Math.max(0, Date.now() - startedAt),
+        });
+        continue;
+      }
       const event = {
         event: "soft_delete_cleanup",
-        module: adapter.module,
-        ...result,
-        durationMs: Date.now() - startedAt,
+        ...context,
+        // Adapters can return extra business fields; only publish approved metrics.
+        deletedCount: result.deletedCount,
+        remainingExpired: result.remainingExpired,
+        oldestExpiredTimeUtc: result.oldestExpiredTimeUtc,
+        overdueMs:
+          result.oldestExpiredTimeUtc === null
+            ? 0
+            : now - result.oldestExpiredTimeUtc,
+        durationMs: Math.max(0, Date.now() - startedAt),
       };
       if (result.remainingExpired > 0) logger.warn(event);
-      else if (result.deletedCount > 0) logger.info(event);
+      else logger.info(event);
     } catch {
       failed = true;
       // Driver errors may contain SQL parameters or record contents.
       logger.error({
         event: "soft_delete_cleanup_failed",
-        module: adapter.module,
+        ...context,
         errorCode: "CLEANUP_FAILED",
-        durationMs: Date.now() - startedAt,
+        durationMs: Math.max(0, Date.now() - startedAt),
       });
     }
   }
