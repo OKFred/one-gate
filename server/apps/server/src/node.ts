@@ -3,6 +3,10 @@ import { getEnv } from "@hodor/core/utils/env.js";
 import { serve } from "@hono/node-server";
 import cron from "node-cron";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
+import {
+  runRetentionMaintenance,
+  runScheduledMaintenance,
+} from "./soft-delete-cleanup.js";
 import { startMqttEventListener } from "@hodor/admin/mqtt/listener.js";
 import {
   InMemoryTotpAttemptCoordinator,
@@ -29,7 +33,7 @@ function main() {
   // 启动定时任务驱动 (每分钟扫描并执行一次)
   cron.schedule("* * * * *", async () => {
     try {
-      await runPendingJobs();
+      await runScheduledMaintenance([runPendingJobs, runRetentionMaintenance]);
     } catch (err) {
       console.error("[Node Scheduler] 定时任务扫描失败:", err);
     }

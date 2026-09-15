@@ -1,4 +1,25 @@
 export const maintenance = {
+  'sidebar.menu.maintenance.recycleBin': 'Recycle Bin',
+  'recycleBin.title': 'Department Recycle Bin',
+  'recycleBin.retentionHelp':
+    'Deleted departments are retained for 30 days, then automatically purged. Restore them during this window, or a super administrator can permanently delete them earlier.',
+  'recycleBin.noReadPermission':
+    'Viewing the recycle bin requires both recycle bin and department read permissions.',
+  'recycleBin.searchName': 'Search department name',
+  'recycleBin.deletedBy': 'Deleted by',
+  'recycleBin.deletedTime': 'Deleted at',
+  'recycleBin.expiresTime': 'Expires at',
+  'recycleBin.unknownDeleter': 'Unknown user',
+  'recycleBin.retained': 'Within retention period',
+  'recycleBin.expired': 'Expired, awaiting purge',
+  'recycleBin.restore': 'Restore',
+  'recycleBin.purge': 'Permanently delete',
+  'recycleBin.restoreConfirm':
+    'Restore department "{{name}}" with its previous enabled status? A duplicate name or deleted parent department must be resolved first.',
+  'recycleBin.purgeConfirm':
+    'Permanently delete department "{{name}}"? Its record will be removed permanently. This cannot be undone.',
+  'recycleBin.pagination': '{{from}}–{{to}} of {{count}}',
+
   'openapi.title': 'API Documentation',
   'apiDocs.button.upload': 'Upload Document',
   'apiDocs.field.name': 'Document Name',

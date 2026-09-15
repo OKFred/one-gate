@@ -15,6 +15,7 @@
     "db:init": "pnpm --filter @hodor/server db:init",
     "db:migrate:worker:local": "pnpm --filter @hodor/server db:migrate:worker:local",
     "db:migrate:worker:remote": "pnpm --filter @hodor/server db:migrate:worker:remote",
+    "db:migrate:department:node": "pnpm --filter @hodor/server db:migrate:department:node",
     "db:check:worker:local": "pnpm --filter @hodor/server db:check:worker:local",
     "db:check:worker:remote": "pnpm --filter @hodor/server db:check:worker:remote",
     "db:generate": "tsx ./scripts/generate-ddl.ts",

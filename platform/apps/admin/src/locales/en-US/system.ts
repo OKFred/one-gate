@@ -34,6 +34,8 @@ export const system = {
   'department.table.parentDepartment': 'Parent Department',
   'department.table.topLevelDepartment': 'None (Top Level)',
   'department.dialog.addChild': 'Add Sub-Department',
+  'department.dialog.softDeleteConfirm':
+    'Delete this department? It will move to the recycle bin for 30 days. Authorized administrators can restore it during this window; it will be permanently deleted after expiry.',
 
   'role.table.roleName': 'Role Name',
   'role.table.permissions': 'Permissions',

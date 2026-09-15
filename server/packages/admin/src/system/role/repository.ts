@@ -13,6 +13,13 @@ import {
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
+import { sql } from "drizzle-orm";
+import {
+  activeDepartmentIds,
+  normalizeDepartmentIds,
+} from "../department/reference-guards";
+import { DepartmentDeletionError } from "../department/errors";
+import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 
 export const buildWhereCondition = (condition?: {
   keyword?: string;
@@ -154,10 +161,21 @@ export class RoleRepository {
       "id" | "createTimeUtc" | "updateTimeUtc"
     >
   ): Promise<number> {
+    const customDeptIds = normalizeDepartmentIds(data.customDeptIds);
+    if (customDeptIds && customDeptIds !== "[]") {
+      const rows = await db.all<{ id: number }>(sql`INSERT INTO system_role
+        (name, remark, is_enabled, permission_count, data_scope, custom_dept_ids, creator_id, updater_id, create_time_utc)
+        SELECT ${data.name}, ${data.remark ?? null}, ${data.isEnabled ? 1 : 0}, ${data.permissionCount}, ${data.dataScope}, ${customDeptIds}, ${data.creatorId}, ${data.updaterId ?? null}, ${Date.now()}
+        WHERE ${activeDepartmentIds(customDeptIds)} RETURNING id`);
+      if (!rows[0])
+        throw new BusinessError(DepartmentDeletionError.REFERENCE_UNAVAILABLE);
+      return rows[0].id;
+    }
     const res = await db
       .insert(roleTable)
       .values({
         ...data,
+        customDeptIds,
         createTimeUtc: Date.now(),
       })
       .returning({ id: roleTable.id });
@@ -173,14 +191,25 @@ export class RoleRepository {
       >
     >
   ): Promise<number> {
+    const customDeptIds = normalizeDepartmentIds(data.customDeptIds);
     const res = await db
       .update(roleTable)
       .set({
         ...data,
+        customDeptIds,
         updateTimeUtc: Date.now(),
       })
-      .where(eq(roleTable.id, id))
+      .where(
+        and(
+          eq(roleTable.id, id),
+          customDeptIds && customDeptIds !== "[]"
+            ? activeDepartmentIds(customDeptIds)
+            : undefined
+        )
+      )
       .returning({ id: roleTable.id });
+    if (!res[0])
+      throw new BusinessError(DepartmentDeletionError.REFERENCE_UNAVAILABLE);
     return res[0].id;
   }
 

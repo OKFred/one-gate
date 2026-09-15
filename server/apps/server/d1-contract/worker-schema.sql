@@ -1,4 +1,15 @@
 -- Read-only deployment contract. A missing table or column must fail before Worker deploy.
+SELECT `id`, `name`, `parent_id`, `is_deleted`, `deleted_time_utc`, `deleter_id`
+FROM `system_department` LIMIT 0;
+SELECT `id` FROM `system_department`
+INDEXED BY `system_department_name_active_unique` WHERE `is_deleted` = 0 LIMIT 0;
+SELECT `id` FROM `system_department`
+INDEXED BY `system_department_deleted_time_idx` LIMIT 0;
+SELECT `id` FROM `system_department`
+INDEXED BY `system_department_parent_id_idx` LIMIT 0;
+SELECT `id` FROM `compliance_archives`
+INDEXED BY `compliance_archives_department_retention_idx` LIMIT 0;
+
 SELECT
   `id`,
   `client_id`,

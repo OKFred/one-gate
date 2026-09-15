@@ -255,6 +255,15 @@ export const initialMenuData = [
     business: "admin.maintenance.api_docs",
   },
   {
+    id: 107,
+    name: "sidebar.menu.maintenance.recycleBin",
+    icon: "material-symbols:restore-from-trash",
+    path: "/admin/recycle-bin",
+    parentId: 19,
+    sort: 7,
+    business: "admin.maintenance.recycle_bin",
+  },
+  {
     id: 23,
     name: "sidebar.menu.oss",
     icon: "material-symbols:cloud",

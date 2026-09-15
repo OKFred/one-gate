@@ -4009,6 +4009,180 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/maintenance/recycle-bin/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 查询回收站 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.recycle_bin.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.recycle_bin.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/maintenance/recycle-bin/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 恢复回收站记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.recycle_bin.restore.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.recycle_bin.restore.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/maintenance/recycle-bin/purge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 提前彻底删除回收站记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.recycle_bin.purge.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.recycle_bin.purge.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/data/schema_form_data/list": {
         parameters: {
             query?: never;
@@ -9286,6 +9460,296 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.system.api_token.revoke.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/authorization/config/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 读取 Authorization 连接配置 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.authorization.config.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.authorization.config.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/authorization/config/save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 保存 Authorization 连接草稿 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.authorization.config.save.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.authorization.config.save.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/authorization/config/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 探测并启用 Authorization 连接 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.authorization.config.test.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.authorization.config.test.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/authorization/config/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 停用 Authorization 连接 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.authorization.config.disable.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.authorization.config.disable.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/authorization/pilot/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 执行服务主体 ABAC 试决策 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.authorization.pilot.check.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.authorization.pilot.check.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -22329,6 +22793,61 @@ export interface components {
             };
             message: string;
         };
+        "admin.maintenance.recycle_bin.list.req": {
+            /** @enum {string} */
+            resourceType: "department";
+            keyword?: string;
+            pageNo?: number;
+            pageSize?: number;
+        };
+        "admin.maintenance.recycle_bin.list.res": {
+            ok: boolean;
+            data: {
+                /** @description 总记录数 */
+                total: number;
+                /** @description 总页数 */
+                totalPage: number;
+                /** @description 当前页码 */
+                currentPage: number;
+                /** @description 每页记录数 */
+                pageSize: number;
+                canPurge: boolean;
+                list: {
+                    /** @enum {string} */
+                    resourceType: "department";
+                    id: number;
+                    name: string;
+                    deleterId: number | null;
+                    deleterName: string | null;
+                    deletedTimeUtc: number;
+                    expiresTimeUtc: number;
+                    canRestore: boolean;
+                }[];
+            };
+            message: string;
+        };
+        "admin.maintenance.recycle_bin.restore.req": {
+            /** @enum {string} */
+            resourceType: "department";
+            id: number;
+            expectedDeletedTimeUtc: number;
+        };
+        "admin.maintenance.recycle_bin.restore.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "admin.maintenance.recycle_bin.purge.req": {
+            /** @enum {string} */
+            resourceType: "department";
+            id: number;
+            expectedDeletedTimeUtc: number;
+        };
+        "admin.maintenance.recycle_bin.purge.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
         "admin.data.schema_form_data.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -25874,6 +26393,126 @@ export interface components {
              * @example 1
              */
             data: number;
+            message: string;
+        };
+        "admin.system.authorization.config.get.req": Record<string, never>;
+        "admin.system.authorization.config.get.res": {
+            ok: boolean;
+            data: {
+                configured: boolean;
+                status: ("draft" | "ready" | "disabled") | null;
+                issuer: string | null;
+                authorizationBaseUrl: string | null;
+                audience: string | null;
+                clientId: string | null;
+                hasClientSecret: boolean;
+                cloudflareAccessClientId: string | null;
+                hasCloudflareAccessClientSecret: boolean;
+                usesCloudflareAccess: boolean;
+                configVersion: number;
+                lastTestedAtUtc: number | null;
+                updateTimeUtc: number | null;
+            };
+            message: string;
+        };
+        "admin.system.authorization.config.save.req": {
+            issuer: string;
+            authorizationBaseUrl: string;
+            audience: string;
+            clientId: string;
+            clientSecret?: string;
+            cloudflareAccess: {
+                clientId: string;
+                clientSecret?: string;
+            } | null;
+            expectedVersion: number;
+        };
+        "admin.system.authorization.config.save.res": {
+            ok: boolean;
+            data: {
+                configured: boolean;
+                status: ("draft" | "ready" | "disabled") | null;
+                issuer: string | null;
+                authorizationBaseUrl: string | null;
+                audience: string | null;
+                clientId: string | null;
+                hasClientSecret: boolean;
+                cloudflareAccessClientId: string | null;
+                hasCloudflareAccessClientSecret: boolean;
+                usesCloudflareAccess: boolean;
+                configVersion: number;
+                lastTestedAtUtc: number | null;
+                updateTimeUtc: number | null;
+            };
+            message: string;
+        };
+        "admin.system.authorization.config.test.req": {
+            expectedVersion: number;
+        };
+        "admin.system.authorization.config.test.res": {
+            ok: boolean;
+            data: {
+                configured: boolean;
+                status: ("draft" | "ready" | "disabled") | null;
+                issuer: string | null;
+                authorizationBaseUrl: string | null;
+                audience: string | null;
+                clientId: string | null;
+                hasClientSecret: boolean;
+                cloudflareAccessClientId: string | null;
+                hasCloudflareAccessClientSecret: boolean;
+                usesCloudflareAccess: boolean;
+                configVersion: number;
+                lastTestedAtUtc: number | null;
+                updateTimeUtc: number | null;
+            };
+            message: string;
+        };
+        "admin.system.authorization.config.disable.req": {
+            expectedVersion: number;
+        };
+        "admin.system.authorization.config.disable.res": {
+            ok: boolean;
+            data: {
+                configured: boolean;
+                status: ("draft" | "ready" | "disabled") | null;
+                issuer: string | null;
+                authorizationBaseUrl: string | null;
+                audience: string | null;
+                clientId: string | null;
+                hasClientSecret: boolean;
+                cloudflareAccessClientId: string | null;
+                hasCloudflareAccessClientSecret: boolean;
+                usesCloudflareAccess: boolean;
+                configVersion: number;
+                lastTestedAtUtc: number | null;
+                updateTimeUtc: number | null;
+            };
+            message: string;
+        };
+        "admin.system.authorization.pilot.check.req": {
+            action: string;
+            resource: {
+                type: string;
+                id: string;
+                attributes: {
+                    [key: string]: boolean | number | string | (boolean | number | string)[];
+                };
+            };
+            context?: {
+                [key: string]: boolean | number | string | (boolean | number | string)[];
+            };
+        };
+        "admin.system.authorization.pilot.check.res": {
+            ok: boolean;
+            data: {
+                decisionId: string;
+                allowed: boolean;
+                /** @enum {string} */
+                reason: "POLICY_ALLOW" | "POLICY_DENY";
+                policyRevision: number;
+                authorizationRequestId: string;
+            };
             message: string;
         };
         "admin.swarm.docker.list.req": {

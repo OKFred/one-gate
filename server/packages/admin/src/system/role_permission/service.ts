@@ -40,16 +40,9 @@ import type { API } from "@hodor/core/middleware/encapsulation";
 import { PermissionInfo } from "../permission/service";
 import { utils as permissionUtils } from "../permission/service";
 import { SUPER_ADMIN_ROLE_ID } from "@hodor/core/db/init";
-import { kv } from "@hodor/core/middleware/cache";
+import { invalidateAuthCache } from "@hodor/core/middleware/auth/cache-invalidation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import { rolePermissionRepository } from "./repository";
-
-/** 更新全局权限版本号，强制所有用户缓存失效 */
-async function invalidateAuthCache() {
-  await kv
-    .put("system.auth:global_version", Date.now().toString())
-    .catch(() => {});
-}
 
 const listAllReq = {
   type: "object",

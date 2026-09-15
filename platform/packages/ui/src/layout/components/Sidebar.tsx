@@ -27,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const location = useLocation();
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
   const { navItems } = useMenu();
-  const { isMobile } = useResponsive();
+  const { isMobile, isSmallMobile } = useResponsive();
   const t = useTranslation();
 
   // 规范化后端返回的数据，确保 children 为 MenuNode[]
@@ -176,7 +176,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
   const mobileSidebar = (
     <Drawer
       variant="temporary"
-      open={open}
+      open={open && isSmallMobile}
       onClose={onClose}
       ModalProps={{
         keepMounted: true, // 提升移动端性能

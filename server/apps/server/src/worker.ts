@@ -3,6 +3,10 @@ import { setD1Binding } from "@hodor/core/db/index.js";
 import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
+import {
+  runRetentionMaintenance,
+  runScheduledMaintenance,
+} from "./soft-delete-cleanup.js";
 import { timeoutExpiredDeviceTasks } from "@hodor/admin/mobile/async-task/facade.js";
 import {
   cleanupExpiredDeviceEvents,
@@ -151,14 +155,15 @@ export default {
 
     // 4. 执行待处理的定时任务
     ctx.waitUntil(
-      Promise.all([
-        runPendingJobs(),
-        timeoutExpiredDeviceTasks(),
-        markTimedOutDevicesOffline(),
-        cleanupExpiredDeviceEvents(),
-        expireDeviceOpsSessions(),
-        cleanupDeviceOpsAudits(),
-      ]).then(() => undefined)
+      runScheduledMaintenance([
+        runPendingJobs,
+        timeoutExpiredDeviceTasks,
+        markTimedOutDevicesOffline,
+        cleanupExpiredDeviceEvents,
+        expireDeviceOpsSessions,
+        cleanupDeviceOpsAudits,
+        runRetentionMaintenance,
+      ])
     );
   },
 };

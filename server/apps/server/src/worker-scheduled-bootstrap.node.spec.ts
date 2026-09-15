@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   getEnv: vi.fn(() => ""),
   markTimedOutDevicesOffline: vi.fn(async () => undefined),
   runPendingJobs: vi.fn(async () => undefined),
+  runRetentionMaintenance: vi.fn(async () => undefined),
   setD1Binding: vi.fn(),
   setEnv: vi.fn(),
   setKVBinding: vi.fn(),
@@ -36,6 +37,12 @@ vi.mock("@hodor/core/utils/env.js", () => ({
 }));
 vi.mock("@hodor/admin/maintenance/cron/scheduler.js", () => ({
   runPendingJobs: mocks.runPendingJobs,
+}));
+vi.mock("./soft-delete-cleanup.js", () => ({
+  runRetentionMaintenance: mocks.runRetentionMaintenance,
+  runScheduledMaintenance: async (tasks: (() => Promise<unknown>)[]) => {
+    await Promise.all(tasks.map((task) => task()));
+  },
 }));
 vi.mock("@hodor/admin/mobile/async-task/facade.js", () => ({
   timeoutExpiredDeviceTasks: mocks.timeoutExpiredDeviceTasks,
@@ -78,6 +85,10 @@ describe("Worker scheduled bootstrap", () => {
     expect(mocks.setEnv).toHaveBeenCalledWith(env);
     expect(mocks.createApp).toHaveBeenCalledTimes(1);
     expect(mocks.runPendingJobs).toHaveBeenCalledTimes(1);
+    expect(mocks.runRetentionMaintenance).toHaveBeenCalledTimes(1);
+    expect(mocks.createApp.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.runRetentionMaintenance.mock.invocationCallOrder[0]
+    );
     expect(mocks.createApp.mock.invocationCallOrder[0]).toBeLessThan(
       mocks.runPendingJobs.mock.invocationCallOrder[0]
     );

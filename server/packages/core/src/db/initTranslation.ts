@@ -9,6 +9,7 @@ import { swarmTranslations } from "../../../admin/src/swarm/translation";
 import { i18nTranslations } from "../../../admin/src/i18n/translation";
 import { mailTranslations } from "../../../admin/src/mail/translation";
 import { maintenanceTranslations } from "../../../admin/src/maintenance/translation";
+import { recycleBinTranslations } from "../../../admin/src/maintenance/recycle-bin/translation";
 import { ossTranslations } from "../../../admin/src/oss/translation";
 import { dataTranslations } from "../../../admin/src/data/translation";
 import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
@@ -147,6 +148,7 @@ export const initialTranslationData = mapTranslations({
   ...i18nTranslations,
   ...mailTranslations,
   ...maintenanceTranslations,
+  ...recycleBinTranslations,
   ...dataTranslations,
   ...ossTranslations,
   ...attendanceTranslations,
