@@ -20,6 +20,8 @@ import {
 import { createTranslator } from '@/hooks/useTranslation';
 import { loginPath } from '@/routes';
 import { RequestQueueManager } from './queue';
+import { readErrorCode } from './failure';
+export { classifyApiFailure, type ApiFailure } from './failure';
 
 const requestQueueManager = new RequestQueueManager();
 
@@ -28,6 +30,7 @@ type SessionRequestConfig = InternalAxiosRequestConfig & {
   requestId?: string;
   ignoreAbort?: boolean;
   authSession?: AuthSessionSnapshot;
+  errorPresentation?: 'global' | 'local';
 };
 
 function assertCurrentRequestSession(config: SessionRequestConfig): void {
@@ -71,7 +74,11 @@ export type AxiosConfig<U, M> = Omit<
   AxiosRequestConfig,
   'url' | 'method' | 'headers' | 'path' | 'params' | 'data' | 'ignoreAbort'
 > &
-  RequestGeneric<U, M> & { ignoreAbort?: boolean };
+  RequestGeneric<U, M> & {
+    ignoreAbort?: boolean;
+    /** Local action feedback owns ordinary errors; authentication remains global. */
+    errorPresentation?: 'global' | 'local';
+  };
 
 /** @description  axios 实例 */
 const service = axios.create({
@@ -144,7 +151,9 @@ function setupInterceptors(service: AxiosInstance) {
           // 获取用户语言创建翻译函数
           const langCode = authUtils.getUserInfo()?.langCode;
           const t = createTranslator(langCode);
-          handleErrorResponse(response.data, t('error.requestFailed'));
+          if (config.errorPresentation !== 'local') {
+            handleErrorResponse(response.data, t('error.requestFailed'));
+          }
           return Promise.reject(response);
         }
       }
@@ -201,18 +210,13 @@ function setupInterceptors(service: AxiosInstance) {
       }
 
       // 其他业务错误：优先展示后端 message
-      handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.networkError'));
+      if (config?.errorPresentation !== 'local') {
+        handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.networkError'));
+      }
       return Promise.reject(error);
     },
   );
   return service;
-}
-
-function readErrorCode(data: unknown): string | undefined {
-  if (!data || typeof data !== 'object' || !('data' in data)) return undefined;
-  const payload = data.data;
-  if (!payload || typeof payload !== 'object' || !('code' in payload)) return undefined;
-  return typeof payload.code === 'string' ? payload.code : undefined;
 }
 
 export type ApiErrorReference = {

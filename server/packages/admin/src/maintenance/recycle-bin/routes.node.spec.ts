@@ -11,6 +11,7 @@ import {
 import createApp from "./index";
 
 const state = vi.hoisted(() => ({
+  authenticated: true,
   resourceReadable: true,
   list: vi.fn(
     async (): Promise<{ total: number; list: RecycleBinItem[] }> => ({
@@ -20,6 +21,7 @@ const state = vi.hoisted(() => ({
   ),
   restore: vi.fn(async () => "document/1"),
   purge: vi.fn(async () => "document/1"),
+  undo: vi.fn(async () => "document/1"),
 }));
 
 const actor: UserObj = {
@@ -38,7 +40,10 @@ const actor: UserObj = {
 };
 
 vi.mock("@hodor/core/middleware/auth", () => ({
-  authMiddleware: async (context: Context) => context.set("userObj", actor),
+  authMiddleware: async (context: Context) => {
+    if (!state.authenticated) throw new BusinessError("NOT_AUTHENTICATED");
+    context.set("userObj", actor);
+  },
 }));
 vi.mock("@hodor/core/utils/i18n/index.js", () => ({
   getTranslator: async () => async (key: string) => key,
@@ -51,6 +56,7 @@ recycleBinRegistry.register({
   list: state.list,
   restore: state.restore,
   purge: state.purge,
+  undo: state.undo,
   purgeExpired: async () => ({
     deletedCount: 0,
     remainingExpired: 0,
@@ -80,6 +86,7 @@ describe("recycle-bin HTTP contract", () => {
     vi.spyOn(Date, "now").mockReturnValue(1_000);
     state.list.mockResolvedValue({ total: 0, list: [] });
     state.resourceReadable = true;
+    state.authenticated = true;
     actor.isSuperAdmin = false;
     actor.permissions = ["read", "restore", "purge"].map((action, index) => ({
       id: index + 1,
@@ -99,6 +106,47 @@ describe("recycle-bin HTTP contract", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it("authenticates undo while letting the adapter authorize it without catalogue or restore permissions", async () => {
+    actor.permissions = [];
+    const body = {
+      resourceType: "route_document",
+      id: "document/1",
+      expectedDeletedTimeUtc: 123,
+    };
+    expect(await (await request("/undo", body)).json()).toEqual({
+      ok: true,
+      message: "OK",
+      data: "document/1",
+    });
+    expect(state.undo).toHaveBeenCalledExactlyOnceWith(
+      { id: "document/1", expectedDeletedTimeUtc: 123 },
+      actor
+    );
+    state.undo.mockClear();
+    state.authenticated = false;
+    expect((await request("/undo", body)).status).toBe(401);
+    expect(state.undo).not.toHaveBeenCalled();
+  });
+
+  it("rejects forged undo clocks and preserves explicit HTTP 200 business refusals", async () => {
+    const body = {
+      resourceType: "route_document",
+      id: "document/1",
+      expectedDeletedTimeUtc: 123,
+    };
+    expect((await request("/undo", { ...body, now: 100 })).status).toBe(422);
+    expect(state.undo).not.toHaveBeenCalled();
+    state.undo.mockRejectedValueOnce(
+      new BusinessError("errorHandler.recycleBin.undoForbidden")
+    );
+    const response = await request("/undo", body);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      ok: false,
+      code: "errorHandler.recycleBin.undoForbidden",
+    });
   });
 
   it("returns the server-time anchor and expires rows through the actual HTTP list route", async () => {

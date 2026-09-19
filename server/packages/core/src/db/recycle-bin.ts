@@ -41,6 +41,21 @@ export interface RecycleBinMutation {
   expectedDeletedTimeUtc: number;
 }
 
+/** A receipt identifies one successful deletion, never a transferable permission. */
+export interface SoftDeleteUndoReceipt {
+  resourceType: string;
+  id: RecycleBinRecordId;
+  expectedDeletedTimeUtc: number;
+  undoExpiresTimeUtc: number;
+  serverTimeUtc: number;
+}
+
+export const RecycleBinUndoError = {
+  EXPIRED: "errorHandler.recycleBin.undoExpired",
+  FORBIDDEN: "errorHandler.recycleBin.undoForbidden",
+  UNSUPPORTED: "errorHandler.recycleBin.undoUnsupported",
+} as const;
+
 export interface RecycleBinResourceAdapter {
   readonly resourceType: string;
   readonly labelKey: string;
@@ -57,6 +72,11 @@ export interface RecycleBinResourceAdapter {
     user: UserObj
   ): Promise<RecycleBinRecordId>;
   purge(input: RecycleBinMutation, user: UserObj): Promise<RecycleBinRecordId>;
+  /** Requires the current business delete permission AND this deletion's actor.
+   * Enforce the deletion version and short deadline in the mutating SQL.
+   * This capability does not require or grant recycle-bin restore permissions.
+   */
+  undo?(input: RecycleBinMutation, user: UserObj): Promise<RecycleBinRecordId>;
   purgeExpired: SoftDeleteCleanupAdapter["purgeExpired"];
 }
 

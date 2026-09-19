@@ -1282,7 +1282,7 @@ test.describe('session isolation', () => {
   });
 });
 
-test('department deletion describes the 30 day recycle bin and keeps the existing request shape', async ({
+test('department deletion describes the 30 day recycle bin and requests a versioned undo receipt', async ({
   page,
 }) => {
   await installRecycleBinFixture(page, { langCode: 'zh-CN' });
@@ -1290,13 +1290,26 @@ test('department deletion describes the 30 day recycle bin and keeps the existin
   const requests: unknown[] = [];
   await page.route('**/api/v1/admin/system/department/listAll', (route) =>
     route.fulfill(
-      fulfillOk(deleted ? [] : [{ id: 9, name: '测试部门', parentId: null, isEnabled: true }]),
+      fulfillOk(
+        deleted
+          ? []
+          : [{ id: 9, name: '测试部门', parentId: null, isEnabled: true, updateTimeUtc: null }],
+      ),
     ),
   );
-  await page.route('**/api/v1/admin/system/department/delete', async (route) => {
+  await page.route('**/api/v1/admin/system/department/deleteWithUndo', async (route) => {
     requests.push(route.request().postDataJSON());
     deleted = true;
-    await route.fulfill(fulfillOk(1));
+    const now = Date.now();
+    await route.fulfill(
+      fulfillOk({
+        resourceType: 'department',
+        id: 9,
+        expectedDeletedTimeUtc: now,
+        undoExpiresTimeUtc: now + 15_000,
+        serverTimeUtc: now,
+      }),
+    );
   });
   await page.goto('/#/admin/system/department');
   await page.getByRole('button', { name: '删除', exact: true }).click();
@@ -1305,7 +1318,8 @@ test('department deletion describes the 30 day recycle bin and keeps the existin
   await expect(dialog).not.toContainText('此操作不可撤销');
   await dialog.getByRole('button', { name: '删除', exact: true }).click();
   await expect(page.getByText('测试部门', { exact: true })).toHaveCount(0);
-  expect(requests).toEqual([{ id: 9 }]);
+  await expect(page.getByRole('button', { name: '撤销删除', exact: true })).toBeEnabled();
+  expect(requests).toEqual([{ id: 9, expectedUpdateTimeUtc: null }]);
 });
 
 test('desktop sidebar can close and reopen without hiding page accessibility', async ({ page }) => {

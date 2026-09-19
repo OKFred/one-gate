@@ -49,3 +49,12 @@ export type ListRes = NonNullable<Awaited<ReturnType<typeof listFn>>['data']['da
 export type RecycleBinItem = ListRes['list'][number];
 export type ResourcesRes = NonNullable<Awaited<ReturnType<typeof resourcesFn>>['data']['data']>;
 export type ResourceDescriptor = ResourcesRes['list'][number];
+
+export const undoFn = (
+  config: Omit<AxiosConfig<'/api/v1/admin/maintenance/recycle-bin/undo', 'post'>, 'url' | 'method'>,
+) =>
+  axiosPlus({
+    ...config,
+    url: '/api/v1/admin/maintenance/recycle-bin/undo',
+    method: 'post',
+  });
