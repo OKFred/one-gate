@@ -14,6 +14,7 @@ import {
   listDeletedDepartments,
   restoreDeletedDepartment,
   purgeDeletedDepartment,
+  undoDeletedDepartment,
 } from "./service";
 
 function requireDepartmentId(id: RecycleBinRecordId): number {
@@ -52,4 +53,10 @@ export const departmentRecycleBinAdapter: RecycleBinResourceAdapter = {
       user.userId
     ),
   purgeExpired: purgeExpiredDepartments,
+  undo: (input, user) =>
+    undoDeletedDepartment(
+      requireDepartmentId(input.id),
+      input.expectedDeletedTimeUtc,
+      user
+    ),
 };

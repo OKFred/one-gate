@@ -4009,6 +4009,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/maintenance/recycle-bin/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 撤销本人刚刚删除的记录 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.recycle_bin.undo.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.recycle_bin.undo.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/maintenance/recycle-bin/resources": {
         parameters: {
             query?: never;
@@ -7024,6 +7082,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.system.department.delete.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/department/deleteWithUndo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除部门并返回短时撤销收据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.department.deletewithundo.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.department.deletewithundo.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -22851,6 +22967,16 @@ export interface components {
             };
             message: string;
         };
+        "admin.maintenance.recycle_bin.undo.req": {
+            resourceType: string;
+            id: number | string;
+            expectedDeletedTimeUtc: number;
+        };
+        "admin.maintenance.recycle_bin.undo.res": {
+            ok: boolean;
+            data: number | string;
+            message: string;
+        };
         "admin.maintenance.recycle_bin.resources.req": Record<string, never>;
         "admin.maintenance.recycle_bin.resources.res": {
             ok: boolean;
@@ -24269,6 +24395,11 @@ export interface components {
                 isEnabled?: boolean;
                 /** @description 备注说明 */
                 remark?: ((string | null) | null) | null;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
             }[];
             message: string;
         };
@@ -24382,6 +24513,22 @@ export interface components {
              * @example 1
              */
             data: number;
+            message: string;
+        };
+        "admin.system.department.deletewithundo.req": {
+            id: number;
+            expectedUpdateTimeUtc: number | null;
+        };
+        "admin.system.department.deletewithundo.res": {
+            ok: boolean;
+            data: {
+                /** @constant */
+                resourceType: "department";
+                id: number;
+                expectedDeletedTimeUtc: number;
+                undoExpiresTimeUtc: number;
+                serverTimeUtc: number;
+            };
             message: string;
         };
         "admin.system.department.update.req": {

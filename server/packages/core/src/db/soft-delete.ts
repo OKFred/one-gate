@@ -2,6 +2,7 @@ import { integer } from "drizzle-orm/sqlite-core";
 
 export const SOFT_DELETE_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 export const SOFT_DELETE_BATCH_SIZE = 100;
+export const SOFT_DELETE_UNDO_WINDOW_MS = 15_000;
 
 /** Each table gets its own builders. System-owned values are set on insertion. */
 export function softDeleteColumns() {

@@ -93,6 +93,39 @@ export type DepartmentUpdateVOLike = DepartmentUpdatePOLike;
 export type DepartmentDeleteVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 export type DepartmentGetVOLike = Pick<DepartmentVOLike, IndexKeyLike>;
 
+export const DepartmentDeleteWithUndoReq = {
+  type: "object",
+  properties: {
+    id: { type: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER },
+    expectedUpdateTimeUtc: {
+      type: ["integer", "null"],
+      minimum: 0,
+      maximum: Number.MAX_SAFE_INTEGER,
+    },
+  },
+  required: ["id", "expectedUpdateTimeUtc"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+export const DepartmentDeleteWithUndoRes = {
+  type: "object",
+  properties: {
+    resourceType: { type: "string", const: "department" },
+    id: { type: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER },
+    expectedDeletedTimeUtc: { type: "integer", minimum: 0 },
+    undoExpiresTimeUtc: { type: "integer", minimum: 0 },
+    serverTimeUtc: { type: "integer", minimum: 0 },
+  },
+  required: [
+    "resourceType",
+    "id",
+    "expectedDeletedTimeUtc",
+    "undoExpiresTimeUtc",
+    "serverTimeUtc",
+  ],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
 //----------------- Required Keys ----------------//
 export const DepartmentAddKeys = [
   "name",

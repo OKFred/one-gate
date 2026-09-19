@@ -3,6 +3,7 @@ import { components } from './components';
 import { sidebar } from './sidebar';
 import { auth } from './auth';
 import { cron } from './cron';
+import { deleteUndo } from './delete-undo';
 
 /**
  * en-US 共享翻译聚合入口
@@ -14,4 +15,5 @@ export default {
   ...sidebar,
   ...auth,
   ...cron,
+  ...deleteUndo,
 } as const satisfies Record<string, string>;

@@ -71,7 +71,14 @@ export type AxiosConfig<U, M> = Omit<
 > &
   RequestGeneric<U, M> & {
     ignoreAbort?: boolean;
+    errorPresentation?: 'global' | 'local';
   };
+export interface ApiFailure {
+  kind: 'business' | 'unknown' | 'session';
+  code: string | null;
+  message: string | null;
+}
+export declare function classifyApiFailure(error: unknown): ApiFailure;
 declare const axiosPlus: <U extends keyof paths, M extends keyof UrlGeneric<U>>(
   axiosConfig: AxiosConfig<U, M>,
 ) => Promise<Omit<AxiosResponse, 'data' | 'headers'> & ResponseGeneric<U, M>>;

@@ -18,6 +18,8 @@ import {
   type DepartmentDeleteVOLike,
   type DepartmentGetVOLike,
   DepartmentBaseVO,
+  DepartmentDeleteWithUndoReq,
+  DepartmentDeleteWithUndoRes,
 } from "./model";
 import type { FromSchema, JSONSchema } from "json-schema-to-ts";
 import type { UserObj, RequiredKeys } from "@hodor/core/types/app";
@@ -30,7 +32,15 @@ import {
 import { bodyUserAdapter } from "@hodor/core/middleware/encapsulation/adapter";
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { invalidateAuthCache } from "@hodor/core/middleware/auth/cache-invalidation";
-import { SOFT_DELETE_RETENTION_MS } from "@hodor/core/db/soft-delete";
+import { can } from "@hodor/core/middleware/auth/permission";
+import {
+  SOFT_DELETE_RETENTION_MS,
+  SOFT_DELETE_UNDO_WINDOW_MS,
+} from "@hodor/core/db/soft-delete";
+import {
+  RecycleBinUndoError,
+  type SoftDeleteUndoReceipt,
+} from "@hodor/core/db/recycle-bin";
 import { DepartmentDeletionError } from "./errors";
 import {
   BusinessError,
@@ -62,8 +72,9 @@ const listAllRes = {
     properties: {
       ...IndexVO,
       ...DepartmentBaseVO,
+      updateTimeUtc: DepartmentVO.updateTimeUtc,
     },
-    required: [...DepartmentGetKeys],
+    required: [...DepartmentGetKeys, "updateTimeUtc"],
     additionalProperties: false,
   },
 } as const satisfies JSONSchema;
@@ -287,6 +298,41 @@ const deleteApi = {
   } as const,
   adapter: bodyUserAdapter,
   service: onDelete,
+  permission: { action: "delete" },
+} satisfies API;
+
+async function onDeleteWithUndo(
+  params: FromSchema<typeof DepartmentDeleteWithUndoReq>,
+  user: UserObj
+): Promise<FromSchema<typeof DepartmentDeleteWithUndoRes>> {
+  if (!user || !Number.isSafeInteger(user.userId) || user.userId <= 0)
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  if (!(await can(user, "delete", "admin.system.department")))
+    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+  const deleted = await departmentRepository.onDeleteWithUndo(
+    params.id,
+    params.expectedUpdateTimeUtc,
+    user.userId
+  );
+  await invalidateAuthCache();
+  return {
+    resourceType: "department" as const,
+    ...deleted,
+    undoExpiresTimeUtc:
+      deleted.expectedDeletedTimeUtc + SOFT_DELETE_UNDO_WINDOW_MS,
+  } satisfies SoftDeleteUndoReceipt;
+}
+
+const deleteWithUndoApi = {
+  req: DepartmentDeleteWithUndoReq,
+  res: DepartmentDeleteWithUndoRes,
+  pathInfo: {
+    path: "/deleteWithUndo",
+    method: "post",
+    summary: "删除部门并返回短时撤销收据",
+  },
+  adapter: bodyUserAdapter,
+  service: onDeleteWithUndo,
   permission: { action: "delete" },
 } satisfies API;
 
@@ -598,6 +644,48 @@ export async function restoreDeletedDepartment(
   return restoredId;
 }
 
+export async function undoDeletedDepartment(
+  id: number,
+  expectedDeletedTimeUtc: number,
+  user: UserObj
+): Promise<number> {
+  if (!user || !Number.isSafeInteger(user.userId) || user.userId <= 0)
+    throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+  if (!(await can(user, "delete", "admin.system.department")))
+    throw new BusinessError(RecycleBinUndoError.FORBIDDEN);
+
+  async function checkCurrentState() {
+    const row = await departmentRepository.findUndoState(id);
+    if (!row || !row.isDeleted || row.deletedTimeUtc === null)
+      throw new BusinessError(DepartmentDeletionError.NOT_DELETED);
+    if (row.deletedTimeUtc !== expectedDeletedTimeUtc)
+      throw new BusinessError(DepartmentDeletionError.STALE_DELETION);
+    if (row.deleterId !== user.userId)
+      throw new BusinessError(RecycleBinUndoError.FORBIDDEN);
+    const age = row.serverTimeUtc - row.deletedTimeUtc;
+    if (age < 0 || age >= SOFT_DELETE_UNDO_WINDOW_MS)
+      throw new BusinessError(RecycleBinUndoError.EXPIRED);
+    if (
+      row.parentId !== null &&
+      !(await departmentRepository.findById(row.parentId))
+    )
+      throw new BusinessError(DepartmentDeletionError.INVALID_PARENT);
+  }
+
+  await checkCurrentState();
+  const restoredId = await departmentRepository.undoDelete(
+    id,
+    expectedDeletedTimeUtc,
+    user.userId
+  );
+  if (restoredId === null) {
+    await checkCurrentState();
+    throw new BusinessError(DepartmentDeletionError.STATE_CONFLICT);
+  }
+  await invalidateAuthCache();
+  return restoredId;
+}
+
 /** Authorization is checked by the recycle-bin API before entering this domain operation. */
 export async function purgeDeletedDepartment(
   id: number,
@@ -625,6 +713,7 @@ export default {
   list: listApi,
   add: addApi,
   delete: deleteApi,
+  deleteWithUndo: deleteWithUndoApi,
   update: updateApi,
   get: getApi,
   tree: treeApi,

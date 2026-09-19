@@ -79,3 +79,19 @@ export const treeFn = (
     ...axiosConfig,
   });
 };
+
+export const deleteWithUndoFn = (
+  config: Omit<
+    AxiosConfig<'/api/v1/admin/system/department/deleteWithUndo', 'post'>,
+    'url' | 'method'
+  >,
+) =>
+  axiosPlus({
+    ...config,
+    url: '/api/v1/admin/system/department/deleteWithUndo',
+    method: 'post',
+  });
+
+export type DeleteUndoReceipt = NonNullable<
+  Awaited<ReturnType<typeof deleteWithUndoFn>>['data']['data']
+>;

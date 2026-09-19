@@ -8,6 +8,7 @@ import {
 import type { UserObj } from "@hodor/core/types/app";
 import {
   recycleBinRegistry,
+  RecycleBinUndoError,
   type RecycleBinRegistry,
   type RecycleBinAction,
   type RecycleBinResourceAdapter,
@@ -140,13 +141,41 @@ export function createRecycleBinHandlers(registry: RecycleBinRegistry) {
     );
   }
 
-  return { onResources, onList, onRestore, onPurge };
+  async function onUndo(
+    params: RecycleBinMutationInput,
+    user: UserObj
+  ): Promise<RecycleBinRecordId> {
+    if (!user || !Number.isSafeInteger(user.userId) || user.userId <= 0) {
+      throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
+    }
+    const adapter = requireResource(params.resourceType);
+    if (!adapter.undo) throw new BusinessError(RecycleBinUndoError.UNSUPPORTED);
+    return adapter.undo(
+      { id: params.id, expectedDeletedTimeUtc: params.expectedDeletedTimeUtc },
+      user
+    );
+  }
+
+  return { onResources, onList, onRestore, onPurge, onUndo };
 }
 
-export const { onResources, onList, onRestore, onPurge } =
+export const { onResources, onList, onRestore, onPurge, onUndo } =
   createRecycleBinHandlers(recycleBinRegistry);
 
 export default {
+  undo: {
+    req: RecycleBinMutationReq,
+    res: RecycleBinMutationRes,
+    pathInfo: {
+      path: "/undo",
+      method: "post",
+      summary: "撤销本人刚刚删除的记录",
+    },
+    adapter: bodyUserAdapter,
+    service: onUndo,
+    // Authentication/TOTP remain mandatory. The adapter checks business deletion authority.
+    permission: false,
+  },
   resources: {
     req: RecycleBinResourcesReq,
     res: RecycleBinResourcesRes,

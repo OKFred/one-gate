@@ -1,7 +1,9 @@
 import db from "@hodor/core/db/index";
+import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
   SOFT_DELETE_RETENTION_MS,
   SOFT_DELETE_BATCH_SIZE,
+  SOFT_DELETE_UNDO_WINDOW_MS,
 } from "@hodor/core/db/soft-delete";
 import {
   departmentTable,
@@ -68,6 +70,11 @@ function validParentForUpdate(id: number, parentId: number | null): SQL {
 }
 
 export class DepartmentRepository {
+  /** SQL expressions stay unevaluated until execution; tests can inject an isolated clock. */
+  constructor(
+    private readonly currentTimeSql: () => SQL = getCurrentTimestampUtcSql
+  ) {}
+
   async findPage(params: {
     keyword?: string;
     isEnabled?: boolean;
@@ -112,6 +119,7 @@ export class DepartmentRepository {
         parentId: departmentTable.parentId,
         remark: departmentTable.remark,
         isEnabled: departmentTable.isEnabled,
+        updateTimeUtc: departmentTable.updateTimeUtc,
       })
       .from(departmentTable)
       .where(buildWhereCondition(params))
@@ -254,6 +262,104 @@ export class DepartmentRepository {
       throw new BusinessError(DepartmentDeletionError.HAS_REFERENCES);
     }
     return rows[0].id;
+  }
+
+  async onDeleteWithUndo(
+    id: number,
+    expectedUpdateTimeUtc: number | null,
+    actorId: number
+  ) {
+    const now = this.currentTimeSql();
+    const rows = await db
+      .update(departmentTable)
+      .set({
+        isDeleted: true,
+        deletedTimeUtc: now,
+        deleterId: actorId,
+        updaterId: actorId,
+        updateTimeUtc: now,
+      })
+      .where(
+        and(
+          eq(departmentTable.id, id),
+          eq(departmentTable.isDeleted, false),
+          sql`${departmentTable.updateTimeUtc} IS ${expectedUpdateTimeUtc}`,
+          sql`COALESCE(${departmentTable.updateTimeUtc}, 0) < ${now}`,
+          departmentHasNoReferences(sql`${departmentTable.id}`, false)
+        )
+      )
+      .returning({
+        id: departmentTable.id,
+        expectedDeletedTimeUtc: sql<number>`${departmentTable.deletedTimeUtc}`,
+        serverTimeUtc: sql<number>`${now}`,
+      });
+    if (rows[0]) return rows[0];
+
+    const [row] = await db
+      .select({
+        ...publicColumns,
+        serverTimeUtc: sql<number>`${this.currentTimeSql()}`,
+      })
+      .from(departmentTable)
+      .where(
+        and(eq(departmentTable.id, id), eq(departmentTable.isDeleted, false))
+      );
+    if (!row) throw new BusinessError(DepartmentDeletionError.NOT_ACTIVE);
+    if (row.updateTimeUtc !== expectedUpdateTimeUtc)
+      throw new BusinessError(DepartmentDeletionError.STATE_CONFLICT);
+    if ((row.updateTimeUtc ?? 0) >= row.serverTimeUtc)
+      throw new BusinessError(DepartmentDeletionError.CLOCK_CONFLICT);
+    throw new BusinessError(DepartmentDeletionError.HAS_REFERENCES);
+  }
+
+  async findUndoState(id: number) {
+    const [row] = await db
+      .select({
+        id: departmentTable.id,
+        parentId: departmentTable.parentId,
+        isDeleted: departmentTable.isDeleted,
+        deletedTimeUtc: departmentTable.deletedTimeUtc,
+        deleterId: departmentTable.deleterId,
+        serverTimeUtc: sql<number>`${this.currentTimeSql()}`,
+      })
+      .from(departmentTable)
+      .where(eq(departmentTable.id, id))
+      .limit(1);
+    return row ?? null;
+  }
+
+  async undoDelete(
+    id: number,
+    expectedDeletedTimeUtc: number,
+    actorId: number
+  ): Promise<number | null> {
+    const now = this.currentTimeSql();
+    try {
+      const rows = await db
+        .update(departmentTable)
+        .set({
+          isDeleted: false,
+          deletedTimeUtc: null,
+          deleterId: null,
+          updaterId: actorId,
+          updateTimeUtc: now,
+        })
+        .where(
+          and(
+            eq(departmentTable.id, id),
+            eq(departmentTable.isDeleted, true),
+            eq(departmentTable.deletedTimeUtc, expectedDeletedTimeUtc),
+            eq(departmentTable.deleterId, actorId),
+            sql`${departmentTable.deletedTimeUtc} <= ${now}`,
+            sql`${departmentTable.deletedTimeUtc} > ${now} - ${SOFT_DELETE_UNDO_WINDOW_MS}`,
+            sql`(${departmentTable.parentId} IS NULL OR EXISTS (SELECT 1 FROM system_department AS parent WHERE parent.id = ${departmentTable.parentId} AND parent.is_deleted = 0))`
+          )
+        )
+        .returning({ id: departmentTable.id });
+      return rows[0]?.id ?? null;
+    } catch (error) {
+      rethrowDepartmentNameConflict(error);
+    }
   }
 
   async listDeleted(params: {
