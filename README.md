@@ -1,106 +1,85 @@
-# RBAC Fullstack
+# One Gate
 
-[中文说明 (README_zh_CN.md)](README_zh_CN.md)
+[中文](README_zh_CN.md) · [MIT license](LICENSE)
 
-A modern, high-performance Role-Based Access Control (RBAC) system built with Hono (Backend) and React (Frontend). Highlighting seamless deployment on Cloudflare Workers and Node.js.
+One Gate is a Hono and React administration workspace for authentication,
+permissions and business applications. The backend runs on Node.js with SQLite
+or Cloudflare Workers with D1. The frontend includes admin, enterprise and
+personal applications with a shared UI package.
 
-## 🏗️ Project Architecture
+Features include users, roles and departments, SSO and a TOTP security gate,
+task scheduling, and a shared recycle bin with a 30-day recovery window.
+Departments also support undoing your own deletion within 15 seconds while you
+still have delete permission.
 
-The project is split into two main decoupled modules:
+## Local development
 
-- **[/server](./server)**: The backend service powered by Hono. Supports Cloudflare D1 and local SQLite (LibSQL). Handles authentication, permissions, and business logic.
-- **[/platform](./platform)**: The management dashboard built with React 19, MUI v7, and UnoCSS. A sleek, responsive UI for managing users, roles, and permissions.
+Use the Node.js version in [.nvmrc](.nvmrc) and pnpm 11.5.0. The backend and
+frontend are separate pnpm workspaces. Internal `@hodor/*` package names remain
+unchanged.
 
-## 🚀 Quick Start
+```sh
+git clone https://github.com/OKFred/one-gate.git
+cd one-gate/server
+pnpm install --frozen-lockfile
+cp apps/server/.env.example apps/server/.dev.vars
+```
 
-To get the full system running locally, follow these steps:
+Edit `server/apps/server/.dev.vars` before initialization:
 
-### 1. Prerequisites
+- Set `DB_FILE_NAME=file:./local.db`, a unique `SUPER_ADMIN_PASSWORD` and
+  `JWT_SECRET`.
+- Generate independent 32-byte Base64 values for `HODOR_AUTH_MASTER_KEY` and
+  `MOBILE_SENSITIVE_DATA_KEY`, for example with
+  `node -e "console.log(require('node:crypto').randomBytes(32).toString('base64'))"`.
+- Set `MOBILE_RELEASE_PUBLISH_TOKEN` to a random token if using mobile publishing.
+- Keep local origins in `HODOR_ALLOWED_WEB_ORIGINS`; add ports 5174 and 5175 when
+  using the other frontend applications.
 
-- **Node.js** (v18+)
-- **pnpm** (Package Manager)
-- **Cloudflare Wrangler** (for D1/Worker development)
+From `server/`, generate local TOTP enrollment and initialize a **new local** database:
 
-### 2. Setup Backend
-
-```bash
-cd server
-pnpm install
-# Initialize the database (DDL)
-pnpm run db:init node
-# Start the server
+```sh
+pnpm run totp:enroll --environment=local --sync-dev-vars
+pnpm --filter @hodor/server exec tsx --env-file=.dev.vars ../../packages/core/src/db/initTable.ts node
 pnpm run dev
 ```
 
-_For D1 setup, refer to [server/README.md](./server/README.md)._
+Open the generated `.secrets/totp-gate.local.html` locally to enroll an
+authenticator. This file contains your local TOTP secret and must stay private.
+The backend listens on `http://localhost:8787`. Database initialization creates
+the configured administrator; it is not an upgrade procedure for an existing database.
 
-### 3. Setup Frontend
+In another terminal, from the repository root:
 
-```bash
+```sh
 cd platform
-pnpm install
-# Start the dashboard
-pnpm run dev
+pnpm install --frozen-lockfile
+pnpm run dev:admin
 ```
 
-_Frontend will be available at `http://localhost:5173`._
+Open `http://localhost:5173`. The development API URL is configured in
+`platform/.env.development`; override it in `.env.development.local` if needed.
+Use `dev:enterprise`, `dev:personal` or `dev:all` for the other applications.
 
-## 🐳 Deployment (Docker)
+## Verification and deployment
 
-We provide a cross-platform interactive deployment script:
+[CI](.github/workflows/test.yml) runs on GitHub-hosted Linux runners with
+test-only configuration: Node tests, focused Worker/D1 regression tests,
+frontend types/builds, mocked browser tests and secret scanning. Real email
+delivery tests are skipped without explicit mail credentials.
 
-```bash
-# Run the interactive deployment (Build & Push & Compose)
-npx tsx deploy.js
-```
+CI does not deploy production services. For your own deployment, provision your
+resources, replace the placeholders in
+[`server/apps/server/wrangler.jsonc`](server/apps/server/wrangler.jsonc), configure
+the required secrets separately and apply the versioned D1 migrations before
+deploying. See [deployment notes](docs/deployment.md). No existing production
+credentials or resources are provided by this repository.
 
-This script will:
+## Repository history and license
 
-1. Prompt for your **Docker Registry URL**.
-2. Automatically build and push `:server` and `:platform` images.
-3. Save the URL to your local `.env` for future use.
-4. Run `docker compose up -d` to start the services.
+`main` is the development branch. This is an independent repository with a
+sanitized history boundary; clone it freshly instead of merging old repository
+history. See [migration notes](docs/public-migration.md).
 
-## 📂 Key Directories
-
-- `platform/`: React frontend source code.
-- `server/`: Hono backend source code.
-- `scripts/`: Shared maintenance and scanning scripts.
-
-## ☁️ Cloudflare Deployment & CI/CD (Automation)
-
-### ⚡ Quick Deployment (Backend Only)
-
-You can quickly deploy the backend Workers and provision the associated Cloudflare resources (D1 Database, KV Namespace, R2 Bucket) to your own Cloudflare account by clicking the button below:
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/okfred/node_server/tree/dev/server)
-
-> [!IMPORTANT]
-> **Post-deployment Steps Required:**
-> 1. **Initialize Database Tables:** The button provisions the D1 database but does not initialize the schema. You **must** run the following command locally to sync DDL and base data to your remote D1:
->    ```bash
->    cd server && pnpm run db:init worker remote
->    ```
-> 2. **Deploy Frontend Pages:** The deploy button only supports Workers and does *not* deploy the React frontend (`/platform`). You need to manually deploy the `/platform` folder to Cloudflare Pages, and configure the frontend to point to your backend Worker's URL.
-
-### 🛠️ Automated Deployment via GitHub Actions (Recommended)
-
-This repository includes a pre-configured GitHub Actions workflow (`.github/workflows/test.yml`) for automated testing and deployments. If you fork or clone this project and want to deploy it to your own Cloudflare account, follow these steps:
-
-### 1. Rename Project Identifiers
-
-- **Backend Worker**: Open `server/wrangler.jsonc` (or `wrangler.toml`) and change the `"name": "your-worker-name"` to match your desired backend service name on Cloudflare.
-- **Frontend Pages**: Open `.github/workflows/test.yml`, go to the very last step, and update `--project-name=your-pages-name` with your Cloudflare Pages project name.
-
-### 2. Configure GitHub Repository Secrets
-
-Navigate to your GitHub repository -> **Settings** -> **Secrets and variables** -> **Actions** -> **Repository secrets**:
-
-- **Cloudflare Credentials**: Add `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`.
-- **Other Configuration / Test Environment Variables**: Refer to [**`server/.env.example`**](./server/.env.example) to configure any additional secrets needed for testing or development (e.g. `TEST_MAIL_*` variables for email integration testing, which will be safely skipped on CI if not provided).
-
-### 3. Disconnect Automated Builds on Cloudflare
-
-- To avoid double deployments, go to your Cloudflare dashboard settings for the imported Worker and Pages, and **Disconnect** the Git repository under **Build**.
-- This delegates the full deployment control to your GitHub Actions runner, establishing a secure delivery pipeline where **"deployments only execute after all tests pass with green lights"**.
-
+Project code is available under the [MIT license](LICENSE). Bundled third-party
+code and dependencies retain their respective licenses and notices.

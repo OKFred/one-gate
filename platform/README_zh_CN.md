@@ -1,60 +1,20 @@
-# RBAC 管理后台
+# One Gate 前端
 
-权限管理系统的官方管理后台。采用 React 19 与 MUI v7 构建，提供流畅、专业的响应式管理体验。
+[English](README.md) · [完整启动说明](../README_zh_CN.md)
 
-## 🚀 核心技术栈
+此 pnpm 工作区包含 `apps/admin`、`apps/enterprise`、`apps/personal` 三个 React 应用，
+以及 `packages/ui` 中的共享组件与 API 客户端。使用 `../.nvmrc` 中的 Node.js 版本及 pnpm 11.5.0。
 
-- **React 19**：现代化的 UI 组件库与状态管理。
-- **MUI v7**：工业级的 UI 设计规范与组件。
-- **Vite 7**：下一代前端构建工具，提供极速的热重载。
-- **Axios**：可扩展的 HTTP 请求客户端。
-- **React Router 7**：强大的单页应用路由管理。
-
-## 🛠️ 快速上手
-
-### 1. 环境准备
-
-- **Node.js** (推荐 v18+)
-- **pnpm** (包管理工具)
-
-### 2. 环境配置
-
-在 `platform/` 目录下创建 `.env.development` 文件，配置后端 API 的基地址：
-
-```env
-VITE_API_URL=http://localhost:3000
+```sh
+pnpm install --frozen-lockfile
+pnpm dev:admin
 ```
 
-### 3. 安装与启动
+管理端端口为 5173，企业端、个人端为 5174、5175。其他启动命令为 `dev:enterprise`、
+`dev:personal`、`dev:all`。`.env.development` 中的 `VITE_SERVER_URL` 默认为
+`http://localhost:8787`；使用 `.env.development.local` 覆盖本地配置。
+Vite 环境变量是公开的浏览器配置，不能存储密钥。
 
-```bash
-pnpm install
-pnpm run dev
-```
-
-管理后台默认运行在 `http://localhost:5173`。
-
-## 📦 核心脚本
-
-- `pnpm run dev`：启动本地开发预览。
-- **`pnpm run build`**：执行生产环境构建。
-- `pnpm run lint`：执行代码风格检查。
-- `pnpm run i18n:scan`：自动扫描源代码中的国际化 Key。
-
-## Playwright 冒烟测试
-
-复制与部署无关的模板，并填写自己的管理前端/API Origin：
-
-```bash
-cp .env.playwright.example .env.playwright.local
-pnpm test:e2e:auth
-pnpm test:e2e
-```
-
-`HODOR_E2E_BASE_URL` 必填；`HODOR_E2E_ALLOWED_ORIGINS` 和
-`HODOR_E2E_DEVICE_CLIENT_ID` 可选。本地环境文件和保存的浏览器登录态均由
-Git 忽略。
-
----
-
-[English Version (README.md)](README.md)
+`pnpm build:all` 执行三个应用的类型检查与构建，`pnpm typecheck:e2e` 检查浏览器测试类型。
+公开 CI 的登录、回收站和撤销测试使用本地预览及模拟接口。真实部署测试须先复制
+`.env.playwright.example` 为 `.env.playwright.local`，并配置自己的测试环境和账号。

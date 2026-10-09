@@ -1,60 +1,24 @@
-# RBAC Dashboard
+# One Gate frontend
 
-A high-performance management dashboard for the RBAC system. Built with React 19 and MUI v7 for a sleek and responsive administration experience.
+[Project setup](../README.md) · [中文说明](../README_zh_CN.md)
 
-## 🚀 Key Technologies
+This pnpm workspace contains React applications in `apps/admin`,
+`apps/enterprise` and `apps/personal`, plus shared components and API clients in
+`packages/ui`. Use the Node.js version in `../.nvmrc` and pnpm 11.5.0.
 
-- **React 19**: Modern UI component library.
-- **MUI v7**: Professional-grade design system and components.
-- **Vite 7**: Next-generation frontend tooling.
-- **Axios**: HTTP client for API communication.
-- **React Router 7**: Declarative routing for single-page applications.
-
-## 🛠️ Getting Started
-
-### 1. Prerequisites
-
-- **Node.js** (v18+)
-- **pnpm** (Package Manager)
-
-### 2. Configuration
-
-Create a `.env.development` file in the `platform/` directory to configure your backend API endpoint:
-
-```env
-VITE_API_URL=http://localhost:3000
+```sh
+pnpm install --frozen-lockfile
+pnpm dev:admin
 ```
 
-### 3. Installation & Run
+The admin app runs on port 5173; enterprise and personal use 5174 and 5175.
+Use `dev:enterprise`, `dev:personal` or `dev:all` as needed.
+`VITE_SERVER_URL` defaults to `http://localhost:8787` in `.env.development`.
+Override it in `.env.development.local`; Vite variables are public browser
+configuration and must not contain secrets.
 
-```bash
-pnpm install
-pnpm run dev
-```
-
-Dashboard will be served at `http://localhost:5173`.
-
-## 📦 Core Scripts
-
-- `pnpm run dev`: Start the development server.
-- **`pnpm run build`**: Build for production.
-- `pnpm run lint`: Lint and fix code issues.
-- `pnpm run i18n:scan`: Scan source code for i18n keys.
-
-## Playwright smoke tests
-
-Copy the deployment-neutral template and set your own admin/API origins:
-
-```bash
-cp .env.playwright.example .env.playwright.local
-pnpm test:e2e:auth
-pnpm test:e2e
-```
-
-`HODOR_E2E_BASE_URL` is required. `HODOR_E2E_ALLOWED_ORIGINS` and
-`HODOR_E2E_DEVICE_CLIENT_ID` are optional. The local environment file and saved
-browser authentication state are ignored by Git.
-
----
-
-[中文说明 (README_zh_CN.md)](README_zh_CN.md)
+`pnpm build:all` checks application types and builds all three apps.
+`pnpm typecheck:e2e` checks browser-test types. Public CI runs mocked auth,
+recycle-bin and undo tests against the local preview. For an explicitly
+configured deployment, copy `.env.playwright.example` to `.env.playwright.local`
+and configure your own test account before using authenticated tests.

@@ -1,227 +1,126 @@
-name: Run Server Tests & Deploy
-
-env:
-  FORCE_JUST_ACTIONS_TO_NODE24: "true"
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+name: CI
 
 on:
   push:
-    branches:
-      - feature/SOC-20260611-fred
-      - dev
-      - master
+    branches: [main]
   pull_request:
-    branches:
-      - dev
-      - main
-      - master
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  # Job 1：跑测试
-  test:
-    runs-on: [self-hosted, Linux, X64]
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HODOR_AUTH_MASTER_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      JWT_SECRET: "test-secret-key-for-ci-runs"
+      BASE_API_PATH: "/api/v1"
+      LOCALE: "zh-CN"
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
         with:
-          node-version-file: ".nvmrc"
-          mirror: https://nodejs.org/dist
-
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
       - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack install --global pnpm@11.5.0
-          pnpm --version
-
-      - name: Install Dependencies
+        run: corepack enable && corepack install --global pnpm@11.5.0
+      - name: Install backend
         run: pnpm install --frozen-lockfile
-        working-directory: ./server
-
-      - name: Run All Tests
+        working-directory: server
+      - name: Create isolated Worker test configuration
+        working-directory: server/apps/server
+        run: |
+          cat > .dev.vars <<'EOF'
+          NODE_ENV=test
+          BASE_API_PATH=/api/v1
+          LOCALE=zh-CN
+          JWT_SECRET=test-secret-key-for-ci-runs
+          HODOR_AUTH_MASTER_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          MOBILE_SENSITIVE_DATA_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          MOBILE_RELEASE_PUBLISH_TOKEN=test-only-mobile-publish-token
+          HODOR_ALLOWED_WEB_ORIGINS=http://localhost:5173
+          HODOR_TOTP_GATE_SECRET=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+          EOF
+      - name: Node tests
         run: pnpm exec vitest run --config vitest.config.node.mts
-        working-directory: ./server/apps/server
-        # ─── 核心步骤：将 GitHub 存储的 Secrets 注入到测试的运行环境变量中 ───
-        env:
-          TEST_MAIL_ADDRESS: ${{ secrets.TEST_MAIL_ADDRESS }}
-          TEST_MAIL_PASSWORD: ${{ secrets.TEST_MAIL_PASSWORD }}
-          TEST_MAIL_HOST: ${{ secrets.TEST_MAIL_HOST }}
-          TEST_MAIL_PORT: ${{ secrets.TEST_MAIL_PORT }}
-          TEST_MAIL_RECEIVER: ${{ secrets.TEST_MAIL_RECEIVER }}
-          HODOR_AUTH_MASTER_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-          JWT_SECRET: "test-secret-key-for-ci-runs"
-          BASE_API_PATH: "/api/v1"
-          LOCALE: "zh-CN"
+        working-directory: server/apps/server
+      - name: Worker and D1 retention regression
+        run: pnpm exec vitest run --config vitest.config.workers.mts recycle-bin soft-delete department-cleanup undo.integration --maxWorkers=1
+        working-directory: server/apps/server
+      - name: Backend application types
+        run: pnpm exec tsc --noEmit -p apps/server/tsconfig.json
+        working-directory: server
+      - name: Build Node backend
+        run: pnpm run build
+        working-directory: server
+      - name: Bundle Worker locally
+        run: pnpm exec wrangler deploy --dry-run --outdir .wrangler/ci-bundle
+        working-directory: server/apps/server
 
-      - name: Install Frontend Dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: ./platform
-
-      - name: Reject Native Browser Dialogs
-        run: pnpm run check:native-dialogs
-        working-directory: ./platform
-
-      - name: Build Admin for Mock Auth E2E
-        run: pnpm run build:admin
-        working-directory: ./platform
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --no-shell chromium
-        working-directory: ./platform
-
-      - name: Run Mock Auth E2E
-        run: pnpm run test:e2e:auth-flow
-        working-directory: ./platform
-        env:
-          HODOR_E2E_BASE_URL: http://127.0.0.1:4173
-          HODOR_E2E_ALLOWED_ORIGINS: http://127.0.0.1:4173
-          HODOR_E2E_MOCK_AUTH: "true"
-
-      - name: Run Recycle Bin E2E
-        run: pnpm exec playwright test recycle-bin/recycle-bin.spec.ts --project=chromium
-        working-directory: ./platform
-        env:
-          HODOR_E2E_BASE_URL: http://127.0.0.1:4173
-          HODOR_E2E_ALLOWED_ORIGINS: http://127.0.0.1:4173
-          HODOR_E2E_MOCK_AUTH: "true"
-
-      - name: Run Delete Undo E2E and Error Contracts
-        run: pnpm exec playwright test delete-undo/ --project=chromium
-        working-directory: ./platform
-        env:
-          HODOR_E2E_BASE_URL: http://127.0.0.1:4173
-          HODOR_E2E_ALLOWED_ORIGINS: http://127.0.0.1:4173
-          HODOR_E2E_MOCK_AUTH: "true"
-
-  # Job 2：部署（仅在测试成功，且为 master/dev 分支时运行）
-  deploy:
-    runs-on: [self-hosted, Linux, X64]
-    needs: test
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev')
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HODOR_E2E_BASE_URL: http://127.0.0.1:4173
+      HODOR_E2E_ALLOWED_ORIGINS: http://127.0.0.1:4173
+      HODOR_E2E_MOCK_AUTH: "true"
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
         with:
-          node-version-file: ".nvmrc"
-          mirror: https://nodejs.org/dist
-
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
       - name: Enable pnpm
-        run: |
-          corepack enable
-          corepack install --global pnpm@11.5.0
-          pnpm --version
-
-      # ─── 步骤 1: 部署后端 Workers ───
-      - name: Install Backend Dependencies
+        run: corepack enable && corepack install --global pnpm@11.5.0
+      - name: Install frontend
         run: pnpm install --frozen-lockfile
-        working-directory: ./server
-
-      # 所有部署输入必须在任何远程 D1 写入前就绪，且只报告缺失名称，不输出 Secret 值。
-      - name: Verify Deployment Secret Inputs
-        run: pnpm run deployment:secrets:check
-        working-directory: ./server/apps/server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          HODOR_AUTH_MASTER_KEY: ${{ secrets.HODOR_AUTH_MASTER_KEY }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
-          MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
-          HODOR_TOTP_GATE_SECRET: ${{ secrets.HODOR_TOTP_GATE_SECRET }}
-          HODOR_ALLOWED_WEB_ORIGINS: ${{ secrets.HODOR_ALLOWED_WEB_ORIGINS }}
-
-      # D1 结构是 Worker 发布前置条件；迁移或合约失败必须阻断新代码上线。
-      - name: Apply Remote D1 Migrations
-        run: pnpm run db:migrate:worker:remote
-        working-directory: ./server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Verify Remote D1 Schema Contract
-        run: pnpm run db:check:worker:remote
-        working-directory: ./server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      # Worker 与 Pages 必须使用同一个本次部署提交版本，不能使用 pre-commit 看到的上一个 HEAD。
-      - name: Stamp Deployment Versions
-        working-directory: ./server
-        env:
-          DEPLOYMENT_COMMIT_SHA: ${{ github.sha }}
-        run: pnpm exec tsx scripts/stamp-worker-version.ts "$DEPLOYMENT_COMMIT_SHA"
-
-      - name: Deploy Workers Backend
-        uses: cloudflare/wrangler-action@v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: "server/apps/server"
-          packageManager: pnpm
-          wranglerVersion: "4.100.0"
-          command: deploy
-          secrets: |
-            HODOR_AUTH_MASTER_KEY
-            JWT_SECRET
-            MOBILE_SENSITIVE_DATA_KEY
-            MOBILE_RELEASE_PUBLISH_TOKEN
-            HODOR_TOTP_GATE_SECRET
-            HODOR_ALLOWED_WEB_ORIGINS
-        env:
-          HODOR_AUTH_MASTER_KEY: ${{ secrets.HODOR_AUTH_MASTER_KEY }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          MOBILE_SENSITIVE_DATA_KEY: ${{ secrets.MOBILE_SENSITIVE_DATA_KEY }}
-          MOBILE_RELEASE_PUBLISH_TOKEN: ${{ secrets.MOBILE_RELEASE_PUBLISH_TOKEN }}
-          HODOR_TOTP_GATE_SECRET: ${{ secrets.HODOR_TOTP_GATE_SECRET }}
-          HODOR_ALLOWED_WEB_ORIGINS: ${{ secrets.HODOR_ALLOWED_WEB_ORIGINS }}
-
-      # 系统 Schema 属于发布产物的一部分；失败时阻断 Pages 发布，避免 UI 依赖空 D1 配置。
-      - name: Sync System Schemas to Remote D1
-        run: pnpm run sync:schemas --remote
-        working-directory: ./server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      # ─── 步骤 2: 部署前端 Pages ───
-      - name: Install Frontend Dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: ./platform
-
-      - name: Build Frontend
+        working-directory: platform
+      - name: Reject native browser dialogs
+        run: pnpm run check:native-dialogs
+        working-directory: platform
+      - name: Browser test types
+        run: pnpm run typecheck:e2e
+        working-directory: platform
+      - name: Build all frontends
         run: pnpm run build:all
-        working-directory: ./platform
-        env:
-          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
-          VITE_ENTERPRISE_URL: ${{ secrets.VITE_ENTERPRISE_URL }}
-          VITE_PERSONAL_URL: ${{ secrets.VITE_PERSONAL_URL }}
+        working-directory: platform
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps --no-shell chromium
+        working-directory: platform
+      - name: Mocked auth, recycle bin and undo tests
+        run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ --project=chromium
+        working-directory: platform
 
-      # ─── 步骤 2a: 部署主系统 Admin (gate) ───
-      - name: Deploy Admin Pages
-        run: pnpm exec wrangler pages deploy ../../../platform/apps/admin/dist --project-name=gate
-        working-directory: ./server/apps/server
+  secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan Git history
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      # ─── 步骤 2b: 部署企业系统 Enterprise (gate-enterprise) ───
-      - name: Deploy Enterprise Pages
-        run: pnpm exec wrangler pages deploy ../../../platform/apps/enterprise/dist --project-name=gate-enterprise --branch=dev
-        working-directory: ./server/apps/server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      # ─── 步骤 2c: 部署个人系统 Personal (gate-personal) ───
-      - name: Deploy Personal Pages
-        run: pnpm exec wrangler pages deploy ../../../platform/apps/personal/dist --project-name=gate-personal --branch=dev
-        working-directory: ./server/apps/server
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          tool_dir=$(mktemp -d)
+          archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          checksums="gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          release="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          curl --fail --location --retry 3 "$release/$archive" -o "$tool_dir/$archive"
+          curl --fail --location --retry 3 "$release/$checksums" -o "$tool_dir/$checksums"
+          (cd "$tool_dir" && grep "  $archive$" "$checksums" | sha256sum --check --strict)
+          tar -xzf "$tool_dir/$archive" -C "$tool_dir"
+          "$tool_dir/gitleaks" git . --log-opts="--all --full-history -m" --redact --no-banner

@@ -156,8 +156,7 @@ export async function runAiChat(
   }
 
   // Tier 2b: Cloudflare REST API fallback if Account ID and API Token are provided
-  const accountId =
-    getEnv("CLOUDFLARE_ACCOUNT_ID") || "00000000000000000000000000000000";
+  const accountId = getEnv("CLOUDFLARE_ACCOUNT_ID");
   const apiToken = getEnv("CLOUDFLARE_API_TOKEN");
   if (accountId && apiToken) {
     const res = await registry.base.httpFetch.fetch(

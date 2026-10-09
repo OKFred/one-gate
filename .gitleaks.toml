@@ -1,0 +1,49 @@
+title = "One Gate secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Reviewed synthetic fixture or translation identifier"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/packages/admin/src/maintenance/cron/notification\-executor\.integration\.spec\.ts$''']
+regexes = ['''^(?:us_treasury_30y_yield)$''']
+
+[[rules.allowlists]]
+description = "Reviewed synthetic fixture or translation identifier"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/packages/admin/src/system/auth/sso/application/sso\-center\.spec\.ts$''']
+regexes = ['''^(?:hodor\-1\-subject\-1)$''']
+
+[[rules.allowlists]]
+description = "Reviewed synthetic fixture or translation identifier"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/packages/admin/src/system/auth/totp\-gate/totp\-gate\.spec\.ts$''']
+regexes = ['''^(?:GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ)$''']
+
+[[rules.allowlists]]
+description = "Reviewed synthetic fixture or translation identifier"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/packages/core/src/db/migrations/schema\-migration\.spec\.ts$''']
+regexes = ['''^(?:us_treasury_30y_yield)$''']
+
+[[rules.allowlists]]
+description = "Reviewed synthetic fixture or translation identifier"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/src/db/initI18n\.ts$''']
+regexes = ['''^(?:i18n\.translation\.duplicate\.foundPrefix|i18n\.translation\.duplicate\.foundSuffix|i18n\.translation\.duplicate\.suggestion)$''']
+
+[[rules.allowlists]]
+description = "Reviewed synthetic fixture or translation identifier"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/src/middleware/errorHandler/businessError/errorMapping\.ts$''']
+regexes = ['''^(?:i18n\.api\.duplicateKeys)$''']

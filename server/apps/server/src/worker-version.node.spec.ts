@@ -41,17 +41,12 @@ describe("Worker deployment version", () => {
     );
   });
 
-  it("stamps Worker and Pages before their deployment steps", () => {
-    const workflow = readFileSync(
-      resolve(import.meta.dirname, "../../../../.github/workflows/test.yml"),
+  it("keeps an unconfigured public build marked as local development", () => {
+    const config = readFileSync(
+      resolve(import.meta.dirname, "../wrangler.jsonc"),
       "utf8"
     );
-    const stampAt = workflow.indexOf("Stamp Deployment Versions");
-    const workerDeployAt = workflow.indexOf("Deploy Workers Backend");
-    const frontendBuildAt = workflow.indexOf("Build Frontend");
-    expect(stampAt).toBeGreaterThan(0);
-    expect(workerDeployAt).toBeGreaterThan(stampAt);
-    expect(frontendBuildAt).toBeGreaterThan(stampAt);
+    expect(config).toContain('"VERSION": "local-development"');
   });
 
   it("does not commit a version derived from the previous HEAD", () => {

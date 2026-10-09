@@ -12,41 +12,6 @@ function readRepositoryFile(relativeUrl: string): string {
   return readFileSync(new URL(relativeUrl, import.meta.url), "utf8");
 }
 
-function readWorkflowStep(workflow: string, name: string): string {
-  const startMarker = `      - name: ${name}`;
-  const start = workflow.indexOf(startMarker);
-  if (start < 0) {
-    return "";
-  }
-
-  const nextStep = workflow.indexOf(
-    "\n      - name:",
-    start + startMarker.length
-  );
-  return workflow.slice(start, nextStep < 0 ? undefined : nextStep);
-}
-
-function extractSecretReferences(step: string): string[] {
-  return [
-    ...step.matchAll(
-      /^\s+([A-Z0-9_]+):\s+\$\{\{\s*secrets\.([A-Z0-9_]+)\s*\}\}\s*$/gm
-    ),
-  ]
-    .filter((match) => match[1] === match[2])
-    .map((match) => match[1] ?? "")
-    .filter(Boolean)
-    .sort();
-}
-
-function extractUploadedSecretNames(step: string): string[] {
-  const match = step.match(/secrets:\s*\|\r?\n([\s\S]*?)\r?\n\s+env:/);
-  return (match?.[1] ?? "")
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => /^[A-Z0-9_]+$/.test(line))
-    .sort();
-}
-
 function extractWranglerRequiredSecretNames(config: string): string[] {
   const match = config.match(
     /"secrets"\s*:\s*\{\s*"required"\s*:\s*\[([\s\S]*?)\]/
@@ -232,46 +197,26 @@ describe("D1 deployment contract", () => {
     expect(config).toContain('"new_sqlite_classes": ["TotpGateCoordinator"]');
   });
 
-  it("runs migrations and the schema contract before Worker deployment", () => {
+  it("isolates public CI from production credentials, runners and writes", () => {
     const workflow = readRepositoryFile(
       "../../../../.github/workflows/test.yml"
     );
-    const preflightAt = workflow.indexOf("Verify Deployment Secret Inputs");
-    const migrateAt = workflow.indexOf("Apply Remote D1 Migrations");
-    const contractAt = workflow.indexOf("Verify Remote D1 Schema Contract");
-    const deployAt = workflow.indexOf("Deploy Workers Backend");
-
-    expect(preflightAt).toBeGreaterThan(-1);
-    expect(migrateAt).toBeGreaterThan(preflightAt);
-    expect(contractAt).toBeGreaterThan(migrateAt);
-    expect(deployAt).toBeGreaterThan(contractAt);
+    expect(workflow).toContain("branches: [main]");
+    expect(workflow).toMatch(/permissions:\s+contents: read/);
+    expect(workflow).toContain("persist-credentials: false");
+    expect(workflow).not.toContain("self-hosted");
+    expect(workflow).not.toContain("pull_request_target");
+    expect(workflow).not.toMatch(/\$\{\{\s*secrets[.[]/);
+    expect(workflow).not.toMatch(/--remote\b|cloudflare\/wrangler-action@/);
+    expect(workflow).not.toMatch(/db:(?:migrate|check):worker:remote/);
+    expect(workflow).not.toMatch(/wrangler\s+pages\s+deploy/);
+    const deploymentCommands = workflow.match(/wrangler\s+deploy[^\n]*/g) ?? [];
+    expect(deploymentCommands).toHaveLength(1);
+    expect(deploymentCommands[0]).toMatch(/--dry-run\b/);
   });
 
-  it("deploys only active Hodor root secrets", () => {
-    const workflow = readRepositoryFile(
-      "../../../../.github/workflows/test.yml"
-    );
-    const preflightStep = readWorkflowStep(
-      workflow,
-      "Verify Deployment Secret Inputs"
-    );
-    const deployStep = readWorkflowStep(workflow, "Deploy Workers Backend");
+  it("declares active secrets for a separately managed deployment", () => {
     const expectedWorkerSecrets = [...REQUIRED_WORKER_SECRET_NAMES].sort();
-    const expectedDeploymentSecrets = [
-      ...REQUIRED_DEPLOYMENT_SECRET_NAMES,
-    ].sort();
-    expect(extractSecretReferences(preflightStep)).toEqual(
-      expectedDeploymentSecrets
-    );
-    expect(extractUploadedSecretNames(deployStep)).toEqual(
-      expectedWorkerSecrets
-    );
-    expect(extractSecretReferences(deployStep)).toEqual(expectedWorkerSecrets);
-    expect(workflow).not.toContain("Configure Optional Feishu Secrets");
-    for (const retiredSecretName of RETIRED_AUTHENTICATION_SECRET_NAMES) {
-      expect(workflow).not.toContain(retiredSecretName);
-    }
-
     const config = readRepositoryFile("../wrangler.jsonc");
     expect(extractWranglerRequiredSecretNames(config)).toEqual(
       expectedWorkerSecrets
