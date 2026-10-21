@@ -1,5 +1,13 @@
-import { sqliteTable, integer, text } from "drizzle-orm/sqlite-core";
-import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
+import {
+  sqliteTable,
+  integer,
+  text,
+  uniqueIndex,
+  index,
+  check,
+} from "drizzle-orm/sqlite-core";
+import { sql, type InferSelectModel, type InferInsertModel } from "drizzle-orm";
+import { softDeleteColumns } from "@hodor/core/db/soft-delete";
 import type { JSONSchema } from "json-schema-to-ts";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import { DataScopeValues } from "@hodor/core/types/dataScope";
@@ -58,8 +66,15 @@ const RolePO = {
   ...RoleBasePO,
   ...AuditPO,
 } as const satisfies Record<keyof RolePOLike, JSONSchema>;
-export type RolePOLike = InferSelectModel<typeof roleTable>; // 列表
-type RoleSelectPOLike = InferInsertModel<typeof roleTable>;
+export type RoleRecord = InferSelectModel<typeof roleTable>;
+export type RolePOLike = Omit<
+  RoleRecord,
+  "isDeleted" | "deletedTimeUtc" | "deleterId"
+>;
+type RoleSelectPOLike = Omit<
+  InferInsertModel<typeof roleTable>,
+  "isDeleted" | "deletedTimeUtc" | "deleterId"
+>;
 type RoleAddPOLike = Omit<
   RolePOLike,
   IndexKeyLike | AuditAddOmitKeyLike | "permissionCount"
@@ -96,6 +111,39 @@ export type RoleUpdateVOLike = RoleUpdatePOLike;
 export type RoleDeleteVOLike = Pick<RoleVOLike, IndexKeyLike>;
 export type RoleGetVOLike = Pick<RoleVOLike, IndexKeyLike>;
 
+export const RoleDeleteWithUndoReq = {
+  type: "object",
+  properties: {
+    id: { type: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER },
+    expectedUpdateTimeUtc: {
+      type: ["integer", "null"],
+      minimum: 0,
+      maximum: Number.MAX_SAFE_INTEGER,
+    },
+  },
+  required: ["id", "expectedUpdateTimeUtc"],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
+export const RoleDeleteWithUndoRes = {
+  type: "object",
+  properties: {
+    resourceType: { type: "string", const: "role" },
+    id: { type: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER },
+    expectedDeletedTimeUtc: { type: "integer", minimum: 0 },
+    undoExpiresTimeUtc: { type: "integer", minimum: 0 },
+    serverTimeUtc: { type: "integer", minimum: 0 },
+  },
+  required: [
+    "resourceType",
+    "id",
+    "expectedDeletedTimeUtc",
+    "undoExpiresTimeUtc",
+    "serverTimeUtc",
+  ],
+  additionalProperties: false,
+} as const satisfies JSONSchema;
+
 //----------------- Required Keys ----------------//
 export const RoleAddKeys = [
   "name",
@@ -130,22 +178,39 @@ export const RoleSortableKeys = [
   "createTimeUtc",
 ] as const satisfies RequiredKeys<RolePOLike>[];
 
-export const roleTable = sqliteTable("system_role", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  name: text("name").notNull().unique(),
-  remark: text("remark"),
-  isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
-  permissionCount: integer("permission_count").notNull(),
-  dataScope: text("data_scope")
-    .$type<import("@hodor/core/types/dataScope").DataScopeValue>()
-    .notNull(),
-  customDeptIds: text("custom_dept_ids"),
-  creatorId: integer("creator_id").notNull(),
-  updaterId: integer("updater_id"),
-  createTimeUtc: integer("create_time_utc")
-    .notNull()
-    .default(getCurrentTimestampUtcSql()),
-  updateTimeUtc: integer("update_time_utc"),
-});
+export const roleTable = sqliteTable(
+  "system_role",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    name: text("name").notNull(),
+    remark: text("remark"),
+    isEnabled: integer("is_enabled", { mode: "boolean" }).notNull(),
+    permissionCount: integer("permission_count").notNull(),
+    dataScope: text("data_scope")
+      .$type<import("@hodor/core/types/dataScope").DataScopeValue>()
+      .notNull(),
+    customDeptIds: text("custom_dept_ids"),
+    creatorId: integer("creator_id").notNull(),
+    updaterId: integer("updater_id"),
+    createTimeUtc: integer("create_time_utc")
+      .notNull()
+      .default(getCurrentTimestampUtcSql()),
+    updateTimeUtc: integer("update_time_utc"),
+    ...softDeleteColumns(),
+  },
+  (table) => [
+    uniqueIndex("system_role_name_active_unique")
+      .on(table.name)
+      .where(sql`${table.isDeleted} = 0`),
+    index("system_role_deleted_time_idx").on(
+      table.isDeleted,
+      table.deletedTimeUtc
+    ),
+    check(
+      "system_role_soft_delete_state_check",
+      sql`(${table.isDeleted} = 0 AND ${table.deletedTimeUtc} IS NULL AND ${table.deleterId} IS NULL) OR (${table.isDeleted} = 1 AND ${table.deletedTimeUtc} IS NOT NULL AND ${table.deleterId} IS NOT NULL)`
+    ),
+  ]
+);
 
 export default roleTable;

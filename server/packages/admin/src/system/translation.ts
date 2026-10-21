@@ -1,5 +1,6 @@
 import type { TranslationInputItem } from "@hodor/core/db/initTranslation";
 import type { BusinessKey } from "@hodor/core/types/business";
+import { roleDeletionTranslations } from "./role/translation";
 
 export const systemTranslations = {
   "admin.system.auth": [
@@ -214,6 +215,7 @@ export const systemTranslations = {
     },
   ],
   "admin.system.role": [
+    ...roleDeletionTranslations,
     {
       application: "backend",
       tKey: "errorHandler.roleNotExist",

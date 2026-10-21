@@ -15,6 +15,8 @@ import {
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
 import { activeDepartmentReference } from "../department/reference-guards";
+import { activeRoleIds } from "../role/reference-guards";
+import { RoleDeletionError } from "../role/errors";
 import { DepartmentDeletionError } from "../department/errors";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 
@@ -175,23 +177,21 @@ export class UserRepository {
       "id" | "createTimeUtc" | "updateTimeUtc"
     >
   ): Promise<number> {
-    if (data.departmentId !== undefined && data.departmentId !== null) {
-      const rows = await db.all<{ id: number }>(sql`INSERT INTO system_user
+    const rows = await db.all<{ id: number }>(sql`INSERT INTO system_user
         (username, password, lang_code, remark, region_id, department_id, role_id_arr, is_enabled, creator_id, updater_id, create_time_utc)
-        SELECT ${data.username}, ${data.password}, ${data.langCode}, ${data.remark ?? null}, ${data.regionId ?? null}, ${data.departmentId}, ${JSON.stringify(data.roleIdArr)}, ${data.isEnabled ? 1 : 0}, ${data.creatorId}, ${data.updaterId ?? null}, ${Date.now()}
-        WHERE ${activeDepartmentReference(data.departmentId)} RETURNING id`);
-      if (!rows[0])
-        throw new BusinessError(DepartmentDeletionError.REFERENCE_UNAVAILABLE);
-      return rows[0].id;
+        SELECT ${data.username}, ${data.password}, ${data.langCode}, ${data.remark ?? null}, ${data.regionId ?? null}, ${data.departmentId ?? null}, ${JSON.stringify(data.roleIdArr)}, ${data.isEnabled ? 1 : 0}, ${data.creatorId}, ${data.updaterId ?? null}, ${Date.now()}
+        WHERE ${activeDepartmentReference(data.departmentId ?? null)} AND ${activeRoleIds(data.roleIdArr)} RETURNING id`);
+    if (!rows[0]) {
+      const [department] = await db.all<{ available: number }>(
+        sql`SELECT ${activeDepartmentReference(data.departmentId ?? null)} AS available`
+      );
+      throw new BusinessError(
+        department?.available
+          ? RoleDeletionError.NOT_ACTIVE
+          : DepartmentDeletionError.REFERENCE_UNAVAILABLE
+      );
     }
-    const res = await db
-      .insert(userTable)
-      .values({
-        ...data,
-        createTimeUtc: Date.now(),
-      })
-      .returning({ id: userTable.id });
-    return res[0].id;
+    return rows[0].id;
   }
 
   async onUpdate(
@@ -212,14 +212,25 @@ export class UserRepository {
       .where(
         and(
           eq(userTable.id, id),
-          data.departmentId !== undefined && data.departmentId !== null
+          data.departmentId !== undefined
             ? activeDepartmentReference(data.departmentId)
+            : undefined,
+          data.roleIdArr !== undefined
+            ? activeRoleIds(data.roleIdArr)
             : undefined
         )
       )
       .returning({ id: userTable.id });
-    if (!res[0])
-      throw new BusinessError(DepartmentDeletionError.REFERENCE_UNAVAILABLE);
+    if (!res[0]) {
+      const [department] = await db.all<{ available: number }>(
+        sql`SELECT ${activeDepartmentReference(data.departmentId ?? null)} AS available`
+      );
+      throw new BusinessError(
+        department?.available
+          ? RoleDeletionError.NOT_ACTIVE
+          : DepartmentDeletionError.REFERENCE_UNAVAILABLE
+      );
+    }
     return res[0].id;
   }
 

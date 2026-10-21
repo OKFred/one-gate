@@ -17,7 +17,7 @@
     "test:e2e": "playwright test --project=chromium",
     "test:e2e:headed": "playwright test --project=chromium --headed",
     "test:e2e:auth-flow": "playwright test auth/auth-ui.spec.ts --project=chromium",
-    "typecheck:e2e": "tsc --noEmit -p tsconfig.node.json",
+    "typecheck:e2e": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p e2e/fixtures/crud-switch/tsconfig.json",
     "i18n:scan": "node ./scripts/scan-i18n-enhanced.js",
     "i18n:scan:json": "node ./scripts/scan-i18n-enhanced.js --json",
     "format": "prettier --write .",

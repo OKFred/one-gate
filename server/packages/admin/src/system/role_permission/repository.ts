@@ -9,17 +9,46 @@ import {
   eq,
   and,
   inArray,
+  sql,
   type SQL,
   type InferInsertModel,
 } from "drizzle-orm";
 import hasValue from "@hodor/core/utils/hasValue";
+import { activeRoleIds } from "../role/reference-guards";
+import { RoleDeletionError } from "../role/errors";
+import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
+
+const activeOwner = sql`EXISTS (SELECT 1 FROM system_role AS association_owner WHERE association_owner.id = ${rolePermissionTable.roleId} AND association_owner.is_deleted = 0)`;
+
+// Keep this immediately after the association mutation in the same transaction.
+// A zero-row mutation must leave both counts and deletion versions untouched.
+function updateOwnerCounts(roleIds: number[]) {
+  return db
+    .update(roleTable)
+    .set({
+      permissionCount: sql`(SELECT COUNT(*) FROM system_role_permission WHERE role_id = ${roleTable.id})`,
+      updateTimeUtc: sql`MAX(${Date.now()}, COALESCE(${roleTable.updateTimeUtc}, 0) + 1)`,
+    })
+    .where(
+      and(
+        sql`changes() > 0`,
+        sql`${roleTable.id} IN (SELECT value FROM json_each(${JSON.stringify(roleIds)}))`,
+        eq(roleTable.isDeleted, false)
+      )
+    );
+}
+
+type AssociationInsert = Omit<
+  InferInsertModel<typeof rolePermissionTable>,
+  "id" | "createTimeUtc" | "updateTimeUtc"
+>;
 
 export const buildWhereCondition = (condition?: {
   roleId?: number;
   permissionId?: number;
 }) => {
   const { roleId, permissionId } = condition || {};
-  const conditions: SQL<unknown>[] = [];
+  const conditions: SQL<unknown>[] = [activeOwner];
   if (hasValue(roleId))
     conditions.push(eq(rolePermissionTable.roleId, roleId as number));
   if (hasValue(permissionId))
@@ -99,7 +128,7 @@ export class RolePermissionRepository {
     const rows = await db
       .select()
       .from(rolePermissionTable)
-      .where(eq(rolePermissionTable.id, id))
+      .where(and(eq(rolePermissionTable.id, id), activeOwner))
       .limit(1);
     return rows[0] || null;
   }
@@ -108,7 +137,7 @@ export class RolePermissionRepository {
     const countResult = await db
       .select({ count: count(rolePermissionTable.id).as("count") })
       .from(rolePermissionTable)
-      .where(eq(rolePermissionTable.roleId, roleId));
+      .where(and(eq(rolePermissionTable.roleId, roleId), activeOwner));
     return countResult[0]?.count || 0;
   }
 
@@ -136,6 +165,7 @@ export class RolePermissionRepository {
       .where(
         and(
           eq(rolePermissionTable.roleId, roleId),
+          activeOwner,
           eq(permissionTable.isEnabled, true)
         )
       );
@@ -171,6 +201,7 @@ export class RolePermissionRepository {
         and(
           inArray(rolePermissionTable.roleId, roleIds),
           eq(roleTable.isEnabled, true),
+          eq(roleTable.isDeleted, false),
           eq(permissionTable.isEnabled, true)
         )
       );
@@ -181,88 +212,95 @@ export class RolePermissionRepository {
     const rows = await db
       .select({ id: rolePermissionTable.id })
       .from(rolePermissionTable)
-      .where(eq(rolePermissionTable.id, id))
+      .where(and(eq(rolePermissionTable.id, id), activeOwner))
       .limit(1);
     return rows.length > 0;
   }
 
-  async onInsert(
-    data: Omit<
-      InferInsertModel<typeof rolePermissionTable>,
-      "id" | "createTimeUtc" | "updateTimeUtc"
-    >
-  ): Promise<number> {
-    const res = await db
-      .insert(rolePermissionTable)
-      .values({
-        ...data,
-        createTimeUtc: Date.now(),
-      })
-      .returning({ id: rolePermissionTable.id });
-    return res[0].id;
+  async onInsert(data: AssociationInsert): Promise<number> {
+    const [rows] = await db.batch([
+      db
+        .insert(rolePermissionTable)
+        .select(
+          sql`SELECT NULL, ${data.roleId}, ${data.permissionId}, ${data.creatorId}, ${data.updaterId ?? null}, ${Date.now()}, NULL
+        WHERE ${activeRoleIds([data.roleId])}`
+        )
+        .returning({ id: rolePermissionTable.id }),
+      updateOwnerCounts([data.roleId]),
+    ]);
+    if (!rows[0]) throw new BusinessError(RoleDeletionError.NOT_ACTIVE);
+    return rows[0].id;
   }
 
-  async onBatchInsert(
-    values: Omit<
-      InferInsertModel<typeof rolePermissionTable>,
-      "id" | "createTimeUtc" | "updateTimeUtc"
-    >[]
-  ): Promise<number> {
+  async onBatchInsert(values: AssociationInsert[]): Promise<number> {
     if (values.length === 0) return 0;
-    // 批量插入，分片处理以避免 D1 变量限制 (通常为 100)
-    // 每行 3 个变量，取 25 行为一组 (75 变量)
-    const chunkSize = 25;
-    const batches: any[] = [];
-    for (let i = 0; i < values.length; i += chunkSize) {
-      const chunk = values.slice(i, i + chunkSize);
-      const chunkValues = chunk.map((v) => ({
-        ...v,
-        createTimeUtc: Date.now(),
-      }));
-      batches.push(
-        db
-          .insert(rolePermissionTable)
-          .values(chunkValues)
-          .returning({ id: rolePermissionTable.id })
-      );
-    }
-    const results =
-      batches.length > 0
-        ? await db.batch(batches as unknown as Parameters<typeof db.batch>[0])
-        : [];
-    const totalAdded = (results as { id: number }[][]).reduce(
-      (acc: number, curr) => acc + curr.length,
-      0
-    );
-    return totalAdded;
+    const roleIds = [...new Set(values.map(({ roleId }) => roleId))];
+    // One JSON parameter avoids the D1 parameter ceiling without partial chunks.
+    const [rows] = await db.batch([
+      db
+        .insert(rolePermissionTable)
+        .select(
+          sql`SELECT NULL,
+        json_extract(association.value, '$.roleId'), json_extract(association.value, '$.permissionId'),
+        json_extract(association.value, '$.creatorId'), json_extract(association.value, '$.updaterId'), ${Date.now()}, NULL
+        FROM json_each(${JSON.stringify(values)}) AS association WHERE ${activeRoleIds(roleIds)}`
+        )
+        .returning({ id: rolePermissionTable.id }),
+      updateOwnerCounts(roleIds),
+    ]);
+    if (rows.length !== values.length)
+      throw new BusinessError(RoleDeletionError.NOT_ACTIVE);
+    return rows.length;
   }
 
   async onUpdate(
     id: number,
-    data: Partial<
-      Omit<
-        InferInsertModel<typeof rolePermissionTable>,
-        "id" | "createTimeUtc" | "updateTimeUtc"
-      >
-    >
+    data: Partial<AssociationInsert>
   ): Promise<number> {
-    const res = await db
-      .update(rolePermissionTable)
-      .set({
-        ...data,
-        updateTimeUtc: Date.now(),
-      })
-      .where(eq(rolePermissionTable.id, id))
-      .returning({ id: rolePermissionTable.id });
-    return res[0].id;
+    const current = await this.findById(id);
+    if (!current) throw new BusinessError(RoleDeletionError.STATE_CONFLICT);
+    const targetRoleId = data.roleId ?? current.roleId;
+    const [rows] = await db.batch([
+      db
+        .update(rolePermissionTable)
+        .set({
+          ...data,
+          updateTimeUtc: sql`MAX(${Date.now()}, COALESCE(${rolePermissionTable.updateTimeUtc}, 0) + 1)`,
+        })
+        .where(
+          and(
+            eq(rolePermissionTable.id, id),
+            eq(rolePermissionTable.roleId, current.roleId),
+            sql`${rolePermissionTable.updateTimeUtc} IS ${current.updateTimeUtc}`,
+            activeRoleIds([current.roleId, targetRoleId])
+          )
+        )
+        .returning({ id: rolePermissionTable.id }),
+      updateOwnerCounts([current.roleId, targetRoleId]),
+    ]);
+    if (!rows[0]) throw new BusinessError(RoleDeletionError.STATE_CONFLICT);
+    return rows[0].id;
   }
 
   async onDelete(id: number): Promise<number> {
-    const res = await db
-      .delete(rolePermissionTable)
-      .where(eq(rolePermissionTable.id, id))
-      .returning({ id: rolePermissionTable.id });
-    return res[0].id;
+    const current = await this.findById(id);
+    if (!current) throw new BusinessError(RoleDeletionError.STATE_CONFLICT);
+    const [rows] = await db.batch([
+      db
+        .delete(rolePermissionTable)
+        .where(
+          and(
+            eq(rolePermissionTable.id, id),
+            eq(rolePermissionTable.roleId, current.roleId),
+            sql`${rolePermissionTable.updateTimeUtc} IS ${current.updateTimeUtc}`,
+            activeRoleIds([current.roleId])
+          )
+        )
+        .returning({ id: rolePermissionTable.id }),
+      updateOwnerCounts([current.roleId]),
+    ]);
+    if (!rows[0]) throw new BusinessError(RoleDeletionError.STATE_CONFLICT);
+    return rows[0].id;
   }
 
   async onBatchDelete(
@@ -270,33 +308,27 @@ export class RolePermissionRepository {
     permissionIds: number[]
   ): Promise<number> {
     if (permissionIds.length === 0) return 0;
-    // 分片删除以避免 D1 变量限制 (通常为 100)
-    // inArray 会产生 N 个变量，取 50 为一组
-    const chunkSize = 50;
-    const batches: any[] = [];
-    for (let i = 0; i < permissionIds.length; i += chunkSize) {
-      const chunk = permissionIds.slice(i, i + chunkSize);
-      batches.push(
-        db
-          .delete(rolePermissionTable)
-          .where(
-            and(
-              eq(rolePermissionTable.roleId, roleId),
-              inArray(rolePermissionTable.permissionId, chunk)
-            )
+    const [rows] = await db.batch([
+      db
+        .delete(rolePermissionTable)
+        .where(
+          and(
+            eq(rolePermissionTable.roleId, roleId),
+            sql`${rolePermissionTable.permissionId} IN (SELECT value FROM json_each(${JSON.stringify(permissionIds)}))`,
+            activeRoleIds([roleId])
           )
-          .returning({ id: rolePermissionTable.id })
-      );
+        )
+        .returning({ id: rolePermissionTable.id }),
+      updateOwnerCounts([roleId]),
+    ]);
+    if (!rows.length) {
+      const active = await db
+        .select({ id: roleTable.id })
+        .from(roleTable)
+        .where(and(eq(roleTable.id, roleId), eq(roleTable.isDeleted, false)));
+      if (!active[0]) throw new BusinessError(RoleDeletionError.NOT_ACTIVE);
     }
-    const results =
-      batches.length > 0
-        ? await db.batch(batches as unknown as Parameters<typeof db.batch>[0])
-        : [];
-    const totalDeleted = (results as { id: number }[][]).reduce(
-      (acc: number, curr) => acc + curr.length,
-      0
-    );
-    return totalDeleted;
+    return rows.length;
   }
 }
 

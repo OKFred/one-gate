@@ -23,4 +23,5 @@ export const deleteUndo = {
   'deleteUndo.openRecycleBin': '打开回收站',
   'deleteUndo.listFailed': '列表加载失败。',
   'deleteUndo.reloadDepartmentList': '重新加载部门列表',
+  'deleteUndo.reloadList': '重新加载列表',
 } as const satisfies Record<string, string>;

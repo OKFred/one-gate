@@ -24,6 +24,7 @@ import roleService, { utils as roleUtils } from "../role/service";
 import { ErrorCodes } from "../role/prevention";
 import { permissionTable } from "../permission/model";
 import { rolePermissionRepository } from "../role_permission/repository";
+import { rolePermissionTable } from "../role_permission/model";
 import rolePermissionService, {
   getPermissionsByRoleIds,
 } from "../role_permission/service";
@@ -56,6 +57,9 @@ async function seedRole(
   } = {}
 ) {
   await db.insert(roleTable).values({
+    isDeleted: false,
+    deletedTimeUtc: null,
+    deleterId: null,
     id,
     name: "role-" + id,
     remark: "Management-only role detail",
@@ -207,7 +211,10 @@ describe("enabled role authorization repository and service boundaries", () => {
     await grant(3, 10);
     await grant(3, 11);
     await grant(2, 12);
-    await grant(404, 13);
+    // Deliberate legacy orphan fixture: normal repository writes now reject it.
+    await db
+      .insert(rolePermissionTable)
+      .values({ roleId: 404, permissionId: 13, creatorId: actor.userId });
     expect(
       (await rolePermissionRepository.getPermissionsByRoleIds([2, 3, 404])).map(
         (permission) => permission.id
@@ -297,7 +304,11 @@ describe("enabled role authorization repository and service boundaries", () => {
       await seedPermission(10);
       await seedPermission(11);
       await grant(2, 10);
-      await grant(1, 11);
+      if (state === "missing") {
+        await db
+          .insert(rolePermissionTable)
+          .values({ roleId: 1, permissionId: 11, creatorId: actor.userId });
+      } else await grant(1, 11);
       expect(await roleUtils.getAuthorizationRoles([1])).toEqual([]);
       expect(await getPermissionsByRoleIds([1])).toEqual([]);
       expect(

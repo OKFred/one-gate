@@ -173,11 +173,6 @@ async function onAdd(
     creatorId,
   });
 
-  // 更新角色权限数量
-  const currentCount =
-    await rolePermissionRepository.getCurrentPermissionCount(roleId);
-  await roleUtils.updatePermissionCount(roleId, currentCount);
-
   // 触发全局缓存失效
   await invalidateAuthCache();
 
@@ -232,11 +227,6 @@ async function onBatchAdd(
   }));
 
   const totalAdded = await rolePermissionRepository.onBatchInsert(values);
-
-  // 更新角色权限数量
-  const currentCount =
-    await rolePermissionRepository.getCurrentPermissionCount(roleId);
-  await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
   await invalidateAuthCache();
@@ -327,14 +317,8 @@ async function onDelete(
   // 前置校验
   const record = await rolePermissionRepository.findById(id);
   preventEmpty(record);
-  const roleId = record.roleId;
 
   const deletedId = await rolePermissionRepository.onDelete(id);
-
-  // 更新角色权限数量
-  const currentCount =
-    await rolePermissionRepository.getCurrentPermissionCount(roleId);
-  await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
   await invalidateAuthCache();
@@ -386,11 +370,6 @@ async function onBatchDelete(
     roleId,
     permissionIds
   );
-
-  // 更新角色权限数量
-  const currentCount =
-    await rolePermissionRepository.getCurrentPermissionCount(roleId);
-  await roleUtils.updatePermissionCount(roleId, currentCount);
 
   // 触发全局缓存失效
   await invalidateAuthCache();

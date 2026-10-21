@@ -8386,6 +8386,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/system/role/deleteWithUndo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 删除角色并返回短时撤销收据 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.system.role.deletewithundo.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.system.role.deletewithundo.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/system/role/get": {
         parameters: {
             query?: never;
@@ -25465,6 +25523,11 @@ export interface components {
                  * @example 管理员
                  */
                 name: string;
+                /**
+                 * @description 更新时间
+                 * @example 1672531199000
+                 */
+                updateTimeUtc: ((number | null) | null) | null;
             }[];
             message: string;
         };
@@ -25621,6 +25684,22 @@ export interface components {
              * @example 1
              */
             data: number;
+            message: string;
+        };
+        "admin.system.role.deletewithundo.req": {
+            id: number;
+            expectedUpdateTimeUtc: number | null;
+        };
+        "admin.system.role.deletewithundo.res": {
+            ok: boolean;
+            data: {
+                /** @constant */
+                resourceType: "role";
+                id: number;
+                expectedDeletedTimeUtc: number;
+                undoExpiresTimeUtc: number;
+                serverTimeUtc: number;
+            };
             message: string;
         };
         "admin.system.role.get.req": {

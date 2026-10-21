@@ -45,6 +45,8 @@ export const system = {
 
   // 角色管理
   'role.table.roleName': '角色名称',
+  'role.dialog.softDeleteConfirm':
+    '删除后角色将进入回收站，保留 30 天。删除成功后可在 15 秒内撤销。',
   'role.table.permissions': '权限列表',
   'role.table.permissionsHelper': '权限列表为JSON数组格式',
   'role.table.dataScope': '数据范围',

@@ -179,6 +179,9 @@ describe("System User / Role / Permission RBAC 全链路集成测试", () => {
     it("创建角色、分配权限、批量增删并验证关联列表", async () => {
       // 占位超管角色 ID=1
       await db.insert(roleTable).values({
+        isDeleted: false,
+        deletedTimeUtc: null,
+        deleterId: null,
         id: 1,
         name: "超级管理员",
         remark: null,
@@ -288,6 +291,9 @@ describe("System User / Role / Permission RBAC 全链路集成测试", () => {
 
       // 占位超管角色
       await db.insert(roleTable).values({
+        isDeleted: false,
+        deletedTimeUtc: null,
+        deleterId: null,
         id: 1,
         name: "超级管理员",
         remark: null,
@@ -416,6 +422,9 @@ describe("System User / Role / Permission RBAC 全链路集成测试", () => {
 
       // 占位超管
       await db.insert(roleTable).values({
+        isDeleted: false,
+        deletedTimeUtc: null,
+        deleterId: null,
         id: 1,
         name: "超级管理员",
         remark: null,

@@ -1,4 +1,38 @@
 -- Read-only deployment contract. A missing table or column must fail before Worker deploy.
+-- role-soft-delete-contract-start
+SELECT `id`, `name`, `permission_count`, `custom_dept_ids`, `is_deleted`, `deleted_time_utc`, `deleter_id`
+FROM `system_role` LIMIT 0;
+SELECT `id` FROM `system_role`
+INDEXED BY `system_role_name_active_unique` WHERE `is_deleted` = 0 LIMIT 0;
+SELECT `id` FROM `system_role`
+INDEXED BY `system_role_deleted_time_idx` LIMIT 0;
+-- A failed CASE intentionally produces invalid JSON so contract execution cannot pass silently.
+WITH role_schema AS (
+  SELECT name, type,
+    LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(sql, '"', ''), '`', ''), ' ', ''), CHAR(9), ''), CHAR(10), ''), CHAR(13), '')) AS definition
+  FROM sqlite_master
+)
+SELECT json(CASE WHEN
+  EXISTS (
+    SELECT 1 FROM role_schema WHERE type = 'table' AND name = 'system_role'
+      AND INSTR(definition, 'constraintsystem_role_soft_delete_state_checkcheck((system_role.is_deleted=0andsystem_role.deleted_time_utcisnullandsystem_role.deleter_idisnull)or(system_role.is_deleted=1andsystem_role.deleted_time_utcisnotnullandsystem_role.deleter_idisnotnull))') > 0
+  )
+  AND (SELECT COUNT(*) FROM pragma_table_info('system_role') WHERE
+    LOWER(type) = 'integer' AND dflt_value IS NULL AND (
+      (name = 'is_deleted' AND "notnull" = 1)
+      OR (name IN ('deleted_time_utc', 'deleter_id') AND "notnull" = 0)
+    )) = 3
+  AND EXISTS (SELECT 1 FROM pragma_index_list('system_role') WHERE name = 'system_role_name_active_unique' AND "unique" = 1 AND partial = 1)
+  AND (SELECT COUNT(*) FROM pragma_index_info('system_role_name_active_unique')) = 1
+  AND EXISTS (SELECT 1 FROM pragma_index_info('system_role_name_active_unique') WHERE seqno = 0 AND name = 'name')
+  AND EXISTS (SELECT 1 FROM role_schema WHERE type = 'index' AND name = 'system_role_name_active_unique' AND SUBSTR(definition, -LENGTH('wheresystem_role.is_deleted=0')) = 'wheresystem_role.is_deleted=0')
+  AND EXISTS (SELECT 1 FROM pragma_index_list('system_role') WHERE name = 'system_role_deleted_time_idx' AND "unique" = 0 AND partial = 0)
+  AND (SELECT COUNT(*) FROM pragma_index_info('system_role_deleted_time_idx')) = 2
+  AND EXISTS (SELECT 1 FROM pragma_index_info('system_role_deleted_time_idx') WHERE seqno = 0 AND name = 'is_deleted')
+  AND EXISTS (SELECT 1 FROM pragma_index_info('system_role_deleted_time_idx') WHERE seqno = 1 AND name = 'deleted_time_utc')
+THEN '{}' ELSE 'invalid role soft-delete schema' END) AS role_soft_delete_schema_contract;
+-- role-soft-delete-contract-end
+
 SELECT `id`, `name`, `parent_id`, `is_deleted`, `deleted_time_utc`, `deleter_id`
 FROM `system_department` LIMIT 0;
 SELECT `id` FROM `system_department`
