@@ -12,6 +12,10 @@ task scheduling, and a shared recycle bin with a 30-day recovery window.
 Departments also support undoing your own deletion within 15 seconds while you
 still have delete permission.
 
+Enterprise assets use independent registers for each enterprise, with explicit
+membership and machine-token grants. Asset identity survives renaming, host
+moves and retirement; installation and measurement history use UTC intervals.
+
 ## Local development
 
 Use the Node.js version in [.nvmrc](.nvmrc) and pnpm 11.5.0. The backend and
@@ -60,6 +64,21 @@ pnpm run dev:admin
 Open `http://localhost:5173`. The development API URL is configured in
 `platform/.env.development`; override it in `.env.development.local` if needed.
 Use `dev:enterprise`, `dev:personal` or `dev:all` for the other applications.
+
+## Asset DDL maintenance
+
+From `server/`, check that the current asset models match the committed DDL:
+
+```sh
+pnpm run db:generate:assets
+```
+
+After intentionally changing the models, use `pnpm run db:generate:assets --write`
+to update the seven fresh-database DDL files and the asset schema contracts.
+The tool uses the installed Drizzle Kit and never connects to a database or
+rewrites numbered migrations. Existing databases still need a new versioned
+migration; generating fresh DDL is not an upgrade procedure. The asset-specific
+command does not use the legacy full generator that clears its migration directory.
 
 ## Verification and deployment
 

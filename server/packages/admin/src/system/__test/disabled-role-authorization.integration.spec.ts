@@ -33,6 +33,7 @@ import userService from "../user/service";
 
 const now = 1_800_000_000_000;
 const actor: UserObj = {
+  principal: { kind: "user", userId: 900 },
   id: 900,
   userId: 900,
   username: "authorization-test-actor",

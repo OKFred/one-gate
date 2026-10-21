@@ -92,7 +92,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
           (import.meta as unknown as { env: Record<string, string> }).env.VITE_APP_SCOPE || 'admin';
         let targetScope = 'admin';
 
-        if (item.path.startsWith('/biz/') || item.path.startsWith('biz/')) {
+        if (
+          item.path.startsWith('/biz/') ||
+          item.path.startsWith('biz/') ||
+          item.path.startsWith('/enterprise/') ||
+          item.path.startsWith('enterprise/')
+        ) {
           targetScope = 'enterprise';
         } else if (item.path.startsWith('/personal/') || item.path.startsWith('personal/')) {
           targetScope = 'personal';

@@ -23,7 +23,13 @@ export interface PermissionInfo {
   updateTimeUtc: number | null;
 }
 
+/** Authentication-only identity. Business scopes must never infer this from creatorId. */
+export type AuthPrincipal =
+  | { readonly kind: "user"; readonly userId: number }
+  | { readonly kind: "api_token"; readonly tokenId: number };
+
 export interface UserObj {
+  readonly principal: AuthPrincipal;
   id: number;
   username: string;
   langCode: string;

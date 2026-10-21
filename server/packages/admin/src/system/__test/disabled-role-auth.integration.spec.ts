@@ -48,6 +48,8 @@ type Probe = Pick<
   UserObj,
   "roleIds" | "isSuperAdmin" | "dataScope" | "customDeptIds"
 > & {
+  principal: UserObj["principal"];
+  principalFrozen: boolean;
   initialIsSuperAdmin: boolean;
   permissionCodes: string[];
   mayRead: boolean;
@@ -63,6 +65,8 @@ app.post("/authorization-probe", async (context) => {
   const initialIsSuperAdmin = user.isSuperAdmin;
   await user.ensureLoaded();
   return context.json({
+    principal: user.principal,
+    principalFrozen: Object.isFrozen(user.principal),
     initialIsSuperAdmin,
     roleIds: user.roleIds,
     isSuperAdmin: user.isSuperAdmin,
@@ -212,6 +216,25 @@ describe("disabled roles through JWT authentication and permission caching", () 
   });
 
   afterAll(() => setEnv({ JWT_SECRET: previousJwtSecret }));
+
+  it("derives a frozen human principal from authentication rather than body fields or token username", async () => {
+    const response = await app.request("http://localhost/authorization-probe", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${tokenUtils.generateToken({ userId, username: "api-token:spoofed" })}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        principal: { kind: "api_token", tokenId: 999 },
+        userId: 999,
+      }),
+    });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      principal: { kind: "user", userId },
+      principalFrozen: true,
+    });
+  });
 
   for (const scope of [DataScope.ALL, DataScope.CUSTOM]) {
     it(`does not derive ${scope} scope or permissions from a disabled role on a cold request`, async () => {
@@ -525,6 +548,8 @@ describe("disabled roles through JWT authentication and permission caching", () 
     );
     expect(await authorize("hdr_isolated_disabled_role_fixture")).toMatchObject(
       {
+        principal: { kind: "api_token", tokenId: 501 },
+        principalFrozen: true,
         roleIds: [],
         isSuperAdmin: false,
         dataScope: DataScope.SELF_ONLY,

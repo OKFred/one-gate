@@ -15,6 +15,8 @@ import { dataTranslations } from "../../../admin/src/data/translation";
 import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
 import { workflowTranslations } from "../../../enterprise/src/executive/workflow/translation";
 import { edmTranslations } from "../../../enterprise/src/mail/edm/translation";
+import { tenantTranslations } from "../../../enterprise/src/tenant/translation";
+import { assetTranslations } from "../../../enterprise/src/asset/translation";
 
 import { preferenceTranslations } from "../../../personal/src/base/preference/translation";
 import { financialTranslations } from "../../../personal/src/financial/translation";
@@ -154,6 +156,8 @@ export const initialTranslationData = mapTranslations({
   ...attendanceTranslations,
   ...workflowTranslations,
   ...edmTranslations,
+  "enterprise.tenant": tenantTranslations,
+  "enterprise.asset": assetTranslations,
 
   ...preferenceTranslations,
   ...financialTranslations,

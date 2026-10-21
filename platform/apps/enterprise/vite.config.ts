@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
 
   const result = {
     root: __dirname,
+    define: { 'import.meta.env.VITE_APP_SCOPE': JSON.stringify('enterprise') },
     publicDir: path.resolve(__dirname, '../../public'),
     resolve: {
       alias: {
