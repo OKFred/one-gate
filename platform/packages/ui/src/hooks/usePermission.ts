@@ -402,6 +402,22 @@ export const permissions = {
   },
   enterprise: {
     read: 'enterprise:read',
+    /** 企业与成员 */
+    tenant: {
+      read: 'enterprise.tenant:read',
+      add: 'enterprise.tenant:add',
+      edit: 'enterprise.tenant:edit',
+    },
+    /** 企业资产 */
+    asset: {
+      read: 'enterprise.asset:read',
+      add: 'enterprise.asset:add',
+      edit: 'enterprise.asset:edit',
+      /** mapping */
+      mapping: {
+        read: 'enterprise.asset.mapping:read',
+      },
+    },
     /** enterprise.mail */
     mail: {
       read: 'enterprise.mail:read',

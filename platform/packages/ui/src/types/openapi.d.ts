@@ -17550,6 +17550,1572 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enterprise/tenant/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List my enterprises */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/platformList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Platform enterprise management */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.platformlist.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.platformlist.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create an enterprise and its first owner */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.create.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.create.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update enterprise settings */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/memberList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List enterprise members */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.memberlist.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.memberlist.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/memberSet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add or update an enterprise member */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.memberset.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.memberset.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/transferOwner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transfer enterprise ownership atomically */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.transferowner.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.transferowner.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/recoverOwner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Platform owner recovery with an audit reason */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.recoverowner.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.recoverowner.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/tokenGrantList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** List enterprise machine grants */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.tokengrantlist.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.tokengrantlist.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/tenant/tokenGrantSet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Manage an enterprise mapping token grant */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.tenant.tokengrantset.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.tenant.tokengrantset.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset list */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/get": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset get */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.get.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.get.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/add": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset add */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.add.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.add.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset update */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.update.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.update.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset retire */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.retire.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.retire.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset activate */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.activate.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.activate.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/identifierList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset identifierList */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.identifierlist.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.identifierlist.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/identifierAdd": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset identifierAdd */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.identifieradd.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.identifieradd.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/identifierUpdate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset identifierUpdate */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.identifierupdate.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.identifierupdate.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/assignmentList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset assignmentList */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.assignmentlist.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.assignmentlist.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset assign */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.assign.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.assign.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/closeAssignment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset closeAssignment */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.closeassignment.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.closeassignment.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/bindingList": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset bindingList */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.bindinglist.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.bindinglist.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/bind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset bind */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.bind.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.bind.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/closeBinding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset closeBinding */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.closebinding.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.closebinding.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/mapping/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset resolve */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.mapping.resolve.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.mapping.resolve.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/mapping/list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Enterprise asset list */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.mapping.list.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.mapping.list.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/personal/base/user_config/list": {
         parameters: {
             query?: never;
@@ -31527,6 +33093,584 @@ export interface components {
                 totalSent: number;
                 successCount: number;
                 failCount: number;
+            };
+            message: string;
+        };
+        "enterprise.tenant.list.req": {
+            pageNo?: number;
+            pageSize?: number;
+            keyword?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "key" | "name" | "createTimeUtc";
+            descend?: boolean;
+        };
+        "enterprise.tenant.list.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    key: string;
+                    name: string;
+                    isEnabled: boolean;
+                    /** @enum {string|null} */
+                    memberRole: "owner" | "admin" | "editor" | "viewer" | null;
+                    frozen: boolean;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+                canManagePlatform: boolean;
+            };
+            message: string;
+        };
+        "enterprise.tenant.platformlist.req": {
+            pageNo?: number;
+            pageSize?: number;
+            keyword?: string;
+            /** @enum {string} */
+            orderBy?: "id" | "key" | "name" | "createTimeUtc";
+            descend?: boolean;
+        };
+        "enterprise.tenant.platformlist.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    key: string;
+                    name: string;
+                    isEnabled: boolean;
+                    /** @enum {string|null} */
+                    memberRole: "owner" | "admin" | "editor" | "viewer" | null;
+                    frozen: boolean;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+                canManagePlatform: boolean;
+            };
+            message: string;
+        };
+        "enterprise.tenant.create.req": {
+            key: string;
+            name: string;
+            ownerUserId: number;
+        };
+        "enterprise.tenant.create.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.tenant.update.req": {
+            tenantId: number;
+            name: string;
+            isEnabled: boolean;
+            expectedUpdateTimeUtc: number;
+        };
+        "enterprise.tenant.update.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.tenant.memberlist.req": {
+            tenantId: number;
+            pageNo?: number;
+            pageSize?: number;
+        };
+        "enterprise.tenant.memberlist.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    tenantId: number;
+                    userId: number;
+                    username: string | null;
+                    userIsEnabled: boolean;
+                    /** @enum {string} */
+                    role: "owner" | "admin" | "editor" | "viewer";
+                    isEnabled: boolean;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+            };
+            message: string;
+        };
+        "enterprise.tenant.memberset.req": {
+            tenantId: number;
+            userId: number;
+            /** @enum {string} */
+            role: "owner" | "admin" | "editor" | "viewer";
+            isEnabled: boolean;
+            expectedUpdateTimeUtc: number | null;
+        };
+        "enterprise.tenant.memberset.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.tenant.transferowner.req": {
+            tenantId: number;
+            toUserId: number;
+            expectedSourceTimeUtc: number;
+            expectedTargetTimeUtc: number;
+        };
+        "enterprise.tenant.transferowner.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.tenant.recoverowner.req": {
+            tenantId: number;
+            userId: number;
+            expectedUpdateTimeUtc: number;
+            reason: string;
+        };
+        "enterprise.tenant.recoverowner.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.tenant.tokengrantlist.req": {
+            tenantId: number;
+            pageNo?: number;
+            pageSize?: number;
+        };
+        "enterprise.tenant.tokengrantlist.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    tenantId: number;
+                    tokenId: number;
+                    isEnabled: boolean;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+            };
+            message: string;
+        };
+        "enterprise.tenant.tokengrantset.req": {
+            tenantId: number;
+            tokenId: number;
+            isEnabled: boolean;
+            expectedUpdateTimeUtc: number | null;
+        };
+        "enterprise.tenant.tokengrantset.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.list.req": {
+            tenantId: number;
+            pageNo?: number;
+            pageSize?: number;
+            descend?: boolean;
+            keyword?: string;
+            /** @enum {string} */
+            category?: "host" | "disk" | "gpu" | "board" | "sensor" | "meter" | "other";
+            /** @enum {string} */
+            status?: "active" | "retired";
+            /** @enum {string} */
+            orderBy?: "id" | "name" | "category" | "status" | "createTimeUtc" | "updateTimeUtc";
+        };
+        "enterprise.asset.list.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    tenantId: number;
+                    /** Format: uuid */
+                    assetId: string;
+                    assetCode: string | null;
+                    name: string;
+                    /** @enum {string} */
+                    category: "host" | "disk" | "gpu" | "board" | "sensor" | "meter" | "other";
+                    brand: string | null;
+                    model: string | null;
+                    remark: string | null;
+                    /** @enum {string} */
+                    status: "active" | "retired";
+                    retiredTimeUtc: number | null;
+                    stateReason: string | null;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number | null;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+            };
+            message: string;
+        };
+        "enterprise.asset.get.req": {
+            tenantId: number;
+            id: number;
+        };
+        "enterprise.asset.get.res": {
+            ok: boolean;
+            data: {
+                id: number;
+                tenantId: number;
+                /** Format: uuid */
+                assetId: string;
+                assetCode: string | null;
+                name: string;
+                /** @enum {string} */
+                category: "host" | "disk" | "gpu" | "board" | "sensor" | "meter" | "other";
+                brand: string | null;
+                model: string | null;
+                remark: string | null;
+                /** @enum {string} */
+                status: "active" | "retired";
+                retiredTimeUtc: number | null;
+                stateReason: string | null;
+                creatorId: number;
+                updaterId: number | null;
+                createTimeUtc: number;
+                updateTimeUtc: number | null;
+            };
+            message: string;
+        };
+        "enterprise.asset.add.req": {
+            tenantId: number;
+            name: string;
+            /** @enum {string} */
+            category: "host" | "disk" | "gpu" | "board" | "sensor" | "meter" | "other";
+            assetCode?: string | null;
+            brand?: string | null;
+            model?: string | null;
+            remark?: string | null;
+        };
+        "enterprise.asset.add.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.update.req": {
+            tenantId: number;
+            id: number;
+            expectedUpdateTimeUtc: number | null;
+            name: string;
+            /** @enum {string} */
+            category: "host" | "disk" | "gpu" | "board" | "sensor" | "meter" | "other";
+            assetCode?: string | null;
+            brand?: string | null;
+            model?: string | null;
+            remark?: string | null;
+        };
+        "enterprise.asset.update.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.retire.req": {
+            tenantId: number;
+            id: number;
+            expectedUpdateTimeUtc: number | null;
+            reason: string;
+        };
+        "enterprise.asset.retire.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.activate.req": {
+            tenantId: number;
+            id: number;
+            expectedUpdateTimeUtc: number | null;
+            reason: string;
+        };
+        "enterprise.asset.activate.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.identifierlist.req": {
+            tenantId: number;
+            assetId: number;
+            pageNo?: number;
+            pageSize?: number;
+            descend?: boolean;
+        };
+        "enterprise.asset.identifierlist.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    tenantId: number;
+                    assetId: number;
+                    /** @enum {string} */
+                    identifierType: "sn" | "wwn" | "gpu_uuid" | "sid" | "other";
+                    namespace: string;
+                    value: string;
+                    normalizedValue: string;
+                    source: string;
+                    /** @enum {string} */
+                    confidence: "high" | "medium" | "low";
+                    isVerified: boolean;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number | null;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+            };
+            message: string;
+        };
+        "enterprise.asset.identifieradd.req": {
+            tenantId: number;
+            assetId: number;
+            expectedAssetUpdateTimeUtc: number | null;
+            /** @enum {string} */
+            identifierType: "sn" | "wwn" | "gpu_uuid" | "sid" | "other";
+            namespace: string;
+            value: string;
+            source: string;
+            /** @enum {string} */
+            confidence: "high" | "medium" | "low";
+            isVerified: boolean;
+        };
+        "enterprise.asset.identifieradd.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.identifierupdate.req": {
+            tenantId: number;
+            assetId: number;
+            expectedAssetUpdateTimeUtc: number | null;
+            /** @enum {string} */
+            identifierType: "sn" | "wwn" | "gpu_uuid" | "sid" | "other";
+            namespace: string;
+            value: string;
+            source: string;
+            /** @enum {string} */
+            confidence: "high" | "medium" | "low";
+            isVerified: boolean;
+            id: number;
+            expectedUpdateTimeUtc: number | null;
+        };
+        "enterprise.asset.identifierupdate.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.assignmentlist.req": {
+            tenantId: number;
+            assetId: number;
+            pageNo?: number;
+            pageSize?: number;
+            descend?: boolean;
+        };
+        "enterprise.asset.assignmentlist.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    tenantId: number;
+                    assetId: number;
+                    hostAssetId: number | null;
+                    location: string;
+                    validFromUtc: number;
+                    validToUtc: number | null;
+                    reason: string;
+                    closeReason: string | null;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number | null;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+            };
+            message: string;
+        };
+        "enterprise.asset.assign.req": {
+            tenantId: number;
+            assetId: number;
+            expectedAssetUpdateTimeUtc: number | null;
+            hostAssetId: number | null;
+            location: string;
+            validFromUtc: number;
+            validToUtc?: number | null;
+            reason: string;
+            replacesId?: number;
+            expectedUpdateTimeUtc?: number | null;
+        };
+        "enterprise.asset.assign.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.closeassignment.req": {
+            tenantId: number;
+            assetId: number;
+            id: number;
+            expectedAssetUpdateTimeUtc: number | null;
+            expectedUpdateTimeUtc: number | null;
+            validToUtc: number;
+            reason: string;
+        };
+        "enterprise.asset.closeassignment.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.bindinglist.req": {
+            tenantId: number;
+            assetId: number;
+            pageNo?: number;
+            pageSize?: number;
+            descend?: boolean;
+        };
+        "enterprise.asset.bindinglist.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    id: number;
+                    tenantId: number;
+                    assetId: number;
+                    sourceSystem: string;
+                    collectorId: string;
+                    deviceId: string;
+                    metric: string;
+                    channel: string;
+                    validFromUtc: number;
+                    validToUtc: number | null;
+                    reason: string;
+                    closeReason: string | null;
+                    creatorId: number;
+                    updaterId: number | null;
+                    createTimeUtc: number;
+                    updateTimeUtc: number | null;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
+            };
+            message: string;
+        };
+        "enterprise.asset.bind.req": {
+            tenantId: number;
+            assetId: number;
+            expectedAssetUpdateTimeUtc: number | null;
+            sourceSystem: string;
+            collectorId: string;
+            deviceId: string;
+            metric: string;
+            channel: string;
+            validFromUtc: number;
+            validToUtc?: number | null;
+            reason: string;
+            replacesId?: number;
+            expectedUpdateTimeUtc?: number | null;
+        };
+        "enterprise.asset.bind.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.closebinding.req": {
+            tenantId: number;
+            assetId: number;
+            id: number;
+            expectedAssetUpdateTimeUtc: number | null;
+            expectedUpdateTimeUtc: number | null;
+            validToUtc: number;
+            reason: string;
+        };
+        "enterprise.asset.closebinding.res": {
+            ok: boolean;
+            data: number;
+            message: string;
+        };
+        "enterprise.asset.mapping.resolve.req": {
+            tenantId: number;
+            sourceSystem: string;
+            collectorId: string;
+            deviceId: string;
+            metric: string;
+            channel: string;
+            observedTimeUtc: number;
+        };
+        "enterprise.asset.mapping.resolve.res": {
+            ok: boolean;
+            data: {
+                /** @enum {string} */
+                status: "matched" | "unmapped";
+                mapping: {
+                    /** Format: uuid */
+                    assetId: string;
+                    bindingId: number;
+                    sourceSystem: string;
+                    collectorId: string;
+                    deviceId: string;
+                    metric: string;
+                    channel: string;
+                    validFromUtc: number;
+                    validToUtc: number | null;
+                    updateTimeUtc: number | null;
+                } | null;
+            };
+            message: string;
+        };
+        "enterprise.asset.mapping.list.req": {
+            tenantId: number;
+            pageNo?: number;
+            pageSize?: number;
+            descend?: boolean;
+            sourceSystem?: string;
+            collectorId?: string;
+        };
+        "enterprise.asset.mapping.list.res": {
+            ok: boolean;
+            data: {
+                list: {
+                    /** Format: uuid */
+                    assetId: string;
+                    bindingId: number;
+                    sourceSystem: string;
+                    collectorId: string;
+                    deviceId: string;
+                    metric: string;
+                    channel: string;
+                    validFromUtc: number;
+                    validToUtc: number | null;
+                    updateTimeUtc: number | null;
+                }[];
+                total: number;
+                totalPage: number;
+                currentPage: number;
+                pageSize: number;
             };
             message: string;
         };

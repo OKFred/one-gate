@@ -31,6 +31,7 @@ type SessionRequestConfig = InternalAxiosRequestConfig & {
   ignoreAbort?: boolean;
   authSession?: AuthSessionSnapshot;
   errorPresentation?: 'global' | 'local';
+  shouldPresentError?: () => boolean;
 };
 
 function assertCurrentRequestSession(config: SessionRequestConfig): void {
@@ -78,6 +79,8 @@ export type AxiosConfig<U, M> = Omit<
     ignoreAbort?: boolean;
     /** Local action feedback owns ordinary errors; authentication remains global. */
     errorPresentation?: 'global' | 'local';
+    /** Discard ordinary feedback from an obsolete view; authentication still runs globally. */
+    shouldPresentError?: () => boolean;
   };
 
 /** @description  axios 实例 */
@@ -151,7 +154,7 @@ function setupInterceptors(service: AxiosInstance) {
           // 获取用户语言创建翻译函数
           const langCode = authUtils.getUserInfo()?.langCode;
           const t = createTranslator(langCode);
-          if (config.errorPresentation !== 'local') {
+          if (config.errorPresentation !== 'local' && config.shouldPresentError?.() !== false) {
             handleErrorResponse(response.data, t('error.requestFailed'));
           }
           return Promise.reject(response);
@@ -210,7 +213,7 @@ function setupInterceptors(service: AxiosInstance) {
       }
 
       // 其他业务错误：优先展示后端 message
-      if (config?.errorPresentation !== 'local') {
+      if (config?.errorPresentation !== 'local' && config?.shouldPresentError?.() !== false) {
         handleErrorResponse(axiosError?.response?.data, errorMessage || t('error.networkError'));
       }
       return Promise.reject(error);

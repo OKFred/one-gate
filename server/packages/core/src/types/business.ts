@@ -125,6 +125,9 @@ export const BUSINESS = {
   /** 基础配置 - Webhook 配置 */
   "admin.base.webhook_config": "admin.base.webhook_config",
   "enterprise.mail": "enterprise.mail",
+  "enterprise.tenant": "enterprise.tenant",
+  "enterprise.asset": "enterprise.asset",
+  "enterprise.asset.mapping": "enterprise.asset.mapping",
   "personal.base.user_config": "personal.base.user_config",
 
   /** 基础配置 - 日志 */

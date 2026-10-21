@@ -100,6 +100,7 @@ export const authMiddleware = async (c: Context) => {
 
     // 构建受限 userObj（不关联用户身份，权限来自令牌自身）
     const apiTokenUserObj: UserObj = {
+      principal: Object.freeze({ kind: "api_token", tokenId: apiToken.id }),
       token,
       userId: apiToken.creatorId,
       id: apiToken.creatorId,
@@ -166,6 +167,7 @@ export const authMiddleware = async (c: Context) => {
     isSuperAdmin,
     roleIds: [...roleIds],
     ...rest,
+    principal: Object.freeze({ kind: "user", userId }),
     remark: rest.remark ?? undefined,
     updaterId: rest.updaterId ?? undefined,
     updateTimeUtc: rest.updateTimeUtc ?? undefined,

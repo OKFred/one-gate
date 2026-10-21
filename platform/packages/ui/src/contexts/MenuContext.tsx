@@ -48,7 +48,10 @@ const filterMenuByScope = (nodes: MenuNode[], scope: string): MenuNode[] => {
       }
     } else if (scope === 'admin') {
       isValidNode = true;
-    } else if (scope === 'enterprise' && node.path.startsWith('/biz/')) {
+    } else if (
+      scope === 'enterprise' &&
+      (node.path.startsWith('/biz/') || node.path.startsWith('/enterprise/'))
+    ) {
       isValidNode = true;
     } else if (scope === 'personal' && node.path.startsWith('/personal/')) {
       isValidNode = true;

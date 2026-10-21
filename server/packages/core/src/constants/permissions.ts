@@ -122,6 +122,15 @@ export const permissionSeeds = {
   enterprise: {
     "": ["read"],
   },
+  /** 企业与成员 */
+  "enterprise.tenant": {
+    "": ["read", "add", "edit"],
+  },
+  /** 企业资产 */
+  "enterprise.asset": {
+    "": ["read", "add", "edit"],
+    mapping: ["read"],
+  },
   "enterprise.mail": {
     "": ["read"],
     edm: ["read", "add", "edit", "delete"],

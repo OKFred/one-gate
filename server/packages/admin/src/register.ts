@@ -1,5 +1,6 @@
 import { ServiceRegistry, setRegistry } from "./common/registry.js";
 import { utils as userUtils } from "./system/user/service.js";
+import { systemAccess } from "./system/access-metadata.js";
 import { utils as rolePermissionUtils } from "./system/role_permission/service.js";
 import { utils as roleUtils } from "./system/role/service.js";
 import { utils as regionUtils } from "./i18n/region/service.js";
@@ -31,6 +32,7 @@ import {
 
 // 1. 组装各领域模块的具体服务实现
 export const systemRegister = {
+  access: systemAccess,
   ...userUtils,
   ...rolePermissionUtils,
   ...roleUtils,

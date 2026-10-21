@@ -8,6 +8,9 @@ One Gate 是基于 Hono 和 React 的管理与业务应用工作区。后端支�
 现有功能包括用户、角色、部门、SSO、TOTP 二次门禁、定时任务及通用回收站。
 部门支持 30 天恢复窗口；删除人仍具备删除权限时，可在 15 秒内撤销自己的删除。
 
+企业资产按企业维护独立台账，显式管理成员和机器令牌授权。资产身份不随改名、
+换主机或退役而改变；安装和测点历史使用 UTC 有效区间。
+
 ## 本地启动
 
 使用 [.nvmrc](.nvmrc) 指定的 Node.js 版本和 pnpm 11.5.0。`server/` 与 `platform/`
@@ -52,6 +55,19 @@ pnpm run dev:admin
 访问 `http://localhost:5173`。开发 API 地址在 `platform/.env.development` 中，
 可用 `.env.development.local` 覆盖。企业端、个人端分别使用 `dev:enterprise`、
 `dev:personal`，或用 `dev:all` 一起启动。
+
+## 资产 DDL 维护
+
+在 `server/` 中检查当前资产模型与已保存 DDL 是否一致：
+
+```sh
+pnpm run db:generate:assets
+```
+
+有意修改模型后，使用 `pnpm run db:generate:assets --write` 更新 7 份新库 DDL
+和资产结构检查文件。工具调用本仓库安装的 Drizzle Kit，不连接数据库，不改写
+已编号迁移。已有数据库仍需新增版本化迁移，生成新库 DDL 不等于数据库升级。
+资产专用命令不调用会清空迁移目录的旧全量生成流程。
 
 ## 验证与部署
 
