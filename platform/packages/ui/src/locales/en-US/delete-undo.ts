@@ -29,4 +29,5 @@ export const deleteUndo = {
   'deleteUndo.openRecycleBin': 'Open recycle bin',
   'deleteUndo.listFailed': 'The list could not be loaded.',
   'deleteUndo.reloadDepartmentList': 'Reload department list',
+  'deleteUndo.reloadList': 'Reload list',
 } as const satisfies Record<string, string>;

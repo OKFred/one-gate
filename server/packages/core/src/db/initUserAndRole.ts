@@ -1,6 +1,7 @@
 import db from "./index";
 import { hashPassword } from "../utils/crypto";
 import { sql, eq } from "drizzle-orm";
+import type { BatchItem } from "drizzle-orm/batch";
 import { userTable } from "../../../admin/src/system/user/model";
 import { roleTable } from "../../../admin/src/system/role/model";
 import {
@@ -15,7 +16,7 @@ import {
  */
 export async function prepareSuperAdminRole(options?: { reset?: boolean }) {
   const stats = { total: 1, created: 0, updated: 0, skipped: 0 };
-  const queries: any[] = [];
+  const queries: BatchItem<"sqlite">[] = [];
 
   if (options?.reset) {
     queries.push(
@@ -33,6 +34,9 @@ export async function prepareSuperAdminRole(options?: { reset?: boolean }) {
           name: SUPER_ADMIN_ROLE.name,
           isEnabled: SUPER_ADMIN_ROLE.isEnabled,
           dataScope: SUPER_ADMIN_ROLE.dataScope,
+          isDeleted: SUPER_ADMIN_ROLE.isDeleted,
+          deletedTimeUtc: SUPER_ADMIN_ROLE.deletedTimeUtc,
+          deleterId: SUPER_ADMIN_ROLE.deleterId,
         },
       })
   );
@@ -49,7 +53,7 @@ export async function prepareSuperAdminUser(
   options?: { reset?: boolean }
 ) {
   const stats = { total: 1, created: 0, updated: 0, skipped: 0 };
-  const queries: any[] = [];
+  const queries: BatchItem<"sqlite">[] = [];
 
   if (options?.reset) {
     queries.push(

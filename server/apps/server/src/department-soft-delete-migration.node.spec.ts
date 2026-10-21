@@ -46,7 +46,7 @@ async function prepareMetadata(client: Client) {
     )
   );
   await client.execute(
-    "INSERT INTO system_role (id,name,is_enabled,permission_count,data_scope,creator_id) VALUES (1,'Superadmin',1,0,'ALL',1),(2,'Ordinary',1,0,'ALL',1)"
+    "INSERT INTO system_role (id,name,is_enabled,permission_count,data_scope,creator_id,is_deleted) VALUES (1,'Superadmin',1,0,'ALL',1,0),(2,'Ordinary',1,0,'ALL',1,0)"
   );
 }
 afterEach(() => {

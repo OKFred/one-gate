@@ -295,7 +295,7 @@ describe("department short undo with execution-time SQL clock", () => {
     "denies undo after current role authority is withdrawn: %s",
     async (change) => {
       await db.run(
-        sql`INSERT INTO system_role (id, name, is_enabled, permission_count, data_scope, creator_id) VALUES (42, 'undo-role', 1, 1, 'all', 101)`
+        sql`INSERT INTO system_role (id, name, is_enabled, permission_count, data_scope, creator_id, is_deleted) VALUES (42, 'undo-role', 1, 1, 'all', 101, 0)`
       );
       await db.run(
         sql`INSERT INTO system_permission (id, code, name, category, is_enabled, creator_id) VALUES (42, ${deleteCode}, 'delete', 'action', 1, 101)`
@@ -513,7 +513,7 @@ describe("department short undo with execution-time SQL clock", () => {
   it("keeps reference guards on the new deletion path, including disabled roles", async () => {
     const id = await add();
     await db.run(
-      sql`INSERT INTO system_role (name, is_enabled, permission_count, data_scope, custom_dept_ids, creator_id) VALUES ('reference-role', 0, 0, 'custom', ${JSON.stringify([id])}, 101)`
+      sql`INSERT INTO system_role (name, is_enabled, permission_count, data_scope, custom_dept_ids, creator_id, is_deleted) VALUES ('reference-role', 0, 0, 'custom', ${JSON.stringify([id])}, 101, 0)`
     );
     await expect(remove(id)).rejects.toMatchObject({
       code: DepartmentDeletionError.HAS_REFERENCES,

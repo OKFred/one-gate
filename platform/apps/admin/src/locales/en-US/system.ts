@@ -38,6 +38,8 @@ export const system = {
     'Delete this department? It will move to the recycle bin for 30 days. Authorized administrators can restore it during this window; it will be permanently deleted after expiry.',
 
   'role.table.roleName': 'Role Name',
+  'role.dialog.softDeleteConfirm':
+    'The role will move to the recycle bin for 30 days. You can undo the deletion within 15 seconds after it succeeds.',
   'role.table.permissions': 'Permissions',
   'role.table.permissionsHelper': 'Permissions list in JSON array format',
   'role.table.dataScope': 'Data Scope',

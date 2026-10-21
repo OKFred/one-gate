@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
+import { useRef } from 'react';
 
 import { useTranslation } from '@/hooks/useTranslation';
 
@@ -15,6 +16,7 @@ interface DeleteConfirmDialogProps {
   onConfirm: () => void;
   title?: React.ReactNode;
   content?: React.ReactNode;
+  loading?: boolean;
 }
 
 export function DeleteConfirmDialog({
@@ -23,19 +25,31 @@ export function DeleteConfirmDialog({
   onConfirm,
   title,
   content,
+  loading = false,
 }: DeleteConfirmDialogProps) {
   const t = useTranslation();
+  const displayed = useRef({
+    title: title || t('dialog.deleteConfirmTitle'),
+    content: content || t('table.deleteConfirm'),
+  });
+  // The parent clears its row on close while MUI still renders the exit transition.
+  if (open) {
+    displayed.current = {
+      title: title || t('dialog.deleteConfirmTitle'),
+      content: content || t('table.deleteConfirm'),
+    };
+  }
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{title || t('dialog.deleteConfirmTitle')}</DialogTitle>
+    <Dialog open={open} onClose={loading ? undefined : onClose}>
+      <DialogTitle>{displayed.current.title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{content || t('table.deleteConfirm')}</DialogContentText>
+        <DialogContentText>{displayed.current.content}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="outlined">
+        <Button onClick={onClose} variant="outlined" disabled={loading}>
           {t('dialog.cancel')}
         </Button>
-        <Button onClick={onConfirm} color="error" autoFocus>
+        <Button onClick={onConfirm} color="error" autoFocus disabled={loading}>
           {t('dialog.delete')}
         </Button>
       </DialogActions>

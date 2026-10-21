@@ -41,6 +41,22 @@ export interface FilterFieldConfig<TFilters> {
   options?: { label: string; value: boolean | string | number | undefined }[];
 }
 
+/** A resource opts into the shared receipt, undo and refresh lifecycle. */
+export interface CrudSoftDeleteConfig<TRecord> {
+  resourceType: string;
+  displayName: (row: TRecord, t: (key: string) => string) => string;
+  expectedUpdateTimeUtc: (row: TRecord) => number | null;
+  confirmationContent: (row: TRecord, t: (key: string) => string) => ReactNode;
+  delete: (args: {
+    data: { id: number; expectedUpdateTimeUtc: number | null };
+    errorPresentation: 'local';
+  }) => Promise<{ data: { ok?: boolean; data?: unknown } }>;
+  canOpenRecycleBin: () => boolean;
+  verifyCurrent?: (row: TRecord) => Promise<true | null>;
+  retryableErrorCodes?: readonly string[];
+  stateChangedErrorCodes?: readonly string[];
+}
+
 /**
  * 全局低代码 CRUD 页面核心配置接口
  */
@@ -58,10 +74,20 @@ export interface SchemaCrudConfig<
   /** 启用游标分页模式：total 与翻页解耦，由 hasMore/cursor 驱动翻页 */
   cursorPagination?: boolean;
 
+  /** Omit this option to retain the existing hard-delete interaction. */
+  softDelete?: CrudSoftDeleteConfig<TRecord>;
+
+  /**
+   * Reused instances that switch ordinary CRUD resources must supply a stable business key.
+   * Changing render callbacks does not change this identity.
+   */
+  resourceKey?: string;
+
   // API 异步网络请求接口定义
   api: {
-    list: (args: { data: TApiData }) => Promise<{
+    list: (args: { data: TApiData; errorPresentation?: 'global' | 'local' }) => Promise<{
       data: {
+        ok?: boolean;
         data?: { list?: TRecord[]; total?: number; hasMore?: boolean; cursor?: string };
       };
     }>;

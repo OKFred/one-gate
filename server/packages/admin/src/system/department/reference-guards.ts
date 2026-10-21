@@ -41,7 +41,10 @@ export function departmentHasNoReferences(
   const childState = includeDeletedChildren
     ? sql`1 = 1`
     : sql`child.is_deleted = 0`;
+  const roleState = includeDeletedChildren
+    ? sql`1 = 1`
+    : sql`department_role.is_deleted = 0`;
   return sql`NOT EXISTS (SELECT 1 FROM system_department AS child WHERE child.parent_id = ${target} AND ${childState})
     AND NOT EXISTS (SELECT 1 FROM system_user AS department_user WHERE department_user.department_id = ${target})
-    AND NOT EXISTS (SELECT 1 FROM system_role AS department_role, json_each(CASE WHEN json_valid(department_role.custom_dept_ids) THEN department_role.custom_dept_ids ELSE '[]' END) AS assigned_department WHERE CAST(assigned_department.value AS INTEGER) = ${target})`;
+    AND NOT EXISTS (SELECT 1 FROM system_role AS department_role, json_each(CASE WHEN json_valid(department_role.custom_dept_ids) THEN department_role.custom_dept_ids ELSE '[]' END) AS assigned_department WHERE ${roleState} AND CAST(assigned_department.value AS INTEGER) = ${target})`;
 }

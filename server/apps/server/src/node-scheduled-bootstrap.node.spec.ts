@@ -10,6 +10,11 @@ const mocks = vi.hoisted(() => ({
     remainingExpired: 0,
     oldestExpiredTimeUtc: null,
   })),
+  roleCleanup: vi.fn(async () => ({
+    deletedCount: 0,
+    remainingExpired: 0,
+    oldestExpiredTimeUtc: null,
+  })),
   archiveCleanup: vi.fn(async () => ({
     deletedCount: 0,
     remainingExpired: 0,
@@ -41,6 +46,17 @@ vi.mock("@hodor/admin/system/department/facade.js", () => ({
     purgeExpired: mocks.departmentCleanup,
   } satisfies RecycleBinResourceAdapter,
 }));
+vi.mock("@hodor/admin/system/role/facade.js", () => ({
+  roleRecycleBinAdapter: {
+    resourceType: "role",
+    labelKey: "businessType.admin.system.role",
+    can: async () => true,
+    list: async () => ({ total: 0, list: [] }),
+    restore: async ({ id }) => id,
+    purge: async ({ id }) => id,
+    purgeExpired: mocks.roleCleanup,
+  } satisfies RecycleBinResourceAdapter,
+}));
 vi.mock("@hodor/admin/maintenance/compliance/department-cleanup.js", () => ({
   purgeExpiredDepartmentArchives: mocks.archiveCleanup,
 }));
@@ -56,6 +72,10 @@ describe("Node scheduled bootstrap", () => {
     await tick();
     expect(mocks.cron).toHaveBeenCalledTimes(1);
     expect(mocks.departmentCleanup).toHaveBeenCalledExactlyOnceWith({
+      now: expect.any(Number),
+      batchSize: 100,
+    });
+    expect(mocks.roleCleanup).toHaveBeenCalledExactlyOnceWith({
       now: expect.any(Number),
       batchSize: 100,
     });

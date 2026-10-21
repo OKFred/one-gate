@@ -13,6 +13,22 @@ const mocks = vi.hoisted(() => ({
     remainingExpired: 0,
     oldestExpiredTimeUtc: null,
   })),
+  role: vi.fn(async (_input: SoftDeleteCleanupInput) => ({
+    deletedCount: 0,
+    remainingExpired: 0,
+    oldestExpiredTimeUtc: null,
+  })),
+}));
+vi.mock("@hodor/admin/system/role/facade.js", () => ({
+  roleRecycleBinAdapter: {
+    resourceType: "role",
+    labelKey: "businessType.admin.system.role",
+    can: async () => true,
+    list: async () => ({ total: 0, list: [] }),
+    restore: async ({ id }) => id,
+    purge: async ({ id }) => id,
+    purgeExpired: mocks.role,
+  } satisfies RecycleBinResourceAdapter,
 }));
 vi.mock("@hodor/admin/system/department/facade.js", () => ({
   departmentRecycleBinAdapter: {
@@ -40,9 +56,12 @@ describe("shared scheduled retention", () => {
     const { recycleBinRegistry } = await import("./recycle-bin-resources");
     expect(
       recycleBinRegistry.list().map(({ resourceType }) => resourceType)
-    ).toEqual(["department"]);
+    ).toEqual(["department", "role"]);
     await runRetentionMaintenance();
     expect(mocks.department).toHaveBeenCalledTimes(1);
+    expect(mocks.role).toHaveBeenCalledExactlyOnceWith(
+      mocks.department.mock.calls[0][0]
+    );
     expect(mocks.archive).toHaveBeenCalledTimes(1);
     expect(mocks.department).toHaveBeenCalledWith({
       now: expect.any(Number),
@@ -93,6 +112,34 @@ describe("shared scheduled retention", () => {
       expect(JSON.stringify(log.mock.calls)).not.toContain(
         "private database details"
       );
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  it("reports a role failure, still runs the other resources, and retries the next tick", async () => {
+    const { runRetentionMaintenance } = await import("./soft-delete-cleanup");
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    mocks.role.mockRejectedValueOnce(new Error("synthetic private role error"));
+    try {
+      await expect(runRetentionMaintenance()).rejects.toThrow(
+        "Soft-delete cleanup failed"
+      );
+      expect(mocks.department).toHaveBeenCalledTimes(1);
+      expect(mocks.archive).toHaveBeenCalledTimes(1);
+      expect(log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: "soft_delete_cleanup_failed",
+          module: "role",
+        })
+      );
+      expect(JSON.stringify(log.mock.calls)).not.toContain(
+        "synthetic private role error"
+      );
+      await runRetentionMaintenance();
+      expect(mocks.role).toHaveBeenCalledTimes(2);
+      expect(mocks.department).toHaveBeenCalledTimes(2);
+      expect(mocks.archive).toHaveBeenCalledTimes(2);
     } finally {
       log.mockRestore();
     }

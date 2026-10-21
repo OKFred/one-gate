@@ -214,6 +214,9 @@ describe("System Auth 模块全链路集成测试", () => {
     // 8. 权限控制角色与测试
     // 8.0 插入超级管理员角色占用 ID 1 (以符合系统 SUPER_ADMIN_ROLE_ID)
     await db.insert(roleTable).values({
+      isDeleted: false,
+      deletedTimeUtc: null,
+      deleterId: null,
       id: 1,
       name: "超级管理员",
       remark: "Super Admin",

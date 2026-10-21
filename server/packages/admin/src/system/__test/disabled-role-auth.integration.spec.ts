@@ -113,6 +113,9 @@ async function addRole(
   } = {}
 ) {
   await db.insert(roleTable).values({
+    isDeleted: false,
+    deletedTimeUtc: null,
+    deleterId: null,
     id,
     name: `authorization-role-${id}`,
     isEnabled: options.enabled ?? true,

@@ -60,3 +60,16 @@ export const deleteFn = (
     ...axiosConfig,
   });
 };
+
+export const deleteWithUndoFn = (
+  axiosConfig: Omit<
+    AxiosConfig<'/api/v1/admin/system/role/deleteWithUndo', 'post'>,
+    'url' | 'method'
+  >,
+) => {
+  return axiosPlus({
+    url: '/api/v1/admin/system/role/deleteWithUndo',
+    method: 'post',
+    ...axiosConfig,
+  });
+};

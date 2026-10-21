@@ -15,12 +15,20 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never' }]],
   outputDir: 'test-results',
   webServer: e2eEnvironment.mockAuth
-    ? {
-        command: 'pnpm --filter @hodor/admin preview --host 127.0.0.1 --port 4173',
-        url: e2eEnvironment.baseUrl,
-        reuseExistingServer: !process.env.CI,
-        timeout: 60_000,
-      }
+    ? [
+        {
+          command: 'pnpm --filter @hodor/admin preview --host 127.0.0.1 --port 4173',
+          url: e2eEnvironment.baseUrl,
+          reuseExistingServer: !process.env.CI,
+          timeout: 60_000,
+        },
+        {
+          command: 'pnpm exec vite --config e2e/fixtures/crud-switch/vite.config.ts',
+          url: 'http://127.0.0.1:4176',
+          reuseExistingServer: !process.env.CI,
+          timeout: 60_000,
+        },
+      ]
     : undefined,
   use: {
     baseURL: e2eEnvironment.baseUrl,
