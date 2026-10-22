@@ -13,6 +13,29 @@ export const DEVICE_EVENT_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 export const DEVICE_EVENT_FUTURE_TOLERANCE_MS = 5 * 60 * 1000;
 export const DEVICE_MAX_REPORT_JSON_BYTES = 32 * 1024;
 
+/** Reported client capabilities are metadata, not operation execution grants. */
+export const DEVICE_REPORTED_OPERATIONS = [
+  "device.ops.capabilities",
+  "device.audio.get",
+  "device.audio.set",
+  "device.audio.mute",
+  "device.audio.unmute",
+  "device.screen.brightness.get",
+  "device.screen.brightness.set",
+  "device.storage.stat",
+  "device.files.list",
+  "device.foreground.get",
+  "device.ui.target-at",
+  "device.network.get",
+  "device.telephony.get",
+  "device.alert.find",
+  "device.screen.capture",
+] as const;
+
+const reportedOperationNames: ReadonlySet<string> = new Set(
+  DEVICE_REPORTED_OPERATIONS
+);
+
 export interface DevicePresenceInput {
   protocolVersion: 2;
   deviceId: string;
@@ -163,11 +186,7 @@ export function validateCapabilities(
       value.ops.operations.length > 50 ||
       !value.ops.operations.every(
         (operation) =>
-          typeof operation === "string" &&
-          /^device\.(?:ops|audio|storage|files|foreground|network|screen)\.[a-z]+$/.test(
-            operation
-          ) &&
-          !operation.includes("shell")
+          typeof operation === "string" && reportedOperationNames.has(operation)
       )
     ) {
       fail("Invalid operations capability");
