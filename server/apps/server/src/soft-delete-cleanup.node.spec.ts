@@ -157,10 +157,13 @@ describe("shared scheduled retention", () => {
         };
       });
     const scheduled = runScheduledMaintenance([
-      async () => {
-        throw new Error("cron failed");
+      {
+        name: "cron_jobs",
+        run: async () => {
+          throw new Error("cron failed");
+        },
       },
-      retention,
+      { name: "retention", run: retention },
     ]);
     const rejected = expect(scheduled).rejects.toThrow(
       "Scheduled maintenance failed"
@@ -170,5 +173,54 @@ describe("shared scheduled retention", () => {
     finish?.();
     await rejected;
     expect(retentionCompleted).toBe(true);
+  });
+
+  it("correlates per-resource failures with the scheduled run without leaking causes", async () => {
+    const { runRetentionMaintenance, runScheduledMaintenance } =
+      await import("./soft-delete-cleanup");
+    const errorLog = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    const infoLog = vi
+      .spyOn(console, "info")
+      .mockImplementation(() => undefined);
+    mocks.department.mockRejectedValueOnce(
+      new Error("private SQL and record", {
+        cause: new Error("Network connection lost."),
+      })
+    );
+    try {
+      await expect(
+        runScheduledMaintenance([
+          { name: "retention", run: runRetentionMaintenance },
+        ])
+      ).rejects.toThrow("Scheduled maintenance failed");
+      expect(errorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: "soft_delete_cleanup_failed",
+          module: "department",
+          errorCode: "CLEANUP_FAILED",
+          causeCode: "NETWORK_CONNECTION_LOST",
+          runId: expect.any(String),
+        })
+      );
+      expect(errorLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          event: "scheduled_task_failed",
+          task: "retention",
+          causeCode: "SOFT_DELETE_CLEANUP_FAILED",
+        })
+      );
+      const events = errorLog.mock.calls.map(
+        ([event]) => event as { runId: string }
+      );
+      expect(new Set(events.map(({ runId }) => runId)).size).toBe(1);
+      expect(JSON.stringify(errorLog.mock.calls)).not.toContain(
+        "private SQL and record"
+      );
+    } finally {
+      errorLog.mockRestore();
+      infoLog.mockRestore();
+    }
   });
 });

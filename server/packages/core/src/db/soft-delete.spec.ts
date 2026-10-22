@@ -254,4 +254,36 @@ describe("registered soft-delete cleanup", () => {
     expect(purgeExpired).toHaveBeenCalledTimes(2);
     expect(log.info).toHaveBeenCalledTimes(3);
   });
+
+  it("retains a fixed driver cause category while suppressing wrapped SQL and parameters", async () => {
+    const log = logger();
+    await expect(
+      runSoftDeleteCleanup(
+        [
+          {
+            module: "department",
+            purgeExpired: async () => {
+              throw new Error("private SQL and secret parameters", {
+                cause: new Error("Network connection lost."),
+              });
+            },
+          },
+        ],
+        123,
+        log
+      )
+    ).rejects.toThrow("Soft-delete cleanup failed");
+    expect(log.error).toHaveBeenCalledExactlyOnceWith({
+      event: "soft_delete_cleanup_failed",
+      module: "department",
+      checkedTimeUtc: 123,
+      cutoffTimeUtc: 123 - SOFT_DELETE_RETENTION_MS,
+      errorCode: "CLEANUP_FAILED",
+      causeCode: "NETWORK_CONNECTION_LOST",
+      durationMs: expect.any(Number),
+    });
+    expect(JSON.stringify(log.error.mock.calls)).not.toMatch(
+      /private|secret|parameters/
+    );
+  });
 });

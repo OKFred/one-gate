@@ -55,11 +55,16 @@ function main() {
   // 启动定时任务驱动 (每分钟扫描并执行一次)
   cron.schedule("* * * * *", async () => {
     try {
-      if (database) await database.run(runRetentionMaintenance);
+      if (database)
+        await database.run(() =>
+          runScheduledMaintenance([
+            { name: "retention", run: runRetentionMaintenance },
+          ])
+        );
       else
         await runScheduledMaintenance([
-          runPendingJobs,
-          runRetentionMaintenance,
+          { name: "cron_jobs", run: runPendingJobs },
+          { name: "retention", run: runRetentionMaintenance },
         ]);
     } catch (err) {
       console.error("[Node Scheduler] 定时任务扫描失败:", err);

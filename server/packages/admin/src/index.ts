@@ -13,11 +13,11 @@ import voice from "./voice/index.js";
 import mobile from "./mobile/index.js";
 import type { App, AppBindings } from "@hodor/core/types/app";
 import { OpenAPIHono } from "@hono/zod-openapi";
-import { initAdminRegistry } from "./register.js";
+import { ensureAdminRegistry } from "./register.js";
 import type { AuthAppOptions } from "./system/auth/index.js";
 
 function createAdminApp(options: AuthAppOptions): App {
-  initAdminRegistry();
+  ensureAdminRegistry();
   const app = new OpenAPIHono<AppBindings>();
   app.route("/i18n", i18n());
   app.route("/mail", mail());

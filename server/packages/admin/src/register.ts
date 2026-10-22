@@ -1,4 +1,8 @@
-import { ServiceRegistry, setRegistry } from "./common/registry.js";
+import {
+  ServiceRegistry,
+  isAdminRegistryInitialized,
+  setRegistry,
+} from "./common/registry.js";
 import { utils as userUtils } from "./system/user/service.js";
 import { systemAccess } from "./system/access-metadata.js";
 import { utils as rolePermissionUtils } from "./system/role_permission/service.js";
@@ -218,4 +222,9 @@ export function initAdminRegistry() {
     })
   );
   setRegistry(reg);
+}
+
+/** Initialize services once; preserve an explicitly installed registry override. */
+export function ensureAdminRegistry(): void {
+  if (!isAdminRegistryInitialized()) initAdminRegistry();
 }

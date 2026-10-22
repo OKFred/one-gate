@@ -1,4 +1,5 @@
 import createApp from "./index.js";
+import { ensureAdminRegistry } from "@hodor/admin/register.js";
 import { setD1Binding } from "@hodor/core/db/index.js";
 import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
@@ -46,7 +47,7 @@ function postgresConfiguration(env: DatabaseBindings) {
   };
 }
 
-/** Initialize the application-wide service registry once per Worker isolate. */
+/** Construct HTTP routes only on the first fetch in this Worker isolate. */
 function getApp(): ReturnType<typeof createApp> {
   if (!app) {
     app = createApp({
@@ -195,9 +196,13 @@ export default {
     if (env.DATABASE_BACKEND === "postgresql") {
       setEnv(env);
       if (env.KV) setKVBinding(env.KV);
-      getApp();
       ctx.waitUntil(
-        withWorkerPostgres(postgresConfiguration(env), runRetentionMaintenance)
+        withWorkerPostgres(postgresConfiguration(env), async () => {
+          ensureAdminRegistry();
+          await runScheduledMaintenance([
+            { name: "retention", run: runRetentionMaintenance },
+          ]);
+        })
       );
       return;
     }
@@ -212,19 +217,19 @@ export default {
     // 2. 全局设置环境变量
     setEnv(env);
 
-    // 3. scheduled 事件可能先于 fetch 到达，需先初始化跨领域服务注册中心
-    getApp();
+    // 3. scheduled may arrive first; register services without building HTTP routes.
+    ensureAdminRegistry();
 
     // 4. 执行待处理的定时任务
     ctx.waitUntil(
       runScheduledMaintenance([
-        runPendingJobs,
-        timeoutExpiredDeviceTasks,
-        markTimedOutDevicesOffline,
-        cleanupExpiredDeviceEvents,
-        expireDeviceOpsSessions,
-        cleanupDeviceOpsAudits,
-        runRetentionMaintenance,
+        { name: "cron_jobs", run: runPendingJobs },
+        { name: "device_task_timeouts", run: timeoutExpiredDeviceTasks },
+        { name: "device_offline", run: markTimedOutDevicesOffline },
+        { name: "device_event_cleanup", run: cleanupExpiredDeviceEvents },
+        { name: "device_ops_sessions", run: expireDeviceOpsSessions },
+        { name: "device_ops_audits", run: cleanupDeviceOpsAudits },
+        { name: "retention", run: runRetentionMaintenance },
       ])
     );
   },
