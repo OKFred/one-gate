@@ -18,7 +18,8 @@ import { OpenAPIHono } from "@hono/zod-openapi";
 import pathRegister from "../../utils/pathRegister.js";
 import { registerSchema } from "../../utils/schemaRegistry.js";
 import { authMiddleware } from "../auth";
-import { can } from "../auth/permission";
+import { can, assertPostgresAuthority } from "../auth/permission";
+import { withPostgresWriteCheck } from "../../db/postgresql/runtime";
 import { getTranslator } from "../../utils/i18n/index.js";
 import { isHodorAuthBypassed } from "../authenticationRoutePolicy/index.js";
 
@@ -129,9 +130,20 @@ function routeMaker({
       });
     }
     c.set("bodyObj", bodyObj);
-    const result = await (adapter as AdapterFn)(
-      service as Parameters<AdapterFn>[0]
-    )(c);
+    const invoke = () =>
+      (adapter as AdapterFn)(service as Parameters<AdapterFn>[0])(c);
+    const user = c.get("userObj");
+    const result = user
+      ? await withPostgresWriteCheck(
+          () =>
+            assertPostgresAuthority(
+              user,
+              permission ? permission.action : undefined,
+              nameSpace
+            ),
+          invoke
+        )
+      : await invoke();
     if (getEnv("NODE_ENV") !== "production") {
       const { valid: resValid, errors: resErrors } = validate(
         result,

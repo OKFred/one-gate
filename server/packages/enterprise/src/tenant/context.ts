@@ -4,12 +4,20 @@ import type { AuthPrincipal, UserObj } from "@hodor/core/types/app";
 import { registry } from "@hodor/admin/common/registry";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 import { TenantError } from "./errors";
+import {
+  getPostgresDb,
+  isPostgresBackend,
+  withPostgresTransaction,
+} from "@hodor/core/db/postgresql/runtime";
+import { postgresActiveOwnerExists, postgresTenantGuard } from "./context.pg";
 
 export type TenantCapability = "read" | "edit" | "manage";
 export interface TenantContext {
   readonly tenantId: number;
   readonly principal: AuthPrincipal;
   readonly capability: TenantCapability;
+  /** Fixed by the HTTP service, never accepted from client input. */
+  readonly permissionCode?: string;
 }
 
 /** A disabled/deleted global owner freezes ordinary tenant access until platform recovery. */
@@ -17,6 +25,8 @@ export function activeOwnerExists(
   tenantId: number | SQL,
   exceptUserId?: number
 ): SQL {
+  if (isPostgresBackend())
+    return postgresActiveOwnerExists(tenantId, exceptUserId);
   return sql`EXISTS (SELECT 1 FROM enterprise_tenant_member AS effective_owner
     WHERE effective_owner.tenant_id = ${tenantId} AND effective_owner.role = 'owner'
       AND effective_owner.is_enabled = 1
@@ -25,6 +35,7 @@ export function activeOwnerExists(
 }
 
 export function tenantGuard(context: TenantContext): SQL {
+  if (isPostgresBackend()) return postgresTenantGuard(context);
   const { tenantId, principal, capability } = context;
   const permission =
     capability === "read"
@@ -60,10 +71,26 @@ export function requireHuman(
 export async function getTenantContext(
   tenantId: number,
   user: UserObj,
-  capability: TenantCapability
+  capability: TenantCapability,
+  permissionCode?: string
 ): Promise<TenantContext> {
   const principal = requireHuman(user);
-  const context: TenantContext = { tenantId, principal, capability };
+  const context: TenantContext = {
+    tenantId,
+    principal,
+    capability,
+    permissionCode,
+  };
+  if (isPostgresBackend()) {
+    return withPostgresTransaction(async () => {
+      const rows = await getPostgresDb()
+        .select({ allowed: sql<number>`1` })
+        .from(sql`(SELECT 1) AS tenant_access_check`)
+        .where(postgresTenantGuard(context));
+      if (rows.length !== 1) throw new BusinessError(TenantError.NOT_VISIBLE);
+      return context;
+    });
+  }
   const [row] = await db.all<{ allowed: number }>(
     sql`SELECT 1 AS allowed WHERE ${tenantGuard(context)} LIMIT 1`
   );
@@ -73,7 +100,8 @@ export async function getTenantContext(
 
 export async function getMappingContext(
   tenantId: number,
-  user: UserObj
+  user: UserObj,
+  permissionCode?: string
 ): Promise<TenantContext> {
   if (
     !user.principal ||
@@ -81,12 +109,22 @@ export async function getMappingContext(
   )
     throw new BusinessError(TenantError.NOT_VISIBLE);
   if (user.principal.kind === "user")
-    return getTenantContext(tenantId, user, "read");
+    return getTenantContext(tenantId, user, "read", permissionCode);
   const context: TenantContext = {
     tenantId,
     principal: user.principal,
     capability: "read",
   };
+  if (isPostgresBackend()) {
+    return withPostgresTransaction(async () => {
+      const rows = await getPostgresDb()
+        .select({ allowed: sql<number>`1` })
+        .from(sql`(SELECT 1) AS mapping_access_check`)
+        .where(postgresTenantGuard(context));
+      if (rows.length !== 1) throw new BusinessError(TenantError.NOT_VISIBLE);
+      return context;
+    });
+  }
   const [row] = await db.all<{ allowed: number }>(
     sql`SELECT 1 AS allowed WHERE ${tenantGuard(context)} LIMIT 1`
   );

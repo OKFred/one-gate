@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
@@ -445,7 +447,8 @@ export class RoleRepository {
   async purge(
     id: number,
     expectedDeletedTimeUtc: number,
-    cutoff?: number
+    cutoff?: number,
+    _actorId?: number
   ): Promise<number | null> {
     const [, removed] = await db.batch([
       db
@@ -476,9 +479,129 @@ export class RoleRepository {
   }
 }
 
-export const roleRepository = new RoleRepository();
+const sqliteRepositoryImplementation = new RoleRepository();
+export const roleRepository = {
+  findPage: (
+    ...args: Parameters<RoleRepository["findPage"]>
+  ): ReturnType<RoleRepository["findPage"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.findPage(...args)
+      : sqliteRepositoryImplementation.findPage(...args),
+  findAll: (
+    ...args: Parameters<RoleRepository["findAll"]>
+  ): ReturnType<RoleRepository["findAll"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.findAll(...args)
+      : sqliteRepositoryImplementation.findAll(...args),
+  findById: (
+    ...args: Parameters<RoleRepository["findById"]>
+  ): ReturnType<RoleRepository["findById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.findById(...args)
+      : sqliteRepositoryImplementation.findById(...args),
+  findDeletedById: (
+    ...args: Parameters<RoleRepository["findDeletedById"]>
+  ): ReturnType<RoleRepository["findDeletedById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.findDeletedById(...args)
+      : sqliteRepositoryImplementation.findDeletedById(...args),
+  getRolesByIds: (
+    ...args: Parameters<RoleRepository["getRolesByIds"]>
+  ): ReturnType<RoleRepository["getRolesByIds"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.getRolesByIds(...args)
+      : sqliteRepositoryImplementation.getRolesByIds(...args),
+  getRoleDataScopes: (
+    ...args: Parameters<RoleRepository["getRoleDataScopes"]>
+  ): ReturnType<RoleRepository["getRoleDataScopes"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.getRoleDataScopes(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getRoleDataScopes(...args),
+  getAuthorizationRoles: (
+    ...args: Parameters<RoleRepository["getAuthorizationRoles"]>
+  ): ReturnType<RoleRepository["getAuthorizationRoles"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.getAuthorizationRoles(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getAuthorizationRoles(...args),
+  verifyRoleExists: (
+    ...args: Parameters<RoleRepository["verifyRoleExists"]>
+  ): ReturnType<RoleRepository["verifyRoleExists"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.verifyRoleExists(
+          ...args
+        )
+      : sqliteRepositoryImplementation.verifyRoleExists(...args),
+  updatePermissionCount: (
+    ...args: Parameters<RoleRepository["updatePermissionCount"]>
+  ): ReturnType<RoleRepository["updatePermissionCount"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.updatePermissionCount(
+          ...args
+        )
+      : sqliteRepositoryImplementation.updatePermissionCount(...args),
+  onInsert: (
+    ...args: Parameters<RoleRepository["onInsert"]>
+  ): ReturnType<RoleRepository["onInsert"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.onInsert(...args)
+      : sqliteRepositoryImplementation.onInsert(...args),
+  onUpdate: (
+    ...args: Parameters<RoleRepository["onUpdate"]>
+  ): ReturnType<RoleRepository["onUpdate"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.onUpdate(...args)
+      : sqliteRepositoryImplementation.onUpdate(...args),
+  onDelete: (
+    ...args: Parameters<RoleRepository["onDelete"]>
+  ): ReturnType<RoleRepository["onDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.onDelete(...args)
+      : sqliteRepositoryImplementation.onDelete(...args),
+  onDeleteWithUndo: (
+    ...args: Parameters<RoleRepository["onDeleteWithUndo"]>
+  ): ReturnType<RoleRepository["onDeleteWithUndo"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.onDeleteWithUndo(
+          ...args
+        )
+      : sqliteRepositoryImplementation.onDeleteWithUndo(...args),
+  findUndoState: (
+    ...args: Parameters<RoleRepository["findUndoState"]>
+  ): ReturnType<RoleRepository["findUndoState"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.findUndoState(...args)
+      : sqliteRepositoryImplementation.findUndoState(...args),
+  undoDelete: (
+    ...args: Parameters<RoleRepository["undoDelete"]>
+  ): ReturnType<RoleRepository["undoDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.undoDelete(...args)
+      : sqliteRepositoryImplementation.undoDelete(...args),
+  restore: (
+    ...args: Parameters<RoleRepository["restore"]>
+  ): ReturnType<RoleRepository["restore"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.restore(...args)
+      : sqliteRepositoryImplementation.restore(...args),
+  listDeleted: (
+    ...args: Parameters<RoleRepository["listDeleted"]>
+  ): ReturnType<RoleRepository["listDeleted"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.listDeleted(...args)
+      : sqliteRepositoryImplementation.listDeleted(...args),
+  purge: (
+    ...args: Parameters<RoleRepository["purge"]>
+  ): ReturnType<RoleRepository["purge"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.roleRepository.purge(...args)
+      : sqliteRepositoryImplementation.purge(...args),
+};
 
-export async function purgeExpiredRoles({
+async function purgeExpiredRolesSqlite({
   now,
   batchSize,
 }: SoftDeleteCleanupInput) {
@@ -553,4 +676,12 @@ export async function purgeExpiredRoles({
     remainingExpired: remaining?.remainingExpired ?? 0,
     oldestExpiredTimeUtc: remaining?.oldestExpiredTimeUtc ?? null,
   };
+}
+
+export function purgeExpiredRoles(
+  input: SoftDeleteCleanupInput
+): ReturnType<typeof purgeExpiredRolesSqlite> {
+  return isPostgresBackend()
+    ? postgresRepositoryImplementation.purgeExpiredRoles(input)
+    : purgeExpiredRolesSqlite(input);
 }

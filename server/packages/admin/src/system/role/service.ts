@@ -510,7 +510,12 @@ export async function purgeDeletedRole(
   requireActor(actorId);
   preventSuperAdminDelete(id);
   await requireDeletedState(id, expectedDeletedTimeUtc);
-  const purged = await roleRepository.purge(id, expectedDeletedTimeUtc);
+  const purged = await roleRepository.purge(
+    id,
+    expectedDeletedTimeUtc,
+    undefined,
+    actorId
+  );
   if (purged === null) {
     await requireDeletedState(id, expectedDeletedTimeUtc);
     throw new BusinessError(RoleDeletionError.HAS_REFERENCES);

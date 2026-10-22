@@ -28,7 +28,13 @@
     "sync:business": "tsx scripts/sync-business-keys.ts",
     "sync:schemas": "tsx -r dotenv/config ./scripts/sync-schemas.ts",
     "format": "prettier --write .",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "db:generate:postgresql": "tsx scripts/postgresql/generate.ts",
+    "db:migrate:postgresql": "tsx scripts/postgresql/migrate.ts",
+    "db:seed:postgresql": "tsx scripts/postgresql/seed.ts",
+    "db:preflight:assets:worker": "pnpm --filter @hodor/server db:preflight:assets:worker",
+    "worker:dev:postgresql": "pnpm --filter @hodor/server worker:dev:postgresql",
+    "worker:types:postgresql": "pnpm --filter @hodor/server worker:types:postgresql"
   },
   "lint-staged": {
     "*.{js,ts,json,md}": [
@@ -58,6 +64,7 @@
     "node-cron": "^4.2.1",
     "nodemailer": "^7.0.3",
     "openapi3-ts": "^4.5.0",
+    "pg": "^8.23.1",
     "pino": "^10.3.1",
     "pino-roll": "^4.0.0",
     "worker-mailer": "^1.2.1",
@@ -75,6 +82,7 @@
     "@types/node": "^22.13.10",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
+    "@types/pg": "^8.23.1",
     "@types/xmldom": "^0.1.34",
     "@typescript-eslint/eslint-plugin": "^8.27.0",
     "@typescript/native-preview": "7.0.0-dev.20250623.1",

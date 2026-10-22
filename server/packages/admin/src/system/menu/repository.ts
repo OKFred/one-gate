@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { menuTable, type MenuPOLike } from "./model";
 import {
@@ -225,4 +227,68 @@ export class MenuRepository {
   }
 }
 
-export const menuRepository = new MenuRepository();
+const sqliteRepositoryImplementation = new MenuRepository();
+export const menuRepository = {
+  findPage: (
+    ...args: Parameters<MenuRepository["findPage"]>
+  ): ReturnType<MenuRepository["findPage"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.findPage(...args)
+      : sqliteRepositoryImplementation.findPage(...args),
+  findAll: (
+    ...args: Parameters<MenuRepository["findAll"]>
+  ): ReturnType<MenuRepository["findAll"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.findAll(...args)
+      : sqliteRepositoryImplementation.findAll(...args),
+  findById: (
+    ...args: Parameters<MenuRepository["findById"]>
+  ): ReturnType<MenuRepository["findById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.findById(...args)
+      : sqliteRepositoryImplementation.findById(...args),
+  getTreeMenus: (
+    ...args: Parameters<MenuRepository["getTreeMenus"]>
+  ): ReturnType<MenuRepository["getTreeMenus"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.getTreeMenus(...args)
+      : sqliteRepositoryImplementation.getTreeMenus(...args),
+  getChildMenus: (
+    ...args: Parameters<MenuRepository["getChildMenus"]>
+  ): ReturnType<MenuRepository["getChildMenus"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.getChildMenus(...args)
+      : sqliteRepositoryImplementation.getChildMenus(...args),
+  getAllMenus: (
+    ...args: Parameters<MenuRepository["getAllMenus"]>
+  ): ReturnType<MenuRepository["getAllMenus"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.getAllMenus(...args)
+      : sqliteRepositoryImplementation.getAllMenus(...args),
+  countEnabledChildMenus: (
+    ...args: Parameters<MenuRepository["countEnabledChildMenus"]>
+  ): ReturnType<MenuRepository["countEnabledChildMenus"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.countEnabledChildMenus(
+          ...args
+        )
+      : sqliteRepositoryImplementation.countEnabledChildMenus(...args),
+  onInsert: (
+    ...args: Parameters<MenuRepository["onInsert"]>
+  ): ReturnType<MenuRepository["onInsert"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.onInsert(...args)
+      : sqliteRepositoryImplementation.onInsert(...args),
+  onUpdate: (
+    ...args: Parameters<MenuRepository["onUpdate"]>
+  ): ReturnType<MenuRepository["onUpdate"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.onUpdate(...args)
+      : sqliteRepositoryImplementation.onUpdate(...args),
+  onDelete: (
+    ...args: Parameters<MenuRepository["onDelete"]>
+  ): ReturnType<MenuRepository["onDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.menuRepository.onDelete(...args)
+      : sqliteRepositoryImplementation.onDelete(...args),
+};

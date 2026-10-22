@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { languageTable, type LanguagePOLike } from "./model";
 import { eq, and, or, like, asc, desc, count, ne, SQL } from "drizzle-orm";
@@ -35,6 +37,9 @@ export async function findPageAll(params: {
   keyword?: string;
   isEnabled?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPageAll(params);
+
   const { orderBy = "sortOrder", descend = false } = params;
   const orderField = languageTable[orderBy] || languageTable.sortOrder;
   const maxLimit = 100_000;
@@ -61,6 +66,9 @@ export async function findPage(params: {
   keyword?: string;
   isEnabled?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPage(params);
+
   const { pageNo, pageSize, orderBy = "sortOrder", descend = false } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = languageTable[orderBy] || languageTable.sortOrder;
@@ -87,6 +95,8 @@ export async function findPage(params: {
 }
 
 export async function findById(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.findById(id);
+
   const rows = await db
     .select()
     .from(languageTable)
@@ -100,6 +110,9 @@ export async function findByLangCode(params: {
   isEnabled?: boolean;
   excludeId?: number;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByLangCode(params);
+
   const { langCode, isEnabled, excludeId } = params;
   const conditions = [eq(languageTable.langCode, langCode)];
 
@@ -119,6 +132,9 @@ export async function findByLangCode(params: {
 }
 
 export async function onInsert(data: InferInsertModel<typeof languageTable>) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onInsert(data);
+
   const result = await db
     .insert(languageTable)
     .values(data)
@@ -130,6 +146,9 @@ export async function onUpdate(
   id: number,
   data: Partial<Omit<InferInsertModel<typeof languageTable>, "id">>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onUpdate(id, data);
+
   const result = await db
     .update(languageTable)
     .set(data)
@@ -139,6 +158,8 @@ export async function onUpdate(
 }
 
 export async function onDelete(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.onDelete(id);
+
   const result = await db
     .delete(languageTable)
     .where(eq(languageTable.id, id))

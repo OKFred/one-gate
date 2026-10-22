@@ -29,7 +29,7 @@ afterEach(() => {
   for (const client of clients.splice(0)) client.close();
 });
 
-describe("legacy D1 schema migrations", () => {
+describe("archived SQLite schema migrations", () => {
   it("upgrades the legacy mobile device table without losing existing rows", async () => {
     const client = createMemoryClient();
     await client.execute(`

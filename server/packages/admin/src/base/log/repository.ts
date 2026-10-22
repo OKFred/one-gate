@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import {
   baseSysLogTable,
@@ -38,6 +40,9 @@ function isValidJsonKey(key: string): boolean {
 export async function insertSysLog(
   data: InferInsertModel<typeof baseSysLogTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.insertSysLog(data);
+
   const result = await db
     .insert(baseSysLogTable)
     .values(data)
@@ -48,6 +53,9 @@ export async function insertSysLog(
 export async function insertHttpRequestLog(
   data: InferInsertModel<typeof baseHttpRequestLogTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.insertHttpRequestLog(data);
+
   const result = await db
     .insert(baseHttpRequestLogTable)
     .values(data)
@@ -67,6 +75,9 @@ export async function findHttpRequestLogPage(params: {
   orderBy?: keyof typeof baseHttpRequestLogTable.$inferSelect;
   descend?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findHttpRequestLogPage(params);
+
   const {
     namespace,
     method,
@@ -91,7 +102,9 @@ export async function findHttpRequestLogPage(params: {
     conditions.push(eq(baseHttpRequestLogTable.method, method.toUpperCase()));
   }
   if (protocol) {
-    conditions.push(eq(baseHttpRequestLogTable.protocol, protocol.toLowerCase()));
+    conditions.push(
+      eq(baseHttpRequestLogTable.protocol, protocol.toLowerCase())
+    );
   }
   if (responseStatus) {
     conditions.push(eq(baseHttpRequestLogTable.responseStatus, responseStatus));
@@ -132,6 +145,9 @@ export async function findSysLogPage(params: {
   descend?: boolean;
   filters?: Record<string, unknown>;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findSysLogPage(params);
+
   const {
     namespace,
     creatorId,
@@ -194,6 +210,9 @@ export async function findSysLogPage(params: {
 export async function insertAuditLog(
   data: InferInsertModel<typeof baseAuditLogTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.insertAuditLog(data);
+
   const result = await db
     .insert(baseAuditLogTable)
     .values(data)
@@ -208,6 +227,9 @@ export async function findAuditLogPage(params: {
   orderBy?: keyof AuditLogPOLike;
   descend?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findAuditLogPage(params);
+
   const {
     namespace,
     pageNo,
@@ -250,6 +272,9 @@ export async function findAuditLogPage(params: {
 export async function insertBizLog(
   data: InferInsertModel<typeof baseBizLogTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.insertBizLog(data);
+
   const result = await db
     .insert(baseBizLogTable)
     .values(data)
@@ -269,6 +294,9 @@ export async function findBizLogPage(params: {
   startTime?: number;
   endTime?: number;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findBizLogPage(params);
+
   const {
     namespace,
     pageNo,
@@ -353,6 +381,9 @@ export async function findBizLogPage(params: {
 
 // Utilities for standard ID fetches
 export async function findSysLogById(id: number) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findSysLogById(id);
+
   const rows = await db
     .select()
     .from(baseSysLogTable)
@@ -362,6 +393,9 @@ export async function findSysLogById(id: number) {
 }
 
 export async function findAuditLogById(id: number) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findAuditLogById(id);
+
   const rows = await db
     .select()
     .from(baseAuditLogTable)
@@ -371,6 +405,9 @@ export async function findAuditLogById(id: number) {
 }
 
 export async function findBizLogById(id: number) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findBizLogById(id);
+
   const rows = await db
     .select()
     .from(baseBizLogTable)
@@ -386,6 +423,9 @@ export async function findTimelineChunkSys(params: {
   limit: number;
   namespaces?: string[];
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findTimelineChunkSys(params);
+
   const conditions: SQL[] = [];
   if (params.namespaces && params.namespaces.length > 0) {
     conditions.push(inArray(baseSysLogTable.namespace, params.namespaces));
@@ -407,6 +447,9 @@ export async function findTimelineChunkAudit(params: {
   limit: number;
   namespaces?: string[];
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findTimelineChunkAudit(params);
+
   const conditions: SQL[] = [];
   if (params.namespaces && params.namespaces.length > 0) {
     conditions.push(inArray(baseAuditLogTable.namespace, params.namespaces));
@@ -428,6 +471,9 @@ export async function findTimelineChunkBiz(params: {
   limit: number;
   namespaces?: string[];
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findTimelineChunkBiz(params);
+
   const conditions: SQL[] = [];
   if (params.namespaces && params.namespaces.length > 0) {
     conditions.push(inArray(baseBizLogTable.namespace, params.namespaces));

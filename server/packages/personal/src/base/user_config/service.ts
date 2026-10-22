@@ -31,6 +31,10 @@ import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import * as baseUserConfigRepository from "./repository";
 import { kv } from "@hodor/core/middleware/cache/index";
+import {
+  isPostgresBackend,
+  withPostgresTransaction,
+} from "@hodor/core/db/postgresql/runtime";
 
 import { registry, type IAdminServices } from "@hodor/admin/common/registry";
 
@@ -149,7 +153,7 @@ const addReq = {
 
 const addRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
 
-export async function onAdd(
+async function addConfiguration(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
@@ -184,8 +188,18 @@ export async function onAdd(
     userObj
   );
 
-  await kv.delete(`user_config:${userId}:${obj.namespace}`);
+  return insertedId;
+}
 
+export async function onAdd(
+  obj: FromSchema<typeof addReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof addRes> | null> {
+  const operation = () => addConfiguration(obj, userObj);
+  const insertedId = isPostgresBackend()
+    ? await withPostgresTransaction(operation, { write: true })
+    : await operation();
+  await kv.delete(`user_config:${userObj.userId}:${obj.namespace}`);
   return insertedId;
 }
 
@@ -208,10 +222,10 @@ const updateReq = {
 
 const updateRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
 
-export async function onUpdate(
+async function updateConfiguration(
   obj: FromSchema<typeof updateReq>,
   userObj: UserObj
-): Promise<FromSchema<typeof updateRes> | null> {
+): Promise<string> {
   const userId = userObj.userId;
   if (!userId) throw new Error("Missing userId");
 
@@ -254,9 +268,18 @@ export async function onUpdate(
     userObj
   );
 
-  const ns = obj.namespace ?? dbObj.namespace;
-  await kv.delete(`user_config:${userId}:${ns}`);
+  return obj.namespace ?? dbObj.namespace;
+}
 
+export async function onUpdate(
+  obj: FromSchema<typeof updateReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof updateRes> | null> {
+  const operation = () => updateConfiguration(obj, userObj);
+  const namespace = isPostgresBackend()
+    ? await withPostgresTransaction(operation, { write: true })
+    : await operation();
+  await kv.delete(`user_config:${userObj.userId}:${namespace}`);
   return obj.id;
 }
 

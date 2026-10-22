@@ -1,0 +1,48 @@
+{
+  "$schema": "https://cdn.jsdelivr.net/npm/wrangler/config-schema.json",
+  "name": "one-gate-postgresql",
+  "main": "src/worker.postgresql.ts",
+  "compatibility_date": "2026-03-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "logs": { "enabled": true, "invocation_logs": true } },
+  "triggers": { "crons": ["* * * * *"] },
+  "alias": {
+    "@hodor/core": "../../packages/core/src",
+    "@hodor/admin": "../../packages/admin/src",
+    "@hodor/enterprise": "../../packages/enterprise/src",
+    "@hodor/personal": "../../packages/personal/src",
+  },
+  "vars": {
+    "NODE_ENV": "production",
+    "BASE_API_PATH": "/api/v1",
+    "LOCALE": "en-US",
+    "VERSION": "local-development",
+    "DATABASE_BACKEND": "postgresql",
+    "PG_SCHEMA": "one_gate",
+  },
+  "secrets": {
+    "required": [
+      "HODOR_AUTH_MASTER_KEY",
+      "JWT_SECRET",
+      "HODOR_TOTP_GATE_SECRET",
+      "HODOR_ALLOWED_WEB_ORIGINS",
+    ],
+  },
+  // Create a cache-disabled Hyperdrive configuration; point its origin at the direct database endpoint.
+  "hyperdrive": [
+    { "binding": "HYPERDRIVE", "id": "00000000000000000000000000000000" },
+  ],
+  "kv_namespaces": [
+    { "binding": "KV", "id": "00000000000000000000000000000000" },
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "TOTP_GATE_COORDINATOR", "class_name": "TotpGateCoordinator" },
+    ],
+  },
+  "migrations": [
+    { "tag": "totp-gate-v1", "new_sqlite_classes": ["TotpGateCoordinator"] },
+  ],
+}

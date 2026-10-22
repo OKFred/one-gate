@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { getCurrentTimestampUtcSql } from "@hodor/core/utils/timestamp";
 import {
@@ -438,7 +440,8 @@ export class DepartmentRepository {
 
   async purge(
     id: number,
-    expectedDeletedTimeUtc: number
+    expectedDeletedTimeUtc: number,
+    _actorId?: number
   ): Promise<number | null> {
     const rows = await db
       .delete(departmentTable)
@@ -455,9 +458,123 @@ export class DepartmentRepository {
   }
 }
 
-export const departmentRepository = new DepartmentRepository();
+const sqliteRepositoryImplementation = new DepartmentRepository();
+export const departmentRepository = {
+  findPage: (
+    ...args: Parameters<DepartmentRepository["findPage"]>
+  ): ReturnType<DepartmentRepository["findPage"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.findPage(...args)
+      : sqliteRepositoryImplementation.findPage(...args),
+  findAll: (
+    ...args: Parameters<DepartmentRepository["findAll"]>
+  ): ReturnType<DepartmentRepository["findAll"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.findAll(...args)
+      : sqliteRepositoryImplementation.findAll(...args),
+  findById: (
+    ...args: Parameters<DepartmentRepository["findById"]>
+  ): ReturnType<DepartmentRepository["findById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.findById(...args)
+      : sqliteRepositoryImplementation.findById(...args),
+  findDeletedById: (
+    ...args: Parameters<DepartmentRepository["findDeletedById"]>
+  ): ReturnType<DepartmentRepository["findDeletedById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.findDeletedById(
+          ...args
+        )
+      : sqliteRepositoryImplementation.findDeletedById(...args),
+  getDepartmentNameById: (
+    ...args: Parameters<DepartmentRepository["getDepartmentNameById"]>
+  ): ReturnType<DepartmentRepository["getDepartmentNameById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.getDepartmentNameById(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getDepartmentNameById(...args),
+  getAllDepartments: (
+    ...args: Parameters<DepartmentRepository["getAllDepartments"]>
+  ): ReturnType<DepartmentRepository["getAllDepartments"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.getAllDepartments(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getAllDepartments(...args),
+  getTreeData: (
+    ...args: Parameters<DepartmentRepository["getTreeData"]>
+  ): ReturnType<DepartmentRepository["getTreeData"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.getTreeData(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getTreeData(...args),
+  onInsert: (
+    ...args: Parameters<DepartmentRepository["onInsert"]>
+  ): ReturnType<DepartmentRepository["onInsert"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.onInsert(...args)
+      : sqliteRepositoryImplementation.onInsert(...args),
+  onUpdate: (
+    ...args: Parameters<DepartmentRepository["onUpdate"]>
+  ): ReturnType<DepartmentRepository["onUpdate"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.onUpdate(...args)
+      : sqliteRepositoryImplementation.onUpdate(...args),
+  onDelete: (
+    ...args: Parameters<DepartmentRepository["onDelete"]>
+  ): ReturnType<DepartmentRepository["onDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.onDelete(...args)
+      : sqliteRepositoryImplementation.onDelete(...args),
+  onDeleteWithUndo: (
+    ...args: Parameters<DepartmentRepository["onDeleteWithUndo"]>
+  ): ReturnType<DepartmentRepository["onDeleteWithUndo"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.onDeleteWithUndo(
+          ...args
+        )
+      : sqliteRepositoryImplementation.onDeleteWithUndo(...args),
+  findUndoState: (
+    ...args: Parameters<DepartmentRepository["findUndoState"]>
+  ): ReturnType<DepartmentRepository["findUndoState"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.findUndoState(
+          ...args
+        )
+      : sqliteRepositoryImplementation.findUndoState(...args),
+  undoDelete: (
+    ...args: Parameters<DepartmentRepository["undoDelete"]>
+  ): ReturnType<DepartmentRepository["undoDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.undoDelete(
+          ...args
+        )
+      : sqliteRepositoryImplementation.undoDelete(...args),
+  listDeleted: (
+    ...args: Parameters<DepartmentRepository["listDeleted"]>
+  ): ReturnType<DepartmentRepository["listDeleted"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.listDeleted(
+          ...args
+        )
+      : sqliteRepositoryImplementation.listDeleted(...args),
+  restore: (
+    ...args: Parameters<DepartmentRepository["restore"]>
+  ): ReturnType<DepartmentRepository["restore"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.restore(...args)
+      : sqliteRepositoryImplementation.restore(...args),
+  purge: (
+    ...args: Parameters<DepartmentRepository["purge"]>
+  ): ReturnType<DepartmentRepository["purge"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.departmentRepository.purge(...args)
+      : sqliteRepositoryImplementation.purge(...args),
+};
 
-export async function purgeExpiredDepartments({
+async function purgeExpiredDepartmentsSqlite({
   now,
   batchSize,
 }: {
@@ -501,4 +618,12 @@ export async function purgeExpiredDepartments({
     remainingExpired: remaining[0]?.remainingExpired ?? 0,
     oldestExpiredTimeUtc: remaining[0]?.oldestExpiredTimeUtc ?? null,
   };
+}
+
+export function purgeExpiredDepartments(
+  input: Parameters<typeof purgeExpiredDepartmentsSqlite>[0]
+): ReturnType<typeof purgeExpiredDepartmentsSqlite> {
+  return isPostgresBackend()
+    ? postgresRepositoryImplementation.purgeExpiredDepartments(input)
+    : purgeExpiredDepartmentsSqlite(input);
 }

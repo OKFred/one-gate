@@ -1,9 +1,16 @@
 import { sql, type SQL } from "drizzle-orm";
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import {
+  postgresActiveDepartmentReference,
+  postgresActiveDepartmentIds,
+  postgresDepartmentHasNoReferences,
+} from "./reference-guards.pg";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
 import { DepartmentDeletionError } from "./errors";
 
 /** Kept inside the mutating SQL so a concurrent deletion cannot win after validation. */
 export function activeDepartmentReference(id: number | null): SQL {
+  if (isPostgresBackend()) return postgresActiveDepartmentReference(id);
   return sql`(${id} IS NULL OR EXISTS (SELECT 1 FROM system_department AS referenced_department WHERE referenced_department.id = ${id} AND referenced_department.is_deleted = 0))`;
 }
 
@@ -30,6 +37,7 @@ export function normalizeDepartmentIds(
 }
 
 export function activeDepartmentIds(ids: string | null): SQL {
+  if (isPostgresBackend()) return postgresActiveDepartmentIds(ids);
   return sql`NOT EXISTS (SELECT 1 FROM json_each(${ids ?? "[]"}) AS requested_department WHERE NOT EXISTS (SELECT 1 FROM system_department AS referenced_department WHERE referenced_department.id = requested_department.value AND referenced_department.is_deleted = 0))`;
 }
 
@@ -38,6 +46,8 @@ export function departmentHasNoReferences(
   target: SQL,
   includeDeletedChildren: boolean
 ): SQL {
+  if (isPostgresBackend())
+    return postgresDepartmentHasNoReferences(target, includeDeletedChildren);
   const childState = includeDeletedChildren
     ? sql`1 = 1`
     : sql`child.is_deleted = 0`;

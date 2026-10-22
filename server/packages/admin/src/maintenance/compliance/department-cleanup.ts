@@ -1,4 +1,6 @@
 import db from "@hodor/core/db/index";
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import { purgeExpiredDepartmentArchives as purgePostgresArchives } from "./department-cleanup.pg";
 import {
   SOFT_DELETE_RETENTION_MS,
   SOFT_DELETE_BATCH_SIZE,
@@ -12,6 +14,7 @@ import { complianceArchiveTable as archive } from "./model";
 export async function purgeExpiredDepartmentArchives(
   input: SoftDeleteCleanupInput
 ): Promise<SoftDeleteCleanupResult> {
+  if (isPostgresBackend()) return purgePostgresArchives(input);
   const cutoff = input.now - SOFT_DELETE_RETENTION_MS;
   const batchSize = Math.max(
     1,

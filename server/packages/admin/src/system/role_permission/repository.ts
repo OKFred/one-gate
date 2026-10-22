@@ -17,6 +17,8 @@ import hasValue from "@hodor/core/utils/hasValue";
 import { activeRoleIds } from "../role/reference-guards";
 import { RoleDeletionError } from "../role/errors";
 import { BusinessError } from "@hodor/core/middleware/errorHandler/businessError";
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import { postgresRolePermissionRepository } from "./repository.pg";
 
 const activeOwner = sql`EXISTS (SELECT 1 FROM system_role AS association_owner WHERE association_owner.id = ${rolePermissionTable.roleId} AND association_owner.is_deleted = 0)`;
 
@@ -332,4 +334,66 @@ export class RolePermissionRepository {
   }
 }
 
-export const rolePermissionRepository = new RolePermissionRepository();
+const sqliteRolePermissionRepository = new RolePermissionRepository();
+export const rolePermissionRepository: RolePermissionRepository = {
+  findPage(params) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.findPage(params)
+      : sqliteRolePermissionRepository.findPage(params);
+  },
+  findAll(params) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.findAll(params)
+      : sqliteRolePermissionRepository.findAll(params);
+  },
+  findById(id) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.findById(id)
+      : sqliteRolePermissionRepository.findById(id);
+  },
+  getCurrentPermissionCount(roleId) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.getCurrentPermissionCount(roleId)
+      : sqliteRolePermissionRepository.getCurrentPermissionCount(roleId);
+  },
+  getPermissionsByRole(roleId) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.getPermissionsByRole(roleId)
+      : sqliteRolePermissionRepository.getPermissionsByRole(roleId);
+  },
+  getPermissionsByRoleIds(roleIds) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.getPermissionsByRoleIds(roleIds)
+      : sqliteRolePermissionRepository.getPermissionsByRoleIds(roleIds);
+  },
+  verifyRecordExists(id) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.verifyRecordExists(id)
+      : sqliteRolePermissionRepository.verifyRecordExists(id);
+  },
+  onInsert(data) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.onInsert(data)
+      : sqliteRolePermissionRepository.onInsert(data);
+  },
+  onBatchInsert(values) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.onBatchInsert(values)
+      : sqliteRolePermissionRepository.onBatchInsert(values);
+  },
+  onUpdate(id, data) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.onUpdate(id, data)
+      : sqliteRolePermissionRepository.onUpdate(id, data);
+  },
+  onDelete(id) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.onDelete(id)
+      : sqliteRolePermissionRepository.onDelete(id);
+  },
+  onBatchDelete(roleId, permissionIds) {
+    return isPostgresBackend()
+      ? postgresRolePermissionRepository.onBatchDelete(roleId, permissionIds)
+      : sqliteRolePermissionRepository.onBatchDelete(roleId, permissionIds);
+  },
+};

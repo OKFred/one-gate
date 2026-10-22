@@ -8,7 +8,11 @@ import db from "@hodor/core/db/index";
  * @param tableName 表名称，用于日志输出
  * @param sqlFileName 可选：SQL 文件名（不含扩展名），如果与 tableName 不同则需指定
  */
-export async function baseTableInit(tableName: string, sqlFileName?: string) {
+export async function baseTableInit(
+  tableName: string,
+  sqlFileName?: string,
+  options: { failOnError?: boolean } = {}
+) {
   try {
     // 动态导入 node:fs, node:path, node:url 确保在非 Node.js 环境（如 Worker）不报错
     const fs = await import("node:fs");
@@ -42,6 +46,8 @@ export async function baseTableInit(tableName: string, sqlFileName?: string) {
     const sqlPath = findSqlFile(sqlDir, sqlFileName || tableName);
 
     if (!sqlPath || !fs.existsSync(sqlPath)) {
+      if (options.failOnError)
+        throw new Error(`DDL file missing for table: ${tableName}`);
       console.warn(`⚠️ 未发现 SQL 文件 for table: ${tableName}`);
       return;
     }
@@ -66,9 +72,15 @@ export async function baseTableInit(tableName: string, sqlFileName?: string) {
       await db.run(safeStatement);
     }
     console.log(`💾 表 ${tableName} 已初始化`);
-  } catch (err: any) {
+  } catch (err: unknown) {
+    if (options.failOnError) throw err;
     // 如果是因为模块找不到（通常在 Worker 运行时触发），则静默跳过
-    if (err.code === "ERR_MODULE_NOT_FOUND" || typeof process === "undefined") {
+    if (
+      (err instanceof Error &&
+        "code" in err &&
+        err.code === "ERR_MODULE_NOT_FOUND") ||
+      typeof process === "undefined"
+    ) {
       return;
     }
     console.error(`❌ 初始化表 ${tableName} 失败:`, err);

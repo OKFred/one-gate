@@ -696,7 +696,11 @@ export async function purgeDeletedDepartment(
   if (!Number.isSafeInteger(actorId) || actorId <= 0)
     throw new BusinessError(BusinessErrorCode.NOT_AUTHENTICATED);
   await requireDeletedVersion(id, expectedDeletedTimeUtc);
-  const purgedId = await departmentRepository.purge(id, expectedDeletedTimeUtc);
+  const purgedId = await departmentRepository.purge(
+    id,
+    expectedDeletedTimeUtc,
+    actorId
+  );
   if (purgedId === null) {
     await requireDeletedVersion(id, expectedDeletedTimeUtc);
     throw new BusinessError(DepartmentDeletionError.HAS_REFERENCES);

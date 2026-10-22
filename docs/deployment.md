@@ -10,6 +10,8 @@ environment variables, a persistent SQLite location and an HTTPS reverse proxy.
 Build with `pnpm run build` from `server/`; run the built server with the same
 private environment (`pnpm start` does not load `.dev.vars` automatically).
 Back up your database and use the documented migration for an existing schema.
+See [database migration commands](database-migrations.md) for the supported entry
+points and retained legacy SQL. Initialization does not replace migration.
 
 ## Cloudflare Workers
 

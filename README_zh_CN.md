@@ -4,6 +4,8 @@
 
 One Gate 是基于 Hono 和 React 的管理与业务应用工作区。后端支持 Node.js + SQLite
 和 Cloudflare Workers + D1；前端包含管理端、企业端、个人端与共享 UI 库。
+可选 PostgreSQL 后端已接入身份权限、企业资产和回收站闭环，支持 Node 与 Worker；
+范围与配置见 [PostgreSQL 部署说明](docs/postgresql.md)。
 
 现有功能包括用户、角色、部门、SSO、TOTP 二次门禁、定时任务及通用回收站。
 部门支持 30 天恢复窗口；删除人仍具备删除权限时，可在 15 秒内撤销自己的删除。
@@ -67,7 +69,9 @@ pnpm run db:generate:assets
 有意修改模型后，使用 `pnpm run db:generate:assets --write` 更新 7 份新库 DDL
 和资产结构检查文件。工具调用本仓库安装的 Drizzle Kit，不连接数据库，不改写
 已编号迁移。已有数据库仍需新增版本化迁移，生成新库 DDL 不等于数据库升级。
-资产专用命令不调用会清空迁移目录的旧全量生成流程。
+资产专用命令与全量生成器保持独立，两者都会保留迁移历史。SQLite、D1 和
+PostgreSQL 的升级入口见[数据库迁移说明](docs/database-migrations.md)；旧 Node
+无账本重放入口已停用。
 
 ## 验证与部署
 

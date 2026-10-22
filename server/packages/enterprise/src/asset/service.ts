@@ -139,7 +139,12 @@ const list = api(
   "read",
   async (params: AssetListInput, user) =>
     assetRepository.findPage(
-      await getTenantContext(params.tenantId, user, "read"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "read",
+        "enterprise.asset:read"
+      ),
       params
     )
 );
@@ -150,7 +155,12 @@ const get = api(
   "read",
   async (params: AssetGetInput, user) => {
     const item = await assetRepository.findById(
-      await getTenantContext(params.tenantId, user, "read"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "read",
+        "enterprise.asset:read"
+      ),
       params.id
     );
     if (!item) throw new BusinessError(AssetError.NOT_VISIBLE);
@@ -165,7 +175,12 @@ const add = api(
   async (params: AssetAddInput, user) => {
     requireText(params.name);
     return assetRepository.add(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:add"
+      ),
       params
     );
   }
@@ -178,7 +193,12 @@ const update = api(
   async (params: AssetUpdateInput, user) => {
     requireText(params.name);
     return assetRepository.update(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -191,7 +211,12 @@ const retire = api(
   async (params: AssetStateInput, user) => {
     requireText(params.reason);
     return assetRepository.retire(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -204,7 +229,12 @@ const activate = api(
   async (params: AssetStateInput, user) => {
     requireText(params.reason);
     return assetRepository.activate(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -216,7 +246,12 @@ const identifierList = api(
   "read",
   async (params: ChildListInput, user) =>
     assetRepository.identifiers(
-      await getTenantContext(params.tenantId, user, "read"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "read",
+        "enterprise.asset:read"
+      ),
       params
     )
 );
@@ -227,7 +262,12 @@ const identifierAdd = api(
   "edit",
   async (params: IdentifierAddInput, user) =>
     assetRepository.addIdentifier(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params,
       normalizeIdentifier(params)
     )
@@ -239,7 +279,12 @@ const identifierUpdate = api(
   "edit",
   async (params: IdentifierUpdateInput, user) =>
     assetRepository.updateIdentifier(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params,
       normalizeIdentifier(params)
     )
@@ -251,7 +296,12 @@ const assignmentList = api(
   "read",
   async (params: ChildListInput, user) =>
     assetRepository.assignments(
-      await getTenantContext(params.tenantId, user, "read"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "read",
+        "enterprise.asset:read"
+      ),
       params
     )
 );
@@ -264,7 +314,12 @@ const assign = api(
     requireText(params.reason);
     requireInterval(params);
     return assetRepository.assign(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -277,7 +332,12 @@ const closeAssignment = api(
   async (params: CloseRelationInput, user) => {
     requireText(params.reason);
     return assetRepository.closeAssignment(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -289,7 +349,12 @@ const bindingList = api(
   "read",
   async (params: ChildListInput, user) =>
     assetRepository.bindings(
-      await getTenantContext(params.tenantId, user, "read"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "read",
+        "enterprise.asset:read"
+      ),
       params
     )
 );
@@ -308,7 +373,12 @@ const bind = api(
     );
     requireInterval(params);
     return assetRepository.bind(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -321,7 +391,12 @@ const closeBinding = api(
   async (params: CloseRelationInput, user) => {
     requireText(params.reason);
     return assetRepository.closeBinding(
-      await getTenantContext(params.tenantId, user, "edit"),
+      await getTenantContext(
+        params.tenantId,
+        user,
+        "edit",
+        "enterprise.asset:edit"
+      ),
       params
     );
   }
@@ -340,7 +415,11 @@ export const mappingService = {
         params.metric
       );
       return assetRepository.resolve(
-        await getMappingContext(params.tenantId, user),
+        await getMappingContext(
+          params.tenantId,
+          user,
+          "enterprise.asset.mapping:read"
+        ),
         params
       );
     }
@@ -352,7 +431,11 @@ export const mappingService = {
     "read",
     async (params: MappingListInput, user) =>
       assetRepository.mappingPage(
-        await getMappingContext(params.tenantId, user),
+        await getMappingContext(
+          params.tenantId,
+          user,
+          "enterprise.asset.mapping:read"
+        ),
         params
       )
   ),
