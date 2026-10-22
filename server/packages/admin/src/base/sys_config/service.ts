@@ -31,6 +31,10 @@ import {
 import type { API } from "@hodor/core/middleware/encapsulation";
 import { preventEmpty } from "@hodor/core/middleware/auth/prevention";
 import * as baseSysConfigRepository from "./repository";
+import {
+  isPostgresBackend,
+  withPostgresTransaction,
+} from "@hodor/core/db/postgresql/runtime";
 
 import { registry, type IAdminServices } from "../../common/registry";
 
@@ -161,7 +165,7 @@ const addReq = {
 
 const addRes = { ...IndexVO["id"] } as const satisfies JSONSchema;
 
-export async function onAdd(
+async function addConfiguration(
   obj: FromSchema<typeof addReq>,
   userObj: UserObj
 ): Promise<FromSchema<typeof addRes> | null> {
@@ -179,8 +183,19 @@ export async function onAdd(
         : JSON.stringify(obj.configValue),
     creatorId,
   });
+  if (isPostgresBackend()) preventEmpty(insertedId);
 
   return insertedId;
+}
+
+export function onAdd(
+  obj: FromSchema<typeof addReq>,
+  userObj: UserObj
+): Promise<FromSchema<typeof addRes> | null> {
+  const operation = () => addConfiguration(obj, userObj);
+  return isPostgresBackend()
+    ? withPostgresTransaction(operation, { write: true })
+    : operation();
 }
 
 const addApi = {
@@ -200,7 +215,7 @@ const updateReq = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 
-export async function onUpdate(
+async function updateConfiguration(
   params: FromSchema<typeof updateReq>,
   userObj: UserObj
 ): Promise<number | null> {
@@ -230,6 +245,16 @@ export async function onUpdate(
   const updateRow = await baseSysConfigRepository.onUpdate(id, updateData);
   preventEmpty(updateRow);
   return updateRow.id;
+}
+
+export function onUpdate(
+  params: FromSchema<typeof updateReq>,
+  userObj: UserObj
+): Promise<number | null> {
+  const operation = () => updateConfiguration(params, userObj);
+  return isPostgresBackend()
+    ? withPostgresTransaction(operation, { write: true })
+    : operation();
 }
 
 const updateApi = {

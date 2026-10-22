@@ -25,3 +25,6 @@ pnpm dev
 Node 测试在 `apps/server/` 中执行
 `pnpm exec vitest run --config vitest.config.node.mts`，仅使用测试环境变量。
 公开 CI 提供完整可复现的测试配置。已有数据库应使用对应迁移流程；生产部署单独管理。
+
+参见[数据库迁移说明](../docs/database-migrations.md)。旧 `db:init node migration`
+无账本重放入口已停用；PostgreSQL 使用独立迁移流程。

@@ -30,4 +30,6 @@ values. Public CI documents the complete reproducible test configuration.
 Do not use a production database or real credentials for unit tests.
 
 Existing databases require their migration procedure, not fresh initialization.
+See [database migration commands](../docs/database-migrations.md); the untracked
+`db:init node migration` replay is retired. PostgreSQL has a separate migration path.
 Production deployment is managed separately from public CI.

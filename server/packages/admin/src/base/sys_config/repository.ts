@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import {
   eq,
   and,
@@ -31,6 +33,9 @@ export function pickConfig(
 export async function findByNamespace(
   namespace: string
 ): Promise<BaseSysConfigPOLike[]> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByNamespace(namespace);
+
   const conditions = [eq(baseSysConfigTable.namespace, namespace)];
   return db
     .select()
@@ -42,6 +47,12 @@ export async function findByNamespaceAndKey(
   namespace: string,
   key: string
 ): Promise<BaseSysConfigPOLike | undefined> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByNamespaceAndKey(
+      namespace,
+      key
+    );
+
   const conditions = [
     eq(baseSysConfigTable.namespace, namespace),
     eq(baseSysConfigTable.configKey, key),
@@ -57,6 +68,9 @@ export async function findByNamespaceAndKey(
 export async function findPrimaryByNamespace(
   namespace: string
 ): Promise<BaseSysConfigPOLike | undefined> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPrimaryByNamespace(namespace);
+
   const conditions = [
     eq(baseSysConfigTable.namespace, namespace),
     eq(baseSysConfigTable.isPrimary, true),
@@ -70,6 +84,9 @@ export async function findPrimaryByNamespace(
 }
 
 export async function findNamespaces(): Promise<{ namespace: string }[]> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findNamespaces();
+
   return db
     .selectDistinct({ namespace: baseSysConfigTable.namespace })
     .from(baseSysConfigTable)
@@ -90,6 +107,9 @@ export async function findPage(params: {
   pageSize: number;
   list: BaseSysConfigPOLike[];
 }> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPage(params);
+
   const { pageNo, pageSize, namespace, keyword, isEnabled, orderBy, descend } =
     params;
 
@@ -140,6 +160,8 @@ export async function findPage(params: {
 export async function findById(
   id: number
 ): Promise<BaseSysConfigPOLike | undefined> {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.findById(id);
+
   const result = await db
     .select()
     .from(baseSysConfigTable)
@@ -153,6 +175,13 @@ export async function findIdByCondition(
   configKey: string,
   excludeId?: number
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findIdByCondition(
+      namespace,
+      configKey,
+      excludeId
+    );
+
   const records = await db
     .select({ id: baseSysConfigTable.id })
     .from(baseSysConfigTable)
@@ -172,6 +201,9 @@ export async function findIdByCondition(
 export async function onInsert(
   data: InferInsertModel<typeof baseSysConfigTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onInsert(data);
+
   const result = await db
     .insert(baseSysConfigTable)
     .values(data)
@@ -183,6 +215,9 @@ export async function onUpdate(
   id: number,
   data: Partial<Omit<InferInsertModel<typeof baseSysConfigTable>, "id">>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onUpdate(id, data);
+
   const result = await db
     .update(baseSysConfigTable)
     .set(data)
@@ -192,6 +227,8 @@ export async function onUpdate(
 }
 
 export async function onDelete(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.onDelete(id);
+
   const result = await db
     .delete(baseSysConfigTable)
     .where(eq(baseSysConfigTable.id, id))
@@ -200,6 +237,12 @@ export async function onDelete(id: number) {
 }
 
 export async function resetPrimaryFlags(namespace: string, excludeId?: number) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.resetPrimaryFlags(
+      namespace,
+      excludeId
+    );
+
   const updateQuery = db.update(baseSysConfigTable).set({ isPrimary: false });
   const conditions: SQL<unknown>[] = [
     eq(baseSysConfigTable.namespace, namespace),
@@ -214,6 +257,9 @@ export async function insert(
   data: Omit<BaseSysConfigInsertPOLike, "creatorId" | "createTimeUtc">,
   userObj: UserObj
 ): Promise<number> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.insert(data, userObj);
+
   const insertData = {
     ...data,
     creatorId: userObj.id,
@@ -232,6 +278,9 @@ export async function updateById(
   data: Partial<Omit<BaseSysConfigInsertPOLike, "creatorId" | "createTimeUtc">>,
   userObj: UserObj
 ): Promise<number> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.updateById(id, data, userObj);
+
   const updateData = {
     ...data,
     updaterId: userObj.id,
@@ -247,6 +296,9 @@ export async function updateById(
 }
 
 export async function deleteByIds(ids: number[]): Promise<number> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.deleteByIds(ids);
+
   const result = await db
     .delete(baseSysConfigTable)
     .where(inArray(baseSysConfigTable.id, ids));

@@ -18,6 +18,51 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
+  postgresql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: one_gate_test
+          POSTGRES_USER: one_gate_test
+          POSTGRES_PASSWORD: disposable-ci-postgresql
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U one_gate_test -d one_gate_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      ONE_GATE_TEST_POSTGRES_URL: postgresql://one_gate_test:disposable-ci-postgresql@127.0.0.1:5432/one_gate_test
+      HODOR_AUTH_MASTER_KEY: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      JWT_SECRET: "test-secret-key-for-ci-runs"
+      HODOR_TOTP_GATE_SECRET: "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP"
+      HODOR_ALLOWED_WEB_ORIGINS: "http://localhost:5173"
+      BASE_API_PATH: "/api/v1"
+      LOCALE: "zh-CN"
+      NODE_ENV: "test"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Enable pnpm
+        run: corepack enable && corepack install --global pnpm@11.5.0
+      - name: Install backend
+        run: pnpm install --frozen-lockfile
+        working-directory: server
+      - name: Check PostgreSQL DDL against models
+        run: pnpm run db:generate:postgresql
+        working-directory: server
+      - name: Real PostgreSQL integration tests
+        run: pnpm exec vitest run --config vitest.config.postgresql.mts
+        working-directory: server/apps/server
+      - name: Bundle PostgreSQL Worker locally
+        run: pnpm exec wrangler deploy --config wrangler.postgresql.jsonc --dry-run --outdir .wrangler/ci-pg-bundle
+        working-directory: server/apps/server
+
   backend:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -58,7 +103,7 @@ jobs:
           HODOR_TOTP_GATE_SECRET=JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
           EOF
       - name: Node tests
-        run: pnpm exec vitest run --config vitest.config.node.mts
+        run: pnpm exec vitest run --config vitest.config.node.mts --maxWorkers=2
         working-directory: server/apps/server
       - name: Worker and D1 retention and enterprise isolation regression
         run: pnpm exec vitest run --config vitest.config.workers.mts recycle-bin soft-delete department-cleanup undo.integration tenant-isolation enterprise-http asset access-metadata disabled-role-auth --maxWorkers=1

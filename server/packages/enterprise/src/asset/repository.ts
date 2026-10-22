@@ -36,6 +36,8 @@ import {
   type MappingListInput,
 } from "./model";
 import { AssetError, guardedAssetWrite } from "./errors";
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import { postgresAssetRepository } from "./repository.pg";
 
 function human(ctx: TenantContext): number {
   if (ctx.principal.kind !== "user")
@@ -791,4 +793,113 @@ export class AssetRepository {
     return pages(list, total, pageNo, pageSize);
   }
 }
-export const assetRepository = new AssetRepository();
+const sqliteAssetRepository = new AssetRepository();
+type AssetRepositoryPort = Pick<
+  AssetRepository,
+  | "findPage"
+  | "findById"
+  | "add"
+  | "update"
+  | "retire"
+  | "activate"
+  | "identifiers"
+  | "addIdentifier"
+  | "updateIdentifier"
+  | "assignments"
+  | "assign"
+  | "closeAssignment"
+  | "bindings"
+  | "bind"
+  | "closeBinding"
+  | "resolve"
+  | "mappingPage"
+>;
+
+/** Each method selects a real backend implementation while retaining the shared contract. */
+export const assetRepository: AssetRepositoryPort = {
+  findPage(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.findPage(ctx, input)
+      : sqliteAssetRepository.findPage(ctx, input);
+  },
+  findById(ctx, id) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.findById(ctx, id)
+      : sqliteAssetRepository.findById(ctx, id);
+  },
+  add(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.add(ctx, input)
+      : sqliteAssetRepository.add(ctx, input);
+  },
+  update(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.update(ctx, input)
+      : sqliteAssetRepository.update(ctx, input);
+  },
+  retire(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.retire(ctx, input)
+      : sqliteAssetRepository.retire(ctx, input);
+  },
+  activate(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.activate(ctx, input)
+      : sqliteAssetRepository.activate(ctx, input);
+  },
+  identifiers(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.identifiers(ctx, input)
+      : sqliteAssetRepository.identifiers(ctx, input);
+  },
+  addIdentifier(ctx, input, normalizedValue) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.addIdentifier(ctx, input, normalizedValue)
+      : sqliteAssetRepository.addIdentifier(ctx, input, normalizedValue);
+  },
+  updateIdentifier(ctx, input, normalizedValue) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.updateIdentifier(ctx, input, normalizedValue)
+      : sqliteAssetRepository.updateIdentifier(ctx, input, normalizedValue);
+  },
+  assignments(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.assignments(ctx, input)
+      : sqliteAssetRepository.assignments(ctx, input);
+  },
+  assign(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.assign(ctx, input)
+      : sqliteAssetRepository.assign(ctx, input);
+  },
+  closeAssignment(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.closeAssignment(ctx, input)
+      : sqliteAssetRepository.closeAssignment(ctx, input);
+  },
+  bindings(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.bindings(ctx, input)
+      : sqliteAssetRepository.bindings(ctx, input);
+  },
+  bind(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.bind(ctx, input)
+      : sqliteAssetRepository.bind(ctx, input);
+  },
+  closeBinding(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.closeBinding(ctx, input)
+      : sqliteAssetRepository.closeBinding(ctx, input);
+  },
+  resolve(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.resolve(ctx, input)
+      : sqliteAssetRepository.resolve(ctx, input);
+  },
+  mappingPage(ctx, input) {
+    return isPostgresBackend()
+      ? postgresAssetRepository.mappingPage(ctx, input)
+      : sqliteAssetRepository.mappingPage(ctx, input);
+  },
+};

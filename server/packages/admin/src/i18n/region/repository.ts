@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { regionTable, type RegionPOLike } from "./model";
 import { eq, and, or, like, asc, desc, count, ne, type SQL } from "drizzle-orm";
@@ -35,6 +37,9 @@ export async function findPageAll(params: {
   keyword?: string;
   isEnabled?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPageAll(params);
+
   const { orderBy = "id", descend = true } = params;
   const orderField = regionTable[orderBy] || regionTable.id;
   const maxLimit = 100_000;
@@ -64,6 +69,9 @@ export async function findPage(params: {
   keyword?: string;
   isEnabled?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPage(params);
+
   const { pageNo, pageSize, orderBy = "id", descend = true } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = regionTable[orderBy] || regionTable.id;
@@ -90,6 +98,8 @@ export async function findPage(params: {
 }
 
 export async function findById(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.findById(id);
+
   const rows = await db
     .select()
     .from(regionTable)
@@ -104,6 +114,9 @@ export async function findByCodes(params: {
   numeric?: number | null;
   excludeId?: number;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByCodes(params);
+
   const { alpha2Code, alpha3Code, numeric, excludeId } = params;
   const matchConditions: SQL<unknown>[] = [];
 
@@ -135,6 +148,9 @@ export async function findByCodes(params: {
 }
 
 export async function onInsert(data: InferInsertModel<typeof regionTable>) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onInsert(data);
+
   const result = await db
     .insert(regionTable)
     .values(data)
@@ -146,6 +162,9 @@ export async function onUpdate(
   id: number,
   data: Partial<Omit<InferInsertModel<typeof regionTable>, "id">>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onUpdate(id, data);
+
   const result = await db
     .update(regionTable)
     .set(data)
@@ -155,6 +174,8 @@ export async function onUpdate(
 }
 
 export async function onDelete(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.onDelete(id);
+
   const result = await db
     .delete(regionTable)
     .where(eq(regionTable.id, id))

@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import {
   eq,
   and,
@@ -32,6 +34,9 @@ export async function findByNamespace(
   userId: number,
   namespace: string
 ): Promise<BaseUserConfigPOLike[]> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByNamespace(userId, namespace);
+
   const conditions: SQL<unknown>[] = [
     eq(baseUserConfigTable.userId, userId),
     eq(baseUserConfigTable.namespace, namespace),
@@ -47,6 +52,13 @@ export async function findByNamespaceAndKey(
   namespace: string,
   key: string
 ): Promise<BaseUserConfigPOLike | undefined> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByNamespaceAndKey(
+      userId,
+      namespace,
+      key
+    );
+
   const conditions: SQL<unknown>[] = [
     eq(baseUserConfigTable.userId, userId),
     eq(baseUserConfigTable.userId, userId),
@@ -65,6 +77,12 @@ export async function findPrimaryByNamespace(
   userId: number,
   namespace: string
 ): Promise<BaseUserConfigPOLike | undefined> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPrimaryByNamespace(
+      userId,
+      namespace
+    );
+
   const conditions: SQL<unknown>[] = [
     eq(baseUserConfigTable.userId, userId),
     eq(baseUserConfigTable.userId, userId),
@@ -82,6 +100,9 @@ export async function findPrimaryByNamespace(
 export async function findNamespaces(
   userId: number
 ): Promise<{ namespace: string }[]> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findNamespaces(userId);
+
   return db
     .selectDistinct({ namespace: baseUserConfigTable.namespace })
     .from(baseUserConfigTable)
@@ -104,6 +125,9 @@ export async function findPage(params: {
   pageSize: number;
   list: BaseUserConfigPOLike[];
 }> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPage(params);
+
   const {
     pageNo,
     pageSize,
@@ -163,6 +187,9 @@ export async function findById(
   userId: number,
   id: number
 ): Promise<BaseUserConfigPOLike | undefined> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findById(userId, id);
+
   const result = await db
     .select()
     .from(baseUserConfigTable)
@@ -182,6 +209,14 @@ export async function findIdByCondition(
   configKey: string,
   excludeId?: number
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findIdByCondition(
+      userId,
+      namespace,
+      configKey,
+      excludeId
+    );
+
   const records = await db
     .select({ id: baseUserConfigTable.id })
     .from(baseUserConfigTable)
@@ -202,6 +237,9 @@ export async function findIdByCondition(
 export async function onInsert(
   data: InferInsertModel<typeof baseUserConfigTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onInsert(data);
+
   const result = await db
     .insert(baseUserConfigTable)
     .values(data)
@@ -214,6 +252,9 @@ export async function onUpdate(
   id: number,
   data: Partial<Omit<InferInsertModel<typeof baseUserConfigTable>, "id">>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onUpdate(userId, id, data);
+
   const result = await db
     .update(baseUserConfigTable)
     .set(data)
@@ -228,6 +269,9 @@ export async function onUpdate(
 }
 
 export async function onDelete(userId: number, id: number) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onDelete(userId, id);
+
   const result = await db
     .delete(baseUserConfigTable)
     .where(
@@ -245,6 +289,13 @@ export async function resetPrimaryFlags(
   namespace: string,
   excludeId?: number
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.resetPrimaryFlags(
+      userId,
+      namespace,
+      excludeId
+    );
+
   const updateQuery = db.update(baseUserConfigTable).set({ isPrimary: false });
   const conditions: SQL<unknown>[] = [
     eq(baseUserConfigTable.userId, userId),
@@ -264,6 +315,9 @@ export async function insert(
   >,
   userObj: UserObj
 ): Promise<number> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.insert(userId, data, userObj);
+
   const insertData = {
     userId,
     ...data,
@@ -286,6 +340,14 @@ export async function updateById(
   >,
   userObj: UserObj
 ): Promise<number> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.updateById(
+      userId,
+      id,
+      data,
+      userObj
+    );
+
   const updateData = {
     ...data,
     updaterId: userObj.id,
@@ -309,6 +371,9 @@ export async function deleteByIds(
   userId: number,
   ids: number[]
 ): Promise<number> {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.deleteByIds(userId, ids);
+
   const result = await db
     .delete(baseUserConfigTable)
     .where(

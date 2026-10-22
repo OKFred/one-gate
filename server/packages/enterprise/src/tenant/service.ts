@@ -66,11 +66,21 @@ async function onUpdate(input: TenantUpdateInput, user: UserObj) {
 async function onMemberList(input: TenantChildrenListInput, user: UserObj) {
   return tenantRepository.members(
     input,
-    await getTenantContext(input.tenantId, user, "manage")
+    await getTenantContext(
+      input.tenantId,
+      user,
+      "manage",
+      "enterprise.tenant:read"
+    )
   );
 }
 async function onMemberSet(input: TenantMemberSetInput, user: UserObj) {
-  const context = await getTenantContext(input.tenantId, user, "manage");
+  const context = await getTenantContext(
+    input.tenantId,
+    user,
+    "manage",
+    "enterprise.tenant:edit"
+  );
   if (input.isEnabled) {
     const target = await registry.system.access.getUserMetadata(input.userId);
     if (!target?.isEnabled)
@@ -79,7 +89,12 @@ async function onMemberSet(input: TenantMemberSetInput, user: UserObj) {
   return tenantRepository.memberSet(input, context);
 }
 async function onTransferOwner(input: TenantOwnerTransferInput, user: UserObj) {
-  const context = await getTenantContext(input.tenantId, user, "manage");
+  const context = await getTenantContext(
+    input.tenantId,
+    user,
+    "manage",
+    "enterprise.tenant:edit"
+  );
   return tenantRepository.transferOwner(input, context);
 }
 async function onRecoverOwner(input: TenantOwnerRecoverInput, user: UserObj) {
@@ -107,11 +122,21 @@ async function onRecoverOwner(input: TenantOwnerRecoverInput, user: UserObj) {
 async function onTokenGrantList(input: TenantChildrenListInput, user: UserObj) {
   return tenantRepository.tokenGrants(
     input,
-    await getTenantContext(input.tenantId, user, "manage")
+    await getTenantContext(
+      input.tenantId,
+      user,
+      "manage",
+      "enterprise.tenant:read"
+    )
   );
 }
 async function onTokenGrantSet(input: TenantTokenGrantSetInput, user: UserObj) {
-  const context = await getTenantContext(input.tenantId, user, "manage");
+  const context = await getTenantContext(
+    input.tenantId,
+    user,
+    "manage",
+    "enterprise.tenant:edit"
+  );
   let ownedTokenId: number | null = null;
   if (input.isEnabled) {
     const token = await registry.system.access.getApiTokenMetadata(

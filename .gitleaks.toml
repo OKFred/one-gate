@@ -7,6 +7,13 @@ useDefault = true
 id = "generic-api-key"
 
 [[rules.allowlists]]
+description = "Published RFC 6238 test vector in PostgreSQL integration fixture"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/apps/server/src/admin\.postgresql\.node\.spec\.ts$''']
+regexes = ['''^(?:GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ)$''']
+
+[[rules.allowlists]]
 description = "Reviewed synthetic fixture or translation identifier"
 condition = "AND"
 regexTarget = "secret"

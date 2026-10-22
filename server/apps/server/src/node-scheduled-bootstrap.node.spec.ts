@@ -22,8 +22,10 @@ const mocks = vi.hoisted(() => ({
   })),
 }));
 vi.mock("./index.js", () => ({ default: mocks.createApp }));
-vi.mock("@hodor/core/utils/env.js", () => ({ getEnv: () => "8787" }));
-vi.mock("@hono/node-server", () => ({ serve: vi.fn() }));
+vi.mock("@hodor/core/utils/env.js", () => ({
+  getEnv: (key: string) => (key === "PORT" ? "8787" : undefined),
+}));
+vi.mock("@hono/node-server", () => ({ serve: vi.fn(() => ({ on: vi.fn() })) }));
 vi.mock("node-cron", () => ({ default: { schedule: mocks.schedule } }));
 vi.mock("@hodor/admin/maintenance/cron/scheduler.js", () => ({
   runPendingJobs: mocks.cron,

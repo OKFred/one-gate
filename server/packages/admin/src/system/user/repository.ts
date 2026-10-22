@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { userTable, type UserPOLike } from "./model";
 import {
@@ -243,4 +245,70 @@ export class UserRepository {
   }
 }
 
-export const userRepository = new UserRepository();
+const sqliteRepositoryImplementation = new UserRepository();
+export const userRepository = {
+  findPage: (
+    ...args: Parameters<UserRepository["findPage"]>
+  ): ReturnType<UserRepository["findPage"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.findPage(...args)
+      : sqliteRepositoryImplementation.findPage(...args),
+  findAll: (
+    ...args: Parameters<UserRepository["findAll"]>
+  ): ReturnType<UserRepository["findAll"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.findAll(...args)
+      : sqliteRepositoryImplementation.findAll(...args),
+  findById: (
+    ...args: Parameters<UserRepository["findById"]>
+  ): ReturnType<UserRepository["findById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.findById(...args)
+      : sqliteRepositoryImplementation.findById(...args),
+  findByUsername: (
+    ...args: Parameters<UserRepository["findByUsername"]>
+  ): ReturnType<UserRepository["findByUsername"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.findByUsername(...args)
+      : sqliteRepositoryImplementation.findByUsername(...args),
+  countDepartmentUsers: (
+    ...args: Parameters<UserRepository["countDepartmentUsers"]>
+  ): ReturnType<UserRepository["countDepartmentUsers"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.countDepartmentUsers(
+          ...args
+        )
+      : sqliteRepositoryImplementation.countDepartmentUsers(...args),
+  getUserNameById: (
+    ...args: Parameters<UserRepository["getUserNameById"]>
+  ): ReturnType<UserRepository["getUserNameById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.getUserNameById(...args)
+      : sqliteRepositoryImplementation.getUserNameById(...args),
+  getUserNameMapByIds: (
+    ...args: Parameters<UserRepository["getUserNameMapByIds"]>
+  ): ReturnType<UserRepository["getUserNameMapByIds"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.getUserNameMapByIds(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getUserNameMapByIds(...args),
+  onInsert: (
+    ...args: Parameters<UserRepository["onInsert"]>
+  ): ReturnType<UserRepository["onInsert"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.onInsert(...args)
+      : sqliteRepositoryImplementation.onInsert(...args),
+  onUpdate: (
+    ...args: Parameters<UserRepository["onUpdate"]>
+  ): ReturnType<UserRepository["onUpdate"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.onUpdate(...args)
+      : sqliteRepositoryImplementation.onUpdate(...args),
+  onDelete: (
+    ...args: Parameters<UserRepository["onDelete"]>
+  ): ReturnType<UserRepository["onDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.userRepository.onDelete(...args)
+      : sqliteRepositoryImplementation.onDelete(...args),
+};

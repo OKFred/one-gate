@@ -27,7 +27,10 @@
     "deployment:secrets:check": "tsx scripts/verify-deployment-secrets.ts",
     "sync:permissions": "tsx ../../scripts/sync-permissions.ts",
     "format": "prettier --write .",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "db:preflight:assets:worker": "tsx scripts/preflight-enterprise-assets.ts",
+    "worker:dev:postgresql": "wrangler dev --config wrangler.postgresql.jsonc --ip 127.0.0.1 --var NODE_ENV:development",
+    "worker:types:postgresql": "wrangler types --config wrangler.postgresql.jsonc --env-interface PostgresEnv --include-runtime=false worker-postgresql-configuration.d.ts"
   },
   "lint-staged": {
     "*.{js,ts,json,md}": [

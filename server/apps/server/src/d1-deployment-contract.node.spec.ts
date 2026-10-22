@@ -211,8 +211,9 @@ describe("D1 deployment contract", () => {
     expect(workflow).not.toMatch(/db:(?:migrate|check):worker:remote/);
     expect(workflow).not.toMatch(/wrangler\s+pages\s+deploy/);
     const deploymentCommands = workflow.match(/wrangler\s+deploy[^\n]*/g) ?? [];
-    expect(deploymentCommands).toHaveLength(1);
-    expect(deploymentCommands[0]).toMatch(/--dry-run\b/);
+    expect(deploymentCommands.length).toBeGreaterThan(0);
+    for (const command of deploymentCommands)
+      expect(command).toMatch(/--dry-run\b/);
   });
 
   it("declares active secrets for a separately managed deployment", () => {

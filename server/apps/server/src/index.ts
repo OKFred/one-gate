@@ -13,6 +13,7 @@ import createEnterpriseApp from "@hodor/enterprise/index.js";
 import createPersonalApp from "@hodor/personal/index.js";
 import type { TotpGateCenterResolver } from "@hodor/admin/system/auth/totp-gate/index.js";
 import { registerTotpGateMiddleware } from "./security/totp-gate.js";
+import { registerPostgresCapabilities } from "./postgresql-capabilities.js";
 
 export interface ServerAppOptions {
   readonly resolveTotpGateCenter: TotpGateCenterResolver;
@@ -28,6 +29,7 @@ function createApp(options: ServerAppOptions) {
   serverTiming(app);
 
   const baseApiPath = getEnv("BASE_API_PATH") || "";
+  registerPostgresCapabilities(app, baseApiPath);
   registerTotpGateMiddleware(app, {
     baseApiPath,
     resolveTotpGateCenter: options.resolveTotpGateCenter,

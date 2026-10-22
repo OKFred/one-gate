@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { permissionTable, type PermissionPOLike } from "./model";
 import {
@@ -196,4 +198,50 @@ export class PermissionRepository {
   }
 }
 
-export const permissionRepository = new PermissionRepository();
+const sqliteRepositoryImplementation = new PermissionRepository();
+export const permissionRepository = {
+  findPage: (
+    ...args: Parameters<PermissionRepository["findPage"]>
+  ): ReturnType<PermissionRepository["findPage"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.findPage(...args)
+      : sqliteRepositoryImplementation.findPage(...args),
+  findAll: (
+    ...args: Parameters<PermissionRepository["findAll"]>
+  ): ReturnType<PermissionRepository["findAll"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.findAll(...args)
+      : sqliteRepositoryImplementation.findAll(...args),
+  findById: (
+    ...args: Parameters<PermissionRepository["findById"]>
+  ): ReturnType<PermissionRepository["findById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.findById(...args)
+      : sqliteRepositoryImplementation.findById(...args),
+  getAllPermissions: (
+    ...args: Parameters<PermissionRepository["getAllPermissions"]>
+  ): ReturnType<PermissionRepository["getAllPermissions"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.getAllPermissions(
+          ...args
+        )
+      : sqliteRepositoryImplementation.getAllPermissions(...args),
+  onInsert: (
+    ...args: Parameters<PermissionRepository["onInsert"]>
+  ): ReturnType<PermissionRepository["onInsert"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.onInsert(...args)
+      : sqliteRepositoryImplementation.onInsert(...args),
+  onUpdate: (
+    ...args: Parameters<PermissionRepository["onUpdate"]>
+  ): ReturnType<PermissionRepository["onUpdate"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.onUpdate(...args)
+      : sqliteRepositoryImplementation.onUpdate(...args),
+  onDelete: (
+    ...args: Parameters<PermissionRepository["onDelete"]>
+  ): ReturnType<PermissionRepository["onDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.permissionRepository.onDelete(...args)
+      : sqliteRepositoryImplementation.onDelete(...args),
+};

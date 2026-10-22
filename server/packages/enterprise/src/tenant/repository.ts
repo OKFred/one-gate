@@ -20,6 +20,8 @@ import {
 } from "./model";
 import { activeOwnerExists, tenantGuard, type TenantContext } from "./context";
 import { TenantError, isTenantBatchConflict, tenantConflict } from "./errors";
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import { postgresTenantRepository } from "./repository.pg";
 
 type Human = Extract<AuthPrincipal, { kind: "user" }>;
 const now = getCurrentTimestampUtcSql;
@@ -94,7 +96,7 @@ function pageResult<T>(
   };
 }
 
-export const tenantRepository = {
+const sqliteTenantRepository = {
   async canManagePlatform(principal: Human): Promise<boolean> {
     const [allowed] = await db.all<{ allowed: number }>(
       sql`SELECT 1 AS allowed WHERE ${registry.system.access.platformAdminSql(principal.userId)} LIMIT 1`
@@ -496,5 +498,64 @@ export const tenantRepository = {
       ]);
       return changed[0]?.id ?? tenantConflict();
     });
+  },
+};
+
+/** Resolve the deployment backend for each operation, never at module initialization. */
+export const tenantRepository: typeof sqliteTenantRepository = {
+  canManagePlatform(principal) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.canManagePlatform(principal)
+      : sqliteTenantRepository.canManagePlatform(principal);
+  },
+  list(input, principal, platform) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.list(input, principal, platform)
+      : sqliteTenantRepository.list(input, principal, platform);
+  },
+  create(input, actor) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.create(input, actor)
+      : sqliteTenantRepository.create(input, actor);
+  },
+  update(input, actor) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.update(input, actor)
+      : sqliteTenantRepository.update(input, actor);
+  },
+  members(input, context) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.members(input, context)
+      : sqliteTenantRepository.members(input, context);
+  },
+  member(input, context) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.member(input, context)
+      : sqliteTenantRepository.member(input, context);
+  },
+  memberSet(input, context) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.memberSet(input, context)
+      : sqliteTenantRepository.memberSet(input, context);
+  },
+  transferOwner(input, context) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.transferOwner(input, context)
+      : sqliteTenantRepository.transferOwner(input, context);
+  },
+  recoverOwner(input, actor) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.recoverOwner(input, actor)
+      : sqliteTenantRepository.recoverOwner(input, actor);
+  },
+  tokenGrants(input, context) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.tokenGrants(input, context)
+      : sqliteTenantRepository.tokenGrants(input, context);
+  },
+  tokenGrantSet(input, context, ownedTokenId) {
+    return isPostgresBackend()
+      ? postgresTenantRepository.tokenGrantSet(input, context, ownedTokenId)
+      : sqliteTenantRepository.tokenGrantSet(input, context, ownedTokenId);
   },
 };

@@ -1,0 +1,549 @@
+import {
+  getPostgresDb,
+  withPostgresTransaction,
+} from "@hodor/core/db/postgresql/runtime";
+
+import {
+  baseSysLogTable,
+  baseAuditLogTable,
+  baseBizLogTable,
+  baseHttpRequestLogTable,
+} from "./schema.pg";
+import {
+  type SysLogPOLike,
+  type AuditLogPOLike,
+  type BizLogPOLike,
+} from "./model";
+import {
+  eq,
+  like,
+  asc,
+  desc,
+  count,
+  and,
+  gte,
+  lte,
+  inArray,
+  sql,
+  type SQL,
+} from "drizzle-orm";
+import type { InferInsertModel } from "drizzle-orm";
+
+/**
+ * 校验 JSON 动态键名是否合法（防止路径注入）。
+ * 仅允许字母、数字、下划线、连字符，最大长度 64。
+ * @param key - 待校验的 JSON 字段名
+ * @returns 合法时返回 true，否则返回 false
+ */
+function isValidJsonKey(key: string): boolean {
+  return /^[a-zA-Z0-9_-]{1,64}$/.test(key);
+}
+
+// ----------------- Sys Log -----------------
+
+export async function insertSysLog(
+  data: InferInsertModel<typeof baseSysLogTable>
+) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const result = await db
+        .insert(baseSysLogTable)
+        .values(data)
+        .returning({ id: baseSysLogTable.id });
+      return result[0]?.id;
+    },
+    { write: true }
+  );
+}
+
+export async function insertHttpRequestLog(
+  data: InferInsertModel<typeof baseHttpRequestLogTable>
+) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const result = await db
+        .insert(baseHttpRequestLogTable)
+        .values(data)
+        .returning({ id: baseHttpRequestLogTable.id });
+      return result[0]?.id;
+    },
+    { write: true }
+  );
+}
+
+export async function findHttpRequestLogPage(params: {
+  namespace?: string;
+  method?: string;
+  protocol?: string;
+  responseStatus?: number;
+  keyword?: string;
+  creatorId?: number;
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof typeof baseHttpRequestLogTable.$inferSelect;
+  descend?: boolean;
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const {
+        namespace,
+        method,
+        protocol,
+        responseStatus,
+        keyword,
+        creatorId,
+        pageNo,
+        pageSize,
+        orderBy = "id",
+        descend = true,
+      } = params;
+      const offset = (pageNo - 1) * pageSize;
+      const orderField =
+        baseHttpRequestLogTable[orderBy] || baseHttpRequestLogTable.id;
+
+      const conditions: SQL[] = [];
+      if (namespace) {
+        conditions.push(eq(baseHttpRequestLogTable.namespace, namespace));
+      }
+      if (method) {
+        conditions.push(
+          eq(baseHttpRequestLogTable.method, method.toUpperCase())
+        );
+      }
+      if (protocol) {
+        conditions.push(
+          eq(baseHttpRequestLogTable.protocol, protocol.toLowerCase())
+        );
+      }
+      if (responseStatus) {
+        conditions.push(
+          eq(baseHttpRequestLogTable.responseStatus, responseStatus)
+        );
+      }
+      if (keyword) {
+        conditions.push(like(baseHttpRequestLogTable.url, `%${keyword}%`));
+      }
+      if (creatorId) {
+        conditions.push(eq(baseHttpRequestLogTable.creatorId, creatorId));
+      }
+
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
+      const order = descend ? desc(orderField) : asc(orderField);
+
+      const [list, [{ total }]] = await Promise.all([
+        db
+          .select()
+          .from(baseHttpRequestLogTable)
+          .where(where)
+          .limit(pageSize)
+          .offset(offset)
+          .orderBy(order),
+        db
+          .select({ total: count(baseHttpRequestLogTable.id) })
+          .from(baseHttpRequestLogTable)
+          .where(where),
+      ]);
+
+      return { list, total };
+    },
+    { write: false }
+  );
+}
+
+export async function findSysLogPage(params: {
+  namespace?: string;
+  creatorId?: number;
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof SysLogPOLike;
+  descend?: boolean;
+  filters?: Record<string, unknown>;
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const {
+        namespace,
+        creatorId,
+        pageNo,
+        pageSize,
+        orderBy = "id",
+        descend = true,
+        filters,
+      } = params;
+      const offset = (pageNo - 1) * pageSize;
+      const orderField = baseSysLogTable[orderBy] || baseSysLogTable.id;
+
+      const conditions: SQL[] = [];
+      if (namespace !== undefined && namespace !== null) {
+        conditions.push(eq(baseSysLogTable.namespace, namespace));
+      }
+      if (creatorId !== undefined && creatorId !== null) {
+        conditions.push(eq(baseSysLogTable.creatorId, creatorId));
+      }
+      if (filters) {
+        for (const [k, v] of Object.entries(filters)) {
+          if (!isValidJsonKey(k)) {
+            console.warn(`[findSysLogPage] 非法 JSON 键名已跳过: "${k}"`);
+            continue;
+          }
+          if (v !== undefined && v !== null) {
+            // 键名已通过白名单校验，使用字符串拼接构建静态路径，值仍由参数绑定保护
+            conditions.push(
+              sql`(${baseSysLogTable.logValue} -> ${k}) = ${JSON.stringify(v)}::jsonb`
+            );
+          }
+        }
+      }
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      const countResult = await db
+        .select({ total: count(baseSysLogTable.id).as("total") })
+        .from(baseSysLogTable)
+        .where(whereClause);
+      const total = countResult[0]?.total || 0;
+
+      if (total === 0) {
+        return { total, list: [] as SysLogPOLike[] };
+      }
+
+      const list = await db
+        .select()
+        .from(baseSysLogTable)
+        .where(whereClause)
+        .orderBy(!descend ? asc(orderField) : desc(orderField))
+        .limit(pageSize)
+        .offset(offset);
+
+      return { total, list };
+    },
+    { write: false }
+  );
+}
+
+// ----------------- Audit Log -----------------
+
+export async function insertAuditLog(
+  data: InferInsertModel<typeof baseAuditLogTable>
+) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const result = await db
+        .insert(baseAuditLogTable)
+        .values(data)
+        .returning({ id: baseAuditLogTable.id });
+      return result[0]?.id;
+    },
+    { write: true }
+  );
+}
+
+export async function findAuditLogPage(params: {
+  namespace?: string;
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof AuditLogPOLike;
+  descend?: boolean;
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const {
+        namespace,
+        pageNo,
+        pageSize,
+        orderBy = "id",
+        descend = true,
+      } = params;
+      const offset = (pageNo - 1) * pageSize;
+      const orderField = baseAuditLogTable[orderBy] || baseAuditLogTable.id;
+
+      const conditions: SQL[] = [];
+      if (namespace !== undefined && namespace !== null) {
+        conditions.push(eq(baseAuditLogTable.namespace, namespace));
+      }
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      const countResult = await db
+        .select({ total: count(baseAuditLogTable.id).as("total") })
+        .from(baseAuditLogTable)
+        .where(whereClause);
+      const total = countResult[0]?.total || 0;
+
+      if (total === 0) {
+        return { total, list: [] as AuditLogPOLike[] };
+      }
+
+      const list = await db
+        .select()
+        .from(baseAuditLogTable)
+        .where(whereClause)
+        .orderBy(!descend ? asc(orderField) : desc(orderField))
+        .limit(pageSize)
+        .offset(offset);
+
+      return { total, list };
+    },
+    { write: false }
+  );
+}
+
+// ----------------- Biz Log -----------------
+
+export async function insertBizLog(
+  data: InferInsertModel<typeof baseBizLogTable>
+) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const result = await db
+        .insert(baseBizLogTable)
+        .values(data)
+        .returning({ id: baseBizLogTable.id });
+      return result[0]?.id;
+    },
+    { write: true }
+  );
+}
+
+export async function findBizLogPage(params: {
+  namespace?: string;
+  pageNo: number;
+  pageSize: number;
+  orderBy?: keyof BizLogPOLike;
+  descend?: boolean;
+  filters?: Record<string, unknown>;
+  likeFilters?: Record<string, string>;
+  status?: boolean;
+  startTime?: number;
+  endTime?: number;
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const {
+        namespace,
+        pageNo,
+        pageSize,
+        orderBy = "id",
+        descend = true,
+        filters,
+        likeFilters,
+        status,
+        startTime,
+        endTime,
+      } = params;
+      const offset = (pageNo - 1) * pageSize;
+      const orderField = baseBizLogTable[orderBy] || baseBizLogTable.id;
+
+      const conditions: SQL[] = [];
+      if (namespace !== undefined && namespace !== null) {
+        conditions.push(eq(baseBizLogTable.namespace, namespace));
+      }
+      if (status !== undefined && status !== null) {
+        conditions.push(eq(baseBizLogTable.status, status));
+      }
+      if (startTime !== undefined) {
+        conditions.push(gte(baseBizLogTable.createTimeUtc, startTime));
+      }
+      if (endTime !== undefined) {
+        conditions.push(lte(baseBizLogTable.createTimeUtc, endTime));
+      }
+      if (filters) {
+        for (const [k, v] of Object.entries(filters)) {
+          if (!isValidJsonKey(k)) {
+            console.warn(`[findBizLogPage] 非法 JSON 键名已跳过: "${k}"`);
+            continue;
+          }
+          if (v !== undefined && v !== null) {
+            // 键名已通过白名单校验，使用字符串拼接构建静态路径，值仍由参数绑定保护
+            conditions.push(
+              sql`(${baseBizLogTable.logValue} -> ${k}) = ${JSON.stringify(v)}::jsonb`
+            );
+          }
+        }
+      }
+      if (likeFilters) {
+        for (const [k, v] of Object.entries(likeFilters)) {
+          if (!isValidJsonKey(k)) {
+            console.warn(`[findBizLogPage] 非法 JSON 键名已跳过: "${k}"`);
+            continue;
+          }
+          if (v !== undefined && v !== null && v !== "") {
+            // 键名已通过白名单校验，使用字符串拼接构建静态路径，值仍由参数绑定保护
+            const pattern = `%${v}%`;
+            conditions.push(
+              sql`(${baseBizLogTable.logValue} ->> ${k}) LIKE ${pattern}`
+            );
+          }
+        }
+      }
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+
+      const countResult = await db
+        .select({ total: count(baseBizLogTable.id).as("total") })
+        .from(baseBizLogTable)
+        .where(whereClause);
+      const total = countResult[0]?.total || 0;
+
+      if (total === 0) {
+        return { total, list: [] as BizLogPOLike[] };
+      }
+
+      const list = await db
+        .select()
+        .from(baseBizLogTable)
+        .where(whereClause)
+        .orderBy(!descend ? asc(orderField) : desc(orderField))
+        .limit(pageSize)
+        .offset(offset);
+
+      return { total, list };
+    },
+    { write: false }
+  );
+}
+
+// Utilities for standard ID fetches
+export async function findSysLogById(id: number) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const rows = await db
+        .select()
+        .from(baseSysLogTable)
+        .where(eq(baseSysLogTable.id, id))
+        .limit(1);
+      return rows[0] || null;
+    },
+    { write: false }
+  );
+}
+
+export async function findAuditLogById(id: number) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const rows = await db
+        .select()
+        .from(baseAuditLogTable)
+        .where(eq(baseAuditLogTable.id, id))
+        .limit(1);
+      return rows[0] || null;
+    },
+    { write: false }
+  );
+}
+
+export async function findBizLogById(id: number) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const rows = await db
+        .select()
+        .from(baseBizLogTable)
+        .where(eq(baseBizLogTable.id, id))
+        .limit(1);
+      return rows[0] || null;
+    },
+    { write: false }
+  );
+}
+
+// ----------------- Timeline Cursor Utilities -----------------
+
+export async function findTimelineChunkSys(params: {
+  cursor?: number;
+  limit: number;
+  namespaces?: string[];
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const conditions: SQL[] = [];
+      if (params.namespaces && params.namespaces.length > 0) {
+        conditions.push(inArray(baseSysLogTable.namespace, params.namespaces));
+      }
+      if (params.cursor !== undefined) {
+        conditions.push(lte(baseSysLogTable.createTimeUtc, params.cursor));
+      }
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+      return db
+        .select()
+        .from(baseSysLogTable)
+        .where(whereClause)
+        .orderBy(desc(baseSysLogTable.createTimeUtc), desc(baseSysLogTable.id))
+        .limit(params.limit);
+    },
+    { write: false }
+  );
+}
+
+export async function findTimelineChunkAudit(params: {
+  cursor?: number;
+  limit: number;
+  namespaces?: string[];
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const conditions: SQL[] = [];
+      if (params.namespaces && params.namespaces.length > 0) {
+        conditions.push(
+          inArray(baseAuditLogTable.namespace, params.namespaces)
+        );
+      }
+      if (params.cursor !== undefined) {
+        conditions.push(lte(baseAuditLogTable.createTimeUtc, params.cursor));
+      }
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+      return db
+        .select()
+        .from(baseAuditLogTable)
+        .where(whereClause)
+        .orderBy(
+          desc(baseAuditLogTable.createTimeUtc),
+          desc(baseAuditLogTable.id)
+        )
+        .limit(params.limit);
+    },
+    { write: false }
+  );
+}
+
+export async function findTimelineChunkBiz(params: {
+  cursor?: number;
+  limit: number;
+  namespaces?: string[];
+}) {
+  return withPostgresTransaction(
+    async () => {
+      const db = getPostgresDb();
+      const conditions: SQL[] = [];
+      if (params.namespaces && params.namespaces.length > 0) {
+        conditions.push(inArray(baseBizLogTable.namespace, params.namespaces));
+      }
+      if (params.cursor !== undefined) {
+        conditions.push(lte(baseBizLogTable.createTimeUtc, params.cursor));
+      }
+      const whereClause =
+        conditions.length > 0 ? and(...conditions) : undefined;
+      return db
+        .select()
+        .from(baseBizLogTable)
+        .where(whereClause)
+        .orderBy(desc(baseBizLogTable.createTimeUtc), desc(baseBizLogTable.id))
+        .limit(params.limit);
+    },
+    { write: false }
+  );
+}

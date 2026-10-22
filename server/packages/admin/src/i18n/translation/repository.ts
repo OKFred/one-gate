@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { translationTable, type TranslationPOLike } from "./model";
 import {
@@ -65,6 +67,9 @@ export async function findPageAll(params: {
   langCode?: string;
   isEnabled?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPageAll(params);
+
   const { orderBy = "id", descend = true } = params;
   const orderField = translationTable[orderBy] || translationTable.id;
   const maxLimit = 100_000;
@@ -96,6 +101,9 @@ export async function findPage(params: {
   langCode?: string;
   isEnabled?: boolean;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findPage(params);
+
   const { pageNo, pageSize, orderBy = "id", descend = true } = params;
   const offset = (pageNo - 1) * pageSize;
   const orderField = translationTable[orderBy] || translationTable.id;
@@ -122,6 +130,8 @@ export async function findPage(params: {
 }
 
 export async function findById(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.findById(id);
+
   const rows = await db
     .select()
     .from(translationTable)
@@ -131,6 +141,9 @@ export async function findById(id: number) {
 }
 
 export async function findTranslationsByIds(ids: number[]) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findTranslationsByIds(ids);
+
   if (ids.length === 0) return [];
   const rows = await db
     .select({ value: translationTable.id, label: translationTable.tKey })
@@ -143,6 +156,9 @@ export async function findDuplicates(params: {
   valueHash: string;
   excludeId?: number;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findDuplicates(params);
+
   const { valueHash, excludeId } = params;
   const whereCondition = excludeId
     ? and(
@@ -172,6 +188,9 @@ export async function findByKeyAndLang(params: {
   application?: string;
   excludeId?: number;
 }) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.findByKeyAndLang(params);
+
   const { tKey, langCode, application, excludeId } = params;
   const rows = await db
     .select({
@@ -195,6 +214,9 @@ export async function findByKeyAndLang(params: {
 export async function onInsert(
   data: InferInsertModel<typeof translationTable>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onInsert(data);
+
   const result = await db
     .insert(translationTable)
     .values(data)
@@ -206,6 +228,9 @@ export async function onUpdate(
   id: number,
   data: Partial<Omit<InferInsertModel<typeof translationTable>, "id">>
 ) {
+  if (isPostgresBackend())
+    return postgresRepositoryImplementation.onUpdate(id, data);
+
   const result = await db
     .update(translationTable)
     .set(data)
@@ -215,6 +240,8 @@ export async function onUpdate(
 }
 
 export async function onDelete(id: number) {
+  if (isPostgresBackend()) return postgresRepositoryImplementation.onDelete(id);
+
   const result = await db
     .delete(translationTable)
     .where(eq(translationTable.id, id))

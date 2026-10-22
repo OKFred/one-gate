@@ -5,6 +5,7 @@ import {
 } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { drizzle as drizzleD1, type DrizzleD1Database } from "drizzle-orm/d1";
+import { isPostgresBackend } from "./postgresql/runtime";
 
 /**
  * 定义统一的数据库类型
@@ -35,6 +36,8 @@ export function setD1Binding(d1Binding: D1Binding) {
  * Get the database instance, initializing it if necessary.
  */
 export function getDb(): AppDatabase {
+  if (isPostgresBackend())
+    throw new Error("SQLite access is unavailable in PostgreSQL mode");
   if (_db) return _db;
 
   // Check if we have a stored D1 binding

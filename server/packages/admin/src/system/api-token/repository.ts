@@ -1,3 +1,5 @@
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import * as postgresRepositoryImplementation from "./repository.pg";
 import db from "@hodor/core/db/index";
 import { apiTokenTable, type ApiTokenPOLike } from "./model";
 import {
@@ -212,4 +214,52 @@ export class ApiTokenRepository {
   }
 }
 
-export const apiTokenRepository = new ApiTokenRepository();
+const sqliteRepositoryImplementation = new ApiTokenRepository();
+export const apiTokenRepository = {
+  findPage: (
+    ...args: Parameters<ApiTokenRepository["findPage"]>
+  ): ReturnType<ApiTokenRepository["findPage"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.findPage(...args)
+      : sqliteRepositoryImplementation.findPage(...args),
+  findById: (
+    ...args: Parameters<ApiTokenRepository["findById"]>
+  ): ReturnType<ApiTokenRepository["findById"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.findById(...args)
+      : sqliteRepositoryImplementation.findById(...args),
+  findByTokenHash: (
+    ...args: Parameters<ApiTokenRepository["findByTokenHash"]>
+  ): ReturnType<ApiTokenRepository["findByTokenHash"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.findByTokenHash(
+          ...args
+        )
+      : sqliteRepositoryImplementation.findByTokenHash(...args),
+  onInsert: (
+    ...args: Parameters<ApiTokenRepository["onInsert"]>
+  ): ReturnType<ApiTokenRepository["onInsert"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.onInsert(...args)
+      : sqliteRepositoryImplementation.onInsert(...args),
+  onUpdate: (
+    ...args: Parameters<ApiTokenRepository["onUpdate"]>
+  ): ReturnType<ApiTokenRepository["onUpdate"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.onUpdate(...args)
+      : sqliteRepositoryImplementation.onUpdate(...args),
+  onDelete: (
+    ...args: Parameters<ApiTokenRepository["onDelete"]>
+  ): ReturnType<ApiTokenRepository["onDelete"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.onDelete(...args)
+      : sqliteRepositoryImplementation.onDelete(...args),
+  updateLastUsedTime: (
+    ...args: Parameters<ApiTokenRepository["updateLastUsedTime"]>
+  ): ReturnType<ApiTokenRepository["updateLastUsedTime"]> =>
+    isPostgresBackend()
+      ? postgresRepositoryImplementation.apiTokenRepository.updateLastUsedTime(
+          ...args
+        )
+      : sqliteRepositoryImplementation.updateLastUsedTime(...args),
+};

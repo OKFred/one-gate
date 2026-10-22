@@ -5,7 +5,9 @@
 One Gate is a Hono and React administration workspace for authentication,
 permissions and business applications. The backend runs on Node.js with SQLite
 or Cloudflare Workers with D1. The frontend includes admin, enterprise and
-personal applications with a shared UI package.
+personal applications with a shared UI package. An optional PostgreSQL backend
+supports the authentication, enterprise assets and recycle-bin workflow on Node
+and Workers; see [PostgreSQL setup and supported scope](docs/postgresql.md).
 
 Features include users, roles and departments, SSO and a TOTP security gate,
 task scheduling, and a shared recycle bin with a 30-day recovery window.
@@ -78,7 +80,9 @@ to update the seven fresh-database DDL files and the asset schema contracts.
 The tool uses the installed Drizzle Kit and never connects to a database or
 rewrites numbered migrations. Existing databases still need a new versioned
 migration; generating fresh DDL is not an upgrade procedure. The asset-specific
-command does not use the legacy full generator that clears its migration directory.
+command remains separate from the full generator. Both preserve migration history.
+See [database migration commands](docs/database-migrations.md) for SQLite, D1 and
+PostgreSQL upgrades; the old untracked Node migration replay has been retired.
 
 ## Verification and deployment
 

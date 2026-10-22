@@ -1,4 +1,11 @@
 import type { UserObj } from "../../types/app.js";
+import { registry } from "../../../../admin/src/common/registry";
+import { getPostgresDb } from "../../db/postgresql/runtime";
+import { or, sql } from "drizzle-orm";
+import {
+  BusinessError,
+  BusinessErrorCode,
+} from "../errorHandler/businessError";
 
 /** 通用动作映射，将抽象动作映射到具体的权限码后缀 */
 const ACTION_MAP: Record<string, string[]> = {
@@ -7,6 +14,47 @@ const ACTION_MAP: Record<string, string[]> = {
   update: ["edit", "update"],
   delete: ["delete", "remove"],
 };
+
+export function permissionCodesForAction(
+  action: string,
+  resource: string
+): string[] {
+  return [action, ...(ACTION_MAP[action] || [])].map(
+    (value) => `${resource}:${value}`
+  );
+}
+
+/** Called after the PG write lock, using current database authority instead of cached claims. */
+export async function assertPostgresAuthority(
+  user: UserObj,
+  action?: string,
+  resource?: string
+): Promise<void> {
+  const codes =
+    action && resource ? permissionCodesForAction(action, resource) : [];
+  const principal = user.principal;
+  const active =
+    principal.kind === "user"
+      ? registry.system.access.userActiveSql(principal.userId)
+      : registry.system.access.tokenUsableSql(principal.tokenId);
+  const permissions = codes.length
+    ? or(
+        ...codes.map((code) =>
+          principal.kind === "user"
+            ? registry.system.access.currentUserPermissionSql(
+                principal.userId,
+                code
+              )
+            : registry.system.access.tokenUsableSql(principal.tokenId, code)
+        )
+      )
+    : sql`TRUE`;
+  const { rows } = await getPostgresDb().execute<{ allowed: boolean }>(
+    sql`SELECT (${active} AND ${permissions}) AS allowed`
+  );
+  if (rows[0]?.allowed !== true)
+    throw new BusinessError(BusinessErrorCode.PERMISSION_DENIED);
+}
 
 /**
  * 权限检查核心函数
@@ -26,16 +74,6 @@ export async function can(
 
   if (user.isSuperAdmin) return true;
 
-  // 1. 尝试直接查找 (例如 enterprise.attendance:add)
-  const directCode = `${resource}:${action}`;
-  if (user.permissions.some((p) => p.code === directCode)) return true;
-
-  // 2. 如果是通用动作，尝试映射查找（例如：action是'read'，尝试查找enterprise.attendance:list、enterprise.attendance:get、enterprise.attendance:view）
-  const mappedActions = ACTION_MAP[action] || [];
-  for (const ma of mappedActions) {
-    if (user.permissions.some((p) => p.code === `${resource}:${ma}`))
-      return true;
-  }
-
-  return false;
+  const codes = permissionCodesForAction(action, resource);
+  return user.permissions.some((permission) => codes.includes(permission.code));
 }

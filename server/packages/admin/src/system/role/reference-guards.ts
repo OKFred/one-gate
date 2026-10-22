@@ -1,4 +1,10 @@
 import { sql, type SQL } from "drizzle-orm";
+import { isPostgresBackend } from "@hodor/core/db/postgresql/runtime";
+import {
+  postgresActiveRoleIds,
+  postgresRoleHasNoUserReferences,
+  postgresActiveSavedRoleDepartments,
+} from "./reference-guards.pg";
 import {
   BusinessError,
   BusinessErrorCode,
@@ -9,6 +15,7 @@ export function activeRoleIds(ids: number[]): SQL {
   if (!ids.every((id) => Number.isSafeInteger(id) && id > 0)) {
     throw new BusinessError(BusinessErrorCode.INVALID_PARAMS);
   }
+  if (isPostgresBackend()) return postgresActiveRoleIds(ids);
   return sql`NOT EXISTS (SELECT 1 FROM json_each(${JSON.stringify(ids)}) AS requested_role
     WHERE NOT EXISTS (SELECT 1 FROM system_role AS referenced_role
       WHERE referenced_role.id = requested_role.value AND referenced_role.is_deleted = 0))`;
@@ -16,6 +23,7 @@ export function activeRoleIds(ids: number[]): SQL {
 
 /** Malformed legacy JSON cannot be treated as an empty reference list. */
 export function roleHasNoUserReferences(target: SQL): SQL {
+  if (isPostgresBackend()) return postgresRoleHasNoUserReferences(target);
   return sql`NOT EXISTS (SELECT 1 FROM system_user AS role_user WHERE
     CASE WHEN json_valid(role_user.role_id_arr) THEN json_type(role_user.role_id_arr) != 'array' ELSE 1 END
     OR EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(role_user.role_id_arr) AND
@@ -27,6 +35,7 @@ export function roleHasNoUserReferences(target: SQL): SQL {
 
 /** Saved custom ranges are checked without parsing or repairing them in JavaScript. */
 export function activeSavedRoleDepartments(ids: SQL): SQL {
+  if (isPostgresBackend()) return postgresActiveSavedRoleDepartments(ids);
   return sql`(${ids} IS NULL OR (json_valid(${ids}) AND
     CASE WHEN json_valid(${ids}) THEN json_type(${ids}) = 'array' ELSE 0 END
     AND NOT EXISTS (SELECT 1 FROM json_each(CASE WHEN json_valid(${ids}) AND

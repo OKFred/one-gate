@@ -1,6 +1,17 @@
 import { BusinessError, BusinessErrorCode } from "../businessError";
+import { getPostgresError } from "../../../db/postgresql/errors";
 
 export function convertSqlErrorToBusinessError(e: Error): BusinessError | null {
+  const postgres = getPostgresError(e);
+  if (postgres?.code === "23505")
+    return new BusinessError(BusinessErrorCode.DUPLICATE_DATA);
+  if (
+    postgres?.code === "40001" ||
+    postgres?.code === "40P01" ||
+    postgres?.code === "55P03"
+  )
+    return new BusinessError(BusinessErrorCode.DATABASE_BUSY);
+  if (postgres) return new BusinessError(BusinessErrorCode.DATABASE_ERROR);
   const errorCause = String(e.cause || "");
   const errorName = e.name || "";
   const errorMessage = e.message || "";

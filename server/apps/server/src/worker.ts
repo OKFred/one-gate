@@ -2,6 +2,7 @@ import createApp from "./index.js";
 import { setD1Binding } from "@hodor/core/db/index.js";
 import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
+import { withWorkerPostgres } from "@hodor/core/db/postgresql/drivers.js";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
 import {
   runRetentionMaintenance,
@@ -23,6 +24,27 @@ export { MobileOpsSession } from "./mobile-ops-session.js";
 export { TotpGateCoordinator } from "./totp-gate-coordinator.js";
 
 let app: ReturnType<typeof createApp> | null = null;
+
+type DatabaseBindings = Env & {
+  readonly DATABASE_BACKEND?: string;
+  readonly PG_SCHEMA?: string;
+  readonly HYPERDRIVE?: Hyperdrive;
+};
+
+function validateDatabaseBackend(env: DatabaseBindings): void {
+  const selected = env.DATABASE_BACKEND;
+  if (selected && !["sqlite", "d1", "postgresql"].includes(selected))
+    throw new Error("Unsupported DATABASE_BACKEND configuration");
+}
+
+function postgresConfiguration(env: DatabaseBindings) {
+  if (!env.HYPERDRIVE?.connectionString)
+    throw new Error("PostgreSQL requires a Hyperdrive binding");
+  return {
+    connectionString: env.HYPERDRIVE.connectionString,
+    schema: env.PG_SCHEMA || "one_gate",
+  };
+}
 
 /** Initialize the application-wide service registry once per Worker isolate. */
 function getApp(): ReturnType<typeof createApp> {
@@ -112,7 +134,37 @@ export default {
   /**
    * Cloudflare Workers fetch handler.
    */
-  async fetch(request: Request, env: Env, ctx: ExecutionContext) {
+  async fetch(request: Request, env: DatabaseBindings, ctx: ExecutionContext) {
+    validateDatabaseBackend(env);
+    if (env.DATABASE_BACKEND === "postgresql") {
+      setEnv(env);
+      if (env.KV) setKVBinding(env.KV);
+      return withWorkerPostgres(postgresConfiguration(env), async () => {
+        const pending: Promise<unknown>[] = [];
+        const context: ExecutionContext = {
+          waitUntil(promise) {
+            pending.push(promise);
+            ctx.waitUntil(promise);
+          },
+          passThroughOnException() {
+            ctx.passThroughOnException();
+          },
+          props: ctx.props,
+          exports: ctx.exports,
+        };
+        try {
+          return await getApp().fetch(request, env, context);
+        } finally {
+          // A deferred authentication/log task must finish before its request client closes.
+          let completed = 0;
+          while (completed < pending.length) {
+            const batch = pending.slice(completed);
+            completed = pending.length;
+            await Promise.allSettled(batch);
+          }
+        }
+      });
+    }
     // 1. 将绑定注入数据库和缓存层
     if (env.DB) {
       setD1Binding(env.DB);
@@ -136,9 +188,19 @@ export default {
    */
   async scheduled(
     _event: ScheduledController,
-    env: Env,
+    env: DatabaseBindings,
     ctx: ExecutionContext
   ) {
+    validateDatabaseBackend(env);
+    if (env.DATABASE_BACKEND === "postgresql") {
+      setEnv(env);
+      if (env.KV) setKVBinding(env.KV);
+      getApp();
+      ctx.waitUntil(
+        withWorkerPostgres(postgresConfiguration(env), runRetentionMaintenance)
+      );
+      return;
+    }
     // 1. 将绑定注入数据库和缓存层
     if (env.DB) {
       setD1Binding(env.DB);
