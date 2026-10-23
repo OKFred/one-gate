@@ -1,0 +1,261 @@
+{
+  "contractVersion": 1,
+  "syntheticOnly": true,
+  "canonicalVectors": [
+    {
+      "name": "utf16-numeric-keys-unicode-controls",
+      "value": {
+        "2": "two",
+        "10": "ten",
+        "01": "leading",
+        "-1": "minus",
+        "": "bmp-private",
+        "😀": "astral",
+        "z": [
+          "中文",
+          "😀",
+          "  ",
+          "\b\t\n\f\r\"\\/",
+          9007199254740991,
+          -9007199254740991,
+          0
+        ],
+        "a": "00-SN/中😀:\n\"\\"
+      },
+      "canonical": "{\"-1\":\"minus\",\"01\":\"leading\",\"10\":\"ten\",\"2\":\"two\",\"a\":\"00-SN/中😀:\\n\\\"\\\\\",\"z\":[\"中文\",\"😀\",\"  \",\"\\b\\t\\n\\f\\r\\\"\\\\/\",9007199254740991,-9007199254740991,0],\"😀\":\"astral\",\"\":\"bmp-private\"}",
+      "revision": "sha256:7368ecebd1c09692c9f69420c3de18dc2536ffd632484057f4a47468df11788b"
+    },
+    {
+      "name": "safe-primitives-and-nesting",
+      "value": {
+        "f": false,
+        "t": true,
+        "n": null,
+        "nested": [
+          {
+            "b": 2,
+            "a": 1
+          },
+          -1,
+          0,
+          9007199254740991
+        ]
+      },
+      "canonical": "{\"f\":false,\"n\":null,\"nested\":[{\"a\":1,\"b\":2},-1,0,9007199254740991],\"t\":true}",
+      "revision": "sha256:335339762726cc345ff9179c5c366717e92c836e7d5904dbd6d7733a8a04401c"
+    }
+  ],
+  "normalizationVectors": [
+    {
+      "identifierType": "sn",
+      "value": "﻿00-SN/AbC﻿",
+      "normalized": "00-SN/AbC"
+    },
+    {
+      "identifierType": "sn",
+      "value": "00-SN/AbC",
+      "normalized": "00-SN/AbC"
+    },
+    {
+      "identifierType": "wwn",
+      "value": "﻿0x50:00-00 00 00 00 00 01﻿",
+      "normalized": "5000000000000001"
+    },
+    {
+      "identifierType": "wwn",
+      "value": "5000000000000001",
+      "normalized": null
+    }
+  ],
+  "catalogFixture": {
+    "nowTimeUtc": 2000000001000,
+    "transitionTimeUtc": 2000000000000,
+    "hostA": "11111111-1111-4111-8111-111111111111",
+    "hostB": "22222222-2222-4222-8222-222222222222",
+    "diskD": "33333333-3333-4333-8333-333333333333",
+    "diskE": "44444444-4444-4444-8444-444444444444",
+    "contentA": {
+      "contractVersion": 1,
+      "tenantId": 1,
+      "host": {
+        "assetId": "11111111-1111-4111-8111-111111111111",
+        "status": "active",
+        "retiredTimeUtc": null
+      },
+      "assets": [
+        {
+          "assetId": "33333333-3333-4333-8333-333333333333",
+          "status": "active",
+          "retiredTimeUtc": null,
+          "model": "SIMULATED-DISK 中文😀",
+          "identifiers": [
+            {
+              "identifierType": "wwn",
+              "namespace": "storage.wwn",
+              "value": "5000000000000001",
+              "effectiveFromUtc": 1999999990000
+            },
+            {
+              "identifierType": "sn",
+              "namespace": "storage.serial",
+              "value": "00-SN/中😀:\n\"\\",
+              "effectiveFromUtc": 1999999991000
+            }
+          ],
+          "assignments": [
+            {
+              "assignmentId": 101,
+              "hostAssetId": "11111111-1111-4111-8111-111111111111",
+              "validFromUtc": 1999999990000,
+              "validToUtc": 2000000000000
+            },
+            {
+              "assignmentId": 102,
+              "hostAssetId": "22222222-2222-4222-8222-222222222222",
+              "validFromUtc": 2000000000000,
+              "validToUtc": null
+            }
+          ]
+        },
+        {
+          "assetId": "44444444-4444-4444-8444-444444444444",
+          "status": "active",
+          "retiredTimeUtc": null,
+          "model": "SIMULATED-DISK-E",
+          "identifiers": [
+            {
+              "identifierType": "wwn",
+              "namespace": "storage.wwn",
+              "value": "5000000000000002",
+              "effectiveFromUtc": 1999999990000
+            }
+          ],
+          "assignments": [
+            {
+              "assignmentId": 103,
+              "hostAssetId": "11111111-1111-4111-8111-111111111111",
+              "validFromUtc": 1999999990000,
+              "validToUtc": null
+            }
+          ]
+        }
+      ]
+    },
+    "contentB": {
+      "contractVersion": 1,
+      "tenantId": 1,
+      "host": {
+        "assetId": "22222222-2222-4222-8222-222222222222",
+        "status": "active",
+        "retiredTimeUtc": null
+      },
+      "assets": [
+        {
+          "assetId": "33333333-3333-4333-8333-333333333333",
+          "status": "active",
+          "retiredTimeUtc": null,
+          "model": "SIMULATED-DISK 中文😀",
+          "identifiers": [
+            {
+              "identifierType": "wwn",
+              "namespace": "storage.wwn",
+              "value": "5000000000000001",
+              "effectiveFromUtc": 1999999990000
+            },
+            {
+              "identifierType": "sn",
+              "namespace": "storage.serial",
+              "value": "00-SN/中😀:\n\"\\",
+              "effectiveFromUtc": 1999999991000
+            }
+          ],
+          "assignments": [
+            {
+              "assignmentId": 101,
+              "hostAssetId": "11111111-1111-4111-8111-111111111111",
+              "validFromUtc": 1999999990000,
+              "validToUtc": 2000000000000
+            },
+            {
+              "assignmentId": 102,
+              "hostAssetId": "22222222-2222-4222-8222-222222222222",
+              "validFromUtc": 2000000000000,
+              "validToUtc": null
+            }
+          ]
+        },
+        {
+          "assetId": "44444444-4444-4444-8444-444444444444",
+          "status": "active",
+          "retiredTimeUtc": null,
+          "model": "SIMULATED-DISK-E",
+          "identifiers": [
+            {
+              "identifierType": "wwn",
+              "namespace": "storage.wwn",
+              "value": "5000000000000002",
+              "effectiveFromUtc": 1999999990000
+            }
+          ],
+          "assignments": [
+            {
+              "assignmentId": 103,
+              "hostAssetId": "11111111-1111-4111-8111-111111111111",
+              "validFromUtc": 1999999990000,
+              "validToUtc": null
+            }
+          ]
+        }
+      ]
+    },
+    "expectedRevisionA": "sha256:ce7f80b1d0f0e3767e2fea7f9604c9d2271b90043b95aeab8e6972ca573fffed",
+    "expectedRevisionB": "sha256:b350bb84e5051c2266abf722cc1d35bc5903213a5d964901c2dbb3604f517a72"
+  },
+  "resolveCases": [
+    {
+      "name": "A-before-transition",
+      "hostAssetId": "11111111-1111-4111-8111-111111111111",
+      "observedTimeUtc": 1999999999999,
+      "wwn": "5000000000000001",
+      "expectedReason": "MATCHED",
+      "expectedAssetId": "33333333-3333-4333-8333-333333333333",
+      "expectedAssignmentId": 101
+    },
+    {
+      "name": "A-at-transition",
+      "hostAssetId": "11111111-1111-4111-8111-111111111111",
+      "observedTimeUtc": 2000000000000,
+      "wwn": "5000000000000001",
+      "expectedReason": "HOST_MISMATCH",
+      "expectedAssetId": null,
+      "expectedAssignmentId": null
+    },
+    {
+      "name": "B-before-transition",
+      "hostAssetId": "22222222-2222-4222-8222-222222222222",
+      "observedTimeUtc": 1999999999999,
+      "wwn": "5000000000000001",
+      "expectedReason": "HOST_MISMATCH",
+      "expectedAssetId": null,
+      "expectedAssignmentId": null
+    },
+    {
+      "name": "B-at-transition",
+      "hostAssetId": "22222222-2222-4222-8222-222222222222",
+      "observedTimeUtc": 2000000000000,
+      "wwn": "5000000000000001",
+      "expectedReason": "MATCHED",
+      "expectedAssetId": "33333333-3333-4333-8333-333333333333",
+      "expectedAssignmentId": 102
+    },
+    {
+      "name": "E-takes-old-path",
+      "hostAssetId": "11111111-1111-4111-8111-111111111111",
+      "observedTimeUtc": 2000000000000,
+      "wwn": "5000000000000002",
+      "expectedReason": "MATCHED",
+      "expectedAssetId": "44444444-4444-4444-8444-444444444444",
+      "expectedAssignmentId": 103
+    }
+  ]
+}

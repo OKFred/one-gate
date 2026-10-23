@@ -128,6 +128,7 @@ export const BUSINESS = {
   "enterprise.tenant": "enterprise.tenant",
   "enterprise.asset": "enterprise.asset",
   "enterprise.asset.mapping": "enterprise.asset.mapping",
+  "enterprise.asset.telemetry": "enterprise.asset.telemetry",
   "personal.base.user_config": "personal.base.user_config",
 
   /** 基础配置 - 日志 */

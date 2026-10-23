@@ -109,6 +109,7 @@ export const sidebar = {
   'businessType.enterprise.tenant': '企业与成员',
   'businessType.enterprise.asset': '资产台账',
   'businessType.enterprise.asset.mapping': '资产测点映射',
+  'businessType.enterprise.asset.telemetry': '资产采集身份目录',
   'businessType.enterprise.mail': '企业邮件',
   'businessType.enterprise.mail.edm': 'EDM群发',
   'businessType.organization': '组织管理',

@@ -105,6 +105,7 @@ export const sidebar = {
   'businessType.enterprise.tenant': 'Enterprises & Members',
   'businessType.enterprise.asset': 'Asset Register',
   'businessType.enterprise.asset.mapping': 'Asset Measurement Mapping',
+  'businessType.enterprise.asset.telemetry': 'Asset Collection Identity Catalog',
   'businessType.enterprise.mail': 'Enterprise Mail',
   'businessType.enterprise.mail.edm': 'EDM',
   'businessType.organization': 'Organization',

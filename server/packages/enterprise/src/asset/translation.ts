@@ -2,6 +2,18 @@ import type { TranslationInputItem } from "@hodor/core/db/initTranslation";
 
 const messages = [
   {
+    key: "errorHandler.enterprise.asset.telemetry.invalidCatalog",
+    "zh-CN": "资产采集身份目录数据无效，请联系管理员核对资产资料后重试",
+    "en-US":
+      "The asset collection identity catalog is invalid. Ask an administrator to check the asset records and try again",
+  },
+  {
+    key: "errorHandler.enterprise.asset.telemetry.catalogTooLarge",
+    "zh-CN": "资产采集身份目录超出上限，请联系管理员调整资产目录后重试",
+    "en-US":
+      "The asset collection identity catalog exceeds the supported limits. Ask an administrator to reduce the catalog and try again",
+  },
+  {
     key: "errorHandler.enterprise.asset.notVisible",
     "zh-CN": "资产不存在或无权访问",
     "en-US": "The asset is unavailable",

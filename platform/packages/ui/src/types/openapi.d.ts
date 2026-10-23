@@ -19000,6 +19000,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enterprise/asset/telemetry/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read the authorized hardware identity catalog */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.telemetry.catalog.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.telemetry.catalog.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enterprise/asset/telemetry/resolveBatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve hardware identities from one authorized catalog */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["enterprise.asset.telemetry.resolvebatch.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["enterprise.asset.telemetry.resolvebatch.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/enterprise/asset/mapping/resolve": {
         parameters: {
             query?: never;
@@ -33611,6 +33727,100 @@ export interface components {
         "enterprise.asset.closebinding.res": {
             ok: boolean;
             data: number;
+            message: string;
+        };
+        "enterprise.asset.telemetry.catalog.req": {
+            /** @constant */
+            contractVersion: 1;
+            tenantId: number;
+            /** Format: uuid */
+            hostAssetId: string;
+        };
+        "enterprise.asset.telemetry.catalog.res": {
+            ok: boolean;
+            data: {
+                /** @constant */
+                contractVersion: 1;
+                tenantId: number;
+                host: {
+                    /** Format: uuid */
+                    assetId: string;
+                    /** @enum {string} */
+                    status: "active" | "retired";
+                    retiredTimeUtc: number | null;
+                };
+                assets: {
+                    /** Format: uuid */
+                    assetId: string;
+                    /** @enum {string} */
+                    status: "active" | "retired";
+                    retiredTimeUtc: number | null;
+                    model: string | null;
+                    identifiers: {
+                        /** @enum {string} */
+                        identifierType: "wwn" | "sn";
+                        /** @enum {string} */
+                        namespace: "storage.wwn" | "storage.serial";
+                        value: string;
+                        effectiveFromUtc: number;
+                    }[];
+                    assignments: {
+                        assignmentId: number;
+                        /** Format: uuid */
+                        hostAssetId: string | null;
+                        validFromUtc: number;
+                        validToUtc: number | null;
+                    }[];
+                }[];
+                revision: string;
+                serverTimeUtc: number;
+                expiresTimeUtc: number;
+            };
+            message: string;
+        };
+        "enterprise.asset.telemetry.resolvebatch.req": {
+            /** @constant */
+            contractVersion: 1;
+            tenantId: number;
+            /** Format: uuid */
+            hostAssetId: string;
+            items: {
+                requestId: string;
+                observedTimeUtc: number;
+                model?: string | null;
+                identifiers: {
+                    identifierType: string;
+                    namespace: string;
+                    value: string;
+                }[];
+            }[];
+        };
+        "enterprise.asset.telemetry.resolvebatch.res": {
+            ok: boolean;
+            data: {
+                /** @constant */
+                contractVersion: 1;
+                revision: string;
+                serverTimeUtc: number;
+                expiresTimeUtc: number;
+                results: {
+                    requestId: string;
+                    observedTimeUtc: number;
+                    /** @enum {string} */
+                    status: "matched" | "unmapped" | "conflict";
+                    /** @enum {string} */
+                    reasonCode: "MATCHED" | "CATALOG_EXPIRED" | "INVALID_OBSERVATION_TIME" | "MISSING_IDENTIFIER" | "UNSUPPORTED_NAMESPACE" | "INVALID_IDENTIFIER" | "IDENTIFIERS_DISAGREE" | "WWN_UNMAPPED" | "IDENTIFIER_UNMAPPED" | "MODEL_REQUIRED" | "MODEL_MISMATCH" | "IDENTIFIER_NOT_EFFECTIVE" | "ASSET_RETIRED" | "HOST_RETIRED" | "ASSIGNMENT_MISSING" | "ASSIGNMENT_CONFLICT" | "HOST_MISMATCH";
+                    mapping: {
+                        /** Format: uuid */
+                        assetId: string;
+                        /** Format: uuid */
+                        hostAssetId: string;
+                        assignmentId: number;
+                        assignmentValidFromUtc: number;
+                        assignmentValidToUtc: number | null;
+                    } | null;
+                }[];
+            };
             message: string;
         };
         "enterprise.asset.mapping.resolve.req": {
