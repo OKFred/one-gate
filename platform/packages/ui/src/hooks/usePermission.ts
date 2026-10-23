@@ -417,6 +417,10 @@ export const permissions = {
       mapping: {
         read: 'enterprise.asset.mapping:read',
       },
+      /** 资产采集身份目录 */
+      telemetry: {
+        read: 'enterprise.asset.telemetry:read',
+      },
     },
     /** enterprise.mail */
     mail: {

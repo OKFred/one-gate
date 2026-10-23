@@ -1,4 +1,5 @@
 import { integer } from "drizzle-orm/sqlite-core";
+import { classifySafeErrorCause } from "../utils/safe-error-cause.js";
 
 export const SOFT_DELETE_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 export const SOFT_DELETE_BATCH_SIZE = 100;
@@ -107,13 +108,14 @@ export async function runSoftDeleteCleanup(
       };
       if (result.remainingExpired > 0) logger.warn(event);
       else logger.info(event);
-    } catch {
+    } catch (error: unknown) {
       failed = true;
       // Driver errors may contain SQL parameters or record contents.
       logger.error({
         event: "soft_delete_cleanup_failed",
         ...context,
         errorCode: "CLEANUP_FAILED",
+        causeCode: classifySafeErrorCause(error),
         durationMs: Math.max(0, Date.now() - startedAt),
       });
     }

@@ -54,6 +54,11 @@ export class ServiceRegistry {
 
 let currentRegistry: ServiceRegistry | null = null;
 
+/** Whether a registry is installed, including an explicitly supplied override. */
+export function isAdminRegistryInitialized(): boolean {
+  return currentRegistry !== null;
+}
+
 // 提供给消费端简洁调用的代理对象，其属性和方法类型完全与 IAdminServices 对齐
 export const registry = new Proxy(
   {},

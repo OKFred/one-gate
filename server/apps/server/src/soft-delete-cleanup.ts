@@ -5,28 +5,39 @@ import {
 } from "@hodor/core/db/soft-delete.js";
 import { purgeExpiredDepartmentArchives } from "@hodor/admin/maintenance/compliance/department-cleanup.js";
 import { recycleBinRegistry } from "./recycle-bin-resources.js";
+import type { ScheduledMaintenanceContext } from "./scheduled-maintenance.js";
+
+export {
+  runScheduledMaintenance,
+  type ScheduledMaintenanceContext,
+  type ScheduledMaintenanceTask,
+  type ScheduledMaintenanceTaskName,
+} from "./scheduled-maintenance.js";
 
 const legacyDepartmentArchiveCleanup: SoftDeleteCleanupAdapter = {
   module: "legacy_department_archive",
   purgeExpired: purgeExpiredDepartmentArchives,
 };
 
-export const runRetentionMaintenance = () =>
-  runSoftDeleteCleanup([
-    ...recycleBinRegistry.list().map((adapter) => ({
-      module: adapter.resourceType,
-      purgeExpired: (input: SoftDeleteCleanupInput) =>
-        adapter.purgeExpired(input),
-    })),
-    legacyDepartmentArchiveCleanup,
-  ]);
-
-/** Await every task even when a user-editable Cron or an unrelated maintenance task fails. */
-export async function runScheduledMaintenance(
-  tasks: readonly (() => Promise<unknown>)[]
-): Promise<void> {
-  const results = await Promise.allSettled(tasks.map(async (task) => task()));
-  if (results.some((result) => result.status === "rejected")) {
-    throw new Error("Scheduled maintenance failed; inspect task logs");
-  }
-}
+/** Keep resource diagnostics correlated with their enclosing maintenance run. */
+export const runRetentionMaintenance = (
+  context?: ScheduledMaintenanceContext
+) =>
+  runSoftDeleteCleanup(
+    [
+      ...recycleBinRegistry.list().map((adapter) => ({
+        module: adapter.resourceType,
+        purgeExpired: (input: SoftDeleteCleanupInput) =>
+          adapter.purgeExpired(input),
+      })),
+      legacyDepartmentArchiveCleanup,
+    ],
+    Date.now(),
+    context
+      ? {
+          info: (event) => console.info({ ...event, runId: context.runId }),
+          warn: (event) => console.warn({ ...event, runId: context.runId }),
+          error: (event) => console.error({ ...event, runId: context.runId }),
+        }
+      : console
+  );

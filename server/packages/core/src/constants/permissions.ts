@@ -130,6 +130,8 @@ export const permissionSeeds = {
   "enterprise.asset": {
     "": ["read", "add", "edit"],
     mapping: ["read"],
+    /** 资产采集身份目录 */
+    telemetry: ["read"],
   },
   "enterprise.mail": {
     "": ["read"],

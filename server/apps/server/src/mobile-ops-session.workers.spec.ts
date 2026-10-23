@@ -1,7 +1,8 @@
 import { env } from "cloudflare:test";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { hashDeviceToken } from "@hodor/admin/mobile/device/infrastructure/crypto.js";
+import { validateCapabilities } from "@hodor/admin/mobile/device/domain/device.js";
 
 const sessionId = "ops_testsession12345678";
 const clientId = "phone-test";
@@ -111,6 +112,100 @@ beforeEach(async () => {
 });
 
 describe("MobileOpsSession Durable Object", () => {
+  it.each([
+    "device.screen.brightness.get",
+    "device.screen.brightness.set",
+    "device.ui.target-at",
+    "device.telephony.get",
+    "device.alert.find",
+    "device.shell.exec",
+  ])(
+    "does not grant execution when a capability is reported: %s",
+    async (operation) => {
+      if (operation !== "device.shell.exec") {
+        expect(
+          validateCapabilities({
+            root: false,
+            trustedScripts: [],
+            ops: {
+              protocolVersion: 1,
+              enabled: true,
+              arbitraryShell: false,
+              operations: [operation],
+            },
+          }).ops?.operations
+        ).toEqual([operation]);
+      }
+      const ownSessionId = `ops_rejected${operation.replaceAll(/[^a-z]/g, "")}`;
+      const ticket = "operator-rejected-ticket";
+      const expiresAt = Date.now() + 60_000;
+      const stub = env.MOBILE_OPS.getByName(ownSessionId);
+      await stub.fetch("https://mobile-ops.internal/init", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-ops-internal": "1" },
+        body: JSON.stringify({
+          sessionId: ownSessionId,
+          clientId,
+          actorId: 1,
+          expiresAt,
+          ticketHash: await hashDeviceToken(ticket),
+        }),
+      });
+      const operatorResponse = await stub.fetch(
+        "https://mobile-ops.internal/ws",
+        {
+          headers: {
+            upgrade: "websocket",
+            "x-ops-role": "operator",
+            "x-ops-ticket": ticket,
+          },
+        }
+      );
+      const deviceResponse = await stub.fetch(
+        "https://mobile-ops.internal/ws",
+        {
+          headers: {
+            upgrade: "websocket",
+            "x-ops-role": "device",
+            "x-ops-client-id": clientId,
+          },
+        }
+      );
+      expect(operatorResponse.status).toBe(101);
+      expect(deviceResponse.status).toBe(101);
+      const operator = operatorResponse.webSocket!;
+      const device = deviceResponse.webSocket!;
+      operator.accept();
+      device.accept();
+      const forwarded = vi.fn();
+      device.addEventListener("message", forwarded);
+      const closed = nextClose(operator);
+      const now = Date.now();
+      operator.send(
+        JSON.stringify({
+          protocolVersion: 1,
+          type: "request",
+          sessionId: ownSessionId,
+          requestId: "req_rejected12345678",
+          operation,
+          params: {},
+          createdAt: now,
+          expiresAt: now + 15_000,
+        })
+      );
+      await expect(closed).resolves.toEqual({
+        code: 1008,
+        reason: "OPS_REQUEST_NOT_ALLOWED",
+      });
+      const audit = await env.DB.prepare(
+        "SELECT COUNT(*) AS count FROM admin_mobile_device_ops_audit"
+      ).first<{ count: number }>();
+      expect(audit?.count).toBe(0);
+      expect(forwarded).not.toHaveBeenCalled();
+      device.close();
+    }
+  );
+
   it("consumes one operator ticket and relays audited structured frames", async () => {
     const ticket = "operator-ticket-value";
     const expiresAt = Date.now() + 60_000;
