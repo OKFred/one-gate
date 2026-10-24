@@ -150,7 +150,7 @@ jobs:
         run: pnpm exec playwright install --with-deps --no-shell chromium
         working-directory: platform
       - name: Mocked auth, recycle bin, undo and enterprise isolation tests
-        run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ enterprise-assets/ --project=chromium
+        run: pnpm exec playwright test auth/auth-ui.spec.ts recycle-bin/recycle-bin.spec.ts delete-undo/ enterprise-assets/ api-token/ --project=chromium
         working-directory: platform
 
   secrets:

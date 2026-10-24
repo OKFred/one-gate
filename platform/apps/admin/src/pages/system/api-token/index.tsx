@@ -36,7 +36,7 @@ export default function ApiTokenManagement() {
     PermissionAPI.listAllFn({ data: {} })
       .then((res) => {
         const list = res.data.data || [];
-        setAllPermissions(list.map((p: any) => ({ code: p.code, name: p.name || '' })));
+        setAllPermissions(list.map((p) => ({ code: p.code, name: p.name || '' })));
       })
       .catch(() => {});
   }, []);
@@ -70,9 +70,9 @@ export default function ApiTokenManagement() {
     permissions: {},
     api: {
       list: ApiTokenAPI.listFn,
-      add: async (args: any) => {
-        const res: any = await ApiTokenAPI.addFn(args);
-        const token = res.data?.rawToken;
+      add: async (args) => {
+        const res = await ApiTokenAPI.addFn(args);
+        const token = res.data.data?.rawToken;
         if (token) {
           setRawToken(token);
           setTokenDialogOpen(true);
