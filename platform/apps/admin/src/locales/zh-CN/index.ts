@@ -12,6 +12,7 @@ import { mqtt } from './mqtt';
 import { base } from './base';
 import { voice } from './voice';
 import { mobile } from './mobile';
+import { map } from './map';
 
 /**
  * admin app zh-CN 翻译聚合入口
@@ -20,6 +21,7 @@ import { mobile } from './mobile';
 export default {
   ...system,
   ...mobile,
+  ...map,
   ...home,
   ...mail,
   ...maintenance,

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Link as RouterLink, useSearchParams } from 'react-router-dom';
 import {
   Alert,
   Box,
@@ -17,7 +17,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import { AutoAwesome, Refresh } from '@mui/icons-material';
+import { AutoAwesome, MapOutlined, Refresh } from '@mui/icons-material';
 import { overviewFn, refreshFn } from '@/api/admin/maintenance/cloudflare-usage';
 import { classifyApiFailure } from '@/api/config';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -28,7 +28,30 @@ import { dateText, hasQuota, metricName, warningKey } from './usage-format';
 import { MetricDetailsDialog, UsageCosts, UsageDetails, UsageMetricCard } from './UsagePanels';
 import UsageTrend from './UsageTrend';
 
+const MapWorkspace = lazy(() => import('../map-workspace/MapWorkspace'));
+
 export default function HomePage() {
+  const [searchParams] = useSearchParams();
+  const t = useTranslation();
+
+  if (searchParams.get('view') === 'map') {
+    return (
+      <Suspense
+        fallback={
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress aria-label={t('map.loading')} />
+          </Box>
+        }
+      >
+        <MapWorkspace />
+      </Suspense>
+    );
+  }
+
+  return <UsageHomePage />;
+}
+
+function UsageHomePage() {
   const t = useTranslation();
   const { permissionCodes, loading: permissionsLoading } = usePermission();
   const allowed = permissionCodes.has(permissions.admin.maintenance.cloudflare_usage.read);
@@ -182,7 +205,20 @@ export default function HomePage() {
             </Typography>
           )}
         </Box>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexShrink: 0 }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          useFlexGap
+          sx={{ alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', maxWidth: '100%' }}
+        >
+          <Button
+            component={RouterLink}
+            to="/home?view=map"
+            startIcon={<MapOutlined />}
+            size="small"
+          >
+            {t('map.open')}
+          </Button>
           {chatAllowed && (
             <Button
               component={RouterLink}
