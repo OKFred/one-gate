@@ -77,7 +77,7 @@ export async function runSelectedChat(
         auditMode: "metadata-only",
         remark: "AI chat inference",
         timeoutMs: 60000,
-        redirect: "error",
+        redirect: "manual",
       });
       if (!result.ok) throw new BusinessError(ErrorCodes.UPSTREAM_ERROR);
       response = await result.json();

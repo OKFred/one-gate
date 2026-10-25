@@ -30,7 +30,8 @@ export function retryAfter(value: string | null, now: number): number | null {
 export class CloudflareUsageClient {
   constructor(
     readonly config: UsageConfiguration,
-    private readonly fetcher: Fetcher = fetch,
+    private readonly fetcher: Fetcher = (input, init) =>
+      globalThis.fetch(input, init),
     private readonly deadline: number | null = null
   ) {}
   async request(
@@ -72,9 +73,13 @@ export class CloudflareUsageClient {
         },
         body:
           options.body === undefined ? undefined : JSON.stringify(options.body),
-        redirect: "error",
+        redirect: "manual",
         signal: controller.signal,
       });
+      if (response.status >= 300 && response.status < 400) {
+        await response.body?.cancel();
+        throw new UsageSourceError("redirect_rejected");
+      }
       if (!response.ok) {
         await response.body?.cancel();
         throw new UsageSourceError(
