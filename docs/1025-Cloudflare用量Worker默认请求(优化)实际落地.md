@@ -9,7 +9,9 @@
 1. 将原生 `fetch` 存为实例属性后，通过 `this.fetcher(...)` 调用会带入错误 receiver，抛出 `Illegal invocation`；现有稳定错误处理将其转成 `network_error`。默认值改为箭头委托 `globalThis.fetch(input, init)`，注入的 Fetcher 调用行为不变。
 2. 修正 receiver 后，Workerd 继续拒绝 `redirect: "error"`，在发出请求前抛出 `TypeError`。改为 `manual`，显式拒绝所有 3xx，返回稳定原因 `redirect_rejected`；不跟随 `Location`。
 
-生产代码仅修改 `client.ts`。旧 adapter 测试同步 redirect 断言，另加独立原生 Workerd 回归；无依赖、环境、数据库或调度修改。
+同一原生 redirect 限制也影响 AI chat 的配置模型与 Cloudflare REST 通道：`provider.ts` 向共享 HTTP 层传入的 `redirect: "error"` 同步改为 `manual`，继续通过 `!result.ok` 拒绝 3xx。只请求选定端点一次，不切换模型或供应商。
+
+生产代码仅修改 `client.ts` 和 AI chat `provider.ts`。旧 adapter 测试同步 redirect 断言，另加独立原生 Workerd 回归及两类 AI REST provider 的 302 回归；无依赖、环境、数据库或调度修改。
 
 ## 复现与验证边界
 
@@ -19,6 +21,7 @@
 - 原生回归覆盖默认 Billing GET、GraphQL POST、注入 Fetcher 行为和拒绝外域 302。所有凭据均为 synthetic；`fetchMock.disableNetConnect()`、`cf: false` 和本地 outbound service 隔离外网。302 测试确认仅一次官方域名请求，未访问重定向目标。
 - 302 测试直接使用 outbound service，避免 Miniflare 的 Node mock 桥先跟随重定向、掩盖原生 `manual` 行为。
 - 本次完成两轮复核；Node 定向 18 项通过（含独立原生 Workerd 4 项，另 3 项 PG 测试未启用），Worker/D1 定向 14 项通过；应用 TypeScript、格式、ESLint、差异检查均通过。
+- AI Node 47 项、Worker 37 项通过，覆盖 OpenAI 兼容与 Cloudflare REST 的 302 拒绝、单次调用及模型/供应商快照保持；使用受控 provider，不代表这些 REST 配置已经完成真实在线验收。
 
 ## 官方依据与后续验收
 

@@ -213,7 +213,7 @@ describe("strict AI chat", () => {
     expect(options).toMatchObject({
       method: "POST",
       auditMode: "metadata-only",
-      redirect: "error",
+      redirect: "manual",
     });
     expect(JSON.parse(String(options?.body))).toMatchObject({
       model: "selected-model",
@@ -412,6 +412,49 @@ describe("strict AI chat", () => {
       `https://api.cloudflare.com/client/v4/accounts/account/ai/run/${CF_TEXT_MODEL}`
     );
   });
+
+  it.each(["openai_compatible", "cloudflare_rest"] as const)(
+    "rejects a selected %s model's 302 without following or switching providers",
+    async (providerKind) => {
+      const run = vi.fn();
+      mocks.environment.CLOUDFLARE_ACCOUNT_ID = "account";
+      mocks.environment.CLOUDFLARE_API_TOKEN = "cf-token";
+      setRows([row({}, { model: "selected-model" })]);
+      if (providerKind === "openai_compatible") mocks.environment.AI = { run };
+      const modelKey =
+        providerKind === "openai_compatible"
+          ? await configuredKey()
+          : "cf:rest:text";
+      const selectedUrl =
+        providerKind === "openai_compatible"
+          ? "https://provider.example/v1/chat/completions"
+          : `https://api.cloudflare.com/client/v4/accounts/account/ai/run/${CF_TEXT_MODEL}`;
+      mocks.fetch.mockResolvedValue(
+        new Response(null, {
+          status: 302,
+          headers: { Location: "https://redirect.example/other-model" },
+        })
+      );
+
+      await expect(
+        chatService.ask.service({ q: "Hello", modelKey })
+      ).rejects.toMatchObject({
+        message: ErrorCodes.UPSTREAM_ERROR,
+        meta: undefined,
+      });
+      expect(mocks.fetch).toHaveBeenCalledTimes(1);
+      expect(mocks.fetch).toHaveBeenCalledWith(
+        selectedUrl,
+        expect.objectContaining({ redirect: "manual" })
+      );
+      if (providerKind === "openai_compatible") {
+        expect(
+          JSON.parse(String(mocks.fetch.mock.calls[0][1]?.body))
+        ).toMatchObject({ model: "selected-model" });
+      }
+      expect(run).not.toHaveBeenCalled();
+    }
+  );
 
   it("does not fall back after a binding exception and never exposes provider details", async () => {
     mocks.environment.AI = {
