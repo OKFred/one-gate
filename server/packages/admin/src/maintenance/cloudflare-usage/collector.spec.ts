@@ -182,4 +182,65 @@ describe("bounded persisted Cloudflare collector", () => {
     });
     expect(calls).toBe(1);
   });
+  it("persists publication failure backoff and replays the same job without duplicate snapshots", async () => {
+    const repository = getUsageRepository();
+    let rejectPublication = true;
+    const events: Record<string, string | number | null>[] = [];
+    const retryRepository = {
+      ...repository,
+      publish: async (...args: Parameters<typeof repository.publish>) => {
+        if (rejectPublication) {
+          rejectPublication = false;
+          throw new Error("D1_ERROR: synthetic publication rejection");
+        }
+        return repository.publish(...args);
+      },
+    };
+    const options = {
+      config,
+      repository: retryRepository,
+      fetcher: fixture(),
+      onEvent: (e: Record<string, string | number | null>) => events.push(e),
+    };
+    const first = await runCloudflareUsageMaintenance({
+      ...options,
+      runId: "first",
+      now,
+    });
+    const failed = await runCloudflareUsageMaintenance({
+      ...options,
+      runId: "second",
+      now: now + 60000,
+    });
+    expect(failed.state).toBe("pending");
+    expect(failed.jobId).toBe(first.jobId);
+    expect(failed.retryTimeUtc).not.toBeNull();
+    expect((await repository.read(config.accountId, 0)).snapshots).toEqual([]);
+    const early = await runCloudflareUsageMaintenance({
+      ...options,
+      runId: "early",
+      now: failed.retryTimeUtc! - 30000,
+    });
+    expect(early.processedCount).toBe(0);
+    const retry = await runCloudflareUsageMaintenance({
+      ...options,
+      runId: "retry",
+      now: failed.retryTimeUtc! + 1,
+    });
+    expect(retry.jobId).toBe(first.jobId);
+    expect(retry.state).toBe("partial");
+    const stored = await repository.read(config.accountId, 0);
+    expect(stored.snapshots).toHaveLength(2);
+    expect(stored.history).toHaveLength(1);
+    expect(events).toContainEqual({
+      event: "cloudflare_usage_publication_failed",
+      stage: "publish",
+      runId: "second",
+      jobId: first.jobId,
+      causeCode: "D1_ERROR",
+    });
+    expect(JSON.stringify(events)).not.toContain(
+      "synthetic publication rejection"
+    );
+  });
 });
