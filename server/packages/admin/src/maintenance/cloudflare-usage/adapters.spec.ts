@@ -44,7 +44,7 @@ describe("Cloudflare official metadata adapters", () => {
     await expect(
       client.request(`/accounts/${accountId}/billable-usage`, "billing")
     ).rejects.toMatchObject({ code: "response_too_large" });
-    expect(fetcher.mock.calls[0][1]?.redirect).toBe("error");
+    expect(fetcher.mock.calls[0][1]?.redirect).toBe("manual");
     const rateClient = new CloudflareUsageClient(
       configuration,
       async () =>
