@@ -1,4 +1,5 @@
 import { sql, type SQL } from "drizzle-orm";
+import { QUOTA_OBSERVATION_SOURCE_PREFIX } from "./quota-observation";
 import { Validator, type Schema } from "@cfworker/json-schema";
 import {
   UsageCostSchema,
@@ -268,6 +269,7 @@ export function createUsageRepository(port: UsageSqlPort): UsageRepository {
     },
     async publish(lease, next, now) {
       const exists = sql`EXISTS (SELECT 1 FROM cloudflare_usage_sync WHERE ${guard(lease, now)})`;
+      const observationSourcePattern = `${QUOTA_OBSERVATION_SOURCE_PREFIX}%`;
       const queries: SQL[] = [];
       for (const source of next.snapshots) {
         queries.push(
@@ -281,7 +283,7 @@ export function createUsageRepository(port: UsageSqlPort): UsageRepository {
                 sql`(${lease.accountId},${h.metricId},CAST(${h.dayUtc} AS BIGINT),${h.kind},${h.source},${h.value == null ? null : String(h.value)})`
             );
           queries.push(
-            sql`INSERT INTO cloudflare_usage_daily(account_id,metric_id,day_utc,kind,source,value) SELECT * FROM (VALUES ${sql.join(entries, sql`, `)}) AS usage_rows WHERE ${exists} ON CONFLICT(account_id,metric_id,day_utc,kind) DO UPDATE SET source=excluded.source,value=excluded.value`
+            sql`INSERT INTO cloudflare_usage_daily(account_id,metric_id,day_utc,kind,source,value) SELECT * FROM (VALUES ${sql.join(entries, sql`, `)}) AS usage_rows WHERE ${exists} ON CONFLICT(account_id,metric_id,day_utc,kind) DO UPDATE SET source=excluded.source,value=excluded.value WHERE cloudflare_usage_daily.kind <> 'cumulative_snapshot' OR cloudflare_usage_daily.source NOT LIKE ${observationSourcePattern} OR excluded.source LIKE ${observationSourcePattern}`
           );
         }
       }

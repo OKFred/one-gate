@@ -13,6 +13,7 @@ import {
   type SourceSnapshot,
 } from "./types";
 import { readUsageOverview } from "./service";
+import { withQuotaObservations } from "./quota-observation";
 export function syntheticSnapshot(now: number): SourceSnapshot {
   return {
     source: "billing-usage",
@@ -32,6 +33,30 @@ export function syntheticSnapshot(now: number): SourceSnapshot {
     ],
   };
 }
+function cycleSnapshot(now: number, used = 80): SourceSnapshot {
+  const snapshot = syntheticSnapshot(now);
+  snapshot.metrics.push({
+    id: "synthetic:known",
+    product: "Synthetic",
+    name: "Cycle requests",
+    unit: "requests",
+    used,
+    limit: 100,
+    remaining: Math.max(0, 100 - used),
+    percentage: used,
+    periodKind: "billing_cycle",
+    periodStartUtc: Date.UTC(2026, 9, 1),
+    periodEndUtc: Date.UTC(2026, 10, 1),
+    resetTimeUtc: Date.UTC(2026, 10, 1),
+    quotaKind: "included",
+    source: "billing-v2",
+    quality: "exact",
+    status: "available",
+    reason: null,
+    collectedTimeUtc: now,
+  });
+  return snapshot;
+}
 describe("Cloudflare usage persistent jobs (SQLite / D1)", () => {
   const now = Date.UTC(2026, 9, 25, 4);
   beforeAll(() => setupTestDb(db, [snapshotSql, dailySql, syncSql]));
@@ -42,6 +67,67 @@ describe("Cloudflare usage persistent jobs (SQLite / D1)", () => {
       "cloudflare_usage_sync",
     ])
   );
+  it("upserts measured observations once per UTC day while retaining raw daily values", async () => {
+    const repository = getUsageRepository();
+    const today = Date.UTC(2026, 9, 25);
+    for (const [offset, total] of [
+      [0, 80],
+      [60001, 90],
+      [DAY_MS, 100],
+    ]) {
+      const stamp = now + offset;
+      await repository.request("observed", stamp, `job-${offset}`, true);
+      const lease = (await repository.claim("observed", stamp, "run"))!;
+      const snapshot = cycleSnapshot(stamp, total);
+      snapshot.history.push(
+        { ...snapshot.history[0] },
+        {
+          ...snapshot.history[0],
+          kind: "cumulative_snapshot",
+          value: 999,
+        }
+      );
+      if (offset === DAY_MS)
+        snapshot.history.push({
+          metricId: "synthetic:known",
+          dayUtc: today,
+          kind: "cumulative_snapshot",
+          source: "billing-v2",
+          value: 999,
+        });
+      expect(
+        await repository.publish(
+          lease,
+          withQuotaObservations({ ...lease.cursor, snapshots: [snapshot] }),
+          stamp + 1
+        )
+      ).toBe(true);
+    }
+    const stored = await repository.read("observed", 0);
+    expect(stored.snapshots).toHaveLength(1);
+    expect(stored.history.filter((h) => h.kind === "daily_usage")).toHaveLength(
+      2
+    );
+    expect(
+      stored.history.filter((h) => h.kind === "cumulative_snapshot")
+    ).toEqual([
+      {
+        metricId: "synthetic:known",
+        dayUtc: today,
+        kind: "cumulative_snapshot",
+        value: 90,
+        source: "quota-observation:billing-v2",
+      },
+      {
+        metricId: "synthetic:known",
+        dayUtc: today + DAY_MS,
+        kind: "cumulative_snapshot",
+        value: 100,
+        source: "quota-observation:billing-v2",
+      },
+    ]);
+    expect(stored.history).toHaveLength(4);
+  });
   it.each([6, 14, 15, 31, 159])(
     "publishes every row across native D1 compound SELECT boundaries (%i rows)",
     async (size) => {
@@ -78,7 +164,7 @@ describe("Cloudflare usage persistent jobs (SQLite / D1)", () => {
     try {
       await repository.request("synthetic", now, "history-job", true);
       const lease = (await repository.claim("synthetic", now, "history-run"))!;
-      const snapshot = syntheticSnapshot(now);
+      const snapshot = cycleSnapshot(now);
       snapshot.history = Array.from({ length: 15 }, (_, i) => ({
         ...snapshot.history[0],
         metricId: i === 14 ? "synthetic:reject" : `synthetic:metric-${i}`,
@@ -86,7 +172,11 @@ describe("Cloudflare usage persistent jobs (SQLite / D1)", () => {
       await expect(
         repository.publish(
           lease,
-          { ...lease.cursor, snapshots: [snapshot], coverage: [] },
+          withQuotaObservations({
+            ...lease.cursor,
+            snapshots: [snapshot],
+            coverage: [],
+          }),
           now + 1
         )
       ).rejects.toBeDefined();

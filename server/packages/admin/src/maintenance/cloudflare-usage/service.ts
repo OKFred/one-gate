@@ -6,6 +6,7 @@ import {
   UsageOverviewResponseSchema,
   UsageRefreshRequestSchema,
   UsageRefreshResponseSchema,
+  type UsageOverviewRequest,
   type UsageOverview,
   type UsageRefresh,
 } from "./model";
@@ -22,7 +23,7 @@ export function getUsageConfiguration(): UsageConfiguration {
   };
 }
 export async function readUsageOverview(
-  params: { days?: 7 | 30 },
+  params: UsageOverviewRequest,
   options: {
     now?: number;
     config?: UsageConfiguration;

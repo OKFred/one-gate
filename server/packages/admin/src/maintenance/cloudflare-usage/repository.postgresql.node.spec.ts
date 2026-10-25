@@ -6,6 +6,7 @@ import {
   type PostgresTestHarness,
 } from "../../../../../apps/server/test/postgresql";
 import { createPostgresUsageRepository } from "./repository.pg";
+import { withQuotaObservations } from "./quota-observation";
 import { LEASE_MS, type SourceSnapshot } from "./types";
 describe.skipIf(!postgresTestsConfigured)(
   "PostgreSQL Cloudflare usage fencing and atomicity",
@@ -34,6 +35,83 @@ describe.skipIf(!postgresTestsConfigured)(
     });
     afterAll(() => harness?.close());
     beforeEach(() => harness.reset());
+    it("deduplicates observed keys before PG VALUES and replaces the same day's observation idempotently", async () => {
+      const repository = createPostgresUsageRepository();
+      for (const [offset, total] of [
+        [0, 80],
+        [60001, 90],
+        [86400000, 100],
+      ]) {
+        const stamp = now + offset;
+        await harness.run(() =>
+          repository.request("observed", stamp, `job-${offset}`, true)
+        );
+        const lease = (await harness.run(() =>
+          repository.claim("observed", stamp, "run")
+        ))!;
+        const source: SourceSnapshot = {
+          ...snapshot,
+          metrics: [
+            {
+              id: "synthetic",
+              product: "Synthetic",
+              name: "Cycle requests",
+              unit: "requests",
+              used: total,
+              limit: 100,
+              remaining: 100 - total,
+              percentage: total,
+              periodKind: "billing_cycle",
+              periodStartUtc: Date.UTC(2026, 9, 1),
+              periodEndUtc: Date.UTC(2026, 10, 1),
+              resetTimeUtc: Date.UTC(2026, 10, 1),
+              quotaKind: "included",
+              source: "billing-v2",
+              quality: "exact",
+              status: "available",
+              reason: null,
+              collectedTimeUtc: stamp,
+            },
+          ],
+          history: [
+            ...snapshot.history,
+            ...snapshot.history,
+            { ...snapshot.history[0], kind: "cumulative_snapshot", value: 999 },
+          ],
+        };
+        expect(
+          await harness.run(() =>
+            repository.publish(
+              lease,
+              withQuotaObservations({ ...lease.cursor, snapshots: [source] }),
+              stamp + 1
+            )
+          )
+        ).toBe(true);
+      }
+      const stored = await harness.run(() => repository.read("observed", 0));
+      expect(stored.history).toHaveLength(3);
+      expect(
+        stored.history.find(
+          (h) => h.kind === "cumulative_snapshot" && h.dayUtc === now
+        )
+      ).toMatchObject({
+        value: 90,
+        source: "quota-observation:billing-v2",
+      });
+      expect(
+        stored.history.find(
+          (h) => h.kind === "cumulative_snapshot" && h.dayUtc === now + 86400000
+        )
+      ).toMatchObject({
+        value: 100,
+        source: "quota-observation:billing-v2",
+      });
+      expect(stored.history.find((h) => h.kind === "daily_usage")?.value).toBe(
+        3
+      );
+      expect(stored.snapshots).toHaveLength(1);
+    });
     it.each([6, 14, 15, 31, 159])(
       "publishes VALUES chunks with nullable quantities (%i history rows)",
       async (size) => {

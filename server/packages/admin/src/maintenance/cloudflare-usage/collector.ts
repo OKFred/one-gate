@@ -7,6 +7,7 @@ import {
 import { getUsageConfiguration } from "./service";
 import { classifySafeErrorCause } from "@hodor/core/utils/safe-error-cause";
 import { getUsageRepository } from "./repository";
+import { withQuotaObservations } from "./quota-observation";
 import {
   ANALYTICS_ADAPTERS,
   advanceAnalytics,
@@ -509,7 +510,7 @@ export async function runCloudflareUsageMaintenance(
       try {
         accepted = await repository.publish(
           lease,
-          cursor,
+          withQuotaObservations(cursor),
           now + Math.floor(performance.now() - start)
         );
       } catch (error: unknown) {

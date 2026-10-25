@@ -24959,7 +24959,7 @@ export interface components {
         };
         "admin.maintenance.cloudflare_usage.overview.req": {
             /** @enum {unknown} */
-            days?: 7 | 30;
+            days?: 1 | 3 | 7 | 30;
         };
         "admin.maintenance.cloudflare_usage.overview.res": {
             ok: boolean;
