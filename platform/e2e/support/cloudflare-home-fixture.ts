@@ -49,7 +49,11 @@ export const fixtureCatalog: ChatCatalog = {
   ],
 };
 
-const now = Date.UTC(2026, 9, 25, 8);
+export const usageFixtureNow = Date.UTC(2026, 9, 25, 8);
+export type UsageDays = 1 | 3 | 7 | 30;
+const now = usageFixtureNow;
+const day = Date.UTC(2026, 9, 25);
+const dayMs = 86_400_000;
 const monthStart = Date.UTC(2026, 9, 1);
 const monthEnd = Date.UTC(2026, 10, 1);
 
@@ -139,25 +143,32 @@ export function usageOverview(): UsageOverview {
     history: [
       {
         metricId: 'workers',
-        dayUtc: now - 86_400_000,
+        dayUtc: day - dayMs,
         value: 4,
         kind: 'daily_usage',
         source: 'Official fixture',
       },
       {
         metricId: 'workers',
-        dayUtc: now,
+        dayUtc: day,
         value: 8,
         kind: 'daily_usage',
         source: 'Official fixture',
       },
       {
         metricId: 'workers',
-        dayUtc: now,
+        dayUtc: monthStart,
         value: 80,
         kind: 'cumulative_snapshot',
         source: 'Official fixture',
       },
+      ...[40, 60, 80].map((value, index) => ({
+        metricId: 'workers',
+        dayUtc: day - (2 - index) * dayMs,
+        value,
+        kind: 'cumulative_snapshot' as const,
+        source: 'quota-observation:Official usage fixture',
+      })),
     ],
     coverage: [
       { product: 'Billing', status: 'forbidden', reason: 'Billing Read permission missing' },
@@ -174,6 +185,119 @@ export function usageOverview(): UsageOverview {
   };
 }
 
+/** A UTC daily quota, including a null day and an absent day that must stay gaps. */
+export function dailyUsageOverview(): UsageOverview {
+  const overview = usageOverview();
+  overview.metrics = [
+    {
+      ...overview.metrics[0],
+      id: 'daily-workers',
+      name: 'Daily requests',
+      used: 120,
+      remaining: 0,
+      percentage: 120,
+      periodKind: 'day',
+      periodStartUtc: day,
+      periodEndUtc: day + dayMs,
+      resetTimeUtc: day + dayMs,
+      quotaKind: 'hard',
+    },
+  ];
+  overview.history = [
+    ...[
+      { offset: 6, value: 25 },
+      { offset: 5, value: 30 },
+      { offset: 4, value: null },
+      { offset: 3, value: 45 },
+      { offset: 1, value: 60 },
+      { offset: 0, value: 120 },
+    ].map(({ offset, value }) => ({
+      metricId: 'daily-workers',
+      dayUtc: day - offset * dayMs,
+      value,
+      kind: 'daily_usage' as const,
+      source: 'Official daily fixture',
+    })),
+    {
+      metricId: 'daily-workers',
+      dayUtc: day,
+      value: 999,
+      kind: 'cumulative_snapshot',
+      source: 'quota-observation:Official daily fixture',
+    },
+  ];
+  return overview;
+}
+
+/** Current-cycle observations must not be added to daily usage or old API snapshots. */
+export function cumulativeUsageOverview(): UsageOverview {
+  const overview = usageOverview();
+  overview.metrics = [{ ...overview.metrics[0], name: 'Cycle requests' }];
+  overview.history.push(
+    {
+      metricId: 'workers',
+      dayUtc: day,
+      value: 999,
+      kind: 'daily_usage',
+      source: 'Official daily fixture',
+    },
+    {
+      metricId: 'workers',
+      dayUtc: monthStart + dayMs,
+      value: 999,
+      kind: 'cumulative_snapshot',
+      source: 'Official old cumulative fixture',
+    },
+    {
+      metricId: 'workers',
+      dayUtc: monthStart - dayMs,
+      value: 999,
+      kind: 'cumulative_snapshot',
+      source: 'quota-observation:Official previous-cycle fixture',
+    },
+  );
+  return overview;
+}
+
+export function capacityUsageOverview(): UsageOverview {
+  const overview = usageOverview();
+  overview.metrics = [
+    {
+      ...overview.metrics[0],
+      id: 'capacity',
+      product: 'R2',
+      name: 'Current storage',
+      used: 6,
+      unit: 'GB',
+      limit: 10,
+      remaining: 4,
+      percentage: 60,
+      periodKind: 'instant',
+      periodStartUtc: null,
+      periodEndUtc: null,
+      resetTimeUtc: null,
+      quotaKind: 'capacity',
+    },
+  ];
+  overview.history = [
+    {
+      metricId: 'capacity',
+      dayUtc: day - dayMs,
+      value: 4,
+      kind: 'daily_usage',
+      source: 'Official historical fixture',
+    },
+    {
+      metricId: 'capacity',
+      dayUtc: day,
+      value: 50,
+      kind: 'cumulative_snapshot',
+      source: 'quota-observation:Official capacity fixture',
+    },
+  ];
+  return overview;
+}
+
 /** All business requests and remote federation modules remain inside the fixture. */
 export async function installCloudflareHomeFixture(
   page: Page,
@@ -181,6 +305,7 @@ export async function installCloudflareHomeFixture(
     permissions?: string[];
     overview?: UsageOverview;
     catalog?: ChatCatalog;
+    langCode?: 'en-US' | 'zh-CN';
   } = {},
 ) {
   const state = {
@@ -191,23 +316,23 @@ export async function installCloudflareHomeFixture(
     overview: options.overview ?? usageOverview(),
     catalog: options.catalog ?? fixtureCatalog,
     askRequests: [] as ChatRequest[],
-    overviewRequests: [] as { days?: 7 | 30 }[],
+    overviewRequests: [] as { days?: UsageDays }[],
     refreshRequests: 0,
     modelRequests: 0,
     oldModelRequests: 0,
   };
-  await page.addInitScript(() => {
+  await page.addInitScript((langCode: 'en-US' | 'zh-CN') => {
     localStorage.setItem(
       'userInfo',
       JSON.stringify({
         id: 42,
         username: 'fixture_user',
         token: 'fixture-token',
-        langCode: 'en-US',
+        langCode,
       }),
     );
     sessionStorage.setItem('chunk_reload_attempted', '1');
-  });
+  }, options.langCode ?? 'en-US');
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (/\/(enterprise|personal)\/remoteEntry\.js$/u.test(url.pathname)) {
@@ -248,8 +373,13 @@ export async function installCloudflareHomeFixture(
       state.askRequests.push(route.request().postDataJSON() as ChatRequest);
       result = '**Fixture reply**';
     } else if (path.endsWith('/cloudflare-usage/overview')) {
-      state.overviewRequests.push(route.request().postDataJSON() as { days?: 7 | 30 });
-      result = state.overview;
+      const request = route.request().postDataJSON() as { days?: UsageDays };
+      state.overviewRequests.push(request);
+      const since = day - ((request.days ?? 7) - 1) * dayMs;
+      result = {
+        ...state.overview,
+        history: state.overview.history.filter((point) => point.dayUtc >= since),
+      };
     } else if (path.endsWith('/cloudflare-usage/refresh')) {
       state.refreshRequests += 1;
       result = { accepted: true, jobId: 'fixture-job', eligibleTimeUtc: null, state: 'pending' };

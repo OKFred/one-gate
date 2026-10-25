@@ -127,7 +127,7 @@ export const UsageSyncSchema = {
 } as const satisfies JSONSchema;
 export const UsageOverviewRequestSchema = {
   type: "object",
-  properties: { days: { enum: [7, 30] } },
+  properties: { days: { enum: [1, 3, 7, 30] } },
   required: [],
   additionalProperties: false,
 } as const satisfies JSONSchema;
@@ -183,6 +183,9 @@ export const UsageRefreshResponseSchema = {
   additionalProperties: false,
 } as const satisfies JSONSchema;
 export type UsageMetric = FromSchema<typeof UsageMetricSchema>;
+export type UsageOverviewRequest = FromSchema<
+  typeof UsageOverviewRequestSchema
+>;
 export type UsageCost = FromSchema<typeof UsageCostSchema>;
 export type UsageHistory = FromSchema<typeof UsageHistorySchema>;
 export type UsageCoverage = FromSchema<typeof UsageCoverageSchema>;

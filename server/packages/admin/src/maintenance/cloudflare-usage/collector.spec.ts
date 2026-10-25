@@ -231,7 +231,17 @@ describe("bounded persisted Cloudflare collector", () => {
     expect(retry.state).toBe("partial");
     const stored = await repository.read(config.accountId, 0);
     expect(stored.snapshots).toHaveLength(2);
-    expect(stored.history).toHaveLength(1);
+    expect(stored.history).toHaveLength(2);
+    expect(stored.history.filter((h) => h.kind === "daily_usage")).toHaveLength(
+      1
+    );
+    expect(
+      stored.history.find((h) => h.kind === "cumulative_snapshot")
+    ).toMatchObject({
+      source: "quota-observation:billing-v1",
+      dayUtc: Math.floor(now / 86_400_000) * 86_400_000,
+      value: 12,
+    });
     expect(events).toContainEqual({
       event: "cloudflare_usage_publication_failed",
       stage: "publish",
