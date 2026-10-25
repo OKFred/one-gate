@@ -70,10 +70,14 @@ describe("PostgreSQL configuration boundary", () => {
       "/admin/system/department/deleteWithUndo",
       "/admin/system/auth/login",
       "/admin/system/auth/gate/status",
+      "/admin/maintenance/cloudflare-usage/overview",
+      "/admin/maintenance/cloudflare-usage/refresh",
     ])
       expect(supportsPostgresPath(path)).toBe(true);
     for (const path of [
       "/admin/mail/action/send",
+      "/admin/ai/chat/ask",
+      "/admin/ai/chat/models",
       "/admin/maintenance/init/reset",
       "/admin/system/auth/ssoLogin",
       "/admin/mobile/device/list",

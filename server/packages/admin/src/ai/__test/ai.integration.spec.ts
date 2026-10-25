@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterEach, vi } from "vitest";
 import db from "@hodor/core/db/index";
 import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
-import aiLlmConfigService from "../config/service";
+import aiLlmConfigService, { getDefaultConfig } from "../config/service";
 import aiChatService from "../chat/service";
 import baseSysConfigSql from "@hodor/core/db/sql/admin/base_sys_config.sql?raw";
 import { initAdminRegistry } from "../../register";
@@ -195,6 +195,32 @@ describe("AI 模块全链路集成测试", () => {
       expect(c2.isDefault).toBe(false);
       expect(c3.isDefault).toBe(true);
     });
+
+    it("读取默认配置时先按主配置排序，不被更新的非主配置遮挡", async () => {
+      await aiLlmConfigService.add.service(
+        {
+          name: "Primary older config",
+          provider: "OpenAI",
+          apiKey: "fixture-primary",
+          model: "gpt-4o",
+          isEnabled: true,
+          isDefault: true,
+        },
+        userObj
+      );
+      await aiLlmConfigService.add.service(
+        {
+          name: "Nonprimary newer config",
+          provider: "OpenAI",
+          apiKey: "fixture-secondary",
+          model: "gpt-4o",
+          isEnabled: true,
+          isDefault: false,
+        },
+        userObj
+      );
+      expect((await getDefaultConfig())?.name).toBe("Primary older config");
+    });
   });
 
   describe("AI 配置连通性校验 (Verify Connection)", () => {
@@ -359,7 +385,7 @@ describe("AI 模块全链路集成测试", () => {
       // 在 afterEach 中已经 clearTestData，所以这里没有配置
       await expect(
         aiChatService.ask.service({ q: "Hello" })
-      ).rejects.toThrowError(/未配置后台 AI 引擎/);
+      ).rejects.toThrowError(ChatErrorCodes.CONFIG_NOT_FOUND);
     });
 
     it("API 响应失败报错测试", async () => {
@@ -390,7 +416,7 @@ describe("AI 模块全链路集成测试", () => {
       // 3. 调用并断言抛出错误
       await expect(
         aiChatService.ask.service({ q: "Hello" })
-      ).rejects.toThrowError(/500/);
+      ).rejects.toThrowError(ChatErrorCodes.UPSTREAM_ERROR);
     });
   });
 });

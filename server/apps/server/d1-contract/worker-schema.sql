@@ -541,3 +541,14 @@ SELECT json(CASE WHEN
   AND (SELECT COUNT(*) FROM pragma_foreign_key_list('enterprise_tenant')) = 0
 THEN '{}' ELSE 'invalid enterprise_tenant schema' END) AS enterprise_tenant_contract;
 -- enterprise-assets-contract-end
+
+-- cloudflare-usage-contract-start
+-- Read-only Cloudflare usage schema contract, generated from the targeted Drizzle schema.
+
+SELECT json(CASE WHEN EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='cloudflare_usage_daily' AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(sql, ' ', ''), CHAR(9), ''), CHAR(10), ''), CHAR(13), ''), '"', ''), CHAR(96), ''))='createtablecloudflare_usage_daily(account_idtextnotnull,metric_idtextnotnull,day_utcintegernotnull,kindtextnotnull,sourcetextnotnull,valuetext,primarykey(account_id,metric_id,day_utc,kind))')
+  AND EXISTS (SELECT 1 FROM sqlite_master WHERE type='index' AND name='cloudflare_usage_daily_retention_idx' AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(sql, ' ', ''), CHAR(9), ''), CHAR(10), ''), CHAR(13), ''), '"', ''), CHAR(96), ''))='createindexcloudflare_usage_daily_retention_idxoncloudflare_usage_daily(account_id,day_utc)') THEN '{}' ELSE 'invalid cloudflare_usage_daily schema' END) AS cloudflare_usage_daily_contract;
+
+SELECT json(CASE WHEN EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='cloudflare_usage_snapshot' AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(sql, ' ', ''), CHAR(9), ''), CHAR(10), ''), CHAR(13), ''), '"', ''), CHAR(96), ''))='createtablecloudflare_usage_snapshot(account_idtextnotnull,sourcetextnotnull,payload_jsontextnotnull,collected_time_utcintegernotnull,primarykey(account_id,source))') THEN '{}' ELSE 'invalid cloudflare_usage_snapshot schema' END) AS cloudflare_usage_snapshot_contract;
+
+SELECT json(CASE WHEN EXISTS (SELECT 1 FROM sqlite_master WHERE type='table' AND name='cloudflare_usage_sync' AND LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(sql, ' ', ''), CHAR(9), ''), CHAR(10), ''), CHAR(13), ''), '"', ''), CHAR(96), ''))='createtablecloudflare_usage_sync(account_idtextprimarykeynotnull,job_idtext,statetextnotnull,last_success_time_utcinteger,next_run_time_utcintegernotnull,retry_time_utcinteger,requested_time_utcintegernotnull,ownertext,generationintegernotnull,lease_expires_time_utcintegernotnull,cursor_jsontext,attemptsintegernotnull,coverage_jsontextnotnull)') THEN '{}' ELSE 'invalid cloudflare_usage_sync schema' END) AS cloudflare_usage_sync_contract;
+-- cloudflare-usage-contract-end

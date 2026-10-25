@@ -43,10 +43,7 @@ export async function createPostgresTestHarness(label: string) {
   });
   const database = drizzle(pool);
   const ddl = await readFile(
-    new URL(
-      "../postgresql-migrations/0001_core_enterprise.sql",
-      import.meta.url
-    ),
+    new URL("../postgresql-schema.sql", import.meta.url),
     "utf8"
   );
   const tables = [...ddl.matchAll(/^CREATE TABLE "([a-z0-9_]+)" \(/gm)].map(

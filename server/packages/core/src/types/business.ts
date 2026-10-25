@@ -31,6 +31,8 @@ export const BUSINESS = {
   "admin.maintenance.compliance": "admin.maintenance.compliance",
   /** 运维回收站 */
   "admin.maintenance.recycle_bin": "admin.maintenance.recycle_bin",
+  /** Cloudflare 用量与费用 */
+  "admin.maintenance.cloudflare_usage": "admin.maintenance.cloudflare_usage",
   /** 运维定时任务 */
   "admin.maintenance.cron": "admin.maintenance.cron",
   /** 运维 API Task */

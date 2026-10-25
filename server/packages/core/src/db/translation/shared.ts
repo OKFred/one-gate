@@ -232,6 +232,10 @@ export const actionTranslations = {
     "zh-CN": "编辑",
     "en-US": "Edit",
   },
+  update: {
+    "zh-CN": "更新",
+    "en-US": "Update",
+  },
   delete: {
     "zh-CN": "删除",
     "en-US": "Delete",

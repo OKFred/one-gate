@@ -5,6 +5,7 @@ import { setKVBinding } from "@hodor/core/middleware/cache/index.js";
 import { setEnv } from "@hodor/core/utils/env.js";
 import { withWorkerPostgres } from "@hodor/core/db/postgresql/drivers.js";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
+import { runCloudflareUsageMaintenance } from "@hodor/admin/maintenance/cloudflare-usage/index.js";
 import {
   runRetentionMaintenance,
   runScheduledMaintenance,
@@ -201,6 +202,7 @@ export default {
           ensureAdminRegistry();
           await runScheduledMaintenance([
             { name: "retention", run: runRetentionMaintenance },
+            { name: "cloudflare_usage", run: runCloudflareUsageMaintenance },
           ]);
         })
       );
@@ -230,6 +232,7 @@ export default {
         { name: "device_ops_sessions", run: expireDeviceOpsSessions },
         { name: "device_ops_audits", run: cleanupDeviceOpsAudits },
         { name: "retention", run: runRetentionMaintenance },
+        { name: "cloudflare_usage", run: runCloudflareUsageMaintenance },
       ])
     );
   },

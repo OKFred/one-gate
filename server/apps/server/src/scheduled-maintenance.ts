@@ -11,6 +11,7 @@ const taskNames = [
   "device_ops_sessions",
   "device_ops_audits",
   "retention",
+  "cloudflare_usage",
 ] as const;
 
 export type ScheduledMaintenanceTaskName = (typeof taskNames)[number];

@@ -20,6 +20,43 @@ export const postgresMigrationSql = readFileSync(
 export const postgresMigrationChecksum = createHash("sha256")
   .update(postgresMigrationSql)
   .digest("hex");
+const cloudflareMigrationId = "0002_cloudflare_usage";
+const cloudflareMigrationSql = readFileSync(
+  new URL(
+    "../../apps/server/postgresql-migrations/0002_cloudflare_usage.sql",
+    import.meta.url
+  ),
+  "utf8"
+);
+const cloudflareMigrationChecksum = createHash("sha256")
+  .update(cloudflareMigrationSql)
+  .digest("hex");
+
+function migrationTableNames(sql: string): string[] {
+  return [...sql.matchAll(/^CREATE TABLE "([a-z0-9_]+)" \(/gm)]
+    .map((match) => match[1])
+    .sort();
+}
+
+/** Earlier SQL, checksums and contract fingerprints remain immutable. */
+export const postgresMigrations = [
+  {
+    id: postgresMigrationId,
+    sql: postgresMigrationSql,
+    checksum: postgresMigrationChecksum,
+    tableNames: migrationTableNames(postgresMigrationSql),
+  },
+  {
+    id: cloudflareMigrationId,
+    sql: cloudflareMigrationSql,
+    checksum: cloudflareMigrationChecksum,
+    tableNames: [
+      ...migrationTableNames(postgresMigrationSql),
+      ...migrationTableNames(cloudflareMigrationSql),
+    ].sort(),
+  },
+] as const;
+
 const ledger = "_one_gate_pg_migrations";
 
 interface CatalogEntry {
@@ -82,7 +119,8 @@ export async function postgresCatalogFingerprint(
 
 export async function assertPostgresSchema(
   client: PostgresMigrationClient,
-  schema: string
+  schema: string,
+  tableNames: readonly string[] = postgresTableNames
 ): Promise<void> {
   validatePostgresSchema(schema);
   const tables = await client.query<{ name: string }>(
@@ -94,7 +132,7 @@ export async function assertPostgresSchema(
     tables.rows
       .map((row) => row.name)
       .sort()
-      .join("\n") !== postgresTableNames.join("\n")
+      .join("\n") !== tableNames.join("\n")
   )
     throw new Error("PostgreSQL supported table set does not match");
   const actual = await client.query<{
@@ -115,6 +153,7 @@ export async function assertPostgresSchema(
   );
   const expected = postgresTables.flatMap((table) => {
     const config = getTableConfig(table);
+    if (!tableNames.includes(config.name)) return [];
     return config.columns.map((column) => ({ table: config.name, column }));
   });
   if (actual.rows.length !== expected.length)
@@ -161,7 +200,7 @@ export async function assertPostgresSchema(
 
 export type PostgresMigrationStatus = "pending" | "applied" | "already_applied";
 
-/** Apply only to an explicitly named application schema; all DDL and marker are atomic. */
+/** Apply an ordered migration prefix atomically to an explicitly named schema. */
 export async function migratePostgres(
   client: PostgresMigrationClient,
   options: { schema: string; apply?: boolean }
@@ -193,27 +232,38 @@ export async function migratePostgres(
       [schema]
     );
     const hasLedger = entries.rows.some((row) => row.name === ledger);
+    let appliedCount = 0;
     if (hasLedger) {
       const prior = await client.query<{
+        id: string;
         checksum: string;
         contract_checksum: string;
-      }>(`SELECT checksum,contract_checksum FROM ${ledger} WHERE id=$1`, [
-        postgresMigrationId,
-      ]);
-      if (prior.rows.length) {
-        if (prior.rows[0].checksum !== postgresMigrationChecksum)
+      }>(`SELECT id,checksum,contract_checksum FROM ${ledger} ORDER BY id`);
+      for (const [index, recorded] of prior.rows.entries()) {
+        const expected = postgresMigrations[index];
+        if (!expected || recorded.id !== expected.id)
+          throw new Error(
+            "PostgreSQL migration ledger is not an ordered known prefix"
+          );
+        if (recorded.checksum !== expected.checksum)
           throw new Error("PostgreSQL migration checksum mismatch");
-        await assertPostgresSchema(client, schema);
+      }
+      appliedCount = prior.rows.length;
+      if (prior.rows.length) {
+        // Validate the previous stage before any DDL or assertion of new tables.
         if (
-          prior.rows[0].contract_checksum !==
+          prior.rows[appliedCount - 1].contract_checksum !==
           (await postgresCatalogFingerprint(client, schema))
         )
           throw new Error("PostgreSQL schema fingerprint mismatch");
-        await client.query("COMMIT");
-        return "already_applied";
       }
     }
-    if (entries.rows.some((row) => row.name !== ledger))
+    if (appliedCount === postgresMigrations.length) {
+      await assertPostgresSchema(client, schema);
+      await client.query("COMMIT");
+      return "already_applied";
+    }
+    if (!appliedCount && entries.rows.some((row) => row.name !== ledger))
       throw new Error("PostgreSQL schema has unmarked existing tables");
     if (!options.apply) {
       await client.query("COMMIT");
@@ -222,13 +272,16 @@ export async function migratePostgres(
     await client.query(`CREATE TABLE IF NOT EXISTS ${ledger} (
       id text PRIMARY KEY NOT NULL, checksum text NOT NULL, contract_checksum text NOT NULL, applied_time_utc bigint NOT NULL
     )`);
-    await client.query(postgresMigrationSql);
+    for (const migration of postgresMigrations.slice(appliedCount)) {
+      await client.query(migration.sql);
+      await assertPostgresSchema(client, schema, migration.tableNames);
+      const fingerprint = await postgresCatalogFingerprint(client, schema);
+      await client.query(
+        `INSERT INTO ${ledger} (id,checksum,contract_checksum,applied_time_utc) VALUES ($1,$2,$3,$4)`,
+        [migration.id, migration.checksum, fingerprint, Date.now()]
+      );
+    }
     await assertPostgresSchema(client, schema);
-    const fingerprint = await postgresCatalogFingerprint(client, schema);
-    await client.query(
-      `INSERT INTO ${ledger} (id,checksum,contract_checksum,applied_time_utc) VALUES ($1,$2,$3,$4)`,
-      [postgresMigrationId, postgresMigrationChecksum, fingerprint, Date.now()]
-    );
     await client.query("COMMIT");
     return "applied";
   } catch (error: unknown) {

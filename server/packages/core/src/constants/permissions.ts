@@ -4,6 +4,7 @@ export type PermissionAction =
   | "read"
   | "add"
   | "edit"
+  | "update"
   | "delete"
   | "export"
   | "view"
@@ -95,6 +96,8 @@ export const permissionSeeds = {
     compliance: ["read"],
     /** 回收站 */
     recycle_bin: ["read", "restore", "purge"],
+    /** Cloudflare 用量与费用 */
+    cloudflare_usage: ["read", "update"],
     /** 初始化数据 */
     init: ["read"],
   },
