@@ -34,6 +34,39 @@ describe.skipIf(!postgresTestsConfigured)(
     });
     afterAll(() => harness?.close());
     beforeEach(() => harness.reset());
+    it.each([6, 14, 15, 31, 159])(
+      "publishes VALUES chunks with nullable quantities (%i history rows)",
+      async (size) => {
+        const repository = createPostgresUsageRepository();
+        await harness.run(() => repository.request("values", now, "job", true));
+        const lease = (await harness.run(() =>
+          repository.claim("values", now, "run")
+        ))!;
+        const source = {
+          ...snapshot,
+          history: Array.from({ length: size }, (_, i) => ({
+            ...snapshot.history[0],
+            metricId: `synthetic:metric-${i}`,
+            value: i % 4 === 0 ? null : i,
+          })),
+        };
+        expect(
+          await harness.run(() =>
+            repository.publish(
+              lease,
+              { ...lease.cursor, snapshots: [source], coverage: [] },
+              now + 1
+            )
+          )
+        ).toBe(true);
+        const stored = await harness.run(() => repository.read("values", 0));
+        expect(stored.history).toHaveLength(size);
+        expect(stored.history.filter((h) => h.value === null)).toHaveLength(
+          Math.ceil(size / 4)
+        );
+        expect(stored.snapshots).toHaveLength(1);
+      }
+    );
     it("serializes concurrent claims, fences expired work and isolates accounts", async () => {
       const repository = createPostgresUsageRepository();
       await harness.run(() =>

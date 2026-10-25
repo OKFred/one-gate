@@ -1,5 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 import db from "@hodor/core/db/index";
+import { sql } from "drizzle-orm";
 import { setupTestDb, clearTestData } from "@hodor/core/db/testHelper";
 import snapshotSql from "@hodor/core/db/sql/admin/cloudflare_usage_snapshot.sql?raw";
 import dailySql from "@hodor/core/db/sql/admin/cloudflare_usage_daily.sql?raw";
@@ -41,6 +42,64 @@ describe("Cloudflare usage persistent jobs (SQLite / D1)", () => {
       "cloudflare_usage_sync",
     ])
   );
+  it.each([6, 14, 15, 31, 159])(
+    "publishes every row across native D1 compound SELECT boundaries (%i rows)",
+    async (size) => {
+      const repository = getUsageRepository();
+      await repository.request("synthetic", now, "history-job", true);
+      const lease = (await repository.claim("synthetic", now, "history-run"))!;
+      const snapshot = syntheticSnapshot(now);
+      snapshot.history = Array.from({ length: size }, (_, i) => ({
+        ...snapshot.history[0],
+        metricId: `synthetic:metric-${i}`,
+        value: i % 4 === 0 ? null : i,
+      }));
+      expect(
+        await repository.publish(
+          lease,
+          { ...lease.cursor, snapshots: [snapshot], coverage: [] },
+          now + 1
+        )
+      ).toBe(true);
+      const stored = await repository.read("synthetic", 0);
+      expect(stored.snapshots).toHaveLength(1);
+      expect(stored.history).toHaveLength(size);
+      expect(stored.history.filter((h) => h.value === null)).toHaveLength(
+        Math.ceil(size / 4)
+      );
+      expect(stored.sync.state).toBe("complete");
+    }
+  );
+  it("rolls back snapshots and earlier history chunks when a later chunk fails", async () => {
+    const repository = getUsageRepository();
+    await db.run(
+      sql`CREATE TRIGGER synthetic_cloudflare_usage_reject BEFORE INSERT ON cloudflare_usage_daily WHEN NEW.metric_id = 'synthetic:reject' BEGIN SELECT RAISE(ABORT, 'synthetic rejection'); END`
+    );
+    try {
+      await repository.request("synthetic", now, "history-job", true);
+      const lease = (await repository.claim("synthetic", now, "history-run"))!;
+      const snapshot = syntheticSnapshot(now);
+      snapshot.history = Array.from({ length: 15 }, (_, i) => ({
+        ...snapshot.history[0],
+        metricId: i === 14 ? "synthetic:reject" : `synthetic:metric-${i}`,
+      }));
+      await expect(
+        repository.publish(
+          lease,
+          { ...lease.cursor, snapshots: [snapshot], coverage: [] },
+          now + 1
+        )
+      ).rejects.toBeDefined();
+      const stored = await repository.read("synthetic", 0);
+      expect(stored.snapshots).toEqual([]);
+      expect(stored.history).toEqual([]);
+      expect(stored.sync.state).toBe("running");
+    } finally {
+      await db.run(
+        sql`DROP TRIGGER IF EXISTS synthetic_cloudflare_usage_reject`
+      );
+    }
+  });
   it("coalesces refreshes and enforces owner/generation/expiry on cursor and publish", async () => {
     const repository = getUsageRepository();
     const requests = await Promise.all([

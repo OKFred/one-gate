@@ -5,6 +5,7 @@ import {
   type UsageConfiguration,
 } from "./client";
 import { getUsageConfiguration } from "./service";
+import { classifySafeErrorCause } from "@hodor/core/utils/safe-error-cause";
 import { getUsageRepository } from "./repository";
 import {
   ANALYTICS_ADAPTERS,
@@ -503,17 +504,49 @@ export async function runCloudflareUsageMaintenance(
       cursor.step++;
     }
     const complete = cursor.step >= STEPS;
-    const accepted = complete
-      ? await repository.publish(
-          lease,
-          cursor,
-          now + Math.floor(performance.now() - start)
-        )
-      : await repository.checkpoint(
+    let accepted: boolean;
+    if (complete) {
+      try {
+        accepted = await repository.publish(
           lease,
           cursor,
           now + Math.floor(performance.now() - start)
         );
+      } catch (error: unknown) {
+        const causeCode = classifySafeErrorCause(error);
+        event({
+          event: "cloudflare_usage_publication_failed",
+          stage: "publish",
+          runId: input.runId,
+          jobId: lease.jobId,
+          causeCode,
+        });
+        const failureTime = now + Math.floor(performance.now() - start);
+        const retryTime =
+          failureTime +
+          Math.min(15 * 60_000, 60_000 * 2 ** Math.min(lease.attempts, 4));
+        const recorded = await repository.fail(
+          lease,
+          [
+            ...cursor.coverage,
+            { product: "Persistence", status: "retrying", reason: causeCode },
+          ],
+          failureTime,
+          retryTime
+        );
+        result.failedCount++;
+        result.state = recorded ? "pending" : "fenced";
+        result.pendingCount = 1;
+        result.retryTimeUtc = recorded ? retryTime : null;
+        return finish();
+      }
+    } else {
+      accepted = await repository.checkpoint(
+        lease,
+        cursor,
+        now + Math.floor(performance.now() - start)
+      );
+    }
     result.state = !accepted
       ? "fenced"
       : complete

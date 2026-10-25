@@ -278,10 +278,10 @@ export function createUsageRepository(port: UsageSqlPort): UsageRepository {
             .slice(offset, offset + 14)
             .map(
               (h) =>
-                sql`SELECT ${lease.accountId},${h.metricId},CAST(${h.dayUtc} AS BIGINT),${h.kind},${h.source},${h.value == null ? null : String(h.value)}`
+                sql`(${lease.accountId},${h.metricId},CAST(${h.dayUtc} AS BIGINT),${h.kind},${h.source},${h.value == null ? null : String(h.value)})`
             );
           queries.push(
-            sql`INSERT INTO cloudflare_usage_daily(account_id,metric_id,day_utc,kind,source,value) SELECT * FROM (${sql.join(entries, sql` UNION ALL `)}) WHERE ${exists} ON CONFLICT(account_id,metric_id,day_utc,kind) DO UPDATE SET source=excluded.source,value=excluded.value`
+            sql`INSERT INTO cloudflare_usage_daily(account_id,metric_id,day_utc,kind,source,value) SELECT * FROM (VALUES ${sql.join(entries, sql`, `)}) AS usage_rows WHERE ${exists} ON CONFLICT(account_id,metric_id,day_utc,kind) DO UPDATE SET source=excluded.source,value=excluded.value`
           );
         }
       }
