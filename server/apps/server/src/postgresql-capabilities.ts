@@ -43,6 +43,7 @@ export function supportsPostgresPath(path: string): boolean {
   const split = path.lastIndexOf("/");
   const domain = path.slice(0, split);
   const action = path.slice(split + 1);
+  if (domain === "/admin/base/map") return action === "config";
   if (domain === "/admin/system/auth") return supportedAuthActions.has(action);
   if (path.startsWith("/admin/system/auth/gate/"))
     return !action.includes("/") && domain === "/admin/system/auth/gate";

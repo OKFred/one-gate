@@ -12,6 +12,7 @@ import { mqtt } from './mqtt';
 import { base } from './base';
 import { voice } from './voice';
 import { mobile } from './mobile';
+import { map } from './map';
 
 export default {
   ...system,
@@ -28,4 +29,5 @@ export default {
   ...base,
   ...voice,
   ...mobile,
+  ...map,
 } as const satisfies Record<string, string>;

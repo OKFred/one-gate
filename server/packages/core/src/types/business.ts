@@ -122,6 +122,8 @@ export const BUSINESS = {
   "admin.rpa.config": "admin.rpa.config",
   /** 基础配置 */
   "admin.base": "admin.base",
+  /** 登录用户地图工作区 */
+  "admin.base.map": "admin.base.map",
   /** 基础配置 - 具体配置 */
   "admin.base.sys_config": "admin.base.sys_config",
   /** 基础配置 - Webhook 配置 */

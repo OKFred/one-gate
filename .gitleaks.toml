@@ -14,6 +14,13 @@ paths = ['''^server/apps/server/src/admin\.postgresql\.node\.spec\.ts$''']
 regexes = ['''^(?:GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ)$''']
 
 [[rules.allowlists]]
+description = "Published RFC 6238 test vector in authenticated map route fixture"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''^server/packages/admin/src/base/map/routes\.spec\.ts$''']
+regexes = ['''^(?:GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ)$''']
+
+[[rules.allowlists]]
 description = "Reviewed synthetic fixture or translation identifier"
 condition = "AND"
 regexTarget = "secret"

@@ -13142,6 +13142,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/base/map/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read authenticated Tianditu browser configuration */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.base.map.config.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.base.map.config.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/mqtt/publish": {
         parameters: {
             query?: never;
@@ -30738,6 +30796,16 @@ export interface components {
              * @example 1
              */
             data: number;
+            message: string;
+        };
+        "admin.base.map.config.req": Record<string, never>;
+        "admin.base.map.config.res": {
+            ok: boolean;
+            data: {
+                configured: boolean;
+                /** @description Authenticated browser-only Tianditu key, or null when unconfigured */
+                browserKey: string | null;
+            };
             message: string;
         };
         "admin.mqtt.publish.req": {
