@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RecycleBinResourceAdapter } from "@hodor/core/db/recycle-bin.js";
 
 const mocks = vi.hoisted(() => ({
+  cloudflareUsage: vi.fn(async () => undefined),
   createApp: vi.fn(() => ({ fetch: vi.fn() })),
   schedule: vi.fn(),
   postgresql: false,
@@ -43,6 +44,9 @@ vi.mock("@hono/node-server", () => ({ serve: vi.fn(() => ({ on: vi.fn() })) }));
 vi.mock("node-cron", () => ({ default: { schedule: mocks.schedule } }));
 vi.mock("@hodor/admin/maintenance/cron/scheduler.js", () => ({
   runPendingJobs: mocks.cron,
+}));
+vi.mock("@hodor/admin/maintenance/cloudflare-usage/index.js", () => ({
+  runCloudflareUsageMaintenance: mocks.cloudflareUsage,
 }));
 vi.mock("@hodor/admin/mqtt/listener.js", () => ({
   startMqttEventListener: vi.fn(),
@@ -104,6 +108,9 @@ describe("Node scheduled bootstrap", () => {
     const tick: () => Promise<void> = mocks.schedule.mock.calls[0][1];
     await tick();
     expect(mocks.cron).toHaveBeenCalledTimes(1);
+    expect(mocks.cloudflareUsage).toHaveBeenCalledExactlyOnceWith({
+      runId: expect.any(String),
+    });
     expect(mocks.departmentCleanup).toHaveBeenCalledExactlyOnceWith({
       now: expect.any(Number),
       batchSize: 100,
@@ -121,8 +128,11 @@ describe("Node scheduled bootstrap", () => {
     );
   });
 
-  it("runs only retention inside the PostgreSQL context", async () => {
+  it("runs retention and usage inside the PostgreSQL context", async () => {
     mocks.postgresql = true;
+    mocks.cloudflareUsage.mockImplementationOnce(async () => {
+      expect(mocks.databaseActive).toBe(true);
+    });
     mocks.departmentCleanup.mockImplementationOnce(async () => {
       expect(mocks.databaseActive).toBe(true);
       return {
@@ -135,6 +145,7 @@ describe("Node scheduled bootstrap", () => {
     const tick: () => Promise<void> = mocks.schedule.mock.calls[0][1];
     await tick();
     expect(mocks.databaseRun).toHaveBeenCalledTimes(1);
+    expect(mocks.cloudflareUsage).toHaveBeenCalledTimes(1);
     expect(mocks.departmentCleanup).toHaveBeenCalledTimes(1);
     expect(mocks.roleCleanup).toHaveBeenCalledTimes(1);
     expect(mocks.archiveCleanup).toHaveBeenCalledTimes(1);

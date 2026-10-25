@@ -20,6 +20,7 @@ const supportedDomains = new Set([
   "/admin/base/log/http",
   "/admin/maintenance/login_log",
   "/admin/maintenance/recycle-bin",
+  "/admin/maintenance/cloudflare-usage",
   "/enterprise/tenant",
   "/enterprise/asset",
   "/enterprise/asset/mapping",

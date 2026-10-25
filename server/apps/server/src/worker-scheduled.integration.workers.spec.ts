@@ -25,12 +25,15 @@ import deviceSql from "@hodor/core/db/sql/admin/admin_mobile_device.sql?raw";
 import deviceEventSql from "@hodor/core/db/sql/admin/admin_mobile_device_event.sql?raw";
 import deviceOpsSql from "../d1-migrations/0003_mobile_device_ops.sql?raw";
 import worker from "./worker.js";
+import usageMigrationSql from "../d1-migrations/0018_cloudflare_usage.sql?raw";
+import { sqlStatements } from "../test/fixtures/enterprise-assets-migration";
+import { setEnv } from "@hodor/core/utils/env.js";
 
 /** Run the actual scheduled handler and observe every waitUntil operation. */
-async function runScheduledTick(): Promise<void> {
+async function runScheduledTick(bindings = env): Promise<void> {
   const context = createExecutionContext();
   const controller = createScheduledController({ cron: "* * * * *" });
-  await worker.scheduled(controller, env, context);
+  await worker.scheduled(controller, bindings, context);
   await waitOnExecutionContext(context);
 }
 
@@ -104,6 +107,11 @@ describe.sequential(
 
     afterEach(() => {
       vi.restoreAllMocks();
+      setEnv({
+        CF_USAGE_ACCOUNT_ID: "",
+        CF_USAGE_ANALYTICS_TOKEN: "",
+        CF_USAGE_BILLING_TOKEN: "",
+      });
     });
 
     it("starts scheduled before fetch, cleans retained resources, and keeps HTTP usable", async () => {
@@ -112,7 +120,7 @@ describe.sequential(
       const initializationLog = vi.spyOn(console, "log");
       expect(isAdminRegistryInitialized()).toBe(false);
 
-      // All seven real task implementations run against empty current schemas.
+      // The real tasks run against empty current schemas; usage skips missing configuration.
       await runScheduledTick();
       expect(isAdminRegistryInitialized()).toBe(true);
       expect(Object.keys(registry).sort()).toEqual([
@@ -202,7 +210,7 @@ describe.sequential(
         2,
         expect.objectContaining({
           event: "scheduled_maintenance_failed",
-          taskCount: 7,
+          taskCount: 8,
           failedTaskCount: 1,
           durationMs: expect.any(Number),
           runId: expect.any(String),
@@ -243,6 +251,49 @@ describe.sequential(
       await runScheduledTick();
       await expectRetentionCompleted();
       expect(errorLog).not.toHaveBeenCalled();
+    });
+    it("collects configured usage through the actual minute driver and isolated D1", async () => {
+      await env.DB.batch(
+        sqlStatements(usageMigrationSql).map((statement) =>
+          env.DB.prepare(statement)
+        )
+      );
+      const provider = vi
+        .spyOn(globalThis, "fetch")
+        .mockImplementation(async (_input, init) => {
+          expect(new Headers(init?.headers).get("Authorization")).toBe(
+            "Bearer fixture-billing-token"
+          );
+          return Response.json({ success: true, result: [] });
+        });
+      const bindings = {
+        ...env,
+        CF_USAGE_ACCOUNT_ID: "a".repeat(32),
+        CF_USAGE_BILLING_TOKEN: "fixture-billing-token",
+        CF_USAGE_ANALYTICS_TOKEN: "",
+      };
+      for (let tick = 0; tick < 15; tick++) {
+        await runScheduledTick(bindings);
+        const state = await env.DB.prepare(
+          "SELECT state FROM cloudflare_usage_sync"
+        ).first("state");
+        if (state === "partial" || state === "complete" || state === "failed")
+          break;
+      }
+      expect(provider).toHaveBeenCalled();
+      expect(
+        await env.DB.prepare("SELECT state FROM cloudflare_usage_sync").first(
+          "state"
+        )
+      ).toBe("partial");
+      expect(
+        await env.DB.prepare(
+          "SELECT COUNT(*) FROM cloudflare_usage_snapshot"
+        ).first("COUNT(*)")
+      ).toBeGreaterThan(0);
+      const calls = provider.mock.calls.length;
+      await runScheduledTick(bindings);
+      expect(provider).toHaveBeenCalledTimes(calls);
     });
   }
 );

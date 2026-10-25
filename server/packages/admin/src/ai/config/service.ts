@@ -362,6 +362,8 @@ export async function getDefaultConfig() {
   const res = await registry.base.sysConfig.list({
     namespace: "ai",
     isEnabled: true,
+    orderBy: "isPrimary",
+    descend: true,
     pageNo: 1,
     pageSize: 1,
   });

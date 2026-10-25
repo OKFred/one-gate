@@ -4,6 +4,7 @@ import { getEnv } from "@hodor/core/utils/env.js";
 import { serve } from "@hono/node-server";
 import cron from "node-cron";
 import { runPendingJobs } from "@hodor/admin/maintenance/cron/scheduler.js";
+import { runCloudflareUsageMaintenance } from "@hodor/admin/maintenance/cloudflare-usage/index.js";
 import {
   runRetentionMaintenance,
   runScheduledMaintenance,
@@ -59,12 +60,14 @@ function main() {
         await database.run(() =>
           runScheduledMaintenance([
             { name: "retention", run: runRetentionMaintenance },
+            { name: "cloudflare_usage", run: runCloudflareUsageMaintenance },
           ])
         );
       else
         await runScheduledMaintenance([
           { name: "cron_jobs", run: runPendingJobs },
           { name: "retention", run: runRetentionMaintenance },
+          { name: "cloudflare_usage", run: runCloudflareUsageMaintenance },
         ]);
     } catch (err) {
       console.error("[Node Scheduler] 定时任务扫描失败:", err);

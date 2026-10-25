@@ -32,17 +32,40 @@ async function installSessionFixture(page: Page) {
       await route.fulfill(fulfillOk({ verified: true, expiresAtUtc: null }));
     } else if (pathname.endsWith('/auth/getButtonPermission')) {
       await route.fulfill(
-        fulfillOk({ permissions: [{ id: 1, code: 'admin.system.auth:read', isEnabled: true }] }),
+        fulfillOk({
+          permissions: [
+            { id: 1, code: 'admin.system.auth:read', isEnabled: true },
+            { id: 2, code: 'admin.ai.chat:read', isEnabled: true },
+          ],
+        }),
       );
     } else if (pathname.endsWith('/menu/tree')) {
       await route.fulfill(
         fulfillOk([
           { id: 1, name: 'sidebar.menu.home', path: '/home', children: [] },
           { id: 2, name: 'sidebar.menu.me', path: '/me', children: [] },
+          { id: 3, name: 'sidebar.menu.ai.chat', path: '/admin/ai/chat', children: [] },
         ]),
       );
     } else if (pathname.endsWith('/auth/check')) {
       await route.fulfill(fulfillOk(true));
+    } else if (pathname.endsWith('/ai/chat/models')) {
+      await route.fulfill(
+        fulfillOk({
+          defaultModelKey: 'fixture:text',
+          models: [
+            {
+              modelKey: 'fixture:text',
+              label: 'Fixture text',
+              providerKind: 'cloudflare',
+              capabilities: ['text'],
+              available: true,
+              unavailableReason: null,
+              isDefault: true,
+            },
+          ],
+        }),
+      );
     } else {
       await route.fulfill(fulfillOk([]));
     }
@@ -603,8 +626,9 @@ test('the current session still expires through its own unauthorized notificatio
       body: JSON.stringify({ ok: false, data: { code: 'UNAUTHORIZED' }, message: 'Unauthorized' }),
     }),
   );
-  await page.goto('/#/home');
-  const question = page.getByPlaceholder(/输入您的提问内容|Enter your question/i);
+  await page.goto('/#/admin/ai/chat');
+  const question = page.getByPlaceholder(/输入您的提问内容|Type your question/i);
+  await expect(page.getByRole('combobox')).toHaveText(/Fixture text/);
   await question.fill('current session authorization check');
   await question.press('Enter');
   const notification = page.getByRole('dialog');

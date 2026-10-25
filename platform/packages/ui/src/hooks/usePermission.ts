@@ -208,6 +208,11 @@ export const permissions = {
         restore: 'admin.maintenance.recycle_bin:restore',
         purge: 'admin.maintenance.recycle_bin:purge',
       },
+      /** Cloudflare 用量与费用 */
+      cloudflare_usage: {
+        read: 'admin.maintenance.cloudflare_usage:read',
+        update: 'admin.maintenance.cloudflare_usage:update',
+      },
       /** 初始化数据 */
       init: {
         read: 'admin.maintenance.init:read',

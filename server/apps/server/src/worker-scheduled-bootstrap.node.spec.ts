@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { RecycleBinResourceAdapter } from "@hodor/core/db/recycle-bin.js";
 
 const mocks = vi.hoisted(() => ({
+  cloudflareUsage: vi.fn(async () => undefined),
   cleanupDeviceOpsAudits: vi.fn(async () => undefined),
   cleanupExpiredDeviceEvents: vi.fn(async () => undefined),
   createApp: vi.fn(),
@@ -73,6 +74,9 @@ vi.mock("@hodor/core/utils/env.js", () => ({
 }));
 vi.mock("@hodor/admin/maintenance/cron/scheduler.js", () => ({
   runPendingJobs: mocks.runPendingJobs,
+}));
+vi.mock("@hodor/admin/maintenance/cloudflare-usage/index.js", () => ({
+  runCloudflareUsageMaintenance: mocks.cloudflareUsage,
 }));
 vi.mock("@hodor/admin/system/department/facade.js", () => ({
   departmentRecycleBinAdapter: {
@@ -187,6 +191,7 @@ describe("Worker scheduled bootstrap", () => {
       mocks.cleanupExpiredDeviceEvents,
       mocks.expireDeviceOpsSessions,
       mocks.cleanupDeviceOpsAudits,
+      mocks.cloudflareUsage,
     ])
       expect(maintenance).toHaveBeenCalledTimes(1);
     expect(waitUntil).toHaveBeenCalledTimes(1);
@@ -225,8 +230,11 @@ describe("Worker scheduled bootstrap", () => {
     expect(mocks.runPendingJobs).toHaveBeenCalledTimes(1);
   });
 
-  it("runs only retention in a live PostgreSQL scope without creating HTTP routes", async () => {
+  it("runs retention and usage in a live PostgreSQL scope without creating HTTP routes", async () => {
     const { tick } = await harness(true);
+    mocks.cloudflareUsage.mockImplementationOnce(async () => {
+      expect(mocks.postgresActive).toBe(true);
+    });
     mocks.departmentCleanup.mockImplementationOnce(async () => {
       expect(mocks.postgresActive).toBe(true);
       return {
@@ -242,6 +250,9 @@ describe("Worker scheduled bootstrap", () => {
     expect(mocks.departmentCleanup).toHaveBeenCalledTimes(1);
     expect(mocks.roleCleanup).toHaveBeenCalledTimes(1);
     expect(mocks.archiveCleanup).toHaveBeenCalledTimes(1);
+    expect(mocks.cloudflareUsage).toHaveBeenCalledExactlyOnceWith({
+      runId: expect.any(String),
+    });
     for (const unavailable of [
       mocks.runPendingJobs,
       mocks.timeoutExpiredDeviceTasks,

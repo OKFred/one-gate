@@ -12,7 +12,8 @@ network access policies.
 
 The first PostgreSQL release supports password/JWT/TOTP authentication, users,
 roles, departments, permissions, menus, API tokens, i18n, application preferences,
-logs, enterprise tenants/assets and department/role recycle-bin operations.
+logs, enterprise tenants/assets, department/role recycle-bin operations and
+Cloudflare usage overview/refresh. AI chat remains outside this capability set.
 Unported modules return HTTP 501 with `POSTGRESQL_CAPABILITY_UNAVAILABLE`.
 SSO, email alerts, mobile operations, arbitrary business Cron jobs and other
 unported modules are unavailable. Machine tokens can use the asset mapping
@@ -77,7 +78,7 @@ an existing PostgreSQL database.
 Add `DATABASE_BACKEND=postgresql` to the private runtime environment alongside
 the connection settings and existing JWT/TOTP/master keys. Start the ordinary
 Node entry point. It uses a bounded `pg.Pool`; minute maintenance runs only the
-registered retention adapters for this backend. Requests use independent
+registered retention and Cloudflare usage maintenance for this backend. Requests use independent
 transaction scopes and a transaction-local schema search path.
 
 The first release serializes critical writes with one application-owned guard

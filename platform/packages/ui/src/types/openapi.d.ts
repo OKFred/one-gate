@@ -4299,6 +4299,122 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/maintenance/cloudflare-usage/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read Cloudflare account usage */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.cloudflare_usage.overview.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.cloudflare_usage.overview.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/maintenance/cloudflare-usage/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request Cloudflare usage refresh */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.maintenance.cloudflare_usage.refresh.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.maintenance.cloudflare_usage.refresh.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/data/schema_form_data/list": {
         parameters: {
             query?: never;
@@ -11316,6 +11432,64 @@ export interface paths {
                     };
                     content: {
                         "application/json": components["schemas"]["admin.ai.chat.ask.res"];
+                    };
+                };
+                /** @description 校验失败 */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+                /** @description 未知异常 */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ErrorInvalidRequest"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/ai/chat/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 获取可用聊天模型 */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["admin.ai.chat.models.req"];
+                };
+            };
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["admin.ai.chat.models.res"];
                     };
                 };
                 /** @description 校验失败 */
@@ -24783,6 +24957,89 @@ export interface components {
             data: number | string;
             message: string;
         };
+        "admin.maintenance.cloudflare_usage.overview.req": {
+            /** @enum {unknown} */
+            days?: 7 | 30;
+        };
+        "admin.maintenance.cloudflare_usage.overview.res": {
+            ok: boolean;
+            data: {
+                account: null | {
+                    id: string;
+                    name: string | null;
+                };
+                /** @enum {unknown} */
+                configuration: "missing" | "partial" | "configured";
+                metrics: {
+                    id: string;
+                    product: string;
+                    name: string;
+                    unit: string;
+                    used: number | null;
+                    limit: number | null;
+                    remaining: number | null;
+                    percentage: number | null;
+                    /** @enum {unknown} */
+                    periodKind: "day" | "billing_cycle" | "calendar_month" | "instant";
+                    periodStartUtc: number | null;
+                    periodEndUtc: number | null;
+                    resetTimeUtc: number | null;
+                    /** @enum {unknown} */
+                    quotaKind: "included" | "hard" | "capacity" | "unknown";
+                    source: string;
+                    /** @enum {unknown} */
+                    quality: "exact" | "estimated" | "reference" | "unknown";
+                    status: string;
+                    reason: string | null;
+                    collectedTimeUtc: number;
+                }[];
+                costs: {
+                    id: string;
+                    product: string;
+                    currency: string;
+                    amount: string;
+                    periodStartUtc: number | null;
+                    periodEndUtc: number | null;
+                    source: string;
+                    status: string;
+                }[];
+                history: {
+                    metricId: string;
+                    dayUtc: number;
+                    value: number | null;
+                    /** @enum {unknown} */
+                    kind: "daily_usage" | "cumulative_snapshot";
+                    source: string;
+                }[];
+                coverage: {
+                    product: string;
+                    status: string;
+                    reason: string | null;
+                }[];
+                sync: {
+                    /** @enum {unknown} */
+                    state: "idle" | "pending" | "running" | "partial" | "failed" | "complete";
+                    jobId: string | null;
+                    lastSuccessTimeUtc: number | null;
+                    nextRunTimeUtc: number | null;
+                    retryTimeUtc: number | null;
+                };
+                collectedTimeUtc: number | null;
+            };
+            message: string;
+        };
+        "admin.maintenance.cloudflare_usage.refresh.req": Record<string, never>;
+        "admin.maintenance.cloudflare_usage.refresh.res": {
+            ok: boolean;
+            data: {
+                accepted: boolean;
+                jobId: string | null;
+                eligibleTimeUtc: number | null;
+                /** @enum {unknown} */
+                state: "idle" | "pending" | "running" | "partial" | "failed" | "complete";
+            };
+            message: string;
+        };
         "admin.data.schema_form_data.list.req": {
             /** @description 是否降序 */
             descend?: boolean;
@@ -29357,8 +29614,10 @@ export interface components {
         "admin.ai.chat.ask.req": {
             /** @description 用户提问内容 */
             q: string;
-            /** @description 可选的图片 Base64 数据 */
+            /** @description 可选 PNG/JPEG data URI，当前及历史最多一张，解码后最大 5 MiB */
             image?: string;
+            /** @description models 接口返回的受控模型键，配置修改后须重新选择 */
+            modelKey?: string;
             /** @description 对话上下文历史 */
             history?: {
                 /** @enum {string} */
@@ -29380,6 +29639,24 @@ export interface components {
             ok: boolean;
             /** @description AI 返回的内容 */
             data: string;
+            message: string;
+        };
+        "admin.ai.chat.models.req": Record<string, never>;
+        "admin.ai.chat.models.res": {
+            ok: boolean;
+            data: {
+                defaultModelKey: string | null;
+                models: {
+                    modelKey: string;
+                    label: string;
+                    /** @enum {string} */
+                    providerKind: "cloudflare" | "openai_compatible";
+                    capabilities: ("text" | "image")[];
+                    available: boolean;
+                    unavailableReason: string | null;
+                    isDefault: boolean;
+                }[];
+            };
             message: string;
         };
         "admin.ai.config.search.req": {

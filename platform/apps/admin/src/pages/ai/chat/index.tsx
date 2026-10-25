@@ -1,436 +1,601 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Chip,
+  Alert,
   Avatar,
+  Box,
+  Button,
+  Chip,
   CircularProgress,
-  Tooltip,
-  Select,
-  MenuItem,
   FormControl,
+  IconButton,
   InputLabel,
+  MenuItem,
+  Paper,
+  Select,
   Stack,
-  useTheme,
+  TextField,
+  Tooltip,
+  Typography,
 } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
-import PersonIcon from '@mui/icons-material/Person';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import {
+  AddOutlined,
+  Close,
+  ContentCopy,
+  Fullscreen,
+  FullscreenExit,
+  ImageOutlined,
+  Person,
+  Refresh,
+  Send,
+  SmartToy,
+} from '@mui/icons-material';
 import dayjs from 'dayjs';
-import { askFn } from '@/api/admin/ai/chat';
-import { modelsFn } from '@/api/admin/ai/openai';
+import { askFn, modelsFn, type ChatRequest } from '@/api/admin/ai/chat';
+import { classifyApiFailure } from '@/api/config';
+import Markdown from '@/components/Markdown';
 import { useTranslation } from '@/hooks/useTranslation';
+import { permissions, usePermission } from '@/hooks/usePermission';
+import { captureAuthSession, isCurrentAuthSession, subscribeAuthChanges } from '@/utils/auth';
 
-interface MessageItem {
+type Catalog = Awaited<ReturnType<typeof modelsFn>>['data']['data'];
+type Message = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  image?: string;
   timestamp: number;
-}
-
-interface ModelOption {
-  id: string;
-  label: string;
-}
-
-const DEFAULT_MODELS: ModelOption[] = [
-  { id: '@cf/meta/llama-3.3-70b-instruct', label: 'Llama 3.3 70B Instruct' },
-  { id: '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b', label: 'DeepSeek R1 Distill Qwen 32B' },
-  { id: '@cf/qwen/qwen2.5-7b-instruct', label: 'Qwen 2.5 7B Instruct' },
-  { id: '@cf/meta/llama-3.2-3b-instruct', label: 'Llama 3.2 3B Instruct' },
-];
+  request?: ChatRequest;
+  error?: string;
+};
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 export default function AiChatPage() {
   const t = useTranslation();
-  const theme = useTheme();
-  const [model, setModel] = useState('@cf/meta/llama-3.3-70b-instruct');
-  const [modelOptions, setModelOptions] = useState<ModelOption[]>(DEFAULT_MODELS);
+  const { permissionCodes } = usePermission();
+  const allowed = permissionCodes.has(permissions.admin.ai.chat.read);
+  const [catalog, setCatalog] = useState<Catalog | null>(null);
+  const [modelKey, setModelKey] = useState('');
   const [input, setInput] = useState('');
+  const [image, setImage] = useState<string>();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<MessageItem[]>([
-    {
-      id: 'init-1',
-      role: 'assistant',
-      content: t('ai.chat.welcome'),
-      timestamp: Date.now(),
-    },
-  ]);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [error, setError] = useState<string>();
+  const [expanded, setExpanded] = useState(false);
+  const [copied, setCopied] = useState<string>();
+  const generation = useRef(0);
+  const catalogGeneration = useRef(0);
+  const uploadGeneration = useRef(0);
+  const inFlight = useRef(false);
+  const controller = useRef<AbortController | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const end = useRef<HTMLDivElement>(null);
+  const selectedModel = catalog?.models.find((model) => model.modelKey === modelKey);
+  const conversationHasImage = messages.some((message) => Boolean(message.image));
+  const supportsImage = selectedModel?.capabilities.includes('image') === true;
 
   useEffect(() => {
-    modelsFn()
-      .then((res) => {
-        const list = res?.data?.data?.data;
-        if (Array.isArray(list) && list.length > 0) {
-          setModelOptions(list.map((m) => ({ id: m.id, label: m.id })));
-        }
+    const auth = captureAuthSession();
+    const requestGeneration = ++catalogGeneration.current;
+    const abort = new AbortController();
+    const current = () =>
+      catalogGeneration.current === requestGeneration && isCurrentAuthSession(auth);
+    setLoading(false);
+    setError(undefined);
+    setCatalog(null);
+    setModelKey('');
+    if (allowed) {
+      setCatalogLoading(true);
+      void modelsFn({
+        signal: abort.signal,
+        ignoreAbort: true,
+        errorPresentation: 'local',
+        shouldPresentError: current,
       })
-      .catch(() => {
-        // Fallback to default options
-      });
-  }, []);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+        .then(
+          (response) => {
+            if (!current()) return;
+            if (response.data.ok !== true || !Array.isArray(response.data.data?.models)) {
+              setError(t('ai.chat.catalogError'));
+              return;
+            }
+            const result = response.data.data;
+            setCatalog(result);
+            const defaultModel =
+              result.models.find(
+                (model) => model.available && model.modelKey === result.defaultModelKey,
+              ) ?? result.models.find((model) => model.available);
+            setModelKey(defaultModel?.modelKey ?? '');
+          },
+          (failure: unknown) => {
+            if (current() && classifyApiFailure(failure).kind !== 'session') {
+              setError(t('ai.chat.catalogError'));
+            }
+          },
+        )
+        .finally(() => {
+          if (current()) setCatalogLoading(false);
+        });
+    }
+    const unsubscribe = subscribeAuthChanges(() => {
+      if (isCurrentAuthSession(auth)) return;
+      generation.current += 1;
+      catalogGeneration.current += 1;
+      uploadGeneration.current += 1;
+      abort.abort();
+      controller.current?.abort();
+      inFlight.current = false;
+      setMessages([]);
+      setImage(undefined);
+      setInput('');
+      setError(undefined);
+      setLoading(false);
+      setCatalog(null);
+    });
+    return () => {
+      generation.current += 1;
+      catalogGeneration.current += 1;
+      uploadGeneration.current += 1;
+      abort.abort();
+      controller.current?.abort();
+      inFlight.current = false;
+      unsubscribe();
+    };
+  }, [allowed, t]);
 
   useEffect(() => {
-    scrollToBottom();
+    end.current?.scrollIntoView({ block: 'nearest' });
   }, [messages, loading]);
 
-  const quickPrompts = [
-    t('ai.chat.prompt1'),
-    t('ai.chat.prompt2'),
-    t('ai.chat.prompt3'),
-    t('ai.chat.prompt4'),
-  ];
+  const newConversation = () => {
+    generation.current += 1;
+    uploadGeneration.current += 1;
+    controller.current?.abort();
+    inFlight.current = false;
+    setLoading(false);
+    setMessages([]);
+    setImage(undefined);
+    setInput('');
+    setError(undefined);
+    setCopied(undefined);
+  };
 
-  const handleSend = async (textToSend?: string) => {
-    const q = (textToSend || input).trim();
-    if (!q || loading) return;
+  const execute = async (request: ChatRequest, userMessage: Message, previous: Message[]) => {
+    // A ref guards the interval before React commits the disabled button.
+    if (inFlight.current || !allowed) return;
+    inFlight.current = true;
+    const requestGeneration = generation.current;
+    const auth = captureAuthSession();
+    const abort = new AbortController();
+    controller.current = abort;
+    const current = () =>
+      generation.current === requestGeneration &&
+      isCurrentAuthSession(auth) &&
+      !abort.signal.aborted;
+    setMessages([...previous, { ...userMessage, error: undefined }]);
+    setError(undefined);
+    setLoading(true);
+    await askFn({
+      data: request,
+      signal: abort.signal,
+      ignoreAbort: true,
+      errorPresentation: 'local',
+      shouldPresentError: current,
+    })
+      .then(
+        (response) => {
+          if (!current()) return;
+          if (response.data.ok !== true || typeof response.data.data !== 'string') {
+            setMessages([...previous, { ...userMessage, error: t('ai.chat.invalidResponse') }]);
+            return;
+          }
+          setMessages([
+            ...previous,
+            { ...userMessage, error: undefined },
+            {
+              id: crypto.randomUUID(),
+              role: 'assistant',
+              content: response.data.data,
+              timestamp: Date.now(),
+            },
+          ]);
+        },
+        (failure: unknown) => {
+          if (!current()) return;
+          const result = classifyApiFailure(failure);
+          if (result.kind !== 'session') {
+            setMessages([
+              ...previous,
+              { ...userMessage, error: result.message ?? t('ai.chat.failed') },
+            ]);
+          }
+        },
+      )
+      .finally(() => {
+        if (generation.current === requestGeneration && isCurrentAuthSession(auth)) {
+          inFlight.current = false;
+          setLoading(false);
+          controller.current = null;
+        }
+      });
+  };
 
-    const userMsg: MessageItem = {
-      id: `usr-${Date.now()}`,
+  const send = (prompt?: string) => {
+    const q = (prompt ?? input).trim();
+    if (!q || inFlight.current || !selectedModel?.available || !allowed) return;
+    if ((image || conversationHasImage) && !supportsImage) {
+      setError(t('ai.chat.imageModelRequired'));
+      return;
+    }
+    const request: ChatRequest = {
+      q,
+      image,
+      modelKey,
+      history: messages.map((message) => ({
+        role: message.role,
+        content: message.image
+          ? [
+              { type: 'text' as const, text: message.content },
+              { type: 'image_url' as const, image_url: { url: message.image } },
+            ]
+          : message.content,
+      })),
+    };
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
       role: 'user',
       content: q,
+      image,
       timestamp: Date.now(),
+      request,
     };
+    setInput('');
+    setImage(undefined);
+    uploadGeneration.current += 1;
+    void execute(request, userMessage, messages);
+  };
 
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    if (!textToSend) setInput('');
-    setLoading(true);
-
+  const uploadImage = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || inFlight.current || conversationHasImage) return;
+    const uploadId = ++uploadGeneration.current;
+    const requestGeneration = generation.current;
+    const auth = captureAuthSession();
+    const current = () =>
+      generation.current === requestGeneration &&
+      uploadGeneration.current === uploadId &&
+      isCurrentAuthSession(auth);
+    if (!supportsImage) {
+      setError(t('ai.chat.imageModelRequired'));
+      return;
+    }
+    if (!['image/png', 'image/jpeg'].includes(file.type) || file.size > MAX_IMAGE_BYTES) {
+      setError(t('ai.chat.imageInvalid'));
+      return;
+    }
     try {
-      const historyPayload = newMessages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-
-      const res = await askFn({
-        data: {
-          q,
-          history: historyPayload,
-        },
-      });
-
-      const replyContent = res?.data?.data || res?.data?.message || '';
-
-      const assistantMsg: MessageItem = {
-        id: `ast-${Date.now()}`,
-        role: 'assistant',
-        content: replyContent,
-        timestamp: Date.now(),
+      const bytes = new Uint8Array(await file.slice(0, 8).arrayBuffer());
+      const png = [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => bytes[index] === byte);
+      const jpeg = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255;
+      if ((file.type === 'image/png' && !png) || (file.type === 'image/jpeg' && !jpeg)) {
+        if (current()) setError(t('ai.chat.imageInvalid'));
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (!current()) return;
+        if (typeof reader.result === 'string') {
+          setImage(reader.result);
+          setError(undefined);
+        }
       };
-
-      setMessages((prev) => [...prev, assistantMsg]);
-    } catch (err: unknown) {
-      const errMsg = err instanceof Error ? err.message : '';
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `err-${Date.now()}`,
-          role: 'assistant',
-          content: errMsg,
-          timestamp: Date.now(),
-        },
-      ]);
-    } finally {
-      setLoading(false);
+      reader.onerror = () => {
+        if (current()) {
+          setError(t('ai.chat.imageInvalid'));
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      if (current()) setError(t('ai.chat.imageInvalid'));
     }
   };
 
-  const handleClear = () => {
-    setMessages([
-      {
-        id: `init-${Date.now()}`,
-        role: 'assistant',
-        content: t('ai.chat.cleared'),
-        timestamp: Date.now(),
-      },
-    ]);
+  const copy = async (message: Message) => {
+    const requestGeneration = generation.current;
+    const auth = captureAuthSession();
+    const current = () => generation.current === requestGeneration && isCurrentAuthSession(auth);
+    try {
+      await navigator.clipboard.writeText(message.content);
+      if (current()) setCopied(message.id);
+    } catch {
+      if (current()) setError(t('ai.chat.copyFailed'));
+    }
   };
 
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
+  if (!allowed) return <Alert severity="info">{t('ai.chat.permissionRequired')}</Alert>;
 
   return (
     <Box
       sx={{
-        height: 'calc(100vh - 120px)',
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        p: 1,
+        minHeight: 500,
+        bgcolor: 'background.default',
+        color: 'text.primary',
+        height: 'calc(100dvh - 140px)',
+        ...(expanded
+          ? {
+              position: 'fixed',
+              inset: 0,
+              zIndex: 1400,
+              p: 2,
+              height: '100dvh',
+              bgcolor: 'background.default',
+            }
+          : {}),
       }}
     >
-      {/* 头部控制栏 */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2,
-          bgcolor: 'background.paper',
-        }}
-      >
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-          <Avatar sx={{ bgcolor: theme.palette.primary.main }}>
-            <SmartToyIcon />
-          </Avatar>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {t('sidebar.menu.ai.chat')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
+      <Paper variant="outlined" sx={{ p: 2 }}>
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          sx={{ alignItems: { md: 'center' } }}
+        >
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="h6">{t('sidebar.menu.ai.chat')}</Typography>
+            <Typography variant="body2" color="text.secondary">
               {t('ai.chat.subtitle')}
             </Typography>
           </Box>
-          <Chip
-            icon={<AutoAwesomeIcon sx={{ fontSize: '14px !important' }} />}
-            label="Workers AI Powered"
-            color="primary"
-            variant="outlined"
-            size="small"
-            sx={{ ml: 1, fontWeight: 500 }}
-          />
-        </Stack>
-
-        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-          <FormControl size="small" sx={{ minWidth: 260 }}>
-            <InputLabel id="ai-model-select-label">{t('ai.chat.modelSelect')}</InputLabel>
+          <FormControl size="small" sx={{ minWidth: { md: 280 }, maxWidth: '100%' }}>
+            <InputLabel id="chat-model-label">{t('ai.chat.modelSelect')}</InputLabel>
             <Select
-              labelId="ai-model-select-label"
-              value={model}
+              labelId="chat-model-label"
               label={t('ai.chat.modelSelect')}
-              onChange={(e) => setModel(e.target.value)}
+              value={modelKey}
+              disabled={loading || catalogLoading}
+              onChange={(event) => {
+                setModelKey(event.target.value);
+                setError(undefined);
+              }}
             >
-              {modelOptions.map((item) => (
-                <MenuItem key={item.id} value={item.id}>
-                  {item.label}
+              {catalog?.models.map((model) => (
+                <MenuItem
+                  key={model.modelKey}
+                  value={model.modelKey}
+                  disabled={!model.available}
+                  title={model.unavailableReason ?? undefined}
+                >
+                  {model.label}
+                  {model.capabilities.includes('image') ? ` · ${t('ai.chat.vision')}` : ''}
+                  {!model.available && model.unavailableReason
+                    ? ` · ${model.unavailableReason}`
+                    : ''}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
-
-          <Tooltip title={t('ai.chat.clearHistory')}>
-            <IconButton onClick={handleClear} color="default" size="small">
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" spacing={1}>
+            <Button startIcon={<AddOutlined />} onClick={newConversation}>
+              {t('ai.chat.newChat')}
+            </Button>
+            <Tooltip title={t(expanded ? 'common.exitFullScreen' : 'common.fullScreen')}>
+              <IconButton
+                aria-label={t(expanded ? 'common.exitFullScreen' : 'common.fullScreen')}
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? <FullscreenExit /> : <Fullscreen />}
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Stack>
       </Paper>
-
-      {/* 主对话区 */}
+      {error && (
+        <Alert severity="error" onClose={() => setError(undefined)}>
+          {error}
+        </Alert>
+      )}
+      {selectedModel?.providerKind === 'cloudflare' && supportsImage && (
+        <Alert severity="info">{t('ai.chat.license')}</Alert>
+      )}
+      {!catalogLoading && catalog && !catalog.models.some((model) => model.available) && (
+        <Alert severity="info">{t('ai.chat.noModels')}</Alert>
+      )}
       <Paper
-        elevation={0}
-        sx={{
-          flex: 1,
-          p: 2.5,
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2,
-          bgcolor: 'background.default',
-        }}
+        variant="outlined"
+        sx={{ flex: 1, minHeight: 180, p: { xs: 1.5, md: 3 }, overflowY: 'auto' }}
       >
-        {messages.map((msg) => {
-          const isUser = msg.role === 'user';
-          return (
-            <Box
-              key={msg.id}
-              sx={{
-                display: 'flex',
-                flexDirection: isUser ? 'row-reverse' : 'row',
-                gap: 1.5,
-                alignItems: 'flex-start',
-              }}
+        {messages.length === 0 && (
+          <Box sx={{ py: 4, textAlign: 'center' }}>
+            <SmartToy color="primary" sx={{ fontSize: 40 }} />
+            <Typography sx={{ my: 2 }}>{t('ai.chat.welcome')}</Typography>
+            <Stack
+              direction="row"
+              spacing={1}
+              useFlexGap
+              sx={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              {[1, 2, 3, 4].map((index) => (
+                <Chip
+                  key={index}
+                  label={t(`ai.chat.prompt${index}`)}
+                  onClick={() => send(t(`ai.chat.prompt${index}`))}
+                  disabled={!selectedModel?.available || loading}
+                />
+              ))}
+            </Stack>
+          </Box>
+        )}
+        <Stack spacing={2}>
+          {messages.map((message, index) => (
+            <Stack
+              key={message.id}
+              direction="row"
+              spacing={1.5}
+              sx={{ flexDirection: message.role === 'user' ? 'row-reverse' : 'row', gap: 1 }}
             >
               <Avatar
                 sx={{
-                  bgcolor: isUser ? 'secondary.main' : 'primary.main',
-                  width: 36,
-                  height: 36,
+                  width: 32,
+                  height: 32,
+                  bgcolor: message.role === 'user' ? 'secondary.main' : 'primary.main',
                 }}
               >
-                {isUser ? <PersonIcon fontSize="small" /> : <SmartToyIcon fontSize="small" />}
+                {message.role === 'user' ? (
+                  <Person fontSize="small" />
+                ) : (
+                  <SmartToy fontSize="small" />
+                )}
               </Avatar>
-
-              <Box
-                sx={{
-                  maxWidth: '78%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: isUser ? 'flex-end' : 'flex-start',
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    mb: 0.5,
-                  }}
-                >
-                  <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'bold' }}>
-                    {isUser ? t('ai.chat.user') : t('ai.chat.assistant')}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                    {dayjs(msg.timestamp).format('YYYY-MM-DD HH:mm:ss')}
-                  </Typography>
-                </Box>
-
+              <Box sx={{ minWidth: 0, maxWidth: { xs: '85%', md: '80%' } }}>
                 <Paper
-                  elevation={0}
+                  variant="outlined"
                   sx={{
                     p: 2,
-                    borderRadius: 2.5,
-                    borderTopRightRadius: isUser ? 0 : 2.5,
-                    borderTopLeftRadius: isUser ? 2.5 : 0,
-                    bgcolor: isUser ? theme.palette.primary.main : 'background.paper',
-                    color: isUser ? theme.palette.primary.contrastText : 'text.primary',
-                    border: isUser ? 'none' : '1px solid',
-                    borderColor: 'divider',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                    position: 'relative',
-                    '&:hover .copy-btn': { opacity: 1 },
+                    bgcolor: message.role === 'user' ? 'action.hover' : 'background.paper',
+                    overflowWrap: 'anywhere',
                   }}
                 >
-                  <Typography variant="body2" sx={{ lineHeight: 1.6, fontSize: '0.92rem' }}>
-                    {msg.content}
-                  </Typography>
-
-                  {!isUser && (
-                    <IconButton
-                      className="copy-btn"
-                      size="small"
-                      onClick={() => handleCopy(msg.content)}
+                  {message.image && (
+                    <Box
+                      component="img"
+                      src={message.image}
+                      alt={t('ai.chat.attachment')}
                       sx={{
-                        position: 'absolute',
-                        bottom: 4,
-                        right: 4,
-                        opacity: 0,
-                        transition: 'opacity 0.2s',
-                        p: 0.5,
+                        display: 'block',
+                        maxWidth: '100%',
+                        maxHeight: 260,
+                        mb: 1,
+                        borderRadius: 1,
+                      }}
+                    />
+                  )}
+                  {message.role === 'assistant' ? (
+                    <Markdown content={message.content} />
+                  ) : (
+                    <Typography sx={{ whiteSpace: 'pre-wrap' }}>{message.content}</Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    {dayjs(message.timestamp).format('HH:mm')}
+                  </Typography>
+                </Paper>
+                {message.error && (
+                  <Alert severity="error" sx={{ mt: 1 }}>
+                    {message.error}
+                  </Alert>
+                )}
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    size="small"
+                    startIcon={<ContentCopy />}
+                    onClick={() => void copy(message)}
+                  >
+                    {t(copied === message.id ? 'ai.chat.copied' : 'ai.chat.copy')}
+                  </Button>
+                  {message.request && (
+                    <Button
+                      size="small"
+                      startIcon={<Refresh />}
+                      disabled={loading}
+                      onClick={() => {
+                        if (message.request)
+                          void execute(message.request, message, messages.slice(0, index));
                       }}
                     >
-                      <ContentCopyIcon sx={{ fontSize: 14 }} />
-                    </IconButton>
+                      {t('ai.chat.retry')}
+                    </Button>
                   )}
-                </Paper>
+                </Stack>
               </Box>
-            </Box>
-          );
-        })}
-
-        {loading && (
-          <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-            <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
-              <SmartToyIcon fontSize="small" />
-            </Avatar>
-            <Paper
-              elevation={0}
-              sx={{
-                p: 1.5,
-                px: 2.5,
-                borderRadius: 2.5,
-                bgcolor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1.5,
-              }}
-            >
-              <CircularProgress size={16} />
-              <Typography variant="body2" color="text.secondary">
-                {t('ai.chat.thinking')}
-              </Typography>
-            </Paper>
-          </Box>
-        )}
-
-        <div ref={messagesEndRef} />
+            </Stack>
+          ))}
+          {(loading || catalogLoading) && (
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} role="status">
+              <CircularProgress size={20} />
+              <Typography>{t(loading ? 'ai.chat.thinking' : 'ai.chat.loadingModels')}</Typography>
+            </Stack>
+          )}
+          <div ref={end} />
+        </Stack>
       </Paper>
-
-      {/* 快捷推荐 Prompt 词条 */}
-      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', px: 0.5 }}>
-        {quickPrompts.map((promptText) => (
-          <Chip
-            key={promptText}
-            label={promptText}
-            onClick={() => handleSend(promptText)}
-            size="small"
-            variant="outlined"
-            clickable
-            sx={{
-              bgcolor: 'background.paper',
-              borderColor: 'divider',
-              '&:hover': { bgcolor: 'action.hover' },
-            }}
+      {image && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            component="img"
+            src={image}
+            alt={t('ai.chat.preview')}
+            sx={{ maxWidth: 160, maxHeight: 90, borderRadius: 1 }}
           />
-        ))}
-      </Box>
-
-      {/* 输入控制栏 */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: 1.5,
-          display: 'flex',
-          gap: 1.5,
-          alignItems: 'flex-end',
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2,
-          bgcolor: 'background.paper',
-        }}
-      >
+          <IconButton
+            aria-label={t('ai.chat.removeImage')}
+            onClick={() => {
+              uploadGeneration.current += 1;
+              setImage(undefined);
+            }}
+          >
+            <Close />
+          </IconButton>
+        </Box>
+      )}
+      {conversationHasImage && (
+        <Typography variant="caption" color="text.secondary">
+          {t('ai.chat.oneImage')}
+        </Typography>
+      )}
+      {(Boolean(image) || conversationHasImage) && !supportsImage && (
+        <Alert severity="info">{t('ai.chat.imageModelRequired')}</Alert>
+      )}
+      <Paper variant="outlined" sx={{ p: 1, display: 'flex', alignItems: 'flex-end', gap: 1 }}>
+        <input
+          ref={fileInput}
+          type="file"
+          hidden
+          accept="image/png,image/jpeg"
+          onChange={(event) => void uploadImage(event)}
+          data-testid="chat-image-input"
+        />
+        <Tooltip title={t('ai.chat.imageHint')}>
+          <span>
+            <IconButton
+              aria-label={t('ai.chat.attachImage')}
+              disabled={loading || conversationHasImage || !supportsImage}
+              onClick={() => fileInput.current?.click()}
+            >
+              <ImageOutlined />
+            </IconButton>
+          </span>
+        </Tooltip>
         <TextField
           fullWidth
           multiline
-          maxRows={4}
-          minRows={1}
-          placeholder={t('ai.chat.inputPlaceholder')}
+          maxRows={5}
+          variant="standard"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              handleSend();
+          placeholder={t('ai.chat.inputPlaceholder')}
+          onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+              event.preventDefault();
+              send();
             }
           }}
-          variant="standard"
           slotProps={{ input: { disableUnderline: true } }}
-          sx={{ px: 1, py: 0.5 }}
         />
-        <Button
-          variant="contained"
+        <IconButton
           color="primary"
-          disabled={!input.trim() || loading}
-          onClick={() => handleSend()}
-          endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <SendIcon />}
-          sx={{ px: 3, py: 1, borderRadius: 2, whiteSpace: 'nowrap' }}
+          aria-label={t('ai.chat.send')}
+          onClick={() => send()}
+          disabled={
+            loading ||
+            !input.trim() ||
+            !selectedModel?.available ||
+            ((Boolean(image) || conversationHasImage) && !supportsImage)
+          }
         >
-          {t('ai.chat.send')}
-        </Button>
+          <Send />
+        </IconButton>
       </Paper>
     </Box>
   );

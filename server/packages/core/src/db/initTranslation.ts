@@ -10,6 +10,7 @@ import { i18nTranslations } from "../../../admin/src/i18n/translation";
 import { mailTranslations } from "../../../admin/src/mail/translation";
 import { maintenanceTranslations } from "../../../admin/src/maintenance/translation";
 import { recycleBinTranslations } from "../../../admin/src/maintenance/recycle-bin/translation";
+import { cloudflareUsageTranslations } from "../../../admin/src/maintenance/cloudflare-usage/translation";
 import { ossTranslations } from "../../../admin/src/oss/translation";
 import { dataTranslations } from "../../../admin/src/data/translation";
 import { attendanceTranslations } from "../../../enterprise/src/organization/attendance/translation";
@@ -151,6 +152,7 @@ export const initialTranslationData = mapTranslations({
   ...mailTranslations,
   ...maintenanceTranslations,
   ...recycleBinTranslations,
+  ...cloudflareUsageTranslations,
   ...dataTranslations,
   ...ossTranslations,
   ...attendanceTranslations,

@@ -14,6 +14,9 @@ import {
   migratePostgres,
   postgresMigrationChecksum,
   postgresMigrationId,
+  postgresMigrationSql,
+  postgresMigrations,
+  postgresCatalogFingerprint,
   postgresToolOptions,
 } from "../../../scripts/postgresql/migrate";
 import {
@@ -58,6 +61,28 @@ describe.skipIf(!configured)(
     });
     async function enter() {
       await client.query(`SET search_path TO "${schema}", pg_catalog`);
+    }
+    async function installLegacySchema() {
+      await client.query("BEGIN");
+      try {
+        await client.query(`CREATE SCHEMA "${schema}"`);
+        await client.query(`SET LOCAL search_path TO "${schema}", pg_catalog`);
+        await client.query(postgresMigrationSql);
+        await client.query(`CREATE TABLE _one_gate_pg_migrations (
+          id text PRIMARY KEY NOT NULL, checksum text NOT NULL,
+          contract_checksum text NOT NULL, applied_time_utc bigint NOT NULL
+        )`);
+        const fingerprint = await postgresCatalogFingerprint(client, schema);
+        await client.query(
+          "INSERT INTO _one_gate_pg_migrations VALUES($1,$2,$3,$4)",
+          [postgresMigrationId, postgresMigrationChecksum, fingerprint, 1000]
+        );
+        await client.query("COMMIT");
+      } catch (error: unknown) {
+        await client.query("ROLLBACK");
+        throw error;
+      }
+      await enter();
     }
     async function counts() {
       await enter();
@@ -116,11 +141,14 @@ describe.skipIf(!configured)(
       );
       await enter();
       expect(
-        (await client.query("SELECT id,checksum FROM _one_gate_pg_migrations"))
-          .rows
-      ).toEqual([
-        { id: postgresMigrationId, checksum: postgresMigrationChecksum },
-      ]);
+        (
+          await client.query(
+            "SELECT id,checksum FROM _one_gate_pg_migrations ORDER BY id"
+          )
+        ).rows
+      ).toEqual(
+        postgresMigrations.map(({ id, checksum }) => ({ id, checksum }))
+      );
       expect(await counts()).toEqual({
         roles: "0",
         users: "0",
@@ -129,6 +157,177 @@ describe.skipIf(!configured)(
         bindings: "0",
       });
     });
+    it("upgrades the original 0001 ledger only after checking its recorded fingerprint", async () => {
+      await installLegacySchema();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows[0];
+      await client.query(
+        "INSERT INTO base_sys_config(namespace,config_key,is_enabled,is_primary,config_value,creator_id,create_time_utc) VALUES('synthetic','retained',TRUE,TRUE,'{}',1,1)"
+      );
+      expect(await migratePostgres(client, { schema })).toBe("pending");
+      await enter();
+      expect(
+        (
+          await client.query(
+            "SELECT to_regclass('cloudflare_usage_sync') AS name"
+          )
+        ).rows[0].name
+      ).toBeNull();
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "applied"
+      );
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "already_applied"
+      );
+      await enter();
+      const markers = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations ORDER BY id")
+      ).rows;
+      expect(markers).toHaveLength(2);
+      expect(markers[0]).toEqual(prior);
+      expect(markers[1]).toMatchObject({
+        id: "0002_cloudflare_usage",
+        checksum: postgresMigrations[1].checksum,
+      });
+      expect(
+        (
+          await client.query(
+            "SELECT config_key FROM base_sys_config WHERE namespace='synthetic'"
+          )
+        ).rows
+      ).toEqual([{ config_key: "retained" }]);
+      expect(
+        (
+          await client.query(
+            "SELECT count(*)::text AS n FROM cloudflare_usage_sync"
+          )
+        ).rows[0].n
+      ).toBe("0");
+    });
+    it("serializes concurrent installers without duplicate migration markers", async () => {
+      const peer = new Client({
+        connectionString: process.env.ONE_GATE_TEST_POSTGRES_URL,
+      });
+      await peer.connect();
+      try {
+        const statuses = await Promise.all([
+          migratePostgres(client, { schema, apply: true }),
+          migratePostgres(peer, { schema, apply: true }),
+        ]);
+        expect(statuses.sort()).toEqual(["already_applied", "applied"]);
+        await enter();
+        expect(
+          (
+            await client.query(
+              "SELECT id FROM _one_gate_pg_migrations ORDER BY id"
+            )
+          ).rows
+        ).toEqual(postgresMigrations.map(({ id }) => ({ id })));
+      } finally {
+        await peer.end();
+      }
+    });
+    it("rejects drift in a 0001-only schema before creating any 0002 table or marker", async () => {
+      await installLegacySchema();
+      await client.query(
+        "ALTER TABLE system_department DROP CONSTRAINT system_department_soft_delete_state_check"
+      );
+      await expect(migratePostgres(client, { schema })).rejects.toThrow(
+        "fingerprint mismatch"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow("fingerprint mismatch");
+      await enter();
+      expect(
+        (await client.query("SELECT id FROM _one_gate_pg_migrations")).rows
+      ).toEqual([{ id: postgresMigrationId }]);
+      expect(
+        (
+          await client.query(
+            "SELECT to_regclass('cloudflare_usage_snapshot') AS name"
+          )
+        ).rows[0].name
+      ).toBeNull();
+    });
+    it("rolls back the whole fresh installation when 0002 fails after 0001", async () => {
+      await client.query(`CREATE SCHEMA "${schema}"`);
+      await enter();
+      await client.query(
+        "CREATE VIEW cloudflare_usage_sync AS SELECT 7 AS synthetic"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow();
+      const tables = await client.query(
+        "SELECT count(*)::text AS n FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relkind='r'",
+        [schema]
+      );
+      expect(tables.rows[0].n).toBe("0");
+      expect(
+        (await client.query("SELECT synthetic FROM cloudflare_usage_sync"))
+          .rows[0].synthetic
+      ).toBe(7);
+    });
+    it("rolls back a failed 0002 upgrade while preserving the original schema and ledger", async () => {
+      await installLegacySchema();
+      const prior = (
+        await client.query("SELECT * FROM _one_gate_pg_migrations")
+      ).rows;
+      await client.query(
+        "CREATE VIEW cloudflare_usage_sync AS SELECT 7 AS synthetic"
+      );
+      await expect(
+        migratePostgres(client, { schema, apply: true })
+      ).rejects.toThrow();
+      await enter();
+      expect(
+        (await client.query("SELECT * FROM _one_gate_pg_migrations")).rows
+      ).toEqual(prior);
+      expect(
+        (
+          await client.query(
+            "SELECT to_regclass('cloudflare_usage_daily') AS name"
+          )
+        ).rows[0].name
+      ).toBeNull();
+      expect(
+        (
+          await client.query(
+            "SELECT to_regclass('cloudflare_usage_snapshot') AS name"
+          )
+        ).rows[0].name
+      ).toBeNull();
+      expect(
+        (await client.query("SELECT synthetic FROM cloudflare_usage_sync"))
+          .rows[0].synthetic
+      ).toBe(7);
+      await client.query("DROP VIEW cloudflare_usage_sync");
+      expect(await migratePostgres(client, { schema, apply: true })).toBe(
+        "applied"
+      );
+    });
+    it.each(["unknown", "missing-first"])(
+      "rejects an unknown or discontinuous migration ledger: %s",
+      async (kind) => {
+        await migratePostgres(client, { schema, apply: true });
+        await enter();
+        if (kind === "unknown") {
+          await client.query(
+            "INSERT INTO _one_gate_pg_migrations VALUES('9999_unknown','synthetic','synthetic',1)"
+          );
+        } else {
+          await client.query(
+            "DELETE FROM _one_gate_pg_migrations WHERE id=$1",
+            [postgresMigrationId]
+          );
+        }
+        await expect(
+          migratePostgres(client, { schema, apply: true })
+        ).rejects.toThrow("ordered known prefix");
+      }
+    );
     it("refuses unmarked existing tables and preserves their contents", async () => {
       await client.query(`CREATE SCHEMA "${schema}"`);
       await enter();
